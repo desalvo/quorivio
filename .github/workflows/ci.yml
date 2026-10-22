@@ -76,8 +76,16 @@ jobs:
           if [ -f /tmp/quorivio-ci-api.log ]; then tail -60 /tmp/quorivio-ci-api.log; fi
       - name: Vulnerability gate (high and critical)
         run: npm audit --omit=dev --audit-level=high
-      - name: Kubernetes wizard validation
-        run: python3 -m unittest discover -s tools/tests -v
+      - name: Install PDF conversion test dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils
+          python3 -m pip install --disable-pip-version-check --break-system-packages 'reportlab>=4,<5'
+          python3 -c 'import reportlab' # fail gate rather than skipping the PDF rendering test
+      - name: Kubernetes wizard and worker integration tests
+        run: |
+          PYTHONPATH=tools python3 -m unittest discover -s tools/tests -v
+          python3 -m unittest tools.tests.test_import_presentation.TestImport.test_convert_pdf -v
       - name: Ensure generated Kubernetes config is deterministic
         run: |
           python3 tools/k8s_wizard.py --unattended --output /tmp/q-a --set host=quorivio.example.org
@@ -120,6 +128,13 @@ jobs:
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: quorivio:gate
+          severity: CRITICAL,HIGH
+          exit-code: '1'
+          ignore-unfixed: true
+      - name: Scan converter image
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: quorivio-converter:gate
           severity: CRITICAL,HIGH
           exit-code: '1'
           ignore-unfixed: true

@@ -68,8 +68,10 @@ def convert(source,dest):
             p.rename(images/name)
             data=(images/name).read_bytes()
             manifest['pages'].append({'position':i,'image':name,'sha256':hashlib.sha256(data).hexdigest(),'bytes':len(data)})
-        shutil.move(str(images),str(output))
-        (output/'manifest.json').write_text(json.dumps(manifest,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+        # Finish the manifest before publishing the directory; interrupted writes
+        # must not expose an incomplete page set to the API reader.
+        (images/'manifest.json').write_text(json.dumps(manifest,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+        images.rename(output)
         return manifest
 
 if __name__=='__main__':

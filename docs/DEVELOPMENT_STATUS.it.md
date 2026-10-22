@@ -192,3 +192,39 @@ Docker/Podman Compose now bundles a private ClamAV service and persists its sign
 - Le cache già tracciate da Git richiedono la rimozione dall'indice da parte del manutentore (`git rm --cached`); non serve riscrivere la cronologia.
 - Ultimo commit confermato: hotfix di sicurezza Nodemailer. Modifiche successive: fixture TOTP e pulizia cache Python. Nessun commit eseguito.
 - Stime invariati: 98% funzionale e 35% readiness; CI reale ancora da verificare.
+
+## Baseline CI verde e sicurezza delle conversioni (2026-10-22)
+- L'utente ha confermato commit della pulizia delle cache Python e CI verde: questa è la nuova baseline dei futuri messaggi di commit; sostituisce gli esiti CI storici riportati sopra.
+- Worker isolato: rifiuto di output preesistenti e symlink, protezione da conversioni simultanee dello stesso job nella singola istanza, rilascio della prenotazione anche in caso di errore; HTTP 413 per richieste eccessive.
+- CI: aggiunta scansione Trivy HIGH/CRITICAL anche per l'immagine `quorivio-converter:gate`, senza indebolire gli altri controlli.
+- 3 nuovi test di regressione. Verifiche locali: 82/82 Node, 43/43 Python, eseguiti senza scrittura bytecode Python.
+- Ancora da verificare nella CI reale il nuovo gate Trivy; non eseguiti collaudi browser/conversione reale/multi-pod. Il blocco anti-duplicazione è locale al worker, non un lock distribuito.
+- Nessun commit, push, tag o release eseguito.
+
+## 2026-10-22 — Prenotazione delle conversioni fra processi (non committata)
+- Aggiunta prenotazione atomica `.conversion-lock` per ogni lavoro sul volume temporaneo condiviso. Impedisce doppie conversioni simultanee anche su processi/worker differenti che usano lo stesso filesystem.
+- In caso di arresto improvviso il blocco rimane: verificare il job prima della rimozione manuale, evitando recuperi automatici rischiosi.
+- Test di regressione su prenotazione già presente, ciclo di vita e pulizia su errore. Esito locale: 82/82 Node e 46/46 Python.
+- Baseline ultimo commit confermato con CI verde (pulizia cache Python); nel package rimangono cumulativamente hardening worker e scansione Trivy. Non effettuati commit o push.
+- Da verificare: nuova CI, test multi-worker su volume reale e collaudi end-to-end/deployment.
+
+## Recupero amministrativo delle conversioni interrotte (2026-10-22, non committato)
+
+- Aggiunto `tools/recover_conversion_lock.py`: ispezione non distruttiva predefinita e recupero esplicito solo con `--recover --workers-stopped`, dopo l'arresto di tutti i worker che montano lo stesso volume.
+- Rifiuta identificativi non validi, percorsi o blocchi simbolici, prenotazioni non vuote, sorgenti ambigue e output già esistenti. Non effettua mai recuperi automatici potenzialmente concorrenti.
+- Aggiunte guide operative IT/EN e sette test. Verifiche locali: **82/82 Node** e **53/53 Python**; restano i collaudi end-to-end in container, multi-worker reale, database e browser.
+- Versione `0.1.0-dev`, nessun commit. Il prossimo messaggio di commit deve includere tutte le modifiche dall'ultimo commit confermato: hardening converter, Trivy, locking distribuito e recupero manuale.
+
+## 2026-10-22 — Integrità della pubblicazione e sorgenti ambigue (non committato)
+- Reject ambiguous PDF/PPTX jobs with two valid sources; require exactly one.
+- Generate page manifest in private staging before atomically renaming the completed page directory into place, avoiding partially published output.
+- Unit tests: 82/82 Node, 55/55 Python pass. Real image builds, multi-worker NFS/PVC semantics and browser import remain to be confirmed in CI/deployment.
+- Last confirmed commit: Python cache cleanup with green CI. All converter/Trivy/recovery changes since then remain uncommitted. Version unchanged: 0.1.0-dev.
+
+## 2026-10-22 — Ciclo integrato per verifiche release candidate (non committato)
+- Aggiunti test HTTP reali del worker privato: autenticazione, conversione, rifiuto richieste errate, limite 413, stato 503 e rilascio lock.
+- Rafforzato l'import PDF/PPTX: l'API verifica formato/versione manifest, tipo e SHA-256 del sorgente, ordine e posizione delle pagine, firma PNG e checksum prima della registrazione.
+- CI: prerequisiti Poppler/ReportLab espliciti, con rendering PDF obbligatorio anziché test opzionalmente saltato.
+- Nuove checklist di consegna `docs/RELEASE_CANDIDATE_READINESS.{it,en}.md`.
+- Test locali: 82/82 Node, 60/60 Python. Baseline ultimo commit utente: pulizia cache e CI verde. Rimangono cumulativamente non committati: hardening converter, Trivy, lock condivisi, recupero manuale, pubblicazione atomica e questo ciclo.
+- **RC BLOCCATA** fino a nuova CI e collaudi reali Docker/Podman/browser/HA. Versione invariata 0.1.0-dev; nessun commit, tag o rilascio effettuato.

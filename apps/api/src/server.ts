@@ -422,16 +422,19 @@ app.post('/api/sessions/:id/presentation-import',requireAuth,async(req,res)=>{
    if(!reply.ok)throw Error('conversion_worker_failed');
   }finally{clearTimeout(deadline)}
   const manifest=JSON.parse(await readFile(path.join(output,'manifest.json'),'utf8'));
-  if(!Number.isInteger(manifest.page_count)||manifest.page_count<1||manifest.page_count>200||manifest.pages?.length!==manifest.page_count)throw Error('invalid_conversion_manifest');
+  if(manifest.format!=='quorivio-presentation-pages'||manifest.version!==1||!Number.isInteger(manifest.page_count)||manifest.page_count<1||manifest.page_count>200||!Array.isArray(manifest.pages)||manifest.pages.length!==manifest.page_count)throw Error('invalid_conversion_manifest');
+  const expectedSourceType=mime==='application/pdf'?'pdf':'pptx';
+  const sourceHash=createHash('sha256').update(await readFile(source)).digest('hex');
+  if(manifest.source_type!==expectedSourceType||manifest.source_sha256!==sourceHash)throw Error('invalid_conversion_source');
   const folder=path.join(assetRoot,s.id);await mkdir(folder,{recursive:true});
   await cx.query('BEGIN');transaction=true;
   const next=await cx.query('SELECT COALESCE(MAX(position),-1)+1 AS p FROM activities WHERE session_id=$1',[s.id]);
   const ids:string[]=[];
   for(let i=0;i<manifest.pages.length;i++){
    const entry=manifest.pages[i],filename=String(entry.image);
-   if(!/^page-[0-9]{4}\.png$/.test(filename))throw Error('invalid_page_filename');
+   if(filename!==`page-${String(i+1).padStart(4,'0')}.png`||entry.position!==i+1)throw Error('invalid_page_filename');
    const contents=await readFile(path.join(output,filename));
-   if(contents.length!==entry.bytes||createHash('sha256').update(contents).digest('hex')!==entry.sha256)throw Error('invalid_page_checksum');
+   if(contents.length<8||!contents.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10]))||contents.length!==entry.bytes||createHash('sha256').update(contents).digest('hex')!==entry.sha256)throw Error('invalid_page_checksum');
    const aid=randomUUID(),assetId=randomUUID(),dest=path.join(folder,assetId);
    await writeFile(dest,contents,{flag:'wx',mode:0o600});created.push(dest);
    await cx.query('INSERT INTO session_assets(id,session_id,uploaded_by,mime_type,byte_size,sha256) VALUES($1,$2,$3,$4,$5,$6)',[assetId,s.id,auth(req),'image/png',contents.length,entry.sha256]);

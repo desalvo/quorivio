@@ -367,3 +367,39 @@ Docker/Podman Compose now bundles a private ClamAV service and persists its sign
 - Note: caches already committed to Git remain tracked until the maintainer explicitly untracks them with `git rm --cached`; no Git history rewrite is required.
 - Latest confirmed commit is the Nodemailer security hotfix. Changes since that commit include the TOTP test-fixture fix and this Python cache cleanup; commit only at user discretion.
 - Functional coverage and production readiness estimates remain 98% / 35%; pending live CI validation.
+
+## CI-green baseline and converter concurrency hardening (2026-10-22)
+- Maintainer confirmed committing the Python-cache cleanup and reported green CI. This supersedes earlier historical CI-pending/failed status above; the latest user-confirmed commit is the baseline for future commit descriptions.
+- Hardened private conversion worker: reject pre-existing output directories and symlink outputs, prevent simultaneous conversion of the same job in a worker instance, release reservation on success/failure, and return HTTP 413 for oversized requests.
+- Added high/critical Trivy image scan for `quorivio-converter:gate` to CI without relaxing the runtime-image security gate.
+- Added 3 regression tests. Current local verification: 82/82 Node and 43/43 Python PASS, Python executed with bytecode generation disabled.
+- Still requires CI rerun for the new converter image scan; live multi-pod/multi-process and browser conversion checks are not yet demonstrated. In-process duplicate-job protection is not a distributed lock; separate converter replicas must coordinate via storage/queue in a production HA design.
+- No commit, push, release or tag performed.
+
+## 2026-10-22 — Cross-process conversion reservation (uncommitted)
+- Extended private PDF/PPTX conversion worker with an atomic per-job `.conversion-lock` directory on its shared conversion volume. Protects against duplicate conversions across worker processes or pods mounting the same filesystem, in addition to the in-process reservation.
+- Preserve lock on abrupt process termination to fail closed; operator must investigate abandoned jobs before manually clearing such a reservation. Do not automatically delete a lock whose owner status is unknown.
+- New regression tests cover pre-existing shared reservations, lock lifecycle during conversion, and cleanup on conversion failure. Local tests: Node 82/82, Python 46/46 pass.
+- Baseline is the last maintainer-confirmed CI-green Python-cache cleanup commit. No subsequent commit confirmed; package cumulatively includes earlier converter hardening and converter-image Trivy gate.
+- Pending: rerun CI for these changes; live multi-worker shared-volume and crash-recovery tests, end-to-end browser and real deployment acceptance. No commit/push/tag performed.
+
+## Manual recovery of crashed shared conversion jobs (2026-10-22, uncommitted)
+
+- Added `tools/recover_conversion_lock.py`, an operator-only, offline lock inspection and recovery utility. Read-only by default; removal requires `--recover --workers-stopped` after **all** workers on the shared conversion volume have been stopped.
+- The recovery tool refuses invalid IDs, unsafe or symlinked lock paths, nonempty reservations, ambiguous source files, and jobs with existing output. It intentionally does **not** attempt to infer that an active worker has stopped or automatically steal a lock.
+- Added `docs/CONVERSION_RECOVERY.en.md` and `.it.md` with safety steps, plus seven tests for safe recovery behavior.
+- Local verification: Node **82/82**, Python **53/53** passed. Full container, concurrent worker, PostgreSQL and browser end-to-end verification remain pending. Keep version `0.1.0-dev` and preserve uncommitted status. Commit summary must include all changes since the last user-confirmed commit: converter hardening, Trivy gate, cross-worker locking, and manual recovery.
+
+## 2026-10-22 — Conversion publish integrity and source ambiguity (uncommitted)
+- Reject ambiguous PDF/PPTX jobs with two valid sources; require exactly one.
+- Generate page manifest in private staging before atomically renaming the completed page directory into place, avoiding partially published output.
+- Unit tests: 82/82 Node, 55/55 Python pass. Real image builds, multi-worker NFS/PVC semantics and browser import remain to be confirmed in CI/deployment.
+- Last confirmed commit: Python cache cleanup with green CI. All converter/Trivy/recovery changes since then remain uncommitted. Version unchanged: 0.1.0-dev.
+
+## 2026-10-22 — RC readiness integration batch (uncommitted)
+- Added private HTTP worker integration tests: authenticated conversion, malformed requests, 413 size limits, 503 not-ready response and safe lock release.
+- Strengthened API validation of converted slide manifests: expected format/version, exact source type and SHA-256, sequential page names/positions and PNG magic bytes in addition to existing per-file SHA-256 and size checks.
+- CI now explicitly installs and checks PDF rendering test prerequisites; runs actual Poppler/ReportLab conversion rather than silently permitting the optional rendering test to skip.
+- Added `docs/RELEASE_CANDIDATE_READINESS.{en,it}.md` to distinguish offline checks from required operational and GitHub acceptance.
+- Local: 82/82 Node, 60/60 Python. Last maintainer-confirmed commit is the Python-cache-cleanup CI-green baseline. All converter hardening, Trivy, shared locking, manual recovery, atomic publishing and this batch are uncommitted cumulatively.
+- **RC status: BLOCKED** until fresh CI (with image scans) and real Docker/Podman/browser/HA acceptance. Preserve version 0.1.0-dev. No commits, tags or releases by assistant. Historical status sections above reflect their time, not the current latest gate.
