@@ -1,0 +1,1 @@
+{"name":"quorivio","version":"0.1.0-dev","private":true,"type":"module","workspaces":["apps/api","apps/web"],"scripts":{"dev:api":"npm run dev -w @quorivio/api","dev:web":"npm run dev -w @quorivio/web","build":"npm run build -w @quorivio/api && npm run build -w @quorivio/web","test":"npm run test -w @quorivio/api"},"engines":{"node":">=22"}}

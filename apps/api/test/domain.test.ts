@@ -1,0 +1,5 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {validTransition,validateOptions,checkAnswer,publicActivity} from '../src/domain.ts';
+test('closed sessions cannot reopen',()=>{assert.equal(validTransition('closed','active'),false);assert.equal(validTransition('draft','active'),true)});
+test('options must be unique and valid',()=>{assert.equal(validateOptions([{id:'x',label:'A'},{id:'x',label:'B'}]),false);assert.equal(validateOptions([{id:'x',label:'A'},{id:'y',label:'B'}]),true)});
+test('quiz answers checked exclusively server-side',()=>{assert.equal(checkAnswer({type:'quiz',correct_option_id:'y',options:[]},'x'),false);assert.equal(checkAnswer({type:'quiz',correct_option_id:'y',options:[]},'y'),true)});
+test('correct answer must not leak into participant activity',()=>{assert.equal('correct_option_id' in publicActivity({id:'x',session_id:'s',type:'quiz',title:'?',options:[],correct_option_id:'secret',duration_seconds:null,status:'open',position:0}),false)});

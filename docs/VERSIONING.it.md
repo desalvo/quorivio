@@ -1,0 +1,2 @@
+# Versionamento
+Versione iniziale `0.1.0-dev`. I tag Git (es. `v0.1.0` oppure `v0.1.0-r1`) vengono pubblicati su Docker Hub con **identico** testo; i push su `main` pubblicano `latest`. La CI non incrementa la versione. Revisione e build sono identificatori distinti (numero esecuzione CI e SHA Git), secondo la separazione versione/revisione/build adottata per MTA. La sintassi esatta delle build estese dovrà essere confermata prima di generare package specifici.

@@ -1,0 +1,2 @@
+# Architettura (IT)
+Backend Express/TypeScript e frontend React/Vite in un unico container applicativo, PostgreSQL come archivio persistente. WebSocket per snapshot in tempo reale. Sessioni separate per presentatore/organizzazione; autenticazione locale di sviluppo. Worker, broker OIDC/SAML/AAI INFN, coordinamento distribuito multi-replica, import PowerPoint/PDF e S3 sono funzionalità future. La persistenza in PostgreSQL non implica automaticamente alta disponibilità né orchestrazione multi-replica. Consultare `ARCHITECTURE.md` e `DEVELOPMENT_STATUS.md`.

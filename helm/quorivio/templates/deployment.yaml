@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-quorivio
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels: {app: quorivio, release: {{ .Release.Name }}}
+  template:
+    metadata:
+      labels: {app: quorivio, release: {{ .Release.Name }}}
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: quorivio
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports: [{name: http, containerPort: 8080}]
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: PORT
+              value: "8080"
+            - name: PUBLIC_BASE_URL
+              value: {{ .Values.publicBaseUrl | quote }}
+            - name: DATABASE_URL
+              valueFrom: {secretKeyRef: {name: {{ .Values.existingSecret }}, key: DATABASE_URL}}
+            - name: AUTH_SECRET
+              valueFrom: {secretKeyRef: {name: {{ .Values.existingSecret }}, key: AUTH_SECRET}}
+            - name: ADMIN_EMAIL
+              valueFrom: {secretKeyRef: {name: {{ .Values.existingSecret }}, key: ADMIN_EMAIL}}
+            - name: ADMIN_PASSWORD
+              valueFrom: {secretKeyRef: {name: {{ .Values.existingSecret }}, key: ADMIN_PASSWORD}}
+          readinessProbe:
+            httpGet: {path: /api/health/ready, port: http}
+            initialDelaySeconds: 5
+          livenessProbe:
+            httpGet: {path: /api/health/live, port: http}
+            initialDelaySeconds: 10
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: {drop: [ALL]}
+            readOnlyRootFilesystem: true
+          resources:
+{{ toYaml .Values.resources | indent 12 }}

@@ -1,0 +1,2 @@
+# Versioning
+The project starts at `0.1.0-dev` (package version). A Git tag (for example `v0.1.0` or `v0.1.0-r1`) is published to Docker Hub with the **identical** tag text; a push to `main` publishes `latest`. No build increments the project version. Revision/build identifiers can be recorded separately (CI run number and commit SHA), in the MTA-style version / revision / build separation. Release policy and exact RPM-style extended build convention must be confirmed before producing packages, not guessed.

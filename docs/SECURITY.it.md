@@ -1,0 +1,2 @@
+# Sicurezza (IT)
+Sono predisposti controlli iniziali: cookie HttpOnly, controllo Origin, limiti richieste, parametrizzazione SQL, segregazione owner lato API e controlli su risposte. Restano da verificare: isolamento completo multi-tenant, autorizzazione WebSocket, protezione CSRF, hardening container, scansione vulnerabilità e test avversariali. La CI applica test, npm audit e scansione immagine con Trivy prima della pubblicazione. Nessuna certificazione AgID è attestata. Per l'elenco effettivo consultare `SECURITY.md` e `DEVELOPMENT_STATUS.md`.
