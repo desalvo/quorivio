@@ -239,3 +239,9 @@ Docker/Podman Compose now bundles a private ClamAV service and persists its sign
 - Validation: Node and Python offline suites, TypeScript/TSX syntax checks; full npm CI, PostgreSQL migration, browser interactions and real SMTPS connectivity remain **unverified** for this cycle. Version remains `0.1.0-dev`, RC acceptance blocked.
 - Last user-confirmed commit: RC-readiness-integration cumulative with green CI. All the changes above are subsequent, uncommitted work.
 - Next priorities: operational end-to-end verification, UX polishing, MFA notification path, SSO configuration UI, full calendar presentation, and validation that the database migration works against existing installations.
+
+## Correzione CI TypeScript navigazione (2026-10-23)
+- **Errore osservato nella CI:** `apps/web/src/main.tsx`, TS2345 nella navigazione admin: le voci condizionali venivano inferite come `string[][]`, perdendo il tipo letterale accettato da `setDashboardPage`.
+- **Correzione:** tuple letterali (`as const`) nelle sole voci riservate agli admin, preservando il controllo statico TypeScript senza cast del parametro o ampliamento del tipo dello stato.
+- **Regressione:** aggiunto `tools/tests/test_dashboard_navigation_types.py`. Resta necessaria una nuova build npm completa tramite GitHub Actions per confermare la compilazione.
+- Restano inclusi gli interventi del precedente collaudo; versione invariata, nessun commit effettuato.
