@@ -61,7 +61,7 @@ jobs:
           load: true
           tags: quorivio:gate
       - name: Scan runtime image
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: quorivio:gate
           severity: CRITICAL,HIGH
