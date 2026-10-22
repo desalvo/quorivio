@@ -170,3 +170,11 @@ Docker/Podman Compose now bundles a private ClamAV service and persists its sign
 - Nuovi test di contratto e guide `CI_INTEGRATION.it.md` e `.en.md`.
 - Mancano nell'ambiente corrente le dipendenze npm e Docker: compilazione completa, test Postgres reale e pipeline remota **non sono verificati**. Il proprietario può eseguire la CI e fornire il primo log di errore. Non dichiarare il 100% né la readiness per produzione.
 - Stime invariate: **98% funzionale**, **35% readiness**.
+
+
+## CI 107927415489: correzione dipendenza vulnerabile (22/10/2026)
+- PASS confermati: test unitari (82), compilazione frontend/backend, avvio su PostgreSQL 18, endpoint di salute, bootstrap e autorizzazioni di base.
+- FAIL confermato: `npm audit` sulle dipendenze di produzione; Nodemailer 6 vulnerabile HIGH.
+- Modifica: `nodemailer: ^10.2.1` e rimozione di `@types/nodemailer`, non più necessario.
+- PENDENTE: nuova installazione npm, compilazione/audit in GitHub Actions e build container. **Non dichiarare la CI verde prima della riesecuzione.**
+- Baseline commit: l'utente ha confermato il commit precedente; il prossimo messaggio di commit riguarda solo questa correzione e documentazione.

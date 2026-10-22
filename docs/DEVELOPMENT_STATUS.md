@@ -344,3 +344,11 @@ Docker/Podman Compose now bundles a private ClamAV service and persists its sign
 - Added Python CI contract tests and bilingual handoff instructions (`CI_INTEGRATION.it.md`, `.en.md`).
 - Local Node/Python suite passes; **not verified in this container:** npm install/build, actual PostgreSQL startup, Docker/Podman image build, GitHub CI execution, real-cluster deployments. The repository owner can now run the CI gate and return first failing logs. Do not claim 100% product completion or production acceptance.
 - Estimates unchanged pending live evidence: **98% functional coverage**, **35% production readiness**.
+
+
+## CI run 107927415489: dependency security fix (2026-10-22)
+- Confirmed PASS: unit tests (82), frontend/backend compilation, live PostgreSQL 18 bootstrap, health probes, initial authorization checks.
+- Confirmed FAIL: npm production dependency audit. Nodemailer 6 flagged HIGH.
+- Code change: `apps/api/package.json` now requires `nodemailer: ^10.2.1` and removes `@types/nodemailer` (bundled TypeScript declarations).
+- PENDING: updated npm install, full build/audit on GitHub Actions, and container gates. **Do not claim CI green before the rerun.**
+- Commit baseline: the user confirmed committing the prior CI integration gate package; the suggested next commit only contains this security dependency remediation plus docs.
