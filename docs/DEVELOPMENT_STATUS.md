@@ -1,3 +1,7 @@
+## 2026-10-23 — Phase 2 field-validation follow-up
+
+See `docs/VALIDATION_PHASE2_ISSUES.it.md` / `.en.md` for completed work, unverified UI, and pending calendar/editor work.
+
 ## 2026-10-22 — Streaming asset upload hardening
 
 - Replaced 100 MB whole-body buffering for presenter and participant raw uploads with bounded streaming to private temporary files, incremental SHA-256 and signature checks, atomic file placement and cleanup on error.
