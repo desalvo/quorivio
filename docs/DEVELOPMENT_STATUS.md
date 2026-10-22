@@ -58,3 +58,10 @@ Current implementation is a prototype and **must not be described as fully end-t
 - Added GDPR IT/EN implementation registers with data inventory, known gaps, required external legal/operational decisions. Added automated check for presence of both registers.
 - Python wizard suite expanded to **11 passing tests** (confirm with command output); PostgreSQL, ingress, CI, Kubernetes and complete app tests are **not validated in runtime**. Existing PDF manuals remain the previous edition and need regeneration when runtime behavior is verified.
 - No git commit, tag, release or production deployment performed.
+
+## CI hotfix — missing npm lockfile (2026-10-22)
+
+- Inspected GitHub Actions run logs `logs_107772108116.zip`: `actions/setup-node@v4` failed before package installation because `cache: npm` requires an npm lockfile, which is absent.
+- Removed npm cache configuration from setup-node, preserving the remaining production quality gate, image build gate and publication gate. This unblocks the *setup-node* failure only, not a guarantee of overall CI success.
+- Attempt to generate a real lockfile via `npm install --package-lock-only` timed out due unavailable npm registry access in the build environment. Do NOT fabricate a lockfile. Next release-hardening step: generate and commit `package-lock.json`, change installation to `npm ci`, restore npm caching and rerun the full CI.
+- `python3 -m unittest discover -s tools/tests -q`: 11 tests passed; npm build/tests and GitHub CI not executed locally.
