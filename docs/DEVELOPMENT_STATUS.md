@@ -65,3 +65,9 @@ Current implementation is a prototype and **must not be described as fully end-t
 - Removed npm cache configuration from setup-node, preserving the remaining production quality gate, image build gate and publication gate. This unblocks the *setup-node* failure only, not a guarantee of overall CI success.
 - Attempt to generate a real lockfile via `npm install --package-lock-only` timed out due unavailable npm registry access in the build environment. Do NOT fabricate a lockfile. Next release-hardening step: generate and commit `package-lock.json`, change installation to `npm ci`, restore npm caching and rerun the full CI.
 - `python3 -m unittest discover -s tools/tests -q`: 11 tests passed; npm build/tests and GitHub CI not executed locally.
+
+## CI hotfix — Trivy Action tag resolution (2026-10-22)
+
+- Inspected `logs_107774225598.zip`: production quality gate passed (four domain tests, frontend/backend build, audit 0 findings, Kubernetes validation and secret scan). Container build job failed **during action resolution** before image build: `aquasecurity/trivy-action@0.33.1` is not an available tag.
+- Fixed `.github/workflows/ci.yml` to use the published release `aquasecurity/trivy-action@v0.36.0` (note the `v` prefix), keeping the blocking HIGH/CRITICAL scan.
+- GitHub CI must be rerun to verify image build and scanning. Container scanning and deployment are not yet validated.
