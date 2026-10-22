@@ -3,7 +3,7 @@
 import argparse, json, re, sys
 from pathlib import Path
 
-DEFAULTS = {'namespace':'quorivio','name':'quorivio','image':'desalvo/quorivio:latest','host':'quorivio.example.org','replicas':1,'container_port':8080,'postgres_mode':'internal','postgres_image':'postgres:18.6-alpine','postgres_host':'postgresql','postgres_port':5432,'postgres_sslmode':'require','ingress_controller':'nginx','haproxy_variant':'community','ingress_class':'','postgres_host':'postgresql','postgres_database':'quorivio','postgres_user':'quorivio','secret_name':'quorivio-app-secrets','tls_secret':'quorivio-tls','storage_class':'','cpu_request':'100m','memory_request':'256Mi','cpu_limit':'1000m','memory_limit':'1Gi'}
+DEFAULTS = {'namespace':'quorivio','name':'quorivio','image':'desalvo/quorivo:latest','host':'quorivio.example.org','replicas':1,'max_upload_mb':100,'container_port':8080,'postgres_mode':'internal','postgres_image':'postgres:18.6-alpine','postgres_host':'postgresql','postgres_port':5432,'postgres_sslmode':'require','ingress_controller':'nginx','haproxy_variant':'community','ingress_class':'','postgres_host':'postgresql','postgres_database':'quorivio','postgres_user':'quorivio','secret_name':'quorivio-app-secrets','tls_secret':'quorivio-tls','storage_class':'','asset_storage_class':'','asset_storage_size':'10Gi','asset_access_mode':'ReadWriteOnce','cpu_request':'100m','memory_request':'256Mi','cpu_limit':'1000m','memory_limit':'1Gi'}
 FIELDS = tuple(DEFAULTS)
 def quote(s): return json.dumps(str(s), ensure_ascii=False)
 def validate(cfg):
@@ -16,13 +16,17 @@ def validate(cfg):
     if not re.fullmatch(r'[A-Za-z0-9._:/@+-]+',cfg['postgres_image']):raise ValueError('Invalid PostgreSQL image')
     if cfg['ingress_class'] and not re.fullmatch(r'[a-z0-9]([-a-z0-9]*[a-z0-9])?',cfg['ingress_class']):raise ValueError('Invalid ingress class')
     if cfg['storage_class'] and not re.fullmatch(r'[a-z0-9]([-a-z0-9.]*[a-z0-9])?',cfg['storage_class']):raise ValueError('Invalid storage class')
+    if cfg['asset_storage_class'] and not re.fullmatch(r'[a-z0-9]([-a-z0-9.]*[a-z0-9])?',cfg['asset_storage_class']):raise ValueError('Invalid asset storage class')
+    if not re.fullmatch(r'[1-9][0-9]*(Mi|Gi|Ti)',cfg['asset_storage_size']):raise ValueError('Invalid asset storage size')
+    if cfg['asset_access_mode'] not in ('ReadWriteOnce','ReadWriteMany'):raise ValueError('Invalid asset access mode')
     if cfg['postgres_mode'] not in ('internal','external'):raise ValueError('Invalid postgres_mode')
     if cfg['ingress_controller'] not in ('nginx','haproxy'):raise ValueError('Invalid ingress_controller')
     if cfg['haproxy_variant'] not in ('community','haproxytech'):raise ValueError('Invalid haproxy_variant')
     if cfg['postgres_sslmode'] not in ('require','verify-full','verify-ca','disable'):raise ValueError('Invalid sslmode')
     if cfg['postgres_mode']=='external' and (cfg['postgres_host']=='postgresql' or cfg['postgres_sslmode']=='disable'):raise ValueError('External PostgreSQL requires dedicated host and TLS')
     if not 1<=int(cfg['postgres_port'])<=65535:raise ValueError('Invalid postgres_port')
-    if int(cfg['replicas']) != 1:raise ValueError('Only one API replica supported until a shared WebSocket event bus exists')
+    if not isinstance(cfg['max_upload_mb'],int) or not 1<=cfg['max_upload_mb']<=1024:raise ValueError('max_upload_mb must be 1..1024')
+    if int(cfg['replicas']) > 1 and cfg['asset_access_mode'] != 'ReadWriteMany':raise ValueError('Multiple API replicas require ReadWriteMany asset storage')
     if int(cfg['replicas'])<1 or int(cfg['replicas'])>20:raise ValueError('replicas must be 1-20')
     if not 1<=int(cfg['container_port'])<=65535:raise ValueError('Invalid port')
     for k in ('postgres_host','postgres_database','postgres_user','secret_name','tls_secret','cpu_request','memory_request','cpu_limit','memory_limit'):
@@ -33,6 +37,7 @@ def generate(cfg,out):
     out.mkdir(parents=True,exist_ok=True)
     name=cfg['name'];ns=cfg['namespace'];port=int(cfg['container_port'])
     klass=cfg['ingress_class'] or cfg['ingress_controller']
+    upload_annotation=('    nginx.ingress.kubernetes.io/proxy-body-size: '+quote(str(cfg['max_upload_mb'])+'m')+'\n') if cfg['ingress_controller']=='nginx' else (('    haproxy.org/max-body-size: '+quote(str(cfg['max_upload_mb']*1024*1024)+'')+'\n') if cfg['haproxy_variant']=='haproxytech' else '')
     legacy= ('    kubernetes.io/ingress.class: '+quote(klass)+'\n' if cfg['haproxy_variant']=='community' else '    haproxy.org/ingress.class: '+quote(klass)+'\n') if cfg['ingress_controller']=='haproxy' else ''
     dbhost=(name+'-postgres') if cfg['postgres_mode']=='internal' else cfg['postgres_host']
     files={
@@ -44,6 +49,8 @@ metadata:
   namespace: {ns}
 data:
   NODE_ENV: production
+  MAX_UPLOAD_MB: {quote(cfg['max_upload_mb'])}
+  QUORIVIO_ASSET_DIR: /app/assets
   PORT: {quote(port)}
   PUBLIC_BASE_URL: {quote('https://'+cfg['host'])}
   PGHOST: {quote(dbhost)}
@@ -110,6 +117,9 @@ spec:
             capabilities:
               drop: [ALL]
             readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: assets
+              mountPath: /app/assets
           resources:
             requests:
               cpu: {quote(cfg['cpu_request'])}
@@ -117,6 +127,21 @@ spec:
             limits:
               cpu: {quote(cfg['cpu_limit'])}
               memory: {quote(cfg['memory_limit'])}
+      volumes:
+        - name: assets
+          persistentVolumeClaim:
+            claimName: {name}-assets
+''',
+      '15-assets-pvc.yaml':f'''apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {name}-assets
+  namespace: {ns}
+spec:
+  accessModes: [{cfg['asset_access_mode']}]
+{('  storageClassName: '+cfg['asset_storage_class']+chr(10)) if cfg['asset_storage_class'] else ''}  resources:
+    requests:
+      storage: {cfg['asset_storage_size']}
 ''',
       '30-service.yaml':f'''apiVersion: v1
 kind: Service
@@ -137,7 +162,7 @@ kind: Ingress
 metadata:
   name: {name}
   namespace: {ns}
-{('  annotations:' + chr(10) + legacy) if legacy else ''}spec:
+{('  annotations:' + chr(10) + legacy + upload_annotation) if (legacy or upload_annotation) else ''}spec:
   ingressClassName: {klass}
   tls:
     - hosts: [{cfg['host']}]
@@ -159,6 +184,7 @@ kind: Kustomization
 resources:
   - 00-namespace.yaml
   - 10-configmap.yaml
+  - 15-assets-pvc.yaml
   - 20-deployment.yaml
   - 30-service.yaml
   - 40-ingress.yaml

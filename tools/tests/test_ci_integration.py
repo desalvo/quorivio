@@ -1,0 +1,28 @@
+"""Static guarantees for CI's real-database boot smoke gate."""
+from pathlib import Path
+import unittest
+
+ROOT = Path(__file__).resolve().parents[2]
+
+class CiIntegrationTests(unittest.TestCase):
+    def test_postgres_service_and_live_boot_smoke(self):
+        flow = (ROOT / '.github/workflows/ci.yml').read_text()
+        for token in ('postgres:18-alpine', 'Start API against real PostgreSQL',
+                      'api/health/ready', 'api/health/live', 'Assert database bootstrapping',
+                      'widget_answers', 'auth_flows', 'api_rate_windows'):
+            self.assertIn(token, flow)
+
+    def test_converter_build_and_scan_are_gated(self):
+        flow = (ROOT / '.github/workflows/ci.yml').read_text()
+        self.assertIn('file: Dockerfile.converter', flow)
+        self.assertIn('quorivio-converter:gate', flow)
+        self.assertIn('image-ref: quorivio:gate', flow)
+        self.assertIn('needs: [validate, image-build]', flow)
+
+    def test_password_reset_throttle_is_shared(self):
+        server = (ROOT / 'apps/api/src/server.ts').read_text()
+        self.assertNotIn('resetRequests=new Map', server)
+        self.assertIn('password-reset:', server)
+        self.assertIn('INSERT INTO api_rate_windows(client_hash,bucket,hits)', server)
+
+if __name__ == '__main__': unittest.main()

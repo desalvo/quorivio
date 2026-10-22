@@ -24,3 +24,12 @@
 | DPIA | pendente | valutazione necessità ed eventuale esecuzione |
 
 Non definire una sessione «rigorosamente anonima» senza prove sulla non riconducibilità dei dati. PostgreSQL non deve essere esposto pubblicamente. I manuali sono istruzioni, non una certificazione di conformità.
+
+## Ciclo di sviluppo: controlli operativi introdotti
+- `PATCH /api/sessions/:id/retention` consente al proprietario di fissare la conservazione della sessione fra 1 e 3650 giorni (predefinito: 90). Il valore conta dalla creazione; la cancellazione automatica avviene solo quando la sessione è chiusa o scaduta.
+- `POST /api/sessions/:id/revoke` chiude la sessione, fa scadere l'accesso pubblico, ruota link e codice, disconnette le sottoscrizioni WebSocket.
+- `DELETE /api/sessions/:id` cancella la sessione e, con i vincoli PostgreSQL `ON DELETE CASCADE`, attività, risposte e partecipanti associati. Non cancella copie già esportate e backup: documentare il ciclo di vita dei backup prima del rilascio.
+- Le esportazioni CSV neutralizzano le celle potenzialmente interpretabili come formule.
+- Un partecipante che ripete il join con un cookie valido mantiene la stessa identità tecnica e le risposte confermate.
+
+**Limiti:** prove reali con PostgreSQL, verifica del TTL dei backup, formalizzazione delle basi giuridiche, esercizio dei diritti GDPR e verifica legale restano aperti. Le funzioni non costituiscono certificazione di conformità GDPR.

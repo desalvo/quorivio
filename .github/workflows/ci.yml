@@ -15,6 +15,20 @@ jobs:
     name: Production quality gate
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_DB: quorivio
+          POSTGRES_USER: quorivio
+          POSTGRES_PASSWORD: ci-only-secret
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U quorivio"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 15
     steps:
       - uses: actions/checkout@v4
         with: {persist-credentials: false}
@@ -26,6 +40,40 @@ jobs:
         run: npm test
       - name: Compile frontend and backend
         run: npm run build
+      - name: Install PostgreSQL client for integration checks
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
+      - name: Start API against real PostgreSQL
+        env:
+          DATABASE_URL: postgres://quorivio:ci-only-secret@127.0.0.1:5432/quorivio
+          AUTH_SECRET: ci-only-integration-secret-must-be-long-enough-123
+          ADMIN_EMAIL: admin@example.com
+          ADMIN_PASSWORD: ci-only-administrator-password-123
+          PUBLIC_BASE_URL: http://127.0.0.1:8080
+          PORT: '8080'
+        run: |
+          node apps/api/dist/server.js > /tmp/quorivio-ci-api.log 2>&1 &
+          echo $! > /tmp/quorivio-ci-api.pid
+          for i in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:8080/api/health/ready >/dev/null; then break; fi
+            if ! kill -0 $(cat /tmp/quorivio-ci-api.pid) 2>/dev/null; then cat /tmp/quorivio-ci-api.log; exit 1; fi
+            sleep 1
+          done
+          curl --fail --show-error http://127.0.0.1:8080/api/health/ready
+          curl --fail --show-error http://127.0.0.1:8080/api/health/live
+          curl --fail --show-error http://127.0.0.1:8080/ > /tmp/quorivio-ci-home.html
+          grep -qi 'html' /tmp/quorivio-ci-home.html
+      - name: Assert database bootstrapping and baseline auth
+        env:
+          PGPASSWORD: ci-only-secret
+        run: |
+          test "$(psql -h 127.0.0.1 -U quorivio -d quorivio -Atc 'SELECT count(*) FROM users')" = '1'
+          test "$(psql -h 127.0.0.1 -U quorivio -d quorivio -Atc "SELECT count(*) FROM information_schema.tables WHERE table_schema='public' AND table_name IN ('auth_flows','api_rate_windows','widget_answers')")" = '3'
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/api/auth/me)" = '401'
+      - name: Stop integration API
+        if: always()
+        run: |
+          if [ -f /tmp/quorivio-ci-api.pid ]; then kill $(cat /tmp/quorivio-ci-api.pid) || true; fi
+          if [ -f /tmp/quorivio-ci-api.log ]; then tail -60 /tmp/quorivio-ci-api.log; fi
       - name: Vulnerability gate (high and critical)
         run: npm audit --omit=dev --audit-level=high
       - name: Kubernetes wizard validation
@@ -60,6 +108,14 @@ jobs:
           push: false
           load: true
           tags: quorivio:gate
+      - name: Build dedicated document converter image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.converter
+          push: false
+          load: true
+          tags: quorivio-converter:gate
       - name: Scan runtime image
         uses: aquasecurity/trivy-action@v0.36.0
         with:
@@ -102,7 +158,7 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: desalvo/quorivio:${{ steps.label.outputs.tag }}
+          tags: desalvo/quorivo:${{ steps.label.outputs.tag }}
           sbom: true
           provenance: mode=max
           labels: |

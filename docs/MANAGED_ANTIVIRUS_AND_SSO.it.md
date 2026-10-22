@@ -1,0 +1,7 @@
+# Antivirus gestito e provider SSO preconfigurati
+
+Quorivio gestisce ClamAV come componente della propria distribuzione, senza pubblicare la porta 3310 all’esterno. In Docker/Podman Compose il servizio `clamav` si avvia con l’applicazione: conserva le firme nel volume `clamav-signatures`, aggiorna il database delle firme e deve diventare healthy prima dell’avvio della web app. I file vengono scartati se la scansione non riesce (`QUORIVIO_AV_REQUIRED=true`). In Helm il container ClamAV è un sidecar del pod applicativo, raggiungibile via `127.0.0.1:3310`. La scansione ClamAV richiede RAM e tempi di avvio adeguati e accesso alle sorgenti degli aggiornamenti. **Non è un demone incorporato nel processo Node** e non serve amministrare separatamente un servizio esterno.
+
+Google usa `https://accounts.google.com` come issuer OIDC; GitHub usa `https://github.com/login/oauth/authorize` e Facebook usa `https://www.facebook.com/v22.0/dialog/oauth`. Gli endpoint pubblici sono già noti al codice. L’amministratore deve registrare un’app per ciascun provider e fornire ID, segreto e redirect HTTPS: nessuna credenziale è inclusa nel repository. Sono supportati altri provider OIDC tramite `OIDC_PROVIDERS_JSON`.
+
+Limiti attuali: scanner ClamAV e immagini container non collaudati con runtime reale in questo ambiente; occorrono validazione operativa, aggiornamento delle firme e test di upload benigni e sospetti. Configurare risorse adeguate e politica di aggiornamento delle immagini prima di un deployment di produzione.

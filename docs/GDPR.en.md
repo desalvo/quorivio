@@ -24,3 +24,12 @@
 | DPIA / risk assessment | pending | determination and, if required, documented DPIA |
 
 Never advertise a session as strictly anonymous without proving unlinkability under the chosen deployment. Restrict access to PostgreSQL and avoid exposing it publicly. Treat the manual PDFs as guidance, not evidence of compliance.
+
+## Development cycle: added operational controls
+- `PATCH /api/sessions/:id/retention` allows the owner to choose retention between 1 and 3650 days (default 90). The interval starts at creation; automatic deletion occurs only once the session is closed or expired.
+- `POST /api/sessions/:id/revoke` closes a session, expires public access, rotates join credentials and disconnects WebSocket subscribers.
+- `DELETE /api/sessions/:id` erases a session and associated activities, responses and participants via PostgreSQL `ON DELETE CASCADE`. Previously downloaded exports and backup copies are not covered; backup expiry must be documented before release.
+- CSV export neutralizes potentially executable spreadsheet formulas.
+- A participant rejoining with a valid cookie retains their technical participant identity and submitted responses.
+
+**Limitations:** real PostgreSQL integration tests, backup lifecycle verification, legal-basis decisions, GDPR rights-request workflows and legal review remain outstanding. These controls do not establish GDPR compliance certification.

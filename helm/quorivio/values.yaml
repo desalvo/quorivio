@@ -19,3 +19,27 @@ ingress:
   className: nginx
   host: quorivio.example.org
   tlsSecret: quorivio-tls
+
+# ClamAV is managed as a private sidecar per Quorivio pod.
+antivirus:
+  image: clamav/clamav:stable
+  resources:
+    requests:
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      cpu: "2"
+      memory: 2Gi
+
+# Required for persisted files. For multiple replicas use a RWX-capable StorageClass.
+assets:
+  existingClaim: ""
+  accessMode: ReadWriteOnce
+  size: 10Gi
+  storageClassName: ""
+
+converter:
+  image: "desalvo/quorivo-converter:0.1.0-dev"
+  resources:
+    requests: {cpu: 100m, memory: 256Mi}
+    limits: {cpu: "2", memory: 2Gi}

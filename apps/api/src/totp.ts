@@ -1,0 +1,12 @@
+import {randomBytes,createHmac,createHash,createCipheriv,createDecipheriv,timingSafeEqual} from 'node:crypto';
+const alphabet='ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+export function encodeBase32(bytes:Uint8Array){let bits=0,value=0,out='';for(const b of bytes){value=(value<<8)|b;bits+=8;while(bits>=5){out+=alphabet[(value>>>(bits-5))&31];bits-=5}}if(bits)out+=alphabet[(value<<(5-bits))&31];return out}
+export function decodeBase32(secret:string){let bits=0,value=0;const out:number[]=[];for(const ch of secret.replace(/=+$/,'').toUpperCase()){const idx=alphabet.indexOf(ch);if(idx<0)throw new Error('invalid base32');value=(value<<5)|idx;bits+=5;if(bits>=8){out.push((value>>>(bits-8))&255);bits-=8}}return Buffer.from(out)}
+export function generateTotpSecret(){return encodeBase32(randomBytes(20))}
+export function validTotpCode(code:string){return /^\d{6}$/.test(code)}
+export function makeTotp(secret:string,time=Date.now()){const counter=Math.floor(time/30000);const bytes=Buffer.alloc(8);bytes.writeBigUInt64BE(BigInt(counter));const mac=createHmac('sha1',decodeBase32(secret)).update(bytes).digest();const offset=mac[19]&15;return String((mac.readUInt32BE(offset)&0x7fffffff)%1_000_000).padStart(6,'0')}
+export function verifyTotp(secret:string,code:string,time=Date.now()){if(!validTotpCode(code))return false;return [-1,0,1].some(delta=>timingSafeEqual(Buffer.from(makeTotp(secret,time+delta*30000)),Buffer.from(code)))}
+function key(authSecret:string){return createHash('sha256').update('quorivio-totp-at-rest-v1:').update(authSecret).digest()}
+export function sealTotp(secret:string,authSecret:string){const iv=randomBytes(12),cipher=createCipheriv('aes-256-gcm',key(authSecret),iv);const data=Buffer.concat([cipher.update(secret,'utf8'),cipher.final()]);return ['v1',iv.toString('base64url'),cipher.getAuthTag().toString('base64url'),data.toString('base64url')].join('.')}
+export function openTotp(blob:string,authSecret:string){const parts=String(blob).split('.');if(parts.length!==4||parts[0]!=='v1')throw new Error('invalid encrypted totp secret');const dec=createDecipheriv('aes-256-gcm',key(authSecret),Buffer.from(parts[1],'base64url'));dec.setAuthTag(Buffer.from(parts[2],'base64url'));return Buffer.concat([dec.update(Buffer.from(parts[3],'base64url')),dec.final()]).toString('utf8')}
+export function totpAuthUrl(secret:string,email:string){return `otpauth://totp/${encodeURIComponent(`Quorivio:${email}`)}?secret=${secret}&issuer=Quorivio&algorithm=SHA1&digits=6&period=30`}

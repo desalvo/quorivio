@@ -12,14 +12,60 @@ spec:
     spec:
       securityContext:
         runAsNonRoot: true
-        runAsUser: 1000
         seccompProfile: {type: RuntimeDefault}
       containers:
+        - name: converter
+          image: {{ .Values.converter.image | quote }}
+          ports: [{name: converter, containerPort: 8099}]
+          env:
+            - name: QUORIVIO_WORKER_TOKEN
+              valueFrom: {secretKeyRef: {name: {{ .Values.existingSecret }}, key: QUORIVIO_WORKER_TOKEN}}
+            - name: QUORIVIO_CONVERSION_DIR
+              value: /conversions
+          volumeMounts:
+            - {name: conversions, mountPath: /conversions}
+            - {name: converter-tmp, mountPath: /tmp}
+          securityContext:
+            runAsUser: 1000
+            allowPrivilegeEscalation: false
+            capabilities: {drop: [ALL]}
+            readOnlyRootFilesystem: true
+          resources:
+{{ toYaml .Values.converter.resources | indent 12 }}
+        # Local antivirus process managed by this pod; socket is never published.
+        - name: clamav
+          image: {{ .Values.antivirus.image | quote }}
+          imagePullPolicy: IfNotPresent
+          ports: [{name: clamd, containerPort: 3310}]
+          readinessProbe:
+            tcpSocket: {port: clamd}
+            initialDelaySeconds: 90
+            periodSeconds: 20
+            failureThreshold: 30
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: {drop: [ALL]}
+          resources:
+{{ toYaml .Values.antivirus.resources | indent 12 }}
         - name: quorivio
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports: [{name: http, containerPort: 8080}]
           env:
+            - name: QUORIVIO_ENABLE_CONVERTER
+              value: "true"
+            - name: QUORIVIO_CONVERTER_WORKER_URL
+              value: "http://127.0.0.1:8099"
+            - name: QUORIVIO_CONVERSION_DIR
+              value: /conversions
+            - name: QUORIVIO_WORKER_TOKEN
+              valueFrom: {secretKeyRef: {name: {{ .Values.existingSecret }}, key: QUORIVIO_WORKER_TOKEN}}
+            - name: QUORIVIO_AV_REQUIRED
+              value: "true"
+            - name: CLAMAV_HOST
+              value: "127.0.0.1"
+            - name: CLAMAV_PORT
+              value: "3310"
             - name: NODE_ENV
               value: production
             - name: PORT
@@ -34,6 +80,10 @@ spec:
               valueFrom: {secretKeyRef: {name: {{ .Values.existingSecret }}, key: ADMIN_EMAIL}}
             - name: ADMIN_PASSWORD
               valueFrom: {secretKeyRef: {name: {{ .Values.existingSecret }}, key: ADMIN_PASSWORD}}
+          volumeMounts:
+            - {name: conversions, mountPath: /conversions}
+            - name: assets
+              mountPath: /app/assets
           readinessProbe:
             httpGet: {path: /api/health/ready, port: http}
             initialDelaySeconds: 5
@@ -41,8 +91,18 @@ spec:
             httpGet: {path: /api/health/live, port: http}
             initialDelaySeconds: 10
           securityContext:
+            runAsUser: 1000
             allowPrivilegeEscalation: false
             capabilities: {drop: [ALL]}
             readOnlyRootFilesystem: true
           resources:
 {{ toYaml .Values.resources | indent 12 }}
+
+      volumes:
+        - name: conversions
+          emptyDir: {}
+        - name: converter-tmp
+          emptyDir: {}
+        - name: assets
+          persistentVolumeClaim:
+            claimName: {{ default (printf "%s-assets" .Release.Name) .Values.assets.existingClaim }}

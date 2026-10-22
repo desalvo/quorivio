@@ -1,0 +1,14 @@
+{{- if not .Values.assets.existingClaim }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-assets
+spec:
+  accessModes: [{{ .Values.assets.accessMode }}]
+  {{- if .Values.assets.storageClassName }}
+  storageClassName: {{ .Values.assets.storageClassName | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.assets.size }}
+{{- end }}

@@ -1,0 +1,4 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {generateRecoveryCodes,validRecoveryCode,recoveryCodeDigest} from '../src/recovery-codes.ts';
+test('recovery codes are distinct and valid',()=>{const codes=generateRecoveryCodes();assert.equal(codes.length,10);assert.equal(new Set(codes).size,10);assert.ok(codes.every(validRecoveryCode));});
+test('hashes are keyed and insensitive to case',()=>{const code=generateRecoveryCodes(1)[0];assert.equal(recoveryCodeDigest(code,'a'.repeat(40)),recoveryCodeDigest(code.toLowerCase(),'a'.repeat(40)));assert.notEqual(recoveryCodeDigest(code,'a'.repeat(40)),recoveryCodeDigest(code,'b'.repeat(40)));});
+test('invalid values are rejected',()=>{for(const x of ['foo','ABCD-1234',null,42,' '.repeat(35)])assert.equal(validRecoveryCode(x),false);assert.throws(()=>generateRecoveryCodes(21));});

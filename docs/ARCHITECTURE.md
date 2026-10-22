@@ -8,7 +8,7 @@ Use Redis pub/sub or PostgreSQL LISTEN/NOTIFY for broadcasts across replicas, sh
 
 ## Identity federation
 
-OIDC/SAML 2.0 with Keycloak is the preferred integration path; Google, Facebook, GitHub and AAI INFN are future tasks contingent on actual provider configuration, compatibility and authorized tests. No provider endpoint, credentials or verified AAI INFN claim is asserted. Accounts must never auto-link on unverified email alone.
+OIDC/SAML 2.0 with Keycloak is the preferred integration path; Google, Facebook, GitHub and generic OIDC are future tasks contingent on actual provider configuration, compatibility and authorized tests. No provider endpoint, credentials or verified generic OIDC claim is asserted. Accounts must never auto-link on unverified email alone.
 
 ## Licenses
 

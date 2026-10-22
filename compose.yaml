@@ -14,11 +14,45 @@ services:
       timeout: 3s
       retries: 15
     security_opt: ["no-new-privileges:true"]
+  # Managed antivirus service: private to this application stack, no exposed port.
+  clamav:
+    image: ${CLAMAV_IMAGE:-clamav/clamav:stable}
+    restart: unless-stopped
+    environment:
+      CLAMAV_NO_FRESHCLAMD: "false"
+    volumes:
+      - clamav-signatures:/var/lib/clamav
+    healthcheck:
+      test: ["CMD", "clamdscan", "--ping", "1"]
+      start_period: 300s
+      interval: 30s
+      timeout: 15s
+      retries: 5
+    security_opt: ["no-new-privileges:true"]
+  converter:
+    build:
+      context: .
+      dockerfile: Dockerfile.converter
+    restart: unless-stopped
+    environment:
+      QUORIVIO_WORKER_TOKEN: ${QUORIVIO_WORKER_TOKEN:?set_QUORIVIO_WORKER_TOKEN}
+      QUORIVIO_CONVERSION_DIR: /conversions
+    volumes:
+      - conversion-tmp:/conversions
+    security_opt: ["no-new-privileges:true"]
+    read_only: true
+    tmpfs: [/tmp]
+    pids_limit: 256
+    mem_limit: 2g
+    cpus: 2
   app:
+    image: ${QUORIVIO_IMAGE:-desalvo/quorivo:latest}
     build: .
     restart: unless-stopped
     depends_on:
       db: {condition: service_healthy}
+      clamav: {condition: service_healthy}
+      converter: {condition: service_started}
     environment:
       DATABASE_URL: postgres://quorivio:${POSTGRES_PASSWORD:?set_POSTGRES_PASSWORD}@db:5432/quorivio
       AUTH_SECRET: ${AUTH_SECRET:?set_AUTH_SECRET}
@@ -26,7 +60,18 @@ services:
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:?set_ADMIN_PASSWORD}
       PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://localhost:8080}
       PORT: "8080"
+      QUORIVIO_ASSET_DIR: /app/assets
+      QUORIVIO_AV_REQUIRED: "true"
+      CLAMAV_HOST: clamav
+      CLAMAV_PORT: "3310"
+      QUORIVIO_ENABLE_CONVERTER: "true"
+      QUORIVIO_CONVERTER_WORKER_URL: http://converter:8099
+      QUORIVIO_CONVERSION_DIR: /conversions
+      QUORIVIO_WORKER_TOKEN: ${QUORIVIO_WORKER_TOKEN:?set_QUORIVIO_WORKER_TOKEN}
     ports: ["127.0.0.1:8080:8080"]
+    volumes:
+      - asset-data:/app/assets
+      - conversion-tmp:/conversions
     security_opt: ["no-new-privileges:true"]
     read_only: true
     tmpfs: [/tmp]
@@ -37,3 +82,6 @@ services:
       retries: 10
 volumes:
   db-data:
+  asset-data:
+  clamav-signatures:
+  conversion-tmp:

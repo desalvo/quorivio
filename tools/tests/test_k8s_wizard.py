@@ -39,8 +39,14 @@ class InfrastructureVariants(unittest.TestCase):
    self.assertNotIn('ingress.class:',ingress)
  def test_reject_external_without_tls(self):
   with self.assertRaises(ValueError):validate(dict(DEFAULTS,postgres_mode='external',postgres_host='db.example.org',postgres_sslmode='disable'))
- def test_reject_multi_replica(self):
+ def test_reject_multi_replica_without_shared_storage(self):
   with self.assertRaises(ValueError):validate(dict(DEFAULTS,replicas=2))
+ def test_multi_replica_with_shared_storage(self):
+  cfg=validate(dict(DEFAULTS,replicas=3,asset_access_mode='ReadWriteMany'))
+  with tempfile.TemporaryDirectory() as td:
+   generate(cfg,Path(td))
+   self.assertIn('replicas: 3',(Path(td)/'20-deployment.yaml').read_text())
+   self.assertIn('ReadWriteMany',(Path(td)/'15-assets-pvc.yaml').read_text())
 
  def test_switch_internal_to_external_removes_stale_files(self):
   with tempfile.TemporaryDirectory() as td:
@@ -48,3 +54,26 @@ class InfrastructureVariants(unittest.TestCase):
    generate(validate(dict(DEFAULTS,postgres_mode='external',postgres_host='db.example.org')),Path(td))
    self.assertFalse((Path(td)/'12-postgres-statefulset.yaml').exists())
    self.assertNotIn('12-postgres-statefulset.yaml',(Path(td)/'kustomization.yaml').read_text())
+
+class UploadLimitTests(unittest.TestCase):
+ def test_nginx_limit(self):
+  with tempfile.TemporaryDirectory() as td:
+   generate(validate(dict(DEFAULTS,max_upload_mb=100)),Path(td))
+   self.assertIn('nginx.ingress.kubernetes.io/proxy-body-size: "100m"',(Path(td)/'40-ingress.yaml').read_text())
+ def test_haproxytech_limit(self):
+  with tempfile.TemporaryDirectory() as td:
+   generate(validate(dict(DEFAULTS,ingress_controller='haproxy',haproxy_variant='haproxytech',max_upload_mb=100)),Path(td))
+   self.assertIn('haproxy.org/max-body-size:',(Path(td)/'40-ingress.yaml').read_text())
+ def test_invalid_size(self):
+  with self.assertRaises(ValueError):validate(dict(DEFAULTS,max_upload_mb=0))
+
+class AssetStorageTests(unittest.TestCase):
+ def test_asset_pvc_generated_and_mounted(self):
+  with tempfile.TemporaryDirectory() as td:
+   generate(validate(dict(DEFAULTS,asset_storage_size='25Gi',asset_access_mode='ReadWriteMany')),Path(td))
+   self.assertIn('storage: 25Gi',(Path(td)/'15-assets-pvc.yaml').read_text())
+   self.assertIn('ReadWriteMany',(Path(td)/'15-assets-pvc.yaml').read_text())
+   self.assertIn('mountPath: /app/assets',(Path(td)/'20-deployment.yaml').read_text())
+   self.assertIn('QUORIVIO_ASSET_DIR: /app/assets',(Path(td)/'10-configmap.yaml').read_text())
+ def test_reject_bad_storage(self):
+  with self.assertRaises(ValueError): validate(dict(DEFAULTS,asset_storage_size='100../../'))

@@ -25,6 +25,7 @@ RUN npm install --omit=dev --no-audit --no-fund \
 COPY --from=build /app/apps/api/dist apps/api/dist
 COPY --from=build /app/apps/api/src/schema.sql apps/api/src/schema.sql
 COPY --from=build /app/apps/web/dist apps/web/dist
+RUN mkdir -p /app/assets && chown node:node /app/assets
 USER node
 EXPOSE 8080
 CMD ["node","apps/api/dist/server.js"]

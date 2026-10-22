@@ -1,0 +1,5 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {generateResetToken,resetTokenDigest,normalizeResetEmail,validResetToken,validNewPassword,resetLink} from '../src/password-reset.ts';
+test('reset token is random, url-safe and has fixed digest',()=>{const x=generateResetToken(),y=generateResetToken();assert.notEqual(x,y);assert.equal(validResetToken(x),true);assert.equal(resetTokenDigest(x).length,64);assert.notEqual(resetTokenDigest(x),resetTokenDigest(y))});
+test('password reset input validation',()=>{assert.equal(normalizeResetEmail('  USER@Example.org '),'user@example.org');assert.equal(normalizeResetEmail('wrong'),null);assert.equal(validResetToken('wrong'),false);assert.equal(validNewPassword('123456789012'),true);assert.equal(validNewPassword('short'),false)});
+test('reset URL does not inherit hostile query and fragment',()=>{const u=new URL(resetLink('https://example.org/ignored?a=1#fragment',generateResetToken()));assert.equal(u.pathname,'/');assert.equal(u.searchParams.has('a'),false);assert.equal(u.searchParams.has('reset_token'),true);assert.equal(u.hash,'')});
