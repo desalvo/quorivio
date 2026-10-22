@@ -71,3 +71,11 @@ Current implementation is a prototype and **must not be described as fully end-t
 - Inspected `logs_107774225598.zip`: production quality gate passed (four domain tests, frontend/backend build, audit 0 findings, Kubernetes validation and secret scan). Container build job failed **during action resolution** before image build: `aquasecurity/trivy-action@0.33.1` is not an available tag.
 - Fixed `.github/workflows/ci.yml` to use the published release `aquasecurity/trivy-action@v0.36.0` (note the `v` prefix), keeping the blocking HIGH/CRITICAL scan.
 - GitHub CI must be rerun to verify image build and scanning. Container scanning and deployment are not yet validated.
+
+## CI runtime image vulnerability remediation (2026-10-22)
+
+- Examined GitHub Actions `logs_107776665722.zip`: all quality checks and Docker build passed, but Trivy correctly blocked publication due to **10 HIGH CVEs** reported against bundled npm tooling in the Node 22 Alpine runtime image (`brace-expansion`, `ip-address`, `pacote`, `picomatch`, `sigstore`).
+- Updated `Dockerfile` to delete npm, npx and corepack from the runtime stage **after** installing production dependencies, including explicit assertions verifying removal. Node.js itself and application dependencies remain. The build stage retains npm.
+- The HIGH/CRITICAL Trivy exit-code 1 gate remains in place, unchanged. No suppressions or ignore rules added.
+- Verified Dockerfile configuration and archive integrity locally. **Docker/Podman not installed here**; rebuilt image and Trivy scan must run in GitHub CI. A clean scan is not claimed before that run.
+- Remaining production work: implement committed `package-lock.json` and `npm ci`, verify end-to-end deployment and GDPR technical controls.
