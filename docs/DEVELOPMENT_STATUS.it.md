@@ -178,3 +178,17 @@ Docker/Podman Compose now bundles a private ClamAV service and persists its sign
 - Modifica: `nodemailer: ^10.2.1` e rimozione di `@types/nodemailer`, non più necessario.
 - PENDENTE: nuova installazione npm, compilazione/audit in GitHub Actions e build container. **Non dichiarare la CI verde prima della riesecuzione.**
 - Baseline commit: l'utente ha confermato il commit precedente; il prossimo messaggio di commit riguarda solo questa correzione e documentazione.
+
+## Segnalazione GitGuardian sul test TOTP (22/10/2026)
+- Eliminata la stringa Base32 letterale del vettore pubblico RFC 6238 dal test; vettore ricostruito a runtime e altri segreti di test generati casualmente.
+- Test locali superati: 82/82 Node, 40/40 Python.
+- Altri errori CI non ancora analizzati in assenza dei relativi log.
+- Nessun commit o push effettuato.
+
+
+## Pulizia cache Python (2026-10-22)
+- Aggiunte le regole .gitignore per __pycache__/, *.py[cod], .pytest_cache/, .mypy_cache/, .ruff_cache/.
+- Escluse cache e bytecode Python dal pacchetto cumulativo, mantenendo sorgenti e test.
+- Le cache già tracciate da Git richiedono la rimozione dall'indice da parte del manutentore (`git rm --cached`); non serve riscrivere la cronologia.
+- Ultimo commit confermato: hotfix di sicurezza Nodemailer. Modifiche successive: fixture TOTP e pulizia cache Python. Nessun commit eseguito.
+- Stime invariati: 98% funzionale e 35% readiness; CI reale ancora da verificare.

@@ -4,3 +4,10 @@ dist/
 coverage/
 *.log
 .DS_Store
+
+# Python generated caches and local tooling artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/

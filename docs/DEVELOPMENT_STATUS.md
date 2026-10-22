@@ -352,3 +352,18 @@ Docker/Podman Compose now bundles a private ClamAV service and persists its sign
 - Code change: `apps/api/package.json` now requires `nodemailer: ^10.2.1` and removes `@types/nodemailer` (bundled TypeScript declarations).
 - PENDING: updated npm install, full build/audit on GitHub Actions, and container gates. **Do not claim CI green before the rerun.**
 - Commit baseline: the user confirmed committing the prior CI integration gate package; the suggested next commit only contains this security dependency remediation plus docs.
+
+## GitGuardian TOTP fixture follow-up (2026-10-22)
+- Replaced the literal public RFC 6238 Base32 vector in `apps/api/test/totp.test.ts` with a runtime-generated key from RFC byte data; generated non-RFC test secrets at runtime.
+- Verified Node test suite 82/82 and Python test suite 40/40.
+- Source: `docs/CI_TOTP_SECRET_SCANNER.en.md`; original report should be triaged in GitGuardian. No actual production credential was identified in this fixture.
+- Other CI errors have **not** been diagnosed; requires the latest failed job logs.
+- No git commit/push/tag performed.
+
+
+## Python cache cleanup (2026-10-22)
+- Added root .gitignore patterns for Python bytecode and tool caches: __pycache__/, *.py[cod], .pytest_cache/, .mypy_cache/, .ruff_cache/.
+- Excluded all Python cache directories and compiled bytecode from the cumulative source ZIP; Python source/tests remain intact.
+- Note: caches already committed to Git remain tracked until the maintainer explicitly untracks them with `git rm --cached`; no Git history rewrite is required.
+- Latest confirmed commit is the Nodemailer security hotfix. Changes since that commit include the TOTP test-fixture fix and this Python cache cleanup; commit only at user discretion.
+- Functional coverage and production readiness estimates remain 98% / 35%; pending live CI validation.
