@@ -16,7 +16,7 @@ services:
     security_opt: ["no-new-privileges:true"]
   # Managed antivirus service: private to this application stack, no exposed port.
   clamav:
-    image: ${CLAMAV_IMAGE:-clamav/clamav:stable}
+    image: ${CLAMAV_IMAGE:-clamav/clamav:stable-debian}
     restart: unless-stopped
     environment:
       CLAMAV_NO_FRESHCLAMD: "false"

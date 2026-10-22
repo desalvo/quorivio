@@ -75,14 +75,14 @@ section('Kubernetes: configurazione riproducibile',
 section('Sicurezza e GDPR: attività amministrative',
  item('Data protection by default','Decidi basi giuridiche e ruoli di titolare/responsabile del trattamento, documenta informative, categorie di dati, fornitori esterni e tempi di conservazione. La piattaforma offre controlli tecnici parziali e non può da sola certificare la conformità.'),
  item('Conservazione','La retention globale iniziale delle sessioni chiuse è 60 giorni. Verifica le regole locali prima di modificarla: audit e backup potrebbero richiedere policy separate. Controlla periodicamente che la pulizia schedulata operi sui dati previsti.'),
- item('Cookie e identità','I partecipanti anonimi usano un cookie tecnico e uno pseudonimo. La finestra di conferma dei cookie necessari va distinta da un consenso per usi opzionali. Le registrazioni locali richiedono approvazione; SSO, MFA e SMTP sono ancora in roadmap.'),
+ item('Cookie e identità','I partecipanti anonimi usano un cookie tecnico e uno pseudonimo. La finestra di conferma dei cookie necessari va distinta da un consenso per usi opzionali. Le registrazioni locali richiedono approvazione; SSO e MFA sono disponibili; SMTP/SMTPS può essere configurato nelle impostazioni server. Le integrazioni esterne richiedono credenziali e verifica operativa.'),
  item('Accesso ai log e incidenti','Proteggi log e audit evitando password, token e risposte sensibili. Predisponi escalation incidenti, rotazione delle credenziali, revoca delle sessioni e notifiche richieste dal GDPR quando applicabili. Esegui test di ripristino e tabletop exercise.')
 ),
 section('CI/CD e problemi ricorrenti',
  item('GitHub e Docker Hub','Il workflow include gate di qualità, build container e Trivy HIGH/CRITICAL. Pubblica desalvo/quorivo:latest dai push main e il tag versionato dai tag, solo dopo gate e protezioni di production. I secret Docker Hub sono nell’ambiente production.'),
  item('La build fallisce per npm','Controlla che package-lock.json sia presente e coerente se usi npm ci. Il workflow precedente ha disabilitato la cache perché mancava il lockfile; non disabilitare controlli per ottenere un esito verde.'),
  item('Trivy segnala CVE','Leggi il percorso di origine della vulnerabilità e aggiorna/elimina il componente interessato. Il runtime non dovrebbe includere gli strumenti npm di compilazione; non escludere HIGH/CRITICAL senza motivazione e approvazione.'),
- item('Funzioni ancora mancanti','SSO Google/Facebook/GitHub/generic OIDC, SMTP/MFA, upload verificato, editor WYSIWYG, backup integrale applicativo, cluster multi-replica e collaudi E2E non sono completi. Il gate CI non sostituisce i controlli manuali di produzione.')
+ item('Funzioni ancora mancanti','I servizi esterni di login e posta, la convalida del cluster multi-replica e i collaudi browser end-to-end richiedono ancora verifica. La CI non sostituisce il collaudo operativo.')
 )]
 },
 'en': {}
@@ -153,14 +153,14 @@ section('Repeatable Kubernetes deployment',
 section('Security and GDPR operating controls',
  item('Privacy governance','Assign controller and processor roles; record legal basis, notices, recipients, subprocessors and retention periods. Current technical controls are partial and cannot themselves establish GDPR compliance.'),
  item('Retention','The initial global period for closed sessions is 60 days. Verify applicable retention duties, backup policy and deletion jobs before changing it. Audit evidence and backup retention may be separate.'),
- item('Cookies and account approval','Anonymous access uses a functional cookie and chosen pseudonym. Necessary cookies are not the same as optional tracking consent. Registered accounts require approval; SSO, SMTP and MFA are not yet operational.'),
+ item('Cookies and account approval','Anonymous access uses a functional cookie and chosen pseudonym. Necessary cookies are not the same as optional tracking consent. Registered accounts require approval; SSO and MFA are available in the application; SMTP/SMTPS is configurable in server settings. External providers require real-world verification.'),
  item('Logs and incidents','Limit access to audit logs and exclude passwords, tokens and unnecessary response content. Document incident escalation, credential rotation, access revocation and breach reporting rules where applicable.')
 ),
 section('CI/CD and operational troubleshooting',
  item('Publication flow','GitHub Actions runs quality, container build and blocking Trivy HIGH/CRITICAL security gates before production publication to desalvo/quorivio. Protect main and the production environment.'),
  item('npm errors','Use a committed reproducible lockfile with npm ci when available. A previous workflow disabled caching because package-lock.json was absent; avoid weakening quality gates.'),
  item('Trivy findings','Inspect the vulnerable runtime path and update or remove the relevant dependency. Build-only npm tooling should not remain in the runtime; do not silently ignore HIGH or CRITICAL vulnerabilities.'),
- item('Known production blockers','SSO integrations, MFA and SMTP, media upload, full-instance backup, WYSIWYG editing, real multi-replica Kubernetes testing, GDPR evidence and end-to-end load/security tests remain incomplete.')
+ item('Known production blockers','Real provider credentials, SMTP delivery, browser workflows, Kubernetes multi-replica deployment, GDPR evidence and load/security acceptance remain pending.')
 )]
 
 # Audience tools: available in development code; full browser/DB integration pending.
@@ -205,17 +205,17 @@ for language in ('it','en'):
 # Newly delivered, explicitly scoped authentication service procedures.
 EXTRA['it']['presenter'].append(section('MFA TOTP per il presentatore',
  item('Attivare un autenticatore','Eseguire accesso locale, scegliere Configura MFA, importare il segreto o il link otpauth in una app di autenticazione e confermare il primo codice valido. Dal login successivo inserire email, password e le sei cifre correnti.'),
- item('Disattivazione e recupero','La disattivazione richiede password e codice TOTP. I codici di recupero non sono ancora supportati: coordinare con il gestore eventuali procedure di emergenza prima di rendere obbligatorio MFA.')))
+ item('Disattivazione e recupero','La disattivazione richiede password e codice TOTP. Sono disponibili codici di recupero monouso, mostrati una sola volta: conservarli offline in modo protetto.')))
 EXTRA['en']['presenter'].append(section('Presenter TOTP MFA',
  item('Enable an authenticator','Log in locally, choose Configure MFA, import the secret or otpauth link and confirm a valid code. Subsequent logins require password plus the current six-digit code.'),
- item('Disable and recovery','Deactivation requires the password and a valid TOTP code. Recovery codes are not yet available; agree a safe emergency process with the operator before requiring MFA.')))
+ item('Disable and recovery','Deactivation requires the password and a valid TOTP code. One-time recovery codes are generated and shown once: store them securely offline.')))
 EXTRA['it']['admin'].append(section('Controllo SMTPS e sicurezza degli account',
- item('Configurazione SMTP','Impostare host, porta, account, password e mittente con SMTP_HOST, SMTP_PORT, SMTP_SECURE=true, SMTP_USER, SMTP_PASSWORD e SMTP_FROM, conservando i segreti fuori da Git. Nella schermata amministrativa usare Verifica configurazione e Invia email di prova.'),
- item('Test e limitazioni','SMTPS richiede TLS con certificato valido. Non sono ancora disponibili SMTP STARTTLS, reset password tramite email, test reali di consegna e recovery MFA. Il servizio non è certificato AgID o GDPR.'),
+ item('Configurazione SMTP','Aprire Impostazioni server e compilare host, porta SMTPS, account, password e mittente. Le credenziali sono cifrate nel database; la password non viene restituita al browser. Verificare la configurazione e inviare una mail di prova.'),
+ item('Test e limitazioni','SMTPS richiede TLS con certificato valido. STARTTLS non è abilitato in questa configurazione. Reset password via email e codici di recupero MFA sono implementati, ma la consegna effettiva deve essere collaudata. Il servizio non è certificato AgID o GDPR.'),
  item('Chiave AUTH_SECRET','Conservare una chiave segreta stabile: il suo cambiamento rende illeggibili i segreti MFA cifrati. Valutare una migrazione protetta prima della rotazione.')))
 EXTRA['en']['admin'].append(section('SMTPS and account security',
- item('SMTP configuration','Set SMTP_HOST, SMTP_PORT, SMTP_SECURE=true, SMTP_USER, SMTP_PASSWORD and SMTP_FROM using deployment secrets. Use the administration page to check non-secret settings and send a test email.'),
- item('Tests and restrictions','SMTPS uses certificate-validated TLS; actual mail delivery, email password reset, MFA recovery and STARTTLS have not been verified or implemented.'),
+ item('SMTP configuration','Open Server Settings to configure SMTP host, implicit-TLS port, account, password and sender. Credentials are encrypted at rest; the password is never returned to the browser. Send a test message to verify delivery.'),
+ item('Tests and restrictions','SMTPS uses certificate-validated TLS; actual mail delivery still needs acceptance testing; email reset and one-time MFA recovery codes are implemented. STARTTLS is not enabled.'),
  item('AUTH_SECRET retention','Keep a stable protected AUTH_SECRET. Changing it without migration prevents decryption of stored MFA secrets.')))
 
 # Antivirus scanning: operator responsibilities and limits for this cumulative.

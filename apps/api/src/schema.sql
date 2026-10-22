@@ -203,3 +203,14 @@ CREATE TABLE IF NOT EXISTS api_rate_windows(
  PRIMARY KEY(client_hash,bucket)
 );
 CREATE INDEX IF NOT EXISTS api_rate_windows_expiry ON api_rate_windows(bucket);
+
+-- Stable platform identity and optional unique nickname. Existing installations receive
+-- a deterministic bootstrap owner only after role and email have been verified.
+ALTER TABLE users ADD COLUMN IF NOT EXISTS nickname text;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS is_primary_admin boolean NOT NULL DEFAULT false;
+CREATE UNIQUE INDEX IF NOT EXISTS users_nickname_unique ON users(lower(nickname)) WHERE nickname IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS users_one_primary_admin ON users(is_primary_admin) WHERE is_primary_admin=true;
+CREATE TABLE IF NOT EXISTS session_schedule_dates(session_id uuid NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,scheduled_date date NOT NULL,PRIMARY KEY(session_id,scheduled_date));
+
+-- SMTP credentials encrypted using AUTH_SECRET, never returned by API.
+CREATE TABLE IF NOT EXISTS smtp_configuration(id integer PRIMARY KEY CHECK(id=1), encrypted_config text NOT NULL, updated_at timestamptz NOT NULL DEFAULT now());
