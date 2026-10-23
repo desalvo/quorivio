@@ -46,7 +46,7 @@ services:
     mem_limit: 2g
     cpus: 2
   app:
-    image: ${QUORIVIO_IMAGE:-desalvo/quorivo:latest}
+    image: ${QUORIVIO_IMAGE:-desalvo/quorivio:latest}
     build: .
     restart: unless-stopped
     depends_on:

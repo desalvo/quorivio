@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Standalone, deterministic, idempotent Quorivio Kubernetes Kustomize generator (stdlib)."""
-import argparse, json, re, sys
+import argparse, json, re, sys, os, secrets, base64, urllib.parse
 from pathlib import Path
 
-DEFAULTS = {'namespace':'quorivio','name':'quorivio','image':'desalvo/quorivo:latest','host':'quorivio.example.org','replicas':1,'max_upload_mb':100,'container_port':8080,'postgres_mode':'internal','postgres_image':'postgres:18.6-alpine','postgres_host':'postgresql','postgres_port':5432,'postgres_sslmode':'require','ingress_controller':'nginx','haproxy_variant':'community','ingress_class':'','postgres_host':'postgresql','postgres_database':'quorivio','postgres_user':'quorivio','secret_name':'quorivio-app-secrets','tls_secret':'quorivio-tls','storage_class':'','asset_storage_class':'','asset_storage_size':'10Gi','asset_access_mode':'ReadWriteOnce','cpu_request':'100m','memory_request':'256Mi','cpu_limit':'1000m','memory_limit':'1Gi'}
+DEFAULTS = {'namespace':'quorivio','name':'quorivio','image':'desalvo/quorivio:latest','host':'quorivio.example.org','replicas':1,'max_upload_mb':100,'container_port':8080,'postgres_mode':'internal','postgres_image':'postgres:18.6-alpine','postgres_host':'postgresql','postgres_port':5432,'postgres_sslmode':'require','ingress_controller':'nginx','haproxy_variant':'community','ingress_class':'','postgres_host':'postgresql','postgres_database':'quorivio','postgres_user':'quorivio','secret_name':'quorivio-app-secrets','tls_secret':'','tls_termination':True,'app_node_selector':'','postgres_node_selector':'','admin_email':'admin@example.org','admin_password':'','auth_secret':'','postgres_password':'','storage_class':'','asset_storage_class':'','asset_storage_size':'10Gi','asset_access_mode':'ReadWriteOnce','cpu_request':'100m','memory_request':'256Mi','cpu_limit':'1000m','memory_limit':'1Gi'}
 FIELDS = tuple(DEFAULTS)
 def quote(s): return json.dumps(str(s), ensure_ascii=False)
 def validate(cfg):
@@ -29,19 +29,80 @@ def validate(cfg):
     if int(cfg['replicas']) > 1 and cfg['asset_access_mode'] != 'ReadWriteMany':raise ValueError('Multiple API replicas require ReadWriteMany asset storage')
     if int(cfg['replicas'])<1 or int(cfg['replicas'])>20:raise ValueError('replicas must be 1-20')
     if not 1<=int(cfg['container_port'])<=65535:raise ValueError('Invalid port')
-    for k in ('postgres_host','postgres_database','postgres_user','secret_name','tls_secret','cpu_request','memory_request','cpu_limit','memory_limit'):
+    if not isinstance(cfg['tls_termination'],bool): raise ValueError('tls_termination must be true or false')
+    for key in ('app_node_selector','postgres_node_selector'):
+        parse_node_selector(cfg[key])
+    if cfg['tls_secret'] and not re.fullmatch(r'[a-z0-9]([-a-z0-9]*[a-z0-9])?',cfg['tls_secret']): raise ValueError('Invalid TLS secret')
+    if not re.fullmatch(r'[^@\s]+@[^@\s]+\.[^@\s]+',cfg['admin_email']): raise ValueError('Invalid admin_email')
+    for k in ('admin_password','auth_secret','postgres_password'):
+        if cfg[k] and (len(cfg[k]) < (32 if k=='auth_secret' else 12) or any(x in cfg[k] for x in '\r\n')): raise ValueError(f'Invalid or short {k}')
+    for k in ('postgres_host','postgres_database','postgres_user','secret_name','cpu_request','memory_request','cpu_limit','memory_limit'):
         if not re.fullmatch('[A-Za-z0-9._/-]+',str(cfg[k])):raise ValueError(f'Invalid value for {k}')
+    return cfg
+
+def parse_node_selector(value):
+    """Parse comma separated Kubernetes label selectors into a deterministic map."""
+    result={}
+    if not value: return result
+    for item in value.split(','):
+        if '=' not in item: raise ValueError('nodeSelector requires key=value entries')
+        key,val=(part.strip() for part in item.split('=',1))
+        dns=r'[a-z0-9]([-a-z0-9.]*[a-z0-9])?'
+        label=r'[A-Za-z0-9]([-A-Za-z0-9_.]*[A-Za-z0-9])?'
+        if '/' in key:
+            prefix,name=key.split('/',1)
+            if len(prefix)>253 or not re.fullmatch(dns,prefix) or any(len(x)>63 for x in prefix.split('.')): raise ValueError('Invalid nodeSelector prefix')
+        else: name=key
+        if not name or len(name)>63 or not re.fullmatch(label,name) or len(val)>63 or (val and not re.fullmatch(label,val)): raise ValueError('Invalid nodeSelector label')
+        if key in result: raise ValueError('Duplicate nodeSelector label')
+        result[key]=val
+    return dict(sorted(result.items()))
+
+def selector_yaml(value,indent=6):
+    labels=parse_node_selector(value)
+    if not labels:return ''
+    pad=' '*indent
+    return pad+'nodeSelector:\n'+''.join(pad+'  '+quote(k)+': '+quote(v)+'\n' for k,v in labels.items())
+
+def secure_write(path, content):
+    fd=os.open(str(path),os.O_WRONLY|os.O_CREAT|os.O_TRUNC,0o600)
+    try:
+        os.fchmod(fd,0o600)
+        with os.fdopen(fd,'w',encoding='utf-8') as f: f.write(content)
+    except:
+        os.close(fd)
+        raise
+
+def resolve_credentials(cfg,out):
+    cfg=dict(cfg)
+    saved=out/'quorivio-overrides.json'
+    if saved.exists():
+        previous=json.loads(saved.read_text())
+        for key in ('admin_password','auth_secret','postgres_password'):
+            if not cfg[key] and previous.get(key): cfg[key]=previous[key]
+    if not cfg['admin_password']: cfg['admin_password']=secrets.token_urlsafe(24)
+    if not cfg['auth_secret']: cfg['auth_secret']=secrets.token_urlsafe(48)
+    if cfg['postgres_mode']=='internal' and not cfg['postgres_password']:
+        cfg['postgres_password']=secrets.token_urlsafe(32)
+    if cfg['postgres_mode']=='external' and not cfg['postgres_password']:
+        raise ValueError('External PostgreSQL requires postgres_password (existing database credential)')
+    validate(cfg)
     return cfg
 
 def generate(cfg,out):
     out.mkdir(parents=True,exist_ok=True)
+    cfg=resolve_credentials(cfg,out)
     name=cfg['name'];ns=cfg['namespace'];port=int(cfg['container_port'])
     klass=cfg['ingress_class'] or cfg['ingress_controller']
     upload_annotation=('    nginx.ingress.kubernetes.io/proxy-body-size: '+quote(str(cfg['max_upload_mb'])+'m')+'\n') if cfg['ingress_controller']=='nginx' else (('    haproxy.org/max-body-size: '+quote(str(cfg['max_upload_mb']*1024*1024)+'')+'\n') if cfg['haproxy_variant']=='haproxytech' else '')
     legacy= ('    kubernetes.io/ingress.class: '+quote(klass)+'\n' if cfg['haproxy_variant']=='community' else '    haproxy.org/ingress.class: '+quote(klass)+'\n') if cfg['ingress_controller']=='haproxy' else ''
     dbhost=(name+'-postgres') if cfg['postgres_mode']=='internal' else cfg['postgres_host']
+    db_url=('postgresql://'+urllib.parse.quote(cfg['postgres_user'],safe='')+':'+urllib.parse.quote(cfg['postgres_password'],safe='')+'@'+dbhost+':'+str(cfg['postgres_port'])+'/'+urllib.parse.quote(cfg['postgres_database'],safe='')+'?sslmode='+('disable' if cfg['postgres_mode']=='internal' else cfg['postgres_sslmode']))
+    secret_data={'DATABASE_URL':db_url,'AUTH_SECRET':cfg['auth_secret'],'ADMIN_EMAIL':cfg['admin_email'],'ADMIN_PASSWORD':cfg['admin_password']}
+    if cfg['postgres_mode']=='internal':secret_data['POSTGRES_PASSWORD']=cfg['postgres_password']
     files={
       '00-namespace.yaml':f'apiVersion: v1\nkind: Namespace\nmetadata:\n  name: {ns}\n',
+      '05-app-secret.yaml':'apiVersion: v1\nkind: Secret\nmetadata:\n  name: '+name.replace('\n','')+'-PLACEHOLDER\n',
       '10-configmap.yaml':f'''apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -76,7 +137,7 @@ spec:
       labels:
         app: {name}
     spec:
-      automountServiceAccountToken: false
+{selector_yaml(cfg['app_node_selector'])}      automountServiceAccountToken: false
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
@@ -164,9 +225,7 @@ metadata:
   namespace: {ns}
 {('  annotations:' + chr(10) + legacy + upload_annotation) if (legacy or upload_annotation) else ''}spec:
   ingressClassName: {klass}
-  tls:
-    - hosts: [{cfg['host']}]
-      secretName: {cfg['tls_secret']}
+{('  tls:' + chr(10) + '    - hosts: [' + cfg['host'] + ']' + chr(10) + ('      secretName: ' + cfg['tls_secret'] + chr(10) if cfg['tls_secret'] else '')) if cfg['tls_termination'] else ''}
   rules:
     - host: {cfg['host']}
       http:
@@ -190,16 +249,20 @@ resources:
   - 40-ingress.yaml
 '''
     }
+    files['05-app-secret.yaml']='apiVersion: v1\nkind: Secret\nmetadata:\n  name: '+cfg['secret_name']+'\n  namespace: '+ns+'\ntype: Opaque\ndata:\n'+''.join('  '+k+': '+base64.b64encode(v.encode()).decode()+'\n' for k,v in sorted(secret_data.items()))
+    files['kustomization.yaml']=files['kustomization.yaml'].replace('  - 10-configmap.yaml\n','  - 05-app-secret.yaml\n  - 10-configmap.yaml\n')
     if cfg['postgres_mode']=='internal':
         files.update(postgres_resources(cfg,name,ns))
         files['kustomization.yaml']=files['kustomization.yaml'].replace('  - 10-configmap.yaml\n','  - 10-configmap.yaml\n  - 11-postgres-service.yaml\n  - 12-postgres-statefulset.yaml\n')
     # Remove obsolete generated database resources when switching internal -> external.
     for old in ('11-postgres-service.yaml','12-postgres-statefulset.yaml'):
         if old not in files: (out/old).unlink(missing_ok=True)
-    for filename,body in files.items(): (out/filename).write_text(body,encoding='utf-8')
+    for filename,body in files.items():
+        if filename=='05-app-secret.yaml': secure_write(out/filename,body)
+        else: (out/filename).write_text(body,encoding='utf-8')
     # Store ONLY changed custom values. No passwords/tokens are collected by the wizard.
     overrides={k:cfg[k] for k in FIELDS if cfg[k]!=DEFAULTS[k]}
-    (out/'quorivio-overrides.json').write_text(json.dumps(overrides,indent=2,ensure_ascii=False,sort_keys=True)+'\n')
+    secure_write(out/'quorivio-overrides.json',json.dumps(overrides,indent=2,ensure_ascii=False,sort_keys=True)+'\n')
     return list(files)
 
 def postgres_resources(cfg,name,ns):
@@ -234,7 +297,7 @@ spec:
       labels:
         app: {name}-postgres
     spec:
-      automountServiceAccountToken: false
+{selector_yaml(cfg['postgres_node_selector'])}      automountServiceAccountToken: false
       securityContext:
         runAsUser: 999
         runAsGroup: 999
@@ -298,7 +361,7 @@ def main(argv=None):
     if saved.is_file(): cfg.update(json.loads(saved.read_text()))
     if args.values:cfg.update(json.loads(Path(args.values).read_text()))
     print('Quorivio Kubernetes defaults + existing overrides:')
-    for k in FIELDS:print(f'  {k}: {cfg[k]}')
+    for k in FIELDS:print(f'  {k}: '+ ('[configured]' if cfg[k] else '[auto-generated]') if k in ('admin_password','auth_secret','postgres_password') else f'  {k}: {cfg[k]}')
     if not args.unattended:
         if not sys.stdin.isatty():a.error('Interactive mode requires a TTY; use --unattended')
         for k in FIELDS:
@@ -306,11 +369,16 @@ def main(argv=None):
             if val:cfg[k]=val
     for entry in args.set:
         if '=' not in entry:a.error('--set requires KEY=VALUE')
-        k,v=entry.split('=',1);cfg[k]=v
+        k,v=entry.split('=',1)
+        if k=='tls_termination':
+            if v.lower() not in ('true','false'):a.error('tls_termination requires true/false')
+            cfg[k]=v.lower()=='true'
+        else: cfg[k]=v
     try:validate(cfg)
     except ValueError as e:a.error(str(e))
     generate(cfg,out)
     print(f'Generated Kustomize base in {out} (never applied).')
-    print('Provide pre-existing Kubernetes Secret and ingress TLS Secret before deployment.')
+    print('Application Secret generated; keep overrides and 05-app-secret.yaml private (0600). Never commit them to Git.')
+    print('TLS uses tls_secret when provided, otherwise the ingress controller default certificate.')
     return 0
 if __name__=='__main__':raise SystemExit(main())

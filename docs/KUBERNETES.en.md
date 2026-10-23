@@ -3,7 +3,7 @@
 Run the stdlib-only standalone generator from the root repository:
 
 ```bash
-python3 tools/k8s_wizard.py --unattended --output ./k8s-generated --set host=quorivio.example.org --set image=desalvo/quorivo:v0.1.0
+python3 tools/k8s_wizard.py --unattended --output ./k8s-generated --set host=quorivio.example.org --set image=desalvo/quorivio:v0.1.0
 kubectl kustomize ./k8s-generated
 ```
 

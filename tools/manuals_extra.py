@@ -79,7 +79,7 @@ section('Sicurezza e GDPR: attività amministrative',
  item('Accesso ai log e incidenti','Proteggi log e audit evitando password, token e risposte sensibili. Predisponi escalation incidenti, rotazione delle credenziali, revoca delle sessioni e notifiche richieste dal GDPR quando applicabili. Esegui test di ripristino e tabletop exercise.')
 ),
 section('CI/CD e problemi ricorrenti',
- item('GitHub e Docker Hub','Il workflow include gate di qualità, build container e Trivy HIGH/CRITICAL. Pubblica desalvo/quorivo:latest dai push main e il tag versionato dai tag, solo dopo gate e protezioni di production. I secret Docker Hub sono nell’ambiente production.'),
+ item('GitHub e Docker Hub','Il workflow include gate di qualità, build container e Trivy HIGH/CRITICAL. Pubblica desalvo/quorivio:latest dai push main e il tag versionato dai tag, solo dopo gate e protezioni di production. I secret Docker Hub sono nell’ambiente production.'),
  item('La build fallisce per npm','Controlla che package-lock.json sia presente e coerente se usi npm ci. Il workflow precedente ha disabilitato la cache perché mancava il lockfile; non disabilitare controlli per ottenere un esito verde.'),
  item('Trivy segnala CVE','Leggi il percorso di origine della vulnerabilità e aggiorna/elimina il componente interessato. Il runtime non dovrebbe includere gli strumenti npm di compilazione; non escludere HIGH/CRITICAL senza motivazione e approvazione.'),
  item('Funzioni ancora mancanti','I servizi esterni di login e posta, la convalida del cluster multi-replica e i collaudi browser end-to-end richiedono ancora verifica. La CI non sostituisce il collaudo operativo.')

@@ -173,7 +173,7 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: desalvo/quorivo:${{ steps.label.outputs.tag }}
+          tags: desalvo/quorivio:${{ steps.label.outputs.tag }}
           sbom: true
           provenance: mode=max
           labels: |

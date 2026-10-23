@@ -5,7 +5,7 @@
 **Autore:** Alessandro De Salvo <braket71@gmail.com>  
 **Sorgenti:** https://github.com/desalvo/quorivio  
 **Licenza:** EUPL-1.2 (vedere LICENSE; inclusione del testo integrale ufficiale ancora da completare)  
-**Docker:** `desalvo/quorivo`
+**Docker:** `desalvo/quorivio`
 
 Quorivio è una piattaforma web autonoma per presentazioni interattive, sondaggi, quiz e risultati in diretta. Supporta sessioni indipendenti dalle presentazioni esterne e QR code riutilizzabili. Questa è una **versione iniziale di sviluppo, non ancora validata per produzione**.
 

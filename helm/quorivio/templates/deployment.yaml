@@ -10,6 +10,10 @@ spec:
     metadata:
       labels: {app: quorivio, release: {{ .Release.Name }}}
     spec:
+{{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+{{- end }}
       securityContext:
         runAsNonRoot: true
         seccompProfile: {type: RuntimeDefault}

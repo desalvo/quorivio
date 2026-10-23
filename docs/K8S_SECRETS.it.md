@@ -1,0 +1,9 @@
+# Segreti Kubernetes generati dal wizard
+
+Il wizard genera automaticamente una password PostgreSQL **solo per il database interno**, una password iniziale per l’account amministratore e `AUTH_SECRET` (necessario per le sessioni e la cifratura dei dati applicativi). Usa `admin_email` per selezionare l’identità iniziale dell’amministratore; il valore predefinito è dimostrativo, quindi deve essere sostituito prima del deployment. L’amministratore deve cambiare la password al primo accesso.
+
+I valori generati sono scritti in `quorivio-overrides.json` e riutilizzati alle successive esecuzioni nella stessa directory; il manifest `05-app-secret.yaml` contiene un Kubernetes Secret Opaque con valori base64, **non cifrati**. Entrambi hanno permessi 0600. Sono aggiunti automaticamente a `kustomization.yaml`. Conservare gli override in un vault o backup protetto, non committarli né pubblicarli. La rigenerazione in una directory nuova crea nuove credenziali. Una modifica di AUTH_SECRET può rendere illeggibili segreti già cifrati nell'app; cambiare la password PostgreSQL di un database inizializzato richiede un intervento coordinato nel database.
+
+Per PostgreSQL **esterno** il wizard richiede `--set postgres_password=...` o valori protetti preesistenti: non può generare arbitrariamente la password di un server esistente. È responsabilità dell'operatore configurare TLS e certificati del DB esterno. Le credenziali passate tramite `--set` possono finire nella cronologia shell e nei process list: preferire un file `--values` protetto con permessi 0600. Applicare i manifest soltanto dopo revisione del Secret e del namespace.
+
+Esempio: `python3 tools/k8s_wizard.py --unattended --output ./k8s-generated --set admin_email=admin@example.com`. Le opzioni TLS senza secret e nodeSelector continuano a funzionare.

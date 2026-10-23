@@ -5,9 +5,13 @@ metadata:
   name: {{ .Release.Name }}-quorivio
 spec:
   ingressClassName: {{ .Values.ingress.className }}
+{{- if .Values.ingress.tlsTermination }}
   tls:
     - hosts: [{{ .Values.ingress.host | quote }}]
-      secretName: {{ .Values.ingress.tlsSecret }}
+{{- if .Values.ingress.tlsSecret }}
+      secretName: {{ .Values.ingress.tlsSecret | quote }}
+{{- end }}
+{{- end }}
   rules:
     - host: {{ .Values.ingress.host | quote }}
       http:

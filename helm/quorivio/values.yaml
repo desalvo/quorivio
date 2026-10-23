@@ -1,8 +1,9 @@
 image:
-  repository: ghcr.io/replace-me/quorivio
-  tag: 0.1.0-dev
+  repository: desalvo/quorivio
+  tag: latest
   pullPolicy: IfNotPresent
 replicaCount: 1
+nodeSelector: {}
 service:
   port: 8080
 publicBaseUrl: https://quorivio.example.org
@@ -18,7 +19,8 @@ ingress:
   enabled: false
   className: nginx
   host: quorivio.example.org
-  tlsSecret: quorivio-tls
+  tlsTermination: true
+  tlsSecret: ""
 
 # ClamAV is managed as a private sidecar per Quorivio pod.
 antivirus:
@@ -39,7 +41,7 @@ assets:
   storageClassName: ""
 
 converter:
-  image: "desalvo/quorivo-converter:0.1.0-dev"
+  image: "desalvo/quorivio-converter:0.1.0-dev"
   resources:
     requests: {cpu: 100m, memory: 256Mi}
     limits: {cpu: "2", memory: 2Gi}

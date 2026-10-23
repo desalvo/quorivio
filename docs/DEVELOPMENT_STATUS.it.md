@@ -1,3 +1,11 @@
+## K8s wizard credentials — 2026-10-23
+2026-10-23: il wizard Kubernetes genera credenziali PostgreSQL interne, admin e AUTH_SECRET riutilizzabili, salva override/Secret con permessi 0600 e richiede una password nota per DB esterno. Vedi K8S_SECRETS.it.md. Collaudo reale ancora aperto.
+
+## 2026-10-23 — Kubernetes test deployment and image correction (uncommitted after latest confirmed green CI)
+- Default application image corrected to `desalvo/quorivio:latest` in Compose/Kustomize/Helm/CI; Helm converter image reference renamed to `desalvo/quorivio-converter:0.1.0-dev` (registry availability not confirmed).
+- Wizard supports TLS termination without a named ingress TLS secret (controller default certificate required), explicit TLS disable, and independent app/PostgreSQL pod node selectors. Helm supports optional TLS secret and shared pod nodeSelector.
+- Verifiche: 111/111 Python, 107/107 Node.js, build di produzione backend/frontend PASS e parsing YAML Kustomize. Helm non disponibile; cluster Kubernetes reale e pubblicazione registry non verificati. See `K8S_TEST_DEPLOYMENT.en.md` / `.it.md`. GitHub not changed; new maintainer commit and CI required before deploying. Version unchanged 0.1.0-dev.
+
 
 ## 2026-10-23 — Verifica editor con Chromium: blocco di accesso al server locale
 - Chromium 144 e Python Playwright disponibili e avviabili; il browser gestito dall'ambiente blocca le navigazioni verso il server Vite su 127.0.0.1 (`ERR_BLOCKED_BY_ADMINISTRATOR`). Non è stato eseguito alcun E2E browser né PostgreSQL (server non disponibile).
@@ -135,7 +143,7 @@ Implementazione parziale API: collaboratori, import/export delle sole definizion
 - Le precedenti percentuali 53% e 33% restano stime storiche. Questo ciclo non dimostra un aumento verificato di almeno 10 punti percentuali.
 
 ## 22 ottobre 2026 — Immagini, layout e risposte invalidate
-- Default Compose/Podman/Kubernetes: `desalvo/quorivo:latest`; pubblicazione Docker Hub aggiornata, mantenendo GitHub `desalvo/quorivio`.
+- Default Compose/Podman/Kubernetes: `desalvo/quorivio:latest`; pubblicazione Docker Hub aggiornata, mantenendo GitHub `desalvo/quorivio`.
 - Data di riferimento persistita e modifica dei metadati durante la sessione.
 - Editor dei layout specifici domanda e risultati; ancora da verificare il rendering completo in browser.
 - Risposte invalidate mantenute per audit; indice univoco parziale sulle sole risposte attive per consentire un nuovo voto. Applicare prima la migrazione.

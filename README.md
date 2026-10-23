@@ -5,7 +5,7 @@
 **Author:** Alessandro De Salvo <braket71@gmail.com>  
 **Source:** https://github.com/desalvo/quorivio  
 **License:** EUPL-1.2 (see LICENSE; official full-text inclusion pending)  
-**Docker:** `desalvo/quorivo`
+**Docker:** `desalvo/quorivio`
 
 [Italian README](README.it.md) · [CI / Docker Hub setup](docs/GITHUB_DOCKERHUB.en.md) · [User manual](docs/manuals/user-guide.en.pdf) · [Administrator manual](docs/manuals/admin-guide.en.pdf) · [Kubernetes wizard](docs/KUBERNETES.en.md)
 

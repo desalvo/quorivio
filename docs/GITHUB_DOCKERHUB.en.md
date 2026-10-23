@@ -1,7 +1,7 @@
 # GitHub / Docker Hub setup
-Repository: `https://github.com/desalvo/quorivio`. Docker Hub target: `desalvo/quorivo`.
+Repository: `https://github.com/desalvo/quorivio`. Docker Hub target: `desalvo/quorivio`.
 
-1. Create and verify the Docker Hub repository `desalvo/quorivo`; create a **scoped access token** with read/write permissions (not a password).
+1. Create and verify the Docker Hub repository `desalvo/quorivio`; create a **scoped access token** with read/write permissions (not a password).
 2. In GitHub repository **Settings > Environments**, create **production**. Set environment variable `DOCKERHUB_USERNAME=desalvo`, and environment secret `DOCKERHUB_TOKEN` to your Docker Hub access token.
 3. Restrict the production environment to trusted `main` and release tag patterns. If GitHub plan / repository visibility permits, require independent reviewers. A single self-approving reviewer is not an independent release gate.
 4. Under **Settings > Actions > General** allow the required GitHub and Docker actions. Enable GitHub Actions. Under **Settings > Branches / Rulesets** protect `main`, require status checks `Production quality gate` and `Container build gate`, disallow direct unreviewed pushes and force pushes, restrict tag creation.

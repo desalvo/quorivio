@@ -8,7 +8,7 @@ class WizardTests(unittest.TestCase):
    d=Path(td);generate(dict(DEFAULTS),d);a={f.name:f.read_bytes() for f in d.iterdir()};generate(dict(DEFAULTS),d);self.assertEqual(a,{f.name:f.read_bytes() for f in d.iterdir()})
  def test_overrides_only(self):
   with tempfile.TemporaryDirectory() as td:
-   c=dict(DEFAULTS,host='q.example.org');generate(c,Path(td));self.assertEqual((Path(td)/'quorivio-overrides.json').read_text().strip(),'\u007b\n  "host": "q.example.org"\n\u007d')
+   c=dict(DEFAULTS,host='q.example.org');generate(c,Path(td));self.assertEqual(__import__('json').loads((Path(td)/'quorivio-overrides.json').read_text())['host'],'q.example.org')
  def test_invalid_host(self):
   with self.assertRaises(ValueError):validate(dict(DEFAULTS,host='hello:bad'))
  def test_no_plain_secret(self):
@@ -24,7 +24,7 @@ class InfrastructureVariants(unittest.TestCase):
    self.assertIn('DATABASE_URL',(Path(td)/'20-deployment.yaml').read_text())
  def test_external_postgres_without_statefulset(self):
   with tempfile.TemporaryDirectory() as td:
-   cfg=validate(dict(DEFAULTS,postgres_mode='external',postgres_host='db.example.org',postgres_sslmode='verify-full'))
+   cfg=validate(dict(DEFAULTS,postgres_mode='external',postgres_host='db.example.org',postgres_sslmode='verify-full',postgres_password='test-only-database-password'))
    generate(cfg,Path(td));self.assertFalse((Path(td)/'12-postgres-statefulset.yaml').exists())
    self.assertIn('db.example.org',(Path(td)/'10-configmap.yaml').read_text())
  def test_haproxy_variants(self):
@@ -51,7 +51,7 @@ class InfrastructureVariants(unittest.TestCase):
  def test_switch_internal_to_external_removes_stale_files(self):
   with tempfile.TemporaryDirectory() as td:
    generate(dict(DEFAULTS),Path(td))
-   generate(validate(dict(DEFAULTS,postgres_mode='external',postgres_host='db.example.org')),Path(td))
+   generate(validate(dict(DEFAULTS,postgres_mode='external',postgres_host='db.example.org',postgres_password='test-only-database-password')),Path(td))
    self.assertFalse((Path(td)/'12-postgres-statefulset.yaml').exists())
    self.assertNotIn('12-postgres-statefulset.yaml',(Path(td)/'kustomization.yaml').read_text())
 

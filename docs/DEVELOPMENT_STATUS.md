@@ -1,3 +1,11 @@
+## K8s wizard credentials — 2026-10-23
+2026-10-23: Kubernetes wizard creates stable internal DB/admin/auth credentials and an application Secret (base64, not encrypted), with 0600 overrides, reuse on repeat generation and protected external-DB password input. See K8S_SECRETS.en.md. Real cluster acceptance pending.
+
+## 2026-10-23 — Kubernetes test deployment and image correction (uncommitted after latest confirmed green CI)
+- Default application image corrected to `desalvo/quorivio:latest` in Compose/Kustomize/Helm/CI; Helm converter image reference renamed to `desalvo/quorivio-converter:0.1.0-dev` (registry availability not confirmed).
+- Wizard supports TLS termination without a named ingress TLS secret (controller default certificate required), explicit TLS disable, and independent app/PostgreSQL pod node selectors. Helm supports optional TLS secret and shared pod nodeSelector.
+- Verification: 111/111 Python, 107/107 Node.js and backend/frontend production build PASS; generated Kustomize YAML parsed. No Helm binary, real Kubernetes cluster or registry publication validation. See `K8S_TEST_DEPLOYMENT.en.md` / `.it.md`. GitHub not changed; new maintainer commit and CI required before deploying. Version unchanged 0.1.0-dev.
+
 
 ## 2026-10-23 — Chromium editor validation: local-server access blocked
 - Chromium 144 and Python Playwright are installed and launch successfully, but the managed browser blocks navigation to the local Vite server at 127.0.0.1 (`ERR_BLOCKED_BY_ADMINISTRATOR`). No browser E2E or PostgreSQL acceptance was performed (PostgreSQL server unavailable).
@@ -253,7 +261,7 @@ Additional deletion hook: session deletion and retention-based purging now attem
 - Previous completion estimates of 53% functional and 33% readiness are historical estimates. This cycle adds useful capabilities but does **not** substantiate +10 percentage points of fully validated functionality.
 
 ## 2026-10-22 — Image defaults, page layout editor and re-voting
-- Default container reference changed to `desalvo/quorivo:latest` in Compose and Kubernetes wizard; publish target updated to Docker Hub `desalvo/quorivo` without renaming the GitHub source repository.
+- Default container reference changed to `desalvo/quorivio:latest` in Compose and Kubernetes wizard; publish target updated to Docker Hub `desalvo/quorivio` without renaming the GitHub source repository.
 - Fixed session creation to persist the reference date and added authorized live metadata editing.
 - Added presenter page-specific editor for question/result headings and backgrounds.
 - Changed response uniqueness to partial unique active vote; invalidated history is retained and same participant may submit again after invalidation. Requires PostgreSQL schema migration before backend deployment.
