@@ -10,3 +10,5 @@ test('canvas coordinates are accepted in heterogeneous page widget layouts',()=>
  assert.equal(validPageDesign({widgets:[{id:'abc',kind:'text',position:{x:95,y:0,width:50}}]}),false);
  assert.equal(validPageDesign({widgets:[{id:'abc',kind:'text'}]}),true);
 });
+
+test('rotation and independent topic widgets',()=>{assert.equal(validWidgetPosition({x:10,y:10,width:40,height:30,rotation:37.5}),true);assert.equal(validWidgetPosition({x:10,y:10,width:40,height:30,rotation:Infinity}),false);assert.equal(validWidgetPosition({x:10,y:10,width:40,height:30,rotation:361}),false);assert.equal(validPageDesign({widgets:[{id:'topic1',kind:'topic-question',label:'Topic 1',showNames:false,position:{x:2,y:5,width:48,height:38,rotation:-28}}]}),true);});

@@ -1,3 +1,19 @@
+## 23/10/2026 — Quiz a tempo e Risultati per il presentatore (parziale)
+- Vedi `TIMED_QUIZ_RESULTS.it.md`: attività separata e cronometro dal server, classifica protetta, nuovi widget palette e pulsante Risultati del presentatore, build frontend/backend e 90 test Node superati. **Macroarea non conclusa.** 67% invariato. Le funzioni precedenti non committate rimangono incluse nel cumulativo.
+
+## 2026-10-23 — Recupero MFA amministrativo per utente
+- Introdotto reset MFA TOTP per utente con verifica password/TOTP amministratore, protezione account principale e reset proprio, cancellazione transazionale dei segreti/codici, chiusura WebSocket, indicatore MFA e controllo UI. Il cookie di login preesistente **non è revocato**: gate sicurezza produzione aperto.
+- Build sorgenti, TypeScript e Vite eseguite; 87 verifiche Node e 91 Python. Nessun test E2E PostgreSQL/browser. Vedere `ADMIN_MFA_RESET.it.md`. Gate RC ancora al **67%**.
+
+## Stato dei gate aggiornato — 23 ottobre 2026 (ultimo cumulativo)
+- **Gate RC chiusi: 67% (invariato).** La nuova anteprima geometrica e il riordino via tastiera non hanno ancora superato build/collaudo browser; la stima non è percentuale di test né idoneità alla produzione.
+- Implementate miniature con fino a 24 widget, posizioni e rotazioni salvate, sfondo facoltativo; riordino Alt+frecce tramite API transazionale già esistente. Media rappresentati con simboli e non con veri fotogrammi.
+- Verifiche locali: 85/85 test Node.js e 88/88 Python, inclusi 2 nuovi test statici. `npm install --offline` non riesce per assenza di `@types/bcryptjs` nella cache: build TypeScript/Vite **non eseguita** e CI recente non confermata.
+- Restano aperti i gate PostgreSQL/browser/container/Kubernetes/SSO/MFA via email e amministrativa/accessibilità/sicurezza/HA. I manuali PDF sono edizioni precedenti e **non** descrivono integralmente l'interfaccia attuale. Dettagli in `SLIDE_THUMBNAILS_KEYBOARD.it.md`.
+- Nessuna modifica del repository remoto; gli sviluppi successivi all'ultima CI confermata sono cumulativamente non committati.
+
+
+## RC editor grouped cycle 2026-10-23 — see docs/RC_EDITOR_BATCH.en.md and .it.md
 ## 2026-10-23 — Phase 2 field-validation follow-up
 
 See `docs/VALIDATION_PHASE2_ISSUES.it.md` / `.en.md` for completed work, unverified UI, and pending calendar/editor work.
@@ -249,3 +265,51 @@ Docker/Podman Compose now bundles a private ClamAV service and persists its sign
 - **Correzione:** tuple letterali (`as const`) nelle sole voci riservate agli admin, preservando il controllo statico TypeScript senza cast del parametro o ampliamento del tipo dello stato.
 - **Regressione:** aggiunto `tools/tests/test_dashboard_navigation_types.py`. Resta necessaria una nuova build npm completa tramite GitHub Actions per confermare la compilazione.
 - Restano inclusi gli interventi del precedente collaudo; versione invariata, nessun commit effettuato.
+
+## Ciclo 2026-10-23 — paginazione server, calendario e ciclo di vita (non ancora committato)
+- Ricerca e paginazione server-side di utenti e sessioni (1–100 voci/pagina), rispettando i ruoli owner/collaboratore; mantenuta la compatibilità delle risposte legacy.
+- Nuova tabella `session_appointments` con data, ora HH:MM, durata di 5–1440 minuti e fuso IANA, API del calendario globale filtrata per permessi e appuntamenti per singola sessione, vista mensile e editor appuntamenti.
+- Stato sessione `paused`, con pausa e ripresa; l'invio delle risposte rimane limitato alle sessioni attive.
+- Navigazione iniziale a tab per l'editor e adattamento responsive del calendario.
+- Verifiche locali: 82 test Node e 75 test Python superati. Build TS completa, migrazione PostgreSQL con dati esistenti e collaudi reali browser/container ancora obbligatori.
+- **Da completare**: MFA amministrativa completa, secondo fattore email, gestione completa SSO dalla UI, audit accessibilità/responsive, conversione globale dei controlli sì/no a toggle e test end-to-end. RC non ancora validata.
+
+## Aggiornamento post-collaudo UI e profili (23 ottobre 2026)
+- Foto profilo caricate direttamente con streaming privato (PNG/JPEG/WebP, massimo 5 MB), scansione antivirus, sostituzione ed eliminazione; accesso pubblico alle foto dei presentatori vincolato alla sessione.
+- Nickname inizializzato dal profilo corrente; rimosso l'inserimento di URL esterni per la foto.
+- Toolbox con drag & drop nel canvas esistente; widget spostabili e rimovibili.
+- Notifiche chiudibili con clic, pulsante e tasto Escape; migliorata la sovrapposizione visiva.
+- Test di regressione aggiunti. **Ancora aperti**: esperienza completa tipo PowerPoint (widget immagine/video dedicati, catalogo integrale, miniature pagine e navigazione), verifica responsive nel browser, compilazione completa in CI e test operativi.
+
+
+### 2026-10-23: Prova sessione nel browser e widget post-it
+Aggiunto alla dashboard un dialogo di prova come partecipante con risposte locali, navigazione pagine e reset: non invia risposte all’API e non equivale a un collaudo E2E con partecipanti veri. Aggiunto il post-it al canvas e alla validazione condivisa. Rimangono da completare widget media con accesso sicuro, rifiniture dell’editor, MFA amministrativa, SSO via web e prove browser/CI.
+
+Widget media, navigazione pagine e toggle implementati nei sorgenti; chiusura stimata gate RC 63%, collaudi E2E aperti.
+
+## 2026-10-23 — Canvas slide a tutto schermo e riordino visuale
+- L'editor usa un canvas 16:9, spostamento trascinando il corpo del widget e ridimensionamento da otto bordi/angoli. Le dimensioni sono salvate in percentuale; `height` è opzionale per compatibilità con le vecchie pagine.
+- Rimossi i pulsanti di larghezza `+`/`−`; mantenuto il piccolo controllo di rimozione sul bordo.
+- Aggiunto il comando di editor a schermo intero e riordino drag & drop nella barra delle slide, tramite l'API transazionale esistente.
+- La simulazione partecipante rispetta le altezze salvate; aggiunti test delle geometrie.
+- Test locali Node e Python eseguiti. La build TypeScript completa, il comportamento browser e i collaudi E2E devono essere verificati in CI e su un'installazione reale; restano aperti i flussi SSO/MFA e altri gate RC.
+
+## 2026-10-23 — Righelli, rotazione, reflow mobile, domande per argomento e anteprima presentatore
+
+- Editor bianco 16:9 con righelli percentuali; movimento dal corpo del widget, ridimensionamento ai bordi e rotazione arbitraria da maniglia dedicata (angolo salvato). Restano modalità fullscreen e riordino delle slide.
+- Layout live su mobile adattato in blocchi verticali per la leggibilità; la rotazione salvata viene ignorata solo sul piccolo schermo.
+- La dashboard espone anteprima incorporata e collegamento alla schermata pubblica di presentazione/risultati.
+- Nuovo widget `topic-question` ripetibile: invii indipendenti per argomento in PostgreSQL, elenco del presentatore paginato a 10 domande, pseudonimo facoltativo disattivato per impostazione predefinita, aggiornamento periodico; dieci invii per partecipante/widget.
+- Test mirati completati. **Da validare in CI/browser/PostgreSQL reali:** compilazione integrale, trascinamenti, responsive e migrazione dati. Consulta `docs/SLIDE_RULERS_ROTATION_TOPICS.it.md`.
+- Stima di chiusura gate RC **67%** (prima 65%); non equivale a certificazione production-ready.
+
+## 2026-10-23 — Geometria dei widget accessibile da tastiera (non committato)
+- I widget del canvas sono selezionabili con Tab: frecce per spostamento (1 punto percentuale), Maiusc+frecce per ridimensionamento, Alt+frecce per rotazione (5 gradi). Ctrl abilita regolazioni fini (0,1 punti percentuali o 1 grado). Le operazioni rispettano i limiti del canvas e sfruttano il normale percorso di persistenza della geometria. I controlli di inserimento testo e i pulsanti non sono intercettati. Aggiunti indicatori di focus e istruzioni accessibili.
+- Verifiche del ciclo: compilazione backend TypeScript **SUPERATA** e frontend TypeScript/Vite **SUPERATA** (1.579 moduli); Node **85/85 SUPERATI**; Python **91/91 SUPERATI**, compresi tre nuovi controlli contrattuali. Mancano prove su browser reale e tecnologie assistive; il gate accessibilità non è chiuso.
+- Stima gate RC invariata al **67%**; restano verifiche reali browser, database, CI, multi-replica e deployment. Nessun commit/push/tag/release effettuato. Le modifiche dopo l'ultimo commit con CI verde dichiarato dall'utente restano non committate.
+
+## 2026-10-23 — Posizionamento dei Risultati e domande per argomento (non committato)
+- Il pulsante `results-button` nella proiezione segue ora l'intero rettangolo e la rotazione salvati; resta un pulsante di riserva per le pagine precedenti. I risultati sono visibili soltanto al presentatore tramite un pannello espandibile accessibile.
+- Il pannello mostra statistiche dell'attività, classifica quiz a tempo se applicabile ed elenchi paginati (10/pagina) per ciascun widget di domande per argomento.
+- Verifiche locali: build backend TypeScript e frontend Vite PASS; Node 90/90 PASS; Python 93/93 PASS, inclusi due nuovi test contrattuali. Test E2E con browser e PostgreSQL non eseguiti.
+- **Chiusura gate RC confermata al 67%**. Mancano grafici configurabili per singolo widget, quiz a tempo indipendenti e verifiche reali di sincronizzazione/deployment. Nessuna nuova CI confermata, commit o release.

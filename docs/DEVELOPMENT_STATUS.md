@@ -1,3 +1,19 @@
+## 2026-10-23 — Timed quiz and presenter Results (partial)
+- See `TIMED_QUIZ_RESULTS.en.md`: distinct timed activity, authoritative server start and score timing, protected rankings, palette markers, presenter-only Results overlay, passing API/frontend production build and 90 Node tests. **Not RC complete.** 67% unchanged. Previous entry and earlier uncommitted features remain part of the cumulative baseline.
+
+## 2026-10-23 — Administrative user MFA recovery
+- Implemented privileged per-user TOTP MFA reset with password/TOTP step-up, primary-admin/self-reset protection, transactional credential and recovery-code deletion, websocket closure, directory status flag and administrator UI. Existing stateless login cookies are **not revoked**: production security gate remains open.
+- Source, TypeScript and Vite production build validated locally; 87 Node and 91 Python checks after change. No PostgreSQL/browser E2E. See `ADMIN_MFA_RESET.en.md`. RC gate closure remains **67%**, pending live acceptance.
+
+## Current gate snapshot — 2026-10-23 (latest cumulative package)
+- **RC acceptance gate closure: 67% (unchanged).** The previous estimate is retained because source-level preview/keyboard features have not passed build/browser acceptance. This is not functional test coverage or production readiness.
+- Newly implemented: geometry-backed slide filmstrip with up to 24 widget boxes, preserved placement and rotation, optional background; keyboard Alt+Arrow reordering uses the existing transactional API. Thumbnails are approximate (media glyphs, not actual image/video frames).
+- Local tests: 85/85 Node.js and 88/88 Python; the latter includes 2 new static feature regressions. Full `npm install --offline` fails due to absent cached `@types/bcryptjs`; TypeScript/Vite build **not executed**, no claim of CI green on these changes.
+- Still open: all live PostgreSQL/browser/container/Kubernetes/SSO/email MFA/admin MFA/accessibility/security/HA acceptance gates in prior status; PDF manuals are older editions and are **not** authoritative for recently added UI. See `SLIDE_THUMBNAILS_KEYBOARD.en.md`.
+- No repository mutations; last confirmed CI predates the user-specified uncommitted changes.
+
+
+## RC editor grouped cycle 2026-10-23 — see docs/RC_EDITOR_BATCH.en.md and .it.md
 ## 2026-10-23 — Phase 2 field-validation follow-up
 
 See `docs/VALIDATION_PHASE2_ISSUES.it.md` / `.en.md` for completed work, unverified UI, and pending calendar/editor work.
@@ -424,3 +440,51 @@ Docker/Podman Compose now bundles a private ClamAV service and persists its sign
 - **Fix:** preserve literal tuple types on the conditional entries (`as const`), so `setDashboardPage(key)` remains statically checked without casts or widening the state type.
 - **Regression:** `tools/tests/test_dashboard_navigation_types.py` asserts literal typing and state setter usage. A fresh full npm build in GitHub Actions is still required to confirm compilation.
 - **Scope:** all previous field-validation changes remain included; no version bump, commit, push or release.
+
+## Cycle 2026-10-23 — server pagination, scheduling and session lifecycle (uncommitted)
+- Added authenticated, owner/collaborator-scoped server-side search and paginated listings for users and sessions (1–100 entries per page); legacy unpaginated array responses retained to avoid breaking existing clients.
+- Introduced `session_appointments` with explicit date, HH:MM start time, duration (5–1440 minutes), and IANA timezone. Added session-specific CRUD and a scoped global calendar API, plus monthly calendar and appointment editor UI.
+- Added `paused` session state with pause/resume transitions and UI controls; responses remain restricted to active sessions.
+- Introduced initial editor section tabs and responsive calendar styling.
+- Local checks: Node test suite 82 passed; Python suite 75 passed. A complete TypeScript frontend build, database migration against an existing DB, real browser testing, and multi-container verification were not available in this cycle and remain release gates.
+- **Still open**: full administrative MFA enforcement flow, email second-factor, full web management of configurable SSO providers, accessibility/responsive audit, broad UI toggles, and end-to-end tests with seeded PostgreSQL and external services. Do not call RC validated yet.
+
+## Post-validation UI and profile update (23 October 2026)
+- Added private streamed profile-image uploads (PNG/JPEG/WebP, 5 MB), antivirus scanning, replacement and deletion via authenticated API; presenter public image delivery is scoped to session and membership.
+- Profile nickname now initializes from the authenticated account; profile images no longer accept externally hosted URLs.
+- Added drag-and-drop from existing widget toolbox into the graphic canvas; positioned widgets remain draggable and removable.
+- Notifications support click to dismiss, explicit close and Escape, with improved stacking.
+- Added regression contract tests. **Remaining**: full PowerPoint-like page editing (dedicated image/video widgets, complete widget types, slide thumbnails, advanced management), responsive browser QA, full CI compilation and deployment testing.
+
+
+### 2026-10-23: Browser-only session rehearsal and sticky-note widgets
+Added a dashboard-launched participant rehearsal dialog with local-only mock responses, per-page navigation and reset. No submissions reach the API; this is not a full networked participant end-to-end test. Added sticky notes to the page canvas and shared validation. Local Node and Python tests pass. Still pending: production image/video widget asset delivery, full presentation-grade canvas ergonomics, admin-managed MFA, full web SSO configuration, and real browser/CI integration tests.
+
+Media widgets, filmstrip navigation and binary controls implemented in source; RC gate estimate 63%, not E2E approved.
+
+## 2026-10-23 — Fullscreen slide canvas and graphical page ordering
+- The slide composer uses a 16:9 editing surface, with inside-body pointer dragging and eight edge/corner resize handles. Width and height are persisted as percentages, with a backward-compatible optional `height` in the validated page schema.
+- Removed the old embedded width `+`/`−` buttons. A small dismiss control remains on the widget border; the widget fits its explicit rectangle.
+- Added the browser fullscreen editor control; direct drag-to-reorder is available on the slide filmstrip as well as the existing slide list, using the transactional order API.
+- Updated the rehearsal display to respect stored widget heights; added geometry regression coverage.
+- Verification performed: Node unit tests and Python tests. Browser rendering/fullscreen behavior and complete TypeScript build await CI and field testing. The full RC remains gated on SSO/MFA completion and operational E2E checks.
+
+## 2026-10-23 — Widescreen slide rulers, rotation, mobile reflow, topic Q&A and presenter preview
+
+- White 16:9 editor canvas with percent rulers; draggable interior, edge resizing, dedicated arbitrary-angle rotation handle and stored `position.rotation` (-360..360). The earlier fullscreen and slide reordering controls remain.
+- Reflow live widgets into readable stacked blocks on small screens; desktop layout retains stored rotation, mobile presentation does not rotate controls.
+- Presenter dashboard previews projection/results in an iframe and links to a separate presentation screen.
+- Added independent `topic-question` widgets, topic-specific PostgreSQL submissions, anonymous-by-default presenter listings with optional pseudonyms, ten questions per page, ten submissions per participant/widget, and periodic refresh. Presenter rehearsal remains browser-local.
+- New focused Node rotation validation regression, migration and contract tests; see `docs/SLIDE_RULERS_ROTATION_TOPICS.en.md`. **Not yet E2E validated:** frontend npm build, browser gestures, real DB migration, mobile devices, historical live-results preview.
+- Estimated RC gate closure **67%** (prior 65%); this is not production certification.
+
+## 2026-10-23 — Accessible keyboard geometry on slide canvas (uncommitted)
+- Focusable widget canvas items now provide arrow-key positioning (1 percentage point), Shift+arrows width/height resizing, and Alt+arrows rotation (5 degrees). Ctrl permits finer changes (0.1 position/size points, 1 degree rotation). All changes use existing widget position state and persistence pathways, and remain bounded by canvas dimensions. Interactive form controls are excluded from keyboard geometry handling. Visible keyboard focus styling and accessible instructions were added.
+- Verification in this cycle: production backend TypeScript compilation and frontend TypeScript/Vite build **PASS** (1,579 transformed modules); Node tests **85/85 PASS**; Python tests **91/91 PASS**, including three new source/contract regressions. Keyboard interactions have **not** been exercised in a real browser with assistive technology; this is not a closed accessibility acceptance gate.
+- Overall RC gate estimate remains **67%** pending real browser, database, CI, multi-replica and deployment checks. Last maintainer-confirmed CI green remains the prior baseline; all subsequent changes are uncommitted. No commit, push, tag or release performed.
+
+## 2026-10-23 — Presenter results canvas placement and topic questions (uncommitted)
+- The `results-button` on the projection screen now uses its saved complete rectangle and rotation; a legacy fallback remains available. Results stay presenter-only and use an accessible toggle region.
+- The presenter Results panel includes the current activity aggregates, the timed-quiz leaderboard when applicable, and one paginated (10/page) topic-question list per topic widget.
+- Local validation: backend TypeScript and frontend Vite production builds PASS; Node 90/90 PASS; Python 93/93 PASS, including two new presenter-results contract tests. No browser or PostgreSQL E2E validation in this cycle.
+- **RC gate closure estimate remains 67%**. Remaining widget-specific graph settings, fully independent timed quiz widgets, and real synchronization/deployment tests are not completed. No maintainer-confirmed new CI, commit or release.

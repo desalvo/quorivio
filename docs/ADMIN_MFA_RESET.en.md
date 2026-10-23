@@ -1,0 +1,7 @@
+# Administrative MFA recovery — 0.1.0-dev
+
+Platform administrators can reset another user's TOTP MFA from **Users → user details → Reset user MFA**. The target's pending and active TOTP secrets and all recovery codes are revoked in a single PostgreSQL transaction. Existing WebSocket connections for that user are closed. The administrator must confirm the operation, enter their own account password and, when their own TOTP is active, provide a valid TOTP code. The current administrator cannot reset themselves; the protected primary administrator cannot be reset through this endpoint. The directory exposes only the boolean `totp_enabled`, not private secrets. A structured reset event is written to server logs without credentials.
+
+API: `POST /api/admin/users/:id/mfa/reset` with `{ "confirm": true, "admin_password": "...", "admin_totp_code": "..." }`. Requires an authenticated platform administrator. This is a recovery operation and not automatic enrollment: the affected user must enroll again.
+
+**Limitations / security:** The current stateless authentication cookie remains valid until expiration; WebSocket closure is not equivalent to cookie/session revocation. Real PostgreSQL/browser E2E, audit log retention, rate limiting, fresh-auth age enforcement and administrator email notification remain pending. Treat reset as a privileged, manually supervised operation. Do not deploy this feature as production-grade account recovery before those controls are validated.

@@ -22,3 +22,95 @@
 @media(prefers-reduced-motion:reduce){.widget-canvas-item{transition:none!important}}
 
 .audience-widget-layout{width:100%;position:relative}.audience-widget-layout:has(> .page-widget[style*="absolute"]){min-height:560px}.audience-widget-layout .page-widget[style*="absolute"]{box-sizing:border-box;z-index:1;max-height:400px;overflow:auto}
+
+/* RC workspace: accessible appointments, navigable editor sections. */
+.quorivio-calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin:12px 0}
+.calendar-day{min-height:88px;border:1px solid var(--border,#dadde5);border-radius:8px;padding:7px;min-width:0;overflow-wrap:anywhere}
+.calendar-entry{display:block;width:100%;text-align:left;margin-top:5px;font-size:.75rem;white-space:normal;overflow-wrap:anywhere}
+.session-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 18px}
+.session-tabs button[aria-pressed="true"]{font-weight:700}
+@media(max-width:680px){.quorivio-calendar{grid-template-columns:repeat(2,minmax(0,1fr))}.calendar-day{min-height:65px}}
+/* Session editor tabs: hide inactive functional groups instead of mixing settings and live pages. */
+.session-tab-overview > div:first-child > section:nth-of-type(n+3),
+.session-tab-overview > div:last-child > section{display:none}
+.session-tab-pages > div:first-child > section:not(:nth-of-type(3)):not(:nth-of-type(4)),
+.session-tab-pages > div:last-child > section:nth-of-type(n+4){display:none}
+.session-tab-audience > div:first-child > section:not(:nth-of-type(2)),
+.session-tab-audience > div:last-child > section:not(:nth-of-type(1)):not(:nth-of-type(2)){display:none}
+.session-tab-results > div:first-child > section,
+.session-tab-results > div:last-child > section:not(:last-child){display:none}
+
+/* Dismissible alerts and direct-manipulation widget toolbox */
+.alert{display:flex;align-items:center;gap:14px;max-width:min(460px,calc(100vw - 32px));z-index:2000;box-shadow:0 15px 45px #0008;overflow-wrap:anywhere;cursor:default}
+.alert button{flex-shrink:0;margin-left:auto;min-width:32px;min-height:32px;position:relative;z-index:2001;cursor:pointer}
+.widget-palette button[draggable=true]{cursor:grab;touch-action:auto}
+.widget-canvas-item .canvas-actions button:last-child{background:#7d2330;color:#fff;border:1px solid #f19ba4}
+
+/* Participant rehearsal is a standalone browser-only sandbox. */
+.rehearsal-backdrop{position:fixed;inset:0;z-index:5000;background:rgba(12,17,35,.76);display:grid;place-items:center;padding:1rem}
+.rehearsal-shell{background:#fff;color:#172038;border-radius:16px;width:min(1200px,98vw);height:min(850px,95vh);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 80px #0006}
+.rehearsal-toolbar,.rehearsal-footer{display:flex;align-items:center;gap:1rem;justify-content:space-between;padding:1rem;background:#f1f3fa;flex-wrap:wrap}
+.rehearsal-toolbar button{margin-left:auto}.rehearsal-stage{overflow:auto;flex:1;display:grid;grid-template-columns:minmax(145px,200px) 1fr;gap:1rem;padding:1rem}
+.rehearsal-pages{display:flex;flex-direction:column;gap:.5rem;align-items:stretch}.rehearsal-slide{position:relative;background:white;border:1px solid #cdd2e2;min-height:520px;padding:1.5rem;box-shadow:0 4px 12px #0001;overflow:auto}
+.rehearsal-widgets{position:relative;min-height:350px}.rehearsal-widget{position:absolute;border:1px solid #d8cde8;border-radius:8px;background:#fff;padding:.75rem;min-width:100px;overflow:auto;box-sizing:border-box}.rehearsal-widget label{display:block}.rehearsal-postit{background:#fff4b5;padding:1rem;white-space:pre-wrap}.rehearsal-launch{display:flex;gap:1rem;align-items:center;flex-wrap:wrap;margin:.75rem 0}
+@media(max-width:700px){.rehearsal-stage{display:block}.rehearsal-pages{flex-direction:row;overflow:auto;margin-bottom:.5rem}.rehearsal-widget{position:relative!important;left:auto!important;top:auto!important;width:100%!important;margin:.5rem 0}}
+
+/* RC editor: keyboard-accessible slide strip and binary controls */
+.slide-filmstrip{display:flex;gap:.65rem;overflow-x:auto;padding:.75rem 0;scroll-snap-type:x mandatory}.slide-filmstrip button{min-width:145px;max-width:175px;text-align:left;scroll-snap-align:start;border:2px solid #a8aabc;border-radius:10px;padding:.65rem;background:var(--panel,#fff);color:inherit}.slide-filmstrip button[aria-current='page']{border-color:#6251d4;box-shadow:0 0 0 2px #6251d433}.slide-filmstrip .miniature{height:70px;background:linear-gradient(145deg,#f1f0fa,#dfe8fa);border-radius:5px;display:flex;align-items:center;justify-content:center;overflow:hidden}.slide-filmstrip .miniature img{max-width:100%;max-height:100%;object-fit:contain}.slide-filmstrip small{display:block;margin-top:.35rem}.binary-toggle{font-weight:700;border:1px solid #8c8c8c;border-radius:12px;padding:.5rem .85rem}.binary-toggle[aria-pressed='true']{background:#167346;color:white}.binary-toggle[aria-pressed='false']{background:#a42c37;color:white}
+
+/* PowerPoint-style slide surface and native border resize handles. */
+.widget-canvas{aspect-ratio:16/9;min-height:0;overflow:hidden;background-color:#fafaff;touch-action:none}
+.widget-canvas-item{overflow:visible;min-width:0;min-height:0;touch-action:none;cursor:move;padding:9px 23px 9px 9px;border-radius:2px}
+.widget-canvas-item input{box-sizing:border-box;height:100%;max-height:100%;width:100%;background:transparent;border:0;outline:none;padding:0;resize:none}
+.widget-canvas-item:focus-within,.widget-canvas-item.dragging{outline:1px solid #7654bb}
+.widget-canvas-item .canvas-remove{position:absolute;right:2px;top:2px;z-index:12;padding:0;width:18px;height:18px;line-height:16px;background:#a32735;color:white;border:0;border-radius:3px;font-size:16px}
+.widget-resize-edge{position:absolute;z-index:11;width:11px;height:11px;box-sizing:border-box;border:1px solid #fff;background:#7060ad;touch-action:none;opacity:0}
+.widget-canvas-item:hover .widget-resize-edge,.widget-canvas-item.dragging .widget-resize-edge,.widget-canvas-item:focus-within .widget-resize-edge{opacity:1}
+.widget-resize-edge.edge-n{left:50%;top:-6px;cursor:n-resize}.widget-resize-edge.edge-s{left:50%;bottom:-6px;cursor:s-resize}
+.widget-resize-edge.edge-e{right:-6px;top:50%;cursor:e-resize}.widget-resize-edge.edge-w{left:-6px;top:50%;cursor:w-resize}
+.widget-resize-edge.edge-ne{right:-6px;top:-6px;cursor:ne-resize}.widget-resize-edge.edge-nw{left:-6px;top:-6px;cursor:nw-resize}
+.widget-resize-edge.edge-se{right:-6px;bottom:-6px;cursor:se-resize}.widget-resize-edge.edge-sw{left:-6px;bottom:-6px;cursor:sw-resize}
+.powerpoint-editor:fullscreen{overflow:auto;background:var(--panel,#fff);padding:18px 30px;box-sizing:border-box}
+.powerpoint-editor:fullscreen .widget-canvas{max-height:76vh;margin:auto;max-width:min(100%,130vh)}
+.editor-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.slide-filmstrip button[draggable=true]{cursor:grab}.slide-filmstrip button[draggable=true]:active{cursor:grabbing}
+
+.widget-canvas-item input[readonly]{pointer-events:none;cursor:move;color:#25233c}.widget-canvas-item input:not([readonly]){pointer-events:auto;color:#25233c;background:#fff;cursor:text}
+
+/* White widescreen slide with unobtrusive measurement rulers. */
+.canvas-with-rulers{display:grid;grid-template-columns:28px minmax(0,1fr);grid-template-rows:25px auto;max-width:100%;overflow:auto;background:#ebedf2;padding:5px;gap:0}
+.canvas-ruler-horizontal{grid-column:2;grid-row:1;display:flex;justify-content:space-between;background:#fafafa;border-bottom:1px solid #bac1cc;color:#555;font:10px system-ui;padding:5px 7px}
+.canvas-ruler-vertical{grid-column:1;grid-row:2;display:flex;flex-direction:column;justify-content:space-between;align-items:center;background:#fafafa;border-right:1px solid #bac1cc;color:#555;font:10px system-ui;padding:7px 0}
+.canvas-with-rulers .widget-canvas{grid-column:2;grid-row:2;background:#fff!important;border:1px solid #b7bfce;border-radius:0;box-shadow:0 3px 14px #0001;min-width:0;width:100%;margin:0;overflow:visible}
+.widget-rotate-handle{position:absolute;left:calc(50% - 7px);top:-27px;width:14px;height:14px;border:2px solid #fff;border-radius:50%;background:#6158a7;box-shadow:0 0 0 1px #6158a7;cursor:grab;z-index:15}
+.widget-rotate-handle::after{content:'';position:absolute;width:1px;height:8px;background:#6158a7;left:5px;top:13px}
+@media(max-width:650px){.canvas-with-rulers{grid-template-columns:17px minmax(0,1fr);grid-template-rows:19px auto;padding:1px}.canvas-ruler-horizontal,.canvas-ruler-vertical{font-size:7px;padding:2px}.widget-canvas-item{font-size:clamp(9px,2vw,14px);padding:3px 17px 3px 3px}.widget-canvas-item input{font-size:inherit}.widget-rotate-handle{top:-20px}}
+@media(max-width:480px){.rehearsal-widgets{display:flex;flex-direction:column;gap:.65rem;min-height:0}.rehearsal-widget{position:relative!important;left:auto!important;top:auto!important;width:100%!important;height:auto!important;transform:none!important;min-width:0;overflow-wrap:anywhere}.rehearsal-slide{min-height:0;padding:.65rem}}
+
+.presenter-preview{margin-top:1rem}.presenter-preview iframe{display:block;aspect-ratio:16/9;width:min(100%,1000px);border:1px solid #cbd1de;background:#fff;border-radius:6px;margin-top:.5rem}
+@media(max-width:700px){.widget-canvas{touch-action:none}.widget-canvas-item{overflow-wrap:anywhere}.projection,.page-widgets{max-width:100%;min-width:0}.page-widgets{display:flex;flex-flow:column nowrap}.page-widgets>div{position:relative!important;inset:auto!important;width:100%!important;height:auto!important;min-height:64px;transform:none!important;margin:.5rem 0}}
+
+/* Small screens use readable stacked widgets instead of clipping the desktop slide. */
+@media(max-width:700px){.audience-widget-layout{min-height:0!important;display:flex;flex-direction:column;gap:.6rem}.audience-widget-layout>.page-widget{position:relative!important;left:auto!important;top:auto!important;width:100%!important;height:auto!important;max-height:none!important;min-height:65px;transform:none!important;font-size:clamp(14px,3.5vw,19px)!important;overflow-wrap:anywhere}.audience-widget-layout img,.audience-widget-layout video{max-width:100%;height:auto}.rehearsal-widget{overflow-wrap:anywhere}}
+
+/* True (definition-backed) slide previews share the saved percentage geometry. */
+.slide-filmstrip .miniature{height:auto;aspect-ratio:16/9;background:#e5e7eb;padding:3px;display:block}
+.miniature-slide{width:100%;height:100%;position:relative;overflow:hidden;border:1px solid #cbd5e1;color:#1e293b;background:#fff}
+.miniature-heading{position:absolute;top:3%;left:4%;right:4%;font-size:clamp(5px,.65vw,10px);font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.miniature-widget{position:absolute;box-sizing:border-box;border:1px solid #a5b4fc;background:#eef2ff;color:#1e293b;border-radius:2px;font-size:clamp(4px,.47vw,8px);line-height:1.2;padding:2px;overflow:hidden;overflow-wrap:anywhere;transform-origin:center}
+.miniature-widget-image,.miniature-widget-video{background:#dbeafe;text-align:center}
+.miniature-widget-postit{background:#fef08a;border-color:#eab308}
+.miniature-default{position:absolute;top:45%;width:100%;text-align:center;font-size:9px;color:#64748b}
+.slide-filmstrip button:focus-visible{outline:3px solid #2563eb;outline-offset:3px}
+@media(max-width:600px){.miniature-heading{font-size:8px}.miniature-widget{font-size:6px}}
+
+/* Keyboard-accessible canvas widget geometry. */
+.widget-canvas-item:focus-visible{outline:3px solid #1d4ed8;outline-offset:3px;z-index:6}
+/* Presenter-only overlay surface for current-page results. */
+.projection-page-content{position:relative;min-height:240px}.presenter-results-button{z-index:10}.projection-widget{overflow:auto}
+
+/* Presenter-only results control follows the exact editor geometry. */
+.projection-page-content{min-height:clamp(260px,48vw,660px);aspect-ratio:16/9;position:relative}
+.projection-results-control{position:absolute;z-index:11;min-height:36px;overflow:hidden}
+.presenter-page-results{padding:1rem 0}
+@media(max-width:640px){.projection-results-control{min-width:96px;min-height:44px;font-size:.85rem}}

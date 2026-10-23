@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS organizations(id uuid PRIMARY KEY, name text NOT NULL);
 CREATE TABLE IF NOT EXISTS users(id uuid PRIMARY KEY,organization_id uuid NOT NULL REFERENCES organizations(id),email text NOT NULL UNIQUE,password_hash text NOT NULL,role text NOT NULL CHECK(role IN ('platform_admin','org_admin','presenter','moderator')),created_at timestamptz NOT NULL DEFAULT now());
-CREATE TABLE IF NOT EXISTS sessions(id uuid PRIMARY KEY,organization_id uuid NOT NULL REFERENCES organizations(id),owner_id uuid NOT NULL REFERENCES users(id),title text NOT NULL,join_code text UNIQUE NOT NULL,join_secret text UNIQUE NOT NULL,status text NOT NULL DEFAULT 'draft' CHECK(status IN ('draft','ready','active','closed')),current_activity_id uuid,expires_at timestamptz NOT NULL,created_at timestamptz NOT NULL DEFAULT now());
+CREATE TABLE IF NOT EXISTS sessions(id uuid PRIMARY KEY,organization_id uuid NOT NULL REFERENCES organizations(id),owner_id uuid NOT NULL REFERENCES users(id),title text NOT NULL,join_code text UNIQUE NOT NULL,join_secret text UNIQUE NOT NULL,status text NOT NULL DEFAULT 'draft' CHECK(status IN ('draft','ready','active','paused','closed')),current_activity_id uuid,expires_at timestamptz NOT NULL,created_at timestamptz NOT NULL DEFAULT now());
 CREATE TABLE IF NOT EXISTS activities(id uuid PRIMARY KEY,session_id uuid NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,type text NOT NULL CHECK(type IN ('poll','quiz')),title text NOT NULL,options jsonb NOT NULL,correct_option_id text,duration_seconds integer,opened_at timestamptz,status text NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','open','closed')),position integer NOT NULL,UNIQUE(session_id,position));
 CREATE TABLE IF NOT EXISTS participants(id uuid PRIMARY KEY,session_id uuid NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,token_hash text NOT NULL UNIQUE,created_at timestamptz NOT NULL DEFAULT now(),UNIQUE(id,session_id));
 CREATE TABLE IF NOT EXISTS responses(id uuid PRIMARY KEY,activity_id uuid NOT NULL REFERENCES activities(id) ON DELETE CASCADE,participant_id uuid NOT NULL REFERENCES participants(id) ON DELETE CASCADE,option_id text NOT NULL,correct boolean NOT NULL DEFAULT false,submitted_at timestamptz NOT NULL DEFAULT now(),UNIQUE(activity_id,participant_id));
@@ -156,7 +156,7 @@ CREATE INDEX IF NOT EXISTS idx_session_assets_participant ON session_assets(sess
 
 -- Safe integrated image-slide presentation pages (no historical answer mutation).
 ALTER TABLE activities DROP CONSTRAINT IF EXISTS activities_type_check;
-ALTER TABLE activities ADD CONSTRAINT activities_type_check CHECK(type IN ('poll','quiz','slide'));
+ALTER TABLE activities ADD CONSTRAINT activities_type_check CHECK(type IN ('poll','quiz','slide','timed_quiz'));
 CREATE TABLE IF NOT EXISTS presentation_slide_assets(
  activity_id uuid PRIMARY KEY REFERENCES activities(id) ON DELETE CASCADE,
  asset_id uuid NOT NULL REFERENCES session_assets(id) ON DELETE RESTRICT
@@ -214,3 +214,27 @@ CREATE TABLE IF NOT EXISTS session_schedule_dates(session_id uuid NOT NULL REFER
 
 -- SMTP credentials encrypted using AUTH_SECRET, never returned by API.
 CREATE TABLE IF NOT EXISTS smtp_configuration(id integer PRIMARY KEY CHECK(id=1), encrypted_config text NOT NULL, updated_at timestamptz NOT NULL DEFAULT now());
+
+-- Scheduled appointments with explicit local wall-clock time, duration and IANA timezone.
+CREATE TABLE IF NOT EXISTS session_appointments(id uuid PRIMARY KEY,session_id uuid NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,scheduled_date date NOT NULL,start_time time NOT NULL,duration_minutes integer NOT NULL CHECK(duration_minutes BETWEEN 5 AND 1440),time_zone text NOT NULL DEFAULT 'Europe/Rome',created_at timestamptz NOT NULL DEFAULT now());
+CREATE INDEX IF NOT EXISTS session_appointments_user_calendar ON session_appointments(scheduled_date,start_time,session_id);
+-- Upgrade check constraints from previously deployed releases.
+DO $$ DECLARE constraint_name text; BEGIN
+ SELECT c.conname INTO constraint_name FROM pg_constraint c JOIN pg_class t ON c.conrelid=t.oid WHERE t.relname='sessions' AND c.contype='c' AND pg_get_constraintdef(c.oid) LIKE '%status%';
+ IF constraint_name IS NOT NULL THEN EXECUTE format('ALTER TABLE sessions DROP CONSTRAINT %I',constraint_name); END IF;
+ ALTER TABLE sessions ADD CONSTRAINT sessions_status_valid CHECK (status IN ('draft','ready','active','paused','closed'));
+END $$;
+
+-- Topic questions are separate from poll/quiz answers; presenters can display 10 per page.
+CREATE TABLE IF NOT EXISTS topic_widget_questions (
+ id uuid PRIMARY KEY, session_id uuid NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
+ activity_id uuid NOT NULL REFERENCES activities(id) ON DELETE CASCADE,
+ widget_id text NOT NULL, participant_id uuid NOT NULL REFERENCES participants(id) ON DELETE CASCADE,
+ body text NOT NULL CHECK(char_length(body) BETWEEN 5 AND 2000),
+ created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS topic_widget_questions_lookup ON topic_widget_questions(session_id,activity_id,widget_id,created_at);
+
+-- Server-authoritative duration of quiz responses (milliseconds).
+ALTER TABLE responses ADD COLUMN IF NOT EXISTS elapsed_ms bigint;
+CREATE INDEX IF NOT EXISTS responses_timed_rank ON responses(activity_id,elapsed_ms,submitted_at,id) WHERE correct=true AND invalidated_at IS NULL;
