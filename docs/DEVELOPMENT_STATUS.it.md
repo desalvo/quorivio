@@ -1,3 +1,8 @@
+
+## Hotfix CI — 23/10/2026
+
+Run GitHub Actions 108461560295: build backend/frontend superata; suite Python fallita per dipendenze CI mancanti python-pptx e aiohttp (16 errori import, 3 fallimenti CLI). Il workflow installa e verifica tali dipendenze prima dei test; il simulatore valida gli argomenti prima di importare aiohttp. Suite Python locale: 171/171 superati. Riesecuzione GitHub Actions ancora da effettuare; RC invariata al 37,5%.
+
 ## 2026-10-23 — Conversione nativa delle forme rettangolari PowerPoint (test locali)
 - I rettangoli e rettangoli arrotondati PowerPoint con testo sono importati come widget Quorivio `postit` modificabili; le normali caselle di testo restano widget `text`.
 - L'esportazione dei widget `postit` produce un rettangolo PPTX nativo modificabile. Testo, geometria, stile testuale e rotazione usano il percorso di conversione esistente.

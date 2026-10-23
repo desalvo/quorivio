@@ -1,3 +1,8 @@
+
+## CI hotfix — 2026-10-23
+
+GitHub Actions run 108461560295: backend/frontend compiled successfully; Python integration suite failed because the CI dependency setup installed reportlab but omitted python-pptx and aiohttp (16 import errors, 3 load-test CLI failures). CI now installs and imports both dependencies before tests; the load tool validates CLI arguments before importing aiohttp. Local Python suite: 171/171 passed. Real rerun of GitHub Actions remains pending; RC gate 37.5% unchanged.
+
 ## 2026-10-23 — Native PowerPoint rectangular shape round-trip (local tests)
 - Imported PowerPoint rectangle/rounded-rectangle auto-shapes with text are mapped to editable Quorivio `postit` widgets instead of generic text widgets. Standard text boxes remain `text`.
 - Export of `postit` widgets now creates a native editable PPTX rectangle rather than a text box. Text, position, text style and rotation follow the existing converter path.

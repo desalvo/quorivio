@@ -15,7 +15,6 @@ import time
 from pathlib import Path
 from urllib.parse import urlparse, unquote
 
-import aiohttp
 
 
 def options():
@@ -50,6 +49,10 @@ def options():
 
 async def main():
     a = options()
+    try:
+        import aiohttp
+    except ImportError as exc:
+        raise SystemExit("Missing aiohttp: install Python load-test requirements before running the simulator") from exc
     indices = [i for i in range(a.users) if i % a.shards == a.shard_index]
     failures, joins, first_snapshots, close_count = [], [], [], 0
     presenter_peak = 0
