@@ -1,3 +1,128 @@
+## 2026-10-23 — Native PowerPoint rectangular shape round-trip (local tests)
+- Imported PowerPoint rectangle/rounded-rectangle auto-shapes with text are mapped to editable Quorivio `postit` widgets instead of generic text widgets. Standard text boxes remain `text`.
+- Export of `postit` widgets now creates a native editable PPTX rectangle rather than a text box. Text, position, text style and rotation follow the existing converter path.
+- Fidelity limitation: PowerPoint fills, outlines, original corner radius, grouped shapes and unlabelled vector shapes are **not** preserved. Rounded rectangles export as standard rectangles. This is a partial native shape authoring step, not full vector fidelity.
+- Local verification: Python unittest **171/171**, Node.js **113/113**, including a new native auto-shape round-trip regression. Full TypeScript/Vite build and browser/Kubernetes acceptance not validated. Weighted RC stays **37.5%**.
+
+## 2026-10-23 — PPTX image export round-trip (local validation only)
+- Completed image/logo PPTX export from the browser worker: the authenticated API stages only session-owned, explicitly referenced PNG/JPEG assets, enforcing 200 files, 10 MiB/file, 50 MiB total, matching DB byte size and SHA-256 before passing them to the private conversion workspace.
+- The isolated Python converter restores editable picture geometry and rotation into PPTX; missing/private media is rejected rather than silently omitted. Existing text, quiz and question static-export behavior is preserved.
+- Local checks: Python unittest 165/165, Node tests 112/112. Full TypeScript/Vite build, browser execution and actual PostgreSQL/Kubernetes E2E are NOT verified; RC remains 37.5%. Unsupported vector formats, charts, SmartArt, themes and animations remain open.
+
+## 2026-10-23 — PPTX embedded pictures as session image widgets (local validation)
+- Editable PPTX browser imports now extract supported embedded PNG/JPEG pictures in the isolated worker as separate widget images, with original editable geometry and rotation. Media is placed in conversion scratch space, never exposed through portable JSON as binary data.
+- During new-session creation the API checks declared asset IDs, MIME types, per-file and aggregate size bounds, count, SHA-256 and widget references; stores files under the new session and registers corresponding session_assets in the same PostgreSQL transaction. Failed imports roll back the database and remove the new session directory.
+- The worker limit is 200 imported images / 50 MiB in total, each image <=10 MiB. Unsupported formats, images beyond the supported widget cap, grouped graphics, SmartArt and PPTX image export remain open. JSON Quorivio export still needs an asset-inclusive portable bundle for full media portability; static PPTX export currently omits image widgets.
+- Local tests: 158 Python unittest and 111 Node.js tests passed, including new embedded picture extraction and updated fidelity report regression. Production TypeScript build and browser/PostgreSQL/Kubernetes integration NOT validated. RC 37.5% unchanged pending acceptance.
+
+## 2026-10-23 — Widget statistics defensive aggregation (local verification)
+- Hardened per-revision widget aggregation for invalid historical revision values and malformed answer payloads. Only positive safe integer revisions are emitted; answer statistics count validated unique option IDs with safe own-properties (including reserved JavaScript names). Malformed text and attachment values are ignored. No API shape or schema changes.
+- Added Node regression covering invalid revisions, malformed option IDs and null/non-string payload values. Local verification: **147/147 Python unittest**, **111/111 Node.js** passed.
+- **Build blocker clarified:** the supplied archive has no `package-lock.json` / shrinkwrap file, so `npm ci --offline` cannot execute; no installed frontend/backend build dependencies were present in this runtime. Production build and real browser/PostgreSQL/Kubernetes E2E remain **not validated**. Regenerate and commit a lockfile in a trusted connected build environment, then run clean `npm ci && npm run build`.
+- Weighted RC gate remains **37.5%**, pending acceptance evidence. Remaining: full widget E2E, multi-replica live, MFA/photo profile and non-PDF documents.
+
+## 2026-10-23 — Safe widget answer aggregation (local)
+- Hardened per-revision widget result aggregation against JavaScript reserved object keys (`__proto__`, `constructor`) and duplicate option IDs in historical payloads. Count each unique choice at most once per submission; avoid polluted or miscounted result objects. No API or database migration.
+- Verification: 147 Python unittest tests passed, 110 Node.js tests passed (one additional aggregation regression). npm install could not complete in the available environment; full build, real PostgreSQL, browser and Kubernetes end-to-end tests are **not validated**.
+- RC weighted progress remains **37.5%** until acceptance gates are verified.
+
+## 2026-10-23 — Timed widget submission deadline final validation (local)
+- Fixed expiry enforcement using a fresh PostgreSQL `clock_timestamp()` sample immediately before response insertion, after attachment and revision checks; elapsed-time ranking uses this same sample. This avoids accepting an answer based on an earlier clock sample when checks take time. API/schema unchanged.
+- Verification: Python unittest **147/147 passed**; Node.js **109/109 passed**. npm dependency installation timed out; production TypeScript/Vite build **not validated**. No live PostgreSQL, browser, or Kubernetes end-to-end acceptance performed.
+- Weighted RC **37.5% unchanged**; outstanding: confirm deadline behavior with a real PostgreSQL instance including slow attachment check and multi-replica exercise, plus complete existing RC gates.
+
+## 2026-10-23 — Timed widget answer-key compatibility (local validation)
+- Fixed disagreement between timed-quiz validation and grading: single-choice widgets with legacy `correctOptionId` and empty `correctOptionIds` now consistently use the legacy key. Multiple-choice widgets still require `correctOptionIds`; duplicate keys are rejected before accepting a submission.
+- Uses one resolver in validation and grading; no database/API migration. Regression tests added for fallback and consistent scoring.
+- Local checks: Python pytest **160 passed + 7 subtests**, Node.js **107 passed**. Production `npm run build` attempted but blocked by missing Node type declarations (TS2580). Browser, PostgreSQL and Kubernetes acceptance not run. **Weighted RC 37.5% unchanged.**
+- Remaining: browser E2E for widget authoring and submissions, multi-replica live, MFA, profile photo, and other RC acceptance gates.
+
+## 2026-10-23 — Widget-first dashboard authoring
+- Consolidated dashboard page creation into the Pages widget-first commands; removed the duplicate legacy creation form from the visible UI while retaining its API and existing edit route for historical activities. Clarified widget editor handoff and button labels. Local regression only; browser E2E pending.
+- Verification: 158 pytest passed (+7 subtests), 107 Node tests passed; production build blocked by absent Node typings (TS2580). No browser/PostgreSQL/Kubernetes E2E run.
+- RC: 37.5% unchanged pending production and Kubernetes acceptance.
+
+## 2026-10-23 — Transactional live widget submission guard (local verification)
+- Fixed a race between the initial participant identity check and widget response insertion: the handler now locks and rechecks the active, unexpired session, current published page, anonymous access and open activity inside the response transaction, before saving any answer.
+- Session row lock precedes activity row lock to align with presenter page transitions. No API or database migration; historical responses remain intact.
+- Verified: pytest 156 passed (+7 subtests), Node 107 passed. `npm run build` attempted but blocked by missing installed @types/node (TS2580 Buffer). Browser, live PostgreSQL, Kubernetes and multi-replica validation not run. RC unchanged at 37.5%.
+- Remaining: full widget-first activity creation and acceptance, live rendering/browser checks, profile/MFA checks, non-PDF documents and other outstanding RC gates.
+
+## 2026-10-23 — Projected media widget rendering (local verification)
+- Replaced label-only projection placeholders for image, logo, video and PDF widgets with actual session-owned asset rendering (image, controlled video, PDF viewer/open link). Empty assets display a safe placeholder. Kept existing projection geometry, timed widgets and live lifecycle behavior; no API or database migration.
+- Added responsive media containment styles and regression checks for asset URL encoding, supported media and safe external link attributes.
+- Verification: Python unittest **142 passed**, Node **107 passed**; `npm run build` **blocked** by missing installed TypeScript Node typings (`TS2580 Buffer`). Browser, PostgreSQL and Kubernetes E2E **not run**. Weighted RC **37.5%** unchanged.
+- Remaining: verify media authorization/visibility in actual browser and presenter/participant pages, widget-only activity authoring, non-PDF documents, multi-replica live sync, MFA and profile photo acceptance.
+
+## 2026-10-23 — Canvas-first blank page creation (local verification)
+- Added authenticated `POST /api/sessions/:id/pages` to create a blank slide directly in the page sequence, with title validation, presenter permissions, session closure checks, transaction and sequential positioning. Reuses existing JSONB layout; no migration.
+- The Pages section has a **New blank page · Widget editor** button; the newly created page is selected and its canvas editor opens immediately. Existing poll/quiz form remains explicitly marked compatibility; full widget-only poll/quiz authoring is NOT complete.
+- Verification: Python **144 passed** (+7 subtests), Node.js **107 passed**. Browser/PostgreSQL/Kubernetes E2E pending. Weighted RC remains **37.5%** pending verified acceptance.
+- Remaining: fully widget-only poll and timed quiz creation, production build, live E2E, MFA/profile-photo acceptance, documents beyond PDF.
+
+## 2026-10-23 — Page creation to widget editor handoff (local verification)
+- Creating an interactive page now retains the returned activity identity, refreshes the session snapshot, selects the Pages tab and loads the newly created page directly into widget-layout editing. This removes the extra manual selection step and makes widget editing discoverable.
+- The existing create-activity API remains unchanged for compatibility. The initial poll/quiz form is **not yet fully replaced** by a widget-only creation workflow; activity migration/creation from widgets is still open. No migration was added.
+- Validation: pytest **141 passed** (plus 7 subtests); Node **107/107 passed**. Production build **blocked** by missing Node TypeScript declarations/dependencies; browser, PostgreSQL and Kubernetes E2E not tested. Weighted RC **37.5%** unchanged.
+- Remaining: design and implement widget-only creation with full API validation, verify live presenter/participant workflow on Kubernetes, and complete remaining acceptance gates.
+
+## 2026-10-23 — Live page unpublish and audience snapshot safety (local verification)
+- Closing a published activity now atomically clears `sessions.current_activity_id` with a session row lock and broadcasts the updated snapshot. This prevents a closed page from remaining selected on the public presenter display.
+- Participant WebSocket snapshots now expose an activity/results only while the session is active and that activity is explicitly open; paused, closed or unpublished pages return empty public activity/results arrays. Owner snapshots retain their editing information. No database migration is required.
+- Validation: Python pytest **139 passed** (plus 7 subtests), Node **107/107 passed**, including three regression checks. Build and Kubernetes/browser/PostgreSQL E2E not validated. RC matrix stays **37.5%**.
+- Outstanding: exercise open/close/resume with two live browsers and test multi-instance broadcasts on Kubernetes; widget-only activities, documents beyond PDF, MFA and profile image acceptance are pending.
+
+## 2026-10-23 — Projection lifecycle states and session controls (local validation)
+- Corrected public presenter projection to explicitly distinguish **not started**, **active with no published page**, **paused**, and **closed** sessions. Previously active sessions with no selected page could render a blank area, and paused sessions continued rendering the last page without explanation.
+- Added dashboard guidance that changing session status to active does not itself publish a page; the presenter must open the desired page in Pages and contents. Paused controls explain that new participant answers are disabled by the API. Retained existing status and page-open endpoints without migrations.
+- Verification: Python **136/136**, Node.js **107/107** PASS, including three new projection lifecycle regression checks. No live browser, PostgreSQL or Kubernetes end-to-end validation; full production build not certified in this environment.
+- Still open: end-to-end state synchronization on live deployment, participant reconnect/pause UX, pointer-positioned canvas menus, other document formats and widget-only activities. RC gate **37.5%** unchanged.
+
+## 2026-10-23 — Native empty-canvas background context menu (local validation)
+- Added a right-click background menu on **empty canvas** only, with existing session image-library selection, authenticated image upload, clearing the uploaded background and explicit save guidance. Existing widget right-click menus remain independent. Keyboard-accessible expandable page/result background controls remain available.
+- Existing `questionBackgroundAsset` state, upload handler, and design PATCH are reused; no API or database changes. The contextual menu is anchored inside the canvas rather than at precise pointer coordinates.
+- Verification: Python 133/133 PASS; Node.js 107/107 PASS. Production build attempted and BLOCKED by unavailable Node typings / workspace dependencies. No browser, PostgreSQL or Kubernetes E2E. RC gate **37.5%** unchanged.
+- Still open: contextual menu for results backdrop itself, other document formats, widget-only activity workflow, live presenter/audience end-to-end checks and real browser validation.
+
+## 2026-10-23 — Context-accessible page/result backgrounds (local validation)
+- Added separate keyboard-accessible expandable background menus in the page editor, offering library selection, authenticated image upload and explicit removal for question pages and results independently. Original editor controls remain for compatibility.
+- Fixed persisted design clearing: blanking either background URL now explicitly clears the previously stored URL instead of preserving stale values on PATCH merge. Uploaded asset IDs can also be cleared. Saving remains explicit.
+- Verification: Python 130/130, Node.js 107/107 PASS. Full production build attempted but BLOCKED by missing installed Node typings/dependencies. No real browser, PostgreSQL or Kubernetes E2E; weighted RC still 37.5%.
+- NOT COMPLETE: true right-click on an empty canvas (current controls are accessible expanded menus), other document formats, live presentation synchronization and widget-only activity workflow. No backend schema modifications.
+
+## 2026-10-23 — Contextual media selection for canvas widgets (local verification only)
+- Canvas widget context menus now expose stored-asset selection and authenticated file upload for Image, Logo, Video and PDF. Selection changes `assetId` via the same layout state and requires explicit Save layout; no new public upload endpoint or asset privileges.
+- MIME options are filtered by widget type, existing `uploadWidgetMedia` is reused, and input is disabled during uploads. Legacy widget properties and layer commands are preserved.
+- Python 127/127 and Node.js 107/107 PASS. Full build attempted but BLOCKED by missing workspace dependencies and Node typings; no browser or Kubernetes integration acceptance. Weighted RC remains 37.5%.
+- OPEN: document types beyond PDF, page-background context control, presenter's live rendering and synchronization, widget-only activities, comprehensive editor/UI E2E; validate selectors and uploads on deployed instance.
+
+## 2026-10-23 — Canvas widget contextual actions (local verification; RC pending)
+- Added right-click and touch/keyboard button menus for duplicate, front/back layer ordering, title editing and deletion; underlying widget geometry and saved schema unchanged.
+- Python 126/126 and Node.js 107/107 pass. Full frontend build blocked by unavailable `vite/client` dependencies. Live browser/Kubernetes acceptance is outstanding; per-widget contextual media picker is still pending. RC 37.5% unchanged.
+
+## 2026-10-23 — Session media widget extension (local, Kubernetes acceptance pending)
+- Extended the graphical editor palette with separate Logo and PDF widgets, in addition to Image and Video; existing private session uploads and media library are reused. Asset selection and direct upload support images for logo and PDF for document widgets.
+- Extended page-design validation to require a stored UUID asset for every media widget, and design-save API now checks ownership by the same session, presenter-owned origin and MIME/widget compatibility. Public media access remains limited to the currently opened page in an active session. PDF uses a direct download/open link; arbitrary documents are not yet accepted (the strict asset allowlist remains unchanged).
+- Tests: Python 124/124 and Node 107/107 locally. Full TypeScript/Vite build unavailable (vite/client type definitions not installed), and browser/PostgreSQL/Kubernetes end-to-end acceptance remains pending.
+- Remaining: per-slide uploaded background asset with audience-safe delivery, document formats beyond PDF, contextual asset choice on canvas, final presenter multimedia rendering and end-to-end checks. Do not promote the media macroarea or RC gate. Weighted RC remains 37.5%.
+
+## 2026-10-23 — Session scheduling UI consolidation (local, pending live acceptance)
+- Unified session-date editing around date, start time, duration and explicit IANA timezone; added timezone validation, duplicate prevention, sorted entries, and an opt-in import of old date-only entries. Legacy API and stored data remain intact; its parallel editing form is removed.
+- Regression contracts in `tools/tests/test_session_dates_consolidation.py`. Browser/PostgreSQL/Kubernetes acceptance pending. RC weighted 37.5% unchanged.
+
+## 2026-10-23 — Full-page session navigation and dashboard layout (partial acceptance)
+- Separate New/Open/Calendar main views and selected session control room, explicit page-editor entry, session date naming, improved labels/responsive grid, and corrected Terminate control.
+- Python 118/118 and Node 107/107 PASS locally; full build, browser and K8s tests not confirmed. Media widget overhaul and legacy schedule consolidation remain open. RC 37.5% unchanged. Details: `SESSION_NAVIGATION_REWORK.en.md`.
+
+## 2026-10-23 — Multi-method MFA / calendar / Kubernetes asset-volume cycle (local, uncommitted)
+- Login now returns a five-minute database-backed MFA challenge after valid primary credentials, with independently selectable TOTP or email verification. Email OTP is delivered only on explicit method selection; TOTP or a recovery code consumes the same single-use challenge under row lock, with bounded attempts. Both methods are not required sequentially. Existing email challenge verification remains compatible.
+- Updated second-factor screen; primary login no longer asks for recovery/TOTP. Profile email MFA activation no longer depends on supplying an active TOTP code.
+- Consolidated user save action for nickname/role/approval fields (approval-state button still has its existing immediate semantics). Modern day/week/month calendar uses existing appointments, timezone metadata and session navigation; no schema migrations.
+- Kubernetes Kustomize and Helm pod fsGroup=1000 and OnRootMismatch for non-root persistent asset write access, a likely cause of upload failures; runtime volume permissions and ClamAV must still be tested on the real cluster. Profile photo upload now removes the superseded private file.
+- OIDC provider inventory confirmed to be environment-driven via OIDC_PROVIDERS_JSON / OIDC_GOOGLE_* and optional social provider configuration. Empty list alone does not imply an application fault. Real provider credentials and callback testing not performed.
+- Verification: Python unittest 115/115 PASS and Node (experimental TypeScript stripping) 107/107 PASS. Full production build BLOCKED: npm dependency installation stalled / npm idealTree error; global compiler parser showed no TS1xxx syntax errors but lacks installed React/Node dependencies. No Kubernetes/browser/PostgreSQL E2E. Weighted RC remains 37.5% as no new gate has sufficient end-to-end evidence.
+- OPEN: unified overall MFA switch and independent email ownership confirmation, avatar runtime acceptance with volume/AV diagnostics, mobile visual acceptance, admin-save transaction atomicity and complete browser e2e. The package is NOT RC.
+
 
 ## 2026-10-23 — CI Kubernetes credential-generation acceptance hotfix (uncommitted)
 - CI run 108303599236: 115 Python tests and PDF conversion passed, but the previous `diff -ru /tmp/q-a /tmp/q-b` step failed because independent new wizard outputs correctly generate different credentials.
@@ -585,3 +710,96 @@ RC weighted gate score unchanged at 37.5%; email MFA is partial until PostgreSQL
 
 ### 2026-10-23 – Email MFA issuance hardening
 Rate limit shared across replicas (3/account/minute), atomic single active challenge, migration cleanup and unique index. Build and regression evidence in `docs/EMAIL_MFA_ISSUANCE_HARDENING.en.md`. RC acceptance unchanged pending integration tests.
+
+### 2026-10-23 — per-page uploaded backgrounds (partial multimedia cycle)
+- Added `backgroundAssetId` to page/result design validation; server verifies image MIME, presenter ownership and session boundary at save time.
+- Added per-page/result background asset selection and upload in the editor, and image background in presenter and participant rehearsal views.
+- Public asset delivery recognizes backgrounds only on the currently open activity, preserving restricted access.
+- Still open: canvas context menu, live audience visual parity, full browser/build and Kubernetes acceptance. RC weighted score held at 37.5%.
+
+## 2026-10-23 — Canvas-first interactive page templates
+- Added direct page actions for poll, quiz and timed quiz; each calls the existing authenticated activity API, uses starter options (and 30-second timed-quiz duration), refreshes the session and opens the created page in the widget editor.
+- The legacy activity creation form is retained; option editing and answer-key management still use the existing activity editor. Full widget-only activity authoring is **not closed**.
+- Validation: Python 146 passed (+7 subtests), Node 107 passed; production build attempted but blocked by unavailable Node typings/dependencies (`Buffer` TS2580). No browser/PostgreSQL/Kubernetes acceptance. RC remains **37.5%**.
+
+## 2026-10-23 — canvas interactive widget configuration
+- Added in-canvas configuration controls for question and timed-quiz widgets: response modes, answer options, correct answers, required responses, quiz duration.
+- Preserved legacy activity APIs and editing paths. No version change.
+- Local checks: 140 Python unittest cases; 107 Node tests passed. Full frontend build and browser/Kubernetes end-to-end acceptance pending.
+- See `docs/CANVAS_WIDGET_ACTIVITY_EDITOR.en.md`.
+
+## 2026-10-23 — Presenter interactive widget rendering
+- Projected `question` and `timed-quiz` widgets now render their saved prompt, description, answer options, answer-mode guidance and (for timed quizzes) live countdown instead of a label-only placeholder. Correct answers are intentionally not exposed to the presenter projection.
+- Text/post-it widgets also render their descriptions. Added responsive overflow handling and 3 static regression tests.
+- Local validation: Python unittest discovery 145 passing (runner also prints a recover-CLI diagnostic during import), Node 107 passing. `npm run build` attempted and failed due to missing Node typings (`Buffer`, TS2580); browser, PostgreSQL and Kubernetes acceptance not performed. Weighted RC remains 37.5%.
+- Open: participant/presenter end-to-end parity, full widget-only authoring, browser builds and Kubernetes verification.
+
+## 2026-10-23 — Canonical timed-widget revision semantics
+- Normalized timed-quiz answer-key comparison to match the live scorer: for single choice the nonempty legacy `correctOptionId` takes precedence; a one-element `correctOptionIds` array is equivalent when the legacy field is absent. Multiple-choice widgets use `correctOptionIds`. Default timed-quiz mode is single and duration is 30 seconds.
+- Prevents spurious answer-revision increments and unnecessary rejection of live cosmetic/format-preserving edits. Genuine answer-key and duration changes remain protected.
+- Added two Node regression tests; 109/109 Node tests passed and 145/145 Python unittest cases passed. Full TypeScript production build and Kubernetes/browser/PostgreSQL acceptance not validated in this cycle. RC remains 37.5%.
+- Open: full widget-only authoring, live end-to-end, MFA/profile asset checks, production build and Kubernetes acceptance.
+
+### 2026-10-23 — Timed widget database-clock consistency
+- Timed widget submission checks expiry and computes elapsed milliseconds from the same PostgreSQL `clock_timestamp()` captured on the locked activity read, instead of each Node.js replica's system clock.
+- Regression tests: `tools/tests/test_widget_database_clock.py`; local Python unit discovery 147 passed, Node API suite 109 passed.
+- Production TypeScript build and real PostgreSQL / Kubernetes multi-replica browser validation remain pending; RC gates and baseline 37.5% unchanged.
+
+### 2026-10-23 — PowerPoint editable portability groundwork
+- Added `tools/pptx_portable.py` for PPTX text boxes -> portable Quorivio editable text widgets and portable JSON -> PPTX static text slides (opt-in `python-pptx`).
+- Fixed the proprietary JSON importer to accept exported slide pages (previous export/import incompatibility).
+- Added mobile editor/participant layout constraints and touch targets without altering stored canvas geometry.
+- Verified standalone converter tests; full graphical format fidelity, direct in-browser PPTX editable import/export and touch-device acceptance remain OPEN. See `docs/POWERPOINT_PORTABILITY.md`.
+- Release gate percentage unchanged pending full build, browser and Kubernetes acceptance.
+
+### 2026-10-23 — Editable PPTX text-style round-trip
+- Extended the optional text-box converter to retain explicit font family, point size, bold, italic and fixed RGB color on PPTX import/export. Local styled PPTX round-trip passed. Mixed formatting, master/theme semantics, in-browser export, production build and device acceptance remain OPEN. RC gate score unchanged at 37.5%.
+
+### PPTX editable import hardening (2026-10-23)
+- CLI: pre-parse OOXML ZIP size, entry-count and macro/executable checks, plus permitted-font filtering for portable import. New Python regression tests.
+- Pending: editable PPTX import/export in browser, faithful rendering of non-text shapes, complete mobile E2E and acceptance gates.
+
+### 2026-10-23 — Incremental editable PPTX + mobile interaction
+- PPTX CLI: derive page headings from source text and round-trip text-box rotation; regression test added.
+- Mobile: increase participant radio/checkbox touch targets and normalize response text areas without changing stored geometry.
+- Validation: Python unittest discovery 153 passed; `npm test` 111 passed. Full frontend build and browser/Kubernetes acceptance not verified.
+- PowerPoint fidelity, browser PPTX import/export, embedded shapes/assets and mobile device acceptance remain OPEN; weighted RC stays 37.5%.
+
+### 2026-10-23 — Browser-integrated editable PPTX import/export
+- Added authenticated `POST /api/presentations/import-editable` (creates a new editable session) and owner-authorized `GET /api/sessions/:id/export.pptx`, with Dashboard controls.
+- Conversions run in the existing isolated converter service through `/portable-import` and `/portable-export`, with opaque job IDs, worker token, reservation locks, bounded input/output, malware scanning on import and temporary workspace cleanup. Converter image installs pinned python-pptx 1.0.2.
+- Imports editable text boxes, positions, rotation and a subset of formatting; only supported text/interactive widget representations export to PPTX. Interactive activities become static visual content in PowerPoint. Original image-based PPTX/PDF import remains available as a separate fidelity-first option.
+- Validation: 155 Python unittest cases and 111 Node.js tests passed; isolated PPTX worker round trip passed. Production TypeScript build FAILED owing to missing installed Node type definitions; no browser, cluster or database E2E run. Browser integrated fidelity and service deployment remain UNACCEPTED; RC gate unchanged at 37.5%.
+
+### 2026-10-23 — PPTX import fidelity reporting / Rapporto di fedeltà PPTX
+- Extended editable PowerPoint conversion to round-trip explicit underline formatting; added metadata-only import fidelity counts for skipped pictures, charts, tables and unsupported shapes and page overflow, returned from worker to API without including slide text or media bytes. / Estesa la conversione PPTX alla sottolineatura; aggiunto resoconto delle forme non convertite restituito dall’API senza contenuti privati.
+- 157 Python and 111 Node tests passed locally. Image/shape editability, frontend build and real browser/mobile/Kubernetes testing remain open. Weighted RC unchanged at 37.5%.
+
+
+## 2026-10-23 — Demo, presenza e carico
+Added demo session transactional provisioning on registration/admin account creation (five activities), live cross-replica distinct participant presence widget, and authorized 500-audience staging load script. End-to-end cluster acceptance pending.
+
+### 2026-10-23 — 500-user anonymous QR load topology
+- Reworked `tools/load_500.py` to use anonymous QR invitation flow, cookie-isolated virtual participants, optional presenter and sharding across distinct load generators, optional locally bound source IPs, JSON metrics.
+- Added `docs/ARCHITECTURE_500.md`, Italian counterpart, and an optional Helm staging capacity values profile; made ingress annotations configurable.
+- **Open RC gate:** no actual 500-client measurement; cross-pod websocket event distribution, ingress capacity, resource sizing and synchronization require Kubernetes acceptance testing. Percentage unchanged (37.5%).
+
+
+### 2026-10-23 — Fan-out reconnect hardening
+Cross-pod PostgreSQL notification listener now re-synchronizes local WebSocket sessions after reconnect; tests cover recovery. Real multi-pod validation pending.
+
+### 2026-10-23 Native PPTX geometry cycle
+- Removed forced 12% × 8% minimum widget geometry from native PPTX import and API validation to preserve small objects. Added off-canvas loss reporting and round-trip geometry tests.
+- RC weighted progress remains 37.5%; browser/Kubernetes acceptance and full frontend build remain unverified.
+
+### 2026-10-23 — Native PPTX deduplicated media and OOXML validation
+- Editable PPTX import now reuses a single stored asset for byte-identical PNG/JPEG objects repeated across slides; their widget instances and geometry remain independent.
+- Preflight rejects unsafe/duplicate OOXML archive member names and encrypted ZIP entries.
+- Regression coverage: repeated media import/export and unsafe ZIP entry rejection. Local test run: 169 Python tests and 113 Node.js tests passed.
+- Browser/full TypeScript build and real PostgreSQL/Kubernetes acceptance **not validated**. Overall verified RC gate value remains **37.5%**.
+
+### 2026-10-23 — Native PPTX import media guard
+- Fixed MIME/size versus remaining media-quota precedence in `tools/pptx_portable.py`; unsupported picture formats can no longer enter staged session assets.
+- Added regression coverage to `tools/tests/test_pptx_portability.py`.
+- Local checks: 170 Python unittest cases passed; 113 Node tests passed. Browser, PostgreSQL, Kubernetes and production frontend build not certified in this cycle.
+- PPTX native vector shape fidelity and full editing remain open. RC gate matrix unchanged pending end-to-end acceptance.

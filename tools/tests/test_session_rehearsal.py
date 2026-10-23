@@ -16,5 +16,5 @@ class SessionRehearsalContracts(unittest.TestCase):
  def test_postit_validated_both_sides(self):
   web=(ROOT/'apps/web/src/main.tsx').read_text()
   domain=(ROOT/'apps/api/src/domain.ts').read_text()
-  self.assertIn("'postit','image','video','topic-question','timed-quiz','results-button'].includes(kind)",web)
-  self.assertIn("'postit','image','video','topic-question','timed-quiz','results-button'].includes(w.kind)",domain)
+  self.assertIn("'postit','image','video','logo','pdf','topic-question','timed-quiz','results-button','participant-count'].includes(kind)",web)
+  self.assertIn("'postit','image','video','logo','pdf','topic-question','timed-quiz','results-button','participant-count'].includes(w.kind)",domain)

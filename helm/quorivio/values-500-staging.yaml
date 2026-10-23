@@ -1,0 +1,25 @@
+# Reference capacity starting point, NOT a proven 500-user guarantee.
+# Apply only to an approved staging deployment with existing secrets and RWX PVC.
+replicaCount: 3
+resources:
+  requests: {cpu: "500m", memory: 512Mi}
+  limits: {cpu: "2", memory: 1Gi}
+antivirus:
+  resources:
+    requests: {cpu: "200m", memory: 768Mi}
+    limits: {cpu: "2", memory: 2Gi}
+converter:
+  resources:
+    requests: {cpu: "250m", memory: 512Mi}
+    limits: {cpu: "2", memory: 2Gi}
+assets:
+  accessMode: ReadWriteMany
+  # Set existingClaim to a prepared RWX PVC in the deployment override.
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "30"
+    nginx.ingress.kubernetes.io/proxy-body-size: "16m"

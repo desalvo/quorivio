@@ -4,7 +4,7 @@ ROOT=pathlib.Path(__file__).resolve().parents[2]
 class RCMediaEditor(unittest.TestCase):
  def test_uploaded_widget_types_require_asset_reference(self):
   domain=(ROOT/'apps/api/src/domain.ts').read_text()
-  self.assertIn("'image','video'].includes(w.kind)",domain)
+  self.assertIn("'image','video','logo','pdf'].includes(w.kind)",domain)
   self.assertIn('uuidRegex.test(w.assetId)',domain)
  def test_media_read_requires_current_published_page(self):
   api=(ROOT/'apps/api/src/server.ts').read_text()

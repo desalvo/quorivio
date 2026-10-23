@@ -18,3 +18,7 @@ test('anonymous pseudonyms are bounded and reject markup',()=>{
  assert.equal(validPseudonym('<script>'),false);
  assert.equal(validPseudonym('x'),false);
 });
+
+// Uploaded backgrounds must be UUID references, never arbitrary local paths.
+assert.equal(validPageDesign({backgroundAssetId:'not-a-uuid'}),false);
+assert.equal(validPageDesign({backgroundAssetId:'123e4567-e89b-42d3-a456-426614174000'}),true);

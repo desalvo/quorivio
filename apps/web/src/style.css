@@ -133,3 +133,96 @@
 /* Canvas gestures must not be hijacked by touch scrolling or selection. */
 .widget-canvas-item { touch-action: none; user-select: none; }
 .widget-canvas-item input { user-select: text; }
+
+/* Accessible adaptive appointment agenda */
+.agenda-toolbar,.agenda-controls{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.agenda-toolbar h2{margin:0}.agenda-toolbar p{margin:5px 0 12px;text-transform:capitalize}.agenda-controls input,.agenda-controls select{width:auto;max-width:190px}.agenda-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;margin-top:16px;background:#303957;border:1px solid #505a7b;border-radius:12px;overflow:hidden}.agenda-day{min-height:125px;min-width:0;background:#151c36;padding:7px;overflow-wrap:anywhere}.agenda-day.agenda-today{background:#222d52;box-shadow:inset 0 0 0 2px #aa9bff}.agenda-day.agenda-outside{opacity:.6}.agenda-date{background:transparent;color:#e2e8ff;font-weight:700;font-size:12px;padding:5px}.agenda-events{display:grid;gap:5px}.agenda-event{min-width:0;display:block;text-align:left;background:#404a86;color:#fff;padding:6px;border-radius:6px;font-size:12px;overflow-wrap:anywhere}.agenda-event small{display:block;color:#ccd5fa;margin-top:4px}.agenda-week .agenda-day{min-height:240px}.agenda-day .agenda-date:focus-visible,.agenda-event:focus-visible{outline:2px solid #fff;outline-offset:2px}.agenda-day .agenda-event:hover{background:#565fb4}.agenda-day .agenda-date:hover{background:#484e82}.agenda-day .agenda-event strong{font-variant-numeric:tabular-nums}.agenda-day .agenda-event small{font-size:10px}@media(max-width:850px){.agenda-grid.agenda-month{grid-template-columns:repeat(7,minmax(0,1fr))}.agenda-month .agenda-day{min-height:75px;padding:3px}.agenda-month .agenda-event{font-size:10px;padding:4px}.agenda-month .agenda-event small{display:none}.agenda-grid.agenda-week{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:540px){.agenda-grid.agenda-month{grid-template-columns:repeat(7,minmax(0,1fr))}.agenda-month .agenda-day{min-height:48px}.agenda-month .agenda-date{font-size:10px;padding:2px}.agenda-month .agenda-event{font-size:9px}.agenda-grid.agenda-week{grid-template-columns:1fr}}
+
+/* Session-first navigation and resilient control-room layout. */
+.dashboard{max-width:none;grid-template-columns:250px minmax(0,1fr)}
+.dashboard>.workspace{min-width:0;width:100%;max-width:1680px;margin:0 auto}
+.dashboard .aside{min-width:0}
+.session-tab-overview,.session-tab-pages,.session-tab-audience,.session-tab-results{min-width:0}
+.cols{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}
+.cols>div,.panel,.title-row,.activity-row,.activity-actions{min-width:0}
+.panel{overflow-wrap:anywhere}
+.title-row,.activity-row,.downloads,.activity-actions,.actions,.session-tabs{flex-wrap:wrap}
+.panel button,.panel a,.activity-actions>*{max-width:100%;white-space:normal;overflow-wrap:anywhere}
+.panel input,.panel select,.panel textarea{min-width:0;max-width:100%}
+.session-tabs{display:flex;gap:10px;margin:20px 0}
+.session-tabs button{flex:0 1 auto}
+@media(max-width:1140px){.cols{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:740px){.dashboard{grid-template-columns:minmax(0,1fr)}.aside{padding:14px}.aside .panel{display:flex;flex-wrap:wrap;gap:8px}.aside .panel h3{flex-basis:100%}.aside .session{width:auto!important;min-width:0;padding:9px}.workspace{padding:18px 12px}.activity-row{align-items:flex-start}.session-tabs button{flex:1 1 135px}}
+
+/* Invitation belongs to session settings only. */
+.session-tab-pages .invitation-panel,.session-tab-audience .invitation-panel,.session-tab-results .invitation-panel{display:none!important}
+
+/* Contextual widget commands, keyboard and touch accessible. */
+.canvas-menu-trigger{position:absolute;right:22px;top:2px;z-index:14;padding:0 5px;min-width:24px;min-height:24px;border:1px solid #64748b;border-radius:4px;background:#fff;color:#172554;cursor:pointer}
+.canvas-context-menu{position:absolute;left:10px;top:28px;z-index:30;display:flex;flex-direction:column;min-width:150px;max-width:min(240px,90vw);padding:4px;border:1px solid #64748b;border-radius:7px;box-shadow:0 8px 22px #0003;background:#fff;color:#172554}
+.canvas-context-menu button{min-height:36px;text-align:left;border:0;background:#fff;color:#172554;padding:6px 10px;cursor:pointer}
+.canvas-context-menu button:hover,.canvas-context-menu button:focus-visible{background:#e0e7ff;outline:2px solid #2563eb}
+
+/* Context media picker: controls stay within the widget menu on mobile. */
+.canvas-context-assets{display:grid;gap:5px;padding:8px 9px;border-block:1px solid #cbd5e1;max-width:240px}
+.canvas-context-assets select,.canvas-context-assets input{max-width:100%;min-width:0;font-size:13px}
+.canvas-context-assets label{font-weight:600;font-size:12px}
+.canvas-context-assets small{line-height:1.3;font-size:11px}
+.canvas-context-menu{max-height:min(75vh,430px);overflow-y:auto}
+
+.canvas-background-context{position:absolute;top:12px;left:12px;z-index:30;width:min(320px,calc(100% - 24px));max-height:calc(100% - 24px);overflow:auto;padding:12px;border:1px solid #8077ab;border-radius:10px;background:var(--panel,#fff);box-shadow:0 8px 24px #0003;display:grid;gap:8px;touch-action:auto}.canvas-background-context label{display:grid;gap:4px}.canvas-background-context select,.canvas-background-context input{max-width:100%;min-width:0}.canvas-background-context button{white-space:normal}
+/* Canvas-first interactive widget configuration */
+.widget-question-editor{margin-bottom:1rem;display:grid;gap:.7rem;min-width:0}.widget-question-editor label{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem}.widget-question-editor input:not([type=checkbox]):not([type=radio]),.widget-question-editor select{max-width:100%;min-width:0}.widget-answer-options{display:grid;gap:.5rem}.widget-option-row{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}.widget-option-row>input{flex:1 1 12rem}.widget-option-row label{white-space:nowrap}@media(max-width:700px){.widget-option-row>input{flex-basis:100%}}
+
+/* Keep projected media inside the 16:9 slide, including rotated/resized widgets. */
+.projection-widget{min-width:0;min-height:0;overflow:hidden}
+.projection-media{display:block;width:100%;height:100%;object-fit:contain}
+.projection-document{display:flex;flex-direction:column;height:100%;min-height:0;gap:.25rem}
+.projection-document iframe{flex:1;min-height:0;width:100%;border:0;background:#fff}
+.projection-missing-media{font-size:.85rem;opacity:.75}
+
+/* Project the saved question/quiz configuration, never the correct answers. */
+.projection-interactive-widget{width:100%;height:100%;overflow:auto;padding:.6rem;box-sizing:border-box}.projection-interactive-widget strong{display:block;font-size:1.25em}.projection-interactive-options{list-style:upper-alpha;padding-left:2em;margin:.6em 0}.projection-interactive-options li{padding:.25em .4em;border-bottom:1px solid rgba(128,128,128,.22);overflow-wrap:anywhere}.projection-answer-mode{opacity:.72;font-style:italic}.projection-text-widget{overflow-wrap:anywhere;white-space:pre-wrap}
+
+/* Mobile-first interactive authoring and participation. Canvas geometry is
+   retained in stored data and rearranged only at the mobile breakpoint. */
+@media (max-width: 700px) {
+  .powerpoint-editor,.widget-editor,.workspace,.workspace>*{min-width:0;max-width:100%}
+  .widget-canvas{min-height:420px;overflow:auto;overscroll-behavior:contain}
+  .widget-canvas-item{touch-action:manipulation;min-width:0;max-width:100%;overflow-wrap:anywhere}
+  .canvas-actions button,.widget-palette button,.session-tabs button,
+  .audience-widget-layout button,.rehearsal-widget button{min-height:44px;min-width:44px}
+  .audience-widget-layout,.rehearsal-widgets{min-width:0;max-width:100%}
+  .audience-widget-layout .page-widget{overflow-wrap:anywhere;overflow-x:hidden}
+  .audience-widget-layout input,.audience-widget-layout textarea,
+  .rehearsal-widget input,.rehearsal-widget textarea{font-size:16px;max-width:100%}
+  .activity-row{flex-wrap:wrap;min-width:0}
+  .activity-actions,.downloads{flex-wrap:wrap;max-width:100%;min-width:0}
+  .activity-actions button{white-space:normal}
+}
+@media (max-width: 480px) {
+  .widget-canvas-item{position:relative!important;left:auto!important;top:auto!important;
+    width:100%!important;height:auto!important;transform:none!important;
+    margin:8px 0;min-height:74px;cursor:default}
+  .widget-canvas{display:flex;flex-direction:column;min-height:0;padding:8px}
+  .widget-canvas-item .canvas-actions{flex-wrap:wrap}
+}
+
+/* Participant interaction is a mobile reading flow, not a scaled-down 16:9 editor. */
+@media (max-width: 700px) {
+  .audience-widget-layout button,.audience-widget-layout label,
+  .rehearsal-widget button,.rehearsal-widget label {overflow-wrap:anywhere}
+  .audience-widget-layout input[type="checkbox"],.audience-widget-layout input[type="radio"],
+  .rehearsal-widget input[type="checkbox"],.rehearsal-widget input[type="radio"] {
+    width:20px;height:20px;min-width:20px;accent-color:var(--primary,#6b55b7)
+  }
+  .audience-widget-layout textarea,.rehearsal-widget textarea {
+    width:100%;box-sizing:border-box;min-height:100px;resize:vertical
+  }
+  .audience-widget-layout button,.rehearsal-widget button {white-space:normal;max-width:100%}
+}
+
+/* Live distinct participant statistic widget, readable on stage and responsive. */
+.projection-participant-count{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.6rem;width:100%;height:100%;text-align:center;overflow:hidden}
+.projection-participant-count strong{font-size:clamp(.95rem,2vw,2rem);line-height:1.15}
+.projection-participant-count [data-live-participants]{font-size:clamp(2.25rem,6vw,7rem);font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+@media(max-width:640px){.projection-participant-count strong{font-size:1rem}.projection-participant-count [data-live-participants]{font-size:clamp(2rem,12vw,4rem)}}

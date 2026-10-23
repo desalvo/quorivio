@@ -8,6 +8,7 @@ import re
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from import_presentation import convert
+from pptx_portable import pptx_to_portable, portable_to_pptx, inspect_pptx_fidelity
 
 ROOT = pathlib.Path(os.environ.get('QUORIVIO_CONVERSION_DIR', '/conversions')).resolve()
 TOKEN = os.environ.get('QUORIVIO_WORKER_TOKEN', '')
@@ -52,6 +53,51 @@ def execute_job(job):
             _ACTIVE_JOBS.discard(job)
 
 
+def execute_portable_job(job, mode):
+    """Run bounded portable conversion in the isolated worker; opaque job IDs only."""
+    if not JOB.fullmatch(job):
+        raise ValueError('invalid job id')
+    workspace = ROOT / job
+    if workspace.is_symlink() or not workspace.is_dir():
+        raise ValueError('unknown job')
+    reservation = workspace / '.conversion-lock'
+    with _ACTIVE_LOCK:
+        if job in _ACTIVE_JOBS:
+            raise ValueError('job already running')
+        _ACTIVE_JOBS.add(job)
+    acquired = False
+    try:
+        reservation.mkdir(mode=0o700)
+        acquired = True
+        if mode == 'import':
+            source = workspace / 'source.pptx'
+            destination = workspace / 'portable.json'
+            if not source.is_file() or source.is_symlink() or destination.exists():
+                raise ValueError('invalid import source')
+            result = pptx_to_portable(source, media_dir=workspace / "import-media")
+            encoded = json.dumps(result, ensure_ascii=False).encode('utf-8')
+            if len(encoded) > 2 * 1024 * 1024:
+                raise ValueError('portable definition too large')
+            destination.write_bytes(encoded)
+            return {'pages': len(result['activities']), 'fidelity': inspect_pptx_fidelity(source)}
+        if mode == 'export':
+            source = workspace / 'portable.json'
+            destination = workspace / 'presentation.pptx'
+            if not source.is_file() or source.is_symlink() or destination.exists() or source.stat().st_size > 2 * 1024 * 1024:
+                raise ValueError('invalid export source')
+            portable_to_pptx(json.loads(source.read_text(encoding='utf-8')), destination, media_dir=workspace / 'export-media')
+            if destination.stat().st_size > 50 * 1024 * 1024:
+                destination.unlink()
+                raise ValueError('export too large')
+            return {'bytes': destination.stat().st_size}
+        raise ValueError('invalid portable mode')
+    finally:
+        if acquired:
+            reservation.rmdir()
+        with _ACTIVE_LOCK:
+            _ACTIVE_JOBS.discard(job)
+
+
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path != '/health':
@@ -60,7 +106,7 @@ class Handler(BaseHTTPRequestHandler):
         return self.reply(200 if ready else 503, {'ready': ready})
 
     def do_POST(self):
-        if self.path != '/convert':
+        if self.path not in ('/convert', '/portable-import', '/portable-export'):
             return self.reply(404, {'error': 'not_found'})
         credential = self.headers.get('Authorization', '').removeprefix('Bearer ')
         if not TOKEN or not hmac.compare_digest(credential, TOKEN):
@@ -72,7 +118,7 @@ class Handler(BaseHTTPRequestHandler):
             request = json.loads(self.rfile.read(size))
             if not isinstance(request, dict) or not isinstance(request.get('job'), str):
                 return self.reply(400, {'error': 'invalid_request'})
-            return self.reply(200, execute_job(request['job']))
+            return self.reply(200, execute_job(request['job']) if self.path == '/convert' else execute_portable_job(request['job'], 'import' if self.path == '/portable-import' else 'export'))
         except (ValueError, OSError, RuntimeError, TimeoutError, json.JSONDecodeError) as exc:
             self.log_error('conversion rejected: %s', type(exc).__name__)
             return self.reply(422, {'error': 'conversion_failed'})

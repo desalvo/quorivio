@@ -16,6 +16,8 @@ spec:
 {{- end }}
       securityContext:
         runAsNonRoot: true
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
         seccompProfile: {type: RuntimeDefault}
       containers:
         - name: converter

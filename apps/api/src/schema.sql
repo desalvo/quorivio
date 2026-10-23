@@ -260,3 +260,6 @@ CREATE INDEX IF NOT EXISTS idx_email_mfa_challenges_expiry ON email_mfa_challeng
 DELETE FROM email_mfa_challenges a USING email_mfa_challenges b
  WHERE a.user_id=b.user_id AND (a.created_at,a.id)<(b.created_at,b.id);
 CREATE UNIQUE INDEX IF NOT EXISTS uq_email_mfa_challenges_user ON email_mfa_challenges(user_id);
+
+CREATE TABLE IF NOT EXISTS live_connections(id uuid PRIMARY KEY,session_id uuid NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,participant_id uuid REFERENCES participants(id) ON DELETE CASCADE,last_seen timestamptz NOT NULL DEFAULT now());
+CREATE INDEX IF NOT EXISTS live_connections_recent_idx ON live_connections(session_id,last_seen);

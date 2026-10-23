@@ -18,6 +18,7 @@ resources:
 ingress:
   enabled: false
   className: nginx
+  annotations: {}
   host: quorivio.example.org
   tlsTermination: true
   tlsSecret: ""

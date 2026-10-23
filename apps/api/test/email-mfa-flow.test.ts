@@ -9,8 +9,8 @@ const schema=readFileSync(path.join(dir,'../src/schema.sql'),'utf8');
 test('email MFA challenge is stored in PostgreSQL with expiry and attempt limits',()=>{
  assert.match(schema,/CREATE TABLE IF NOT EXISTS email_mfa_challenges/);
  assert.match(schema,/CHECK\(attempts BETWEEN 0 AND 5\)/);
- assert.match(server,/emailOtpDigest\(code,r\.rows\[0\]\.id,id,secret\)/);
- assert.match(server,/sendEmailOtp\(smtp,r\.rows\[0\]\.email,code\)/);
+ assert.match(server,/emailOtpDigest\(code,r\.rows\[0\]\.user_id,id,secret\)/);
+ assert.match(server,/sendEmailOtp\(mail.smtp,mail.email,mail.code\)/);
 });
 test('verify consumes challenge transactionally and never issues cookie before verification',()=>{
  const handler=server.split("app.post('/api/auth/email-mfa/verify'")[1]?.split("app.post('/api/auth/email-mfa/settings'")[0]||'';

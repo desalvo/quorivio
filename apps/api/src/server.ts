@@ -24,6 +24,14 @@ function originSafe(req:express.Request){return !['POST','PUT','PATCH','DELETE']
 app.use('/api',(req,res,next)=>{if(!originSafe(req)){res.status(403).json({error:'invalid_origin'});return;}next()});
 // Shared, database-backed fixed-window limiter: consistent across all API replicas.
 async function throttle(req:express.Request,res:express.Response,next:express.NextFunction){try{
+ // Explicit staging-only opt-in. No bypass in production or without a strong secret.
+ const loadSecret=process.env.LOAD_TEST_TOKEN;
+ const supplied=req.headers['x-quorivio-load-token'];
+ if(process.env.NODE_ENV!=='production'&&loadSecret&&loadSecret.length>=32&&typeof supplied==='string'){
+  const a=Buffer.from(loadSecret),b=Buffer.from(supplied);
+  if(a.length===b.length&&timingSafeEqual(a,b)){next();return}
+ }
+
  const key=hash(req.ip||'unknown'),bucket=Math.floor(Date.now()/60000);
  const r=await db.query(`INSERT INTO api_rate_windows(client_hash,bucket,hits) VALUES($1,$2,1)
  ON CONFLICT(client_hash,bucket) DO UPDATE SET hits=api_rate_windows.hits+1 RETURNING hits`,[key,bucket]);
@@ -33,8 +41,11 @@ app.use('/api',throttle);
 async function owner(id:string,uid:string){const r=await db.query('SELECT s.* FROM sessions s WHERE s.id=$1 AND (s.owner_id=$2 OR EXISTS (SELECT 1 FROM session_presenters sp WHERE sp.session_id=s.id AND sp.user_id=$2))',[id,uid]);return r.rows[0] as (Record<string,any>|undefined)}
 const validDate=(x:string)=>/^\d{4}-\d{2}-\d{2}$/.test(x)&&!Number.isNaN(Date.parse(x));
 const strip=(s:any)=>({access_role:s.access_role||'owner',id:s.id,title:s.title,reference_date:s.reference_date,join_code:s.join_code,status:s.status,expires_at:s.expires_at,current_activity_id:s.current_activity_id,allow_anonymous:s.allow_anonymous,show_results:s.show_results,theme:s.theme,retention_days:s.retention_days,join_url:`${publicBase}/join/${s.join_secret}`});
-async function snapshot(sid:string){const s=(await db.query('SELECT * FROM sessions WHERE id=$1',[sid])).rows[0];if(!s)return null;const acts=(await db.query('SELECT * FROM activities WHERE session_id=$1 ORDER BY position',[sid])).rows as Activity[];const counts=(await db.query('SELECT a.id AS activity_id,r.option_id,count(*)::int AS count FROM activities a JOIN responses r ON r.activity_id=a.id AND r.invalidated_at IS NULL WHERE a.session_id=$1 GROUP BY a.id,r.option_id',[sid])).rows;const totals=(await db.query('SELECT activity_id,count(*)::int AS count FROM responses WHERE invalidated_at IS NULL AND activity_id IN (SELECT id FROM activities WHERE session_id=$1) GROUP BY activity_id',[sid])).rows;const reactions=(await db.query('SELECT activity_id,emoji,count(*)::int AS count FROM page_reactions WHERE session_id=$1 GROUP BY activity_id,emoji',[sid])).rows;return {session:strip(s),activities:acts,results:counts,totals,reactions};}
+async function snapshot(sid:string){const s=(await db.query('SELECT * FROM sessions WHERE id=$1',[sid])).rows[0];if(!s)return null;const acts=(await db.query('SELECT * FROM activities WHERE session_id=$1 ORDER BY position',[sid])).rows as Activity[];const counts=(await db.query('SELECT a.id AS activity_id,r.option_id,count(*)::int AS count FROM activities a JOIN responses r ON r.activity_id=a.id AND r.invalidated_at IS NULL WHERE a.session_id=$1 GROUP BY a.id,r.option_id',[sid])).rows;const totals=(await db.query('SELECT activity_id,count(*)::int AS count FROM responses WHERE invalidated_at IS NULL AND activity_id IN (SELECT id FROM activities WHERE session_id=$1) GROUP BY activity_id',[sid])).rows;const reactions=(await db.query('SELECT activity_id,emoji,count(*)::int AS count FROM page_reactions WHERE session_id=$1 GROUP BY activity_id,emoji',[sid])).rows;return {session:strip(s),activities:acts,results:counts,totals,reactions,connected_participants:await connectedParticipants(sid)};}
 const sockets=new Map<string,Set<WebSocket>>();
+const liveSocketIds=new WeakMap<WebSocket,string>();
+async function connectedParticipants(sid:string){const r=await db.query("SELECT count(DISTINCT participant_id)::int AS n FROM live_connections WHERE session_id=$1 AND participant_id IS NOT NULL AND last_seen>now()-interval '50 seconds'",[sid]);return r.rows[0]?.n||0;}
+
 async function broadcastLocal(sid:string){if(!sockets.get(sid)?.size)return;const data=await snapshot(sid);for(const ws of sockets.get(sid)||[])if(ws.readyState===WebSocket.OPEN)ws.send(JSON.stringify({type:'snapshot',data:(ws as any).view==='owner'?data:participantSnapshot(data)}))}
 async function broadcast(sid:string){await broadcastLocal(sid);await db.query('SELECT pg_notify($1,$2)',[SESSION_CHANNEL,sid]);}
 
@@ -90,7 +101,27 @@ app.patch('/api/sessions/:id/activities/:aid/questions/:qid',requireAuth,async(r
  }catch(e){sendError(res,e)}});
 app.get('/api/health/live',(_,res)=>res.json({status:'ok'}));app.get('/api/health/ready',async(_,res)=>{try{await db.query('SELECT 1');res.json({status:'ok'})}catch{res.status(503).json({status:'unavailable'})}});
 async function activeSmtpConfig(){const r=await db.query('SELECT encrypted_config FROM smtp_configuration WHERE id=1');return r.rowCount?openSmtpConfig(r.rows[0].encrypted_config,secret):smtpConfigFromEnv(process.env)}
-app.post('/api/auth/register',async(req,res)=>{try{const email=String(req.body?.email||'').trim().toLowerCase(),password=req.body?.password;if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)||email.length>254||typeof password!=='string'||password.length<12||password.length>256){res.status(400).json({error:'invalid_registration'});return}const org=(await db.query('SELECT id FROM organizations ORDER BY id LIMIT 1')).rows[0];if(!org){res.status(503).json({error:'organization_unavailable'});return}await db.query('INSERT INTO users(id,organization_id,email,password_hash,role,approved) VALUES($1,$2,$3,$4,$5,false)',[randomUUID(),org.id,email,await bcrypt.hash(password,12),'user']);res.status(202).json({status:'pending_admin_approval'})}catch(e){if((e as any)?.code==='23505'){res.status(409).json({error:'account_exists'});return}sendError(res,e)}});
+
+/** Provision a private, unpublished tutorial session in the same transaction as an account. */
+async function provisionDemo(cx:pg.PoolClient,userId:string,orgId:string){
+ const sid=randomUUID();
+ await cx.query("INSERT INTO sessions(id,organization_id,owner_id,title,join_code,join_secret,expires_at,reference_date) VALUES($1,$2,$3,$4,$5,$6,now()+interval '365 days',current_date)",[sid,orgId,userId,'Esempio Quorivio · sondaggio, quiz e domande',randomBytes(5).toString('hex').toUpperCase(),randomBytes(20).toString('base64url')]);
+ const choices=[{id:'a',label:'Prima opzione'},{id:'b',label:'Seconda opzione'},{id:'c',label:'Terza opzione'}];
+ const entries:[string,string,string,unknown,string|null,number|null,string][]=[
+  ['poll','Sondaggio di esempio: cosa preferisci?', 'single',choices,null,null,'question'],
+  ['quiz','Quiz di esempio: scegli la prima risposta','single',choices,'a',null,'question'],
+  ['timed_quiz','Quiz a tempo: scegli la seconda risposta','single',choices,'b',30,'timed-quiz'],
+  ['poll','Domanda aperta: cosa vorresti imparare?','text',[],null,null,'question'],
+  ['poll','Domanda: quale argomento approfondire?','multiple',choices,null,null,'question']
+ ];
+ for(const [idx,[type,title,mode,options,correct,duration,kind]] of entries.entries()){
+  const aid=randomUUID(),widget={id:'demo-'+idx,kind,label:title,answerMode:mode,options,required:true,...(correct?{correctOptionId:correct}:{}),...(duration?{durationSeconds:duration}:{}) ,position:{x:8,y:16,width:84,height:65}};
+  await cx.query('INSERT INTO activities(id,session_id,type,title,options,correct_option_id,duration_seconds,position,answer_mode,answer_required,page_design,result_design) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,true,$10,$11)',[aid,sid,type,title,JSON.stringify(options),correct,duration,idx,mode,JSON.stringify({widgets:[widget]}),JSON.stringify({})]);
+ }
+ return sid;
+}
+
+app.post('/api/auth/register',async(req,res)=>{const cx=await db.connect();try{const email=String(req.body?.email||'').trim().toLowerCase(),password=req.body?.password;if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)||email.length>254||typeof password!=='string'||password.length<12||password.length>256){res.status(400).json({error:'invalid_registration'});return}await cx.query('BEGIN');const org=(await cx.query('SELECT id FROM organizations ORDER BY id LIMIT 1')).rows[0];if(!org){await cx.query('ROLLBACK');res.status(503).json({error:'organization_unavailable'});return}const uid=randomUUID();await cx.query('INSERT INTO users(id,organization_id,email,password_hash,role,approved) VALUES($1,$2,$3,$4,$5,false)',[uid,org.id,email,await bcrypt.hash(password,12),'user']);await provisionDemo(cx,uid,org.id);await cx.query('COMMIT');res.status(202).json({status:'pending_admin_approval'})}catch(e){await cx.query('ROLLBACK');if((e as any)?.code==='23505'){res.status(409).json({error:'account_exists'});return}sendError(res,e)}finally{cx.release()}});
 // Password recovery does not reveal account existence. SMTP must be configured to deliver tokens.
 app.post('/api/auth/password-reset/request',async(req,res)=>{try{
  const email=normalizeResetEmail(req.body?.email);if(!email){res.status(400).json({error:'invalid_email'});return}
@@ -187,21 +218,43 @@ app.get('/api/auth/social/:provider/callback',async(req,res)=>{
  res.cookie('q_auth',`${body}.${sign(body)}`,{httpOnly:true,sameSite:'strict',secure:true,maxAge:8*3600*1000,path:'/'});res.redirect('/?oidc_login=1');
  }catch(e){console.error('social oauth callback',e instanceof Error?e.message:'error');res.status(502).json({error:'social_authentication_failed'})}
 });
-app.post('/api/auth/login',async(req,res)=>{try{const {email,password}=req.body||{};if(typeof email!=='string'||typeof password!=='string'){res.status(400).json({error:'invalid_request'});return}const r=await db.query('SELECT id,email,password_hash,approved,must_change_password,role,totp_enabled,totp_secret,email_mfa_enabled FROM users WHERE lower(email)=$1 OR lower(nickname)=$1',[email.trim().toLowerCase()]);if(!r.rowCount||!await bcrypt.compare(password,r.rows[0].password_hash)){res.status(401).json({error:'invalid_credentials'});return}if(!r.rows[0].approved){res.status(403).json({error:'account_pending_approval'});return}if(r.rows[0].totp_enabled){const otp=String(req.body?.totp_code||'');if(!validTotpCode(otp)||!verifyTotp(openTotp(r.rows[0].totp_secret,secret),otp)){const backup=String(req.body?.recovery_code||'');if(!validRecoveryCode(backup)){res.status(401).json({error:'mfa_code_required_or_invalid'});return}const used=await db.query('DELETE FROM mfa_recovery_codes WHERE user_id=$1 AND code_hash=$2 RETURNING code_hash',[r.rows[0].id,recoveryCodeDigest(backup,secret)]);if(!used.rowCount){res.status(401).json({error:'mfa_code_required_or_invalid'});return}}}if(r.rows[0].email_mfa_enabled){
- // Limit challenge generation across replicas to prevent mailbox flooding after password compromise.
- const issueKey=hash(`email-mfa-issue:${r.rows[0].id}`),issueBucket=Math.floor(Date.now()/60000);
- const issue=await db.query(`INSERT INTO api_rate_windows(client_hash,bucket,hits) VALUES($1,$2,1)
- ON CONFLICT(client_hash,bucket) DO UPDATE SET hits=api_rate_windows.hits+1 RETURNING hits`,[issueKey,issueBucket]);
- if(Number(issue.rows[0].hits)>3){res.setHeader('Retry-After',String(60-Math.floor(Date.now()/1000)%60));res.status(429).json({error:'email_mfa_rate_limited'});return}
- const smtp=await activeSmtpConfig();if(!smtp){res.status(503).json({error:'email_mfa_smtp_unavailable'});return}
- const id=randomUUID(),code=createEmailOtp(),digest=emailOtpDigest(code,r.rows[0].id,id,secret);
- await db.query(`INSERT INTO email_mfa_challenges(id,user_id,digest,expires_at)
- VALUES($1,$2,$3,now()+interval '5 minutes') ON CONFLICT(user_id)
- DO UPDATE SET id=EXCLUDED.id,digest=EXCLUDED.digest,expires_at=EXCLUDED.expires_at,attempts=0,created_at=now()`,[id,r.rows[0].id,digest]);
- try{await sendEmailOtp(smtp,r.rows[0].email,code)}catch{await db.query('DELETE FROM email_mfa_challenges WHERE id=$1',[id]);res.status(502).json({error:'email_mfa_delivery_failed'});return}
- res.json({email_mfa_required:true,challenge_id:id});return
+app.post('/api/auth/login',async(req,res)=>{try{const {email,password}=req.body||{};if(typeof email!=='string'||typeof password!=='string'){res.status(400).json({error:'invalid_request'});return}const r=await db.query('SELECT id,email,password_hash,approved,must_change_password,role,totp_enabled,totp_secret,email_mfa_enabled FROM users WHERE lower(email)=$1 OR lower(nickname)=$1',[email.trim().toLowerCase()]);if(!r.rowCount||!await bcrypt.compare(password,r.rows[0].password_hash)){res.status(401).json({error:'invalid_credentials'});return}if(!r.rows[0].approved){res.status(403).json({error:'account_pending_approval'});return}if(r.rows[0].totp_enabled||r.rows[0].email_mfa_enabled){
+ const id=randomUUID();
+ // A challenge is created only after successful primary authentication. No delivery until selected.
+ await db.query(`INSERT INTO email_mfa_challenges(id,user_id,digest,expires_at) VALUES($1,$2,$3,now()+interval '5 minutes') ON CONFLICT(user_id) DO UPDATE SET id=EXCLUDED.id,digest=EXCLUDED.digest,expires_at=EXCLUDED.expires_at,attempts=0,created_at=now()`,[id,r.rows[0].id,hash(randomUUID())]);
+ res.json({mfa_required:true,challenge_id:id,methods:[...(r.rows[0].totp_enabled?['totp']:[]),...(r.rows[0].email_mfa_enabled?['email']:[])]});return;
  }const expires=Date.now()+8*3600*1000;const body=`${r.rows[0].id}.${expires}`;res.cookie('q_auth',`${body}.${sign(body)}`,{httpOnly:true,sameSite:'strict',secure:base.startsWith('https:'),maxAge:8*3600*1000,path:'/'});res.json({email:r.rows[0].email,role:r.rows[0].role,must_change_password:r.rows[0].must_change_password})}catch(e){sendError(res,e)}});
 app.post('/api/auth/logout',(_,res)=>{res.clearCookie('q_auth',{path:'/'});res.json({ok:true})});
+app.post('/api/auth/mfa/challenge/email',async(req,res)=>{try{
+ const id=req.body?.challenge_id;if(typeof id!=='string'||!/^[0-9a-f-]{36}$/i.test(id)){res.status(400).json({error:'invalid_challenge'});return}
+ const client=await db.connect();let mail:any;
+ try{await client.query('BEGIN');const r=await client.query(`SELECT c.user_id,c.expires_at,c.attempts,u.email,u.email_mfa_enabled,u.approved FROM email_mfa_challenges c JOIN users u ON u.id=c.user_id WHERE c.id=$1 FOR UPDATE OF c`,[id]);
+ if(!r.rowCount||!r.rows[0].approved||!r.rows[0].email_mfa_enabled||r.rows[0].attempts>=5||new Date(r.rows[0].expires_at).getTime()<=Date.now()){await client.query('ROLLBACK');res.status(401).json({error:'invalid_challenge'});return}
+ const key=hash(`email-mfa-issue:${r.rows[0].user_id}`),bucket=Math.floor(Date.now()/60000);
+ const count=await client.query(`INSERT INTO api_rate_windows(client_hash,bucket,hits) VALUES($1,$2,1) ON CONFLICT(client_hash,bucket) DO UPDATE SET hits=api_rate_windows.hits+1 RETURNING hits`,[key,bucket]);
+ if(Number(count.rows[0].hits)>3){await client.query('COMMIT');res.status(429).json({error:'email_mfa_rate_limited'});return}
+ const smtp=await activeSmtpConfig();if(!smtp){await client.query('ROLLBACK');res.status(503).json({error:'email_mfa_smtp_unavailable'});return}
+ const code=createEmailOtp();await client.query('UPDATE email_mfa_challenges SET digest=$2 WHERE id=$1',[id,emailOtpDigest(code,r.rows[0].user_id,id,secret)]);await client.query('COMMIT');mail={smtp,email:r.rows[0].email,code};
+ }catch(e){await client.query('ROLLBACK');throw e}finally{client.release()}
+ try{await sendEmailOtp(mail.smtp,mail.email,mail.code)}catch{await db.query('DELETE FROM email_mfa_challenges WHERE id=$1',[id]);res.status(502).json({error:'email_mfa_delivery_failed'});return}
+ res.json({ok:true});
+ }catch(e){sendError(res,e)}});
+app.post('/api/auth/mfa/challenge/verify',async(req,res)=>{try{
+ const id=req.body?.challenge_id,method=req.body?.method,code=String(req.body?.code||'');
+ if(typeof id!=='string'||!/^[0-9a-f-]{36}$/i.test(id)||!['totp','recovery'].includes(method)){res.status(400).json({error:'invalid_challenge'});return}
+ const client=await db.connect();let user:any;
+ try{await client.query('BEGIN');const r=await client.query(`SELECT c.user_id,c.expires_at,c.attempts,u.email,u.role,u.must_change_password,u.approved,u.totp_enabled,u.totp_secret FROM email_mfa_challenges c JOIN users u ON u.id=c.user_id WHERE c.id=$1 FOR UPDATE OF c`,[id]);
+ if(!r.rowCount||!r.rows[0].approved||!r.rows[0].totp_enabled||r.rows[0].attempts>=5||new Date(r.rows[0].expires_at).getTime()<=Date.now()){await client.query('ROLLBACK');res.status(401).json({error:'mfa_invalid_or_expired'});return}
+ user=r.rows[0];let valid=false;
+ if(method==='totp')valid=validTotpCode(code)&&verifyTotp(openTotp(user.totp_secret,secret),code);
+ else if(validRecoveryCode(code)){const used=await client.query('DELETE FROM mfa_recovery_codes WHERE user_id=$1 AND code_hash=$2 RETURNING code_hash',[user.user_id,recoveryCodeDigest(code,secret)]);valid=!!used.rowCount}
+ if(!valid){await client.query('UPDATE email_mfa_challenges SET attempts=attempts+1 WHERE id=$1',[id]);await client.query('COMMIT');res.status(401).json({error:'mfa_invalid_or_expired'});return}
+ await client.query('DELETE FROM email_mfa_challenges WHERE user_id=$1',[user.user_id]);await client.query('COMMIT');
+ }catch(e){await client.query('ROLLBACK');throw e}finally{client.release()}
+ const expires=Date.now()+8*3600*1000,body=`${user.user_id}.${expires}`;
+ res.cookie('q_auth',`${body}.${sign(body)}`,{httpOnly:true,sameSite:'strict',secure:base.startsWith('https:'),maxAge:8*3600*1000,path:'/'});
+ res.json({email:user.email,role:user.role,must_change_password:user.must_change_password});
+ }catch(e){sendError(res,e)}});
 app.post('/api/auth/email-mfa/verify',async(req,res)=>{try{
  const id=req.body?.challenge_id,code=req.body?.code;
  if(typeof id!=='string'||!/^[0-9a-f-]{36}$/i.test(id)||!validEmailOtp(code)){res.status(400).json({error:'invalid_email_mfa_request'});return}
@@ -221,7 +274,7 @@ app.post('/api/auth/email-mfa/settings',requireAuth,async(req,res)=>{try{
  if(typeof enabled!=='boolean'||typeof password!=='string'){res.status(400).json({error:'invalid_request'});return}
  const r=await db.query('SELECT password_hash,totp_enabled,totp_secret FROM users WHERE id=$1',[uid]);
  if(!r.rowCount||!await bcrypt.compare(password,r.rows[0].password_hash)){res.status(403).json({error:'invalid_credentials'});return}
- if(r.rows[0].totp_enabled&&(!validTotpCode(totp)||!verifyTotp(openTotp(r.rows[0].totp_secret,secret),totp))){res.status(403).json({error:'invalid_mfa_code'});return}
+ // Email enrollment is independent of TOTP enrollment.
  if(enabled&&!await activeSmtpConfig()){res.status(409).json({error:'smtp_required_before_email_mfa'});return}
  await db.query('UPDATE users SET email_mfa_enabled=$2,auth_revoked_at=now() WHERE id=$1',[uid,enabled]);
  await db.query('DELETE FROM email_mfa_challenges WHERE user_id=$1',[uid]);res.clearCookie('q_auth',{path:'/'});res.json({enabled,reauthentication_required:true});
@@ -308,7 +361,7 @@ app.patch('/api/admin/users/:id/identity',requireAuth,requireAdmin,async(req,res
  const result=await db.query('UPDATE users SET email=$2 WHERE id=$1 RETURNING id,email,nickname,is_primary_admin',[req.params.id,email]);
  if(!result.rowCount){res.status(404).end();return}res.json(result.rows[0]);
  }catch(e){if((e as any)?.code==='23505'){res.status(409).json({error:'email_already_taken'});return}sendError(res,e)}});
-app.post('/api/admin/users',requireAuth,requireAdmin,async(req,res)=>{try{const email=String(req.body?.email||'').trim().toLowerCase(),role=req.body?.role,password=req.body?.temporary_password,nickname=req.body?.nickname?String(req.body.nickname).trim().toLowerCase():null;if(nickname&&(!/^[a-z][a-z0-9_.-]{2,31}$/.test(nickname)||nickname==='admin')){res.status(400).json({error:'invalid_nickname'});return}if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)||!['user','presenter','moderator','org_admin','platform_admin'].includes(role)||typeof password!=='string'||password.length<12||password.length>256){res.status(400).json({error:'invalid_user'});return}const org=(await db.query('SELECT organization_id FROM users WHERE id=$1',[auth(req)])).rows[0];const r=await db.query('INSERT INTO users(id,organization_id,email,password_hash,role,approved,must_change_password,nickname) VALUES($1,$2,$3,$4,$5,true,true,$6) RETURNING id,email,nickname,role,approved',[randomUUID(),org.organization_id,email,await bcrypt.hash(password,12),role,nickname]);res.status(201).json(r.rows[0])}catch(e){if((e as any)?.code==='23505'){res.status(409).json({error:'account_exists'});return}sendError(res,e)}});
+app.post('/api/admin/users',requireAuth,requireAdmin,async(req,res)=>{const cx=await db.connect();try{const email=String(req.body?.email||'').trim().toLowerCase(),role=req.body?.role,password=req.body?.temporary_password,nickname=req.body?.nickname?String(req.body.nickname).trim().toLowerCase():null;if(nickname&&(!/^[a-z][a-z0-9_.-]{2,31}$/.test(nickname)||nickname==='admin')){res.status(400).json({error:'invalid_nickname'});return}if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)||!['user','presenter','moderator','org_admin','platform_admin'].includes(role)||typeof password!=='string'||password.length<12||password.length>256){res.status(400).json({error:'invalid_user'});return}const org=(await db.query('SELECT organization_id FROM users WHERE id=$1',[auth(req)])).rows[0];await cx.query('BEGIN');const r=await cx.query('INSERT INTO users(id,organization_id,email,password_hash,role,approved,must_change_password,nickname) VALUES($1,$2,$3,$4,$5,true,true,$6) RETURNING id,email,nickname,role,approved',[randomUUID(),org.organization_id,email,await bcrypt.hash(password,12),role,nickname]);await provisionDemo(cx,r.rows[0].id,org.organization_id);await cx.query('COMMIT');res.status(201).json(r.rows[0])}catch(e){await cx.query('ROLLBACK');if((e as any)?.code==='23505'){res.status(409).json({error:'account_exists'});return}sendError(res,e)}finally{cx.release()}});
 app.patch('/api/admin/users/:id/nickname',requireAuth,requireAdmin,async(req,res)=>{try{const nickname=req.body?.nickname==null||req.body.nickname===''?null:String(req.body.nickname).trim().toLowerCase();if(nickname&&(!/^[a-z][a-z0-9_.-]{2,31}$/.test(nickname)||nickname==='admin')){res.status(400).json({error:'invalid_nickname'});return}const r=await db.query('UPDATE users SET nickname=$2 WHERE id=$1 AND is_primary_admin=false RETURNING id,nickname',[req.params.id,nickname]);if(!r.rowCount){res.status(409).json({error:'primary_admin_immutable_or_missing'});return}res.json(r.rows[0])}catch(e){if((e as any)?.code==='23505'){res.status(409).json({error:'nickname_already_taken'});return}sendError(res,e)}});
 app.get('/api/admin/users',requireAuth,requireAdmin,async(req,res)=>{try{
  const page=Number(req.query.page||1),pageSize=Number(req.query.page_size||(req.query.page===undefined?100:10)),search=String(req.query.search||'').trim().slice(0,160),status=String(req.query.approval||'all');
@@ -334,7 +387,9 @@ app.post('/api/auth/profile/photo',requireAuth,async(req,res)=>{try{
  const id=randomUUID();const received=await receiveAssetStream(req,profilePhotoFolder(),id,type,limit,size);
  try{await scanUploadedFile(received.destination)}catch(e){await unlink(received.destination).catch(()=>{});throw e}
  const url=`/api/auth/profile/photo/${id}`;
+ const previous=await db.query('SELECT profile_photo_url FROM users WHERE id=$1',[uid]);
  const prior=await db.query('UPDATE users SET profile_photo_url=$2 WHERE id=$1 RETURNING profile_photo_url',[uid,url]);
+ if(previous.rows[0]?.profile_photo_url){const old=String(previous.rows[0].profile_photo_url).split('/').pop()||'';if(/^[0-9a-f-]{36}$/i.test(old))await unlink(profilePhotoPath(old)).catch(()=>{})}
  if(!prior.rowCount){await unlink(received.destination).catch(()=>{});res.status(404).end();return}
  res.status(201).json({profile_photo_url:url});
  }catch(e){sendError(res,e)}});
@@ -399,8 +454,22 @@ app.post('/api/sessions',requireAuth,requirePresenter,async(req,res)=>{try{const
 
 // Portable definition exports intentionally omit participant data and join credentials.
 async function portableSession(id:string){const session=(await db.query('SELECT title,reference_date,theme,allow_anonymous,show_results FROM sessions WHERE id=$1',[id])).rows[0];const activities=(await db.query('SELECT type,title,options,correct_option_id,correct_option_ids,answer_mode,answer_required,duration_seconds,page_design,result_design FROM activities WHERE session_id=$1 ORDER BY position',[id])).rows;return {format:'quorivio-session',version:1,session,activities}}
-function validPortable(x:any){return x?.format==='quorivio-session'&&x.version===1&&typeof x.session?.title==='string'&&x.session.title.trim().length>0&&x.session.title.length<=160&&validDate(String(x.session.reference_date))&&validPageDesign(x.session.theme)&&typeof x.session.allow_anonymous==='boolean'&&typeof x.session.show_results==='boolean'&&Array.isArray(x.activities)&&x.activities.length<=200&&x.activities.every((a:any)=>['poll','quiz','timed_quiz'].includes(a.type)&&typeof a.title==='string'&&a.title.trim().length>0&&a.title.length<=240&&validateOptions(a.options)&&validAnswerMode(a.answer_mode||'single')&&typeof (a.answer_required??true)==='boolean'&& (a.correct_option_ids===undefined||Array.isArray(a.correct_option_ids)&&a.correct_option_ids.every((v:any)=>typeof v==='string'&&a.options.some((o:any)=>o.id===v)))&&validPageDesign(a.page_design)&&validPageDesign(a.result_design)&&(!['quiz','timed_quiz'].includes(a.type)||!['single','multiple'].includes(a.answer_mode||'single')||(a.answer_mode==='multiple'?Array.isArray(a.correct_option_ids)&&a.correct_option_ids.length>0:a.options.some((o:any)=>o.id===a.correct_option_id)))&&(a.type!=='timed_quiz'||['single','multiple'].includes(a.answer_mode||'single')&&Number.isInteger(a.duration_seconds)&&a.duration_seconds>=5&&a.duration_seconds<=600)&&(a.duration_seconds==null||Number.isInteger(a.duration_seconds)&&a.duration_seconds>=5&&a.duration_seconds<=600));}
-async function createFromPortable(data:any,uid:string){const cx=await db.connect();try{await cx.query('BEGIN');const u=(await cx.query('SELECT organization_id FROM users WHERE id=$1',[uid])).rows[0];if(!u)throw Error('missing_user');const sid=randomUUID();await cx.query("INSERT INTO sessions(id,organization_id,owner_id,title,reference_date,join_code,join_secret,expires_at,theme,allow_anonymous,show_results) VALUES($1,$2,$3,$4,$5,$6,$7,now()+interval '1 day',$8,$9,$10)",[sid,u.organization_id,uid,data.session.title,data.session.reference_date,randomBytes(5).toString('hex').toUpperCase(),randomBytes(20).toString('base64url'),JSON.stringify(data.session.theme),data.session.allow_anonymous,data.session.show_results]);for(let i=0;i<data.activities.length;i++){const a=data.activities[i];await cx.query('INSERT INTO activities(id,session_id,type,title,options,correct_option_id,duration_seconds,page_design,result_design,position,answer_mode,answer_required,correct_option_ids) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)',[randomUUID(),sid,a.type,a.title,JSON.stringify(a.options),['quiz','timed_quiz'].includes(a.type)?a.correct_option_id:null,a.duration_seconds,JSON.stringify(a.page_design),JSON.stringify(a.result_design),i,a.answer_mode||'single',a.answer_required??true,JSON.stringify(a.correct_option_ids||[])])}await cx.query('COMMIT');return sid}catch(e){await cx.query('ROLLBACK');throw e}finally{cx.release()}}
+function validPortable(x:any){return x?.format==='quorivio-session'&&x.version===1&&typeof x.session?.title==='string'&&x.session.title.trim().length>0&&x.session.title.length<=160&&validDate(String(x.session.reference_date))&&validPageDesign(x.session.theme)&&typeof x.session.allow_anonymous==='boolean'&&typeof x.session.show_results==='boolean'&&Array.isArray(x.activities)&&x.activities.length<=200&&x.activities.every((a:any)=>['slide','poll','quiz','timed_quiz'].includes(a.type)&&typeof a.title==='string'&&a.title.trim().length>0&&a.title.length<=240&&(a.type==='slide'?Array.isArray(a.options)&&a.options.length===0:validateOptions(a.options))&&validAnswerMode(a.answer_mode||'single')&&typeof (a.answer_required??true)==='boolean'&& (a.correct_option_ids===undefined||Array.isArray(a.correct_option_ids)&&a.correct_option_ids.every((v:any)=>typeof v==='string'&&a.options.some((o:any)=>o.id===v)))&&validPageDesign(a.page_design)&&validPageDesign(a.result_design)&&(!['quiz','timed_quiz'].includes(a.type)||!['single','multiple'].includes(a.answer_mode||'single')||(a.answer_mode==='multiple'?Array.isArray(a.correct_option_ids)&&a.correct_option_ids.length>0:a.options.some((o:any)=>o.id===a.correct_option_id)))&&(a.type!=='timed_quiz'||['single','multiple'].includes(a.answer_mode||'single')&&Number.isInteger(a.duration_seconds)&&a.duration_seconds>=5&&a.duration_seconds<=600)&&(a.duration_seconds==null||Number.isInteger(a.duration_seconds)&&a.duration_seconds>=5&&a.duration_seconds<=600));}
+async function createFromPortable(data:any,uid:string,importMediaDir?:string){const cx=await db.connect();const sid=randomUUID();try{await cx.query('BEGIN');const u=(await cx.query('SELECT organization_id FROM users WHERE id=$1',[uid])).rows[0];if(!u)throw Error('missing_user');await cx.query("INSERT INTO sessions(id,organization_id,owner_id,title,reference_date,join_code,join_secret,expires_at,theme,allow_anonymous,show_results) VALUES($1,$2,$3,$4,$5,$6,$7,now()+interval '1 day',$8,$9,$10)",[sid,u.organization_id,uid,data.session.title,data.session.reference_date,randomBytes(5).toString('hex').toUpperCase(),randomBytes(20).toString('base64url'),JSON.stringify(data.session.theme),data.session.allow_anonymous,data.session.show_results]);for(let i=0;i<data.activities.length;i++){const a=data.activities[i];await cx.query('INSERT INTO activities(id,session_id,type,title,options,correct_option_id,duration_seconds,page_design,result_design,position,answer_mode,answer_required,correct_option_ids) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)',[randomUUID(),sid,a.type,a.title,JSON.stringify(a.options),['quiz','timed_quiz'].includes(a.type)?a.correct_option_id:null,a.duration_seconds,JSON.stringify(a.page_design),JSON.stringify(a.result_design),i,a.answer_mode||'single',a.answer_required??true,JSON.stringify(a.correct_option_ids||[])])}if(importMediaDir){
+ const assets=data.import_assets;
+ if(!Array.isArray(assets)||assets.reduce((sum:number,a:any)=>sum+(Number.isFinite(a?.bytes)?a.bytes:0),0)>50*1024*1024||assets.length>200||new Set(assets.map((a:any)=>a.id)).size!==assets.length)throw Error('invalid_import_assets');
+ const referenced=new Set(data.activities.flatMap((a:any)=>(a.page_design?.widgets||[]).filter((w:any)=>w.kind==='image').map((w:any)=>w.assetId)));
+ if(referenced.size!==assets.length||!assets.every((a:any)=>referenced.has(a.id)))throw Error('unmatched_import_assets');
+ const folder=path.join(assetRoot,sid);await mkdir(folder,{recursive:true,mode:0o700});
+ for(const asset of assets){
+  if(!/^[0-9a-f-]{36}$/.test(asset.id)||!['image/png','image/jpeg'].includes(asset.mime)||!Number.isInteger(asset.bytes)||asset.bytes<1||asset.bytes>10*1024*1024||! /^[a-f0-9]{64}$/.test(asset.sha256))throw Error('invalid_import_asset');
+  const contents=await readFile(path.join(importMediaDir,asset.id));
+  if(contents.length!==asset.bytes||createHash('sha256').update(contents).digest('hex')!==asset.sha256)throw Error('invalid_import_asset_digest');
+  await writeFile(path.join(folder,asset.id),contents,{flag:'wx',mode:0o600});
+  await cx.query('INSERT INTO session_assets(id,session_id,uploaded_by,mime_type,byte_size,sha256) VALUES($1,$2,$3,$4,$5,$6)',[asset.id,sid,uid,asset.mime,asset.bytes,asset.sha256]);
+ }
+}
+await cx.query('COMMIT');return sid}catch(e){await cx.query('ROLLBACK');if(importMediaDir)await rm(path.join(assetRoot,sid),{recursive:true,force:true}).catch(()=>{});throw e}finally{cx.release()}}
 // Asset endpoints accept raw bytes with a strictly bounded Content-Length and file signatures.
 // Storage is intentionally private and local; configure a shared persistent volume before production.
 const assetRoot=path.resolve(process.env.QUORIVIO_ASSET_DIR||'/app/assets');
@@ -494,8 +563,23 @@ app.patch('/api/sessions/:id/activities/:aid/design',requireAuth,async(req,res)=
  await cx.query('BEGIN');
  const a=await cx.query('SELECT page_design,result_design,status FROM activities WHERE id=$1 AND session_id=$2 FOR UPDATE',[req.params.aid,s.id]);
  if(!a.rowCount){await cx.query('ROLLBACK');res.status(404).end();return}
+ // Page background assets use the same ownership boundary as embedded widgets.
+ for(const design of [req.body.page_design,req.body.result_design]){
+  if(design.backgroundAssetId){
+   const background=await cx.query('SELECT mime_type FROM session_assets WHERE id=$1 AND session_id=$2 AND participant_id IS NULL',[design.backgroundAssetId,s.id]);
+   if(!['image/png','image/jpeg','image/gif','image/webp'].includes(background.rows[0]?.mime_type)){await cx.query('ROLLBACK');res.status(400).json({error:'invalid_background_asset'});return}
+  }
+ }
  const previous=a.rows[0].page_design?.widgets||[];
  const next=req.body.page_design.widgets||[];
+ // Every referenced asset must belong to this session and match the widget type.
+ const mediaWidgets=next.filter((w:any)=>['image','logo','video','pdf'].includes(w.kind));
+ for(const w of mediaWidgets){
+  const match=await cx.query('SELECT mime_type FROM session_assets WHERE id=$1 AND session_id=$2 AND participant_id IS NULL',[w.assetId,s.id]);
+  const mime=match.rows[0]?.mime_type||'';
+  const expected=w.kind==='video'?['video/mp4','video/webm']:w.kind==='pdf'?['application/pdf']:['image/png','image/jpeg','image/gif','image/webp'];
+  if(!expected.includes(mime)){await cx.query('ROLLBACK');res.status(400).json({error:'invalid_widget_asset'});return}
+ }
  if(a.rows[0].status==='open'&&liveTimedWidgetMutation(previous,next)){await cx.query('ROLLBACK');res.status(409).json({error:'live_timed_quiz_definition_locked'});return}
  // A changed question is a new revision, not a reinterpretation of historical answers.
  for(const widget of next.filter((w:any)=>['question','timed-quiz'].includes(w.kind))){
@@ -545,6 +629,20 @@ app.put('/api/sessions/:id/pages/order',requireAuth,async(req,res)=>{
   await cx.query('COMMIT');begun=false;await broadcast(req.params.id);res.json({activity_ids:ids});
  }catch(e){if(begun)await cx.query('ROLLBACK').catch(()=>{});sendError(res,e)}finally{cx.release()}
 });
+// Canvas-first pages: no activity form or media upload is required to compose a slide.
+app.post('/api/sessions/:id/pages',requireAuth,async(req,res)=>{const cx=await db.connect();let begun=false;try{
+ const title=req.body?.title;
+ if(typeof title!=='string'||!title.trim()||title.trim().length>240){res.status(400).json({error:'invalid_page_title'});return}
+ await cx.query('BEGIN');begun=true;
+ const session=await cx.query('SELECT id,status FROM sessions WHERE id=$1 AND (owner_id=$2 OR EXISTS (SELECT 1 FROM session_presenters p WHERE p.session_id=$1 AND p.user_id=$2)) FOR UPDATE',[req.params.id,auth(req)]);
+ if(!session.rowCount){await cx.query('ROLLBACK');begun=false;res.status(404).end();return}
+ if(session.rows[0].status==='closed'){await cx.query('ROLLBACK');begun=false;res.status(409).json({error:'session_closed'});return}
+ const position=await cx.query('SELECT coalesce(max(position)+1,0)::int AS p FROM activities WHERE session_id=$1',[req.params.id]);
+ const id=randomUUID();
+ await cx.query("INSERT INTO activities(id,session_id,type,title,options,position,page_design,result_design,answer_mode,answer_required) VALUES($1,$2,'slide',$3,'[]'::jsonb,$4,$5,'{}'::jsonb,'{}'::jsonb,'text',false)",[id,req.params.id,title.trim(),position.rows[0].p]);
+ await cx.query('COMMIT');begun=false;await broadcast(req.params.id);
+ res.status(201).json({id,title:title.trim(),position:position.rows[0].p});
+ }catch(e){if(begun)await cx.query('ROLLBACK').catch(()=>{});sendError(res,e)}finally{cx.release()}});
 // Images already checked and stored privately may be promoted to presentation slides.
 // This preserves the original session independent presentation mode and avoids untrusted URLs.
 app.post('/api/sessions/:id/slides',requireAuth,async(req,res)=>{try{
@@ -619,14 +717,81 @@ app.post('/api/sessions/:id/presentation-import',requireAuth,async(req,res)=>{
  }catch(e){if(transaction)await cx.query('ROLLBACK').catch(()=>{});for(const f of created)await unlink(f).catch(()=>{});sendError(res,e)}
  finally{cx.release();await rm(scratch,{recursive:true,force:true}).catch(()=>{})}
 });
+// Editable PowerPoint import/export shares the existing isolated converter worker.
+// The imported PPTX becomes a NEW editable session; existing sessions are unchanged.
+app.post('/api/presentations/import-editable',requireAuth,requirePresenter,async(req,res)=>{
+ const mime=String(req.headers['content-type']||'').split(';')[0].trim().toLowerCase();
+ if(mime!=='application/vnd.openxmlformats-officedocument.presentationml.presentation'){res.status(415).json({error:'pptx_required'});return}
+ if(process.env.QUORIVIO_ENABLE_CONVERTER!=='true'){res.status(503).json({error:'conversion_worker_not_configured'});return}
+ const workerUrl=process.env.QUORIVIO_CONVERTER_WORKER_URL,token=process.env.QUORIVIO_WORKER_TOKEN||'';
+ if(!workerUrl||!/^http:\/\/[a-zA-Z0-9.-]+:\d{2,5}$/.test(workerUrl)||token.length<32){res.status(503).json({error:'conversion_worker_not_configured'});return}
+ const length=Number(req.headers['content-length']);
+ if(!Number.isSafeInteger(length)||length<8||length>50*1024*1024){res.status(413).json({error:'invalid_presentation_size'});return}
+ const scratch=path.join(process.env.QUORIVIO_CONVERSION_DIR||'/conversions',randomBytes(16).toString('hex'));
+ await mkdir(scratch,{recursive:false,mode:0o700});
+ try{
+  const received=await receiveAssetStream(req,scratch,'source.pptx',mime,50*1024*1024,length);
+  await scanUploadedFile(received.destination);
+  const controller=new AbortController(),deadline=setTimeout(()=>controller.abort(),240000);
+  let fidelity:unknown;
+  try{const r=await fetch(`${workerUrl}/portable-import`,{method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({job:path.basename(scratch)}),signal:controller.signal});if(!r.ok)throw Error('editable_conversion_failed');const result=await r.json() as {fidelity?:unknown};fidelity=result.fidelity}
+  finally{clearTimeout(deadline)}
+  const file=await readFile(path.join(scratch,'portable.json'));
+  if(file.length>2*1024*1024)throw Error('portable_definition_too_large');
+  const portable=JSON.parse(file.toString('utf8'));
+  if(!validPortable(portable))throw Error('invalid_editable_conversion');
+  const id=await createFromPortable(portable,auth(req)!,path.join(scratch,'import-media'));
+  res.status(201).json({id,pages:portable.activities.length,warning:'partial_pptx_fidelity',fidelity});
+ }catch(e){sendError(res,e)}finally{await rm(scratch,{recursive:true,force:true}).catch(()=>{})}
+});
+app.get('/api/sessions/:id/export.pptx',requireAuth,async(req,res)=>{
+ try{
+  const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}
+  if(process.env.QUORIVIO_ENABLE_CONVERTER!=='true'){res.status(503).json({error:'conversion_worker_not_configured'});return}
+  const workerUrl=process.env.QUORIVIO_CONVERTER_WORKER_URL,token=process.env.QUORIVIO_WORKER_TOKEN||'';
+  if(!workerUrl||!/^http:\/\/[a-zA-Z0-9.-]+:\d{2,5}$/.test(workerUrl)||token.length<32){res.status(503).json({error:'conversion_worker_not_configured'});return}
+  const scratch=path.join(process.env.QUORIVIO_CONVERSION_DIR||'/conversions',randomBytes(16).toString('hex'));
+  await mkdir(scratch,{recursive:false,mode:0o700});
+  try{
+   const portable=JSON.stringify(await portableSession(s.id));
+   if(Buffer.byteLength(portable)>2*1024*1024){res.status(413).json({error:'session_too_large_for_pptx'});return}
+   await writeFile(path.join(scratch,'portable.json'),portable,{flag:'wx',mode:0o600});
+   // Stage only referenced, session-owned image assets for the isolated PPTX worker.
+   const definition=JSON.parse(portable);
+   const imageIds=[...new Set<string>(definition.activities.flatMap((a:any)=>(a.page_design?.widgets||[]).filter((w:any)=>['image','logo'].includes(w.kind)).map((w:any)=>w.assetId)))];
+   if(imageIds.length>200)throw Error('pptx_export_too_many_images');
+   if(imageIds.length){
+    const registered=await db.query('SELECT id,mime_type,byte_size,sha256 FROM session_assets WHERE session_id=$1 AND participant_id IS NULL AND id=ANY($2::uuid[])',[s.id,imageIds]);
+    if(registered.rows.length!==imageIds.length)throw Error('pptx_export_missing_media');
+    const mediaFolder=path.join(scratch,'export-media');await mkdir(mediaFolder,{mode:0o700});
+    let total=0;
+    for(const asset of registered.rows){
+     if(!['image/png','image/jpeg'].includes(asset.mime_type)||asset.byte_size>10*1024*1024)throw Error('pptx_export_unsupported_media');
+     const buffer=await readFile(path.join(assetRoot,s.id,asset.id));
+     total+=buffer.length;
+     if(total>50*1024*1024||buffer.length!==Number(asset.byte_size)||createHash('sha256').update(buffer).digest('hex')!==asset.sha256)throw Error('pptx_export_media_integrity');
+     await writeFile(path.join(mediaFolder,asset.id),buffer,{flag:'wx',mode:0o600});
+    }
+   }
+   const controller=new AbortController(),deadline=setTimeout(()=>controller.abort(),240000);
+   try{const r=await fetch(`${workerUrl}/portable-export`,{method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({job:path.basename(scratch)}),signal:controller.signal});if(!r.ok)throw Error('editable_export_failed')}
+   finally{clearTimeout(deadline)}
+   const output=await readFile(path.join(scratch,'presentation.pptx'));
+   if(output.length>50*1024*1024)throw Error('pptx_export_too_large');
+   res.setHeader('Content-Type','application/vnd.openxmlformats-officedocument.presentationml.presentation');
+   res.setHeader('Content-Disposition','attachment; filename="quorivio-session.pptx"');
+   res.setHeader('Cache-Control','private, no-store');res.send(output);
+  }finally{await rm(scratch,{recursive:true,force:true}).catch(()=>{})}
+ }catch(e){sendError(res,e)}
+});
 // Uploaded media is never public by asset ID alone: it must appear on the active slide.
 app.get('/api/join/:code/activities/:aid/media/:assetId',async(req,res)=>{try{
  const s=await publicSession(req.params.code);
  if(!s||s.status!=='active'||s.current_activity_id!==req.params.aid){res.status(404).end();return}
  const a=await db.query('SELECT page_design FROM activities WHERE id=$1 AND session_id=$2 AND status=$3',[req.params.aid,s.id,'open']);
- if(!a.rowCount||!Array.isArray(a.rows[0].page_design?.widgets)||!a.rows[0].page_design.widgets.some((w:any)=>['image','video'].includes(w.kind)&&w.assetId===req.params.assetId)){res.status(404).end();return}
+ if(!a.rowCount||!(a.rows[0].page_design?.backgroundAssetId===req.params.assetId||(a.rows[0].page_design?.widgets||[]).some((w:any)=>['image','video','logo','pdf'].includes(w.kind)&&w.assetId===req.params.assetId))){res.status(404).end();return}
  const r=await db.query('SELECT mime_type FROM session_assets WHERE id=$1 AND session_id=$2',[req.params.assetId,s.id]);
- if(!r.rowCount||!['image/png','image/jpeg','image/gif','image/webp','video/mp4','video/webm'].includes(r.rows[0].mime_type)){res.status(404).end();return}
+ if(!r.rowCount||!['image/png','image/jpeg','image/gif','image/webp','video/mp4','video/webm','application/pdf'].includes(r.rows[0].mime_type)){res.status(404).end();return}
  res.setHeader('Cache-Control','private, no-store');res.setHeader('X-Content-Type-Options','nosniff');res.type(r.rows[0].mime_type);
  res.sendFile(path.join(assetRoot,s.id,req.params.assetId));
  }catch(e){sendError(res,e)}});
@@ -642,7 +807,7 @@ app.get('/api/join/:code/slides/:aid/image',async(req,res)=>{try{
 app.post('/api/sessions/:id/activities',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}if(s.status==='closed'){res.status(409).json({error:'session_closed'});return}const {title,type,options,correct_option_id,duration_seconds}=req.body||{};const answerMode=req.body?.answer_mode||'single';const required=req.body?.answer_required!==false;const validOpts=answerMode==='text'||answerMode==='file'?(Array.isArray(options)&&options.length===0):validateOptions(options);const correctIds=req.body?.correct_option_ids;const validCorrect=answerMode!=='multiple'||(Array.isArray(correctIds)&&correctIds.length>0&&correctIds.length<=options.length&&new Set(correctIds).size===correctIds.length&&correctIds.every((id:unknown)=>typeof id==='string'&&options.some((o:any)=>o.id===id)));if(type==='timed_quiz'&&(!['single','multiple'].includes(answerMode)||!Number.isInteger(duration_seconds)||duration_seconds<5||duration_seconds>600)||!['poll','quiz','timed_quiz'].includes(type)||typeof title!=='string'||!title.trim()||title.length>240||!validAnswerMode(answerMode)||typeof required!=='boolean'||!validOpts||!validCorrect||(['quiz','timed_quiz'].includes(type)&&answerMode==='single'&&!options.some((o:any)=>o.id===correct_option_id))){res.status(400).json({error:'invalid_activity'});return}const r=await db.query("INSERT INTO activities(id,session_id,type,title,options,correct_option_id,duration_seconds,position,answer_mode,answer_required,correct_option_ids) VALUES($1,$2,$3,$4,$5,$6,$7,(SELECT count(*) FROM activities WHERE session_id=$2),$8,$9,$10) RETURNING *",[randomUUID(),s.id,type,title,JSON.stringify(options),['quiz','timed_quiz'].includes(type)?correct_option_id:null,type==='timed_quiz'&&Number.isInteger(duration_seconds)&&duration_seconds>=5&&duration_seconds<=600?duration_seconds:null,answerMode,required,JSON.stringify(answerMode==='multiple'&&Array.isArray(req.body?.correct_option_ids)?req.body.correct_option_ids:[]) ]);await broadcast(s.id);res.status(201).json(r.rows[0])}catch(e){sendError(res,e)}});
 app.post('/api/sessions/:id/status',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}const target=req.body?.status as SessionStatus;if(!validTransition(s.status,target)){res.status(409).json({error:'invalid_transition'});return}await db.query('UPDATE sessions SET status=$1 WHERE id=$2',[target,s.id]);if(target==='closed')await db.query('UPDATE sessions SET closed_at=now() WHERE id=$1',[s.id]);if(target==='closed')await db.query("UPDATE activities SET status='closed' WHERE session_id=$1 AND status='open'",[s.id]);await broadcast(s.id);res.json({ok:true})}catch(e){sendError(res,e)}});
 app.post('/api/sessions/:id/activities/:aid/open',requireAuth,async(req,res)=>{const cx=await db.connect();try{await cx.query('BEGIN');const s=await cx.query('SELECT * FROM sessions WHERE id=$1 AND (owner_id=$2 OR EXISTS (SELECT 1 FROM session_presenters WHERE session_id=$1 AND user_id=$2)) FOR UPDATE',[req.params.id,auth(req)]);if(!s.rowCount||s.rows[0].status!=='active'){await cx.query('ROLLBACK');res.status(409).json({error:'session_not_active'});return}const a=await cx.query('SELECT id FROM activities WHERE id=$1 AND session_id=$2',[req.params.aid,req.params.id]);if(!a.rowCount){await cx.query('ROLLBACK');res.status(404).end();return}await cx.query("UPDATE activities SET status='closed' WHERE session_id=$1 AND status='open'",[req.params.id]);await cx.query("UPDATE activities SET status='open',opened_at=now() WHERE id=$1",[req.params.aid]);await cx.query('UPDATE sessions SET current_activity_id=$1 WHERE id=$2',[req.params.aid,req.params.id]);await cx.query('COMMIT');await broadcast(req.params.id);res.json({ok:true})}catch(e){await cx.query('ROLLBACK');sendError(res,e)}finally{cx.release()}});
-app.post('/api/sessions/:id/activities/:aid/close',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}await db.query("UPDATE activities SET status='closed' WHERE id=$1 AND session_id=$2 AND status='open'",[req.params.aid,s.id]);await broadcast(s.id);res.json({ok:true})}catch(e){sendError(res,e)}});
+app.post('/api/sessions/:id/activities/:aid/close',requireAuth,async(req,res)=>{const cx=await db.connect();try{await cx.query('BEGIN');const s=await cx.query('SELECT * FROM sessions WHERE id=$1 AND (owner_id=$2 OR EXISTS (SELECT 1 FROM session_presenters WHERE session_id=$1 AND user_id=$2)) FOR UPDATE',[req.params.id,auth(req)]);if(!s.rowCount){await cx.query('ROLLBACK');res.status(404).end();return}const a=await cx.query('SELECT id FROM activities WHERE id=$1 AND session_id=$2',[req.params.aid,req.params.id]);if(!a.rowCount){await cx.query('ROLLBACK');res.status(404).end();return}await cx.query("UPDATE activities SET status='closed' WHERE id=$1 AND session_id=$2 AND status='open'",[req.params.aid,req.params.id]);await cx.query('UPDATE sessions SET current_activity_id=NULL WHERE id=$1 AND current_activity_id=$2',[req.params.id,req.params.aid]);await cx.query('COMMIT');await broadcast(req.params.id);res.json({ok:true})}catch(e){await cx.query('ROLLBACK');sendError(res,e)}finally{cx.release()}});
 app.get('/api/sessions/:id/qr',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}const url=`${publicBase}/join/${s.join_secret}`;const type=req.query.format==='svg'?'svg':'png';res.setHeader('Content-Disposition',`attachment; filename="quorivio-${s.join_code}.${type}"`);if(type==='svg'){res.type('image/svg+xml').send(await QRCode.toString(url,{type:'svg',margin:2}))}else{res.type('png').send(await QRCode.toBuffer(url,{width:800,margin:2}))}}catch(e){sendError(res,e)}});
 // GDPR data lifecycle: only the session owner can revoke access, set retention or erase a session.
 app.post('/api/sessions/:id/revoke',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}if(s.owner_id!==auth(req)){res.status(403).json({error:'owner_required'});return}const updated=await db.query("UPDATE sessions SET join_code=$2,join_secret=$3,status='closed',closed_at=now(),expires_at=now() WHERE id=$1 RETURNING *",[s.id,randomBytes(5).toString('hex').toUpperCase(),randomBytes(20).toString('base64url')]);await db.query("UPDATE activities SET status='closed' WHERE session_id=$1 AND status='open'",[s.id]);await broadcast(s.id);for(const ws of sockets.get(s.id)||[])ws.close(1008,'access revoked');res.json({ok:true,session:strip(updated.rows[0])})}catch(e){sendError(res,e)}});
@@ -715,13 +880,28 @@ app.get('/api/sessions/:id/activities/:aid/topic-widgets/:wid/questions',require
  const rows=await db.query(`SELECT q.id,q.body,q.created_at,p.pseudonym AS participant_name FROM topic_widget_questions q JOIN participants p ON p.id=q.participant_id WHERE q.session_id=$1 AND q.activity_id=$2 AND q.widget_id=$3 ORDER BY q.created_at,q.id LIMIT 10 OFFSET $4`,[session.id,req.params.aid,req.params.wid,(page-1)*10]);
  res.json({page,page_size:10,total:total.rows[0].n,items:rows.rows.map((r:any)=>({...r,participant_name:w.showNames?r.participant_name:null}))});
  }catch(e){sendError(res,e)}});
+// Resolve the correct answer consistently for both historic single-answer widgets and
+// new multi-answer widgets. An empty correctOptionIds array must not mask the
+// legacy correctOptionId; malformed / duplicate ids must never award points.
+function widgetCorrectOptionIds(widget:any):string[]{
+ const multi=widget.answerMode==='multiple';
+ if(multi)return Array.isArray(widget.correctOptionIds)?widget.correctOptionIds:[];
+ if(typeof widget.correctOptionId==='string'&&widget.correctOptionId)return [widget.correctOptionId];
+ return Array.isArray(widget.correctOptionIds)&&widget.correctOptionIds.length===1?widget.correctOptionIds:[];
+}
 // Question widgets have independent submissions; an activity's primary answer is unaffected.
 app.post('/api/join/:code/activities/:aid/widgets/:wid/respond',async(req,res)=>{const cx=await db.connect();try{
  const who=await audienceIdentity(req,req.params.code,req.params.aid);
  if(!who){res.status(403).json({error:'join_or_open_activity_required'});return}
  await cx.query('BEGIN');
+ // Recheck the live session under a shared row lock. The earlier identity check can
+ // become stale if the presenter pauses, closes, or switches pages concurrently.
+ // Lock session first, matching the presenter publication transaction lock order.
+ const live=await cx.query("SELECT id FROM sessions WHERE id=$1 AND status='active' AND current_activity_id=$2 AND expires_at>now() AND allow_anonymous=true FOR SHARE",[who.sessionId,req.params.aid]);
+ if(!live.rowCount){await cx.query('ROLLBACK');res.status(409).json({error:'activity_not_open'});return}
  // Serialize edits and submissions on the activity row to bind each response to a stable revision.
- const a=await cx.query('SELECT page_design,opened_at FROM activities WHERE id=$1 AND session_id=$2 FOR SHARE',[req.params.aid,who.sessionId]);
+ const a=await cx.query("SELECT page_design,opened_at FROM activities WHERE id=$1 AND session_id=$2 AND status='open' FOR SHARE",[req.params.aid,who.sessionId]);
+ if(!a.rowCount){await cx.query('ROLLBACK');res.status(409).json({error:'activity_not_open'});return}
  const widget=(a.rows[0]?.page_design?.widgets||[]).find((w:any)=>['question','timed-quiz'].includes(w.kind)&&w.id===req.params.wid);
  if(!widget){await cx.query('ROLLBACK');res.status(404).json({error:'widget_not_found'});return}
  const timed=widget.kind==='timed-quiz';
@@ -733,16 +913,23 @@ app.post('/api/join/:code/activities/:aid/widgets/:wid/respond',async(req,res)=>
  if(timed){
   const duration=Number(widget.durationSeconds||30);
   if(!Number.isInteger(duration)||duration<5||duration>600||!a.rows[0].opened_at){await cx.query('ROLLBACK');res.status(409).json({error:'timed_widget_not_started'});return}
-  if(Date.now()>new Date(a.rows[0].opened_at).getTime()+duration*1000){await cx.query('ROLLBACK');res.status(409).json({error:'timer_elapsed'});return}
-  const correctIds=Array.isArray(widget.correctOptionIds)?widget.correctOptionIds:widget.correctOptionId?[widget.correctOptionId]:[];
-  if(!correctIds.length||!correctIds.every((id:string)=>options.some((o:any)=>o.id===id))){await cx.query('ROLLBACK');res.status(409).json({error:'timed_widget_not_configured'});return}
+  const correctIds=widgetCorrectOptionIds(widget);
+  if(!correctIds.length||new Set(correctIds).size!==correctIds.length||!correctIds.every((id:string)=>options.some((o:any)=>o.id===id))){await cx.query('ROLLBACK');res.status(409).json({error:'timed_widget_not_configured'});return}
  }
  if(answer.assetId){const owned=await cx.query('SELECT id FROM session_assets WHERE id=$1 AND session_id=$2 AND (participant_id IS NULL OR participant_id=$3)',[answer.assetId,who.sessionId,who.participantId]);if(!owned.rowCount){await cx.query('ROLLBACK');res.status(400).json({error:'attachment_not_in_session'});return}}
  const rev=await cx.query('SELECT coalesce(max(revision),1)::int AS revision FROM widget_revisions WHERE activity_id=$1 AND widget_id=$2',[req.params.aid,req.params.wid]);
  const revision=Number(rev.rows[0].revision);
- const correctIds=timed?(Array.isArray(widget.correctOptionIds)?widget.correctOptionIds:[widget.correctOptionId]):[];
+ const correctIds=timed?widgetCorrectOptionIds(widget):[];
  const correct=timed&&answer.optionIds.length===correctIds.length&&answer.optionIds.every((id:string)=>correctIds.includes(id));
- const elapsed=timed?Math.max(0,Date.now()-new Date(a.rows[0].opened_at).getTime()):null;
+ // Read PostgreSQL's wall clock immediately before the write, not at the start of
+ // the transaction: validation and attachment lookups can take time. All replicas
+ // therefore agree on the deadline and on the elapsed time reported to rankings.
+ let elapsed:number|null=null;
+ if(timed){
+  const clock=await cx.query('SELECT clock_timestamp() AS database_now');
+  elapsed=Math.max(0,new Date(clock.rows[0].database_now).getTime()-new Date(a.rows[0].opened_at).getTime());
+  if(elapsed>Number(widget.durationSeconds||30)*1000){await cx.query('ROLLBACK');res.status(409).json({error:'timer_elapsed'});return}
+ }
  const r=await cx.query('INSERT INTO widget_answers(id,session_id,activity_id,participant_id,widget_id,answer_mode,answer_payload,revision,correct,elapsed_ms) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) ON CONFLICT(activity_id,participant_id,widget_id,revision) DO NOTHING RETURNING id',[randomUUID(),who.sessionId,req.params.aid,who.participantId,req.params.wid,mode,JSON.stringify(answer),revision,timed?correct:null,elapsed]);
  await cx.query('COMMIT');if(r.rowCount)await broadcast(who.sessionId);res.json({ok:true,already_submitted:!r.rowCount,revision});
  }catch(e){await cx.query('ROLLBACK');sendError(res,e)}finally{cx.release()}});
@@ -788,7 +975,7 @@ if(!answer){await cx.query('ROLLBACK');res.status(400).json({error:'invalid_answ
 if(answer.assetId){const asset=await cx.query('SELECT id FROM session_assets WHERE id=$1 AND session_id=$2 AND (participant_id IS NULL OR participant_id=$3)',[answer.assetId,sid,p.rows[0].id]);if(!asset.rowCount){await cx.query('ROLLBACK');res.status(400).json({error:'attachment_not_in_session'});return}}
 const option=answer.optionIds.join(',');if(act.duration_seconds&&Date.now()>new Date(act.opened_at).getTime()+act.duration_seconds*1000){await cx.query('ROLLBACK');res.status(409).json({error:'timer_elapsed'});return}const correct=mode==='single'?checkAnswer(act,option):mode==='multiple'&&Array.isArray((act as any).correct_option_ids)&&answer.optionIds.length>0&&answer.optionIds.length===(act as any).correct_option_ids.length&&answer.optionIds.every(x=>(act as any).correct_option_ids.includes(x));
 const elapsedMs=act.type==='timed_quiz'?Math.max(0,Date.now()-new Date(act.opened_at).getTime()):null;const r=await cx.query('INSERT INTO responses(id,activity_id,participant_id,option_id,correct,answer_payload,elapsed_ms) VALUES($1,$2,$3,$4,$5,$6,$7) ON CONFLICT(activity_id,participant_id) WHERE invalidated_at IS NULL DO NOTHING RETURNING id',[randomUUID(),act.id,p.rows[0].id,option,correct,JSON.stringify(answer),elapsedMs]);await cx.query('COMMIT');if(r.rowCount)await broadcast(sid);res.json({ok:true,already_submitted:!r.rowCount})}catch(e){await cx.query('ROLLBACK');sendError(res,e)}finally{cx.release()}});
-server.on('upgrade',async(req,socket,head)=>{try{const origin=req.headers.origin;if(!allowedLiveOrigin(origin,base)){socket.destroy();return}const url=new URL(req.url||'/',base);if(url.pathname!=='/live'){socket.destroy();return}const sid=url.searchParams.get('session');if(!sid){socket.destroy();return}const s=(await db.query('SELECT * FROM sessions WHERE id=$1',[sid])).rows[0];if(!s||s.status==='closed'||new Date(s.expires_at).getTime()<=Date.now()){socket.destroy();return}const uid=auth(req as express.Request);const part=cookies(req.headers.cookie)[`q_part_${sid}`];const ownerAccount=uid&&(uid===s.owner_id||(await db.query('SELECT 1 FROM session_presenters WHERE session_id=$1 AND user_id=$2',[sid,uid])).rowCount)?(await db.query("SELECT 1 FROM users WHERE id=$1 AND approved=true AND must_change_password=false AND role IN ('presenter','platform_admin','org_admin') AND (auth_revoked_at IS NULL OR auth_revoked_at <= to_timestamp($2::double precision / 1000.0)) AND (password_changed_at IS NULL OR password_changed_at <= to_timestamp($2::double precision / 1000.0))",[uid,Number(cookies(req.headers.cookie).q_auth?.split('.')[1]||0)-8*3600*1000])).rowCount:false;const allowed=ownerAccount||(part&&s.allow_anonymous&&(await db.query('SELECT id FROM participants WHERE session_id=$1 AND token_hash=$2',[sid,hash(part)])).rowCount);if(!allowed){socket.destroy();return}wss.handleUpgrade(req,socket,head,ws=>{(ws as any).view=ownerAccount?'owner':'participant';(ws as any).uid=ownerAccount?uid:null;(ws as any).issuedAt=ownerAccount?authCookieIssuedAt(req.headers.cookie):null;wss.emit('connection',ws,req,sid)})}catch{socket.destroy()}});
+server.on('upgrade',async(req,socket,head)=>{try{const origin=req.headers.origin;if(!allowedLiveOrigin(origin,base)){socket.destroy();return}const url=new URL(req.url||'/',base);if(url.pathname!=='/live'){socket.destroy();return}const sid=url.searchParams.get('session');if(!sid){socket.destroy();return}const s=(await db.query('SELECT * FROM sessions WHERE id=$1',[sid])).rows[0];if(!s||s.status==='closed'||new Date(s.expires_at).getTime()<=Date.now()){socket.destroy();return}const uid=auth(req as express.Request);const part=cookies(req.headers.cookie)[`q_part_${sid}`];const ownerAccount=uid&&(uid===s.owner_id||(await db.query('SELECT 1 FROM session_presenters WHERE session_id=$1 AND user_id=$2',[sid,uid])).rowCount)?(await db.query("SELECT 1 FROM users WHERE id=$1 AND approved=true AND must_change_password=false AND role IN ('presenter','platform_admin','org_admin') AND (auth_revoked_at IS NULL OR auth_revoked_at <= to_timestamp($2::double precision / 1000.0)) AND (password_changed_at IS NULL OR password_changed_at <= to_timestamp($2::double precision / 1000.0))",[uid,Number(cookies(req.headers.cookie).q_auth?.split('.')[1]||0)-8*3600*1000])).rowCount:false;const allowed=ownerAccount||(part&&s.allow_anonymous&&(await db.query('SELECT id FROM participants WHERE session_id=$1 AND token_hash=$2',[sid,hash(part)])).rowCount);if(!allowed){socket.destroy();return}const participantId=ownerAccount?null:(await db.query('SELECT id FROM participants WHERE session_id=$1 AND token_hash=$2',[sid,hash(part||'')])).rows[0]?.id;wss.handleUpgrade(req,socket,head,ws=>{(ws as any).view=ownerAccount?'owner':'participant';(ws as any).uid=ownerAccount?uid:null;(ws as any).issuedAt=ownerAccount?authCookieIssuedAt(req.headers.cookie):null;(ws as any).participantId=participantId;wss.emit('connection',ws,req,sid)})}catch{socket.destroy()}});
 // Recheck existing presenter sockets on every replica against the shared database.
 // Fail closed on database outages: never continue streaming protected results to an
 // authenticated presenter whose credentials can no longer be checked.
@@ -804,8 +991,16 @@ async function auditLivePresenterSockets(){
 }
 const liveAuthAudit=setInterval(()=>{void auditLivePresenterSockets()},10000);
 liveAuthAudit.unref();
-wss.on('connection',(ws:WebSocket,_req:unknown,sid:string)=>{let group=sockets.get(sid);if(!group){group=new Set();sockets.set(sid,group)}group.add(ws);snapshot(sid).then(data=>{if(ws.readyState===WebSocket.OPEN)ws.send(JSON.stringify({type:'snapshot',data:(ws as any).view==='owner'?data:participantSnapshot(data)}))});ws.on('close',()=>{group?.delete(ws);if(!group?.size)sockets.delete(sid)})});
-function participantSnapshot(data:any){if(!data)return data;return {session:{id:data.session.id,title:data.session.title,status:data.session.status},activities:data.activities.filter((a:Activity)=>a.id===data.session.current_activity_id).map(publicActivity),results:data.session.show_results?data.results.filter((r:any)=>r.activity_id===data.session.current_activity_id):[],totals:data.session.show_results?data.totals.filter((r:any)=>r.activity_id===data.session.current_activity_id):[]}}
+wss.on('connection',(ws:WebSocket,_req:unknown,sid:string)=>{
+ let group=sockets.get(sid);if(!group){group=new Set();sockets.set(sid,group)}group.add(ws);
+ const id=randomUUID();liveSocketIds.set(ws,id);
+ const ping=async()=>{if(ws.readyState!==WebSocket.OPEN)return;await db.query('INSERT INTO live_connections(id,session_id,participant_id,last_seen) VALUES($1,$2,$3,now()) ON CONFLICT(id) DO UPDATE SET last_seen=now()',[id,sid,(ws as any).participantId||null]);};
+ void ping().then(()=>broadcast(sid)).catch(()=>ws.close(1011,'presence unavailable'));
+ const beat=setInterval(()=>void ping().catch(()=>ws.close(1011,'presence unavailable')),20000);beat.unref();
+ snapshot(sid).then(data=>{if(ws.readyState===WebSocket.OPEN)ws.send(JSON.stringify({type:'snapshot',data:(ws as any).view==='owner'?data:participantSnapshot(data)}))}).catch(()=>ws.close());
+ ws.on('close',()=>{clearInterval(beat);group?.delete(ws);if(!group?.size)sockets.delete(sid);void db.query('DELETE FROM live_connections WHERE id=$1',[id]).then(()=>broadcast(sid)).catch(()=>{})});
+});
+function participantSnapshot(data:any){if(!data)return data;const aid=data.session.status==='active'?data.session.current_activity_id:null;const published=aid?data.activities.find((a:Activity)=>a.id===aid&&a.status==='open'):null;return {session:{id:data.session.id,title:data.session.title,status:data.session.status,current_activity_id:published?aid:null},activities:published?[publicActivity(published)]:[],results:published&&data.session.show_results?data.results.filter((r:any)=>r.activity_id===aid):[],totals:published&&data.session.show_results?data.totals.filter((r:any)=>r.activity_id===aid):[]}}
 const webRoot=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../../web/dist');if(existsSync(webRoot)){app.use(express.static(webRoot));app.get('*',(_,res)=>res.sendFile(path.join(webRoot,'index.html')))}
-async function initialize(){const schema=readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)),'../src/schema.sql'),'utf8');await db.query(schema);publicBase=(await db.query("SELECT value FROM platform_settings WHERE key='public_base_url'")).rows[0]?.value||base;const email=process.env.ADMIN_EMAIL?.toLowerCase(),password=process.env.ADMIN_PASSWORD;if(email&&password){if(password.length<12&&!(process.env.ALLOW_INSECURE_DEV_BOOTSTRAP==='true'&&process.env.NODE_ENV!=='production'&&password==='000000'))throw new Error('ADMIN_PASSWORD must be >=12 characters (insecure demo bootstrap allowed only outside production)');const count=await db.query('SELECT count(*)::int AS n FROM users');if(count.rows[0].n===0){const oid=randomUUID(),uid=randomUUID();await db.query('INSERT INTO organizations(id,name) VALUES($1,$2)',[oid,'Default']);await db.query('INSERT INTO users(id,organization_id,email,password_hash,role) VALUES($1,$2,$3,$4,$5)',[uid,oid,email,await bcrypt.hash(password,12),'platform_admin']);await db.query('UPDATE users SET approved=true,must_change_password=true,is_primary_admin=true,nickname=$2 WHERE id=$1',[uid,'admin']);console.log('Initial admin provisioned; password change required')}}await db.query("UPDATE users SET is_primary_admin=true,nickname='admin' WHERE id=(SELECT id FROM users WHERE role='platform_admin' AND approved=true ORDER BY created_at ASC LIMIT 1) AND NOT EXISTS (SELECT 1 FROM users WHERE is_primary_admin=true)");startSessionBus(async()=>{const client=new pg.Client({connectionString:process.env.DATABASE_URL});await client.connect();return client},broadcastLocal);await purgeExpiredSessions();setInterval(()=>purgeExpiredSessions().catch(e=>console.error('retention purge error',e instanceof Error?e.message:'unknown')),3600000).unref();setInterval(()=>db.query("DELETE FROM auth_flows WHERE expires_at<now(); DELETE FROM email_mfa_challenges WHERE expires_at<now(); DELETE FROM api_rate_windows WHERE bucket<floor(extract(epoch from now())/60)-3").catch(e=>console.error('auth cleanup error',e instanceof Error?e.message:'unknown')),3600000).unref();server.listen(Number(process.env.PORT||8080),'0.0.0.0',()=>console.log('Quorivio API ready'))}
+async function initialize(){const schema=readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)),'../src/schema.sql'),'utf8');await db.query(schema);publicBase=(await db.query("SELECT value FROM platform_settings WHERE key='public_base_url'")).rows[0]?.value||base;const email=process.env.ADMIN_EMAIL?.toLowerCase(),password=process.env.ADMIN_PASSWORD;if(email&&password){if(password.length<12&&!(process.env.ALLOW_INSECURE_DEV_BOOTSTRAP==='true'&&process.env.NODE_ENV!=='production'&&password==='000000'))throw new Error('ADMIN_PASSWORD must be >=12 characters (insecure demo bootstrap allowed only outside production)');const count=await db.query('SELECT count(*)::int AS n FROM users');if(count.rows[0].n===0){const oid=randomUUID(),uid=randomUUID();await db.query('INSERT INTO organizations(id,name) VALUES($1,$2)',[oid,'Default']);await db.query('INSERT INTO users(id,organization_id,email,password_hash,role) VALUES($1,$2,$3,$4,$5)',[uid,oid,email,await bcrypt.hash(password,12),'platform_admin']);await db.query('UPDATE users SET approved=true,must_change_password=true,is_primary_admin=true,nickname=$2 WHERE id=$1',[uid,'admin']);const demoClient=await db.connect();try{await demoClient.query('BEGIN');await provisionDemo(demoClient,uid,oid);await demoClient.query('COMMIT')}catch(e){await demoClient.query('ROLLBACK');throw e}finally{demoClient.release()}console.log('Initial admin provisioned; password change required')}}await db.query("UPDATE users SET is_primary_admin=true,nickname='admin' WHERE id=(SELECT id FROM users WHERE role='platform_admin' AND approved=true ORDER BY created_at ASC LIMIT 1) AND NOT EXISTS (SELECT 1 FROM users WHERE is_primary_admin=true)");startSessionBus(async()=>{const client=new pg.Client({connectionString:process.env.DATABASE_URL});await client.connect();return client},broadcastLocal,console.error,async()=>{await Promise.all([...sockets.keys()].map(sid=>broadcastLocal(sid).catch(()=>{})))});await db.query("DELETE FROM live_connections WHERE last_seen<now()-interval '2 minutes'");setInterval(()=>db.query("DELETE FROM live_connections WHERE last_seen<now()-interval '2 minutes'").catch(()=>{}),60000).unref();await purgeExpiredSessions();setInterval(()=>purgeExpiredSessions().catch(e=>console.error('retention purge error',e instanceof Error?e.message:'unknown')),3600000).unref();setInterval(()=>db.query("DELETE FROM auth_flows WHERE expires_at<now(); DELETE FROM email_mfa_challenges WHERE expires_at<now(); DELETE FROM api_rate_windows WHERE bucket<floor(extract(epoch from now())/60)-3").catch(e=>console.error('auth cleanup error',e instanceof Error?e.message:'unknown')),3600000).unref();server.listen(Number(process.env.PORT||8080),'0.0.0.0',()=>console.log('Quorivio API ready'))}
 initialize().catch(e=>{console.error('startup failed',e);process.exit(1)});

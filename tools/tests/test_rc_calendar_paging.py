@@ -30,7 +30,9 @@ class CalendarPagingContract(unittest.TestCase):
         self.assertIn('sessions_status_valid',schema)
     def test_calendar_ui(self):
         ui=(ROOT/'apps/web/src/main.tsx').read_text()
-        self.assertIn('quorivio-calendar',ui)
+        self.assertIn('agenda-grid',ui)
+        self.assertIn('Vista calendario',ui)
+        self.assertIn('Calendario sessioni',ui)
         self.assertIn('session-tabs',ui)
         self.assertIn('Riprendi',ui)
 

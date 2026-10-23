@@ -12,7 +12,7 @@ export type ListenerClient = {
  end(): Promise<unknown>;
 };
 /** Reconnect with exponential backoff. The caller owns the process lifecycle. */
-export function startSessionBus(connect: () => Promise<ListenerClient>, onUpdate: (sessionId:string)=>Promise<void>, log: (message:string)=>void = console.error) {
+export function startSessionBus(connect: () => Promise<ListenerClient>, onUpdate: (sessionId:string)=>Promise<void>, log: (message:string)=>void = console.error, onReady: ()=>Promise<void> = async()=>{}) {
  let stopped=false, client:ListenerClient|null=null, retry:ReturnType<typeof setTimeout>|null=null, attempt=0;
  const attach=async()=>{
   if(stopped)return;
@@ -35,6 +35,10 @@ export function startSessionBus(connect: () => Promise<ListenerClient>, onUpdate
    next.on('error',failed);next.on('end',failed);
    await next.query(`LISTEN ${SESSION_CHANNEL}`);
    attempt=0;
+   // LISTEN does not replay notifications missed while disconnected.
+   // Resnapshot every locally connected session after subscribing; any concurrent
+   // notification is still delivered by PostgreSQL after LISTEN completes.
+   await onReady().catch(()=>log('session notification resynchronization failed'));
   }catch{if(client){await client.end().catch(()=>{});client=null}if(!stopped){const wait=Math.min(30000,500*Math.pow(2,Math.min(attempt++,6)));log('session notification listener unavailable; retrying');retry=setTimeout(()=>{void attach()},wait);retry.unref?.()}}
  };
  void attach();

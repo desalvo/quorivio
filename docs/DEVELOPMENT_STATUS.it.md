@@ -1,3 +1,128 @@
+## 2026-10-23 — Conversione nativa delle forme rettangolari PowerPoint (test locali)
+- I rettangoli e rettangoli arrotondati PowerPoint con testo sono importati come widget Quorivio `postit` modificabili; le normali caselle di testo restano widget `text`.
+- L'esportazione dei widget `postit` produce un rettangolo PPTX nativo modificabile. Testo, geometria, stile testuale e rotazione usano il percorso di conversione esistente.
+- Limiti di fedeltà: riempimenti, bordi, raggio degli angoli, gruppi e forme vettoriali senza testo non sono conservati. I rettangoli arrotondati vengono esportati come rettangoli normali. Supporto alle forme ancora parziale.
+- Test locali: **171/171 Python**, **113/113 Node.js**, compreso un nuovo test di round-trip delle forme. Build TypeScript/Vite completa e collaudi browser/Kubernetes non verificati. RC ponderata invariata al **37,5%**.
+
+## 2026-10-23 — Esportazione immagini PPTX (solo validazione locale)
+- Completato il percorso di esportazione PPTX per widget immagine/logo: il backend autenticato prepara solamente gli asset PNG/JPEG della sessione effettivamente referenziati, verificando proprietà, numero massimo 200, 10 MiB per immagine, 50 MiB complessivi, dimensioni e SHA-256.
+- Il convertitore isolato ripristina le immagini con geometria e rotazione nel PowerPoint. Riferimenti mancanti o non autorizzati provocano un errore esplicito. Rimane la rappresentazione statica delle attività interattive nel PPTX.
+- Test locali: 165/165 Python, 112/112 Node. Build completa TypeScript/Vite e collaudi browser/PostgreSQL/Kubernetes NON verificati. RC invariata al 37,5%; aperti SmartArt, grafici, animazioni, temi e formati vettoriali.
+
+## 2026-10-23 — PPTX embedded pictures as session image widgets (local validation)
+- Editable PPTX browser imports now extract supported embedded PNG/JPEG pictures in the isolated worker as separate widget images, with original editable geometry and rotation. Media is placed in conversion scratch space, never exposed through portable JSON as binary data.
+- During new-session creation the API checks declared asset IDs, MIME types, per-file and aggregate size bounds, count, SHA-256 and widget references; stores files under the new session and registers corresponding session_assets in the same PostgreSQL transaction. Failed imports roll back the database and remove the new session directory.
+- The worker limit is 200 imported images / 50 MiB in total, each image <=10 MiB. Unsupported formats, images beyond the supported widget cap, grouped graphics, SmartArt and PPTX image export remain open. JSON Quorivio export still needs an asset-inclusive portable bundle for full media portability; static PPTX export currently omits image widgets.
+- Local tests: 158 Python unittest and 111 Node.js tests passed, including new embedded picture extraction and updated fidelity report regression. Production TypeScript build and browser/PostgreSQL/Kubernetes integration NOT validated. RC 37.5% unchanged pending acceptance.
+
+## 23 ottobre 2026 — Aggregazione difensiva delle statistiche widget (verifica locale)
+- Rafforzati i risultati per revisione contro revisioni storiche non valide e payload di risposta malformati. Sono esposte soltanto revisioni intere positive sicure; ogni opzione valida viene conteggiata una sola volta tramite proprietà JavaScript proprie e sicure (anche per nomi riservati). Valori non testuali di risposta e allegato ignorati. Nessuna modifica allo schema o al contratto API.
+- Aggiunto test Node di regressione per revisioni non valide, identificativi non ammessi e payload incompleti. Verifiche locali: **147/147 Python unittest**, **111/111 Node.js** superati.
+- **Blocco build chiarito:** il package non include `package-lock.json` né shrinkwrap, quindi `npm ci --offline` non è eseguibile; nell'ambiente non sono installate le dipendenze di build. Build di produzione e test E2E browser/PostgreSQL/Kubernetes **non verificati**. Generare e versionare il lockfile in un ambiente fidato con accesso alle dipendenze, quindi `npm ci && npm run build`.
+- Percentuale RC ponderata **37,5% invariata** finché non vengono validati i gate. Residui: E2E widget, live multi-replica, MFA/foto profilo e documenti non PDF.
+
+## 2026-10-23 — Aggregazione sicura delle risposte widget (test locali)
+- Corretti i conteggi per identificativi speciali (`__proto__`, `constructor`) e per identificativi ripetuti nelle risposte storiche. Ogni opzione viene conteggiata al massimo una volta per risposta; nessuna modifica API o migrazione.
+- Verifiche: 147 test Python superati; 110 test Node.js superati (nuovo test di regressione). Installazione npm non completata nell'ambiente; build completa, PostgreSQL reale, browser e Kubernetes **non collaudati**.
+- Avanzamento RC ponderato invariato al **37,5%**, in attesa dei gate di accettazione.
+
+## 2026-10-23 — Controllo finale scadenza risposte dei quiz a tempo (test locali)
+- Corretto il controllo della scadenza con una lettura aggiornata di `clock_timestamp()` PostgreSQL subito prima dell'inserimento della risposta, dopo le verifiche dell'allegato e della revisione. Lo stesso riferimento temporale calcola il tempo per le classifiche. API e schema invariati.
+- Verifiche: **147/147 test Python** e **109/109 test Node.js** superati. Installazione delle dipendenze npm non completata (timeout), quindi build TypeScript/Vite **non validata**. Mancano i collaudi reali PostgreSQL, browser e Kubernetes.
+- Avanzamento RC ponderato **37,5% invariato**. Residui: test temporali e multi-replica reali e gli altri gate di accettazione.
+
+## 2026-10-23 — Compatibilità delle risposte corrette dei widget quiz (verifica locale)
+- Risolta una divergenza tra validazione e punteggio: i widget quiz a risposta singola con il precedente `correctOptionId` e `correctOptionIds` vuoto utilizzano ora coerentemente la chiave precedente. La risposta multipla richiede `correctOptionIds`; vengono rifiutate chiavi duplicate prima della registrazione.
+- Unica logica di risoluzione per convalida e punteggio, senza migrazioni DB/API. Aggiunti test di regressione.
+- Verifiche locali: pytest Python **160 superati + 7 subtest**, Node.js **107 superati**. Build di produzione tentata, bloccata dalle tipizzazioni Node assenti (TS2580). Collaudi browser, PostgreSQL e Kubernetes non eseguiti. **RC ponderata invariata al 37,5%.**
+- Residui: E2E browser dell'editor e delle risposte, live multi-replica, MFA, foto profilo e altri gate RC.
+
+## 2026-10-23 — Creazione pagine dalla dashboard tramite widget
+- Unificata la creazione delle pagine nei comandi della sezione Pagine, eliminando il modulo di creazione duplicato dall’interfaccia. API e modifica dei dati legacy conservate per compatibilità. Aggiornati messaggi e test; collaudo browser ancora necessario.
+- Verifica: 158 test pytest superati (+7 subtest), 107 test Node superati; build bloccata dai tipi Node non disponibili (TS2580). Nessun collaudo browser/PostgreSQL/Kubernetes.
+- RC: 37.5% unchanged pending production and Kubernetes acceptance.
+
+## 2026-10-23 — Controllo transazionale invio risposte dei widget (verifica locale)
+- Corretta la condizione di concorrenza tra controllo iniziale del partecipante e inserimento della risposta. La transazione blocca e ricontrolla sessione attiva e non scaduta, pagina corrente, permessi di partecipazione anonima e attività aperta prima di registrare la risposta.
+- Lock sulla sessione prima del lock sull'attività, coerentemente con le transizioni del presentatore. Nessuna migrazione o nuova API; le risposte storiche restano intatte.
+- Verifiche: pytest 156 superati (+7 subtest), Node 107 superati. Build tentata ma bloccata dalle tipizzazioni @types/node non installate (TS2580 Buffer). Collaudi browser, PostgreSQL reale, Kubernetes e multi-replica non eseguiti. RC invariata al 37,5%.
+- Residui: completamento attività esclusivamente tramite widget, prove live nel browser, MFA/foto profilo, documenti non PDF e altri gate RC.
+
+## 2026-10-23 — Rendering dei widget multimediali nella proiezione (verifica locale)
+- Sostituiti i segnaposto con sole etichette nello schermo del presentatore: immagini, loghi, video e PDF utilizzano ora gli asset della sessione (immagine, video controllabile, visualizzatore/link PDF). In assenza di asset compare un messaggio non ambiguo. Geometria, timer e stati live mantenuti; nessuna migrazione o modifica API.
+- Aggiunti CSS per il contenimento dei media e test di regressione su URL codificati, formati supportati e link sicuri.
+- Verifiche: **142 test Python**, **107 test Node** superati; `npm run build` **bloccata** per tipizzazioni Node non installate (`TS2580 Buffer`). Collaudi browser, PostgreSQL, Kubernetes **non eseguiti**. RC ponderata **37,5%** invariata.
+- Residui: collaudo autorizzazioni e visibilità degli asset in browser, attività esclusivamente tramite widget, documenti non PDF, sincronizzazione su più repliche, MFA e foto profilo.
+
+## 23 ottobre 2026 — Creazione pagine vuote direttamente nel canvas (verifica locale)
+- Aggiunto `POST /api/sessions/:id/pages` autenticato per creare una slide vuota nella sequenza, con validazione titolo, permessi presentatore, blocco sessioni chiuse, transazione e ordinamento. Riutilizza il layout JSONB esistente, senza migrazioni.
+- Nella sezione Pagine è presente **Nuova pagina vuota · Editor widget**: la pagina viene selezionata e si apre direttamente l'editor canvas. Il modulo quiz/sondaggio preesistente resta disponibile per compatibilità; creazione completamente basata su widget NON ancora terminata.
+- Test: Python **144 superati** (+7 subtest), Node.js **107 superati**. Collaudi E2E browser/PostgreSQL/Kubernetes ancora pendenti. RC ponderata **37,5%** invariata.
+- Residui: quiz/sondaggi interamente configurabili nei widget, build completa, verifica live, MFA/foto profilo e documenti oltre PDF.
+
+## 2026-10-23 — Apertura diretta editor dopo la creazione di una pagina (verifica locale)
+- Dopo la creazione di una pagina interattiva, l'interfaccia conserva l'identificativo restituito dall'API, ricarica la sessione, seleziona la scheda Pagine e carica la pagina appena creata nell'editor dei widget. Non è più necessaria una selezione manuale aggiuntiva.
+- L'API di creazione attività rimane compatibile. Il modulo iniziale di sondaggio/quiz **non è ancora interamente sostituito** dalla creazione esclusiva tramite widget: questa macroarea rimane aperta. Nessuna migrazione.
+- Verifiche: **141 test pytest** superati (più 7 subtest), **107/107 test Node**. Build completa **bloccata** da dipendenze e definizioni Node TypeScript mancanti; nessun collaudo E2E browser, PostgreSQL o Kubernetes. RC ponderata ancora **37,5%**.
+- Da completare: flusso di creazione esclusivamente tramite widget, sincronizzazione reale presentatore/partecipanti e ulteriori gate di accettazione.
+
+## 2026-10-23 — Chiusura pagina live e sicurezza snapshot partecipanti (verifica locale)
+- La chiusura di una pagina pubblicata azzera `sessions.current_activity_id` nella stessa transazione, con lock sulla sessione, e notifica i client. Si evita così che una pagina chiusa rimanga selezionata sullo schermo pubblico.
+- Gli snapshot WebSocket dei partecipanti includono pagina/risultati solo con sessione attiva e attività effettivamente aperta. In pausa, chiusura o assenza di pagina restituiscono liste vuote; gli snapshot del proprietario restano completi. Nessuna migrazione database.
+- Verifica: pytest Python **139 superati** (più 7 subtest), Node **107/107**, con tre controlli di regressione nuovi. Build e collaudi E2E Kubernetes/browser/PostgreSQL ancora non verificati. RC invariata **37,5%**.
+- Restano: collaudi reali apertura/chiusura/ripresa con due browser e broadcast multi-replica Kubernetes; attività solo widget, documenti extra PDF, MFA e foto profilo.
+
+## 2026-10-23 — Stati della proiezione e comandi sessione (verifica locale)
+- Corretto lo schermo presentatore per distinguere sessione **non avviata**, **attiva senza pagina pubblicata**, **in pausa** e **terminata**. Prima una sessione attiva senza pagina poteva mostrare un'area vuota, mentre la pausa continuava a mostrare l'ultima pagina senza indicazione.
+- Aggiunta spiegazione nella dashboard: Avvia non pubblica automaticamente una pagina, che deve essere aperta nella sezione Pagine e contenuti. I comandi in pausa indicano che le nuove risposte sono bloccate dalle API. Endpoint e schema invariati.
+- Verifiche: **136/136 Python**, **107/107 Node.js** superati, inclusi tre test di regressione sul ciclo di vita della proiezione. Non certificati build completa, browser, PostgreSQL o Kubernetes end-to-end.
+- Restano aperti collaudi live e ripresa dei partecipanti, menu contestuali posizionati al puntatore, altri documenti e attivita' basate soltanto sui widget. RC **37,5%** invariata.
+
+## 23 ottobre 2026 — Menu contestuale nativo per sfondi del canvas vuoto (verifica locale)
+- Aggiunto clic destro sullo **spazio vuoto del canvas** per scegliere immagini dalla libreria, caricare con autenticazione o rimuovere uno sfondo caricato; il salvataggio del layout resta esplicito. I menu contestuali dei widget sono indipendenti; i controlli espandibili per pagina e risultati rimangono accessibili da tastiera.
+- Riutilizzati stato `questionBackgroundAsset`, upload e PATCH del layout: nessuna nuova API o migrazione. Il menu è posizionato nel canvas e non ancora alle coordinate esatte del puntatore.
+- Verifiche: Python 133/133 e Node.js 107/107 superati. Build di produzione tentata, BLOCCATA dall'assenza di tipi Node/dipendenze workspace. Nessun collaudo browser, PostgreSQL o Kubernetes. RC **37,5%** invariata.
+- Aperti: menu contestuale specifico dei risultati, altri documenti, attività solo tramite widget, sincronizzazione live e verifiche browser.
+
+## 2026-10-23 — Controlli contestuali per sfondi pagina/risultati (verifica locale)
+- Introdotti menu espandibili accessibili da tastiera per selezionare asset, caricare immagini con autenticazione e rimuovere separatamente gli sfondi delle pagine e dei risultati. Conservati i controlli precedenti.
+- Corretto un difetto di persistenza: l'URL svuotato viene ora rimosso esplicitamente dal layout, senza mantenere quello precedente nel merge PATCH. Il salvataggio resta esplicito.
+- Test: Python 130/130 e Node.js 107/107 superati. Build di produzione tentata ma bloccata dalle dipendenze/tipizzazioni Node non installate. Nessun collaudo reale browser, PostgreSQL o Kubernetes; RC sempre al 37,5%.
+- DA FARE: clic destro sullo sfondo vuoto del canvas (i nuovi menu sono espandibili, non menu al puntatore), altri documenti, sincronizzazione presentazione live e attività soltanto tramite widget. Nessuna migrazione DB.
+
+## 23 ottobre 2026 — Selezione contestuale dei media del canvas (solo verifica locale)
+- I menu contestuali dei widget Immagine, Logo, Video e PDF consentono selezione di asset già caricati e upload autenticato. La scelta aggiorna `assetId` nello stesso layout, da salvare esplicitamente; nessuna nuova API pubblica.
+- Filtro MIME per tipo widget, riuso di `uploadWidgetMedia`, input disabilitato durante gli upload. Proprietà esistenti e comandi di livello conservati.
+- Test Python 127/127 e Node.js 107/107 PASS. Build completa tentata ma BLOCCATA per dipendenze e tipi Node non presenti; nessun collaudo browser/Kubernetes. RC ponderata invariata al 37,5%.
+- APERTI: documenti oltre PDF, sfondo tramite menu contestuale, rendering e sincronizzazione live, attività solo tramite widget, E2E editor/UI; convalidare upload e selettori nel deployment.
+
+## 2026-10-23 — Azioni contestuali widget canvas (verifica locale; RC in sospeso)
+- Aggiunti menu da clic destro e pulsante accessibile anche a touch/tastiera: duplicazione, livelli, modifica titolo ed eliminazione. Schema dei widget invariato.
+- Test Python 126/126 e Node.js 107/107 superati. Build frontend bloccata dalle dipendenze `vite/client` assenti. Da verificare in browser/Kubernetes e da completare il selettore media contestuale. RC invariata al 37,5%.
+
+## 2026-10-23 — Estensione widget multimediali (test locali, collaudo Kubernetes pendente)
+- Aggiunti alla palette dell'editor i widget separati Logo e PDF oltre a Immagine e Video; riutilizzate libreria file e API di caricamento private. Associazione di immagini ai loghi e PDF ai documenti con selezione o upload diretto.
+- Rafforzata la convalida dei layout: ogni widget multimediale richiede un asset UUID; al salvataggio il server verifica appartenenza alla sessione, origine del file dal presentatore e corrispondenza del MIME. Accesso pubblico limitato alla pagina corrente di una sessione attiva. PDF esposto come collegamento; altri formati documentali non ancora supportati.
+- Test locali: Python 124/124 e Node 107/107; build TypeScript/Vite completa non disponibile (mancano le definizioni vite/client). Restano i collaudi reali browser/PostgreSQL/Kubernetes.
+- Aperti: sfondi caricati per pagina con consegna pubblica sicura, documenti oltre PDF, menu contestuale sul canvas, rendering media completo sullo schermo presentatore. Nessuna nuova macroarea/gate RC validata; avanzamento ponderato invariato 37,5%.
+
+## 2026-10-23 — Consolidamento UI delle date sessione (collaudo locale)
+- Le date della sessione hanno ora data, ora iniziale, durata e fuso IANA esplicito; controlli per timezone, duplicati e ordinamento. Importazione opzionale delle vecchie date prive di orario; API e dati legacy conservati, editor parallelo eliminato.
+- Test contrattuali in `tools/tests/test_session_dates_consolidation.py`. Collaudo browser/PostgreSQL/Kubernetes ancora aperto. RC ponderata invariata: 37,5%.
+
+## 23 ottobre 2026 — Navigazione sessioni a pagina intera e layout dashboard (accettazione parziale)
+- Vista Nuova sessione, Apri sessione e Calendario separate; dashboard sostituisce il selettore dopo la scelta. Accesso esplicito alle pagine, etichette date sessione e risultati più chiare, adattamento responsive e fix pulsante Termina.
+- Test locali Python 118/118 e Node 107/107 PASS; build completa/browser/K8s non verificati. Widget multimediali avanzati e dati legacy ancora da completare. RC 37,5% invariata. Dettagli: `SESSION_NAVIGATION_REWORK.it.md`.
+
+## 23 ottobre 2026 — Ciclo MFA multi-metodo, calendario e volume asset Kubernetes (locale, non committato)
+- Dopo la verifica delle credenziali primarie, il login restituisce una sfida MFA PostgreSQL di cinque minuti. TOTP oppure email sono alternativi; il codice email viene inviato solo a scelta esplicita, e TOTP o codice di recupero consumano la sfida monouso con lock e limite tentativi.
+- Interfaccia separata per il secondo fattore. Rimossi i campi TOTP/recupero dal login iniziale. La configurazione email non richiede un codice TOTP già attivo.
+- Salvataggio nickname/ruolo/approvazione accorpato (rimane un controllo rapido separato per lo stato di approvazione). Nuovo calendario giorno/settimana/mese con dati e API esistenti.
+- Aggiunti fsGroup=1000 e OnRootMismatch ai pod applicativi Kubernetes/Helm per consentire l'accesso al volume degli asset da utente non privilegiato: causa possibile ma NON ancora confermata del bug foto. Sostituzione foto elimina il vecchio file privato.
+- SSO: provider OIDC letti dalla configurazione ambientale. Un elenco vuoto non dimostra un bug; servono parametri OAuth/OIDC reali per il test.
+- Test: Python 115/115 PASS; Node 107/107 PASS con stripping TypeScript sperimentale. Build completa BLOCCATA dall'installazione npm (idealTree/timeout); verifica sintattica con compilatore globale priva di errori TS1xxx, ma dipendenze React/Node non installate. Nessun E2E PostgreSQL/browser/K8s; RC resta 37,5%.
+- APERTI: controllo MFA generale, validazione del possesso dell'indirizzo email, prova upload foto sul cluster e antivirus, test visuali responsive, atomicità del salvataggio admin e accettazione end-to-end. Non dichiarare RC.
+
 
 ## 23 ottobre 2026 — Correzione CI per generazione credenziali Kubernetes (non committata)
 - Run CI 108303599236: 115 test Python e conversione PDF superati; fallimento nel vecchio confronto `diff -ru /tmp/q-a /tmp/q-b`, perché due nuove installazioni devono generare password differenti.
@@ -410,3 +535,96 @@ RC weighted gate score unchanged at 37.5%; email MFA is partial until PostgreSQL
 
 ### 2026-10-23 – Protezione emissione MFA email
 Limite condiviso tra repliche (3/account/minuto), una sola sfida attiva atomica, pulizia migrazione e indice univoco. Dettagli in `docs/EMAIL_MFA_ISSUANCE_HARDENING.it.md`. Gate RC invariati in attesa di prove di integrazione.
+
+### 2026-10-23 — sfondi caricati per pagina (ciclo multimediale parziale)
+- Aggiunto `backgroundAssetId` per pagina/risultati; validazione server MIME immagine, titolarità e appartenenza alla sessione.
+- Selezione/upload sfondi nell’editor, rendering sul presentatore e anteprima partecipante.
+- Distribuzione pubblica limitata alla pagina correntemente aperta.
+- Restano aperti: menu contestuali, parità grafica del pubblico live, build/browser e collaudo Kubernetes. Avanzamento RC invariato 37,5%.
+
+## 2026-10-23 — Modelli di pagine interattive con accesso diretto al canvas
+- Aggiunte azioni per creare pagine sondaggio, quiz e quiz a tempo tramite l'API autenticata esistente: opzioni iniziali, durata predefinita di 30 secondi per quiz a tempo, aggiornamento sessione e apertura automatica dell'editor widget.
+- Il modulo storico resta disponibile; opzioni e risposte corrette si configurano ancora nell'editor attività. La creazione *esclusivamente* tramite widget **non è conclusa**.
+- Verifiche: 146 test Python (+7 sottotest) e 107 Node superati; build tentata e bloccata da dipendenze/tipi Node non disponibili (`Buffer` TS2580). Collaudi browser/PostgreSQL/Kubernetes non effettuati. RC **37,5%** invariata.
+
+## 23/10/2026 — configurazione delle attività tramite widget del canvas
+- Aggiunti controlli nel canvas per domanda e quiz a tempo: modalità risposta, opzioni, risposte corrette, obbligatorietà, durata.
+- Conservati API e percorsi legacy delle attività; versione invariata.
+- Verifiche locali: 140 test Python e 107 test Node superati. Build frontend completa e collaudi browser/Kubernetes pendenti.
+- Vedere `docs/CANVAS_WIDGET_ACTIVITY_EDITOR.it.md`.
+
+## 2026-10-23 — Visualizzazione widget interattivi sul presentatore
+- La proiezione dei widget `question` e `timed-quiz` mostra ora il testo della domanda, descrizione, opzioni, indicazioni della modalità di risposta e conto alla rovescia del quiz, anziché la sola etichetta. Le risposte corrette non vengono svelate nella proiezione.
+- I widget testo e post-it mostrano anche la descrizione. Introdotti stili per contenere testi lunghi e 3 test statici di regressione.
+- Verifiche locali: 145 test Python superati (il runner emette anche una diagnostica della CLI recover durante l'importazione), 107 test Node.js superati. Build tentata, bloccata dalle tipizzazioni Node mancanti (`Buffer`, TS2580). Non eseguiti collaudi browser, PostgreSQL o Kubernetes. Avanzamento RC fermo al 37,5%.
+- Residui: test end-to-end presentatore/partecipante, editing esclusivamente via widget, build e collaudi Kubernetes.
+
+## 2026-10-23 — Confronto canonico delle revisioni dei quiz a tempo
+- Allineato il confronto delle chiavi di risposta al calcolo effettivo dei punteggi: per scelta singola prevale `correctOptionId` non vuoto; in sua assenza è equivalente `correctOptionIds` con un elemento. Per scelta multipla vale `correctOptionIds`. Default: scelta singola e 30 secondi.
+- Evita revisioni superflue e blocchi delle modifiche live che cambiano soltanto la rappresentazione; rimangono protette le modifiche effettive alla chiave o alla durata.
+- Due nuovi test Node: 109/109 superati; 145/145 test Python unittest superati. Build TypeScript completa e collaudi browser/PostgreSQL/Kubernetes non verificati nel ciclo. RC invariata al 37,5%.
+- Da completare: flusso interamente basato sui widget, collaudo live, MFA/foto profilo, build di produzione e accettazione Kubernetes.
+
+### 23 ottobre 2026 — Coerenza temporale dei widget a tempo
+- La verifica della scadenza e il calcolo del tempo trascorso usano il medesimo `clock_timestamp()` PostgreSQL durante la lettura bloccata dell'attività, anziché gli orologi delle singole repliche Node.js.
+- Test di regressione in `tools/tests/test_widget_database_clock.py`; 147 test Python e 109 test Node superati localmente.
+- Restano pendenti build TypeScript di produzione e collaudi reali PostgreSQL/browser/Kubernetes multi-replica; RC invariata al 37,5%.
+
+### 23/10/2026 — Base per portabilità PowerPoint modificabile
+- Aggiunto `tools/pptx_portable.py` per convertire caselle di testo PPTX in widget testuali modificabili e definizioni Quorivio JSON in slide PPTX statiche (dipendenza opzionale `python-pptx`).
+- Corretto l'import JSON proprietario per le pagine `slide`, prima esportabili ma non reimportabili.
+- Rafforzato layout mobile, pulsanti touch e gestione overflow, mantenendo invariata la geometria salvata.
+- Conversione fedele completa, integrazione browser e collaudo sui dispositivi ancora APERTI. Si veda `docs/POWERPOINT_PORTABILITY.md`.
+- Percentuale RC invariata fino a build e collaudi end-to-end.
+
+### 2026-10-23 — Editable PPTX text-style round-trip
+- Extended the optional text-box converter to retain explicit font family, point size, bold, italic and fixed RGB color on PPTX import/export. Local styled PPTX round-trip passed. Mixed formatting, master/theme semantics, in-browser export, production build and device acceptance remain OPEN. RC gate score unchanged at 37.5%.
+
+### Rafforzamento import PPTX modificabile (2026-10-23)
+- CLI: verifiche preliminari su dimensioni ZIP, numero voci, macro/binari e filtro dei font ammessi dal formato portabile. Nuovi test di regressione Python.
+- Aperti: import/export PPTX modificabile dal browser, grafica PowerPoint complessa, collaudi mobile end-to-end e gate di accettazione.
+
+### 2026-10-23 — Miglioramenti incrementali PPTX modificabile e mobile
+- Convertitore CLI: titolo pagina estratto dai testi della slide e rotazione delle caselle di testo preservata; aggiunto test di regressione.
+- Mobile: controlli radio/checkbox più utilizzabili al tocco e aree per risposte testuali responsive, senza cambiare la geometria salvata.
+- Test: 153 Python e 111 Node.js superati. Build frontend completa e collaudi browser/Kubernetes non verificati.
+- Fedeltà PowerPoint, import/export PPTX dal browser, media incorporati e collaudi mobile ancora APERTI; RC 37,5%.
+
+### 2026-10-23 — Import/export PPTX modificabile integrato nel browser
+- Aggiunti `POST /api/presentations/import-editable` autenticato (crea una nuova sessione modificabile), `GET /api/sessions/:id/export.pptx` riservato ai presentatori autorizzati e relativi controlli nella dashboard.
+- Conversione esclusivamente tramite il worker isolato, con ID di lavoro opachi, token, lock, limiti dimensionali, scansione antimalware in ingresso e pulizia dei file temporanei; immagine converter con python-pptx 1.0.2.
+- Importazione modificabile di testi, posizione, rotazione e parte degli stili; esportazione PPTX limitata ai contenuti supportati, con attività interattive statiche. L'importazione grafica precedente resta disponibile per massimizzare la fedeltà visiva.
+- Test: 155 Python e 111 Node.js superati; round-trip del worker riuscito. Build TypeScript completa BLOCCATA dai tipi Node non installati; nessun collaudo browser, PostgreSQL o Kubernetes reale. Fedeltà e integrazione non ancora accettate; RC invariata al 37,5%.
+
+### 2026-10-23 — PPTX import fidelity reporting / Rapporto di fedeltà PPTX
+- Extended editable PowerPoint conversion to round-trip explicit underline formatting; added metadata-only import fidelity counts for skipped pictures, charts, tables and unsupported shapes and page overflow, returned from worker to API without including slide text or media bytes. / Estesa la conversione PPTX alla sottolineatura; aggiunto resoconto delle forme non convertite restituito dall’API senza contenuti privati.
+- 157 Python and 111 Node tests passed locally. Image/shape editability, frontend build and real browser/mobile/Kubernetes testing remain open. Weighted RC unchanged at 37.5%.
+
+
+## 2026-10-23 — Demo, presenza e carico
+Aggiunte sessioni dimostrative transazionali per ogni nuovo account (5 attività), widget live del numero di partecipanti distinti tra repliche, e simulatore autorizzato con 500 client. Accettazione Kubernetes pendente.
+
+### 2026-10-23 — Carico anonimo QR per 500 partecipanti
+- Aggiornato `tools/load_500.py` per il percorso anonimo via URL QR, sessioni cookie indipendenti, presentatore opzionale, suddivisione su generatori distinti, IP locali configurabili e metriche JSON.
+- Aggiunti `docs/ARCHITECTURE_500.it.md`, versione inglese e profilo Helm staging opzionale; supporto configurabile alle annotazioni Ingress.
+- **Gate RC aperto:** carico 500 utenti non misurato sul cluster; fan-out WebSocket tra pod e sincronizzazione, sizing e ingress da collaudare. Percentuale invariata (37,5%).
+
+
+### 2026-10-23 — Fan-out reconnect hardening
+Il listener PostgreSQL per le notifiche tra pod ora risincronizza le sessioni WebSocket locali dopo la riconnessione; aggiunto test di recupero. Collaudo multi-pod reale pendente.
+
+### 2026-10-23 Ciclo geometria PPTX nativa
+- Rimossi i minimi forzati del 12% di larghezza e 8% di altezza da importazione PPTX e validazione API per conservare oggetti piccoli. Aggiunti diagnostica delle forme fuori canvas e test round-trip.
+- Avanzamento RC invariato al 37,5%; build frontend completa e collaudi browser/Kubernetes non verificati.
+
+### 2026-10-23 — Deduplicazione media PPTX nativi e verifica OOXML
+- Durante l'importazione PPTX modificabile le immagini PNG/JPEG identiche condividono un solo asset, pur mantenendo widget e geometrie indipendenti per ogni occorrenza.
+- Il controllo preventivo rifiuta percorsi OOXML non sicuri, nomi duplicati e membri ZIP cifrati.
+- Test di regressione: riutilizzo delle immagini ed esclusione di percorsi non sicuri. Superati localmente 169 test Python e 113 Node.js.
+- Build TypeScript completa, browser, PostgreSQL e Kubernetes **non validati**. Avanzamento RC verificato invariato al **37,5%**.
+
+### 2026-10-23 — Protezione media importati da PPTX nativi
+- Corretta la precedenza logica del controllo MIME/dimensione rispetto alla quota disponibile in `tools/pptx_portable.py`: i formati non supportati non possono entrare nella cartella temporanea degli asset.
+- Aggiunto test di regressione in `tools/tests/test_pptx_portability.py`.
+- Verifiche locali: 170 test Python e 113 test Node superati; build frontend di produzione e collaudi browser/PostgreSQL/Kubernetes non certificati.
+- Forme vettoriali PPTX modificabili e fedeltà completa ancora aperte; matrice RC invariata.
