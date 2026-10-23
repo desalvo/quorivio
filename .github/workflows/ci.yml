@@ -86,11 +86,9 @@ jobs:
         run: |
           PYTHONPATH=tools python3 -m unittest discover -s tools/tests -v
           python3 -m unittest tools.tests.test_import_presentation.TestImport.test_convert_pdf -v
-      - name: Ensure generated Kubernetes config is deterministic
+      - name: Verify Kubernetes credential persistence and unique fresh installations
         run: |
-          python3 tools/k8s_wizard.py --unattended --output /tmp/q-a --set host=quorivio.example.org
-          python3 tools/k8s_wizard.py --unattended --output /tmp/q-b --set host=quorivio.example.org
-          diff -ru /tmp/q-a /tmp/q-b
+          python3 tools/check_k8s_generation.py
       - name: Verify license and documentation
         run: |
           test -s LICENSE && test -s README.md && test -s README.it.md

@@ -1,3 +1,10 @@
+
+## 2026-10-23 — CI Kubernetes credential-generation acceptance hotfix (uncommitted)
+- CI run 108303599236: 115 Python tests and PDF conversion passed, but the previous `diff -ru /tmp/q-a /tmp/q-b` step failed because independent new wizard outputs correctly generate different credentials.
+- Replaced the unsafe comparison with `tools/check_k8s_generation.py`: regenerate the *same* directory and compare all file SHA-256 digests; verify independent installations have distinct admin/database/application secrets; check generated credential files' POSIX permissions. Never print secret contents in CI.
+- Local verification: new acceptance check PASS and Python suite 115/115 PASS. CI must be rerun by maintainer. Build/image jobs after the failed gate were not proven successful.
+- Baseline: maintainer confirmed a commit of the generated-credentials cumulative package before this change; suggested commit covers this hotfix alone. Version remains 0.1.0-dev.
+
 ## K8s wizard credentials — 2026-10-23
 2026-10-23: Kubernetes wizard creates stable internal DB/admin/auth credentials and an application Secret (base64, not encrypted), with 0600 overrides, reuse on repeat generation and protected external-DB password input. See K8S_SECRETS.en.md. Real cluster acceptance pending.
 

@@ -1,3 +1,10 @@
+
+## 23 ottobre 2026 — Correzione CI per generazione credenziali Kubernetes (non committata)
+- Run CI 108303599236: 115 test Python e conversione PDF superati; fallimento nel vecchio confronto `diff -ru /tmp/q-a /tmp/q-b`, perché due nuove installazioni devono generare password differenti.
+- Il nuovo `tools/check_k8s_generation.py` rigenera nella medesima directory e confronta le impronte SHA-256 dei file; verifica credenziali diverse tra installazioni indipendenti, permessi riservati e assenza di segreti nell'output CI.
+- Verifiche locali: controllo dedicato PASS, suite Python 115/115 PASS. La CI GitHub va rieseguita; non si dichiarano verificati i job successivi al gate fallito.
+- Baseline: commit del cumulativo credenziali Kubernetes confermato dall'utente. Il prossimo commit comprende soltanto questa correzione. Versione 0.1.0-dev invariata.
+
 ## K8s wizard credentials — 2026-10-23
 2026-10-23: il wizard Kubernetes genera credenziali PostgreSQL interne, admin e AUTH_SECRET riutilizzabili, salva override/Secret con permessi 0600 e richiede una password nota per DB esterno. Vedi K8S_SECRETS.it.md. Collaudo reale ancora aperto.
 
