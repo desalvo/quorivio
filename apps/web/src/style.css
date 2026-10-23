@@ -114,3 +114,22 @@
 .projection-results-control{position:absolute;z-index:11;min-height:36px;overflow:hidden}
 .presenter-page-results{padding:1rem 0}
 @media(max-width:640px){.projection-results-control{min-width:96px;min-height:44px;font-size:.85rem}}
+
+/* Presenter-configured aggregate result visualization. */
+.result-pie{width:min(220px,65vw);aspect-ratio:1;border-radius:50%;margin:1rem auto;border:2px solid var(--border,#d1d5db)}
+
+/* Per-widget result word cloud: bounded, readable and keyboard/screenreader friendly. */
+.widget-results-cloud{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px;padding:18px;line-height:1.3;max-height:420px;overflow:auto}
+.result-cloud-word{display:inline-flex;align-items:baseline;max-width:100%;overflow-wrap:anywhere;font-weight:650;color:var(--text,#263347)}
+.result-cloud-word small{font-size:12px;margin-left:4px;font-weight:400}
+@media (max-width:600px){.widget-results-cloud{gap:8px;padding:10px}.result-cloud-word{font-size:1rem!important}}
+
+/* Editor composition: optional grid and non-destructive widget stacking. */
+.canvas-editor-group{min-width:0}.canvas-editor-tools{display:flex;gap:1rem;align-items:center;flex-wrap:wrap;margin:.5rem 0;font-size:.85rem}.canvas-editor-tools label{display:inline-flex;align-items:center;gap:.35rem}.canvas-layer-tools{display:flex;position:absolute;left:3px;bottom:3px;gap:2px;z-index:12;opacity:0}.widget-canvas-item:hover .canvas-layer-tools,.widget-canvas-item:focus-within .canvas-layer-tools,.widget-canvas-item:focus-visible .canvas-layer-tools{opacity:1}.canvas-layer-tools button{padding:0 4px;min-width:21px;min-height:23px;border:1px solid #475569;border-radius:3px;background:white;color:#172554}.canvas-layer-tools button:focus-visible{outline:2px solid #2563eb}.widget-canvas-item{isolation:isolate}@media(hover:none){.canvas-layer-tools{opacity:1}}
+
+/* Responsive alternative to fine pointer gestures: same model and persistence. */
+.canvas-accessible-controls{margin:1rem 0;min-width:0}.canvas-accessible-controls h4{margin:.25rem 0}.canvas-accessible-controls p{font-size:.85rem}.canvas-accessible-list{display:grid;gap:.5rem}.canvas-accessible-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem;padding:.6rem;border:1px solid #a8b1c5;border-radius:8px}.canvas-accessible-row>div{display:flex;gap:.35rem;flex-wrap:wrap}.canvas-accessible-row button{min-width:44px;min-height:44px;border:1px solid #7383a5;border-radius:6px;background:#fff;color:#18243b;padding:.4rem}.canvas-accessible-row button:focus-visible{outline:3px solid #2563eb;outline-offset:2px}@media(max-width:700px){.canvas-accessible-row{display:block}.canvas-accessible-row>div{margin-top:.5rem}.canvas-editor-tools{align-items:flex-start}.canvas-with-rulers{max-width:100%;overflow-x:auto}.widget-canvas-item .canvas-layer-tools{opacity:1}.widget-canvas-item .canvas-layer-tools button{min-width:28px;min-height:28px}}@media(prefers-reduced-motion:reduce){.canvas-accessible-row *{animation:none!important;transition:none!important}}
+
+/* Canvas gestures must not be hijacked by touch scrolling or selection. */
+.widget-canvas-item { touch-action: none; user-select: none; }
+.widget-canvas-item input { user-select: text; }

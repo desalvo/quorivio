@@ -1,0 +1,150 @@
+{
+  "version": "0.1.0-dev",
+  "method": "Conservative gate audit. accepted=100% weight, partial=50%, open or blocked=0%. Partial denotes implementation with important unverified acceptance evidence; this is NOT measured test coverage.",
+  "gates": [
+    {
+      "id": "A1",
+      "area": "A-editor",
+      "weight": 6,
+      "status": "partial",
+      "evidence": "Canvas 16:9, free placement, resizing, rotation, rulers, keyboard code and local build documented",
+      "remaining": "Browser drag/rotate/resize, persistence and multi-device acceptance"
+    },
+    {
+      "id": "A2",
+      "area": "A-editor",
+      "weight": 6,
+      "status": "partial",
+      "evidence": "Slide thumbnails, order and duplication implemented with keyboard alternative",
+      "remaining": "Pixel-accurate thumbnails and cross-browser drag/drop acceptance"
+    },
+    {
+      "id": "A3",
+      "area": "A-editor",
+      "weight": 6,
+      "status": "partial",
+      "evidence": "Widget palette, page layouts, media, quiz and topic widgets present in source",
+      "remaining": "Full widget-by-widget visual and accessibility acceptance"
+    },
+    {
+      "id": "A4",
+      "area": "A-editor",
+      "weight": 6,
+      "status": "open",
+      "evidence": "Responsive styles exist; no device test report in package",
+      "remaining": "Mobile/tablet touch usability, keyboard and screenreader review"
+    },
+    {
+      "id": "B1",
+      "area": "B-sessions",
+      "weight": 6,
+      "status": "partial",
+      "evidence": "Presenter dashboard, synced server-driven navigation and participant preview in source",
+      "remaining": "Multi-browser synchronization and presenter/participant lifecycle E2E"
+    },
+    {
+      "id": "B2",
+      "area": "B-sessions",
+      "weight": 6,
+      "status": "partial",
+      "evidence": "Timed quiz APIs, per-widget results and server timestamps implemented",
+      "remaining": "Concurrent clients, fairness under latency, timed quiz widget PostgreSQL E2E"
+    },
+    {
+      "id": "B3",
+      "area": "B-sessions",
+      "weight": 6,
+      "status": "partial",
+      "evidence": "Presenter-only Results, chart selection, paginated leaderboards and topic questions exist",
+      "remaining": "Per-widget cross-browser results and moderation UI acceptance"
+    },
+    {
+      "id": "B4",
+      "area": "B-sessions",
+      "weight": 5,
+      "status": "partial",
+      "evidence": "Anonymous participation, polling and QR routes implemented",
+      "remaining": "Authenticated/anonymous participants load and privacy E2E"
+    },
+    {
+      "id": "C1",
+      "area": "C-admin",
+      "weight": 6,
+      "status": "partial",
+      "evidence": "TOTP enrolment, recovery codes, admin reset and revoke checks; Node unit and contract tests",
+      "remaining": "PostgreSQL/browser account recovery and multi-replica revocation E2E"
+    },
+    {
+      "id": "C2",
+      "area": "C-admin",
+      "weight": 5,
+      "status": "open",
+      "evidence": "SMTP configuration and test email available",
+      "remaining": "Optional email second factor enrolment, verification and recovery not implemented"
+    },
+    {
+      "id": "C3",
+      "area": "C-admin",
+      "weight": 6,
+      "status": "partial",
+      "evidence": "Social OAuth/OIDC and admin configuration code exists",
+      "remaining": "Real providers, redirects, error cases and UI E2E"
+    },
+    {
+      "id": "C4",
+      "area": "C-admin",
+      "weight": 5,
+      "status": "partial",
+      "evidence": "Administrative directory, profile and preferences implemented",
+      "remaining": "Complete UI toggle consistency and browser accessibility validation"
+    },
+    {
+      "id": "D1",
+      "area": "D-validation",
+      "weight": 6,
+      "status": "accepted",
+      "evidence": "Current cycle: backend tsc and frontend TypeScript/Vite production builds PASS; 97 Node and 95 Python tests PASS (2026-10-23)",
+      "remaining": "Re-run targeted build/tests after affected changes"
+    },
+    {
+      "id": "D2",
+      "area": "D-validation",
+      "weight": 6,
+      "status": "open",
+      "evidence": "SQL schema, migrations and database bootstrap exist",
+      "remaining": "Live PostgreSQL 18 migrations, restore, transactions and race E2E"
+    },
+    {
+      "id": "D3",
+      "area": "D-validation",
+      "weight": 4,
+      "status": "open",
+      "evidence": "Docker/Podman/Helm manifests and workflows exist",
+      "remaining": "ARM64/AMD64, rootless Podman and multi-replica Kubernetes runtime checks"
+    },
+    {
+      "id": "D4",
+      "area": "D-validation",
+      "weight": 5,
+      "status": "open",
+      "evidence": "Isolated document converter, upload validation, CSRF and security tests exist",
+      "remaining": "Real PDF/PPTX conversion, malware pipeline, pentest, load and WebSocket acceptance"
+    },
+    {
+      "id": "D5",
+      "area": "D-validation",
+      "weight": 5,
+      "status": "partial",
+      "evidence": "English/Italian documentation and four earlier PDF manuals in package",
+      "remaining": "PDF manuals outdated versus recent UI and admin changes; refresh and verify"
+    },
+    {
+      "id": "D6",
+      "area": "D-validation",
+      "weight": 5,
+      "status": "open",
+      "evidence": "GDPR registers and CI security scanning configuration documented",
+      "remaining": "Runtime privacy controls, dependency license audit, operations and security sign-off"
+    }
+  ]
+}

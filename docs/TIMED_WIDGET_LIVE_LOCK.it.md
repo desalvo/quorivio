@@ -1,0 +1,3 @@
+# Protezione modifiche quiz a tempo attivi — 23 ottobre 2026
+
+I widget quiz a tempo preservano ora le caratteristiche delle risposte mentre la pagina è aperta. Modifiche alle opzioni, alle risposte corrette, alla modalità, alla durata oppure la rimozione del widget restituiscono HTTP 409 `live_timed_quiz_definition_locked`. Restano possibili modifiche a geometria e stile. A pagina chiusa, le modifiche sostanziali generano una nuova revisione separando le risposte storiche. Il test di regressione verifica il contratto; restano necessari collaudi PostgreSQL e browser multipli. Stima RC invariata: 67%.

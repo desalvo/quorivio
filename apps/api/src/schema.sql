@@ -15,6 +15,8 @@ ALTER TABLE sessions ADD COLUMN IF NOT EXISTS retention_days integer NOT NULL DE
 ALTER TABLE users ADD COLUMN IF NOT EXISTS approved boolean NOT NULL DEFAULT false;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS must_change_password boolean NOT NULL DEFAULT false;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS password_changed_at timestamptz;
+-- Invalidate already issued login cookies following security-sensitive administrative recovery.
+ALTER TABLE users ADD COLUMN IF NOT EXISTS auth_revoked_at timestamptz;
 ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check;
 ALTER TABLE users ADD CONSTRAINT users_role_check CHECK(role IN ('platform_admin','org_admin','presenter','moderator','user'));
 UPDATE users SET approved=true WHERE role='platform_admin';
@@ -149,6 +151,10 @@ ALTER TABLE widget_answers ADD COLUMN IF NOT EXISTS revision integer NOT NULL DE
 ALTER TABLE widget_answers DROP CONSTRAINT IF EXISTS widget_answers_activity_id_participant_id_widget_id_key;
 CREATE UNIQUE INDEX IF NOT EXISTS widget_answers_one_per_revision ON widget_answers(activity_id,participant_id,widget_id,revision);
 CREATE INDEX IF NOT EXISTS widget_answers_revision_stats ON widget_answers(session_id,activity_id,widget_id,revision);
+-- Timed widget results are independent per widget and definition revision.
+ALTER TABLE widget_answers ADD COLUMN IF NOT EXISTS correct boolean;
+ALTER TABLE widget_answers ADD COLUMN IF NOT EXISTS elapsed_ms bigint;
+CREATE INDEX IF NOT EXISTS idx_widget_timed_ranking ON widget_answers(activity_id,widget_id,revision,elapsed_ms) WHERE correct=true;
 
 -- Preserve ownership of anonymous uploads; presenter assets keep a NULL participant_id.
 ALTER TABLE session_assets ADD COLUMN IF NOT EXISTS participant_id uuid REFERENCES participants(id) ON DELETE SET NULL;
@@ -238,3 +244,19 @@ CREATE INDEX IF NOT EXISTS topic_widget_questions_lookup ON topic_widget_questio
 -- Server-authoritative duration of quiz responses (milliseconds).
 ALTER TABLE responses ADD COLUMN IF NOT EXISTS elapsed_ms bigint;
 CREATE INDEX IF NOT EXISTS responses_timed_rank ON responses(activity_id,elapsed_ms,submitted_at,id) WHERE correct=true AND invalidated_at IS NULL;
+
+-- Optional email second factor: per-user, single-use, database-backed challenges.
+ALTER TABLE users ADD COLUMN IF NOT EXISTS email_mfa_enabled boolean NOT NULL DEFAULT false;
+CREATE TABLE IF NOT EXISTS email_mfa_challenges(
+ id uuid PRIMARY KEY,user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+ digest char(64) NOT NULL,expires_at timestamptz NOT NULL,
+ attempts integer NOT NULL DEFAULT 0 CHECK(attempts BETWEEN 0 AND 5),
+ created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_email_mfa_challenges_expiry ON email_mfa_challenges(expires_at);
+
+-- Prevent concurrent logins issuing multiple valid OTP challenges for one account.
+-- Existing installations may contain overlapping challenges from earlier concurrent logins.
+DELETE FROM email_mfa_challenges a USING email_mfa_challenges b
+ WHERE a.user_id=b.user_id AND (a.created_at,a.id)<(b.created_at,b.id);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_email_mfa_challenges_user ON email_mfa_challenges(user_id);

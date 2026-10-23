@@ -1,0 +1,3 @@
+# Live timed-widget editing safeguard — 2026-10-23
+
+Timed-quiz widgets now preserve answer semantics while their page is open. Changing choices, correct answer(s), answer mode, or duration, or removing an existing timed widget, returns HTTP 409 `live_timed_quiz_definition_locked`. Presentation-only geometry and styling edits remain available. Once closed, semantic edits establish a new widget revision, so historical responses and leaderboard attempts remain partitioned. Source contract covered by the widget revision regression suite. This does not replace live PostgreSQL and multi-client browser tests. RC estimate stays 67%.

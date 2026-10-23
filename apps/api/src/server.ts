@@ -1,12 +1,16 @@
+import {allowedWriteOrigin,allowedLiveOrigin} from './origin-policy.js';
+import {parseLeaderboardPage} from './pagination-policy.js';
+import {authCookieIssuedAt,presenterAuthActive} from './live-auth.js';
 import {SESSION_CHANNEL,startSessionBus} from './session-bus.js';
 import {socialProviders,socialState,socialAuthorizationUrl,exchangeSocialCode,socialSubject} from './social-oauth.js';
 import {providersFromEnv,nonce,pkceChallenge,authorizationUrl,validateDiscovery,verifyIdToken,fetchOidcJson} from './oidc.js';
 import {generateRecoveryCodes,recoveryCodeDigest,validRecoveryCode} from './recovery-codes.js';
 import {normalizeResetEmail,generateResetToken,resetTokenDigest,validResetToken,validNewPassword,resetLink} from './password-reset.js';
 import {generateTotpSecret,makeTotp,verifyTotp,sealTotp,openTotp,totpAuthUrl,validTotpCode} from './totp.js';
-import {smtpConfigFromEnv,sendTestEmail,sendPasswordResetEmail} from './smtp.js';
+import {smtpConfigFromEnv,sendTestEmail,sendPasswordResetEmail,sendEmailOtp} from './smtp.js';
+import {createEmailOtp,emailOtpDigest,matchesEmailOtp,validEmailOtp} from './email-otp.js';
 import {sealSmtpConfig,openSmtpConfig,validateSmtpInput,publicSmtpConfig} from './smtp-store.js';
-import {widgetAnswerShapeChanged,aggregateWidgetAnswerRevisions} from './widget-revisions.js';
+import {widgetAnswerShapeChanged,aggregateWidgetAnswerRevisions,liveTimedWidgetMutation} from './widget-revisions.js';
 import {normalizeWord,validateQuestion,moderationStatus,safeFrequency} from './audience-tools.js';
 import {validPageOrder} from './page-sequence.js';
 import express from 'express';import helmet from 'helmet';import pg from 'pg';import bcrypt from 'bcryptjs';import QRCode from 'qrcode';import {WebSocketServer,WebSocket} from 'ws';import {createServer} from 'node:http';import {randomUUID,randomBytes,createHash,createHmac,timingSafeEqual} from 'node:crypto';import {readFileSync,existsSync} from 'node:fs';import {mkdir,writeFile,readFile,unlink,rm} from 'node:fs/promises';import {validAsset} from './asset-policy.js';import {receiveAssetStream} from './stream-upload.js';import {scanUploadedFile} from './malware-scan.js';import {readdir,stat} from 'node:fs/promises';import path from 'node:path';import {fileURLToPath} from 'node:url';import {validTransition,validateOptions,checkAnswer,publicActivity,escapeCsvCell,validRetentionDays,validPageDesign,validPseudonym,validAnswerMode,validateSubmittedAnswer,validReaction,type Activity,type SessionStatus} from './domain.js';
@@ -14,9 +18,9 @@ const db=new pg.Pool({connectionString:process.env.DATABASE_URL});const secret=p
 const base=process.env.PUBLIC_BASE_URL||'http://localhost:8080';let publicBase=base;const app=express();app.disable('x-powered-by');app.use(helmet({contentSecurityPolicy:false}));app.use(express.json({limit:'32kb'}));const server=createServer(app);const wss=new WebSocketServer({noServer:true});
 const hash=(v:string)=>createHash('sha256').update(v).digest('hex');const sign=(s:string)=>createHmac('sha256',secret).update(s).digest('base64url');const cookies=(s:string='')=>Object.fromEntries(s.split(';').map(x=>x.trim().split('=')).filter(x=>x.length===2));
 function auth(req:express.Request){const token=cookies(req.headers.cookie).q_auth;if(!token)return null;const parts=token.split('.');if(parts.length!==3||!/^\d+$/.test(parts[1]))return null;const body=parts.slice(0,2).join('.');const a=Buffer.from(sign(body));const b=Buffer.from(parts[2]);if(a.length!==b.length||!timingSafeEqual(a,b)||Number(parts[1])<Date.now())return null;return parts[0]}
-async function requireAuth(req:express.Request,res:express.Response,next:express.NextFunction){const uid=auth(req);if(!uid){res.status(401).json({error:'authentication_required'});return}try{const r=await db.query('SELECT approved,must_change_password,password_changed_at FROM users WHERE id=$1',[uid]);if(r.rowCount&&r.rows[0].password_changed_at){const expires=Number(cookies(req.headers.cookie).q_auth?.split('.')[1]||0);if(expires-8*3600*1000<new Date(r.rows[0].password_changed_at).getTime()){res.status(401).json({error:'session_revoked'});return}}if(!r.rowCount||!r.rows[0].approved){res.status(403).json({error:'account_pending_approval'});return}if(r.rows[0].must_change_password&&!['/api/auth/change-password','/api/auth/me'].includes(req.path)){res.status(403).json({error:'password_change_required'});return}next()}catch{res.status(503).json({error:'auth_unavailable'})}}
+async function requireAuth(req:express.Request,res:express.Response,next:express.NextFunction){const uid=auth(req);if(!uid){res.status(401).json({error:'authentication_required'});return}try{const r=await db.query('SELECT approved,must_change_password,password_changed_at,auth_revoked_at FROM users WHERE id=$1',[uid]);if(r.rowCount){const issued=authCookieIssuedAt(req.headers.cookie);const revoked=[r.rows[0].password_changed_at,r.rows[0].auth_revoked_at].some(v=>v&&(issued===null||issued<new Date(v).getTime()));if(revoked){res.status(401).json({error:'session_revoked'});return}}if(!r.rowCount||!r.rows[0].approved){res.status(403).json({error:'account_pending_approval'});return}if(r.rows[0].must_change_password&&!['/api/auth/change-password','/api/auth/me'].includes(req.path)){res.status(403).json({error:'password_change_required'});return}next()}catch{res.status(503).json({error:'auth_unavailable'})}}
 const sendError=(res:express.Response,e:unknown)=>{console.error('request error',e instanceof Error?e.message:'unknown');res.status(500).json({error:'internal_error'})};
-function originSafe(req:express.Request){if(!['POST','PUT','PATCH','DELETE'].includes(req.method))return true;const origin=req.headers.origin;if(!origin)return true;try{return new URL(origin).host===new URL(base).host}catch{return false}}
+function originSafe(req:express.Request){return !['POST','PUT','PATCH','DELETE'].includes(req.method)||allowedWriteOrigin(req.headers.origin,base)}
 app.use('/api',(req,res,next)=>{if(!originSafe(req)){res.status(403).json({error:'invalid_origin'});return;}next()});
 // Shared, database-backed fixed-window limiter: consistent across all API replicas.
 async function throttle(req:express.Request,res:express.Response,next:express.NextFunction){try{
@@ -142,11 +146,11 @@ app.get('/api/auth/oidc/:provider/callback',async(req,res)=>{const state=typeof 
  if(pending.linkUser){const user=await db.query('SELECT id,approved FROM users WHERE id=$1',[pending.linkUser]);if(!user.rowCount||!user.rows[0].approved){res.status(403).json({error:'link_not_allowed'});return}
  const linked=await db.query('INSERT INTO oidc_identities(provider,subject,user_id) VALUES($1,$2,$3) ON CONFLICT (provider,subject) DO NOTHING RETURNING user_id',[p.id,verified.subject,pending.linkUser]);if(!linked.rowCount){res.status(409).json({error:'identity_already_linked'});return}res.redirect('/?oidc_linked=1');return;
  }
- const existing=await db.query('SELECT u.id,u.approved,u.must_change_password,u.totp_enabled FROM oidc_identities i JOIN users u ON u.id=i.user_id WHERE i.provider=$1 AND i.subject=$2',[p.id,verified.subject]);
+ const existing=await db.query('SELECT u.id,u.approved,u.must_change_password,u.totp_enabled,u.email_mfa_enabled FROM oidc_identities i JOIN users u ON u.id=i.user_id WHERE i.provider=$1 AND i.subject=$2',[p.id,verified.subject]);
  if(!existing.rowCount){res.status(403).json({error:'identity_not_linked',message:'Sign in with your password and link your identity in account settings first.'});return}
  const u=existing.rows[0];if(!u.approved||u.must_change_password){res.status(403).json({error:'account_not_approved'});return}
  // Strict policy: users with TOTP cannot bypass MFA through OIDC.
- if(u.totp_enabled){res.status(403).json({error:'oidc_mfa_requires_local_login'});return}
+ if(u.totp_enabled||u.email_mfa_enabled){res.status(403).json({error:'oidc_mfa_requires_local_login'});return}
  userId=u.id;const expires=Date.now()+8*3600*1000;const body=`${userId}.${expires}`;
  res.cookie('q_auth',`${body}.${sign(body)}`,{httpOnly:true,sameSite:'strict',secure:true,maxAge:8*3600*1000,path:'/'});res.redirect('/?oidc_login=1');
  }catch(e){console.error('oidc callback',e instanceof Error?e.message:'error');res.status(502).json({error:'oidc_verification_failed'})}});
@@ -175,17 +179,54 @@ app.get('/api/auth/social/:provider/callback',async(req,res)=>{
  const linked=await db.query('INSERT INTO oidc_identities(provider,subject,user_id) VALUES($1,$2,$3) ON CONFLICT (provider,subject) DO NOTHING RETURNING user_id',[p.id,subject,pending.linkUser]);
  if(!linked.rowCount){res.status(409).json({error:'identity_already_linked'});return}
  res.redirect('/?oidc_linked=1');return}
- const existing=await db.query('SELECT u.id,u.approved,u.must_change_password,u.totp_enabled FROM oidc_identities i JOIN users u ON u.id=i.user_id WHERE i.provider=$1 AND i.subject=$2',[p.id,subject]);
+ const existing=await db.query('SELECT u.id,u.approved,u.must_change_password,u.totp_enabled,u.email_mfa_enabled FROM oidc_identities i JOIN users u ON u.id=i.user_id WHERE i.provider=$1 AND i.subject=$2',[p.id,subject]);
  if(!existing.rowCount){res.status(403).json({error:'identity_not_linked'});return}
  const u=existing.rows[0];if(!u.approved||u.must_change_password){res.status(403).json({error:'account_not_approved'});return}
- if(u.totp_enabled){res.status(403).json({error:'social_mfa_requires_local_login'});return}
+ if(u.totp_enabled||u.email_mfa_enabled){res.status(403).json({error:'social_mfa_requires_local_login'});return}
  const expires=Date.now()+8*3600*1000;const body=`${u.id}.${expires}`;
  res.cookie('q_auth',`${body}.${sign(body)}`,{httpOnly:true,sameSite:'strict',secure:true,maxAge:8*3600*1000,path:'/'});res.redirect('/?oidc_login=1');
  }catch(e){console.error('social oauth callback',e instanceof Error?e.message:'error');res.status(502).json({error:'social_authentication_failed'})}
 });
-app.post('/api/auth/login',async(req,res)=>{try{const {email,password}=req.body||{};if(typeof email!=='string'||typeof password!=='string'){res.status(400).json({error:'invalid_request'});return}const r=await db.query('SELECT id,email,password_hash,approved,must_change_password,role,totp_enabled,totp_secret FROM users WHERE lower(email)=$1 OR lower(nickname)=$1',[email.trim().toLowerCase()]);if(!r.rowCount||!await bcrypt.compare(password,r.rows[0].password_hash)){res.status(401).json({error:'invalid_credentials'});return}if(!r.rows[0].approved){res.status(403).json({error:'account_pending_approval'});return}if(r.rows[0].totp_enabled){const otp=String(req.body?.totp_code||'');if(!validTotpCode(otp)||!verifyTotp(openTotp(r.rows[0].totp_secret,secret),otp)){const backup=String(req.body?.recovery_code||'');if(!validRecoveryCode(backup)){res.status(401).json({error:'mfa_code_required_or_invalid'});return}const used=await db.query('DELETE FROM mfa_recovery_codes WHERE user_id=$1 AND code_hash=$2 RETURNING code_hash',[r.rows[0].id,recoveryCodeDigest(backup,secret)]);if(!used.rowCount){res.status(401).json({error:'mfa_code_required_or_invalid'});return}}}const expires=Date.now()+8*3600*1000;const body=`${r.rows[0].id}.${expires}`;res.cookie('q_auth',`${body}.${sign(body)}`,{httpOnly:true,sameSite:'strict',secure:base.startsWith('https:'),maxAge:8*3600*1000,path:'/'});res.json({email:r.rows[0].email,role:r.rows[0].role,must_change_password:r.rows[0].must_change_password})}catch(e){sendError(res,e)}});
+app.post('/api/auth/login',async(req,res)=>{try{const {email,password}=req.body||{};if(typeof email!=='string'||typeof password!=='string'){res.status(400).json({error:'invalid_request'});return}const r=await db.query('SELECT id,email,password_hash,approved,must_change_password,role,totp_enabled,totp_secret,email_mfa_enabled FROM users WHERE lower(email)=$1 OR lower(nickname)=$1',[email.trim().toLowerCase()]);if(!r.rowCount||!await bcrypt.compare(password,r.rows[0].password_hash)){res.status(401).json({error:'invalid_credentials'});return}if(!r.rows[0].approved){res.status(403).json({error:'account_pending_approval'});return}if(r.rows[0].totp_enabled){const otp=String(req.body?.totp_code||'');if(!validTotpCode(otp)||!verifyTotp(openTotp(r.rows[0].totp_secret,secret),otp)){const backup=String(req.body?.recovery_code||'');if(!validRecoveryCode(backup)){res.status(401).json({error:'mfa_code_required_or_invalid'});return}const used=await db.query('DELETE FROM mfa_recovery_codes WHERE user_id=$1 AND code_hash=$2 RETURNING code_hash',[r.rows[0].id,recoveryCodeDigest(backup,secret)]);if(!used.rowCount){res.status(401).json({error:'mfa_code_required_or_invalid'});return}}}if(r.rows[0].email_mfa_enabled){
+ // Limit challenge generation across replicas to prevent mailbox flooding after password compromise.
+ const issueKey=hash(`email-mfa-issue:${r.rows[0].id}`),issueBucket=Math.floor(Date.now()/60000);
+ const issue=await db.query(`INSERT INTO api_rate_windows(client_hash,bucket,hits) VALUES($1,$2,1)
+ ON CONFLICT(client_hash,bucket) DO UPDATE SET hits=api_rate_windows.hits+1 RETURNING hits`,[issueKey,issueBucket]);
+ if(Number(issue.rows[0].hits)>3){res.setHeader('Retry-After',String(60-Math.floor(Date.now()/1000)%60));res.status(429).json({error:'email_mfa_rate_limited'});return}
+ const smtp=await activeSmtpConfig();if(!smtp){res.status(503).json({error:'email_mfa_smtp_unavailable'});return}
+ const id=randomUUID(),code=createEmailOtp(),digest=emailOtpDigest(code,r.rows[0].id,id,secret);
+ await db.query(`INSERT INTO email_mfa_challenges(id,user_id,digest,expires_at)
+ VALUES($1,$2,$3,now()+interval '5 minutes') ON CONFLICT(user_id)
+ DO UPDATE SET id=EXCLUDED.id,digest=EXCLUDED.digest,expires_at=EXCLUDED.expires_at,attempts=0,created_at=now()`,[id,r.rows[0].id,digest]);
+ try{await sendEmailOtp(smtp,r.rows[0].email,code)}catch{await db.query('DELETE FROM email_mfa_challenges WHERE id=$1',[id]);res.status(502).json({error:'email_mfa_delivery_failed'});return}
+ res.json({email_mfa_required:true,challenge_id:id});return
+ }const expires=Date.now()+8*3600*1000;const body=`${r.rows[0].id}.${expires}`;res.cookie('q_auth',`${body}.${sign(body)}`,{httpOnly:true,sameSite:'strict',secure:base.startsWith('https:'),maxAge:8*3600*1000,path:'/'});res.json({email:r.rows[0].email,role:r.rows[0].role,must_change_password:r.rows[0].must_change_password})}catch(e){sendError(res,e)}});
 app.post('/api/auth/logout',(_,res)=>{res.clearCookie('q_auth',{path:'/'});res.json({ok:true})});
-app.get('/api/auth/me',requireAuth,async(req,res)=>{try{const r=await db.query('SELECT id,email,nickname,is_primary_admin,role,approved,must_change_password,totp_enabled FROM users WHERE id=$1',[auth(req)]);res.json(r.rows[0]||null)}catch(e){sendError(res,e)}});
+app.post('/api/auth/email-mfa/verify',async(req,res)=>{try{
+ const id=req.body?.challenge_id,code=req.body?.code;
+ if(typeof id!=='string'||!/^[0-9a-f-]{36}$/i.test(id)||!validEmailOtp(code)){res.status(400).json({error:'invalid_email_mfa_request'});return}
+ const client=await db.connect();let user:any;
+ try{await client.query('BEGIN');const r=await client.query('SELECT c.id,c.user_id,c.digest,c.expires_at,c.attempts,u.email,u.role,u.must_change_password,u.approved,u.email_mfa_enabled FROM email_mfa_challenges c JOIN users u ON u.id=c.user_id WHERE c.id=$1 FOR UPDATE OF c',[id]);
+ if(!r.rowCount||!r.rows[0].approved||!r.rows[0].email_mfa_enabled||new Date(r.rows[0].expires_at).getTime()<=Date.now()||r.rows[0].attempts>=5){await client.query('ROLLBACK');res.status(401).json({error:'email_mfa_invalid_or_expired'});return}
+ user=r.rows[0];if(!matchesEmailOtp(code,user.digest,user.user_id,id,secret)){
+ await client.query('UPDATE email_mfa_challenges SET attempts=attempts+1 WHERE id=$1',[id]);await client.query('COMMIT');res.status(401).json({error:'email_mfa_invalid_or_expired'});return}
+ await client.query('DELETE FROM email_mfa_challenges WHERE user_id=$1',[user.user_id]);await client.query('COMMIT');
+ }catch(e){await client.query('ROLLBACK');throw e}finally{client.release()}
+ const expires=Date.now()+8*3600*1000,body=`${user.user_id}.${expires}`;
+ res.cookie('q_auth',`${body}.${sign(body)}`,{httpOnly:true,sameSite:'strict',secure:base.startsWith('https:'),maxAge:8*3600*1000,path:'/'});
+ res.json({email:user.email,role:user.role,must_change_password:user.must_change_password});
+ }catch(e){sendError(res,e)}});
+app.post('/api/auth/email-mfa/settings',requireAuth,async(req,res)=>{try{
+ const uid=auth(req)!,enabled=req.body?.enabled,password=req.body?.password,totp=req.body?.totp_code;
+ if(typeof enabled!=='boolean'||typeof password!=='string'){res.status(400).json({error:'invalid_request'});return}
+ const r=await db.query('SELECT password_hash,totp_enabled,totp_secret FROM users WHERE id=$1',[uid]);
+ if(!r.rowCount||!await bcrypt.compare(password,r.rows[0].password_hash)){res.status(403).json({error:'invalid_credentials'});return}
+ if(r.rows[0].totp_enabled&&(!validTotpCode(totp)||!verifyTotp(openTotp(r.rows[0].totp_secret,secret),totp))){res.status(403).json({error:'invalid_mfa_code'});return}
+ if(enabled&&!await activeSmtpConfig()){res.status(409).json({error:'smtp_required_before_email_mfa'});return}
+ await db.query('UPDATE users SET email_mfa_enabled=$2,auth_revoked_at=now() WHERE id=$1',[uid,enabled]);
+ await db.query('DELETE FROM email_mfa_challenges WHERE user_id=$1',[uid]);res.clearCookie('q_auth',{path:'/'});res.json({enabled,reauthentication_required:true});
+ }catch(e){sendError(res,e)}});
+app.get('/api/auth/me',requireAuth,async(req,res)=>{try{const r=await db.query('SELECT id,email,nickname,is_primary_admin,role,approved,must_change_password,totp_enabled,email_mfa_enabled FROM users WHERE id=$1',[auth(req)]);res.json(r.rows[0]||null)}catch(e){sendError(res,e)}});
 async function requireAdmin(req:express.Request,res:express.Response,next:express.NextFunction){const u=await db.query('SELECT role,approved,must_change_password FROM users WHERE id=$1',[auth(req)]);if(!u.rowCount||!u.rows[0].approved||u.rows[0].must_change_password||u.rows[0].role!=='platform_admin'){res.status(403).json({error:'admin_required'});return}next()}
 async function requirePresenter(req:express.Request,res:express.Response,next:express.NextFunction){const u=await db.query('SELECT role,approved,must_change_password FROM users WHERE id=$1',[auth(req)]);if(!u.rowCount||!u.rows[0].approved||u.rows[0].must_change_password||!['presenter','platform_admin','org_admin'].includes(u.rows[0].role)){res.status(403).json({error:'approved_presenter_required'});return}next()}
 app.post('/api/auth/change-password',requireAuth,async(req,res)=>{try{const current=req.body?.current_password,next=req.body?.new_password;if(typeof current!=='string'||typeof next!=='string'||next.length<12||next.length>256||current===next){res.status(400).json({error:'invalid_password'});return}const r=await db.query('SELECT password_hash FROM users WHERE id=$1',[auth(req)]);if(!r.rowCount||!await bcrypt.compare(current,r.rows[0].password_hash)){res.status(403).json({error:'invalid_credentials'});return}await db.query('UPDATE users SET password_hash=$2,must_change_password=false,password_changed_at=now() WHERE id=$1',[auth(req),await bcrypt.hash(next,12)]);res.json({ok:true})}catch(e){sendError(res,e)}});
@@ -214,7 +255,7 @@ app.post('/api/auth/mfa/confirm',requireAuth,async(req,res)=>{try{
 app.post('/api/auth/mfa/disable',requireAuth,async(req,res)=>{try{
  const uid=auth(req)!;const code=String(req.body?.code||'');const password=String(req.body?.password||'');const r=await db.query('SELECT password_hash,totp_secret,totp_enabled FROM users WHERE id=$1',[uid]);
  if(!r.rowCount||!r.rows[0].totp_enabled||!await bcrypt.compare(password,r.rows[0].password_hash)||!validTotpCode(code)||!verifyTotp(openTotp(r.rows[0].totp_secret,secret),code)){res.status(403).json({error:'invalid_credentials'});return}
- await db.query('UPDATE users SET totp_secret=NULL,totp_pending_secret=NULL,totp_enabled=false WHERE id=$1',[uid]);await db.query('DELETE FROM mfa_recovery_codes WHERE user_id=$1',[uid]);res.json({enabled:false});
+ await db.query('UPDATE users SET totp_secret=NULL,totp_pending_secret=NULL,totp_enabled=false,auth_revoked_at=now() WHERE id=$1',[uid]);await db.query('DELETE FROM mfa_recovery_codes WHERE user_id=$1',[uid]);res.json({enabled:false});
  }catch(e){sendError(res,e)}});
 app.post('/api/auth/mfa/recovery-codes/rotate',requireAuth,async(req,res)=>{try{const uid=auth(req)!;const {password,code}=req.body||{};const r=await db.query('SELECT password_hash,totp_secret,totp_enabled FROM users WHERE id=$1',[uid]);if(!r.rowCount||!r.rows[0].totp_enabled||typeof password!=='string'||!await bcrypt.compare(password,r.rows[0].password_hash)||!validTotpCode(code)||!verifyTotp(openTotp(r.rows[0].totp_secret,secret),code)){res.status(403).json({error:'invalid_credentials'});return}const codes=generateRecoveryCodes(),client=await db.connect();try{await client.query('BEGIN');await client.query('DELETE FROM mfa_recovery_codes WHERE user_id=$1',[uid]);for(const c of codes)await client.query('INSERT INTO mfa_recovery_codes(user_id,code_hash) VALUES($1,$2)',[uid,recoveryCodeDigest(c,secret)]);await client.query('COMMIT')}catch(e){await client.query('ROLLBACK');throw e}finally{client.release()}res.json({recovery_codes:codes});}catch(e){sendError(res,e)}});
 app.get('/api/admin/smtp',requireAuth,requireAdmin,async(_req,res)=>{try{res.json(publicSmtpConfig(await activeSmtpConfig()))}catch(e){sendError(res,e)}});
@@ -253,7 +294,7 @@ app.post('/api/admin/users/:id/mfa/reset',requireAuth,requireAdmin,async(req,res
   const user=await client.query('SELECT id,is_primary_admin,totp_enabled FROM users WHERE id=$1 FOR UPDATE',[req.params.id]);
   if(!user.rowCount){await client.query('ROLLBACK');res.status(404).json({error:'user_not_found'});return}
   if(user.rows[0].is_primary_admin){await client.query('ROLLBACK');res.status(409).json({error:'primary_admin_mfa_protected'});return}
-  await client.query('UPDATE users SET totp_secret=NULL,totp_pending_secret=NULL,totp_enabled=false WHERE id=$1',[req.params.id]);
+  await client.query('UPDATE users SET totp_secret=NULL,totp_pending_secret=NULL,totp_enabled=false,auth_revoked_at=now() WHERE id=$1',[req.params.id]);
   await client.query('DELETE FROM mfa_recovery_codes WHERE user_id=$1',[req.params.id]);
   await client.query('COMMIT');changed=true;
  }catch(e){await client.query('ROLLBACK');throw e}finally{client.release()}
@@ -451,13 +492,14 @@ app.patch('/api/sessions/:id/activities/:aid/design',requireAuth,async(req,res)=
  if(s.status==='closed'){res.status(409).json({error:'session_closed'});return}
  if(!validPageDesign(req.body?.page_design)||!validPageDesign(req.body?.result_design)){res.status(400).json({error:'invalid_page_design'});return}
  await cx.query('BEGIN');
- const a=await cx.query('SELECT page_design,result_design FROM activities WHERE id=$1 AND session_id=$2 FOR UPDATE',[req.params.aid,s.id]);
+ const a=await cx.query('SELECT page_design,result_design,status FROM activities WHERE id=$1 AND session_id=$2 FOR UPDATE',[req.params.aid,s.id]);
  if(!a.rowCount){await cx.query('ROLLBACK');res.status(404).end();return}
  const previous=a.rows[0].page_design?.widgets||[];
  const next=req.body.page_design.widgets||[];
+ if(a.rows[0].status==='open'&&liveTimedWidgetMutation(previous,next)){await cx.query('ROLLBACK');res.status(409).json({error:'live_timed_quiz_definition_locked'});return}
  // A changed question is a new revision, not a reinterpretation of historical answers.
- for(const widget of next.filter((w:any)=>w.kind==='question')){
-  const old=previous.find((w:any)=>w.id===widget.id&&w.kind==='question');
+ for(const widget of next.filter((w:any)=>['question','timed-quiz'].includes(w.kind))){
+  const old=previous.find((w:any)=>w.id===widget.id&&w.kind===widget.kind);
   if(!old)continue;
   if(widgetAnswerShapeChanged(old,widget)){
    await cx.query('INSERT INTO widget_revisions(activity_id,widget_id,revision,definition,changed_by) VALUES($1,$2,1,$3,$4) ON CONFLICT DO NOTHING',[req.params.aid,widget.id,JSON.stringify(old),auth(req)]);
@@ -668,7 +710,7 @@ app.get('/api/sessions/:id/activities/:aid/topic-widgets/:wid/questions',require
  const session=await owner(req.params.id,auth(req)!);if(!session){res.status(404).end();return}
  const a=await db.query('SELECT page_design FROM activities WHERE id=$1 AND session_id=$2',[req.params.aid,session.id]);
  const w=a.rows[0]?.page_design?.widgets?.find((x:any)=>x.id===req.params.wid&&x.kind==='topic-question');if(!w){res.status(404).json({error:'topic_widget_not_found'});return}
- const page=Math.max(1,Math.min(100000,Number.parseInt(String(req.query.page||'1'),10)||1));
+ const page=parseLeaderboardPage(req.query.page);if(page===null){res.status(400).json({error:'invalid_pagination'});return}
  const total=await db.query('SELECT count(*)::int AS n FROM topic_widget_questions WHERE session_id=$1 AND activity_id=$2 AND widget_id=$3',[session.id,req.params.aid,req.params.wid]);
  const rows=await db.query(`SELECT q.id,q.body,q.created_at,p.pseudonym AS participant_name FROM topic_widget_questions q JOIN participants p ON p.id=q.participant_id WHERE q.session_id=$1 AND q.activity_id=$2 AND q.widget_id=$3 ORDER BY q.created_at,q.id LIMIT 10 OFFSET $4`,[session.id,req.params.aid,req.params.wid,(page-1)*10]);
  res.json({page,page_size:10,total:total.rows[0].n,items:rows.rows.map((r:any)=>({...r,participant_name:w.showNames?r.participant_name:null}))});
@@ -679,18 +721,29 @@ app.post('/api/join/:code/activities/:aid/widgets/:wid/respond',async(req,res)=>
  if(!who){res.status(403).json({error:'join_or_open_activity_required'});return}
  await cx.query('BEGIN');
  // Serialize edits and submissions on the activity row to bind each response to a stable revision.
- const a=await cx.query('SELECT page_design FROM activities WHERE id=$1 AND session_id=$2 FOR SHARE',[req.params.aid,who.sessionId]);
- const widget=(a.rows[0]?.page_design?.widgets||[]).find((w:any)=>w.kind==='question'&&w.id===req.params.wid);
+ const a=await cx.query('SELECT page_design,opened_at FROM activities WHERE id=$1 AND session_id=$2 FOR SHARE',[req.params.aid,who.sessionId]);
+ const widget=(a.rows[0]?.page_design?.widgets||[]).find((w:any)=>['question','timed-quiz'].includes(w.kind)&&w.id===req.params.wid);
  if(!widget){await cx.query('ROLLBACK');res.status(404).json({error:'widget_not_found'});return}
- const mode=validAnswerMode(widget.answerMode)?widget.answerMode:'text';
+ const timed=widget.kind==='timed-quiz';
+ const mode=timed?(widget.answerMode==='multiple'?'multiple':'single'):(validAnswerMode(widget.answerMode)?widget.answerMode:'text');
  const options=Array.isArray(widget.options)?widget.options:[];
  const value=mode==='single'?req.body?.option_id:mode==='multiple'?req.body?.option_ids:mode==='text'?req.body?.text:req.body?.asset_id;
  const answer=validateSubmittedAnswer(mode,widget.required!==false,value,options);
  if(!answer){await cx.query('ROLLBACK');res.status(400).json({error:'invalid_widget_answer'});return}
+ if(timed){
+  const duration=Number(widget.durationSeconds||30);
+  if(!Number.isInteger(duration)||duration<5||duration>600||!a.rows[0].opened_at){await cx.query('ROLLBACK');res.status(409).json({error:'timed_widget_not_started'});return}
+  if(Date.now()>new Date(a.rows[0].opened_at).getTime()+duration*1000){await cx.query('ROLLBACK');res.status(409).json({error:'timer_elapsed'});return}
+  const correctIds=Array.isArray(widget.correctOptionIds)?widget.correctOptionIds:widget.correctOptionId?[widget.correctOptionId]:[];
+  if(!correctIds.length||!correctIds.every((id:string)=>options.some((o:any)=>o.id===id))){await cx.query('ROLLBACK');res.status(409).json({error:'timed_widget_not_configured'});return}
+ }
  if(answer.assetId){const owned=await cx.query('SELECT id FROM session_assets WHERE id=$1 AND session_id=$2 AND (participant_id IS NULL OR participant_id=$3)',[answer.assetId,who.sessionId,who.participantId]);if(!owned.rowCount){await cx.query('ROLLBACK');res.status(400).json({error:'attachment_not_in_session'});return}}
  const rev=await cx.query('SELECT coalesce(max(revision),1)::int AS revision FROM widget_revisions WHERE activity_id=$1 AND widget_id=$2',[req.params.aid,req.params.wid]);
  const revision=Number(rev.rows[0].revision);
- const r=await cx.query('INSERT INTO widget_answers(id,session_id,activity_id,participant_id,widget_id,answer_mode,answer_payload,revision) VALUES($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT(activity_id,participant_id,widget_id,revision) DO NOTHING RETURNING id',[randomUUID(),who.sessionId,req.params.aid,who.participantId,req.params.wid,mode,JSON.stringify(answer),revision]);
+ const correctIds=timed?(Array.isArray(widget.correctOptionIds)?widget.correctOptionIds:[widget.correctOptionId]):[];
+ const correct=timed&&answer.optionIds.length===correctIds.length&&answer.optionIds.every((id:string)=>correctIds.includes(id));
+ const elapsed=timed?Math.max(0,Date.now()-new Date(a.rows[0].opened_at).getTime()):null;
+ const r=await cx.query('INSERT INTO widget_answers(id,session_id,activity_id,participant_id,widget_id,answer_mode,answer_payload,revision,correct,elapsed_ms) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) ON CONFLICT(activity_id,participant_id,widget_id,revision) DO NOTHING RETURNING id',[randomUUID(),who.sessionId,req.params.aid,who.participantId,req.params.wid,mode,JSON.stringify(answer),revision,timed?correct:null,elapsed]);
  await cx.query('COMMIT');if(r.rowCount)await broadcast(who.sessionId);res.json({ok:true,already_submitted:!r.rowCount,revision});
  }catch(e){await cx.query('ROLLBACK');sendError(res,e)}finally{cx.release()}});
 app.get('/api/sessions/:id/widget-answers',requireAuth,async(req,res)=>{try{
@@ -706,13 +759,27 @@ app.get('/api/sessions/:id/widget-answers/detail',requireAuth,async(req,res)=>{t
  const revisions=aggregateWidgetAnswerRevisions(r.rows);
  res.json({activity_id:activity,widget_id:widget,revisions});
  }catch(e){sendError(res,e)}});
+// Independent, presenter-only timed rankings scoped to the exact widget and revision.
+app.get('/api/sessions/:id/activities/:aid/widgets/:wid/timed-leaderboard',requireAuth,async(req,res)=>{try{
+ const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}
+ const a=await db.query('SELECT page_design,opened_at FROM activities WHERE id=$1 AND session_id=$2',[req.params.aid,s.id]);
+ const w=(a.rows[0]?.page_design?.widgets||[]).find((w:any)=>w.id===req.params.wid&&w.kind==='timed-quiz');
+ if(!w){res.status(404).json({error:'timed_widget_not_found'});return}
+ const rev=await db.query('SELECT coalesce(max(revision),1)::int AS revision FROM widget_revisions WHERE activity_id=$1 AND widget_id=$2',[req.params.aid,req.params.wid]);
+ const revision=Number(rev.rows[0].revision),page=parseLeaderboardPage(req.query.page);if(page===null){res.status(400).json({error:'invalid_pagination'});return}const size=20;
+ const stats=await db.query('SELECT count(*)::int AS answers,count(*) FILTER (WHERE correct IS TRUE)::int AS correct FROM widget_answers WHERE activity_id=$1 AND widget_id=$2 AND revision=$3',[req.params.aid,req.params.wid,revision]);
+ const ranked=await db.query(`SELECT p.pseudonym AS participant_name,w.elapsed_ms AS duration_ms,w.submitted_at FROM widget_answers w JOIN participants p ON p.id=w.participant_id WHERE w.activity_id=$1 AND w.widget_id=$2 AND w.revision=$3 AND w.correct IS TRUE AND w.elapsed_ms IS NOT NULL ORDER BY w.elapsed_ms,w.submitted_at,w.id LIMIT $4 OFFSET $5`,[req.params.aid,req.params.wid,revision,size,(page-1)*size]);
+ res.json({widget_id:req.params.wid,revision,opened_at:a.rows[0].opened_at,...stats.rows[0],page,page_size:size,total_pages:Math.max(1,Math.ceil(stats.rows[0].correct/size)),ranking:ranked.rows.map((r:any,i:number)=>({...r,rank:(page-1)*size+i+1}))});
+ }catch(e){sendError(res,e)}});
 // Only authorized presenters can read identities and rankings; the start is the server's page-open timestamp.
 app.get('/api/sessions/:id/activities/:aid/timed-leaderboard',requireAuth,async(req,res)=>{try{
  const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}
  const a=await db.query('SELECT id,type,opened_at FROM activities WHERE id=$1 AND session_id=$2',[req.params.aid,s.id]);if(a.rows[0]?.type!=='timed_quiz'){res.status(404).json({error:'not_timed_quiz'});return}
+ const page=parseLeaderboardPage(req.query.page);if(page===null){res.status(400).json({error:'invalid_pagination'});return}
+ const pageSize=20;
  const summary=await db.query('SELECT count(*)::int AS answers,count(*) FILTER (WHERE correct)::int AS correct FROM responses WHERE activity_id=$1 AND invalidated_at IS NULL',[req.params.aid]);
- const ranking=await db.query(`SELECT p.pseudonym AS participant_name,r.elapsed_ms AS duration_ms,r.submitted_at FROM responses r JOIN participants p ON p.id=r.participant_id WHERE r.activity_id=$1 AND r.correct=true AND r.invalidated_at IS NULL AND r.elapsed_ms IS NOT NULL ORDER BY r.elapsed_ms ASC,r.submitted_at ASC,r.id ASC LIMIT 100`,[req.params.aid]);
- res.json({activity_id:req.params.aid,opened_at:a.rows[0].opened_at,...summary.rows[0],ranking:ranking.rows.map((r:any,i:number)=>({...r,rank:i+1}))});
+ const ranking=await db.query(`SELECT p.pseudonym AS participant_name,r.elapsed_ms AS duration_ms,r.submitted_at FROM responses r JOIN participants p ON p.id=r.participant_id WHERE r.activity_id=$1 AND r.correct=true AND r.invalidated_at IS NULL AND r.elapsed_ms IS NOT NULL ORDER BY r.elapsed_ms ASC,r.submitted_at ASC,r.id ASC LIMIT $2 OFFSET $3`,[req.params.aid,pageSize,(page-1)*pageSize]);
+ res.json({activity_id:req.params.aid,opened_at:a.rows[0].opened_at,...summary.rows[0],page,page_size:pageSize,total_pages:Math.max(1,Math.ceil(Number(summary.rows[0].correct)/pageSize)),ranking:ranking.rows.map((r:any,i:number)=>({...r,rank:(page-1)*pageSize+i+1}))});
  }catch(e){sendError(res,e)}});
 app.post('/api/join/:code/respond',async(req,res)=>{const cx=await db.connect();try{await cx.query('BEGIN');const s=await cx.query("SELECT * FROM sessions WHERE (join_secret=$1 OR join_code=$1) AND status='active' AND expires_at>now() FOR SHARE",[req.params.code]);if(!s.rowCount){await cx.query('ROLLBACK');res.status(404).json({error:'session_unavailable'});return}if(!s.rows[0].allow_anonymous){await cx.query('ROLLBACK');res.status(403).json({error:'anonymous_disabled'});return}const sid=s.rows[0].id;const token=cookies(req.headers.cookie)[`q_part_${sid}`];const p=token?await cx.query('SELECT id FROM participants WHERE session_id=$1 AND token_hash=$2',[sid,hash(token)]):null;if(!p?.rowCount){await cx.query('ROLLBACK');res.status(401).json({error:'join_first'});return}const a=await cx.query("SELECT * FROM activities WHERE id=$1 AND session_id=$2 AND status='open' FOR SHARE",[req.body?.activity_id,sid]);if(!a.rowCount||s.rows[0].current_activity_id!==req.body?.activity_id){await cx.query('ROLLBACK');res.status(409).json({error:'activity_not_open'});return}const act=a.rows[0] as Activity & {opened_at:Date};const mode=validAnswerMode((act as any).answer_mode)?(act as any).answer_mode:'single';
 const raw=mode==='single'?req.body?.option_id:mode==='multiple'?req.body?.option_ids:mode==='text'?req.body?.text:req.body?.asset_id;
@@ -721,9 +788,24 @@ if(!answer){await cx.query('ROLLBACK');res.status(400).json({error:'invalid_answ
 if(answer.assetId){const asset=await cx.query('SELECT id FROM session_assets WHERE id=$1 AND session_id=$2 AND (participant_id IS NULL OR participant_id=$3)',[answer.assetId,sid,p.rows[0].id]);if(!asset.rowCount){await cx.query('ROLLBACK');res.status(400).json({error:'attachment_not_in_session'});return}}
 const option=answer.optionIds.join(',');if(act.duration_seconds&&Date.now()>new Date(act.opened_at).getTime()+act.duration_seconds*1000){await cx.query('ROLLBACK');res.status(409).json({error:'timer_elapsed'});return}const correct=mode==='single'?checkAnswer(act,option):mode==='multiple'&&Array.isArray((act as any).correct_option_ids)&&answer.optionIds.length>0&&answer.optionIds.length===(act as any).correct_option_ids.length&&answer.optionIds.every(x=>(act as any).correct_option_ids.includes(x));
 const elapsedMs=act.type==='timed_quiz'?Math.max(0,Date.now()-new Date(act.opened_at).getTime()):null;const r=await cx.query('INSERT INTO responses(id,activity_id,participant_id,option_id,correct,answer_payload,elapsed_ms) VALUES($1,$2,$3,$4,$5,$6,$7) ON CONFLICT(activity_id,participant_id) WHERE invalidated_at IS NULL DO NOTHING RETURNING id',[randomUUID(),act.id,p.rows[0].id,option,correct,JSON.stringify(answer),elapsedMs]);await cx.query('COMMIT');if(r.rowCount)await broadcast(sid);res.json({ok:true,already_submitted:!r.rowCount})}catch(e){await cx.query('ROLLBACK');sendError(res,e)}finally{cx.release()}});
-server.on('upgrade',async(req,socket,head)=>{try{const origin=req.headers.origin;if(origin&&new URL(origin).host!==new URL(base).host){socket.destroy();return}const url=new URL(req.url||'/',base);if(url.pathname!=='/live'){socket.destroy();return}const sid=url.searchParams.get('session');if(!sid){socket.destroy();return}const s=(await db.query('SELECT * FROM sessions WHERE id=$1',[sid])).rows[0];if(!s||s.status==='closed'||new Date(s.expires_at).getTime()<=Date.now()){socket.destroy();return}const uid=auth(req as express.Request);const part=cookies(req.headers.cookie)[`q_part_${sid}`];const ownerAccount=uid&&(uid===s.owner_id||(await db.query('SELECT 1 FROM session_presenters WHERE session_id=$1 AND user_id=$2',[sid,uid])).rowCount)?(await db.query("SELECT 1 FROM users WHERE id=$1 AND approved=true AND must_change_password=false AND role IN ('presenter','platform_admin','org_admin')",[uid])).rowCount:false;const allowed=ownerAccount||(part&&s.allow_anonymous&&(await db.query('SELECT id FROM participants WHERE session_id=$1 AND token_hash=$2',[sid,hash(part)])).rowCount);if(!allowed){socket.destroy();return}wss.handleUpgrade(req,socket,head,ws=>{(ws as any).view=ownerAccount?'owner':'participant';(ws as any).uid=ownerAccount?uid:null;wss.emit('connection',ws,req,sid)})}catch{socket.destroy()}});
+server.on('upgrade',async(req,socket,head)=>{try{const origin=req.headers.origin;if(!allowedLiveOrigin(origin,base)){socket.destroy();return}const url=new URL(req.url||'/',base);if(url.pathname!=='/live'){socket.destroy();return}const sid=url.searchParams.get('session');if(!sid){socket.destroy();return}const s=(await db.query('SELECT * FROM sessions WHERE id=$1',[sid])).rows[0];if(!s||s.status==='closed'||new Date(s.expires_at).getTime()<=Date.now()){socket.destroy();return}const uid=auth(req as express.Request);const part=cookies(req.headers.cookie)[`q_part_${sid}`];const ownerAccount=uid&&(uid===s.owner_id||(await db.query('SELECT 1 FROM session_presenters WHERE session_id=$1 AND user_id=$2',[sid,uid])).rowCount)?(await db.query("SELECT 1 FROM users WHERE id=$1 AND approved=true AND must_change_password=false AND role IN ('presenter','platform_admin','org_admin') AND (auth_revoked_at IS NULL OR auth_revoked_at <= to_timestamp($2::double precision / 1000.0)) AND (password_changed_at IS NULL OR password_changed_at <= to_timestamp($2::double precision / 1000.0))",[uid,Number(cookies(req.headers.cookie).q_auth?.split('.')[1]||0)-8*3600*1000])).rowCount:false;const allowed=ownerAccount||(part&&s.allow_anonymous&&(await db.query('SELECT id FROM participants WHERE session_id=$1 AND token_hash=$2',[sid,hash(part)])).rowCount);if(!allowed){socket.destroy();return}wss.handleUpgrade(req,socket,head,ws=>{(ws as any).view=ownerAccount?'owner':'participant';(ws as any).uid=ownerAccount?uid:null;(ws as any).issuedAt=ownerAccount?authCookieIssuedAt(req.headers.cookie):null;wss.emit('connection',ws,req,sid)})}catch{socket.destroy()}});
+// Recheck existing presenter sockets on every replica against the shared database.
+// Fail closed on database outages: never continue streaming protected results to an
+// authenticated presenter whose credentials can no longer be checked.
+async function auditLivePresenterSockets(){
+ const ownerSockets=[...sockets.values()].flatMap(group=>[...group]).filter(ws=>ws.readyState===WebSocket.OPEN&&(ws as any).view==='owner');
+ if(!ownerSockets.length)return;
+ const ids=[...new Set(ownerSockets.map(ws=>String((ws as any).uid||'')).filter(Boolean))];
+ try{
+  const records=await db.query('SELECT id,approved,must_change_password,auth_revoked_at,password_changed_at FROM users WHERE id=ANY($1::uuid[])',[ids]);
+  const accounts=new Map(records.rows.map(row=>[String(row.id),row]));
+  for(const ws of ownerSockets){const account=accounts.get(String((ws as any).uid));if(!presenterAuthActive(account,(ws as any).issuedAt))ws.close(4003,'session_revoked')}
+ }catch(e){console.error('live auth audit unavailable',e instanceof Error?e.message:'unknown');for(const ws of ownerSockets)ws.close(1011,'authentication_unavailable')}
+}
+const liveAuthAudit=setInterval(()=>{void auditLivePresenterSockets()},10000);
+liveAuthAudit.unref();
 wss.on('connection',(ws:WebSocket,_req:unknown,sid:string)=>{let group=sockets.get(sid);if(!group){group=new Set();sockets.set(sid,group)}group.add(ws);snapshot(sid).then(data=>{if(ws.readyState===WebSocket.OPEN)ws.send(JSON.stringify({type:'snapshot',data:(ws as any).view==='owner'?data:participantSnapshot(data)}))});ws.on('close',()=>{group?.delete(ws);if(!group?.size)sockets.delete(sid)})});
 function participantSnapshot(data:any){if(!data)return data;return {session:{id:data.session.id,title:data.session.title,status:data.session.status},activities:data.activities.filter((a:Activity)=>a.id===data.session.current_activity_id).map(publicActivity),results:data.session.show_results?data.results.filter((r:any)=>r.activity_id===data.session.current_activity_id):[],totals:data.session.show_results?data.totals.filter((r:any)=>r.activity_id===data.session.current_activity_id):[]}}
 const webRoot=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../../web/dist');if(existsSync(webRoot)){app.use(express.static(webRoot));app.get('*',(_,res)=>res.sendFile(path.join(webRoot,'index.html')))}
-async function initialize(){const schema=readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)),'../src/schema.sql'),'utf8');await db.query(schema);publicBase=(await db.query("SELECT value FROM platform_settings WHERE key='public_base_url'")).rows[0]?.value||base;const email=process.env.ADMIN_EMAIL?.toLowerCase(),password=process.env.ADMIN_PASSWORD;if(email&&password){if(password.length<12&&!(process.env.ALLOW_INSECURE_DEV_BOOTSTRAP==='true'&&process.env.NODE_ENV!=='production'&&password==='000000'))throw new Error('ADMIN_PASSWORD must be >=12 characters (insecure demo bootstrap allowed only outside production)');const count=await db.query('SELECT count(*)::int AS n FROM users');if(count.rows[0].n===0){const oid=randomUUID(),uid=randomUUID();await db.query('INSERT INTO organizations(id,name) VALUES($1,$2)',[oid,'Default']);await db.query('INSERT INTO users(id,organization_id,email,password_hash,role) VALUES($1,$2,$3,$4,$5)',[uid,oid,email,await bcrypt.hash(password,12),'platform_admin']);await db.query('UPDATE users SET approved=true,must_change_password=true,is_primary_admin=true,nickname=$2 WHERE id=$1',[uid,'admin']);console.log('Initial admin provisioned; password change required')}}await db.query("UPDATE users SET is_primary_admin=true,nickname='admin' WHERE id=(SELECT id FROM users WHERE role='platform_admin' AND approved=true ORDER BY created_at ASC LIMIT 1) AND NOT EXISTS (SELECT 1 FROM users WHERE is_primary_admin=true)");startSessionBus(async()=>{const client=new pg.Client({connectionString:process.env.DATABASE_URL});await client.connect();return client},broadcastLocal);await purgeExpiredSessions();setInterval(()=>purgeExpiredSessions().catch(e=>console.error('retention purge error',e instanceof Error?e.message:'unknown')),3600000).unref();setInterval(()=>db.query("DELETE FROM auth_flows WHERE expires_at<now(); DELETE FROM api_rate_windows WHERE bucket<floor(extract(epoch from now())/60)-3").catch(e=>console.error('auth cleanup error',e instanceof Error?e.message:'unknown')),3600000).unref();server.listen(Number(process.env.PORT||8080),'0.0.0.0',()=>console.log('Quorivio API ready'))}
+async function initialize(){const schema=readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)),'../src/schema.sql'),'utf8');await db.query(schema);publicBase=(await db.query("SELECT value FROM platform_settings WHERE key='public_base_url'")).rows[0]?.value||base;const email=process.env.ADMIN_EMAIL?.toLowerCase(),password=process.env.ADMIN_PASSWORD;if(email&&password){if(password.length<12&&!(process.env.ALLOW_INSECURE_DEV_BOOTSTRAP==='true'&&process.env.NODE_ENV!=='production'&&password==='000000'))throw new Error('ADMIN_PASSWORD must be >=12 characters (insecure demo bootstrap allowed only outside production)');const count=await db.query('SELECT count(*)::int AS n FROM users');if(count.rows[0].n===0){const oid=randomUUID(),uid=randomUUID();await db.query('INSERT INTO organizations(id,name) VALUES($1,$2)',[oid,'Default']);await db.query('INSERT INTO users(id,organization_id,email,password_hash,role) VALUES($1,$2,$3,$4,$5)',[uid,oid,email,await bcrypt.hash(password,12),'platform_admin']);await db.query('UPDATE users SET approved=true,must_change_password=true,is_primary_admin=true,nickname=$2 WHERE id=$1',[uid,'admin']);console.log('Initial admin provisioned; password change required')}}await db.query("UPDATE users SET is_primary_admin=true,nickname='admin' WHERE id=(SELECT id FROM users WHERE role='platform_admin' AND approved=true ORDER BY created_at ASC LIMIT 1) AND NOT EXISTS (SELECT 1 FROM users WHERE is_primary_admin=true)");startSessionBus(async()=>{const client=new pg.Client({connectionString:process.env.DATABASE_URL});await client.connect();return client},broadcastLocal);await purgeExpiredSessions();setInterval(()=>purgeExpiredSessions().catch(e=>console.error('retention purge error',e instanceof Error?e.message:'unknown')),3600000).unref();setInterval(()=>db.query("DELETE FROM auth_flows WHERE expires_at<now(); DELETE FROM email_mfa_challenges WHERE expires_at<now(); DELETE FROM api_rate_windows WHERE bucket<floor(extract(epoch from now())/60)-3").catch(e=>console.error('auth cleanup error',e instanceof Error?e.message:'unknown')),3600000).unref();server.listen(Number(process.env.PORT||8080),'0.0.0.0',()=>console.log('Quorivio API ready'))}
 initialize().catch(e=>{console.error('startup failed',e);process.exit(1)});

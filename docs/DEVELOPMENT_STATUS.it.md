@@ -1,3 +1,55 @@
+
+## 2026-10-23 — Verifica editor con Chromium: blocco di accesso al server locale
+- Chromium 144 e Python Playwright disponibili e avviabili; il browser gestito dall'ambiente blocca le navigazioni verso il server Vite su 127.0.0.1 (`ERR_BLOCKED_BY_ADMINISTRATOR`). Non è stato eseguito alcun E2E browser né PostgreSQL (server non disponibile).
+- Correzione: i campi input dentro i widget non avviano più trascinamenti accidentali; la perdita della cattura del puntatore annulla il gesto e ripristina la geometria precedente. Aggiornati i test di regressione.
+- Build backend/frontend superate; Node 107/107, Python 104/104. I gate RC rimangono al 37,5% secondo matrice, senza promuovere test sorgente ad accettazione browser.
+
+## 2026-10-23 — Stabilizzazione gesti editor (ciclo 3, parziale)
+Rotazione incrementale con orientamento preservato, rollback della geometria su pointercancel, cleanup su perdita pointer capture, touch-action dei widget. Build backend/frontend superate; Node suite e 102 test Python superati. Collaudi browser, touch, PostgreSQL e accessibilità assistiva non eseguiti. RC 37,5% invariato secondo matrice; editor non ancora validato E2E. Vedi EDITOR_STABILIZATION.it.md.
+
+
+## 2026-10-23 — Editor responsive e controlli accessibili (ciclo 2)
+- Aggiunto pannello alternativo ai gesti del canvas per ogni widget: spostamento del 5% sui due assi, duplicazione e gestione dei livelli con controlli touch da almeno 44px e nomi accessibili.
+- Layout adattivo e focus visibile. Persistenza tramite i metodi widget già esistenti, senza modifiche al database.
+- Build backend e frontend superate, 107 test Node e 99 Python superati. Non verificati: dispositivi fisici, screen reader, PostgreSQL E2E. Il gate RC resta 37,5% e l'editor non è ancora accettato end-to-end.
+
+## 23/10/2026 — Ciclo accorpato composizione editor (non committato)
+- Aggiunti griglia opzionale 5%, duplicazione widget con nuovo ID e gestione livelli avanti/dietro nel canvas 16:9; salvataggio e tastiera esistenti preservati.
+- Node 107/107, Python 99/99 con tre test statici, build TypeScript/Vite PASS; browser/DB E2E non eseguiti. Nessun gate RC chiuso: matrice ponderata **37,5%** invariata. Vedere `EDITOR_COMPOSITION.it.md`.
+- Ultimo commit confermato: baseline CI verde prima dei risultati configurabili. Nessuna operazione git.
+
+## 2026-10-23 — Correzione sincronizzazione slide partecipanti (parziale)
+La pagina attiva ricevuta via WebSocket viene scelta usando `current_activity_id` dal server e lo stato open, non più la prima attività. Build di produzione PASS, Node 107/107 e Python 96/96. E2E browser/PostgreSQL ancora aperti; RC invariata al 37,5%. Vedere `AUDIENCE_PAGE_SYNC.it.md`.
+
+## 2026-10-23 — Nuvola dei risultati per widget (parziale)
+
+Aggiunta vista Nuvola per le frequenze delle opzioni di ogni widget domanda, con conteggi espliciti e revisioni distinte. Non è una nuvola delle parole delle risposte libere. Build backend/frontend e test Node PASS. Collaudi browser/PostgreSQL non eseguiti. Gate RC **37,5%** invariati; vedere `RESULT_WORD_CLOUD.it.md`.
+
+## 2026-10-23 — Fondamenta per MFA email (NON ATTIVA)
+
+Codici casuali a sei cifre, digest HMAC separati per utente/sfida, controllo a tempo costante, helper invio SMTP TLS e tre test. Il login non cambia: restano necessari challenge PostgreSQL monouso, scadenza, limitazione tentativi e interfaccia. **MFA email ancora APERTA**, punteggio RC invariato. Vedere `EMAIL_MFA_FOUNDATION.it.md`.
+
+## 2026-10-23 — Verifica rigorosa Origin in scrittura
+
+Confronto completo schema/host/porta per le API che modificano dati; compatibilità con i client senza Origin invariata. 97/97 test Node e 95/95 Python PASS; build backend TypeScript e frontend Vite PASS. E2E con browser/reverse proxy non eseguito. Vedere `docs/ORIGIN_POLICY_HARDENING.it.md`. Punteggio ponderato di accettazione RC **37,5%**, vedere `docs/RC_GATE_MATRIX.json`.
+
+## 2026-10-23 — Ricalcolo dei gate RC (autorevole)
+
+**RC 37,5% su evidenze ponderate, non 67%.** Vedere `docs/RC_GATE_AUDIT.it.md` e `docs/RC_GATE_MATRIX.json`. I valori precedenti del 67% sotto sono soltanto cronologia, superati da questo ricalcolo. Nessuna nuova validazione end-to-end dichiarata.
+
+## 2026-10-23 — Verifica revoche WebSocket dei presentatori già connessi
+
+Implementata verifica PostgreSQL ogni dieci secondi per i WebSocket già aperti dei presentatori, con chiusura per revoca, account non approvato e indisponibilità del database (fail-closed). Build API + Vite PASS, test Node 95/95, Python 93/93. E2E PostgreSQL/multi-replica NON eseguiti; MFA email e restanti gate RC aperti. Baseline gate RC invariata al 67%. Vedere `docs/LIVE_WEBSOCKET_REVOCATION.it.md`.
+
+## 23 ottobre 2026 — Protezione quiz a tempo attivi (parziale)
+- Bloccate con HTTP 409 le modifiche a risposte, durata e rimozione mentre la pagina è aperta; la geometria resta modificabile. Le modifiche successive creano una revisione. 91/91 test Node superati. Build Vite avviata ma non confermata (timeout ambiente). PostgreSQL/browser E2E da verificare. RC invariata 67%. Vedi `TIMED_WIDGET_LIVE_LOCK.it.md`.
+
+## 23 ottobre 2026 — Quiz a tempo indipendenti per widget (parziale)
+- Risposte e classifiche separate per widget, configurazione e paginazione presentatore. Build locali superate; test PostgreSQL/browser E2E mancanti. RC **67%** invariato. Vedi `TIMED_WIDGET_INDEPENDENCE.it.md`.
+
+## 23/10/2026 — Risultati per widget domanda (parziale)
+- Pannello Risultati del presentatore: aggregazioni autonome per ogni widget domanda, separate per revisione e visualizzazione scelta nell’editor (barre, torta, tabella). Build TypeScript/Vite e 90 test Node superati. Quiz a tempo multipli indipendenti ancora mancanti. Gate RC **67% invariati**. Vedere `WIDGET_RESULTS_PER_WIDGET.it.md`.
+
 ## 23/10/2026 — Quiz a tempo e Risultati per il presentatore (parziale)
 - Vedi `TIMED_QUIZ_RESULTS.it.md`: attività separata e cronometro dal server, classifica protetta, nuovi widget palette e pulsante Risultati del presentatore, build frontend/backend e 90 test Node superati. **Macroarea non conclusa.** 67% invariato. Le funzioni precedenti non committate rimangono incluse nel cumulativo.
 
@@ -313,3 +365,33 @@ Widget media, navigazione pagine e toggle implementati nei sorgenti; chiusura st
 - Il pannello mostra statistiche dell'attività, classifica quiz a tempo se applicabile ed elenchi paginati (10/pagina) per ciascun widget di domande per argomento.
 - Verifiche locali: build backend TypeScript e frontend Vite PASS; Node 90/90 PASS; Python 93/93 PASS, inclusi due nuovi test contrattuali. Test E2E con browser e PostgreSQL non eseguiti.
 - **Chiusura gate RC confermata al 67%**. Mancano grafici configurabili per singolo widget, quiz a tempo indipendenti e verifiche reali di sincronizzazione/deployment. Nessuna nuova CI confermata, commit o release.
+
+## Current cycle (2026-10-23)
+2026-10-23 — Scelta visualizzazione risultati sul widget `results-button`: barre, torta, tabella; persistenza tramite layout. Build backend/frontend e test 90 Node + 93 Python PASS. **Ancora aperti** configurazione per singolo widget, quiz a tempo multipli indipendenti, E2E browser/PostgreSQL, allineamento manuali PDF. CI verde precedente confermata dall’utente (baseline prima di questo ciclo); nessun commit eseguito in questo ciclo. Gate RC 67% invariati.
+
+## 23 ottobre 2026 — Paginazione della classifica quiz a tempo (dopo il commit, CI utente da eseguire)
+- L'utente ha confermato **commit e CI verde** per `quorivio-0.1.0-dev-presenter-results-canvas-cumulative.zip`: questo è il riferimento dell'ultimo commit. I cicli relativi ai grafici dei risultati e alla paginazione non sono ancora committati. Le annotazioni storiche precedenti rimangono tali.
+- La classifica riservata ai presentatori è paginata a 20 risposte corrette per pagina; ordinamento stabile per tempo registrato dal server, timestamp di invio e ID. La posizione in classifica continua tra le pagine; navigazione nel pannello Risultati con aggiornamento ogni due secondi.
+- Build di produzione backend/frontend **PASS**; test Node **90/90 PASS**, Python **93/93 PASS**. Non eseguiti collaudi E2E con browser e database per questa funzione.
+- **Avanzamento RC invariato al 67%**. Ancora aperti quiz indipendenti multipli, grafici per singolo widget, MFA email, invalidazione cookie dopo reset MFA e collaudi infrastrutturali. La RC non è raggiunta.
+
+## 2026-10-23 — Revoca delle sessioni dopo reset MFA (non committato)
+- Il reset MFA amministrativo aggiorna transazionalmente `users.auth_revoked_at`: i cookie emessi in precedenza sono respinti dalle API protette e dalle nuove connessioni WebSocket del presentatore. Rimane la chiusura delle connessioni locali già presente.
+- Aggiunti migrazione SQL incrementale, due regressioni e note tecniche IT/EN. **Restano aperti i collaudi PostgreSQL e la chiusura proattiva dei WebSocket sulle altre repliche.**
+- Ultimo commit/CI verde confermato dall'utente: `presenter-results-canvas`. Gli interventi successivi non risultano committati. Chiusura gate RC invariata: **67%**.
+
+## 23 ottobre 2026 — Interventi accorpati di sicurezza (successivi all'ultimo commit confermato)
+- L'upgrade WebSocket verifica ora l'origine completa dell'URL pubblico (schema, host e porta), invece del solo host, coerentemente con la protezione delle API HTTP che modificano dati. Restano supportati i client non-browser autenticati senza header Origin.
+- Entrambi gli endpoint delle classifiche rifiutano paginazioni ambigue, frazionarie o fuori limite con HTTP 400, senza più forzare silenziosamente il valore. Dimensione e ordinamento delle classifiche rimangono invariati.
+- Verifiche: build backend TypeScript PASS; build produzione frontend Vite PASS (1579 moduli); 99/99 test Node.js PASS; 95/95 test Python PASS. Collaudi E2E PostgreSQL, browser, SSO reale e Kubernetes ancora mancanti.
+- Audit RC **37,5%** (37,5/100), invariato in assenza di nuove evidenze di accettazione. Non è una percentuale di righe di codice implementate.
+- Tutti gli interventi dal commit `presenter-results-canvas` restano non committati; nessun commit, push, tag o release.
+
+
+## 2026-10-23 — Email MFA flow
+MFA email: aggiunti challenge PostgreSQL monouso, verifica login, UI e impostazione; build e test di contratto superati; collaudi E2E ancora necessari.
+RC weighted gate score unchanged at 37.5%; email MFA is partial until PostgreSQL/SMTP/browser integration passes.
+
+
+### 2026-10-23 – Protezione emissione MFA email
+Limite condiviso tra repliche (3/account/minuto), una sola sfida attiva atomica, pulizia migrazione e indice univoco. Dettagli in `docs/EMAIL_MFA_ISSUANCE_HARDENING.it.md`. Gate RC invariati in attesa di prove di integrazione.

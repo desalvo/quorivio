@@ -1,0 +1,3 @@
+# Controllo Origin per API in scrittura
+
+Dal 23 ottobre 2026 il controllo sulle API che modificano dati verifica l'**origine completa** (schema, host, porta), non soltanto l'host. Evita quindi di accettare un'origine HTTP quando l'URL pubblico è HTTPS sullo stesso dominio. I client senza header Origin mantengono il comportamento precedente: si tratta di un rafforzamento, **non di una difesa CSRF esaustiva**; cookie SameSite, reverse proxy e test browser richiedono ancora verifica. Due nuovi test Node coprono il confronto. Build e regressioni locali superate; deployment dietro proxy ancora da collaudare.

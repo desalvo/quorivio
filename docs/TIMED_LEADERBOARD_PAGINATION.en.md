@@ -1,0 +1,4 @@
+# Timed quiz leaderboard: pagination
+The authenticated presenter endpoint `GET /api/sessions/:id/activities/:aid/timed-leaderboard?page=N` returns up to 20 correct answers per page. The ordering is elapsed milliseconds ascending, submission timestamp ascending, response UUID ascending. Response fields `page`, `page_size`, `total_pages`, `correct`, `answers`, and `ranking[].rank` support page navigation and global rank display. Incorrect answers are never included in the ranking. Participant identities are never exposed through the audience endpoint. Server-recorded timings are subject to network latency; this is not a latency-equalized competitive score.
+
+Acceptance still requires a PostgreSQL-backed multi-client session to verify page changes, rankings during live submission and absence of identity exposure.

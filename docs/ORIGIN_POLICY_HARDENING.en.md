@@ -1,0 +1,3 @@
+# Write API Origin matching
+
+As of 2026-10-23 the write API origin guard checks the **entire origin** (scheme, host, port), not merely host. This closes the cross-scheme same-host case, particularly HTTP against a deployed HTTPS public URL. Clients without an Origin header keep existing behavior, so this is a defense-in-depth enhancement, **not comprehensive CSRF validation**; SameSite cookies, proxy configuration and browser E2E still need review. Two Node tests exercise origin distinctions. Builds and existing regression tests pass locally; reverse-proxy production deployment remains untested.

@@ -1,3 +1,55 @@
+
+## 2026-10-23 — Chromium editor validation: local-server access blocked
+- Chromium 144 and Python Playwright are installed and launch successfully, but the managed browser blocks navigation to the local Vite server at 127.0.0.1 (`ERR_BLOCKED_BY_ADMINISTRATOR`). No browser E2E or PostgreSQL acceptance was performed (PostgreSQL server unavailable).
+- Fixed accidental drag gestures when interacting with widget input fields; lost pointer capture now cancels the active gesture and restores the previous geometry. Regression tests were updated.
+- Backend/frontend builds passed; Node 107/107 and Python 104/104. RC gate score remains 37.5% under the existing matrix; source tests are not counted as real browser acceptance.
+
+## 2026-10-23 — Editor gesture stabilization (cycle 3, partial)
+Delta-based rotation preserving stored orientation, cancellation rollback of geometry, pointer capture cleanup and touch gesture isolation. Backend/frontend builds passed; Node suite and 102 Python tests passed. Browser/touch, PostgreSQL and assistive-technology acceptance not executed. RC gate score remains 37.5% per matrix; editor is not E2E accepted. See EDITOR_STABILIZATION.en.md.
+
+
+## 2026-10-23 — Responsive editor and accessible controls (cycle 2)
+- Added a gesture-free widget management panel with 5%-step position controls, duplication and layer ordering, 44px touch targets and accessible names.
+- Responsive layout and visible keyboard focus; existing widget persistence path and database schema remain unchanged.
+- Backend/frontend builds passed, 107 Node and 99 Python tests passed. Real devices, screen readers and PostgreSQL E2E are not validated. RC gate remains 37.5%; editor acceptance is still open.
+
+## 2026-10-23 — Editor composition grouped cycle (after latest cumulative; uncommitted)
+- Added optional 5% drag/resize snap, widget duplication with fresh IDs and widget stacking front/back controls in the 16:9 composer; existing page persistence and keyboard geometry retained.
+- Node 107/107, Python 99/99 including 3 static composition contracts, TypeScript/Vite production build PASS; no live browser/DB E2E. No RC gate closed; weighted matrix **37.5%** unchanged. See `EDITOR_COMPOSITION.en.md`.
+- Last confirmed maintainer commit remains the green-CI baseline before configurable results and timed-quiz changes. No git write operations.
+
+## 2026-10-23 — Audience slide synchronization correction (partial)
+Participant WebSocket snapshots now resolve the active page by server `current_activity_id` and open state, replacing the previous incorrect first-activity fallback. Both production builds PASS, Node 107/107 and Python 96/96. Browser/PostgreSQL E2E remains open. RC acceptance stays 37.5% as no gate has been accepted end-to-end. See `AUDIENCE_PAGE_SYNC.en.md`.
+
+## 2026-10-23 — Per-widget result word cloud (partial)
+
+Added option-frequency word cloud for individual question widgets, with explicit counts and revision isolation; this is not a free-text word extraction cloud. Backend/frontend builds and Node tests PASS. Browser/PostgreSQL E2E not run. RC gate score **37.5%** unchanged; see `RESULT_WORD_CLOUD.en.md`.
+
+## 2026-10-23 — Email MFA cryptographic and SMTP groundwork (NOT ENABLED)
+
+Six-digit CSPRNG OTP, domain-separated per-user/per-challenge HMAC and constant-time validation, TLS SMTP delivery helper, three tests. Login and activation deliberately unchanged until persisted challenge, atomic use, rate limiting and UI are implemented. **Email second factor remains OPEN**, no RC gate change. See `EMAIL_MFA_FOUNDATION.en.md`.
+
+## 2026-10-23 — Strict write Origin policy
+
+Full scheme/host/port Origin comparison for write APIs; preserves existing no-Origin client behavior. 97/97 Node and 95/95 Python tests PASS; backend TypeScript and Vite frontend production build PASS. No reverse-proxy/browser E2E. See `docs/ORIGIN_POLICY_HARDENING.en.md`. Weighted RC acceptance remains **37.5%**, see `docs/RC_GATE_MATRIX.json`.
+
+## 2026-10-23 — RC acceptance gate re-baseline (authoritative)
+
+**RC 37.5% weighted evidence, not 67%.** See `docs/RC_GATE_AUDIT.en.md` and `docs/RC_GATE_MATRIX.json`. All earlier 67% entries below are historical, superseded estimates. No new end-to-end acceptance is claimed.
+
+## 2026-10-23 — Established presenter WebSocket revocation audit
+
+Implemented per-replica ten-second PostgreSQL authorization checks for existing authenticated presenter WebSockets, closing revoked or unapproved connections and failing closed when the database is unavailable. Build API + Vite PASS, Node tests 95/95, Python tests 93/93. Multi-replica/PostgreSQL end-to-end NOT run; email MFA and other RC gates remain open. RC gate baseline remains 67%; no new complete gate accepted. See `docs/LIVE_WEBSOCKET_REVOCATION.en.md`.
+
+## 2026-10-23 — Live timed-widget answer protection (partial)
+- Reject live timed-quiz answer/duration/removal edits with HTTP 409; preserve geometry edits, version later semantic changes for historical response separation. 91/91 Node tests PASS. Vite production build attempted but not confirmed (environment timeout). PostgreSQL/browser E2E outstanding. RC 67% unchanged. See `TIMED_WIDGET_LIVE_LOCK.en.md`.
+
+## 2026-10-23 — Independent timed quiz widgets (partial)
+- Separate widget-scoped submissions and rankings, configurable answers/duration, presenter pagination. Local builds PASS; no PostgreSQL/browser E2E. RC **67%** unchanged. See `TIMED_WIDGET_INDEPENDENCE.en.md`.
+
+## 2026-10-23 — Per-question-widget Results (partial)
+- Presenter Results: independent aggregates for each question widget and revision with a per-widget editor selection (bars/pie/table). TypeScript/Vite build and 90 Node tests PASS. Multiple independent timed quizzes remain unimplemented. RC gates **67% unchanged**. See `WIDGET_RESULTS_PER_WIDGET.en.md`.
+
 ## 2026-10-23 — Timed quiz and presenter Results (partial)
 - See `TIMED_QUIZ_RESULTS.en.md`: distinct timed activity, authoritative server start and score timing, protected rankings, palette markers, presenter-only Results overlay, passing API/frontend production build and 90 Node tests. **Not RC complete.** 67% unchanged. Previous entry and earlier uncommitted features remain part of the cumulative baseline.
 
@@ -488,3 +540,33 @@ Media widgets, filmstrip navigation and binary controls implemented in source; R
 - The presenter Results panel includes the current activity aggregates, the timed-quiz leaderboard when applicable, and one paginated (10/page) topic-question list per topic widget.
 - Local validation: backend TypeScript and frontend Vite production builds PASS; Node 90/90 PASS; Python 93/93 PASS, including two new presenter-results contract tests. No browser or PostgreSQL E2E validation in this cycle.
 - **RC gate closure estimate remains 67%**. Remaining widget-specific graph settings, fully independent timed quiz widgets, and real synchronization/deployment tests are not completed. No maintainer-confirmed new CI, commit or release.
+
+## Current cycle (2026-10-23)
+2026-10-23 — Presenter `results-button` persists page aggregate visualization bars/pie/table. Backend/frontend builds and 90 Node + 93 Python tests PASS. **Still open:** per-widget configuration, multiple independent timed quizzes on a single page, browser/PostgreSQL E2E and PDF manual updates. Previous baseline CI green confirmed by user; this cycle not committed. RC gates remain 67%.
+
+## 2026-10-23 — Timed leaderboard pagination (post-commit, pending user CI)
+- Maintainer confirmed **commit and green CI** for `quorivio-0.1.0-dev-presenter-results-canvas-cumulative.zip`. This is the current commit boundary; the results-visualization cycle and this pagination cycle remain uncommitted. Older notes describing pre-boundary work as uncommitted are historical.
+- The authorized presenter timed-quiz leaderboard now paginates at 20 correct responses per page with stable ordering by server-recorded elapsed time, submission timestamp and response ID. Rank numbering remains global across pages; page navigation is present in the presenter results screen and refreshes every two seconds.
+- Backend and frontend production builds **PASS**; Node tests **90/90 PASS**, Python tests **93/93 PASS**. Database/browser E2E for this pagination remains outstanding.
+- **RC closure remains 67%**. Independently scored concurrent timed widgets, per-widget chart settings, email MFA, cookie invalidation after MFA reset and infrastructure acceptance remain OPEN. This increment is not a release candidate.
+
+## 2026-10-23 — MFA session revocation (uncommitted)
+- Administrative MFA reset now transactionally sets `users.auth_revoked_at`, invalidating previously issued signed cookies on protected API calls and preventing revoked presenter cookies from authenticating new WebSocket connections. Existing instance-local sockets are closed as before.
+- An additive SQL migration, two focused regression checks, and IT/EN technical notes were added. This addresses the previously identified stale-cookie risk, but **multi-replica socket termination and real PostgreSQL validation remain open**.
+- Last user-confirmed commit/green CI was `presenter-results-canvas`; all subsequent changes remain uncommitted. RC closure estimate stays **67%** until integration gates are verified.
+
+## 2026-10-23 — Batch security hardening (after last confirmed commit)
+- WebSocket upgrade Origin now uses exact public URL origin comparison (scheme/hostname/port) instead of hostname-only comparison, matching mutating HTTP API protection; browsers from other schemes or ports cannot use a signed cookie for cross-origin live socket access. Origin-free authenticated non-browser clients retain existing behavior.
+- Both presenter leaderboard endpoints reject invalid/fractional/overlarge page values with HTTP 400 instead of silently clamping or coercing. Response ranking order and page size are unchanged.
+- Verified: backend TypeScript build PASS; frontend Vite production build PASS (1579 modules); Node tests 99/99 PASS; Python tests 95/95 PASS. No PostgreSQL, full browser, SSO-provider or Kubernetes E2E acceptance performed.
+- RC gate audit still **37.5%** (37.5/100), with no gate advanced absent acceptance evidence. This is deliberately not a code-completion percentage.
+- All developments since the maintainer-confirmed `presenter-results-canvas` commit remain uncommitted. No commit, push, tag or release performed.
+
+
+## 2026-10-23 — Email MFA flow
+Email MFA: login challenge endpoint, single-use PostgreSQL digest, UI and setting added; builds and code-contract tests pass; production E2E still pending.
+RC weighted gate score unchanged at 37.5%; email MFA is partial until PostgreSQL/SMTP/browser integration passes.
+
+
+### 2026-10-23 – Email MFA issuance hardening
+Rate limit shared across replicas (3/account/minute), atomic single active challenge, migration cleanup and unique index. Build and regression evidence in `docs/EMAIL_MFA_ISSUANCE_HARDENING.en.md`. RC acceptance unchanged pending integration tests.

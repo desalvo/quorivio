@@ -1,0 +1,5 @@
+# Quiz a tempo indipendenti per widget — 23 ottobre 2026
+
+Ogni widget `timed-quiz` viene configurato separatamente nell'editor: opzioni, risposte corrette singole o multiple e durata (5–600 secondi). Gli invii utilizzano la rotta delle risposte per widget, con riga distinta per partecipante, widget e revisione. La scadenza e i millisecondi trascorsi dipendono da `opened_at` della pagina, stabilito dal server. La classifica è riservata al presentatore, separata per widget e revisione, ordinata per tempo con parità deterministiche e paginata in gruppi da 20. Entrano solo risposte corrette.
+
+Limiti: non sono stati eseguiti test PostgreSQL reali, concorrenza, latenza browser, riapertura pagine dopo una pausa, invarianti delle revisioni o sincronizzazione multi-browser. La latenza della rete incide sui tempi rilevati alla ricezione dal server. Le classifiche delle attività `timed_quiz` restano separate. L'editor permette ancora di cambiare definizioni dopo la partecipazione: le garanzie delle revisioni richiedono ulteriore implementazione. Manuali PDF non aggiornati. Chiusura RC invariata: 67%.

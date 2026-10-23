@@ -19,3 +19,12 @@ export async function sendTestEmail(c:SmtpConfig,to:string){
  const transport=mailer.createTransport({host:c.host,port:c.port,secure:c.secure,requireTLS:!c.secure,auth:{user:c.user,pass:c.password},connectionTimeout:10000,greetingTimeout:10000,socketTimeout:15000,tls:{rejectUnauthorized:true}});
  try{await transport.sendMail({from:c.senderName?{name:c.senderName,address:c.from}:c.from,to,subject:'Quorivio SMTP connection test',text:'This is a test email from your Quorivio installation.'})}finally{transport.close()}
 }
+
+/** Transport for optional email second-factor challenges; activation requires a
+ * database-backed single-use challenge flow and configured SMTP. */
+export async function sendEmailOtp(c:SmtpConfig,to:string,code:string){
+ if(!/^\d{6}$/.test(code)||!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(to))throw Error('invalid_email_otp_delivery');
+ const {default:mailer}=await import('nodemailer');
+ const transport=mailer.createTransport({host:c.host,port:c.port,secure:c.secure,requireTLS:!c.secure,auth:{user:c.user,pass:c.password},connectionTimeout:10000,greetingTimeout:10000,socketTimeout:15000,tls:{rejectUnauthorized:true}});
+ try{await transport.sendMail({from:c.senderName?{name:c.senderName,address:c.from}:c.from,to,subject:'Quorivio - Verification code',text:`Your Quorivio verification code is ${code}. It expires in 5 minutes. If you did not request this code, ignore this message.`})}finally{transport.close()}
+}
