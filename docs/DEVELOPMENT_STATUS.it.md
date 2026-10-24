@@ -905,3 +905,9 @@ test WebSocket contro notifiche obsolete dopo il voto.
 **Ancora da verificare in CI:** ripristino PostgreSQL 18 e sincronizzazione su due repliche.
 Il gate D2 rimane `partial` e la percentuale complessiva rimane **43,0%**: nessun
 incremento non giustificato da evidenze di accettazione. Nessun commit/push/tag/release.
+
+### Hotfix client PostgreSQL 18 in CI (24/10/2026)
+- La CI 40133452409 si è fermata nel backup DR: pg_dump 16.15 contro PostgreSQL 18.6.
+- La CI installa ora esplicitamente il client PostgreSQL 18 e controlla le versioni di pg_dump/pg_restore prima dei test.
+- I test HTTP live e WebSocket a due repliche erano verdi; DR rimane in attesa della nuova CI.
+- Nessun gate RC viene chiuso automaticamente da questa correzione.

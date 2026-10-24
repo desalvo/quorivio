@@ -1111,3 +1111,9 @@ frontend Vite production builds PASS. PostgreSQL 18 fresh-database restore and t
 WebSocket scenario require the next CI run. No claims of remote execution or RPO/RTO
 acceptance are made. D2 remains `partial` and the overall gate audit remains 43.0% until
 its PostgreSQL acceptance evidence is available. No GitHub commit/push/tag/release was made.
+
+### CI PostgreSQL 18 client hotfix (2026-10-24)
+- GitHub Actions run 40133452409 failed during DR backup: Ubuntu supplied pg_dump 16.15 against PostgreSQL 18.6.
+- CI now installs PostgreSQL client 18 explicitly and checks pg_dump/pg_restore versions before integration.
+- Live HTTP and two-replica WebSocket acceptance passed in the failing run. DR acceptance remains pending until the next CI run.
+- No RC gate was marked accepted solely on the basis of this fix.
