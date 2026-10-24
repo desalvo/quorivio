@@ -851,3 +851,8 @@ La coda per sessione ora consente ai chiamanti concorrenti di attendere l’ulti
 - Due nuovi test statici garantiscono presenza e ordine del gate nel workflow.
 - **Verificato localmente:** build backend e Vite PASS, Node 154/154 PASS, Python 239/239 PASS, compilazione script PASS. **Non eseguiti localmente:** collaudo HTTP su PostgreSQL, WebSocket multi-replica, browser/dispositivi e carico 500 utenti. Il nuovo passo sarà eseguito dalla prossima CI autorizzata, non è già stato collaudato.
 - **Matrice RC invariata: 40,0%**. B1–B4 rimangono parziali in attesa delle prove reali.
+
+
+## Hotfix CI successivo al commit 22daad0 (2026-10-24)
+
+GitHub Actions run 40128742733, job 120975700188: il test HTTP del formato portabile su PostgreSQL è fallito alla prima importazione con `invalid_bundle_definition` (HTTP 400). Causa: `portableSession()` leggeva `reference_date` (DATE) senza cast; node-postgres lo trasformava in Date JavaScript e l’archivio serializzava un timestamp ISO anziché `YYYY-MM-DD`. Correzione: `reference_date::text AS reference_date`; aggiunta verifica HTTP di regressione sull’export JSON. Build TypeScript API PASS, 154/154 test Node PASS, 254 test Python PASS (10 sottotest). Occorre rieseguire la CI PostgreSQL dopo il commit; gate non ancora accettato.

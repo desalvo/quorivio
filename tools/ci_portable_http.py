@@ -73,6 +73,10 @@ def run():
     assert asset_id(original) == src
     assert original['activities'][0]['result_design']['backgroundAssetId'] == src
 
+    # PostgreSQL DATE must be serialized as YYYY-MM-DD, never as a JS Date timestamp.
+    exported_json = api('GET', f'/api/sessions/{sid}/export.json')
+    assert exported_json['session']['reference_date'] == session['reference_date'][:10], 'portable reference date changed during export'
+    assert len(exported_json['session']['reference_date']) == 10, 'portable reference date must use YYYY-MM-DD'
     archive = api('GET', f'/api/sessions/{sid}/export.quorivio')
     assert archive[:4] == b'PK\x03\x04'
     ids = []

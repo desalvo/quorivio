@@ -1027,3 +1027,8 @@ Changed the per-session snapshot queue so all concurrent callers await the same 
 - Added two static CI contract tests to ensure the new real-database gate cannot silently disappear or execute before the password transition.
 - **Verified locally:** backend and Vite builds PASS; Node 154/154 PASS; Python 239/239 PASS; Python script compiles. **Not executed locally:** PostgreSQL HTTP smoke, WebSocket cross-replica, browser/device, or 500-client load. The CI workflow must execute the new gate on the next authorized push; no claim of green remote CI is made.
 - **RC matrix remains 40.0%**. B1–B4 remain partial until runtime evidence and browser/distributed acceptance are available. This is test infrastructure, not a closed gate.
+
+
+## CI hotfix after commit 22daad0 (2026-10-24)
+
+GitHub Actions run 40128742733, job 120975700188: the PostgreSQL-backed portable HTTP test failed on first bundle import with `invalid_bundle_definition` (HTTP 400). Root cause: `portableSession()` selected PostgreSQL `reference_date` (DATE) without casting; node-postgres returns a JavaScript Date, and bundle JSON serialized it as an ISO timestamp rather than the required `YYYY-MM-DD`. Fix: select `reference_date::text AS reference_date`. Added an HTTP assertion on `/api/sessions/:id/export.json` to catch future regressions. Local API TypeScript build PASS; 154/154 Node tests PASS; 254 Python tests PASS (10 subtests). The PostgreSQL HTTP workflow must be rerun after commit; do not mark the gate accepted before CI succeeds.
