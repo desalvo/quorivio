@@ -1032,3 +1032,7 @@ Changed the per-session snapshot queue so all concurrent callers await the same 
 ## CI hotfix after commit 22daad0 (2026-10-24)
 
 GitHub Actions run 40128742733, job 120975700188: the PostgreSQL-backed portable HTTP test failed on first bundle import with `invalid_bundle_definition` (HTTP 400). Root cause: `portableSession()` selected PostgreSQL `reference_date` (DATE) without casting; node-postgres returns a JavaScript Date, and bundle JSON serialized it as an ISO timestamp rather than the required `YYYY-MM-DD`. Fix: select `reference_date::text AS reference_date`. Added an HTTP assertion on `/api/sessions/:id/export.json` to catch future regressions. Local API TypeScript build PASS; 154/154 Node tests PASS; 254 Python tests PASS (10 subtests). The PostgreSQL HTTP workflow must be rerun after commit; do not mark the gate accepted before CI succeeds.
+
+
+### 2026-10-24 — CI concurrent live throttle hotfix
+CI hotfix: PostgreSQL HTTP portable test now passes; live concurrent smoke reached the database-backed shared IP rate limit (429). Added ephemeral, 64-hex-character CI-only load token to the existing non-production bypass, preserving production throttling. CI rerun required.

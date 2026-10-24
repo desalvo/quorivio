@@ -42,6 +42,8 @@ jobs:
         run: npm run build
       - name: Install PostgreSQL client for integration checks
         run: sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
+      - name: Generate ephemeral CI load-test credential
+        run: echo "QUORIVIO_CI_LOAD_TOKEN=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
       - name: Start API against real PostgreSQL
         env:
           DATABASE_URL: postgres://quorivio:ci-only-secret@127.0.0.1:5432/quorivio
@@ -52,6 +54,7 @@ jobs:
           PORT: '8080'
           QUORIVIO_ASSET_DIR: /tmp/quorivio-ci-assets
           QUORIVIO_CONVERSION_DIR: /tmp/quorivio-ci-conversions
+          LOAD_TEST_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
         run: |
           node apps/api/dist/server.js > /tmp/quorivio-ci-api.log 2>&1 &
           echo $! > /tmp/quorivio-ci-api.pid
@@ -79,6 +82,7 @@ jobs:
         run: python3 tools/ci_portable_http.py
       - name: PostgreSQL-backed concurrent live lifecycle E2E
         env:
+          QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
           QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
         run: python3 tools/ci_live_http.py

@@ -16,6 +16,7 @@ from urllib.request import HTTPCookieProcessor, Request, build_opener
 BASE = os.environ.get('QUORIVIO_CI_BASE_URL', 'http://127.0.0.1:8080')
 EMAIL = os.environ['QUORIVIO_CI_ADMIN_EMAIL']
 PASSWORD = os.environ['QUORIVIO_CI_NEW_PASSWORD']
+LOAD_TOKEN = os.environ.get('QUORIVIO_CI_LOAD_TOKEN')
 
 
 def client():
@@ -25,7 +26,8 @@ def client():
 def call(opener, method, path, payload=None, expected=200):
     data = json.dumps(payload).encode() if payload is not None else None
     req = Request(BASE + path, data=data, method=method,
-                  headers={'Content-Type': 'application/json'} if data else {})
+                  headers={**({'Content-Type': 'application/json'} if data else {}),
+                           **({'X-Quorivio-Load-Token': LOAD_TOKEN} if LOAD_TOKEN else {})})
     try:
         with opener.open(req, timeout=20) as response:
             status, raw = response.status, response.read()

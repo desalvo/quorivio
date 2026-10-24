@@ -41,3 +41,15 @@ class LiveCiIntegrationTests(unittest.TestCase):
                          "row['valid'] == 24", "'pseudonym' not in", 
                          "'timed_quiz'", "time.sleep(5.3)", "timed_row['valid'] == 1"):
             self.assertIn(required, script)
+
+class LiveRateLimitCiTests(unittest.TestCase):
+    def test_ephemeral_token_only_for_ci_load_smoke(self):
+        flow = (ROOT / '.github/workflows/ci.yml').read_text()
+        script = (ROOT / 'tools/ci_live_http.py').read_text()
+        server = (ROOT / 'apps/api/src/server.ts').read_text()
+        self.assertIn('openssl rand -hex 32', flow)
+        self.assertIn('LOAD_TEST_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}', flow)
+        self.assertIn('QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}', flow)
+        self.assertIn('X-Quorivio-Load-Token', script)
+        self.assertIn("process.env.NODE_ENV!=='production'", server)
+        self.assertIn('timingSafeEqual(a,b)', server)

@@ -856,3 +856,7 @@ La coda per sessione ora consente ai chiamanti concorrenti di attendere l’ulti
 ## Hotfix CI successivo al commit 22daad0 (2026-10-24)
 
 GitHub Actions run 40128742733, job 120975700188: il test HTTP del formato portabile su PostgreSQL è fallito alla prima importazione con `invalid_bundle_definition` (HTTP 400). Causa: `portableSession()` leggeva `reference_date` (DATE) senza cast; node-postgres lo trasformava in Date JavaScript e l’archivio serializzava un timestamp ISO anziché `YYYY-MM-DD`. Correzione: `reference_date::text AS reference_date`; aggiunta verifica HTTP di regressione sull’export JSON. Build TypeScript API PASS, 154/154 test Node PASS, 254 test Python PASS (10 sottotest). Occorre rieseguire la CI PostgreSQL dopo il commit; gate non ancora accettato.
+
+
+### 2026-10-24 — CI concurrent live throttle hotfix
+Hotfix CI: il test HTTP di portabilità PostgreSQL ora passa; il test concorrente live incontrava il rate limiter condiviso per IP (429). Aggiunto token di carico effimero solo CI per il bypass già presente e non disponibile in produzione. Necessaria nuova esecuzione CI.
