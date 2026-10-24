@@ -1,3 +1,9 @@
+## 2026-10-24 — Correzione CI dopo commit confermato (verifica locale)
+- Il log GitHub Actions `logs_108675600015.zip` fallisce in `apps/web/src/main.tsx:394` con TS2657 (pulsanti JSX adiacenti senza elemento genitore). Corretto racchiudendoli in un fragment React; nessuna modifica ad API o funzionalità.
+- Usando le dipendenze complete Node 22 fornite dall’utente: `npm run build` OK (API TypeScript e web TypeScript/Vite); `npm test` OK (121 test); unittest Python OK (224 test).
+- La CI con PostgreSQL, i test di integrazione, Kubernetes, browser, deploy e audit sicurezza non sono stati eseguiti su questa revisione. Stato gate RC: 37,5%; il package non è una release candidate.
+- L’utente ha confermato il commit del cumulativo precedente: il nuovo commit suggerito riguarda soltanto la correzione JSX e le note di verifica.
+
 ## 2026-10-24 — Ciclo unificato: recupero modificabile delle celle delle tabelle PPTX (verifiche locali)
 - Le tabelle PowerPoint importano ora il testo delle celle come widget indipendenti modificabili, mantenendo le coordinate proporzionali e il limite di 16 widget per pagina.
 - La diagnostica conta celle importate e celle scartate; la struttura tabellare nativa (bordi, stili, fusioni e OOXML) rimane esplicitamente **non conservata**.

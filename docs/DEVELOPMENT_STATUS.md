@@ -1,3 +1,9 @@
+## 2026-10-24 — CI repair after confirmed commit (local verification)
+- GitHub Actions log `logs_108675600015.zip` failed exclusively at `apps/web/src/main.tsx:394` with TS2657 (adjacent JSX buttons without a parent element). Wrapped them in a React fragment; no feature or API changes.
+- Using user-provided complete Node 22 dependencies: `npm run build` PASS (API TypeScript and web TypeScript/Vite); `npm test` PASS (121 tests); Python tools unittest PASS (224 tests).
+- CI PostgreSQL/integration, Kubernetes, browser, deployment and security gates have **not** been executed for this revision. RC weighted gate remains 37.5%; this package is **not** a release candidate.
+- The user confirmed a commit of the previous cumulative, so this package commit scope is strictly the post-commit JSX CI fix and verification notes.
+
 ## 2026-10-24 — Unified macroarea pass: editable PPTX table-cell recovery (local)
 - Native PPTX table contents now import as individually editable text widgets with proportional cell geometry instead of being silently discarded. The same 16-widget page limit applies to all shapes, including table cells.
 - Fidelity diagnostics now distinguish imported table cells from dropped overflow cells, and ALWAYS flag original native table semantics as lossy (table borders, styles, merged cells and OOXML structure are not preserved).
