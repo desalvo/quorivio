@@ -30,15 +30,16 @@ export function startSessionBus(connect: () => Promise<ListenerClient>, onUpdate
     retry=setTimeout(()=>{void attach()},wait);retry.unref?.();
    };
    next.on('notification',msg=>{
-    if(msg.channel===SESSION_CHANNEL && validSessionNotification(msg.payload))void onUpdate(msg.payload).catch(()=>{});
+    if(!stopped && !disconnected && client===next && msg.channel===SESSION_CHANNEL && validSessionNotification(msg.payload))void onUpdate(msg.payload).catch(()=>{log('session notification update failed; reconnecting');failed()});
    });
    next.on('error',failed);next.on('end',failed);
    await next.query(`LISTEN ${SESSION_CHANNEL}`);
+   if(stopped || disconnected || client!==next)return;
    attempt=0;
    // LISTEN does not replay notifications missed while disconnected.
    // Resnapshot every locally connected session after subscribing; any concurrent
    // notification is still delivered by PostgreSQL after LISTEN completes.
-   await onReady().catch(()=>log('session notification resynchronization failed'));
+   try {await onReady()} catch {log('session notification resynchronization failed; reconnecting');failed()}
   }catch{if(client){await client.end().catch(()=>{});client=null}if(!stopped){const wait=Math.min(30000,500*Math.pow(2,Math.min(attempt++,6)));log('session notification listener unavailable; retrying');retry=setTimeout(()=>{void attach()},wait);retry.unref?.()}}
  };
  void attach();

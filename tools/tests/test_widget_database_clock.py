@@ -11,8 +11,8 @@ class WidgetDatabaseClockTests(unittest.TestCase):
         self.assertLess(endpoint.index("SELECT clock_timestamp() AS database_now"), endpoint.index("INSERT INTO widget_answers"))
 
     def test_expiry_and_elapsed_same_sample(self):
-        self.assertIn("elapsed=Math.max(0,new Date(clock.rows[0].database_now)", SOURCE)
-        self.assertIn("if(elapsed>Number(widget.durationSeconds||30)*1000)", SOURCE)
+        self.assertIn("elapsed=timing.elapsedMs", SOURCE)
+        self.assertIn("if(!timing.valid)", SOURCE)
         self.assertNotIn("new Date(a.rows[0].database_now)", SOURCE)
 
 if __name__ == '__main__': unittest.main()

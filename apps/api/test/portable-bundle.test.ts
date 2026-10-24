@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash,randomUUID} from 'node:crypto';
-import {encodeBundle,decodeBundle,referencedAssets} from '../src/portable-bundle.ts';
+import {encodeBundle,decodeBundle,referencedAssets,remapPortableAssets} from '../src/portable-bundle.ts';
 const id=randomUUID();
 const bytes=Buffer.concat([Buffer.from([137,80,78,71,13,10,26,10]),Buffer.from('sample embedded binary media')]);
 const definition={format:'quorivio-session',version:1,session:{theme:{}},activities:[{page_design:{backgroundAssetId:id,widgets:[{kind:'image',assetId:id}]},result_design:{}}]};
@@ -45,4 +45,75 @@ test('portable bundle rejects a valid digest for media with a deceptive MIME typ
  const fake=Buffer.from('not a PNG, despite a matching sha256');
  const bad={...manifest,assets:[{...manifest.assets[0],bytes:fake.length,sha256:createHash('sha256').update(fake).digest('hex')}]};
  assert.throws(()=>encodeBundle(bad,new Map([[id,fake]])),/bundle_asset_mismatch/);
+});
+
+
+test('portable import remaps every theme, page and result reference consistently without mutating the source',()=>{
+ const other=randomUUID();
+ const source={...definition,session:{theme:{backgroundAssetId:id,widgets:[{id:'picture',kind:'logo',assetId:other}]}},activities:[
+  {page_design:{backgroundAssetId:other,widgets:[{id:'one',kind:'image',assetId:id},{id:'two',kind:'video',assetId:other}]},result_design:{backgroundAssetId:id,widgets:[{id:'three',kind:'pdf',assetId:other}]}}
+ ]};
+ const untouched=structuredClone(source);
+ const first=remapPortableAssets(source,[id,other]);
+ const second=remapPortableAssets(source,[id,other]);
+ assert.deepEqual(source,untouched);
+ assert.equal(first.ids.size,2);
+ assert.notEqual(first.ids.get(id),id);
+ assert.notEqual(first.ids.get(id),second.ids.get(id));
+ assert.notEqual(first.ids.get(id),first.ids.get(other));
+ assert.deepEqual(referencedAssets(first.definition),new Set(first.ids.values()));
+ assert.equal(first.definition.session.theme.backgroundAssetId,first.ids.get(id));
+ assert.equal(first.definition.activities[0].page_design.widgets[0].assetId,first.ids.get(id));
+ assert.equal(first.definition.activities[0].result_design.backgroundAssetId,first.ids.get(id));
+ assert.equal(first.definition.activities[0].result_design.widgets[0].assetId,first.ids.get(other));
+ assert.throws(()=>remapPortableAssets(source,[id]),/unmatched_import_assets/);
+ assert.throws(()=>remapPortableAssets(source,[id,other,other]),/invalid_import_assets/);
+ assert.throws(()=>remapPortableAssets(source,[id,other,'../secret']),/invalid_import_assets/);
+});
+
+test('portable bundle can be independently imported twice with fresh UUID assignments',()=>{
+ const zip=encodeBundle(manifest,new Map([[id,bytes]]));
+ const a=remapPortableAssets(decodeBundle(zip).manifest.definition,[id]);
+ const b=remapPortableAssets(decodeBundle(zip).manifest.definition,[id]);
+ assert.notEqual(a.ids.get(id),b.ids.get(id));
+ assert.equal(a.definition.activities[0].page_design.backgroundAssetId,a.ids.get(id));
+ assert.equal(b.definition.activities[0].page_design.widgets[0].assetId,b.ids.get(id));
+});
+
+
+test('portable bundle rejects non-canonical malformed UUIDs before export and remapping',()=>{
+ const badId='12345678-1234-1234-1234-123456789abc-';
+ const badDefinition={...definition,activities:[{page_design:{backgroundAssetId:badId},result_design:{}}]};
+ const badManifest={...manifest,definition:badDefinition,assets:[{...manifest.assets[0],id:badId}]};
+ assert.throws(()=>encodeBundle(badManifest,new Map([[badId,bytes]])),/invalid_bundle_manifest/);
+ assert.throws(()=>remapPortableAssets(badDefinition,[badId]),/invalid_import_assets/);
+});
+
+test('portable bundle refuses manifests above the 2 MiB bound before compression',()=>{
+ const huge={...manifest,definition:{...definition,description:'x'.repeat(2*1024*1024)}};
+ assert.throws(()=>encodeBundle(huge,new Map([[id,bytes]])),/invalid_bundle_manifest_size/);
+});
+
+test('portable bundle rejects inflated manifest size declared by ZIP directory before decompression',()=>{
+ const zip=Buffer.from(encodeBundle(manifest,new Map([[id,bytes]])));
+ const end=zip.length-22;const central=zip.readUInt32LE(end+16);
+ zip.writeUInt32LE(3*1024*1024,central+24);
+ assert.throws(()=>decodeBundle(zip),/invalid_bundle_manifest_size/);
+});
+
+
+test('portable export rejects archive size exceeding the maximum even for valid media',()=>{
+ const huge=Buffer.concat([Buffer.from([137,80,78,71,13,10,26,10]),Buffer.alloc(45*1024*1024)]);
+ const a=randomUUID(),b=randomUUID();
+ const media=new Map([[a,huge],[b,huge]]);
+ const d={format:'quorivio-session',version:1,session:{theme:{}},activities:[{page_design:{widgets:[{kind:'image',assetId:a},{kind:'image',assetId:b}]}}]};
+ const m={...manifest,definition:d,assets:[a,b].map(id=>({id,mime:'image/png',bytes:huge.length,sha256:createHash('sha256').update(huge).digest('hex')}))};
+ assert.throws(()=>encodeBundle(m,media),/invalid_bundle_manifest/); // aggregate media quota
+});
+
+test('portable bundle rejects aggregate declared ZIP size before media inflation',()=>{
+ const zip=Buffer.from(encodeBundle(manifest,new Map([[id,bytes]])));
+ const end=zip.length-22,central=zip.readUInt32LE(end+16);
+ zip.writeUInt32LE(84*1024*1024,central+24);
+ assert.throws(()=>decodeBundle(zip),/unsafe_bundle_entry/);
 });

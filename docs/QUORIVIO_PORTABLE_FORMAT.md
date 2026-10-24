@@ -15,3 +15,9 @@ The original `export.json` and `POST /api/sessions/import` remain supported as a
 3. Confirm no participant data or old QR/join code is present.
 4. Tamper with an asset hash, member name, ZIP header and manifest; each must fail without leaving an imported session.
 5. Confirm legacy JSON import/export still works.
+
+## October 2026 hardening: safe repeat imports and cloning
+
+Each imported asset now gets a **fresh database-global UUID** even if the same `.quorivio` file is imported multiple times. References in session theme, page widgets/backgrounds, and result widgets/backgrounds are remapped consistently, including multiple references to one file. The `POST /api/sessions/:id/duplicate` operation copies referenced media bytes into the new session rather than retaining references to the source session. Both paths check length, digest, content signature, and the configured anti-malware policy before persisting media. PostgreSQL `BIGINT` asset sizes are normalized to safe numeric values before validation during cloning.
+
+The new CI step `PostgreSQL-backed portable and profile lifecycle E2E` exercises repeated imports, collision resistance, shared references, asset cloning, and rejection of a corrupted ZIP. **The step is authored but has not been run against PostgreSQL in this environment.** A real cross-instance and multi-media round trip is still required for RC sign-off.

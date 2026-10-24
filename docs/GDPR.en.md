@@ -7,7 +7,7 @@
 - Presenter: login email, salted password hash, organisation membership; purpose: manage presentation sessions and authentication.
 - Participant: randomly generated pseudonymous participant credential and selected option; linked to session, therefore may still be personal data. Anonymous UI does **not** guarantee legal anonymity.
 - Runtime: access logs and network data depend on reverse proxy/operator; minimize retention, avoid logging credentials or participant tokens.
-- External SSO: **not implemented**. Introduce only after provider-specific notices, data mapping and security review.
+- External SSO: GitHub/Facebook OAuth2 and OIDC provider flows are present in source, but not yet validated against real providers; provider-specific notices, data mapping and security review are required before activation.
 
 ## Required safeguards / open implementation work
 
@@ -33,3 +33,9 @@ Never advertise a session as strictly anonymous without proving unlinkability un
 - A participant rejoining with a valid cookie retains their technical participant identity and submitted responses.
 
 **Limitations:** real PostgreSQL integration tests, backup lifecycle verification, legal-basis decisions, GDPR rights-request workflows and legal review remain outstanding. These controls do not establish GDPR compliance certification.
+
+## 2026-10-24 privacy/security addendum
+
+During this cycle, account avatar images remain authenticated and are deleted from local storage after replacement/removal; the underlying PostgreSQL user row is locked during updates to prevent concurrent stale paths. Portable session imports receive independent asset identifiers and never transfer prior participants or answers. Email MFA enrollment requires proof of mailbox control with an expiring, attempt-limited code; disabled/enabled changes revoke old sessions, while TOTP remains separate. A new CI PostgreSQL API smoke is pending execution.
+
+**These controls are not evidence of GDPR compliance.** Verify filesystem and backup retention, private asset paths in shared volumes, email provider data processing, revocation across replicas and organizational deletion requests. Existing GDPR obligations listed above remain open.

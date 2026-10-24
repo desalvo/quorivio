@@ -64,3 +64,11 @@ test('historical malformed revision and payload do not corrupt grouped statistic
  assert.equal(Object.getPrototypeOf(result[0].options),Object.prototype);
  assert.equal(JSON.parse(JSON.stringify(result))[0].options.constructor,1);
 });
+
+test('live timed mutation rejects duplicate and missing widget IDs before lookup',()=>{
+ const quiz={id:'quiz',kind:'timed-quiz',answerMode:'single',correctOptionId:'a',options:[{id:'a',label:'A'}]};
+ assert.equal(liveTimedWidgetMutation([quiz],[quiz,{...quiz,correctOptionId:'b'}]),true);
+ assert.equal(liveTimedWidgetMutation([quiz],[quiz,{kind:'text',id:'quiz'}]),true);
+ assert.equal(liveTimedWidgetMutation([quiz],[quiz,{kind:'text'}]),true);
+ assert.equal(liveTimedWidgetMutation([quiz],[quiz,{kind:'text',id:'other'}]),false);
+});

@@ -46,6 +46,13 @@ export function aggregateWidgetAnswerRevisions(rows:{revision:number;answer_mode
 
 /** Prevent changing the answer key or duration of a live timed quiz. Pure geometry and styling are safe. */
 export function liveTimedWidgetMutation(previous:any[],next:any[]):boolean {
+ // Duplicate IDs make answer attribution ambiguous. Reject them before building
+ // the lookup map, which would otherwise silently discard earlier entries.
+ const ids=new Set<string>();
+ for(const widget of next){
+  if(typeof widget?.id!=='string'||!widget.id||ids.has(widget.id))return true;
+  ids.add(widget.id);
+ }
  const newWidgets=new Map(next.filter(w=>w.kind==='timed-quiz').map(w=>[w.id,w]));
  return previous.some(old=>old.kind==='timed-quiz'&&(!newWidgets.has(old.id)||widgetAnswerShapeChanged(old,newWidgets.get(old.id))));
 }

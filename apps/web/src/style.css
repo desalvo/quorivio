@@ -188,7 +188,7 @@
 @media (max-width: 700px) {
   .powerpoint-editor,.widget-editor,.workspace,.workspace>*{min-width:0;max-width:100%}
   .widget-canvas{min-height:420px;overflow:auto;overscroll-behavior:contain}
-  .widget-canvas-item{touch-action:manipulation;min-width:0;max-width:100%;overflow-wrap:anywhere}
+  .widget-canvas-item{touch-action:none;min-width:0;max-width:100%;overflow-wrap:anywhere}
   .canvas-actions button,.widget-palette button,.session-tabs button,
   .audience-widget-layout button,.rehearsal-widget button{min-height:44px;min-width:44px}
   .audience-widget-layout,.rehearsal-widgets{min-width:0;max-width:100%}
@@ -336,3 +336,7 @@
   .page-editor-thumb[aria-current=page] { outline: 2px solid Highlight; outline-offset: -2px; }
   .page-editor-preview-widget { border: 1px solid CanvasText; }
 }
+
+/* Mobile canvas: keep pointer capture active for drag/resize/rotate while retaining native interaction with form controls. */
+.widget-canvas-item button,.widget-canvas-item input,.widget-canvas-item textarea,.widget-canvas-item select{touch-action:manipulation;user-select:auto}
+.widget-canvas-item [data-resize-edge],.widget-canvas-item [data-rotate-handle]{touch-action:none}

@@ -1,3 +1,30 @@
+## 2026-10-24 — Live widget identity and result-data guardrails
+- Reject duplicate or missing widget IDs before comparing an open timed quiz definition: a Map previously silently overwrote duplicate IDs, creating ambiguous answer attribution in live edits.
+- Word-cloud result projection now drops blank and oversized labels, rather than returning malformed historical data.
+- Verification: API and web production builds PASS, 154/154 Node PASS, 252/252 Python PASS (plus 10 subtests). Two additional Node regression tests added.
+- No live PostgreSQL/browser/500-participant run. B1–B4 remain partial, RC weighted score 40.0%; NOT a release candidate.
+
+## 2026-10-24 — Shared PostgreSQL timed-quiz deadline policy (post live delivery)
+- Legacy timed-quiz responses and independent timed widgets now use the same PostgreSQL `clock_timestamp()` deadline calculation. Previously the legacy route used API host `Date.now()` and could diverge across replicas, with inaccurate leaderboard elapsed times. The shared helper rejects missing/future start times and invalid durations and includes the exact deadline millisecond.
+- Tests: 146/146 Node PASS; full backend TypeScript and frontend TypeScript/Vite production build PASS. Python suite PASS after updating source-contract checks for the refactor.
+- PostgreSQL HTTP, browser, multi-replica, and 500-client E2E remain unexecuted. B2 remains partial and RC remains 40.0%; no new gate accepted.
+
+## 2026-10-24 — Portable archive defensive validation follow-up (after RC load audit)
+- Strict canonical UUID-shape validation now rejects malformed asset identifiers both on manifest export/import and during fresh-ID remapping.
+- Manifest is limited to 2 MiB **before compression on export** and before ZIP deflate inflation on import; this prevents a disproportionate allocation from a forged central directory uncompressed-length field. Existing ZIP archive and total-media quotas remain unchanged.
+- Added three Node.js regressions: malformed asset UUID, oversized manifest during encode, and forged ZIP central-directory manifest length.
+- Verification: 129/129 Node.js tests PASS, 232/232 Python tests PASS. Backend TypeScript compilation PASS; frontend TypeScript checking PASS. The full Vite bundling in this cycle is BLOCKED by mismatched esbuild binary versions/platform in the reused npm dependency archive (nested esbuild JS 0.25.12, root available native binary 0.28.2); this is an environment blocker, not a verified product build failure. Earlier CI-green baseline is not invalidated by this local issue.
+- No real PostgreSQL, SMTP/SSO, browser/mobile, 500-client load or Kubernetes tests were run. RC gate statuses and weighted progress remain 40.0%. The product is NOT release-candidate complete.
+
+## 2026-10-24 — 500-user shard validation follow-up (after previous local cycle)
+- Offline 500-user load report reconciliation added with eight tests and strict topology/concurrency checks. No live load performed; D4 remains open.
+- Local verification: backend/frontend build PASS (Vite esbuild 0.25.12 platform binary), Node 126/126 PASS, Python 232/232 PASS. RC score unchanged at 40.0%; PostgreSQL, actual load, browser and cluster tests not performed.
+
+## 2026-10-24 — Integrated portability, verified email MFA and administration cycle (post-confirmed CI baseline)
+- Fresh UUID and media cloning for portable imports and session duplication; revalidation/AV and rollback; email MFA verified enrollment independent of TOTP; atomic admin settings and profile photo locking/cleanup.
+- Local API/frontend builds PASS; 126 Node tests PASS; 224 Python tests PASS. Added PostgreSQL HTTP CI smoke (NOT yet executed), and regenerated six bilingual role PDF manuals.
+- RC 40.0% weighted (C2 partial, not accepted), all external/browser/cluster gates still pending; **not RC**. Details: `docs/RC_CYCLE_2026-10-24.en.md` and `docs/RC_GATE_MATRIX.json`.
+
 ## 2026-10-24 — CI repair after confirmed commit (local verification)
 - GitHub Actions log `logs_108675600015.zip` failed exclusively at `apps/web/src/main.tsx:394` with TS2657 (adjacent JSX buttons without a parent element). Wrapped them in a React fragment; no feature or API changes.
 - Using user-provided complete Node 22 dependencies: `npm run build` PASS (API TypeScript and web TypeScript/Vite); `npm test` PASS (121 tests); Python tools unittest PASS (224 tests).
@@ -777,7 +804,7 @@ Media widgets, filmstrip navigation and binary controls implemented in source; R
 - WebSocket upgrade Origin now uses exact public URL origin comparison (scheme/hostname/port) instead of hostname-only comparison, matching mutating HTTP API protection; browsers from other schemes or ports cannot use a signed cookie for cross-origin live socket access. Origin-free authenticated non-browser clients retain existing behavior.
 - Both presenter leaderboard endpoints reject invalid/fractional/overlarge page values with HTTP 400 instead of silently clamping or coercing. Response ranking order and page size are unchanged.
 - Verified: backend TypeScript build PASS; frontend Vite production build PASS (1579 modules); Node tests 99/99 PASS; Python tests 95/95 PASS. No PostgreSQL, full browser, SSO-provider or Kubernetes E2E acceptance performed.
-- RC gate audit still **37.5%** (37.5/100), with no gate advanced absent acceptance evidence. This is deliberately not a code-completion percentage.
+- RC gate audit still **37.5%** (40.0/100), with no gate advanced absent acceptance evidence. This is deliberately not a code-completion percentage.
 - All developments since the maintainer-confirmed `presenter-results-canvas` commit remain uncommitted. No commit, push, tag or release performed.
 
 
@@ -946,3 +973,57 @@ Implemented native self-contained `.quorivio` ZIP export/import, with asset mani
 - Local evidence: 224 Python unittest tests PASS; 121 Node.js tests PASS. The full npm build was attempted but could not complete because Node TypeScript declarations are not installed in this environment (`TS2580`), not because compilation success has been established.
 - **Not closed:** whole-product RC, complex PowerPoint charts/SmartArt, end-to-end MFA/SSO, PostgreSQL live participant flows, across-instance bundle import, browser/device accessibility, real 500-participant capacity, security/GDPR and reproducible CI for this revision. All require additional implementation or external validation.
 - No changes to repositories, running servers or Kubernetes.
+
+## 2026-10-24 — Cumulative integrated package handoff
+- See `docs/CYCLE_DELIVERY_2026-10-24.en.md` for a verified baseline delta, performed tests, explicit blocks and acceptance next steps.
+- Local compilation PASS, Node 126/126 PASS, Python 224/224 PASS; CI PostgreSQL end-to-end step added but not run locally.
+- Matrix remains 40.0/100; no RC claim; no external mutations.
+
+### 2026-10-24 integrated hardening follow-up
+- `.quorivio` importer now enforces aggregate declared ZIP expansion quota before payload inflation and decodes manifest as strict UTF-8 (rejecting ill-formed bytes); exporter enforces the total compressed ZIP size bound.
+- Added portable archive rejection tests. PostgreSQL, real browser/device, external SSO and 500-user live load are **not** validated in this environment.
+- Local API TypeScript compilation and Node/Python suites exercised; Vite bundling blocked by archived esbuild binary platform mismatch. Do not promote RC gates solely on these tests.
+
+## Cycle 2026-10-24 — mobile pointer gesture CSS reconciliation
+- Fixed the 700px mobile breakpoint overriding canvas widget `touch-action:none` with `manipulation`, which could cancel pointer capture during drag, resize and rotation. Native form-control touch interaction retained.
+- Added 3 mobile pointer regression tests (`tools/tests/test_mobile_touch_capture_contract.py`).
+- Local verification: API TypeScript build PASS; frontend TypeScript noEmit PASS; Node tests 131/131 PASS; Python tests 235/235 PASS. Full Vite bundling BLOCKED by mismatched offline esbuild native binaries; retest in GitHub Actions. No browser/device or live database acceptance was performed. RC matrix unchanged: 40.0%.
+
+### 2026-10-24 — Page reorder validation hardening
+- Replaced permissive UUID-shape matching with strict UUID version/variant validation.
+- Reject duplicate existing page identifiers and use linear-time set membership instead of repeated scans.
+- Added three Node.js regressions; focused suite: 8/8 PASS.
+- RC gate A2 remains partial pending browser and cross-device acceptance. No production infrastructure was touched.
+
+### 2026-10-24 — Multi-gate acceleration: live authorization lifecycle
+- Strategy switched to full vertical-slice acceptance; see `docs/RC_ACCELERATION_PLAN.en.md` and `.it.md`.
+- Hardened the 10-second WebSocket audit to revalidate all sessions, presenter role/membership and participant membership against PostgreSQL, with fail-closed behavior on database errors. Added policy regression tests for expiration, presenter removal, role/credential revocation and participant removal.
+- Local: backend TypeScript PASS; frontend TypeScript/Vite PASS; Node 138/138 PASS; Python 235/235 PASS. No PostgreSQL/multi-replica E2E evidence; B1–B4 remain partial. Matrix remains 40.0%.
+
+## 2026-10-24 — Live delivery reliability
+
+- Added per-session snapshot coalescing and 2 MiB slow WebSocket consumer protection; five Node regression tests. Full frontend Vite and backend TypeScript builds PASS, Node 143/143, Python 235/235. B1 remains partial pending real PostgreSQL/multi-replica and browser acceptance. See `LIVE_DELIVERY_RELIABILITY.en.md`.
+
+### 2026-10-24 — Session-bus reconnection hardening
+- PostgreSQL LISTEN reconnects if the mandatory local snapshot resynchronization fails, instead of silently leaving stale browser clients.
+- Added regressions for both failed LISTEN and failed resynchronization.
+- Acceptance gate B1 remains partial: no PostgreSQL multi-replica browser validation was performed.
+
+### 2026-10-24 — Session bus stale-listener fencing and error recovery
+- Fence PostgreSQL LISTEN notifications by active listener identity and lifecycle, preventing callbacks from retired connections or after shutdown from sending obsolete updates.
+- On a rejected notification handler, log and force a reconnect/resnapshot rather than silently discarding the update.
+- Two additional Node regressions. Full local checks: backend TypeScript and frontend Vite PASS, Node 150/150 PASS, Python 252 passed (+10 subtests).
+- Gate B1 remains partial; these are simulated listener tests, not PostgreSQL multi-replica acceptance. No live infrastructure was changed.
+
+## 2026-10-24 — Live queue error propagation and completion semantics
+
+Changed the per-session snapshot queue so all concurrent callers await the same final coalesced update, failed reads are reported to callers after pending refreshes drain, and queue entries are cleaned after errors. Listener resynchronization no longer discards failures. Added two regression tests. Local builds PASS, Node 152/152, Python 252/252 (10 subtests). B1 remains partial until PostgreSQL multi-replica browser acceptance.
+
+## 2026-10-24 — PostgreSQL-backed live lifecycle acceptance gate (B1–B4)
+
+- Added `tools/ci_live_http.py` and made it a mandatory CI step following the existing PostgreSQL-backed portable/profile smoke, reusing the changed disposable admin password.
+- The test creates and activates a session, opens a poll, enrolls **24 separate participants** with independent cookie jars, submits concurrently, checks exactly-once storage and duplicate idempotency, verifies aggregate report privacy, closes the poll, and rejects late answers.
+- The same smoke opens a **five-second timed quiz**, checks one accepted answer, PostgreSQL-clock expiry rejection, and the report's exact count. It then closes the session and verifies public join denial.
+- Added two static CI contract tests to ensure the new real-database gate cannot silently disappear or execute before the password transition.
+- **Verified locally:** backend and Vite builds PASS; Node 154/154 PASS; Python 239/239 PASS; Python script compiles. **Not executed locally:** PostgreSQL HTTP smoke, WebSocket cross-replica, browser/device, or 500-client load. The CI workflow must execute the new gate on the next authorized push; no claim of green remote CI is made.
+- **RC matrix remains 40.0%**. B1–B4 remain partial until runtime evidence and browser/distributed acceptance are available. This is test infrastructure, not a closed gate.

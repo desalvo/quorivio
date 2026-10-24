@@ -1,3 +1,30 @@
+## 2026-10-24 — Identità widget live e integrità risultati
+- Rifiutati identificativi widget duplicati o assenti prima del confronto delle definizioni di quiz temporizzati aperti: in precedenza la mappa poteva sovrascrivere un widget senza segnalare l'ambiguità.
+- La proiezione delle word cloud scarta etichette vuote o troppo lunghe provenienti da dati storici malformati.
+- Verifiche: build produzione API e frontend PASS, 154/154 Node PASS, 252/252 Python PASS (più 10 sottotest). Due test Node aggiunti.
+- Mancano prove reali PostgreSQL/browser/500 partecipanti; gate B1–B4 parziali, punteggio RC 40,0%. NON è una release candidate.
+
+## 2026-10-24 — Scadenze quiz uniformate all’orologio PostgreSQL
+- Quiz temporizzati tradizionali e widget temporizzati usano entrambi `clock_timestamp()` di PostgreSQL; eliminata la dipendenza dall’orologio del nodo API per scadenze e tempi della classifica. La policy condivisa verifica apertura, durata e limite esatto.
+- Build backend e frontend/Vite PASS; 146/146 test Node PASS. Test Python verificati dopo l’aggiornamento dei controlli di contratto.
+- Non eseguiti collaudi HTTP PostgreSQL, browser, multi-replica e 500 partecipanti. B2 parziale, RC 40,0%; nessun nuovo gate accettato.
+
+## 2026-10-24 — Portable archive defensive validation follow-up (after RC load audit)
+- Strict canonical UUID-shape validation now rejects malformed asset identifiers both on manifest export/import and during fresh-ID remapping.
+- Manifest is limited to 2 MiB **before compression on export** and before ZIP deflate inflation on import; this prevents a disproportionate allocation from a forged central directory uncompressed-length field. Existing ZIP archive and total-media quotas remain unchanged.
+- Added three Node.js regressions: malformed asset UUID, oversized manifest during encode, and forged ZIP central-directory manifest length.
+- Verification: 129/129 Node.js tests PASS, 232/232 Python tests PASS. Backend TypeScript compilation PASS; frontend TypeScript checking PASS. The full Vite bundling in this cycle is BLOCKED by mismatched esbuild binary versions/platform in the reused npm dependency archive (nested esbuild JS 0.25.12, root available native binary 0.28.2); this is an environment blocker, not a verified product build failure. Earlier CI-green baseline is not invalidated by this local issue.
+- No real PostgreSQL, SMTP/SSO, browser/mobile, 500-client load or Kubernetes tests were run. RC gate statuses and weighted progress remain 40.0%. The product is NOT release-candidate complete.
+
+## 2026-10-24 — 500-user shard validation follow-up (after previous local cycle)
+- Aggiunta la riconciliazione offline dei report del carico da 500 utenti con otto test e controlli rigorosi della topologia. Nessun carico reale eseguito; D4 resta aperto.
+- Verifica locale: build backend/frontend PASS (esbuild Vite 0.25.12), Node 126/126 PASS, Python 232/232 PASS. Punteggio RC invariato al 40,0%; non eseguiti test PostgreSQL, carico reale, browser o cluster.
+
+## 2026-10-24 — Ciclo integrato portabilità, MFA email verificata e amministrazione (post baseline CI confermata)
+- Nuovi UUID e copia effettiva dei media nelle importazioni e duplicazioni; verifiche MIME/hash/AV e rollback; iscrizione email MFA verificata e indipendente da TOTP; configurazione amministrativa atomica e foto private senza condizioni di gara.
+- Build API/frontend PASS, 126 test Node e 224 test Python PASS. Aggiunto smoke HTTP PostgreSQL CI **non ancora eseguito**; rigenerati sei manuali PDF IT/EN.
+- RC 40,0% ponderato (C2 solo parziale), test browser/database reali/cluster aperti; **non è RC**. Dettagli: `docs/RC_CYCLE_2026-10-24.it.md`, `docs/RC_GATE_MATRIX.json`.
+
 ## 2026-10-24 — Correzione CI dopo commit confermato (verifica locale)
 - Il log GitHub Actions `logs_108675600015.zip` fallisce in `apps/web/src/main.tsx:394` con TS2657 (pulsanti JSX adiacenti senza elemento genitore). Corretto racchiudendoli in un fragment React; nessuna modifica ad API o funzionalità.
 - Usando le dipendenze complete Node 22 fornite dall’utente: `npm run build` OK (API TypeScript e web TypeScript/Vite); `npm test` OK (121 test); unittest Python OK (224 test).
@@ -601,7 +628,7 @@ Widget media, navigazione pagine e toggle implementati nei sorgenti; chiusura st
 - L'upgrade WebSocket verifica ora l'origine completa dell'URL pubblico (schema, host e porta), invece del solo host, coerentemente con la protezione delle API HTTP che modificano dati. Restano supportati i client non-browser autenticati senza header Origin.
 - Entrambi gli endpoint delle classifiche rifiutano paginazioni ambigue, frazionarie o fuori limite con HTTP 400, senza più forzare silenziosamente il valore. Dimensione e ordinamento delle classifiche rimangono invariati.
 - Verifiche: build backend TypeScript PASS; build produzione frontend Vite PASS (1579 moduli); 99/99 test Node.js PASS; 95/95 test Python PASS. Collaudi E2E PostgreSQL, browser, SSO reale e Kubernetes ancora mancanti.
-- Audit RC **37,5%** (37,5/100), invariato in assenza di nuove evidenze di accettazione. Non è una percentuale di righe di codice implementate.
+- Audit RC **37,5%** (40,0/100), invariato in assenza di nuove evidenze di accettazione. Non è una percentuale di righe di codice implementate.
 - Tutti gli interventi dal commit `presenter-results-canvas` restano non committati; nessun commit, push, tag o release.
 
 
@@ -770,3 +797,57 @@ Implementati import/export ZIP `.quorivio` con manifest degli asset, verifica SH
 - Evidenze locali: 224 test Python OK e 121 test Node.js OK. La build npm completa è stata tentata ma interrotta perché mancano le definizioni TypeScript Node (`TS2580`). Non è quindi certificata per questa revisione.
 - **Ancora aperti:** Release Candidate globale, grafici PowerPoint completi/SmartArt, MFA/SSO end-to-end, flussi live con PostgreSQL, trasferimento archivi tra istanze, verifica accessibilità su browser/dispositivi, capacità reale di 500 partecipanti, audit sicurezza/GDPR e CI riproducibile di questa revisione. Servono ulteriori sviluppi o verifiche esterne.
 - Nessuna modifica a repository, server o Kubernetes.
+
+## 24 ottobre 2026 — Consegna cumulativa del ciclo integrato
+- Si veda `docs/CYCLE_DELIVERY_2026-10-24.it.md` per differenze dalla baseline, test, blocchi e prossimi collaudi.
+- Compilazione locale PASS; Node 126/126 PASS; Python 224/224 PASS. Aggiunto test HTTP PostgreSQL in CI, non eseguito localmente.
+- Matrice invariata a 40,0/100, nessuna dichiarazione RC, nessuna modifica ai servizi reali.
+
+### 2026-10-24 ulteriore rafforzamento integrato
+- Import `.quorivio`: controllo della quota complessiva dichiarata prima della decompressione e lettura UTF-8 rigorosa del manifest; export con limite sull'archivio ZIP risultante.
+- Aggiunti test di rifiuto degli archivi anomali. PostgreSQL, browser/dispositivi reali, SSO e carico live di 500 partecipanti **non** collaudati qui.
+- Compilazione TypeScript API e suite Node/Python eseguite; bundle Vite bloccato dal binario esbuild non compatibile nell'archivio dipendenze disponibile. Nessun gate RC promosso senza prove.
+
+## Ciclo 2026-10-24 — riconciliazione gesture touch mobile
+- Corretto il breakpoint a 700px che reimpostava `touch-action:manipulation` sui widget del canvas, rischiando di interrompere la cattura degli eventi durante trascinamento, ridimensionamento e rotazione. Mantenuta l'interazione touch dei controlli dei moduli.
+- Aggiunti 3 test di regressione (`tools/tests/test_mobile_touch_capture_contract.py`).
+- Verifiche locali: build API TypeScript PASS; frontend TypeScript noEmit PASS; Node 131/131 PASS; Python 235/235 PASS. Bundling Vite completo BLOCCATO dai binari nativi esbuild incompatibili nell'archivio offline; da ripetere in GitHub Actions. Nessun collaudo reale mobile/browser/database eseguito. Matrice RC invariata: 40,0%.
+
+### 24 ottobre 2026 — Rafforzamento riordinamento pagine
+- Validazione rigorosa di versione/variante UUID e rifiuto di identificativi preesistenti duplicati.
+- Verifica della permutazione con insiemi, a complessità lineare.
+- Tre nuove regressioni Node.js; suite mirata: 8/8 PASS.
+- Gate RC A2 ancora parziale: servono prove browser e multidispositivo. Nessuna modifica a server reali.
+
+### 24 ottobre 2026 — Accelerazione multi-gate: autorizzazioni live
+- Strategia aggiornata per macroaree end-to-end: `docs/RC_ACCELERATION_PLAN.it.md` e `.en.md`.
+- Audit WebSocket ogni 10 secondi esteso a sessioni, ruolo/delega presentatore e appartenenza dei partecipanti; chiusura fail-closed in caso di revoca, scadenza o indisponibilità DB. Nuovi test di regressione.
+- Backend TypeScript PASS; frontend TypeScript/Vite PASS; Node 138/138 PASS; Python 235/235 PASS. Mancano prove E2E PostgreSQL/multi-replica; B1–B4 ancora parziali. Matrice 40,0%.
+
+## 24 ottobre 2026 — Affidabilità live
+
+- Aggiunta la coda di snapshot per sessione e la protezione da client WebSocket lenti (2 MiB), con cinque test Node. Build backend TypeScript e frontend Vite PASS, Node 143/143, Python 235/235. B1 resta parziale in attesa di prove PostgreSQL/multi-replica e browser. Vedere `LIVE_DELIVERY_RELIABILITY.it.md`.
+
+### 2026-10-24 — Riconnessione del bus delle sessioni
+- Il listener PostgreSQL LISTEN si riconnette se fallisce la risincronizzazione obbligatoria degli snapshot locali, evitando client browser silenziosamente non aggiornati.
+- Aggiunte regressioni per errori LISTEN e di risincronizzazione.
+- Il gate B1 resta parziale: non è stato eseguito un collaudo browser multi-replica PostgreSQL.
+
+### 24 ottobre 2026 — Isolamento listener obsoleti e recupero errori bus
+- Ignorate notifiche provenienti da listener PostgreSQL già disconnessi o dopo l’arresto del servizio, verificando identità e ciclo di vita della connessione.
+- Se il gestore di una notifica rifiuta la Promise, viene registrato l’errore e forzata la riconnessione con risincronizzazione, anziché ignorarlo.
+- Due nuovi test Node. Verifiche locali complete: backend TypeScript e frontend Vite PASS, Node 150/150 PASS, Python 252 superati (+10 subtest).
+- Gate B1 ancora parziale: test su listener simulati, non collaudo multi-replica PostgreSQL. Nessuna modifica a infrastrutture reali.
+
+## 2026-10-24 — Propagazione errori e completamento della coda live
+
+La coda per sessione ora consente ai chiamanti concorrenti di attendere l’ultimo aggiornamento accorpato; gli errori delle letture vengono propagati dopo gli eventuali aggiornamenti pendenti e la coda viene liberata. La risincronizzazione del listener non ignora più gli errori. Aggiunti due test. Build locali PASS, Node 152/152, Python 252/252 (10 sottotest). B1 resta parziale fino ai collaudi multi-replica PostgreSQL e browser.
+
+## 2026-10-24 — Collaudo HTTP live con PostgreSQL (gate B1–B4)
+
+- Aggiunto `tools/ci_live_http.py` come passo obbligatorio della CI dopo il collaudo portabilità/profilo, utilizzando la password aggiornata dell'amministratore CI.
+- Verifica sessione attiva, sondaggio, **24 partecipanti indipendenti** con cookie separati, risposte concorrenti, idempotenza, conteggi e riservatezza del report, chiusura e rifiuto delle risposte tardive.
+- Verifica inoltre un quiz temporizzato di cinque secondi, accettazione iniziale, scadenza secondo PostgreSQL e conteggio esatto nel report.
+- Due nuovi test statici garantiscono presenza e ordine del gate nel workflow.
+- **Verificato localmente:** build backend e Vite PASS, Node 154/154 PASS, Python 239/239 PASS, compilazione script PASS. **Non eseguiti localmente:** collaudo HTTP su PostgreSQL, WebSocket multi-replica, browser/dispositivi e carico 500 utenti. Il nuovo passo sarà eseguito dalla prossima CI autorizzata, non è già stato collaudato.
+- **Matrice RC invariata: 40,0%**. B1–B4 rimangono parziali in attesa delle prove reali.

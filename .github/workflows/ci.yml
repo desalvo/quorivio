@@ -50,6 +50,8 @@ jobs:
           ADMIN_PASSWORD: ci-only-administrator-password-123
           PUBLIC_BASE_URL: http://127.0.0.1:8080
           PORT: '8080'
+          QUORIVIO_ASSET_DIR: /tmp/quorivio-ci-assets
+          QUORIVIO_CONVERSION_DIR: /tmp/quorivio-ci-conversions
         run: |
           node apps/api/dist/server.js > /tmp/quorivio-ci-api.log 2>&1 &
           echo $! > /tmp/quorivio-ci-api.pid
@@ -69,6 +71,17 @@ jobs:
           test "$(psql -h 127.0.0.1 -U quorivio -d quorivio -Atc 'SELECT count(*) FROM users')" = '1'
           test "$(psql -h 127.0.0.1 -U quorivio -d quorivio -Atc "SELECT count(*) FROM information_schema.tables WHERE table_schema='public' AND table_name IN ('auth_flows','api_rate_windows','widget_answers')")" = '3'
           test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/api/auth/me)" = '401'
+      - name: PostgreSQL-backed portable and profile lifecycle E2E
+        env:
+          QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
+          QUORIVIO_CI_ADMIN_PASSWORD: ci-only-administrator-password-123
+          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
+        run: python3 tools/ci_portable_http.py
+      - name: PostgreSQL-backed concurrent live lifecycle E2E
+        env:
+          QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
+          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
+        run: python3 tools/ci_live_http.py
       - name: Stop integration API
         if: always()
         run: |

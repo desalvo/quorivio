@@ -12,3 +12,7 @@ The `image-build` job also builds the isolated document-converter image. The blo
 4. Do not deploy to production before real-provider SSO, SMTPS, antivirus, existing-database migrations, and multi-replica behavior have been checked independently.
 
 **Limit:** this full workflow cannot run locally without Docker and npm dependencies. A green CI is necessary but not sufficient for production acceptance.
+
+## Added CI coverage (2026-10-24)
+
+The job now includes `python3 tools/ci_portable_http.py` after PostgreSQL startup and before API shutdown. It uses disposable credentials and exercises authentication, password change, atomic platform-settings rejection, private profile photo upload/deletion, binary image uploads, repeat `.quorivio` imports, duplicated media and corrupted-archive rejection. This script requires a running PostgreSQL 18 API and **has not yet been executed locally**; the existing green CI confirmation applies to the prior committed baseline only. Unit/build checks of this cycle were performed locally using archived npm dependencies; unlike the full CI, Docker, Trivy, real migrations, and SMTP cannot be validated locally.

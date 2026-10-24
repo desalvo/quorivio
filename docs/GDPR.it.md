@@ -7,7 +7,7 @@
 - Presentatore: email, hash protetto della password e organizzazione; finalità: gestione sessioni e accesso.
 - Partecipante: credenziale pseudonima casuale e risposta associata alla sessione; può costituire comunque dato personale. La modalità «anonima» dell'interfaccia non equivale all'anonimato giuridico.
 - Dati di rete/log: dipendono anche da ingress e gestore infrastrutturale; minimizzare i tempi di conservazione ed escludere token e credenziali dai log.
-- SSO esterni: **non implementati**; servono informative e verifiche specifiche per provider.
+- SSO esterni: flussi OAuth2 GitHub/Facebook e OIDC presenti nel codice ma non ancora collaudati con provider reali; servono informative, mappatura dei dati e verifiche specifiche per provider.
 
 ## Requisiti e lacune
 
@@ -33,3 +33,9 @@ Non definire una sessione «rigorosamente anonima» senza prove sulla non ricond
 - Un partecipante che ripete il join con un cookie valido mantiene la stessa identità tecnica e le risposte confermate.
 
 **Limiti:** prove reali con PostgreSQL, verifica del TTL dei backup, formalizzazione delle basi giuridiche, esercizio dei diritti GDPR e verifica legale restano aperti. Le funzioni non costituiscono certificazione di conformità GDPR.
+
+## Addendum privacy/sicurezza — 24/10/2026
+
+In questo ciclo le immagini del profilo rimangono autenticate e il file precedente viene eliminato dopo sostituzione/rimozione; la riga utente PostgreSQL è bloccata per impedire aggiornamenti concorrenti incoerenti. Le importazioni portabili assegnano identificativi indipendenti ai media e non trasferiscono risposte né partecipanti precedenti. L'attivazione MFA email richiede una verifica del possesso della casella con codice a scadenza e tentativi limitati; cambio stato revoca le vecchie sessioni, mantenendo il TOTP indipendente. Un nuovo controllo HTTP PostgreSQL in CI è ancora in attesa di esecuzione.
+
+**Questi controlli non attestano conformità GDPR.** Restano da verificare retention dei filesystem/backup, percorsi degli asset su volumi condivisi, trattamento dati da parte del fornitore email, revoche tra repliche e cancellazione organizzativa. Gli obblighi elencati sopra rimangono aperti.

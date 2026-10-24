@@ -229,3 +229,23 @@ EXTRA['en']['admin'].append(section('Attachment antivirus scanning',
  item('Operational checks','In an authorized test environment, test benign files and the EICAR test pattern, examine the logs, and verify rejected assets leave no database record. This feature is not yet validated with a real ClamAV deployment.'),
  item('Limits','Malware scanning does not replace MIME checks, GDPR processes or isolated document conversion. ClamAV is bundled with Compose/Helm; real-runtime validation remains necessary. See docs/ANTIVIRUS_UPLOADS.en.md.')
 ))
+
+# 2026-10-24 verified-source supplement; not a claim of browser/production acceptance.
+EXTRA['it']['presenter'].append(section('Archivi portabili e duplicazione sicura',
+ item('Esportazione completa della sessione','.quorivio include definizioni e asset referenziati, escludendo utenti, codici di accesso, risposte e dati dei partecipanti. Il formato JSON precedente non include i media.'),
+ item('Importazione o duplicazione','L’importazione e la duplicazione interna producono una nuova bozza, nuove credenziali e nuovi identificativi globali per i file multimediali. I widget che condividono una foto continuano a condividere la nuova copia.'),
+ item('Collaudi ancora necessari','Eseguire un ciclo di esportazione e reimportazione su un’altra istanza PostgreSQL con storage indipendente. Verificare immagini, sfondi, PDF e video, e che i dati dei partecipanti non compaiano nel nuovo archivio.')))
+EXTRA['en']['presenter'].append(section('Portable archives and safe duplication',
+ item('Self-contained session export','A .quorivio file embeds referenced media plus session definitions, but excludes identities, passwords, responses, join codes and audience data. Legacy JSON exports do not contain media.'),
+ item('Import or duplicate','Importing or internally duplicating creates a new draft, new joining credentials and fresh global UUIDs for all media. Shared references within theme/page/results remain linked to the new copy.'),
+ item('Acceptance outstanding','Perform cross-instance import with independent PostgreSQL and asset storage, check backgrounds, PDF and video media, and verify that the bundle contains no audience information.')))
+EXTRA['it']['admin'].append(section('MFA email con conferma e impostazioni atomiche',
+ item('Iscrizione MFA email','In Sicurezza / MFA, inserire la password e richiedere il codice di iscrizione. Il fattore email NON diventa attivo finché il codice di sei cifre ricevuto nella casella di posta non viene confermato entro dieci minuti. TOTP resta indipendente.'),
+ item('Limiti e disattivazione','Il backend accetta al massimo cinque errori per codice e tre richieste d’iscrizione al minuto per account. La conferma o la disattivazione revoca le sessioni precedenti, richiedendo un nuovo accesso.'),
+ item('Impostazioni server e foto','Le modifiche combinate a URL pubblico, retention e limite upload vengono validate integralmente e salvate in un’unica transazione. Le fotografie private vengono sostituite con blocco per utente e i file precedenti rimossi. I collaudi multi-replica e browser restano aperti.'),
+ item('Procedura di accettazione','Provare SMTP reale, codice errato/scaduto, rinnovo dopo revoca, login TOTP/email indipendenti, aggiornamenti amministrativi con valori non validi e collisioni di importazione .quorivio. La CI aggiunge un test HTTP PostgreSQL, ma la prima esecuzione sulla nuova revisione è ancora da verificare.')))
+EXTRA['en']['admin'].append(section('Email MFA confirmation and atomic settings',
+ item('Email MFA enrollment','In Security/MFA, enter the current password to request an enrollment code. Email MFA is NOT enabled until the six-digit email code is confirmed within ten minutes. TOTP remains independently configurable.'),
+ item('Limits and disable','Five invalid codes exhaust an enrollment. No more than three enrollments per account per minute may be issued. Confirmation or disabling revokes existing sessions, requiring sign-in again.'),
+ item('Server settings and profile images','Public URL, retention and upload limit changes are validated together and written atomically. Private profile photos use per-user row locking for replace/delete and dispose of superseded files. Multi-replica and browser acceptance are still outstanding.'),
+ item('Operator checks','Test a real SMTP server, expired and incorrect codes, login using each enabled factor, invalid combined settings updates and .quorivio UUID collisions. A PostgreSQL HTTP CI test has been added but has not been run on the new revision yet.')))

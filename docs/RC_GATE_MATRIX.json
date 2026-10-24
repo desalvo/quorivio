@@ -15,7 +15,7 @@
       "area": "A-editor",
       "weight": 6,
       "status": "partial",
-      "evidence": "Slide thumbnails, order and duplication implemented with keyboard alternative",
+      "evidence": "Slide thumbnails, order and duplication implemented with keyboard alternative; strict UUID/permutation validation and 8 focused tests (2026-10-24)",
       "remaining": "Pixel-accurate thumbnails and cross-browser drag/drop acceptance"
     },
     {
@@ -39,32 +39,32 @@
       "area": "B-sessions",
       "weight": 6,
       "status": "partial",
-      "evidence": "Presenter dashboard, synced server-driven navigation and participant preview in source",
-      "remaining": "Multi-browser synchronization and presenter/participant lifecycle E2E"
+      "evidence": "Presenter dashboard, synced server-driven navigation and participant preview in source; live WebSocket authorization re-audits sessions, presenter memberships/roles and participants every 10s (local policy tests PASS, 2026-10-24); per-session coalesced snapshot delivery and 2 MiB slow-consumer protection, local tests PASS (2026-10-24); LISTEN startup/resync failure now forces reconnection, with local regression tests (2026-10-24); retired listener notification fencing and rejected handler reconnect regression tests PASS (2026-10-24); coalesced snapshot callers now await the final read and failed DB snapshots propagate to listener recovery (152 Node and 252 Python tests PASS, builds PASS, 2026-10-24); disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24)",
+      "remaining": "Real PostgreSQL multi-replica and two-browser acceptance, recovery and latency tests; local queue regressions do not satisfy this gate; await CI result for new live HTTP smoke"
     },
     {
       "id": "B2",
       "area": "B-sessions",
       "weight": 6,
       "status": "partial",
-      "evidence": "Timed quiz APIs, per-widget results and server timestamps implemented",
-      "remaining": "Concurrent clients, fairness under latency, timed quiz widget PostgreSQL E2E"
+      "evidence": "Timed quiz APIs, per-widget results and server timestamps implemented; shared PostgreSQL-clock deadlines for legacy and widget timed answers, local contract and unit tests PASS (2026-10-24); open timed-widget edits now reject duplicate/missing widget IDs (154 Node PASS, 2026-10-24); disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24)",
+      "remaining": "Concurrent clients, fairness under latency, timed quiz widget PostgreSQL E2E; await CI result for new live HTTP smoke"
     },
     {
       "id": "B3",
       "area": "B-sessions",
       "weight": 6,
       "status": "partial",
-      "evidence": "Presenter-only Results, chart selection, paginated leaderboards and topic questions exist",
-      "remaining": "Per-widget cross-browser results and moderation UI acceptance"
+      "evidence": "Presenter-only Results, chart selection, paginated leaderboards and topic questions exist; word-cloud result projection filters malformed historical labels (2026-10-24); disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24)",
+      "remaining": "Per-widget cross-browser results and moderation UI acceptance; await CI result for new live HTTP smoke"
     },
     {
       "id": "B4",
       "area": "B-sessions",
       "weight": 5,
       "status": "partial",
-      "evidence": "Anonymous participation, polling and QR routes implemented",
-      "remaining": "Authenticated/anonymous participants load and privacy E2E"
+      "evidence": "Anonymous participation, polling and QR routes implemented; disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24)",
+      "remaining": "Authenticated/anonymous participants load and privacy E2E; await CI result for new live HTTP smoke"
     },
     {
       "id": "C1",
@@ -78,9 +78,9 @@
       "id": "C2",
       "area": "C-admin",
       "weight": 5,
-      "status": "open",
-      "evidence": "SMTP configuration and test email available",
-      "remaining": "Optional email second factor enrolment, verification and recovery not implemented"
+      "status": "partial",
+      "evidence": "Email OTP login independent of TOTP; new password-authenticated enrollment emails a ten-minute OTP, verifies it under PostgreSQL row lock (five attempts, three issuance requests/minute/account), enables only after verification and revokes prior sessions. UI and backend compile, Node contract tests pass (2026-10-24).",
+      "remaining": "Real SMTP delivery/expiry/concurrency, recovery UX, browser flow and PostgreSQL/multi-replica acceptance still required."
     },
     {
       "id": "C3",
@@ -95,24 +95,24 @@
       "area": "C-admin",
       "weight": 5,
       "status": "partial",
-      "evidence": "Administrative directory, profile and preferences implemented",
-      "remaining": "Complete UI toggle consistency and browser accessibility validation"
+      "evidence": "Administrative directory, profile/preferences, transactional platform settings, and locked private-photo replacement/deletion implemented; build and local unit tests pass (2026-10-24).",
+      "remaining": "Test photo uploads on actual RWX Kubernetes volume and ClamAV, atomic settings runtime/replicas, complete UI/browser accessibility."
     },
     {
       "id": "D1",
       "area": "D-validation",
       "weight": 6,
       "status": "accepted",
-      "evidence": "Current cycle: backend tsc and frontend TypeScript/Vite production builds PASS; 97 Node and 95 Python tests PASS (2026-10-23)",
-      "remaining": "Re-run targeted build/tests after affected changes"
+      "evidence": "Baseline CI green confirmed by maintainer (2026-10-24); new cycle local backend TypeScript and frontend TypeScript/Vite builds PASS with archived Node 22 dependencies. 126 Node and 224 Python tests PASS; new PostgreSQL HTTP CI test authored, NOT yet run.; latest cycle backend/frontend full builds PASS, 143 Node and 235 Python local tests PASS (2026-10-24)",
+      "remaining": "Run GitHub CI on this new package and review the new integration gate; retain existing security scans."
     },
     {
       "id": "D2",
       "area": "D-validation",
       "weight": 6,
       "status": "open",
-      "evidence": "SQL schema, migrations and database bootstrap exist",
-      "remaining": "Live PostgreSQL 18 migrations, restore, transactions and race E2E"
+      "evidence": "Schema and additive migrations present; a new real PostgreSQL API smoke script covers portable roundtrips, identity-safe media cloning and admin photo/settings. It has NOT been executed against PostgreSQL.",
+      "remaining": "Run new CI PostgreSQL smoke and external PostgreSQL 18 migration, backup/restore, transactional and concurrent request acceptance."
     },
     {
       "id": "D3",
@@ -127,16 +127,16 @@
       "area": "D-validation",
       "weight": 5,
       "status": "open",
-      "evidence": "Isolated document converter, upload validation, CSRF and security tests exist",
-      "remaining": "Real PDF/PPTX conversion, malware pipeline, pentest, load and WebSocket acceptance"
+      "evidence": "Isolated document converter, upload validation, CSRF and security tests exist; offline 500-user shard reconciler and eight unit tests added (unexecuted against real staging). Follow-up: aggregate pre-inflate ZIP quotas and strict UTF-8 manifest checks tested locally; does not constitute runtime security acceptance.",
+      "remaining": "Real PDF/PPTX conversion, malware pipeline, pentest, load and WebSocket acceptance; aggregate an actual same-session shard run and verify independent server telemetry."
     },
     {
       "id": "D5",
       "area": "D-validation",
       "weight": 5,
       "status": "partial",
-      "evidence": "English/Italian documentation and four earlier PDF manuals in package",
-      "remaining": "PDF manuals outdated versus recent UI and admin changes; refresh and verify"
+      "evidence": "Six IT/EN role manuals regenerated from source (2026-10-24), with verified matching front cover and updated MFA/portable/admin chapters; Markdown technical references updated.",
+      "remaining": "Full editorial review, live-browser screenshot accuracy and real-operator acceptance of IT/EN instructions."
     },
     {
       "id": "D6",

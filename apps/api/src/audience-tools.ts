@@ -13,4 +13,4 @@ export function validateQuestion(value: unknown): string | null {
 }
 export type ModerationStatus='pending'|'approved'|'rejected';
 export function moderationStatus(v:unknown):v is ModerationStatus{return v==='pending'||v==='approved'||v==='rejected'}
-export function safeFrequency(entries:{word:string;count:number}[]):{word:string;count:number}[]{return entries.filter(x=>typeof x.word==='string'&&Number.isSafeInteger(x.count)&&x.count>=0).sort((a,b)=>b.count-a.count||a.word.localeCompare(b.word)).slice(0,100)}
+export function safeFrequency(entries:{word:string;count:number}[]):{word:string;count:number}[]{return entries.filter(x=>typeof x.word==='string'&&x.word.length>0&&x.word.length<=48&&Number.isSafeInteger(x.count)&&x.count>=0).sort((a,b)=>b.count-a.count||a.word.localeCompare(b.word)).slice(0,100)}

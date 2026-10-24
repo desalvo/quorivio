@@ -12,3 +12,7 @@ Il job `image-build` costruisce anche l'immagine del convertitore isolato. Il co
 4. Non promuovere in produzione finché non sono verificati separatamente provider SSO, invio SMTPS, ClamAV reale, migrazioni dati esistenti e deployment con più repliche.
 
 **Limitazione:** non è stato possibile eseguire questa pipeline nel sandbox locale, dove non sono disponibili né il Docker engine né le dipendenze npm necessarie alla compilazione. Una CI verde non prova il corretto funzionamento del cluster di produzione.
+
+## Nuovi controlli CI (24/10/2026)
+
+Il job include ora `python3 tools/ci_portable_http.py` dopo l'avvio di PostgreSQL e prima dello spegnimento dell'API. Con credenziali effimere controlla accesso, cambio password, rifiuto atomico di impostazioni non valide, ciclo foto profilo private, upload di immagini, importazioni `.quorivio` ripetute, duplicazione con media e rifiuto di ZIP manomessi. Lo script necessita di un'applicazione reale su PostgreSQL 18 e **non è stato eseguito nell'ambiente locale**; la CI verde confermata riguarda la baseline precedente. Le verifiche locali di codice/build sono state effettuate con le dipendenze npm archiviate dall'utente, mentre Docker, Trivy, migrazioni reali e SMTP richiedono ambienti esterni.

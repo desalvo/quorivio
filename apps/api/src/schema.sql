@@ -261,5 +261,15 @@ DELETE FROM email_mfa_challenges a USING email_mfa_challenges b
  WHERE a.user_id=b.user_id AND (a.created_at,a.id)<(b.created_at,b.id);
 CREATE UNIQUE INDEX IF NOT EXISTS uq_email_mfa_challenges_user ON email_mfa_challenges(user_id);
 
+-- Prove ownership of the account email before enabling email MFA.
+-- Independent of TOTP and of login challenges; one outstanding enrollment per user.
+CREATE TABLE IF NOT EXISTS email_mfa_enrollments(
+ id uuid PRIMARY KEY,user_id uuid NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
+ digest char(64) NOT NULL,expires_at timestamptz NOT NULL,
+ attempts integer NOT NULL DEFAULT 0 CHECK(attempts BETWEEN 0 AND 5),
+ created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_email_mfa_enrollments_expiry ON email_mfa_enrollments(expires_at);
+
 CREATE TABLE IF NOT EXISTS live_connections(id uuid PRIMARY KEY,session_id uuid NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,participant_id uuid REFERENCES participants(id) ON DELETE CASCADE,last_seen timestamptz NOT NULL DEFAULT now());
 CREATE INDEX IF NOT EXISTS live_connections_recent_idx ON live_connections(session_id,last_seen);

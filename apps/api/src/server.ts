@@ -1,6 +1,9 @@
+import {timedDeadline} from './timed-deadline.js';
 import {allowedWriteOrigin,allowedLiveOrigin} from './origin-policy.js';
-import {encodeBundle,decodeBundle,referencedAssets,BUNDLE_MIME,MAX_BUNDLE_BYTES,type BundleAsset,type BundleManifest} from './portable-bundle.js';
+import {encodeBundle,decodeBundle,referencedAssets,remapPortableAssets,BUNDLE_MIME,MAX_BUNDLE_BYTES,type BundleAsset,type BundleManifest} from './portable-bundle.js';
 import {parseLeaderboardPage} from './pagination-policy.js';
+import {validateSettingsPatch} from './platform-settings.js';
+import {profilePhotoId} from './profile-photo.js';
 import {authCookieIssuedAt,presenterAuthActive} from './live-auth.js';
 import {SESSION_CHANNEL,startSessionBus} from './session-bus.js';
 import {socialProviders,socialState,socialAuthorizationUrl,exchangeSocialCode,socialSubject} from './social-oauth.js';
@@ -14,7 +17,7 @@ import {sealSmtpConfig,openSmtpConfig,validateSmtpInput,publicSmtpConfig} from '
 import {widgetAnswerShapeChanged,aggregateWidgetAnswerRevisions,liveTimedWidgetMutation} from './widget-revisions.js';
 import {normalizeWord,validateQuestion,moderationStatus,safeFrequency} from './audience-tools.js';
 import {validPageOrder} from './page-sequence.js';
-import express from 'express';import helmet from 'helmet';import pg from 'pg';import bcrypt from 'bcryptjs';import QRCode from 'qrcode';import {WebSocketServer,WebSocket} from 'ws';import {createServer} from 'node:http';import {randomUUID,randomBytes,createHash,createHmac,timingSafeEqual} from 'node:crypto';import {readFileSync,existsSync} from 'node:fs';import {mkdir,writeFile,readFile,unlink,rm} from 'node:fs/promises';import {validAsset} from './asset-policy.js';import {receiveAssetStream} from './stream-upload.js';import {scanUploadedFile} from './malware-scan.js';import {readdir,stat} from 'node:fs/promises';import path from 'node:path';import {fileURLToPath} from 'node:url';import {validTransition,validateOptions,checkAnswer,publicActivity,escapeCsvCell,validRetentionDays,validPageDesign,validPseudonym,validAnswerMode,validateSubmittedAnswer,validReaction,type Activity,type SessionStatus} from './domain.js';
+import express from 'express';import helmet from 'helmet';import pg from 'pg';import bcrypt from 'bcryptjs';import QRCode from 'qrcode';import {WebSocketServer,WebSocket} from 'ws';import {liveSessionActive,livePresenterAuthorized,liveParticipantAuthorized} from './live-socket-policy.js';import {createLiveSnapshotQueue} from './live-snapshot-queue.js';import {shouldDropSlowSocket} from './live-delivery-policy.js';import {createServer} from 'node:http';import {randomUUID,randomBytes,createHash,createHmac,timingSafeEqual} from 'node:crypto';import {readFileSync,existsSync} from 'node:fs';import {mkdir,writeFile,readFile,unlink,rm} from 'node:fs/promises';import {validAsset} from './asset-policy.js';import {receiveAssetStream} from './stream-upload.js';import {scanUploadedFile} from './malware-scan.js';import {readdir,stat} from 'node:fs/promises';import path from 'node:path';import {fileURLToPath} from 'node:url';import {validTransition,validateOptions,checkAnswer,publicActivity,escapeCsvCell,validRetentionDays,validPageDesign,validPseudonym,validAnswerMode,validateSubmittedAnswer,validReaction,type Activity,type SessionStatus} from './domain.js';
 const db=new pg.Pool({connectionString:process.env.DATABASE_URL});const secret=process.env.AUTH_SECRET||'';if(secret.length<32)throw new Error('AUTH_SECRET must have >= 32 characters');
 const base=process.env.PUBLIC_BASE_URL||'http://localhost:8080';let publicBase=base;const app=express();app.disable('x-powered-by');app.use(helmet({contentSecurityPolicy:false}));app.use(express.json({limit:'32kb'}));const server=createServer(app);const wss=new WebSocketServer({noServer:true});
 const hash=(v:string)=>createHash('sha256').update(v).digest('hex');const sign=(s:string)=>createHmac('sha256',secret).update(s).digest('base64url');const cookies=(s:string='')=>Object.fromEntries(s.split(';').map(x=>x.trim().split('=')).filter(x=>x.length===2));
@@ -47,7 +50,8 @@ const sockets=new Map<string,Set<WebSocket>>();
 const liveSocketIds=new WeakMap<WebSocket,string>();
 async function connectedParticipants(sid:string){const r=await db.query("SELECT count(DISTINCT participant_id)::int AS n FROM live_connections WHERE session_id=$1 AND participant_id IS NOT NULL AND last_seen>now()-interval '50 seconds'",[sid]);return r.rows[0]?.n||0;}
 
-async function broadcastLocal(sid:string){if(!sockets.get(sid)?.size)return;const data=await snapshot(sid);for(const ws of sockets.get(sid)||[])if(ws.readyState===WebSocket.OPEN)ws.send(JSON.stringify({type:'snapshot',data:(ws as any).view==='owner'?data:participantSnapshot(data)}))}
+const liveSnapshots=createLiveSnapshotQueue(async(sid:string)=>{if(!sockets.get(sid)?.size)return;const data=await snapshot(sid);for(const ws of sockets.get(sid)||[])if(ws.readyState===WebSocket.OPEN){const payload=JSON.stringify({type:'snapshot',data:(ws as any).view==='owner'?data:participantSnapshot(data)});if(shouldDropSlowSocket(ws.bufferedAmount,Buffer.byteLength(payload))){ws.close(1013,'slow_consumer');continue}ws.send(payload)}},(error,sid)=>console.error('live snapshot failed',sid,error instanceof Error?error.message:'unknown'));
+async function broadcastLocal(sid:string){await liveSnapshots.enqueue(sid)}
 async function broadcast(sid:string){await broadcastLocal(sid);await db.query('SELECT pg_notify($1,$2)',[SESSION_CHANNEL,sid]);}
 
 
@@ -271,15 +275,64 @@ app.post('/api/auth/email-mfa/verify',async(req,res)=>{try{
  res.json({email:user.email,role:user.role,must_change_password:user.must_change_password});
  }catch(e){sendError(res,e)}});
 app.post('/api/auth/email-mfa/settings',requireAuth,async(req,res)=>{try{
- const uid=auth(req)!,enabled=req.body?.enabled,password=req.body?.password,totp=req.body?.totp_code;
+ const uid=auth(req)!,enabled=req.body?.enabled,password=req.body?.password;
  if(typeof enabled!=='boolean'||typeof password!=='string'){res.status(400).json({error:'invalid_request'});return}
- const r=await db.query('SELECT password_hash,totp_enabled,totp_secret FROM users WHERE id=$1',[uid]);
+ const r=await db.query('SELECT email,password_hash,email_mfa_enabled FROM users WHERE id=$1',[uid]);
  if(!r.rowCount||!await bcrypt.compare(password,r.rows[0].password_hash)){res.status(403).json({error:'invalid_credentials'});return}
- // Email enrollment is independent of TOTP enrollment.
- if(enabled&&!await activeSmtpConfig()){res.status(409).json({error:'smtp_required_before_email_mfa'});return}
- await db.query('UPDATE users SET email_mfa_enabled=$2,auth_revoked_at=now() WHERE id=$1',[uid,enabled]);
- await db.query('DELETE FROM email_mfa_challenges WHERE user_id=$1',[uid]);res.clearCookie('q_auth',{path:'/'});res.json({enabled,reauthentication_required:true});
- }catch(e){sendError(res,e)}});
+ if(r.rows[0].email_mfa_enabled===enabled){res.status(409).json({error:'email_mfa_already_in_requested_state'});return}
+ if(enabled){
+  const smtp=await activeSmtpConfig();
+  if(!smtp){res.status(409).json({error:'smtp_required_before_email_mfa'});return}
+  const id=randomUUID(),code=createEmailOtp(),digest=emailOtpDigest(code,uid,id,secret);
+  const client=await db.connect();
+  try{
+   await client.query('BEGIN');
+   // Per-user email issuance limit shared by all replicas (three attempts per minute).
+   const bucket=Math.floor(Date.now()/60000);
+   const limit=await client.query(`INSERT INTO api_rate_windows(client_hash,bucket,hits) VALUES($1,$2,1) ON CONFLICT(client_hash,bucket) DO UPDATE SET hits=api_rate_windows.hits+1 RETURNING hits`,[hash('email-mfa-enroll:'+uid),bucket]);
+   if(Number(limit.rows[0].hits)>3){await client.query('COMMIT');res.status(429).json({error:'email_mfa_rate_limited'});return}
+   await client.query(`INSERT INTO email_mfa_enrollments(id,user_id,digest,expires_at,attempts) VALUES($1,$2,$3,now()+interval '10 minutes',0) ON CONFLICT(user_id) DO UPDATE SET id=$1,digest=$3,expires_at=now()+interval '10 minutes',attempts=0,created_at=now()`,[id,uid,digest]);
+   await client.query('COMMIT');
+  }catch(e){await client.query('ROLLBACK').catch(()=>{});throw e}finally{client.release()}
+  try{await sendEmailOtp(smtp,r.rows[0].email,code)}catch{
+   await db.query('DELETE FROM email_mfa_enrollments WHERE id=$1 AND user_id=$2',[id,uid]);
+   res.status(502).json({error:'email_mfa_delivery_failed'});return;
+  }
+  res.setHeader('Cache-Control','private, no-store');res.json({pending_confirmation:true,challenge_id:id});return;
+ }
+ const cx=await db.connect();
+ try{
+  await cx.query('BEGIN');
+  await cx.query('DELETE FROM email_mfa_enrollments WHERE user_id=$1',[uid]);
+  await cx.query('DELETE FROM email_mfa_challenges WHERE user_id=$1',[uid]);
+  await cx.query('UPDATE users SET email_mfa_enabled=false,auth_revoked_at=now() WHERE id=$1',[uid]);
+  await cx.query('COMMIT');
+ }catch(e){await cx.query('ROLLBACK').catch(()=>{});throw e}finally{cx.release()}
+ res.clearCookie('q_auth',{path:'/'});res.json({enabled:false,reauthentication_required:true});
+ }catch(e){sendError(res,e)}
+});
+app.post('/api/auth/email-mfa/enrollment/confirm',requireAuth,async(req,res)=>{try{
+ const uid=auth(req)!,id=req.body?.challenge_id,code=req.body?.code;
+ if(typeof id!=='string'||!/^[0-9a-f-]{36}$/i.test(id)||!validEmailOtp(code)){res.status(400).json({error:'invalid_email_enrollment'});return}
+ const client=await db.connect();
+ try{
+  await client.query('BEGIN');
+  const r=await client.query('SELECT digest,expires_at,attempts FROM email_mfa_enrollments WHERE id=$1 AND user_id=$2 FOR UPDATE',[id,uid]);
+  if(!r.rowCount||r.rows[0].attempts>=5||new Date(r.rows[0].expires_at).getTime()<=Date.now()){
+   await client.query('ROLLBACK');res.status(401).json({error:'email_enrollment_invalid_or_expired'});return;
+  }
+  if(!matchesEmailOtp(code,r.rows[0].digest,uid,id,secret)){
+   await client.query('UPDATE email_mfa_enrollments SET attempts=attempts+1 WHERE id=$1',[id]);
+   await client.query('COMMIT');res.status(401).json({error:'email_enrollment_invalid_or_expired'});return;
+  }
+  await client.query('UPDATE users SET email_mfa_enabled=true,auth_revoked_at=now() WHERE id=$1',[uid]);
+  await client.query('DELETE FROM email_mfa_enrollments WHERE user_id=$1',[uid]);
+  await client.query('DELETE FROM email_mfa_challenges WHERE user_id=$1',[uid]);
+  await client.query('COMMIT');
+ }catch(e){await client.query('ROLLBACK').catch(()=>{});throw e}finally{client.release()}
+ res.clearCookie('q_auth',{path:'/'});res.setHeader('Cache-Control','private, no-store');res.json({enabled:true,reauthentication_required:true});
+ }catch(e){sendError(res,e)}
+});
 app.get('/api/auth/me',requireAuth,async(req,res)=>{try{const r=await db.query('SELECT id,email,nickname,is_primary_admin,role,approved,must_change_password,totp_enabled,email_mfa_enabled FROM users WHERE id=$1',[auth(req)]);res.json(r.rows[0]||null)}catch(e){sendError(res,e)}});
 async function requireAdmin(req:express.Request,res:express.Response,next:express.NextFunction){const u=await db.query('SELECT role,approved,must_change_password FROM users WHERE id=$1',[auth(req)]);if(!u.rowCount||!u.rows[0].approved||u.rows[0].must_change_password||u.rows[0].role!=='platform_admin'){res.status(403).json({error:'admin_required'});return}next()}
 async function requirePresenter(req:express.Request,res:express.Response,next:express.NextFunction){const u=await db.query('SELECT role,approved,must_change_password FROM users WHERE id=$1',[auth(req)]);if(!u.rowCount||!u.rows[0].approved||u.rows[0].must_change_password||!['presenter','platform_admin','org_admin'].includes(u.rows[0].role)){res.status(403).json({error:'approved_presenter_required'});return}next()}
@@ -376,25 +429,60 @@ app.get('/api/admin/users',requireAuth,requireAdmin,async(req,res)=>{try{
 app.patch('/api/admin/users/:id',requireAuth,requireAdmin,async(req,res)=>{try{const role=req.body?.role,approved=req.body?.approved;const primary=await db.query('SELECT is_primary_admin FROM users WHERE id=$1',[req.params.id]);if(primary.rows[0]?.is_primary_admin&&(!approved||role!=='platform_admin')){res.status(409).json({error:'primary_admin_immutable'});return}if(!['platform_admin','org_admin','presenter','moderator','user'].includes(role)||typeof approved!=='boolean'){res.status(400).json({error:'invalid_update'});return}if(req.params.id===auth(req)&&(!approved||role!=='platform_admin')){res.status(409).json({error:'cannot_demote_self'});return}const r=await db.query('UPDATE users SET role=$2,approved=$3 WHERE id=$1 RETURNING id,email,role,approved',[req.params.id,role,approved]);if(r.rowCount)for(const peers of sockets.values())for(const ws of peers)if((ws as any).uid===req.params.id)ws.close(1008,'account permissions changed');if(!r.rowCount){res.status(404).end();return}res.json(r.rows[0])}catch(e){sendError(res,e)}});
 app.delete('/api/admin/users/:id',requireAuth,requireAdmin,async(req,res)=>{try{if(req.params.id===auth(req)){res.status(409).json({error:'cannot_delete_self'});return}if((await db.query('SELECT is_primary_admin FROM users WHERE id=$1',[req.params.id])).rows[0]?.is_primary_admin){res.status(409).json({error:'primary_admin_immutable'});return}const r=await db.query('DELETE FROM users WHERE id=$1 RETURNING id',[req.params.id]);if(!r.rowCount){res.status(409).json({error:'user_has_dependent_data_or_not_found'});return}res.status(204).end()}catch(e){if((e as any)?.code==='23503'){res.status(409).json({error:'user_has_dependent_data'});return}sendError(res,e)}});
 app.get('/api/admin/settings',requireAuth,requireAdmin,async(_req,res)=>{try{const r=await db.query('SELECT key,value FROM platform_settings');res.json(Object.fromEntries(r.rows.map(x=>[x.key,x.value])))}catch(e){sendError(res,e)}});
-app.patch('/api/admin/settings',requireAuth,requireAdmin,async(req,res)=>{try{const {public_base_url,closed_session_retention_days,max_upload_mb}=req.body||{};if(public_base_url!==undefined){if(typeof public_base_url!=='string'||!/^https:\/\/[^\s/?#]+(?::[0-9]{2,5})?$/.test(public_base_url)){res.status(400).json({error:'invalid_public_url'});return}await db.query("INSERT INTO platform_settings(key,value) VALUES('public_base_url',$1) ON CONFLICT(key) DO UPDATE SET value=$1,updated_at=now()",[public_base_url]);publicBase=public_base_url}if(closed_session_retention_days!==undefined){if(!validRetentionDays(closed_session_retention_days)){res.status(400).json({error:'invalid_retention'});return}await db.query("INSERT INTO platform_settings(key,value) VALUES('closed_session_retention_days',$1) ON CONFLICT(key) DO UPDATE SET value=$1,updated_at=now()",[String(closed_session_retention_days)])}if(max_upload_mb!==undefined){if(!Number.isInteger(max_upload_mb)||max_upload_mb<1||max_upload_mb>1024){res.status(400).json({error:'invalid_upload_limit'});return}await db.query("INSERT INTO platform_settings(key,value) VALUES('max_upload_mb',$1) ON CONFLICT(key) DO UPDATE SET value=$1,updated_at=now()",[String(max_upload_mb)])}res.json({ok:true,ingress_regeneration_required:max_upload_mb!==undefined})}catch(e){sendError(res,e)}});
+app.patch('/api/admin/settings',requireAuth,requireAdmin,async(req,res)=>{
+ const patch=validateSettingsPatch(req.body);
+ if(!patch.ok){res.status(400).json({error:patch.error});return}
+ if(!patch.changes.length){res.json({ok:true,ingress_regeneration_required:false});return}
+ const cx=await db.connect();
+ try{
+  await cx.query('BEGIN');
+  for(const [key,value] of patch.changes){
+   await cx.query('INSERT INTO platform_settings(key,value) VALUES($1,$2) ON CONFLICT(key) DO UPDATE SET value=$2,updated_at=now()',[key,value]);
+  }
+  await cx.query('COMMIT');
+  const publicSetting=patch.changes.find(([key])=>key==='public_base_url');
+  if(publicSetting)publicBase=publicSetting[1];
+  res.json({ok:true,ingress_regeneration_required:patch.changes.some(([key])=>key==='max_upload_mb')});
+ }catch(e){await cx.query('ROLLBACK').catch(()=>{});sendError(res,e)}
+ finally{cx.release()}
+});
 app.use('/api/sessions',requireAuth,requirePresenter);
 // Profile images are private uploads, never arbitrary externally hosted URLs.
 const profilePhotoFolder=()=>path.join(assetRoot,'profile-photos');
 const profilePhotoPath=(id:string)=>path.join(profilePhotoFolder(),id);
-app.post('/api/auth/profile/photo',requireAuth,async(req,res)=>{try{
+// Serialize concurrent profile-photo replacements and deletes using a row-level lock.
+async function replaceProfilePhoto(uid:string,url:string|null):Promise<string|null>{
+ const cx=await db.connect();
+ try{
+  await cx.query('BEGIN');
+  const existing=await cx.query('SELECT profile_photo_url FROM users WHERE id=$1 FOR UPDATE',[uid]);
+  if(!existing.rowCount)throw Error('profile_not_found');
+  await cx.query('UPDATE users SET profile_photo_url=$2 WHERE id=$1',[uid,url]);
+  await cx.query('COMMIT');return existing.rows[0].profile_photo_url||null;
+ }catch(e){await cx.query('ROLLBACK').catch(()=>{});throw e}
+ finally{cx.release()}
+}
+async function cleanOldProfilePhoto(url:unknown){
+ const old=profilePhotoId(url);
+ if(old)await unlink(profilePhotoPath(old)).catch(e=>{if((e as NodeJS.ErrnoException).code!=='ENOENT')console.error('profile photo cleanup pending',old)});
+}
+app.post('/api/auth/profile/photo',requireAuth,async(req,res)=>{
  const uid=auth(req)!;const type=String(req.headers['content-type']||'').split(';')[0].trim().toLowerCase();
  const size=Number(req.headers['content-length']);const limit=5*1024*1024;
  if(!['image/png','image/jpeg','image/webp'].includes(type)){res.status(415).json({error:'unsupported_profile_image'});return}
  if(!Number.isSafeInteger(size)||size<1||size>limit){res.status(413).json({error:'profile_image_too_large'});return}
- const id=randomUUID();const received=await receiveAssetStream(req,profilePhotoFolder(),id,type,limit,size);
- try{await scanUploadedFile(received.destination)}catch(e){await unlink(received.destination).catch(()=>{});throw e}
- const url=`/api/auth/profile/photo/${id}`;
- const previous=await db.query('SELECT profile_photo_url FROM users WHERE id=$1',[uid]);
- const prior=await db.query('UPDATE users SET profile_photo_url=$2 WHERE id=$1 RETURNING profile_photo_url',[uid,url]);
- if(previous.rows[0]?.profile_photo_url){const old=String(previous.rows[0].profile_photo_url).split('/').pop()||'';if(/^[0-9a-f-]{36}$/i.test(old))await unlink(profilePhotoPath(old)).catch(()=>{})}
- if(!prior.rowCount){await unlink(received.destination).catch(()=>{});res.status(404).end();return}
- res.status(201).json({profile_photo_url:url});
- }catch(e){sendError(res,e)}});
+ const id=randomUUID();let destination:string|null=null;
+ try{
+  const received=await receiveAssetStream(req,profilePhotoFolder(),id,type,limit,size);
+  destination=received.destination;
+  await scanUploadedFile(destination);
+  const url=`/api/auth/profile/photo/${id}`;
+  const old=await replaceProfilePhoto(uid,url);
+  destination=null; // the newly committed profile now owns the file
+  await cleanOldProfilePhoto(old);
+  res.status(201).json({profile_photo_url:url});
+ }catch(e){if(destination)await unlink(destination).catch(()=>{});sendError(res,e)}
+});
 app.get('/api/auth/profile/photo/:imageId',requireAuth,async(req,res)=>{try{
  const id=String(req.params.imageId);if(!/^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(id)){res.status(404).end();return}
  const r=await db.query('SELECT profile_photo_url FROM users WHERE id=$1',[auth(req)]);
@@ -403,7 +491,9 @@ app.get('/api/auth/profile/photo/:imageId',requireAuth,async(req,res)=>{try{
  res.setHeader('Content-Type',type);res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Cache-Control','private, no-store');res.send(data);
  }catch(e){if((e as NodeJS.ErrnoException).code==='ENOENT'){res.status(404).end();return}sendError(res,e)}});
 app.delete('/api/auth/profile/photo',requireAuth,async(req,res)=>{try{
- await db.query('UPDATE users SET profile_photo_url=NULL WHERE id=$1',[auth(req)]);res.json({profile_photo_url:null});
+ const old=await replaceProfilePhoto(auth(req)!,null);
+ await cleanOldProfilePhoto(old);
+ res.json({profile_photo_url:null});
  }catch(e){sendError(res,e)}});
 app.get('/api/presenters/me/profile',requireAuth,requirePresenter,async(req,res)=>{try{const u=await db.query('SELECT id,email,display_name,profile_photo_url FROM users WHERE id=$1',[auth(req)]);res.json(u.rows[0])}catch(e){sendError(res,e)}});
 app.patch('/api/presenters/me/profile',requireAuth,requirePresenter,async(req,res)=>{try{const name=String(req.body?.display_name||'').trim();const saved=await db.query('SELECT profile_photo_url FROM users WHERE id=$1',[auth(req)]);const photo=saved.rows[0]?.profile_photo_url||null;if(name.length<2||name.length>100){res.status(400).json({error:'invalid_profile'});return}const u=await db.query('UPDATE users SET display_name=$2,profile_photo_url=$3 WHERE id=$1 RETURNING id,email,display_name,profile_photo_url',[auth(req),name,photo]);res.json(u.rows[0])}catch(e){sendError(res,e)}});
@@ -457,21 +547,38 @@ app.post('/api/sessions',requireAuth,requirePresenter,async(req,res)=>{try{const
 // Portable definition exports intentionally omit participant data and join credentials.
 async function portableSession(id:string){const session=(await db.query('SELECT title,reference_date,theme,allow_anonymous,show_results FROM sessions WHERE id=$1',[id])).rows[0];const activities=(await db.query('SELECT type,title,options,correct_option_id,correct_option_ids,answer_mode,answer_required,duration_seconds,page_design,result_design FROM activities WHERE session_id=$1 ORDER BY position',[id])).rows;return {format:'quorivio-session',version:1,session,activities}}
 function validPortable(x:any){return x?.format==='quorivio-session'&&x.version===1&&typeof x.session?.title==='string'&&x.session.title.trim().length>0&&x.session.title.length<=160&&validDate(String(x.session.reference_date))&&validPageDesign(x.session.theme)&&typeof x.session.allow_anonymous==='boolean'&&typeof x.session.show_results==='boolean'&&Array.isArray(x.activities)&&x.activities.length<=200&&x.activities.every((a:any)=>['slide','poll','quiz','timed_quiz'].includes(a.type)&&typeof a.title==='string'&&a.title.trim().length>0&&a.title.length<=240&&(a.type==='slide'?Array.isArray(a.options)&&a.options.length===0:validateOptions(a.options))&&validAnswerMode(a.answer_mode||'single')&&typeof (a.answer_required??true)==='boolean'&& (a.correct_option_ids===undefined||Array.isArray(a.correct_option_ids)&&a.correct_option_ids.every((v:any)=>typeof v==='string'&&a.options.some((o:any)=>o.id===v)))&&validPageDesign(a.page_design)&&validPageDesign(a.result_design)&&(!['quiz','timed_quiz'].includes(a.type)||!['single','multiple'].includes(a.answer_mode||'single')||(a.answer_mode==='multiple'?Array.isArray(a.correct_option_ids)&&a.correct_option_ids.length>0:a.options.some((o:any)=>o.id===a.correct_option_id)))&&(a.type!=='timed_quiz'||['single','multiple'].includes(a.answer_mode||'single')&&Number.isInteger(a.duration_seconds)&&a.duration_seconds>=5&&a.duration_seconds<=600)&&(a.duration_seconds==null||Number.isInteger(a.duration_seconds)&&a.duration_seconds>=5&&a.duration_seconds<=600));}
-async function createFromPortable(data:any,uid:string,importMediaDir?:string,bundleMode=false){const cx=await db.connect();const sid=randomUUID();try{await cx.query('BEGIN');const u=(await cx.query('SELECT organization_id FROM users WHERE id=$1',[uid])).rows[0];if(!u)throw Error('missing_user');await cx.query("INSERT INTO sessions(id,organization_id,owner_id,title,reference_date,join_code,join_secret,expires_at,theme,allow_anonymous,show_results) VALUES($1,$2,$3,$4,$5,$6,$7,now()+interval '1 day',$8,$9,$10)",[sid,u.organization_id,uid,data.session.title,data.session.reference_date,randomBytes(5).toString('hex').toUpperCase(),randomBytes(20).toString('base64url'),JSON.stringify(data.session.theme),data.session.allow_anonymous,data.session.show_results]);for(let i=0;i<data.activities.length;i++){const a=data.activities[i];await cx.query('INSERT INTO activities(id,session_id,type,title,options,correct_option_id,duration_seconds,page_design,result_design,position,answer_mode,answer_required,correct_option_ids) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)',[randomUUID(),sid,a.type,a.title,JSON.stringify(a.options),['quiz','timed_quiz'].includes(a.type)?a.correct_option_id:null,a.duration_seconds,JSON.stringify(a.page_design),JSON.stringify(a.result_design),i,a.answer_mode||'single',a.answer_required??true,JSON.stringify(a.correct_option_ids||[])])}if(importMediaDir){
- const assets=data.import_assets;
- if(!Array.isArray(assets)||assets.reduce((sum:number,a:any)=>sum+(Number.isFinite(a?.bytes)?a.bytes:0),0)>(bundleMode?80:50)*1024*1024||assets.length>(bundleMode?300:200)||new Set(assets.map((a:any)=>a.id)).size!==assets.length)throw Error('invalid_import_assets');
- const referenced=bundleMode?referencedAssets(data):new Set(data.activities.flatMap((a:any)=>(a.page_design?.widgets||[]).filter((w:any)=>w.kind==='image').map((w:any)=>w.assetId)));
- if(referenced.size!==assets.length||!assets.every((a:any)=>referenced.has(a.id)))throw Error('unmatched_import_assets');
- const folder=path.join(assetRoot,sid);await mkdir(folder,{recursive:true,mode:0o700});
- for(const asset of assets){
-  if(!/^[0-9a-f-]{36}$/.test(asset.id)||!(bundleMode?['image/png','image/jpeg','image/gif','image/webp','application/pdf','video/mp4','video/webm']:['image/png','image/jpeg']).includes(asset.mime)||!Number.isInteger(asset.bytes)||asset.bytes<1||asset.bytes>(bundleMode?50:10)*1024*1024||! /^[a-f0-9]{64}$/.test(asset.sha256))throw Error('invalid_import_asset');
-  const contents=await readFile(path.join(importMediaDir,asset.id));
-  if(contents.length!==asset.bytes||createHash('sha256').update(contents).digest('hex')!==asset.sha256)throw Error('invalid_import_asset_digest');
-  await writeFile(path.join(folder,asset.id),contents,{flag:'wx',mode:0o600});
-  await cx.query('INSERT INTO session_assets(id,session_id,uploaded_by,mime_type,byte_size,sha256) VALUES($1,$2,$3,$4,$5,$6)',[asset.id,sid,uid,asset.mime,asset.bytes,asset.sha256]);
- }
+async function createFromPortable(data:any,uid:string,importMediaDir?:string,bundleMode=false){
+ const imported=importMediaDir?remapPortableAssets(data,(data.import_assets||[]).map((a:any)=>a?.id)):null;
+ const definition=imported?.definition||data;
+ const cx=await db.connect();const sid=randomUUID();
+ try{
+  await cx.query('BEGIN');
+  const u=(await cx.query('SELECT organization_id FROM users WHERE id=$1',[uid])).rows[0];
+  if(!u)throw Error('missing_user');
+  await cx.query("INSERT INTO sessions(id,organization_id,owner_id,title,reference_date,join_code,join_secret,expires_at,theme,allow_anonymous,show_results) VALUES($1,$2,$3,$4,$5,$6,$7,now()+interval '1 day',$8,$9,$10)",[sid,u.organization_id,uid,definition.session.title,definition.session.reference_date,randomBytes(5).toString('hex').toUpperCase(),randomBytes(20).toString('base64url'),JSON.stringify(definition.session.theme),definition.session.allow_anonymous,definition.session.show_results]);
+  for(let i=0;i<definition.activities.length;i++){
+   const a=definition.activities[i];
+   await cx.query('INSERT INTO activities(id,session_id,type,title,options,correct_option_id,duration_seconds,page_design,result_design,position,answer_mode,answer_required,correct_option_ids) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)',[randomUUID(),sid,a.type,a.title,JSON.stringify(a.options),['quiz','timed_quiz'].includes(a.type)?a.correct_option_id:null,a.duration_seconds,JSON.stringify(a.page_design),JSON.stringify(a.result_design),i,a.answer_mode||'single',a.answer_required??true,JSON.stringify(a.correct_option_ids||[])]);
+  }
+  if(importMediaDir){
+   const assets=data.import_assets;
+   if(!Array.isArray(assets)||assets.reduce((sum:number,a:any)=>sum+(Number.isFinite(a?.bytes)?a.bytes:0),0)>(bundleMode?80:50)*1024*1024||assets.length>(bundleMode?300:200)||new Set(assets.map((a:any)=>a.id)).size!==assets.length)throw Error('invalid_import_assets');
+   const folder=path.join(assetRoot,sid);await mkdir(folder,{recursive:true,mode:0o700});
+   for(const asset of assets){
+    if(!/^[0-9a-f-]{36}$/i.test(asset.id)||!(bundleMode?['image/png','image/jpeg','image/gif','image/webp','application/pdf','video/mp4','video/webm']:['image/png','image/jpeg']).includes(asset.mime)||!Number.isInteger(asset.bytes)||asset.bytes<1||asset.bytes>(bundleMode?50:10)*1024*1024||! /^[a-f0-9]{64}$/.test(asset.sha256))throw Error('invalid_import_asset');
+    const source=path.join(importMediaDir,asset.id);
+    const contents=await readFile(source);
+    if(contents.length!==asset.bytes||createHash('sha256').update(contents).digest('hex')!==asset.sha256||!validAsset(contents,asset.mime,(bundleMode?50:10)*1024*1024))throw Error('invalid_import_asset_digest');
+    await scanUploadedFile(source); // honor the same ClamAV fail-closed policy as direct uploads
+    const freshId=imported!.ids.get(asset.id)!;
+    await writeFile(path.join(folder,freshId),contents,{flag:'wx',mode:0o600});
+    await cx.query('INSERT INTO session_assets(id,session_id,uploaded_by,mime_type,byte_size,sha256) VALUES($1,$2,$3,$4,$5,$6)',[freshId,sid,uid,asset.mime,asset.bytes,asset.sha256]);
+   }
+  }
+  await cx.query('COMMIT');return sid;
+ }catch(e){await cx.query('ROLLBACK');if(importMediaDir)await rm(path.join(assetRoot,sid),{recursive:true,force:true}).catch(()=>{});throw e}
+ finally{cx.release()}
 }
-await cx.query('COMMIT');return sid}catch(e){await cx.query('ROLLBACK');if(importMediaDir)await rm(path.join(assetRoot,sid),{recursive:true,force:true}).catch(()=>{});throw e}finally{cx.release()}}
 // Asset endpoints accept raw bytes with a strictly bounded Content-Length and file signatures.
 // Storage is intentionally private and local; configure a shared persistent volume before production.
 const assetRoot=path.resolve(process.env.QUORIVIO_ASSET_DIR||'/app/assets');
@@ -580,7 +687,19 @@ app.post('/api/sessions/import.quorivio',requireAuth,requirePresenter,async(req,
  }catch(e){if(e instanceof Error&&(/bundle|invalid_import_asset|unmatched_import_assets/.test(e.message))){res.status(400).json({error:'invalid_quorivio_bundle'});return}sendError(res,e)}finally{await rm(scratch,{recursive:true,force:true}).catch(()=>{})}
 });
 
-app.post('/api/sessions/:id/duplicate',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}const portable=await portableSession(s.id);portable.session.title=(portable.session.title+' — Copia').slice(0,160);const id=await createFromPortable(portable,auth(req)!);res.status(201).json({id})}catch(e){sendError(res,e)}});
+app.post('/api/sessions/:id/duplicate',requireAuth,async(req,res)=>{try{
+ const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}
+ const portable=await portableSession(s.id);portable.session.title=(portable.session.title+' — Copia').slice(0,160);
+ const refs=[...referencedAssets(portable)];
+ const rows=refs.length?(await db.query('SELECT id,mime_type AS mime,byte_size AS bytes,sha256 FROM session_assets WHERE session_id=$1 AND participant_id IS NULL AND id=ANY($2::uuid[])',[s.id,refs])).rows:[];
+ if(rows.length!==refs.length){res.status(409).json({error:'missing_session_assets'});return}
+ // Internal cloning also copies the referenced media. Global UUIDs must never be reused.
+ // PostgreSQL BIGINT values are returned as strings by node-postgres. Bundle manifests
+ // require safe numeric byte counts; normalize before validating and cloning.
+ const assets=rows.map((row:any)=>({...row,bytes:Number(row.bytes)}));
+ const id=await createFromPortable({...portable,import_assets:assets},auth(req)!,refs.length?path.join(assetRoot,s.id):undefined,true);
+ res.status(201).json({id});
+ }catch(e){sendError(res,e)}});
 app.get('/api/sessions/:id/presenters',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}const r=await db.query('SELECT u.id,u.email FROM users u JOIN session_presenters sp ON u.id=sp.user_id WHERE sp.session_id=$1',[s.id]);res.json(r.rows)}catch(e){sendError(res,e)}});
 app.post('/api/sessions/:id/presenters',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}if(s.owner_id!==auth(req)){res.status(403).json({error:'owner_required'});return}const email=String(req.body?.email||'').toLowerCase();const r=await db.query("SELECT id FROM users WHERE organization_id=$1 AND email=$2 AND approved=true AND must_change_password=false AND role IN ('presenter','org_admin','platform_admin')",[s.organization_id,email]);if(!r.rowCount){res.status(404).json({error:'eligible_presenter_not_found'});return}await db.query('INSERT INTO session_presenters(session_id,user_id) VALUES($1,$2) ON CONFLICT DO NOTHING',[s.id,r.rows[0].id]);res.status(201).json({ok:true})}catch(e){sendError(res,e)}});
 app.delete('/api/sessions/:id/presenters/:uid',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}if(s.owner_id!==auth(req)){res.status(403).end();return}await db.query('DELETE FROM session_presenters WHERE session_id=$1 AND user_id=$2',[s.id,req.params.uid]);res.status(204).end()}catch(e){sendError(res,e)}});
@@ -984,8 +1103,9 @@ app.post('/api/join/:code/activities/:aid/widgets/:wid/respond',async(req,res)=>
  let elapsed:number|null=null;
  if(timed){
   const clock=await cx.query('SELECT clock_timestamp() AS database_now');
-  elapsed=Math.max(0,new Date(clock.rows[0].database_now).getTime()-new Date(a.rows[0].opened_at).getTime());
-  if(elapsed>Number(widget.durationSeconds||30)*1000){await cx.query('ROLLBACK');res.status(409).json({error:'timer_elapsed'});return}
+  const timing=timedDeadline(a.rows[0].opened_at,Number(widget.durationSeconds||30),clock.rows[0].database_now);
+  elapsed=timing.elapsedMs;
+  if(!timing.valid){await cx.query('ROLLBACK');res.status(409).json({error:'timer_elapsed'});return}
  }
  const r=await cx.query('INSERT INTO widget_answers(id,session_id,activity_id,participant_id,widget_id,answer_mode,answer_payload,revision,correct,elapsed_ms) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) ON CONFLICT(activity_id,participant_id,widget_id,revision) DO NOTHING RETURNING id',[randomUUID(),who.sessionId,req.params.aid,who.participantId,req.params.wid,mode,JSON.stringify(answer),revision,timed?correct:null,elapsed]);
  await cx.query('COMMIT');if(r.rowCount)await broadcast(who.sessionId);res.json({ok:true,already_submitted:!r.rowCount,revision});
@@ -1030,21 +1150,41 @@ const raw=mode==='single'?req.body?.option_id:mode==='multiple'?req.body?.option
 const answer=validateSubmittedAnswer(mode,(act as any).answer_required!==false,raw,act.options);
 if(!answer){await cx.query('ROLLBACK');res.status(400).json({error:'invalid_answer'});return}
 if(answer.assetId){const asset=await cx.query('SELECT id FROM session_assets WHERE id=$1 AND session_id=$2 AND (participant_id IS NULL OR participant_id=$3)',[answer.assetId,sid,p.rows[0].id]);if(!asset.rowCount){await cx.query('ROLLBACK');res.status(400).json({error:'attachment_not_in_session'});return}}
-const option=answer.optionIds.join(',');if(act.duration_seconds&&Date.now()>new Date(act.opened_at).getTime()+act.duration_seconds*1000){await cx.query('ROLLBACK');res.status(409).json({error:'timer_elapsed'});return}const correct=mode==='single'?checkAnswer(act,option):mode==='multiple'&&Array.isArray((act as any).correct_option_ids)&&answer.optionIds.length>0&&answer.optionIds.length===(act as any).correct_option_ids.length&&answer.optionIds.every(x=>(act as any).correct_option_ids.includes(x));
-const elapsedMs=act.type==='timed_quiz'?Math.max(0,Date.now()-new Date(act.opened_at).getTime()):null;const r=await cx.query('INSERT INTO responses(id,activity_id,participant_id,option_id,correct,answer_payload,elapsed_ms) VALUES($1,$2,$3,$4,$5,$6,$7) ON CONFLICT(activity_id,participant_id) WHERE invalidated_at IS NULL DO NOTHING RETURNING id',[randomUUID(),act.id,p.rows[0].id,option,correct,JSON.stringify(answer),elapsedMs]);await cx.query('COMMIT');if(r.rowCount)await broadcast(sid);res.json({ok:true,already_submitted:!r.rowCount})}catch(e){await cx.query('ROLLBACK');sendError(res,e)}finally{cx.release()}});
+const option=answer.optionIds.join(',');const clock=act.duration_seconds||act.type==='timed_quiz'?await cx.query('SELECT clock_timestamp() AS database_now'):null;const timing=clock?timedDeadline(act.opened_at,Number(act.duration_seconds),clock.rows[0].database_now):null;if(timing&&!timing.valid){await cx.query('ROLLBACK');res.status(409).json({error:'timer_elapsed'});return}const correct=mode==='single'?checkAnswer(act,option):mode==='multiple'&&Array.isArray((act as any).correct_option_ids)&&answer.optionIds.length>0&&answer.optionIds.length===(act as any).correct_option_ids.length&&answer.optionIds.every(x=>(act as any).correct_option_ids.includes(x));
+const elapsedMs=act.type==='timed_quiz'?timing!.elapsedMs:null;const r=await cx.query('INSERT INTO responses(id,activity_id,participant_id,option_id,correct,answer_payload,elapsed_ms) VALUES($1,$2,$3,$4,$5,$6,$7) ON CONFLICT(activity_id,participant_id) WHERE invalidated_at IS NULL DO NOTHING RETURNING id',[randomUUID(),act.id,p.rows[0].id,option,correct,JSON.stringify(answer),elapsedMs]);await cx.query('COMMIT');if(r.rowCount)await broadcast(sid);res.json({ok:true,already_submitted:!r.rowCount})}catch(e){await cx.query('ROLLBACK');sendError(res,e)}finally{cx.release()}});
 server.on('upgrade',async(req,socket,head)=>{try{const origin=req.headers.origin;if(!allowedLiveOrigin(origin,base)){socket.destroy();return}const url=new URL(req.url||'/',base);if(url.pathname!=='/live'){socket.destroy();return}const sid=url.searchParams.get('session');if(!sid){socket.destroy();return}const s=(await db.query('SELECT * FROM sessions WHERE id=$1',[sid])).rows[0];if(!s||s.status==='closed'||new Date(s.expires_at).getTime()<=Date.now()){socket.destroy();return}const uid=auth(req as express.Request);const part=cookies(req.headers.cookie)[`q_part_${sid}`];const ownerAccount=uid&&(uid===s.owner_id||(await db.query('SELECT 1 FROM session_presenters WHERE session_id=$1 AND user_id=$2',[sid,uid])).rowCount)?(await db.query("SELECT 1 FROM users WHERE id=$1 AND approved=true AND must_change_password=false AND role IN ('presenter','platform_admin','org_admin') AND (auth_revoked_at IS NULL OR auth_revoked_at <= to_timestamp($2::double precision / 1000.0)) AND (password_changed_at IS NULL OR password_changed_at <= to_timestamp($2::double precision / 1000.0))",[uid,Number(cookies(req.headers.cookie).q_auth?.split('.')[1]||0)-8*3600*1000])).rowCount:false;const allowed=ownerAccount||(part&&s.allow_anonymous&&(await db.query('SELECT id FROM participants WHERE session_id=$1 AND token_hash=$2',[sid,hash(part)])).rowCount);if(!allowed){socket.destroy();return}const participantId=ownerAccount?null:(await db.query('SELECT id FROM participants WHERE session_id=$1 AND token_hash=$2',[sid,hash(part||'')])).rows[0]?.id;wss.handleUpgrade(req,socket,head,ws=>{(ws as any).view=ownerAccount?'owner':'participant';(ws as any).uid=ownerAccount?uid:null;(ws as any).issuedAt=ownerAccount?authCookieIssuedAt(req.headers.cookie):null;(ws as any).participantId=participantId;wss.emit('connection',ws,req,sid)})}catch{socket.destroy()}});
 // Recheck existing presenter sockets on every replica against the shared database.
 // Fail closed on database outages: never continue streaming protected results to an
 // authenticated presenter whose credentials can no longer be checked.
 async function auditLivePresenterSockets(){
- const ownerSockets=[...sockets.values()].flatMap(group=>[...group]).filter(ws=>ws.readyState===WebSocket.OPEN&&(ws as any).view==='owner');
- if(!ownerSockets.length)return;
- const ids=[...new Set(ownerSockets.map(ws=>String((ws as any).uid||'')).filter(Boolean))];
+ const entries=[...sockets.entries()].flatMap(([sid,group])=>[...group].filter(ws=>ws.readyState===WebSocket.OPEN).map(ws=>({sid,ws})));
+ if(!entries.length)return;
+ const ids=[...new Set(entries.filter(e=>(e.ws as any).view==='owner').map(e=>String((e.ws as any).uid||'')).filter(Boolean))];
+ const sessionIds=[...new Set(entries.map(e=>e.sid))];
+ const participantIds=[...new Set(entries.filter(e=>(e.ws as any).view!=='owner').map(e=>String((e.ws as any).participantId||'')).filter(Boolean))];
  try{
-  const records=await db.query('SELECT id,approved,must_change_password,auth_revoked_at,password_changed_at FROM users WHERE id=ANY($1::uuid[])',[ids]);
-  const accounts=new Map(records.rows.map(row=>[String(row.id),row]));
-  for(const ws of ownerSockets){const account=accounts.get(String((ws as any).uid));if(!presenterAuthActive(account,(ws as any).issuedAt))ws.close(4003,'session_revoked')}
- }catch(e){console.error('live auth audit unavailable',e instanceof Error?e.message:'unknown');for(const ws of ownerSockets)ws.close(1011,'authentication_unavailable')}
+  const [sessions,accounts,presenters,participants]=await Promise.all([
+   db.query('SELECT id,owner_id,status,expires_at FROM sessions WHERE id=ANY($1::uuid[])',[sessionIds]),
+   ids.length?db.query('SELECT id,role,approved,must_change_password,auth_revoked_at,password_changed_at FROM users WHERE id=ANY($1::uuid[])',[ids]):Promise.resolve({rows:[]}),
+   ids.length?db.query('SELECT session_id,user_id FROM session_presenters WHERE session_id=ANY($1::uuid[]) AND user_id=ANY($2::uuid[])',[sessionIds,ids]):Promise.resolve({rows:[]}),
+   participantIds.length?db.query('SELECT id,session_id FROM participants WHERE id=ANY($1::uuid[])',[participantIds]):Promise.resolve({rows:[]})
+  ]);
+  const sessionMap=new Map(sessions.rows.map(row=>[String(row.id),row]));
+  const accountsMap=new Map(accounts.rows.map(row=>[String(row.id),row]));
+  const presenterSet=new Set(presenters.rows.map(row=>`${row.session_id}:${row.user_id}`));
+  const participantSet=new Set(participants.rows.map(row=>`${row.session_id}:${row.id}`));
+  for(const {sid,ws} of entries){
+   const session=sessionMap.get(sid);
+   if(!liveSessionActive(session)){ws.close(4003,'session_unavailable');continue}
+   if((ws as any).view==='owner'){
+    const uid=String((ws as any).uid||'');
+    if(!livePresenterAuthorized(session,accountsMap.get(uid),presenterSet.has(`${sid}:${uid}`),(ws as any).issuedAt))ws.close(4003,'session_revoked');
+   }else{
+    const pid=String((ws as any).participantId||'');
+    if(!liveParticipantAuthorized(session,pid,participantSet.has(`${sid}:${pid}`)))ws.close(4003,'participant_revoked');
+   }
+  }
+ }catch(e){console.error('live auth audit unavailable',e instanceof Error?e.message:'unknown');for(const {ws} of entries)ws.close(1011,'authentication_unavailable')}
 }
 const liveAuthAudit=setInterval(()=>{void auditLivePresenterSockets()},10000);
 liveAuthAudit.unref();
@@ -1059,5 +1199,5 @@ wss.on('connection',(ws:WebSocket,_req:unknown,sid:string)=>{
 });
 function participantSnapshot(data:any){if(!data)return data;const aid=data.session.status==='active'?data.session.current_activity_id:null;const published=aid?data.activities.find((a:Activity)=>a.id===aid&&a.status==='open'):null;return {session:{id:data.session.id,title:data.session.title,status:data.session.status,current_activity_id:published?aid:null},activities:published?[publicActivity(published)]:[],results:published&&data.session.show_results?data.results.filter((r:any)=>r.activity_id===aid):[],totals:published&&data.session.show_results?data.totals.filter((r:any)=>r.activity_id===aid):[]}}
 const webRoot=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../../web/dist');if(existsSync(webRoot)){app.use(express.static(webRoot));app.get('*',(_,res)=>res.sendFile(path.join(webRoot,'index.html')))}
-async function initialize(){const schema=readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)),'../src/schema.sql'),'utf8');await db.query(schema);publicBase=(await db.query("SELECT value FROM platform_settings WHERE key='public_base_url'")).rows[0]?.value||base;const email=process.env.ADMIN_EMAIL?.toLowerCase(),password=process.env.ADMIN_PASSWORD;if(email&&password){if(password.length<12&&!(process.env.ALLOW_INSECURE_DEV_BOOTSTRAP==='true'&&process.env.NODE_ENV!=='production'&&password==='000000'))throw new Error('ADMIN_PASSWORD must be >=12 characters (insecure demo bootstrap allowed only outside production)');const count=await db.query('SELECT count(*)::int AS n FROM users');if(count.rows[0].n===0){const oid=randomUUID(),uid=randomUUID();await db.query('INSERT INTO organizations(id,name) VALUES($1,$2)',[oid,'Default']);await db.query('INSERT INTO users(id,organization_id,email,password_hash,role) VALUES($1,$2,$3,$4,$5)',[uid,oid,email,await bcrypt.hash(password,12),'platform_admin']);await db.query('UPDATE users SET approved=true,must_change_password=true,is_primary_admin=true,nickname=$2 WHERE id=$1',[uid,'admin']);const demoClient=await db.connect();try{await demoClient.query('BEGIN');await provisionDemo(demoClient,uid,oid);await demoClient.query('COMMIT')}catch(e){await demoClient.query('ROLLBACK');throw e}finally{demoClient.release()}console.log('Initial admin provisioned; password change required')}}await db.query("UPDATE users SET is_primary_admin=true,nickname='admin' WHERE id=(SELECT id FROM users WHERE role='platform_admin' AND approved=true ORDER BY created_at ASC LIMIT 1) AND NOT EXISTS (SELECT 1 FROM users WHERE is_primary_admin=true)");startSessionBus(async()=>{const client=new pg.Client({connectionString:process.env.DATABASE_URL});await client.connect();return client},broadcastLocal,console.error,async()=>{await Promise.all([...sockets.keys()].map(sid=>broadcastLocal(sid).catch(()=>{})))});await db.query("DELETE FROM live_connections WHERE last_seen<now()-interval '2 minutes'");setInterval(()=>db.query("DELETE FROM live_connections WHERE last_seen<now()-interval '2 minutes'").catch(()=>{}),60000).unref();await purgeExpiredSessions();setInterval(()=>purgeExpiredSessions().catch(e=>console.error('retention purge error',e instanceof Error?e.message:'unknown')),3600000).unref();setInterval(()=>db.query("DELETE FROM auth_flows WHERE expires_at<now(); DELETE FROM email_mfa_challenges WHERE expires_at<now(); DELETE FROM api_rate_windows WHERE bucket<floor(extract(epoch from now())/60)-3").catch(e=>console.error('auth cleanup error',e instanceof Error?e.message:'unknown')),3600000).unref();server.listen(Number(process.env.PORT||8080),'0.0.0.0',()=>console.log('Quorivio API ready'))}
+async function initialize(){const schema=readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)),'../src/schema.sql'),'utf8');await db.query(schema);publicBase=(await db.query("SELECT value FROM platform_settings WHERE key='public_base_url'")).rows[0]?.value||base;const email=process.env.ADMIN_EMAIL?.toLowerCase(),password=process.env.ADMIN_PASSWORD;if(email&&password){if(password.length<12&&!(process.env.ALLOW_INSECURE_DEV_BOOTSTRAP==='true'&&process.env.NODE_ENV!=='production'&&password==='000000'))throw new Error('ADMIN_PASSWORD must be >=12 characters (insecure demo bootstrap allowed only outside production)');const count=await db.query('SELECT count(*)::int AS n FROM users');if(count.rows[0].n===0){const oid=randomUUID(),uid=randomUUID();await db.query('INSERT INTO organizations(id,name) VALUES($1,$2)',[oid,'Default']);await db.query('INSERT INTO users(id,organization_id,email,password_hash,role) VALUES($1,$2,$3,$4,$5)',[uid,oid,email,await bcrypt.hash(password,12),'platform_admin']);await db.query('UPDATE users SET approved=true,must_change_password=true,is_primary_admin=true,nickname=$2 WHERE id=$1',[uid,'admin']);const demoClient=await db.connect();try{await demoClient.query('BEGIN');await provisionDemo(demoClient,uid,oid);await demoClient.query('COMMIT')}catch(e){await demoClient.query('ROLLBACK');throw e}finally{demoClient.release()}console.log('Initial admin provisioned; password change required')}}await db.query("UPDATE users SET is_primary_admin=true,nickname='admin' WHERE id=(SELECT id FROM users WHERE role='platform_admin' AND approved=true ORDER BY created_at ASC LIMIT 1) AND NOT EXISTS (SELECT 1 FROM users WHERE is_primary_admin=true)");startSessionBus(async()=>{const client=new pg.Client({connectionString:process.env.DATABASE_URL});await client.connect();return client},broadcastLocal,console.error,async()=>{await Promise.all([...sockets.keys()].map(sid=>broadcastLocal(sid)))});await db.query("DELETE FROM live_connections WHERE last_seen<now()-interval '2 minutes'");setInterval(()=>db.query("DELETE FROM live_connections WHERE last_seen<now()-interval '2 minutes'").catch(()=>{}),60000).unref();await purgeExpiredSessions();setInterval(()=>purgeExpiredSessions().catch(e=>console.error('retention purge error',e instanceof Error?e.message:'unknown')),3600000).unref();setInterval(()=>db.query("DELETE FROM auth_flows WHERE expires_at<now(); DELETE FROM email_mfa_challenges WHERE expires_at<now(); DELETE FROM email_mfa_enrollments WHERE expires_at<now(); DELETE FROM api_rate_windows WHERE bucket<floor(extract(epoch from now())/60)-3").catch(e=>console.error('auth cleanup error',e instanceof Error?e.message:'unknown')),3600000).unref();server.listen(Number(process.env.PORT||8080),'0.0.0.0',()=>console.log('Quorivio API ready'))}
 initialize().catch(e=>{console.error('startup failed',e);process.exit(1)});

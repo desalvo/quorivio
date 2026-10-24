@@ -18,3 +18,19 @@ test('email MFA still explicitly requires configured SMTP',()=>{
  assert.match(settings,/activeSmtpConfig\(\)/);
  assert.match(settings,/smtp_required_before_email_mfa/);
 });
+
+test('email factor enrollment is proof-of-inbox before account MFA activation',()=>{
+ const settings=server.split("app.post('/api/auth/email-mfa/settings'")[1]?.split("app.post('/api/auth/email-mfa/enrollment/confirm'")[0]||'';
+ const confirm=server.split("app.post('/api/auth/email-mfa/enrollment/confirm'")[1]?.split("app.get('/api/auth/me'")[0]||'';
+ const schema=readFileSync(path.join(dir,'../src/schema.sql'),'utf8');
+ assert.match(schema,/CREATE TABLE IF NOT EXISTS email_mfa_enrollments/);
+ assert.match(schema,/attempts integer NOT NULL DEFAULT 0 CHECK\(attempts BETWEEN 0 AND 5\)/);
+ assert.match(settings,/sendEmailOtp\(smtp,r\.rows\[0\]\.email,code\)/);
+ assert.match(settings,/pending_confirmation:true/);
+ assert.doesNotMatch(settings.split('if(enabled){')[1]?.split('const cx=')[0]||'',/email_mfa_enabled=true/);
+ assert.match(confirm,/FOR UPDATE/);
+ assert.match(confirm,/matchesEmailOtp/);
+ assert.match(confirm,/attempts=attempts\+1/);
+ assert.match(confirm,/email_mfa_enabled=true,auth_revoked_at=now\(\)/);
+ assert.match(confirm,/DELETE FROM email_mfa_enrollments WHERE user_id/);
+});
