@@ -64,6 +64,14 @@ jobs:
           done
           curl --fail --show-error http://127.0.0.1:5173/
           python3 tools/ci_browser_editor.py
+      - name: Upload Chromium failure diagnostics
+        if: failure() && github.event_name == 'workflow_dispatch' && inputs.browser_test
+        uses: actions/upload-artifact@v4
+        with:
+          name: chromium-editor-failure
+          path: /tmp/quorivio-browser-artifacts/
+          if-no-files-found: ignore
+          retention-days: 3
       - name: Install PostgreSQL 18 client for integration and disaster recovery
         run: |
           sudo apt-get update -qq

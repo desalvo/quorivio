@@ -7,8 +7,8 @@
       "area": "A-editor",
       "weight": 6,
       "status": "partial",
-      "evidence": "Canvas 16:9, free placement, resizing, rotation, rulers, keyboard code and local build documented; page-scoped bounded widget undo/redo, drag grouping, and keyboard shortcuts implemented; local 163 Node tests and web build PASS (2026-10-24); multi-widget selection (shift-click, accessible checkbox, Ctrl/Cmd+A), 10 alignment/equal-size/distribution commands with bounded geometry and one-step undo/redo, 8 Node regressions PASS (2026-10-25); group move/copy/cut/paste with bounded geometry and eight additional Node tests locally PASS (2026-10-25)",
-      "remaining": "Run opt-in Chromium browser acceptance on GitHub CI and validate drag, clipboard, undo/redo and persistence on desktop/mobile; local Chromium navigation blocked by environment policy."
+      "evidence": "Canvas 16:9, free placement, resizing, rotation, rulers, keyboard code and local build documented; page-scoped bounded widget undo/redo, drag grouping, and keyboard shortcuts implemented; local 163 Node tests and web build PASS (2026-10-24); multi-widget selection (shift-click, accessible checkbox, Ctrl/Cmd+A), 10 alignment/equal-size/distribution commands with bounded geometry and one-step undo/redo, 8 Node regressions PASS (2026-10-25); group move/copy/cut/paste with bounded geometry and eight additional Node tests locally PASS (2026-10-25); Chromium workflow 40141207000 reached multi-selection, alignment, undo/redo and group paste, but failed on test-only disabled deselect click (2026-10-25).",
+      "remaining": "Rerun corrected Chromium browser acceptance, validate persistence and desktop/mobile behavior; current local browser blocked by policy."
     },
     {
       "id": "A2",
@@ -64,7 +64,7 @@
       "weight": 5,
       "status": "partial",
       "evidence": "Anonymous participation, polling and QR routes implemented; disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24); two-replica participant/presenter privacy and notification smoke added to CI, pending execution; opt-in 500-client disposable PostgreSQL CI load with presenter observer and privacy assertion authored, not yet executed (2026-10-24) Maintainer confirmed green two-replica CI (2026-10-24).",
-      "remaining": "Execute opt-in 500-client same-session capacity test and browser privacy acceptance."
+      "remaining": "Execute opt-in 500-client same-session capacity test and browser privacy acceptance; 500-participant workflow step not reached in 40141207000 due to earlier Chromium failure."
     },
     {
       "id": "C1",

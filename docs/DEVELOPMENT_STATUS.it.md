@@ -1,3 +1,8 @@
+## 25 ottobre 2026 — correzione stato selezione nel collaudo Chromium, workflow 40141207000
+- Il collaudo Chromium ha superato navigazione, selezione multipla, allineamento, annulla/ripristina e incolla di gruppo, ma si è fermato tentando di premere `Deseleziona` quando il pulsante era disabilitato: l'annullamento dell'incolla aveva correttamente rimosso i widget e svuotato la selezione.
+- Il test ora verifica lo svuotamento della selezione e il pulsante disabilitato; seleziona due widget esistenti tramite checkbox accessibili, esercita `Deseleziona` e verifica lo stato finale. Timeout predefinito 10 secondi e diagnostica HTML/screenshot/errori JavaScript caricabile come artifact CI in caso di fallimento.
+- La CI standard dell'ultima baseline è stata confermata verde dall'utente; la nuova esecuzione Chromium è fallita e non ha raggiunto il test dei 500 partecipanti. Il browser locale è bloccato dalla policy dell'ambiente (`ERR_BLOCKED_BY_ADMINISTRATOR`): resta necessaria la verifica in CI. Avanzamento RC **43,0%**, gate A1/B4 aperti; nessuna modifica al comportamento applicativo.
+
 ## 2026-10-25 — Group editing and opt-in Chromium acceptance (after last confirmed CI-green baseline)
 - Added page-local multi-widget drag with shared clamped translation (relative spacing retained), group copy/cut/paste with fresh widget IDs and deep copies, preservation of existing multi-selection on pointer-down, group gesture cancellation rollback and single undo/redo history entry per drag.
 - Added eight Node regressions for group bounds, copy identity, immutability and malformed geometry; adjusted three Python source contracts to verify restoration of the *whole group* after pointer cancellation.
