@@ -7,8 +7,8 @@
       "area": "A-editor",
       "weight": 6,
       "status": "partial",
-      "evidence": "Canvas 16:9, free placement, resizing, rotation, rulers, keyboard code and local build documented",
-      "remaining": "Browser drag/rotate/resize, persistence and multi-device acceptance"
+      "evidence": "Canvas 16:9, free placement, resizing, rotation, rulers, keyboard code and local build documented; page-scoped bounded widget undo/redo, drag grouping, and keyboard shortcuts implemented; local 163 Node tests and web build PASS (2026-10-24); multi-widget selection (shift-click, accessible checkbox, Ctrl/Cmd+A), 10 alignment/equal-size/distribution commands with bounded geometry and one-step undo/redo, 8 Node regressions PASS (2026-10-25); group move/copy/cut/paste with bounded geometry and eight additional Node tests locally PASS (2026-10-25)",
+      "remaining": "Run opt-in Chromium browser acceptance on GitHub CI and validate drag, clipboard, undo/redo and persistence on desktop/mobile; local Chromium navigation blocked by environment policy."
     },
     {
       "id": "A2",
@@ -23,8 +23,8 @@
       "area": "A-editor",
       "weight": 6,
       "status": "partial",
-      "evidence": "Widget palette, page layouts, media, quiz and topic widgets present in source",
-      "remaining": "Full widget-by-widget visual and accessibility acceptance"
+      "evidence": "Widget palette, page layouts, media, quiz and topic widgets present in source; editable PPTX import/export security and fidelity regression suite (11 tests) locally PASS, 2026-10-24; editable widget copy/cut/paste with new IDs and slide-bounded geometry, Node regression PASS (2026-10-24)",
+      "remaining": "Full widget-by-widget visual and accessibility acceptance; real-world PPTX corpus roundtrip and browser editing verification"
     },
     {
       "id": "A4",
@@ -39,8 +39,8 @@
       "area": "B-sessions",
       "weight": 6,
       "status": "partial",
-      "evidence": "Presenter dashboard, synced server-driven navigation and participant preview in source; live WebSocket authorization re-audits sessions, presenter memberships/roles and participants every 10s (local policy tests PASS, 2026-10-24); per-session coalesced snapshot delivery and 2 MiB slow-consumer protection, local tests PASS (2026-10-24); LISTEN startup/resync failure now forces reconnection, with local regression tests (2026-10-24); retired listener notification fencing and rejected handler reconnect regression tests PASS (2026-10-24); coalesced snapshot callers now await the final read and failed DB snapshots propagate to listener recovery (152 Node and 252 Python tests PASS, builds PASS, 2026-10-24); disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24); added mandatory CI PostgreSQL two-process WebSocket notification acceptance (not yet run on CI, 2026-10-24); replica smoke now drains pre-mutation notifications to require a fresh post-vote participant snapshot (2026-10-24).",
-      "remaining": "Await CI execution of actual two-replica WebSocket smoke; still need browser and latency/recovery acceptance."
+      "evidence": "Presenter dashboard, synced server-driven navigation and participant preview in source; live WebSocket authorization re-audits sessions, presenter memberships/roles and participants every 10s (local policy tests PASS, 2026-10-24); per-session coalesced snapshot delivery and 2 MiB slow-consumer protection, local tests PASS (2026-10-24); LISTEN startup/resync failure now forces reconnection, with local regression tests (2026-10-24); retired listener notification fencing and rejected handler reconnect regression tests PASS (2026-10-24); coalesced snapshot callers now await the final read and failed DB snapshots propagate to listener recovery (152 Node and 252 Python tests PASS, builds PASS, 2026-10-24); disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24); added mandatory CI PostgreSQL two-process WebSocket notification acceptance (not yet run on CI, 2026-10-24); replica smoke now drains pre-mutation notifications to require a fresh post-vote participant snapshot (2026-10-24). Maintainer confirmed green CI including two-replica PostgreSQL 18 WebSocket test (2026-10-24).",
+      "remaining": "Browser and latency/recovery acceptance; multi-replica stress beyond two processes."
     },
     {
       "id": "B2",
@@ -63,8 +63,8 @@
       "area": "B-sessions",
       "weight": 5,
       "status": "partial",
-      "evidence": "Anonymous participation, polling and QR routes implemented; disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24); two-replica participant/presenter privacy and notification smoke added to CI, pending execution; opt-in 500-client disposable PostgreSQL CI load with presenter observer and privacy assertion authored, not yet executed (2026-10-24)",
-      "remaining": "Execute new two-replica CI and manually dispatch 500-client same-session capacity gate; review presenter peak and browser privacy acceptance."
+      "evidence": "Anonymous participation, polling and QR routes implemented; disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24); two-replica participant/presenter privacy and notification smoke added to CI, pending execution; opt-in 500-client disposable PostgreSQL CI load with presenter observer and privacy assertion authored, not yet executed (2026-10-24) Maintainer confirmed green two-replica CI (2026-10-24).",
+      "remaining": "Execute opt-in 500-client same-session capacity test and browser privacy acceptance."
     },
     {
       "id": "C1",
@@ -111,8 +111,8 @@
       "area": "D-validation",
       "weight": 6,
       "status": "partial",
-      "evidence": "Maintainer confirmed PostgreSQL 18 CI green on 2026-10-24 baseline: schema bootstrapping and portable/profile HTTP lifecycle integration executed successfully. Two-replica new smoke still awaits CI.; atomic checksum-verified backup and staged restore hardened with 7 new adversarial Python tests (255 Python tests pass locally, 2026-10-24); new disposable PostgreSQL 18 fresh-database backup/restore acceptance added to mandatory CI, awaiting execution.",
-      "remaining": "Await PostgreSQL 18 fresh-database backup/restore CI result; external disaster-recovery rehearsal, migration, retention/rotation and production-like RPO/RTO acceptance remain open."
+      "evidence": "Maintainer confirmed CI green (2026-10-24) including PostgreSQL 18 backup/restore into fresh disposable database, schema bootstrap and two-replica WebSocket acceptance. New local DR preflight and staged checksum regressions pass (2026-10-24); negative populated-DB restore, schema parity and timing instrumentation added to CI, awaiting next run.",
+      "remaining": "CI execution of new negative restore acceptance; external operational restore drill, encryption/key rotation, retention, representative dataset and production-like RPO/RTO sign-off."
     },
     {
       "id": "D3",
@@ -127,7 +127,7 @@
       "area": "D-validation",
       "weight": 5,
       "status": "open",
-      "evidence": "Isolated document converter, upload validation, CSRF and security tests exist; offline 500-user shard reconciler and eight unit tests added (unexecuted against real staging). Follow-up: aggregate pre-inflate ZIP quotas and strict UTF-8 manifest checks tested locally; does not constitute runtime security acceptance.",
+      "evidence": "Isolated document converter, upload validation, CSRF and security tests exist; offline 500-user shard reconciler and eight unit tests added (unexecuted against real staging). Follow-up: aggregate pre-inflate ZIP quotas and strict UTF-8 manifest checks tested locally; does not constitute runtime security acceptance.; native PPTX OOXML security/roundtrip regression locally PASS (11 cases, 2026-10-24)",
       "remaining": "Real PDF/PPTX conversion, malware pipeline, pentest, load and WebSocket acceptance; aggregate an actual same-session shard run and verify independent server telemetry."
     },
     {

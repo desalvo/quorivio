@@ -340,3 +340,5 @@
 /* Mobile canvas: keep pointer capture active for drag/resize/rotate while retaining native interaction with form controls. */
 .widget-canvas-item button,.widget-canvas-item input,.widget-canvas-item textarea,.widget-canvas-item select{touch-action:manipulation;user-select:auto}
 .widget-canvas-item [data-resize-edge],.widget-canvas-item [data-rotate-handle]{touch-action:none}
+
+.widget-history-toolbar{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin:.5rem 0}

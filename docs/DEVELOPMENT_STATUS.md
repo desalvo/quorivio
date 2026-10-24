@@ -1,3 +1,15 @@
+## 2026-10-25 — Group editing and opt-in Chromium acceptance (after last confirmed CI-green baseline)
+- Added page-local multi-widget drag with shared clamped translation (relative spacing retained), group copy/cut/paste with fresh widget IDs and deep copies, preservation of existing multi-selection on pointer-down, group gesture cancellation rollback and single undo/redo history entry per drag.
+- Added eight Node regressions for group bounds, copy identity, immutability and malformed geometry; adjusted three Python source contracts to verify restoration of the *whole group* after pointer cancellation.
+- Added opt-in `browser_test` GitHub Actions workflow-dispatch path for Chromium editor UI acceptance. It installs Playwright Chromium and starts a disposable Vite server. The browser script now covers group paste/undo. **Not yet executed in CI.** Local Chromium navigation was blocked by this environment's administrator policy; browser acceptance remains open.
+- Local verification: **179/179 Node tests, 272/272 Python tests, backend TypeScript build and frontend TypeScript/Vite build PASS**. No PostgreSQL or actual 500-participant load test was executed in this cycle.
+- This package is cumulative after the last confirmed commit `quorivio-0.1.0-dev-ci-pg18-client-hotfix-cumulative.zip`; DR preflight, PPTX security/fidelity, editor history/clipboard and multiselect/arrange are included. RC gate score remains **43.0%**; A1/A3/A4 and B4 are not accepted.
+
+## 2026-10-24 — Editable PowerPoint import/export security and fidelity consolidation (post DR preflight)
+- One consolidated cycle of **11 PowerPoint regression scenarios**: require real OOXML presentation part; reject oversized/high-ratio ZIP members, ZIP symlinks, external OOXML relationships and embedded scripts; enforce nonzero widget geometry; validate image UUIDs, private media directory and PNG/JPEG bytes on export; prevent duplicated text when UI labels are truncated; flag text over 500 characters as lossy in fidelity reporting.
+- Python tests **272/272 PASS** (261 baseline + 11 new), Node **154/154 PASS**, API TypeScript and web Vite builds **PASS**. No PostgreSQL, browser, or real PPTX corpus acceptance was performed in this cycle.
+- The previous DR preflight changes remain cumulative. Latest user-confirmed CI green baseline is `quorivio-0.1.0-dev-ci-pg18-client-hotfix-cumulative.zip`; the newer DR preflight package has not been confirmed committed. **43.0% RC gate score remains unchanged**; no unverified acceptance gate was promoted. Full editable OOXML fidelity and browser acceptance remain open.
+
 ## 2026-10-24 — Live widget identity and result-data guardrails
 - Reject duplicate or missing widget IDs before comparing an open timed quiz definition: a Map previously silently overwrote duplicate IDs, creating ambiguous answer attribution in live edits.
 - Word-cloud result projection now drops blank and oversized labels, rather than returning malformed historical data.
@@ -1117,3 +1129,35 @@ its PostgreSQL acceptance evidence is available. No GitHub commit/push/tag/relea
 - CI now installs PostgreSQL client 18 explicitly and checks pg_dump/pg_restore versions before integration.
 - Live HTTP and two-replica WebSocket acceptance passed in the failing run. DR acceptance remains pending until the next CI run.
 - No RC gate was marked accepted solely on the basis of this fix.
+
+
+### 2026-10-24 — PostgreSQL DR operational safety batch (post-green baseline)
+
+Maintainer confirmed green CI with PostgreSQL 18 two-replica WebSocket and fresh-database disaster recovery acceptance. This batch makes restore refuse populated databases before `pg_restore`, rejects unreadable preflight output, verifies staged dump and assets against the original manifest again before database modification, checks regular files at archive creation, and expands adversarial tests. The mandatory CI DR smoke now verifies refusal to restore into its populated source database, schema parity, private asset permissions, and reports backup/restore durations as **CI samples only**, not RTO/RPO guarantees. Local Python suite: 261 tests PASS. The next CI has not run on these changes. D2 remains partial pending operational rehearsal, retention/encryption and production-like RPO/RTO validation; the overall audit remains 43.0%.
+
+### 2026-10-24 — Editor functional batch: history and widget clipboard
+
+Based on the latest cumulative PPTX/DR package (not yet confirmed committed). The
+editor now offers page-scoped Undo/Redo with toolbar and Ctrl/Cmd+Z, Ctrl/Cmd+Shift+Z
+(or Ctrl/Cmd+Y) outside text inputs. A pointer drag/resize/rotation is one undo
+operation, even when it produces many intermediate updates; cancellation restores
+the original geometry without adding a history entry. The bounded 60-step history
+is reset on page changes, preserves unsaved-draft detection, and clears redo after
+new edits. Widget Copy/Cut/Paste operates inside the canvas, assigns fresh widget
+IDs, preserves editable options/media/style, and constrains placement to the slide.
+Keyboard clipboard shortcuts are scoped to the canvas and never intercept form inputs.
+
+**Ten functional checks:** undo, redo, divergent-edit invalidation, gesture grouping,
+gesture cancellation, page isolation, history limit, copy independence, paste bounds,
+and duplicate-ID rejection. **Verified locally:** 163/163 Node tests, 272/272
+Python tests, API TypeScript and web TypeScript/Vite builds PASS. No real browser,
+mobile device, 500-participant capacity, or new CI run in this batch. A1/A3 remain
+partial and RC audit remains 43.0% until browser acceptance evidence is available.
+No commit/push/tag/release performed.
+
+### 2026-10-25 — Editor multi-widget layout batch (after last green CI baseline)
+- Delivered shift-click multi-selection, Ctrl/Cmd+A, accessible selection checkboxes and deselection, ten alignment/size/distribution actions (left/right/top/bottom/center X/Y, same width/height, distribute X/Y).
+- Geometry is constrained to the 0–100% canvas; operation updates are atomic and share existing per-page undo/redo. Selection remains page-scoped because the editor is keyed by session/page.
+- Evidence: 171/171 Node tests, 272/272 Python tests, TypeScript API/web builds PASS; new arrange-widget unit suite PASS.
+- Browser acceptance NOT passed: headless Chromium was available but navigation to localhost and file URLs was blocked by the execution environment (`ERR_BLOCKED_BY_ADMINISTRATOR`). Optional `tools/ci_browser_editor.py` provided for an unrestricted Playwright host. No fabricated browser sign-off.
+- RC A1 remains partial and verified score unchanged at 43.0%; real-browser interaction, persistence, PPTX corpus and 500-participant capacity remain open.

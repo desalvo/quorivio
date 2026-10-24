@@ -40,3 +40,9 @@ Il wizard genera `15-assets-pvc.yaml` con `asset_storage_size` (default `10Gi`),
 ## Limiti prima della produzione
 
 Non sono ancora disponibili: pulsanti amministrativi di backup/restore, schedulazione integrata, crittografia automatica degli archivi, snapshot coordinati, storage S3 e test PostgreSQL reali. Questa funzionalità è una procedura amministrativa iniziale, non un disaster recovery certificato.
+
+## Rafforzamento ripristino (24 ottobre 2026)
+
+La CI PostgreSQL 18 è stata confermata verde dal manutentore. Prima di `pg_restore`, lo script verifica che il database di destinazione non contenga relazioni applicative: un database già popolato o una verifica fallita interrompono il ripristino senza modifiche. I dati estratti vengono inoltre ricontrollati tramite SHA-256 e dimensione, anche dopo la verifica iniziale dell'archivio, prima di scrivere nel database. La CI controlla anche il rifiuto del ripristino nel database sorgente, la corrispondenza dello schema, la riservatezza della directory degli allegati e i tempi di backup/ripristino; questi tempi non sono SLA RTO/RPO.
+
+Restano obbligatori una prova di disaster recovery operativa, politiche di cifratura e conservazione, test con dati rappresentativi e la convalida di RPO/RTO.

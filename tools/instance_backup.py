@@ -102,6 +102,8 @@ def make_backup(destination, assets, database_url):
                         if src.stat().st_size != record['bytes']:
                             raise ValueError('Backup input changed during capture')
                         info = archive.gettarinfo(str(src), arcname=name)
+                        if not info.isfile():
+                            raise ValueError('Backup source changed into a non-regular file')
                         info.mode = 0o600
                         with src.open('rb') as stream:
                             archive.addfile(info, stream)
@@ -162,6 +164,43 @@ def verify(archive_path):
         return manifest
 
 
+def assert_empty_database(database_url):
+    """Refuse a restore into a database that already contains application objects.
+
+    A PostgreSQL custom-format dump is not a merge or migration. This check runs
+    before pg_restore and does not delete or modify any database object.
+    """
+    sql = ("SELECT count(*) FROM pg_catalog.pg_class c "
+           "JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace "
+           "WHERE n.nspname NOT IN ('pg_catalog', 'information_schema') "
+           "AND n.nspname NOT LIKE 'pg_toast%' "
+           "AND c.relkind IN ('r', 'p', 'v', 'm', 'S', 'f')")
+    result = subprocess.run(['psql', '--no-psqlrc', '--tuples-only', '--no-align',
+                             '--set=ON_ERROR_STOP=1', '--dbname', database_url,
+                             '--command', sql], capture_output=True, text=True,
+                            check=True, timeout=30)
+    try:
+        count = int(result.stdout.strip())
+    except (ValueError, AttributeError) as error:
+        raise ValueError('Could not verify that restore database is empty') from error
+    if count != 0:
+        raise ValueError('Restore requires a fresh database without user relations')
+
+
+def copy_checked(source, output, expected):
+    """Verify staged bytes even if the archive changed after initial validation."""
+    hasher = hashlib.sha256()
+    size = 0
+    for chunk in iter(lambda: source.read(1024 * 1024), b''):
+        size += len(chunk)
+        if size > expected['bytes']:
+            raise ValueError('Backup object changed during restore')
+        hasher.update(chunk)
+        output.write(chunk)
+    if size != expected['bytes'] or hasher.hexdigest() != expected['sha256']:
+        raise ValueError('Backup object changed during restore')
+
+
 def restore(archive_path, assets, database_url, confirmation):
     if confirmation != 'RESTORE-QUORIVIO-DATA':
         raise ValueError('Explicit confirmation is required')
@@ -179,16 +218,17 @@ def restore(archive_path, assets, database_url, confirmation):
          tempfile.TemporaryDirectory(prefix='.quorivio-assets-', dir=root.parent) as staged, \
          tarfile.open(archive_path, 'r:gz') as archive:
         dump = pathlib.Path(tmp) / 'database.dump'
-        with dump.open('wb') as output, archive.extractfile('database.dump') as source:
-            shutil.copyfileobj(source, output, 1024 * 1024)
+        with dump.open('xb') as output, archive.extractfile('database.dump') as source:
+            copy_checked(source, output, manifest['files'][0])
         for record in manifest['files'][1:]:
             relative = safe_asset_path(record['path'])
             dest = pathlib.Path(staged) / relative
             dest.parent.mkdir(parents=True, exist_ok=True)
             with dest.open('xb') as output, archive.extractfile(record['path']) as source:
-                shutil.copyfileobj(source, output, 1024 * 1024)
+                copy_checked(source, output, record)
             os.chmod(dest, 0o600)
         # --clean is forbidden: the operator must supply a fresh empty database.
+        assert_empty_database(database_url)
         subprocess.run(['pg_restore', '--exit-on-error', '--no-owner', '--no-acl',
                         '--dbname', database_url, str(dump)], check=True, timeout=3600)
         if root.exists():

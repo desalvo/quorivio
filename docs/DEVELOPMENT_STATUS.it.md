@@ -1,3 +1,15 @@
+## 2026-10-25 — Group editing and opt-in Chromium acceptance (after last confirmed CI-green baseline)
+- Added page-local multi-widget drag with shared clamped translation (relative spacing retained), group copy/cut/paste with fresh widget IDs and deep copies, preservation of existing multi-selection on pointer-down, group gesture cancellation rollback and single undo/redo history entry per drag.
+- Added eight Node regressions for group bounds, copy identity, immutability and malformed geometry; adjusted three Python source contracts to verify restoration of the *whole group* after pointer cancellation.
+- Added opt-in `browser_test` GitHub Actions workflow-dispatch path for Chromium editor UI acceptance. It installs Playwright Chromium and starts a disposable Vite server. The browser script now covers group paste/undo. **Not yet executed in CI.** Local Chromium navigation was blocked by this environment's administrator policy; browser acceptance remains open.
+- Local verification: **179/179 Node tests, 272/272 Python tests, backend TypeScript build and frontend TypeScript/Vite build PASS**. No PostgreSQL or actual 500-participant load test was executed in this cycle.
+- This package is cumulative after the last confirmed commit `quorivio-0.1.0-dev-ci-pg18-client-hotfix-cumulative.zip`; DR preflight, PPTX security/fidelity, editor history/clipboard and multiselect/arrange are included. RC gate score remains **43.0%**; A1/A3/A4 and B4 are not accepted.
+
+## 24 ottobre 2026 — consolidamento sicurezza e fedeltà PowerPoint modificabile (dopo DR preflight)
+- Un solo lotto con **11 nuovi scenari di regressione PowerPoint**: parte OOXML obbligatoria, rifiuto ZIP anomali o con symlink, relazioni esterne e script, geometrie nulle, UUID media non validi, cartelle media non sicure e immagini non PNG/JPEG; esportazione del testo lungo senza duplicare le etichette; segnalazione della perdita di testo oltre 500 caratteri nel report di fedeltà.
+- Verifiche: **272/272 Python**, **154/154 Node**, build backend TypeScript e frontend Vite **PASS**. Non eseguiti in questo lotto test browser, corpus PPTX reale o PostgreSQL.
+- Restano cumulativi gli interventi DR precedenti. L'ultima baseline CI verde confermata è il package `ci-pg18-client-hotfix`; non risulta confermato un commit del successivo package DR. Avanzamento RC invariato **43,0%**: nessun gate accettato senza collaudo.
+
 ## 2026-10-24 — Identità widget live e integrità risultati
 - Rifiutati identificativi widget duplicati o assenti prima del confronto delle definizioni di quiz temporizzati aperti: in precedenza la mappa poteva sovrascrivere un widget senza segnalare l'ambiguità.
 - La proiezione delle word cloud scarta etichette vuote o troppo lunghe provenienti da dati storici malformati.
@@ -911,3 +923,33 @@ incremento non giustificato da evidenze di accettazione. Nessun commit/push/tag/
 - La CI installa ora esplicitamente il client PostgreSQL 18 e controlla le versioni di pg_dump/pg_restore prima dei test.
 - I test HTTP live e WebSocket a due repliche erano verdi; DR rimane in attesa della nuova CI.
 - Nessun gate RC viene chiuso automaticamente da questa correzione.
+
+
+### 24 ottobre 2026 — sicurezza operativa del disaster recovery (dopo CI verde)
+
+Il manutentore ha confermato CI verde con PostgreSQL 18, WebSocket su due repliche e backup/ripristino su database nuovo. Il nuovo lotto blocca il ripristino su database popolati prima di `pg_restore`, rifiuta preflight illeggibili, riverifica dimensioni e checksum degli allegati e del dump estratti prima della modifica del database e controlla la regolarità dei file sorgenti. Il test DR obbligatorio in CI verifica inoltre il rifiuto del database sorgente, la parità dello schema, i permessi degli allegati e registra i tempi (non equivalenti a SLA RTO/RPO). Test Python locali: 261 PASS. La nuova CI non è ancora stata eseguita. D2 resta parziale, avanzamento complessivo 43,0%.
+
+### 24 ottobre 2026 — Editor: cronologia modifiche e copia/incolla widget
+
+Partendo dall'ultimo cumulativo PPTX/DR (non ancora confermato come commit),
+l'editor dispone di Annulla/Ripristina per pagina (massimo 60 passaggi), pulsanti
+e scorciatoie Ctrl/Cmd+Z e Ctrl/Cmd+Maiusc+Z o Y, senza intercettare la digitazione
+nei campi. Trascinamento, ridimensionamento e rotazione sono raggruppati in un
+singolo passaggio annullabile; l'annullamento del gesto ripristina la geometria.
+Il cambio pagina azzera la cronologia; una modifica nuova cancella il ramo Ripristina.
+Copia/Taglia/Incolla dei widget preserva contenuti e stile, crea un nuovo ID e
+mantiene il widget entro i limiti del canvas.
+
+**Dieci controlli funzionali:** annulla, ripristina, invalidazione redo, raggruppamento
+gesti, annullamento gesti, isolamento pagine, limite cronologia, indipendenza copie,
+limiti geometrici, identità univoca. **Verifiche locali:** 163/163 Node,
+272/272 Python, build TypeScript backend e frontend Vite superate. Test browser,
+mobile, carico 500 utenti e nuova CI ancora da eseguire. Gate A1/A3 parziali;
+avanzamento verificato 43,0%. Nessun commit/push/tag/release.
+
+### 2026-10-25 — Lotto editor: disposizione di più widget
+- Implementati selezione multipla con Maiusc+clic, Ctrl/Cmd+A, caselle accessibili, deselezione, dieci operazioni di allineamento/dimensionamento/distribuzione.
+- Coordinate vincolate al canvas e una sola operazione Annulla/Ripristina per disposizione. Selezione limitata alla pagina corrente.
+- Verificati 171 test Node, 272 test Python e build backend/frontend.
+- Test browser non superato: Chromium non può navigare verso localhost o file locali in questo ambiente (`ERR_BLOCKED_BY_ADMINISTRATOR`). Script Playwright opzionale incluso; necessaria esecuzione su host abilitato.
+- A1 ancora parziale, completamento verificato 43,0%; restano test browser, corpus PPTX e carico reale 500 partecipanti.

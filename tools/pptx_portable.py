@@ -13,10 +13,13 @@ import uuid
 from datetime import date
 from pathlib import Path
 from zipfile import ZipFile, BadZipFile
+import re
 
 MAX_PPTX_BYTES = 50 * 1024 * 1024
 MAX_UNCOMPRESSED_BYTES = 250 * 1024 * 1024
 MAX_ZIP_ENTRIES = 3000
+MAX_ZIP_MEMBER_BYTES = 80 * 1024 * 1024
+MAX_ZIP_COMPRESSION_RATIO = 1000
 def _supported_image(blob, mime):
     """Accept recognized image bytes, not only the untrusted OOXML content type."""
     if not isinstance(blob, bytes) or not 0 < len(blob) <= 10 * 1024 * 1024:
@@ -40,14 +43,29 @@ def validate_pptx_archive(source):
             entries = archive.infolist()
             if len(entries) > MAX_ZIP_ENTRIES or sum(e.file_size for e in entries) > MAX_UNCOMPRESSED_BYTES:
                 raise ValueError("PPTX decompression limits exceeded")
-            if not any(e.filename == "[Content_Types].xml" for e in entries):
-                raise ValueError("Not an OOXML presentation")
+            if any(e.file_size > MAX_ZIP_MEMBER_BYTES or
+                   (e.file_size > 1024 * 1024 and e.file_size > max(e.compress_size, 1) * MAX_ZIP_COMPRESSION_RATIO)
+                   for e in entries):
+                raise ValueError('Suspicious OOXML compression ratio or member size')
+            if any(((e.external_attr >> 16) & 0o170000) == 0o120000 for e in entries):
+                raise ValueError('OOXML symbolic links are forbidden')
             if any(e.filename.startswith('/') or '..' in e.filename.split('/') or '\\' in e.filename or (e.flag_bits & 1) for e in entries):
                 raise ValueError('Unsafe OOXML archive member')
             if len({e.filename for e in entries}) != len(entries):
                 raise ValueError('Duplicate OOXML archive member')
-            if any(e.filename.lower().endswith(("vbaproject.bin", ".exe", ".dll")) for e in entries):
+            if any(e.filename.lower().endswith(("vbaproject.bin", ".exe", ".dll", ".vbs", ".js")) for e in entries):
                 raise ValueError("Macro or executable content is not supported")
+            if not {'[Content_Types].xml', 'ppt/presentation.xml'}.issubset({e.filename for e in entries}):
+                raise ValueError("Not an OOXML presentation")
+            # OOXML relationship parts can reference external resources; never
+            # let a document import silently carry active external references.
+            for entry in entries:
+                if entry.filename.endswith('.rels'):
+                    if entry.file_size > 2 * 1024 * 1024:
+                        raise ValueError('Oversized OOXML relationships')
+                    payload = archive.read(entry)
+                    if re.search(rb'TargetMode\s*=\s*[\"\']External[\"\']', payload, re.I):
+                        raise ValueError('External OOXML relationships are not supported')
     except BadZipFile as exc:
         raise ValueError("Invalid PPTX archive") from exc
 
@@ -283,7 +301,7 @@ def inspect_pptx_fidelity(source):
               'unsupported_pictures': 0, 'editable_pictures': 0, 'unsupported_tables': 0,
               'unsupported_charts': 0, 'editable_chart_titles': 0, 'chart_titles_over_page_limit': 0, 'unsupported_other_shapes': 0,
               'editable_table_cells': 0, 'table_cells_over_page_limit': 0,
-              'text_boxes_over_page_limit': 0, 'non_16_9_aspect_ratio': False,
+              'text_boxes_over_page_limit': 0, 'truncated_text_boxes': 0, 'non_16_9_aspect_ratio': False,
               'off_canvas_shapes': 0, 'flattened_groups': 0}
     report['non_16_9_aspect_ratio'] = abs(deck.slide_width / deck.slide_height - 16 / 9) > 0.01
     media_seen = set()
@@ -327,6 +345,8 @@ def inspect_pptx_fidelity(source):
                 else:
                     report['unsupported_pictures'] += 1
             elif supported_shape or (shape.has_text_frame and shape.text.strip()):
+                if shape.has_text_frame and len(shape.text.strip()) > 500:
+                    report['truncated_text_boxes'] += 1
                 if retained < 16:
                     if supported_shape and not (shape.has_text_frame and shape.text.strip()):
                         report['editable_decorative_shapes'] += 1
@@ -367,7 +387,7 @@ def inspect_pptx_fidelity(source):
     report['lossy'] = any(report[k] for k in (
         'unsupported_pictures', 'unsupported_tables', 'unsupported_charts',
         'unsupported_other_shapes', 'text_boxes_over_page_limit', 'table_cells_over_page_limit', 'flattened_groups',
-        'non_16_9_aspect_ratio', 'off_canvas_shapes'))
+        'non_16_9_aspect_ratio', 'off_canvas_shapes', 'truncated_text_boxes'))
     return report
 
 
@@ -391,17 +411,25 @@ def portable_to_pptx(data, destination, media_dir=None):
                 continue
             position = widget.get('position') or {'x': 5, 'y': 5, 'width': 90, 'height': 20}
             x, y, w, h = (float(position.get(k, v)) for k, v in [('x', 5), ('y', 5), ('width', 90), ('height', 20)])
-            if not all(math.isfinite(v) for v in (x, y, w, h)) or x < 0 or y < 0 or w < 0 or h < 0 or x+w > 100 or y+h > 100:
+            if not all(math.isfinite(v) for v in (x, y, w, h)) or x < 0 or y < 0 or w <= 0 or h <= 0 or x+w > 100 or y+h > 100:
                 raise ValueError('Invalid widget geometry')
             if widget.get('kind') in ('image', 'logo'):
                 asset_id = widget.get('assetId')
-                if not isinstance(asset_id, str) or not uuid.UUID(asset_id).version == 4:
+                try:
+                    valid_asset_id = isinstance(asset_id, str) and str(uuid.UUID(asset_id)) == asset_id and uuid.UUID(asset_id).version == 4
+                except (ValueError, AttributeError, TypeError):
+                    valid_asset_id = False
+                if not valid_asset_id:
                     raise ValueError('Invalid image asset ID')
                 if media_dir is None:
                     raise ValueError('Image export requires a private media directory')
                 picture_path = Path(media_dir) / asset_id
-                if picture_path.is_symlink() or not picture_path.is_file() or picture_path.stat().st_size > 10 * 1024 * 1024:
+                if (Path(media_dir).is_symlink() or picture_path.is_symlink() or
+                        not picture_path.is_file() or picture_path.stat().st_size > 10 * 1024 * 1024):
                     raise ValueError('Missing or oversized image asset')
+                blob = picture_path.read_bytes()
+                if not (_supported_image(blob, 'image/png') or _supported_image(blob, 'image/jpeg')):
+                    raise ValueError('Unsupported or invalid image asset')
                 from pptx.enum.shapes import MSO_SHAPE_TYPE
                 shape = slide.shapes.add_picture(str(picture_path), int(p.slide_width*x/100),
                                                  int(p.slide_height*y/100), int(p.slide_width*w/100),
@@ -422,9 +450,14 @@ def portable_to_pptx(data, destination, media_dir=None):
                 box = slide.shapes.add_textbox(int(p.slide_width*x/100), int(p.slide_height*y/100),
                     int(p.slide_width*w/100), int(p.slide_height*h/100))
             content = str(widget.get('label') or '')
+            # Imports keep the short UI label and a longer editable description.
+            # Export the full text once, instead of repeating the truncated label.
+            description = widget.get('description')
+            if widget.get('kind') in ('text', 'postit') and isinstance(description, str) and description.startswith(content):
+                content = description
             if widget.get('kind') in ('question', 'timed-quiz'):
                 content += '\n' + '\n'.join(str(o.get('label', '')) for o in widget.get('options', [])[:12])
-            elif widget.get('description') and widget.get('description') != content:
+            elif widget.get('description') and widget.get('description') != content and widget.get('kind') not in ('text', 'postit'):
                 content += '\n' + str(widget['description'])
             box.text = content[:6000]
             if widget.get('kind') == 'postit' and isinstance(widget.get('style'), dict):

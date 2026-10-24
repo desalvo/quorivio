@@ -11,6 +11,6 @@ class CanvasPointerSafety(unittest.TestCase):
     def test_lost_pointer_capture_restores_initial_geometry(self):
         source = SOURCE.read_text(encoding="utf-8")
         self.assertIn('onPointerCancel={cancelGesture} onLostPointerCapture={cancelGesture}', source)
-        self.assertIn('patch(g.id,{position:g.pos})', source)
+        self.assertIn('onChange(g.groupBase||widgets)', source)
 
 if __name__ == "__main__": unittest.main()

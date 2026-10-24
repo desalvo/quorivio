@@ -26,7 +26,8 @@ class InstanceBackupTests(unittest.TestCase):
    with self.assertRaises(ValueError):restore(root/'backup.tgz',root/'restore','postgres://dummy','no')
    (root/'restore').mkdir();(root/'restore'/'old').write_text('old')
    with self.assertRaises(ValueError):restore(root/'backup.tgz',root/'restore','postgres://dummy','RESTORE-QUORIVIO-DATA')
-   with patch('instance_backup.subprocess.run',side_effect=fake):restore(root/'backup.tgz',root/'empty','postgres://dummy','RESTORE-QUORIVIO-DATA')
+   with patch('instance_backup.assert_empty_database'):
+    with patch('instance_backup.subprocess.run',side_effect=fake):restore(root/'backup.tgz',root/'empty','postgres://dummy','RESTORE-QUORIVIO-DATA')
    self.assertEqual((root/'empty'/'s'/'f').read_bytes(),b'data')
  def test_reject_symlinks(self):
   with tempfile.TemporaryDirectory() as td:
@@ -113,3 +114,58 @@ class BackupHardeningTests(unittest.TestCase):
     # Mutation occurs before capture; the snapshot should remain valid.
     make_backup(root/'new.tgz',a,'postgres://dummy')
    self.assertEqual(len(__import__('instance_backup').verify(root/'new.tgz')['files']),2)
+
+
+class RestorePreflightTests(unittest.TestCase):
+ def fixture(self, root):
+  assets=root/'assets';(assets/'s').mkdir(parents=True)
+  (assets/'s'/'asset').write_bytes(b'private-content')
+  def fake(args, **kw):
+   if args[0]=='pg_dump':pathlib.Path(args[args.index('--file')+1]).write_bytes(b'postgres dump')
+  with patch('instance_backup.subprocess.run',side_effect=fake):make_backup(root/'backup.tgz',assets,'postgres://dummy')
+  return root/'backup.tgz'
+ def test_preflight_rejects_nonempty_database(self):
+  from instance_backup import assert_empty_database
+  with patch('instance_backup.subprocess.run') as run:
+   run.return_value.stdout='2\n'
+   with self.assertRaisesRegex(ValueError,'fresh database'):assert_empty_database('postgres://dummy')
+   self.assertEqual(run.call_args.args[0][0],'psql')
+ def test_preflight_accepts_empty_database(self):
+  from instance_backup import assert_empty_database
+  with patch('instance_backup.subprocess.run') as run:
+   run.return_value.stdout='0\n'
+   assert_empty_database('postgres://dummy')
+ def test_preflight_rejects_unreadable_result(self):
+  from instance_backup import assert_empty_database
+  with patch('instance_backup.subprocess.run') as run:
+   run.return_value.stdout='garbled'
+   with self.assertRaisesRegex(ValueError,'Could not verify'):assert_empty_database('postgres://dummy')
+ def test_nonempty_database_is_not_modified(self):
+  with tempfile.TemporaryDirectory() as td:
+   root=pathlib.Path(td);source=self.fixture(root)
+   with patch('instance_backup.assert_empty_database',side_effect=ValueError('nonempty')):
+    with patch('instance_backup.subprocess.run') as run:
+     with self.assertRaises(ValueError):restore(source,root/'target','postgres://dummy','RESTORE-QUORIVIO-DATA')
+     run.assert_not_called()
+   self.assertFalse((root/'target').exists())
+ def test_changed_archive_between_validation_and_extraction_is_rejected(self):
+  import instance_backup
+  with tempfile.TemporaryDirectory() as td:
+   root=pathlib.Path(td);source=self.fixture(root)
+   original=instance_backup.verify
+   def mutate_after_verify(path):
+    manifest=original(path)
+    with tarfile.open(path,'r:gz') as z:
+     entries=[(m.name,z.extractfile(m).read()) for m in z.getmembers()]
+    with tarfile.open(path,'w:gz') as z:
+     for name,data in entries:
+      if name=='assets/s/asset':data=b'changed-content'
+      m=tarfile.TarInfo(name);m.size=len(data);z.addfile(m,io.BytesIO(data))
+    return manifest
+   with patch('instance_backup.verify',side_effect=mutate_after_verify):
+    with patch('instance_backup.assert_empty_database'):
+     with patch('instance_backup.subprocess.run') as run:
+      with self.assertRaisesRegex(ValueError,'changed during restore'):
+       restore(source,root/'target','postgres://dummy','RESTORE-QUORIVIO-DATA')
+      run.assert_not_called()
+   self.assertFalse((root/'target').exists())

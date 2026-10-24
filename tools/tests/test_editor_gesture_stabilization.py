@@ -11,7 +11,7 @@ class EditorGestures(unittest.TestCase):
         self.assertIn('(g.pos.rotation??0)+(angle-(g.startAngle??angle))', SOURCE)
     def test_cancel_restores_original_geometry(self):
         self.assertIn('function cancelGesture(e:React.PointerEvent<HTMLDivElement>)', SOURCE)
-        self.assertIn('position:g.pos', SOURCE)
+        self.assertIn('onChange(g.groupBase||widgets)', SOURCE)
         self.assertIn('onPointerCancel={cancelGesture}', SOURCE)
     def test_touch_and_pointer_capture(self):
         self.assertIn('onLostPointerCapture={cancelGesture}', SOURCE)

@@ -6,6 +6,10 @@ on:
     tags: ['v*', '0.*', '1.*', '2.*']
   workflow_dispatch:
     inputs:
+      browser_test:
+        description: 'Run Chromium editor UI acceptance (manual opt-in until fixture is validated)'
+        type: boolean
+        default: false
       capacity_test:
         description: 'Run 500-participant disposable PostgreSQL acceptance (manual only)'
         type: boolean
@@ -45,6 +49,21 @@ jobs:
         run: npm test
       - name: Compile frontend and backend
         run: npm run build
+      - name: Chromium editor UI acceptance (opt-in)
+        if: github.event_name == 'workflow_dispatch' && inputs.browser_test
+        timeout-minutes: 8
+        run: |
+          python3 -m pip install --disable-pip-version-check --break-system-packages 'playwright>=1.50,<2'
+          python3 -m playwright install --with-deps chromium
+          npm run dev:web > /tmp/quorivio-ci-vite.log 2>&1 &
+          echo $! > /tmp/quorivio-ci-vite.pid
+          trap 'kill $(cat /tmp/quorivio-ci-vite.pid) || true; tail -80 /tmp/quorivio-ci-vite.log' EXIT
+          for i in $(seq 1 45); do
+            if curl --fail --silent http://127.0.0.1:5173/ >/dev/null; then break; fi
+            sleep 1
+          done
+          curl --fail --show-error http://127.0.0.1:5173/
+          python3 tools/ci_browser_editor.py
       - name: Install PostgreSQL 18 client for integration and disaster recovery
         run: |
           sudo apt-get update -qq

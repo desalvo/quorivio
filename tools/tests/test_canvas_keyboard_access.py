@@ -5,7 +5,7 @@ ROOT=Path(__file__).resolve().parents[2]
 class CanvasKeyboardAccess(unittest.TestCase):
     def test_widget_is_keyboard_focusable(self):
         src=(ROOT/'apps/web/src/main.tsx').read_text()
-        self.assertIn('tabIndex={0} role="group" onKeyDown={e=>keyboardGeometry(e,w)}',src)
+        self.assertIn('tabIndex={0} role="group" data-selected={selectedWidgets.includes(w.id)} onKeyDown={e=>keyboardGeometry(e,w)}',src)
         self.assertIn('e.preventDefault();',src)
     def test_all_geometry_modes_and_limits(self):
         src=(ROOT/'apps/web/src/main.tsx').read_text()

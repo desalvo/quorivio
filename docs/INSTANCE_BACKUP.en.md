@@ -2,7 +2,7 @@
 
 ## Scope and status
 
-This first **offline** operation bundles a PostgreSQL custom-format dump and the private asset directory in a `.tar.gz` archive containing a manifest and per-file SHA-256 hashes. It is not yet exposed from the administrator web UI. It has not been exercised with a real PostgreSQL server, S3 storage or Kubernetes cluster.
+This first **offline** operation bundles a PostgreSQL custom-format dump and the private asset directory in a `.tar.gz` archive containing a manifest and per-file SHA-256 hashes. It is not yet exposed from the administrator web UI. The maintainer confirmed a green PostgreSQL 18 CI run on 2026-10-24 covering disposable database restore; S3, Kubernetes and production-like recovery drills remain unverified.
 
 ## Prerequisites
 
@@ -31,7 +31,7 @@ python3 tools/instance_backup.py restore --input /secure/backups/quorivio-YYYYMM
 
 5. Reconcile migrations, asset references, access controls, service health and application behavior in staging before any production use.
 
-The script deliberately does not use `--clean`: **never restore into a populated database**. PostgreSQL and filesystem writes are **not atomic together**; after a failed restore, recreate empty destinations and repeat rather than reuse partially restored data.
+The script deliberately does not use `--clean`: **never restore into a populated database**. It now queries PostgreSQL before `pg_restore` and refuses any database containing user relations; a failed or unreadable preflight aborts the operation. It also rechecks the staged dump and asset SHA-256 hashes immediately before database modification to detect changes after initial archive verification. PostgreSQL and filesystem writes are **not atomic together**; after a failed restore, recreate empty destinations and repeat rather than reuse partially restored data.
 
 ## Kubernetes
 
@@ -39,4 +39,4 @@ The wizard generates `15-assets-pvc.yaml` using `asset_storage_size` (default `1
 
 ## Remaining production gaps
 
-Administrator UI controls, built-in scheduling, automatic archive encryption, coordinated snapshots, S3 and real PostgreSQL integration tests are not yet available. This is an initial administrative maintenance mechanism, not certified disaster recovery.
+Administrator UI controls, built-in scheduling, automatic archive encryption, coordinated snapshots, S3 and production-like PostgreSQL recovery drills are not yet available. This is an initial administrative maintenance mechanism, not certified disaster recovery.
