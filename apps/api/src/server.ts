@@ -1,4 +1,5 @@
 import {allowedWriteOrigin,allowedLiveOrigin} from './origin-policy.js';
+import {encodeBundle,decodeBundle,referencedAssets,BUNDLE_MIME,MAX_BUNDLE_BYTES,type BundleAsset,type BundleManifest} from './portable-bundle.js';
 import {parseLeaderboardPage} from './pagination-policy.js';
 import {authCookieIssuedAt,presenterAuthActive} from './live-auth.js';
 import {SESSION_CHANNEL,startSessionBus} from './session-bus.js';
@@ -287,9 +288,10 @@ app.post('/api/auth/change-password',requireAuth,async(req,res)=>{try{const curr
 // TOTP is optional and bound to a fully authenticated user. Enrolment remains
 // inactive until a valid authenticator code is provided.
 app.post('/api/auth/mfa/setup',requireAuth,async(req,res)=>{try{
- if(!await activeSmtpConfig()){res.status(409).json({error:'smtp_required_before_mfa'});return} const uid=auth(req)!;const r=await db.query('SELECT totp_enabled FROM users WHERE id=$1',[uid]);if(!r.rowCount||r.rows[0].totp_enabled){res.status(409).json({error:'mfa_already_enabled'});return}
+ const uid=auth(req)!;const r=await db.query('SELECT totp_enabled FROM users WHERE id=$1',[uid]);if(!r.rowCount||r.rows[0].totp_enabled){res.status(409).json({error:'mfa_already_enabled'});return}
  const secretValue=generateTotpSecret();await db.query('UPDATE users SET totp_pending_secret=$2 WHERE id=$1',[uid,sealTotp(secretValue,secret)]);
  const email=(await db.query('SELECT email FROM users WHERE id=$1',[uid])).rows[0].email;
+ res.setHeader('Cache-Control','no-store, private');
  res.json({secret:secretValue,otpauth_url:totpAuthUrl(secretValue,email)});
  }catch(e){sendError(res,e)}});
 app.get('/api/auth/mfa/qr',requireAuth,async(req,res)=>{try{
@@ -455,14 +457,14 @@ app.post('/api/sessions',requireAuth,requirePresenter,async(req,res)=>{try{const
 // Portable definition exports intentionally omit participant data and join credentials.
 async function portableSession(id:string){const session=(await db.query('SELECT title,reference_date,theme,allow_anonymous,show_results FROM sessions WHERE id=$1',[id])).rows[0];const activities=(await db.query('SELECT type,title,options,correct_option_id,correct_option_ids,answer_mode,answer_required,duration_seconds,page_design,result_design FROM activities WHERE session_id=$1 ORDER BY position',[id])).rows;return {format:'quorivio-session',version:1,session,activities}}
 function validPortable(x:any){return x?.format==='quorivio-session'&&x.version===1&&typeof x.session?.title==='string'&&x.session.title.trim().length>0&&x.session.title.length<=160&&validDate(String(x.session.reference_date))&&validPageDesign(x.session.theme)&&typeof x.session.allow_anonymous==='boolean'&&typeof x.session.show_results==='boolean'&&Array.isArray(x.activities)&&x.activities.length<=200&&x.activities.every((a:any)=>['slide','poll','quiz','timed_quiz'].includes(a.type)&&typeof a.title==='string'&&a.title.trim().length>0&&a.title.length<=240&&(a.type==='slide'?Array.isArray(a.options)&&a.options.length===0:validateOptions(a.options))&&validAnswerMode(a.answer_mode||'single')&&typeof (a.answer_required??true)==='boolean'&& (a.correct_option_ids===undefined||Array.isArray(a.correct_option_ids)&&a.correct_option_ids.every((v:any)=>typeof v==='string'&&a.options.some((o:any)=>o.id===v)))&&validPageDesign(a.page_design)&&validPageDesign(a.result_design)&&(!['quiz','timed_quiz'].includes(a.type)||!['single','multiple'].includes(a.answer_mode||'single')||(a.answer_mode==='multiple'?Array.isArray(a.correct_option_ids)&&a.correct_option_ids.length>0:a.options.some((o:any)=>o.id===a.correct_option_id)))&&(a.type!=='timed_quiz'||['single','multiple'].includes(a.answer_mode||'single')&&Number.isInteger(a.duration_seconds)&&a.duration_seconds>=5&&a.duration_seconds<=600)&&(a.duration_seconds==null||Number.isInteger(a.duration_seconds)&&a.duration_seconds>=5&&a.duration_seconds<=600));}
-async function createFromPortable(data:any,uid:string,importMediaDir?:string){const cx=await db.connect();const sid=randomUUID();try{await cx.query('BEGIN');const u=(await cx.query('SELECT organization_id FROM users WHERE id=$1',[uid])).rows[0];if(!u)throw Error('missing_user');await cx.query("INSERT INTO sessions(id,organization_id,owner_id,title,reference_date,join_code,join_secret,expires_at,theme,allow_anonymous,show_results) VALUES($1,$2,$3,$4,$5,$6,$7,now()+interval '1 day',$8,$9,$10)",[sid,u.organization_id,uid,data.session.title,data.session.reference_date,randomBytes(5).toString('hex').toUpperCase(),randomBytes(20).toString('base64url'),JSON.stringify(data.session.theme),data.session.allow_anonymous,data.session.show_results]);for(let i=0;i<data.activities.length;i++){const a=data.activities[i];await cx.query('INSERT INTO activities(id,session_id,type,title,options,correct_option_id,duration_seconds,page_design,result_design,position,answer_mode,answer_required,correct_option_ids) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)',[randomUUID(),sid,a.type,a.title,JSON.stringify(a.options),['quiz','timed_quiz'].includes(a.type)?a.correct_option_id:null,a.duration_seconds,JSON.stringify(a.page_design),JSON.stringify(a.result_design),i,a.answer_mode||'single',a.answer_required??true,JSON.stringify(a.correct_option_ids||[])])}if(importMediaDir){
+async function createFromPortable(data:any,uid:string,importMediaDir?:string,bundleMode=false){const cx=await db.connect();const sid=randomUUID();try{await cx.query('BEGIN');const u=(await cx.query('SELECT organization_id FROM users WHERE id=$1',[uid])).rows[0];if(!u)throw Error('missing_user');await cx.query("INSERT INTO sessions(id,organization_id,owner_id,title,reference_date,join_code,join_secret,expires_at,theme,allow_anonymous,show_results) VALUES($1,$2,$3,$4,$5,$6,$7,now()+interval '1 day',$8,$9,$10)",[sid,u.organization_id,uid,data.session.title,data.session.reference_date,randomBytes(5).toString('hex').toUpperCase(),randomBytes(20).toString('base64url'),JSON.stringify(data.session.theme),data.session.allow_anonymous,data.session.show_results]);for(let i=0;i<data.activities.length;i++){const a=data.activities[i];await cx.query('INSERT INTO activities(id,session_id,type,title,options,correct_option_id,duration_seconds,page_design,result_design,position,answer_mode,answer_required,correct_option_ids) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)',[randomUUID(),sid,a.type,a.title,JSON.stringify(a.options),['quiz','timed_quiz'].includes(a.type)?a.correct_option_id:null,a.duration_seconds,JSON.stringify(a.page_design),JSON.stringify(a.result_design),i,a.answer_mode||'single',a.answer_required??true,JSON.stringify(a.correct_option_ids||[])])}if(importMediaDir){
  const assets=data.import_assets;
- if(!Array.isArray(assets)||assets.reduce((sum:number,a:any)=>sum+(Number.isFinite(a?.bytes)?a.bytes:0),0)>50*1024*1024||assets.length>200||new Set(assets.map((a:any)=>a.id)).size!==assets.length)throw Error('invalid_import_assets');
- const referenced=new Set(data.activities.flatMap((a:any)=>(a.page_design?.widgets||[]).filter((w:any)=>w.kind==='image').map((w:any)=>w.assetId)));
+ if(!Array.isArray(assets)||assets.reduce((sum:number,a:any)=>sum+(Number.isFinite(a?.bytes)?a.bytes:0),0)>(bundleMode?80:50)*1024*1024||assets.length>(bundleMode?300:200)||new Set(assets.map((a:any)=>a.id)).size!==assets.length)throw Error('invalid_import_assets');
+ const referenced=bundleMode?referencedAssets(data):new Set(data.activities.flatMap((a:any)=>(a.page_design?.widgets||[]).filter((w:any)=>w.kind==='image').map((w:any)=>w.assetId)));
  if(referenced.size!==assets.length||!assets.every((a:any)=>referenced.has(a.id)))throw Error('unmatched_import_assets');
  const folder=path.join(assetRoot,sid);await mkdir(folder,{recursive:true,mode:0o700});
  for(const asset of assets){
-  if(!/^[0-9a-f-]{36}$/.test(asset.id)||!['image/png','image/jpeg'].includes(asset.mime)||!Number.isInteger(asset.bytes)||asset.bytes<1||asset.bytes>10*1024*1024||! /^[a-f0-9]{64}$/.test(asset.sha256))throw Error('invalid_import_asset');
+  if(!/^[0-9a-f-]{36}$/.test(asset.id)||!(bundleMode?['image/png','image/jpeg','image/gif','image/webp','application/pdf','video/mp4','video/webm']:['image/png','image/jpeg']).includes(asset.mime)||!Number.isInteger(asset.bytes)||asset.bytes<1||asset.bytes>(bundleMode?50:10)*1024*1024||! /^[a-f0-9]{64}$/.test(asset.sha256))throw Error('invalid_import_asset');
   const contents=await readFile(path.join(importMediaDir,asset.id));
   if(contents.length!==asset.bytes||createHash('sha256').update(contents).digest('hex')!==asset.sha256)throw Error('invalid_import_asset_digest');
   await writeFile(path.join(folder,asset.id),contents,{flag:'wx',mode:0o600});
@@ -543,6 +545,41 @@ app.get('/api/sessions/:id/assets/:assetId',requireAuth,async(req,res)=>{try{
  }catch(e){sendError(res,e)}});
 app.get('/api/sessions/:id/export.json',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}res.setHeader('Content-Disposition','attachment; filename="quorivio-session.json"');res.json(await portableSession(s.id))}catch(e){sendError(res,e)}});
 app.post('/api/sessions/import',requireAuth,requirePresenter,async(req,res)=>{try{if(!validPortable(req.body)){res.status(400).json({error:'invalid_import'});return}const id=await createFromPortable(req.body,auth(req)!);res.status(201).json({id})}catch(e){sendError(res,e)}});
+// Self-contained Quorivio v1 bundle: no participants, responses, credentials or secrets.
+app.get('/api/sessions/:id/export.quorivio',requireAuth,async(req,res)=>{try{
+ const session=await owner(req.params.id,auth(req)!);if(!session){res.status(404).end();return}
+ const definition=await portableSession(session.id),refs=[...referencedAssets(definition)];
+ if(refs.length>300){res.status(413).json({error:'too_many_assets'});return}
+ const rows=refs.length?(await db.query('SELECT id,mime_type,byte_size,sha256 FROM session_assets WHERE session_id=$1 AND participant_id IS NULL AND id=ANY($2::uuid[])',[session.id,refs])).rows:[];
+ if(rows.length!==refs.length){res.status(409).json({error:'missing_session_assets'});return}
+ let total=0;const assets:BundleAsset[]=[],media=new Map<string,Buffer>();
+ for(const row of rows){const bytes=Number(row.byte_size);total+=bytes;
+  if(total>80*1024*1024||bytes>50*1024*1024){res.status(413).json({error:'bundle_media_limit'});return}
+  const body=await readFile(path.join(assetRoot,session.id,row.id));const digest=createHash('sha256').update(body).digest('hex');
+  if(body.length!==bytes||digest!==row.sha256){res.status(409).json({error:'asset_integrity_failure'});return}
+  assets.push({id:row.id,mime:row.mime_type,bytes,sha256:digest});media.set(row.id,body);
+ }
+ const bundle=encodeBundle({format:'quorivio-bundle',version:1,definition,assets},media);
+ if(bundle.length>MAX_BUNDLE_BYTES){res.status(413).json({error:'bundle_too_large'});return}
+ res.setHeader('Content-Type',BUNDLE_MIME);res.setHeader('Content-Disposition','attachment; filename="quorivio-session.quorivio"');res.setHeader('Cache-Control','private, no-store');res.send(bundle);
+ }catch(e){sendError(res,e)}});
+app.post('/api/sessions/import.quorivio',requireAuth,requirePresenter,async(req,res)=>{
+ if(String(req.headers['content-type']||'').split(';')[0].trim().toLowerCase()!==BUNDLE_MIME){res.status(415).json({error:'quorivio_bundle_required'});return}
+ const size=Number(req.headers['content-length']);if(!Number.isSafeInteger(size)||size<22||size>MAX_BUNDLE_BYTES){res.status(413).json({error:'invalid_bundle_size'});return}
+ const scratch=path.join(process.env.QUORIVIO_CONVERSION_DIR||'/conversions',randomBytes(16).toString('hex'));
+ try{
+  await mkdir(scratch,{recursive:true,mode:0o700});
+  const upload=await receiveAssetStream(req,scratch,'import.quorivio',BUNDLE_MIME,MAX_BUNDLE_BYTES,size);
+  const {manifest,media}=decodeBundle(await readFile(upload.destination));
+  if(!validPortable(manifest.definition)){res.status(400).json({error:'invalid_bundle_definition'});return}
+  const importDir=path.join(scratch,'media');await mkdir(importDir,{mode:0o700});
+  for(const [id,bytes] of media)await writeFile(path.join(importDir,id),bytes,{flag:'wx',mode:0o600});
+  const definition={...manifest.definition,import_assets:manifest.assets};
+  const id=await createFromPortable(definition,auth(req)!,importDir,true);
+  res.status(201).json({id});
+ }catch(e){if(e instanceof Error&&(/bundle|invalid_import_asset|unmatched_import_assets/.test(e.message))){res.status(400).json({error:'invalid_quorivio_bundle'});return}sendError(res,e)}finally{await rm(scratch,{recursive:true,force:true}).catch(()=>{})}
+});
+
 app.post('/api/sessions/:id/duplicate',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}const portable=await portableSession(s.id);portable.session.title=(portable.session.title+' — Copia').slice(0,160);const id=await createFromPortable(portable,auth(req)!);res.status(201).json({id})}catch(e){sendError(res,e)}});
 app.get('/api/sessions/:id/presenters',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}const r=await db.query('SELECT u.id,u.email FROM users u JOIN session_presenters sp ON u.id=sp.user_id WHERE sp.session_id=$1',[s.id]);res.json(r.rows)}catch(e){sendError(res,e)}});
 app.post('/api/sessions/:id/presenters',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}if(s.owner_id!==auth(req)){res.status(403).json({error:'owner_required'});return}const email=String(req.body?.email||'').toLowerCase();const r=await db.query("SELECT id FROM users WHERE organization_id=$1 AND email=$2 AND approved=true AND must_change_password=false AND role IN ('presenter','org_admin','platform_admin')",[s.organization_id,email]);if(!r.rowCount){res.status(404).json({error:'eligible_presenter_not_found'});return}await db.query('INSERT INTO session_presenters(session_id,user_id) VALUES($1,$2) ON CONFLICT DO NOTHING',[s.id,r.rows[0].id]);res.status(201).json({ok:true})}catch(e){sendError(res,e)}});
@@ -629,6 +666,26 @@ app.put('/api/sessions/:id/pages/order',requireAuth,async(req,res)=>{
   await cx.query('COMMIT');begun=false;await broadcast(req.params.id);res.json({activity_ids:ids});
  }catch(e){if(begun)await cx.query('ROLLBACK').catch(()=>{});sendError(res,e)}finally{cx.release()}
 });
+// Authorized page deletion, including dependent answers; never leave an active page dangling.
+app.delete('/api/sessions/:id/pages/:aid',requireAuth,async(req,res)=>{
+ const cx=await db.connect();let begun=false;
+ try{
+  await cx.query('BEGIN');begun=true;
+  const session=await cx.query('SELECT id,status,current_activity_id FROM sessions WHERE id=$1 AND (owner_id=$2 OR EXISTS (SELECT 1 FROM session_presenters WHERE session_id=$1 AND user_id=$2)) FOR UPDATE',[req.params.id,auth(req)]);
+  if(!session.rowCount){await cx.query('ROLLBACK');begun=false;res.status(404).end();return}
+  if(session.rows[0].status==='closed'){await cx.query('ROLLBACK');begun=false;res.status(409).json({error:'session_closed'});return}
+  const page=await cx.query('SELECT id FROM activities WHERE id=$1 AND session_id=$2 FOR UPDATE',[req.params.aid,req.params.id]);
+  if(!page.rowCount){await cx.query('ROLLBACK');begun=false;res.status(404).end();return}
+  // Remove dependent rows through their existing ON DELETE CASCADE references.
+  if(session.rows[0].current_activity_id===req.params.aid)await cx.query('UPDATE sessions SET current_activity_id=NULL WHERE id=$1',[req.params.id]);
+  await cx.query('DELETE FROM activities WHERE id=$1 AND session_id=$2',[req.params.aid,req.params.id]);
+  // Avoid transient UNIQUE(session_id,position) collisions when compacting gaps.
+  await cx.query('UPDATE activities SET position= -position-1 WHERE session_id=$1',[req.params.id]);
+  const remaining=await cx.query('SELECT id FROM activities WHERE session_id=$1 ORDER BY position DESC,id',[req.params.id]);
+  for(let i=0;i<remaining.rows.length;i++)await cx.query('UPDATE activities SET position=$3 WHERE id=$1 AND session_id=$2',[remaining.rows[i].id,req.params.id,i]);
+  await cx.query('COMMIT');begun=false;await broadcast(req.params.id);res.json({ok:true});
+ }catch(e){if(begun)await cx.query('ROLLBACK').catch(()=>{});sendError(res,e)}finally{cx.release()}
+});
 // Canvas-first pages: no activity form or media upload is required to compose a slide.
 app.post('/api/sessions/:id/pages',requireAuth,async(req,res)=>{const cx=await db.connect();let begun=false;try{
  const title=req.body?.title;
@@ -639,7 +696,7 @@ app.post('/api/sessions/:id/pages',requireAuth,async(req,res)=>{const cx=await d
  if(session.rows[0].status==='closed'){await cx.query('ROLLBACK');begun=false;res.status(409).json({error:'session_closed'});return}
  const position=await cx.query('SELECT coalesce(max(position)+1,0)::int AS p FROM activities WHERE session_id=$1',[req.params.id]);
  const id=randomUUID();
- await cx.query("INSERT INTO activities(id,session_id,type,title,options,position,page_design,result_design,answer_mode,answer_required) VALUES($1,$2,'slide',$3,'[]'::jsonb,$4,$5,'{}'::jsonb,'{}'::jsonb,'text',false)",[id,req.params.id,title.trim(),position.rows[0].p]);
+ await cx.query("INSERT INTO activities(id,session_id,type,title,options,position,page_design,result_design,answer_mode,answer_required) VALUES($1,$2,'slide',$3,'[]'::jsonb,$4,'{}'::jsonb,'{}'::jsonb,'text',false)",[id,req.params.id,title.trim(),position.rows[0].p]);
  await cx.query('COMMIT');begun=false;await broadcast(req.params.id);
  res.status(201).json({id,title:title.trim(),position:position.rows[0].p});
  }catch(e){if(begun)await cx.query('ROLLBACK').catch(()=>{});sendError(res,e)}finally{cx.release()}});

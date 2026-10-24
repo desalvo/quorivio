@@ -1,3 +1,70 @@
+## 2026-10-24 — Unified macroarea pass: editable PPTX table-cell recovery (local)
+- Native PPTX table contents now import as individually editable text widgets with proportional cell geometry instead of being silently discarded. The same 16-widget page limit applies to all shapes, including table cells.
+- Fidelity diagnostics now distinguish imported table cells from dropped overflow cells, and ALWAYS flag original native table semantics as lossy (table borders, styles, merged cells and OOXML structure are not preserved).
+- Regression tests cover a normal 2x3 table and a 5x4 table exceeding capacity. Local execution: **220/220 Python unittest and 120/120 API Node tests pass**.
+- Full TypeScript/Vite build ATTEMPTED on this revision, blocked by missing local `@types/node` and other dependency typings; no claim of clean build or complete integration. Earlier user-confirmed GitHub CI does not certify this cumulative revision.
+- **UNFINISHED SOFTWARE:** editable grouped shapes, native charts/SmartArt, full OOXML fidelity, MFA/SSO end-to-end, live/browser integration, cross-instance portable import and clean build evidence. RC gate remains 37.5% pending verified gate closure. This package is NOT a final RC.
+
+## 2026-10-24 — Native PPTX media verification and fidelity audit consistency (local)
+- Native PPTX import now checks actual PNG/JPEG file signature as well as OOXML content type and size, preventing mislabelled media from being registered as editable images.
+- The fidelity report now follows the importer's actual shape iteration order, 16-widgets-per-page limit, 200-media ceiling, unique-asset byte budget and media deduplication behavior; unsupported entries contribute to the lossy flag.
+- Regression coverage checks signature mismatch and 18-text-box conversion/report agreement. Local verification: Python unittest 218 passed; Node 116 passed. Earlier GitHub CI was confirmed green by the user, but this new revision has not been built in full or deployed.
+- **NOT COMPLETE:** this cycle does not implement PPTX groups/charts/SmartArt/complex themes, finalize MFA enrollment, or certify responsive browser rendering. RC weighted status remains 37.5%; no new acceptance gates were closed.
+
+## 2026-10-24 — Accessibility and fidelity-copy consolidation (local verification)
+- Improved keyboard focus, reduced-motion/forced-colors support, mobile touch targets and corrected PPTX import guidance. Python 216/216, Node 116/116. Full build/browser/Kubernetes remain unverified; RC remains 37.5%. See docs/LOCAL_COMPLETION_AUDIT.md.
+
+## 2026-10-24 — Mobile canvas pointer semantics (local verification)
+- Fixed a CSS cascade regression: the mobile layout applied `touch-action: manipulation` to editable canvas widgets, allowing browser gestures to interrupt pointer-captured drag, resize and rotation. An editor-scoped mobile override now restores `touch-action: none` without changing audience form controls.
+- Removed a competing `min-height: 420px`/internal overflow from the mobile editor canvas (the 16:9 artboard and outer scroll container remain authoritative).
+- Regression: 213 Python tests and 116 Node tests passed. Full production frontend build, actual touch devices and Kubernetes E2E remain unverified. Weighted RC stays 37.5%.
+- Open: full editor/mobile browser acceptance, extended PPTX OOXML fidelity, MFA polish, widget live E2E, build reproducibility and security audit.
+
+## 2026-10-24 — Editor page isolation (local verification)
+- WidgetCanvas is now keyed to session and selected page, preventing canvas selection, editing mode and context menus from leaking across page changes. Orphan references are cleared when widgets are removed externally.
+- Tests: 211 Python unittest tests and 116 Node.js tests passed. Browser and full production build not certified; RC remains 37.5%.
+
+## 2026-10-24 — Editor keyboard accessibility and deletion safety
+- Added Delete/Backspace on focused widget and Escape to clear selection; protected nested form controls from keyboard interception. Removed widget clears inspector and context menu.
+- Local suites: 207/207 Python unittest, 116/116 Node.js. Browser/TypeScript build and Kubernetes E2E not validated; weighted RC stays 37.5%. Other feature areas remain open.
+
+## 2026-10-24 — Independent widget duplication and quiz answer inspector fix
+- Widget duplication deep-clones nested option arrays and position, selects the new copy and prevents negative position for widgets at canvas edges.
+- Quiz inspector honors the legacy correctOptionId when correctOptionIds is empty, consistently with backend scoring semantics.
+- Three targeted regression checks added. Full TypeScript/Vite and browser/Kubernetes validation not claimed; weighted RC remains 37.5%.
+
+## 2026-10-24 — Canvas selection and activity inspector persistence
+- Fixed selection being cleared on pointer release, which made the question/timed-quiz property inspector disappear during normal editing. Widget selection now persists after pointerup, supports keyboard focus and click, and clears when the selected widget is deleted.
+- Local checks: 198/198 Python, 116/116 Node.js. Production build/browser and Kubernetes acceptance remain pending; weighted RC stays 37.5%.
+
+## 2026-10-24 — Mobile authoring geometry stabilization (local verification)
+- Removed the <480px CSS reflow that overwrote all widget positions, sizes and rotations inside the editor, despite the pointer engine using absolute canvas coordinates.
+- The mobile editor now uses a horizontally scrollable 16:9 artboard (minimum 600px) while keeping persisted geometry intact. The separate participant-facing view may still reflow.
+- Added two mobile-geometry regressions: **195/195 Python** and **116/116 Node.js** tests pass locally.
+- Attempted offline `npm install --ignore-scripts`: **blocked** by uncached `@types/bcryptjs`; no clean TypeScript/Vite build or browser validation is claimed.
+- **Still open**: full mobile/device accessibility testing, PowerPoint complex-object fidelity, widget live E2E, full MFA acceptance, dependency lockfile, and Kubernetes performance/security acceptance. RC matrix remains 37.5%; software completion cannot be claimed.
+
+## 2026-10-24 — Async editor save consistency (local verification)
+- Guarded the editor against overlapping asynchronous saves and navigation while a save is pending.
+- The saved baseline is now the exact draft submitted to the API, not a later in-memory edit. Subsequent edits remain marked unsaved even if an older request finishes later.
+- Added Ctrl/Cmd+S inside the editor, with browser default suppressed only when editor is active; Save button is disabled during pending requests.
+- Regression: Python unittest 190/190, Node.js 113/113. Full TypeScript/Vite build and real browser/Kubernetes acceptance not performed. RC matrix unchanged (37.5%).
+- **Still open:** complete PowerPoint complex-object fidelity, asset-inclusive session portability, mobile E2E, integration acceptance, reproducible clean npm dependency installation, real 500-user benchmark. No claim of release-candidate completeness.
+
+## 2026-10-23 — Page editor selection and closed-session UX hardening
+- After duplication the editor selects the new page using snapshot identity comparison; keyboard navigation on page thumbnails supports arrows/Home/End; destructive/editor page controls are disabled for closed sessions.
+- Added 3 targeted regression tests. Browser/full production build and Kubernetes acceptance are pending. RC remains 37.5%.
+
+## 2026-10-23 — Dedicated full-page session editor and page lifecycle repair
+- Fixed blank page creation: SQL statement had five parameter placeholders but the code supplied four values, causing `internal_error`.
+- Added authorized transactional DELETE endpoint for pages, resetting the currently published page when needed, compacting positions safely, notifying connected clients. **Deletion is destructive and removes associated responses**.
+- Added a fullscreen-style editor workspace, vertical page thumbnails with drag-and-drop and keyboard/button reordering, page creation, duplication and deletion, and a horizontal widget toolbar; main “Edit pages” now opens this workspace.
+- Regression checks: 177 Python tests passed; 113 Node tests passed in this cycle. Production frontend compilation and browser/Kubernetes acceptance have not been rerun. RC gate remains 37.5%.
+
+## 2026-10-23 — Native PPTX decorative shape round-trip
+- Empty rectangle, rounded rectangle, ellipse and isosceles triangle auto-shapes now import as editable `postit` widgets even without text, retaining supported RGB fills and outlines, geometry and rotation. Export reconstructs native PowerPoint shapes. The fidelity report counts decorative shapes separately.
+- Verified locally with Python unittest 174/174 and Node.js 113/113; browser and Kubernetes acceptance not performed. Unsupported vector shapes, charts and themes remain open. Weighted RC unchanged at 37.5%.
+
 
 ## CI hotfix — 2026-10-23
 
@@ -808,3 +875,68 @@ Cross-pod PostgreSQL notification listener now re-synchronizes local WebSocket s
 - Added regression coverage to `tools/tests/test_pptx_portability.py`.
 - Local checks: 170 Python unittest cases passed; 113 Node tests passed. Browser, PostgreSQL, Kubernetes and production frontend build not certified in this cycle.
 - PPTX native vector shape fidelity and full editing remain open. RC gate matrix unchanged pending end-to-end acceptance.
+
+
+### 2026-10-23 native PPTX shape color round-trip
+Post-commit development: native rectangular/rounded shape fills and strokes preserved in PPTX import/export and projection widget style. Local Python/Node checks passed; browser/K8s acceptance pending.
+
+#### 2026-10-23 — Native PPTX ellipse and triangle shape round-trip
+- Added editable shapeType support for oval and isosceles-triangle PPTX text autoshapes, including validated API styles and presenter approximations; preserved rectangle compatibility.
+- Round-trip regression added, 173 Python tests and 113 Node tests passed locally. Full production build/browser/Kubernetes acceptance not claimed.
+- RC gate percentage remains 37.5%; no external changes or commits performed.
+
+### 2026-10-24 — Full-page editor unsaved edits
+Added a baseline signature for widgets, headers and backgrounds; unsaved-change indicator, save-state guard, confirmation on page navigation/close and beforeunload. Full browser validation pending.
+
+### 2026-10-24 — Full-page editor thumbnail fidelity and draft safety
+- Page filmstrip previews now render the saved page's widget positions, sizes, labels, and supported background URLs instead of only the title. The preview remains read-only and is capped at 24 widgets per page.
+- Reordering pages (drag-and-drop or arrow buttons) and returning to the dashboard now guard against discarding unsaved canvas edits.
+- Verification: 186 Python unit tests and 113 Node tests pass locally. Full TypeScript/Vite build and actual browser/Kubernetes tests have **not** been verified in this cycle.
+- RC acceptance stays **37.5%**; other features (PPTX complex elements, full mobile interaction, end-to-end multi-replica synchronization and accessibility) remain open.
+
+## Portable Quorivio archive cycle (2026-10-24)
+Implemented native self-contained `.quorivio` ZIP export/import, with asset manifest, SHA-256 verification, strict ZIP validation, fresh join credentials and a dashboard import/export flow. Legacy JSON definition-only API remains. Local checks: 190 Python and 116 Node tests passing. Real browser/database cross-instance acceptance and complete TypeScript/Vite build remain pending. RC gate stays at 37.5%.
+
+### 2026-10-24 — Editor geometry stabilization
+- Matched pointer and keyboard resize minimums to the 0.01%-sized shapes already accepted by the server and native PPTX conversion. Preserved four decimals instead of one to avoid silently enlarging tiny imported objects.
+- Confirmed that keyboard geometry shortcuts ignore editable input fields.
+- Local tests: 193 Python and 116 Node.js passed. No full browser/production build or Kubernetes acceptance in this cycle; RC remains 37.5%.
+
+### 2026-10-24 — Editor ordering race hardening (post-commit cumulative)
+- Serialized page-order requests while preserving unsaved-edit confirmation and full-screen editor navigation.
+- Added an `aria-busy` state, disabled filmstrip dragging/reordering while a reorder persists, and ignored late order snapshots belonging to a previously selected session.
+- Added targeted Python regression tests. No database migration, public API change, GitHub modification, or cluster deployment.
+- This is **not** completion of the full software backlog: PPTX complex OOXML fidelity, MFA and mobile acceptance, integration/production build, security review, and Kubernetes E2E remain open. RC gate stays **37.5%**.
+- Validation in this cycle: 204 Python unittest cases and 116 Node tests passed; ZIP integrity passed. Local `npm run build` did **not** pass (Node typings unavailable in this container, TS2580 in `totp.ts`); CI/browser/Kubernetes not re-run.
+
+## 2026-10-24 — Canvas multipointer gesture ownership
+- Added pointer identity to in-progress canvas gestures: secondary touches cannot start over an active drag, resize or rotate operation, and unrelated pointer moves/releases/cancels are ignored. Mouse gestures accept only the primary button.
+- Updated gesture regression contracts and added two multipointer tests. Local checks: 209 Python tests and 116 Node tests passing.
+- Local reproducible npm installation remains blocked: `npm install --offline` reports ENOTCACHED for `@types/bcryptjs`; TypeScript/Vite build, browser/device and Kubernetes acceptance remain unverified. This change does not close the editor or RC gates.
+- Verified RC score: 37.5%, unchanged. No commits or remote mutations.
+
+### 2026-10-24 — Unified completion audit: independent authenticator enrolment
+- Removed the erroneous SMTP prerequisite from TOTP authenticator setup. TOTP is available independently of email delivery; email MFA continues to require SMTP.
+- Protected the authenticator provisioning response from intermediate HTTP caching with `Cache-Control: no-store, private`; the QR endpoint already carried the same header.
+- Added Node regression contracts covering independent TOTP/email enrolment and changed the older Python contract that enforced the incorrect coupling.
+- Validation of this cumulative revision: Python unittest 218 PASS, API Node tests 118 PASS. Local `npm run build` FAILED because the container has no installed Node typings; this is **not** evidence of a clean production build. Integration/browser, real PostgreSQL, multi-replica, advanced OOXML, security and GDPR acceptance remain OPEN.
+- RC score remains at the last validated gate level (37.5%). Do not mark the software complete.
+
+### 2026-10-24 — Unified completion cycle / portable bundle integrity
+- Hardened local/central ZIP consistency, canonical and disjoint entry layout, MIME signature checks and adversarial bundle regressions.
+- Tests: 218 Python and 120 Node passing; production build and real integration are not certified here.
+- See `docs/UNIFIED_COMPLETION_PROGRESS_2026-10-24.md`. RC gate remains 37.5%, not complete.
+
+## 2026-10-24 — Native PowerPoint grouped shape recovery
+- Flatten nested OOXML shape groups into independently editable widget candidates with child-coordinate transforms.
+- Fidelity report explicitly marks flattened groups as lossy.
+- Local verification: 223 Python, 120 Node.js API. Fresh build blocked by missing installed Node typings; not RC.
+- See `docs/UNIFIED_COMPLETION_PROGRESS_2026-10-24.md` for detailed open gates.
+
+## 2026-10-24 — Integrated macroarea continuation: chart titles and OIDC boundaries
+
+- Native PPTX chart titles are now imported as independently editable text widgets, respecting the existing 16-widget/page limit. Chart series, axes, plot and styles remain unsupported and are explicitly counted as lossy in fidelity reports.
+- OIDC ID-token claim checks reject excessively old `iat`, non-finite validity claims and validity intervals longer than 24 hours, in addition to existing issuer/audience/nonce/signature requirements. Regression tests added.
+- Local evidence: 224 Python unittest tests PASS; 121 Node.js tests PASS. The full npm build was attempted but could not complete because Node TypeScript declarations are not installed in this environment (`TS2580`), not because compilation success has been established.
+- **Not closed:** whole-product RC, complex PowerPoint charts/SmartArt, end-to-end MFA/SSO, PostgreSQL live participant flows, across-instance bundle import, browser/device accessibility, real 500-participant capacity, security/GDPR and reproducible CI for this revision. All require additional implementation or external validation.
+- No changes to repositories, running servers or Kubernetes.

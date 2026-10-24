@@ -199,13 +199,8 @@
   .activity-actions,.downloads{flex-wrap:wrap;max-width:100%;min-width:0}
   .activity-actions button{white-space:normal}
 }
-@media (max-width: 480px) {
-  .widget-canvas-item{position:relative!important;left:auto!important;top:auto!important;
-    width:100%!important;height:auto!important;transform:none!important;
-    margin:8px 0;min-height:74px;cursor:default}
-  .widget-canvas{display:flex;flex-direction:column;min-height:0;padding:8px}
-  .widget-canvas-item .canvas-actions{flex-wrap:wrap}
-}
+/* The participant view is reflowed independently; the editor must preserve
+   absolute widget coordinates at every viewport width. */
 
 /* Participant interaction is a mobile reading flow, not a scaled-down 16:9 editor. */
 @media (max-width: 700px) {
@@ -226,3 +221,118 @@
 .projection-participant-count strong{font-size:clamp(.95rem,2vw,2rem);line-height:1.15}
 .projection-participant-count [data-live-participants]{font-size:clamp(2.25rem,6vw,7rem);font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
 @media(max-width:640px){.projection-participant-count strong{font-size:1rem}.projection-participant-count [data-live-participants]{font-size:clamp(2rem,12vw,4rem)}}
+/* Dedicated, PowerPoint-style session editor: sidebar, toolbar, central canvas. */
+.powerpoint-editor:not(:fullscreen){position:fixed!important;inset:0;z-index:1000;margin:0!important;max-width:none!important;width:100vw;height:100dvh;box-sizing:border-box;overflow:auto;background:var(--panel,#fff);padding:18px 22px 30px 290px!important;border-radius:0!important}
+.powerpoint-editor .page-editor-sidebar{position:fixed;left:0;top:0;bottom:0;width:265px;z-index:1;display:flex;flex-direction:column;gap:12px;overflow:hidden;padding:16px 12px;background:#f0f2f8;color:#202538;border-right:1px solid #b8bfce;box-sizing:border-box}
+.page-editor-sidebar header{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.page-editor-sidebar footer{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.page-editor-thumbnails{overflow-y:auto;flex:1;min-height:0;display:flex;flex-direction:column;gap:10px}
+.page-editor-thumb-row{background:#fff;border-radius:9px;padding:7px;box-shadow:0 1px 4px #26304824}
+.page-editor-thumb{width:100%;text-align:left;border:2px solid transparent;background:transparent;color:#202538;border-radius:6px;padding:4px;overflow:hidden}
+.page-editor-thumb[aria-current=page]{border-color:#6b52cd}
+.page-editor-preview{display:flex;align-items:center;justify-content:center;aspect-ratio:16/9;background:#fff;border:1px solid #aab3c9;margin-bottom:6px;color:#202538;font-size:11px;padding:6px;overflow:hidden;overflow-wrap:anywhere}
+.page-editor-thumb-actions{display:flex;gap:4px;justify-content:space-between}.page-editor-thumb-actions button{min-width:30px;min-height:30px;padding:4px}
+.powerpoint-editor .widget-palette{display:flex;flex-wrap:nowrap;gap:6px;overflow-x:auto;padding:12px;background:#e7ebf5;border-radius:10px;position:sticky;top:0;z-index:5;margin:12px 0}
+.powerpoint-editor .widget-palette button{flex:0 0 auto;white-space:nowrap}
+.powerpoint-editor .widget-canvas{width:100%;max-width:1400px;margin:16px auto}
+.powerpoint-editor .editor-heading{display:flex;flex-wrap:wrap;align-items:center;gap:12px;justify-content:space-between}
+@media(max-width:720px){.powerpoint-editor:not(:fullscreen){padding:14px 12px 24px!important}.powerpoint-editor .page-editor-sidebar{position:relative;width:100%;height:190px;border-right:0;margin-bottom:15px;flex-direction:column}.page-editor-thumbnails{flex-direction:row;overflow:auto}.page-editor-thumb-row{flex:0 0 148px}.page-editor-sidebar footer{display:flex;overflow-x:auto}.powerpoint-editor .widget-palette button{min-height:44px}}
+
+/* Miniature read-only driven by the persisted page layout (not the current unsaved draft). */
+.page-editor-preview{position:relative;display:block;padding:0;isolation:isolate;overflow:hidden}
+.page-editor-preview-title{position:absolute;top:3%;left:4%;right:4%;font-size:9px;line-height:1.1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;z-index:1;text-shadow:0 1px 2px #fff}
+.page-editor-preview-widget{position:absolute;box-sizing:border-box;display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid;line-height:1;font-size:5px;white-space:nowrap;text-overflow:ellipsis;pointer-events:none}
+@media (max-width:720px){.page-editor-preview-widget{font-size:4px}}
+
+/* Mobile authoring: retain the stored 16:9 coordinate system. The participant
+   reading view may reflow, but the *editor* must never reflow positioned objects:
+   pointer coordinates, resizing and the PPTX round-trip all depend on the same
+   canvas rectangle. On narrow devices pan the artboard horizontally instead. */
+@media (max-width: 700px) {
+  .powerpoint-editor .canvas-with-rulers {
+    overflow-x: auto;
+    overflow-y: visible;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  .powerpoint-editor .canvas-with-rulers .widget-canvas {
+    display: block;
+    flex-direction: initial;
+    box-sizing: border-box;
+    position: relative;
+    width: max(100%, 600px);
+    min-width: 600px;
+    min-height: 0;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    padding: 0;
+    overflow: visible;
+    touch-action: none;
+  }
+  .powerpoint-editor .canvas-with-rulers .widget-canvas-item {
+    position: absolute !important;
+    margin: 0;
+    min-height: 0;
+    max-width: none;
+    touch-action: none;
+    /* left/top/width/height/rotation come from the saved widget geometry */
+  }
+  .powerpoint-editor .canvas-with-rulers .widget-canvas-item input {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .powerpoint-editor .canvas-accessible-row button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+/* Authoring gestures own the pointer stream. The mobile participation controls
+   retain native touch handling, but canvas widgets must not hand pan/zoom to
+   the browser halfway through a resize, rotation or drag gesture. */
+@media (max-width: 700px) {
+  .powerpoint-editor .canvas-with-rulers .widget-canvas-item {
+    touch-action: none;
+  }
+  .powerpoint-editor .canvas-with-rulers .widget-canvas {
+    overflow: visible;
+    min-height: 0;
+  }
+}
+
+
+/* Accessibility across authoring and participation: keyboard focus must stay
+   visible even in clipped/scrollable toolbars. Reduced motion never removes
+   changes of state, only decorative transitions. */
+.powerpoint-editor button:focus-visible,
+.powerpoint-editor [tabindex]:focus-visible,
+.page-editor-thumb:focus-visible,
+.audience-widget-layout button:focus-visible,
+.audience-widget-layout input:focus-visible,
+.audience-widget-layout textarea:focus-visible,
+.audience-widget-layout select:focus-visible {
+  outline: 3px solid #195dbe;
+  outline-offset: 3px;
+}
+.powerpoint-editor .widget-palette:focus-within,
+.page-editor-thumbnails:focus-within { scroll-padding: 12px; }
+@media (max-width: 700px) {
+  .powerpoint-editor .page-editor-thumb-actions button,
+  .powerpoint-editor .page-editor-sidebar footer button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  .audience-widget-layout label { display: block; line-height: 1.45; }
+  .audience-widget-layout input:not([type=checkbox]):not([type=radio]),
+  .audience-widget-layout select,
+  .audience-widget-layout textarea { max-width: 100%; min-width: 0; box-sizing: border-box; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .powerpoint-editor *,
+  .audience-widget-layout *,
+  .projection-interactive-widget * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+@media (forced-colors: active) {
+  .page-editor-thumb[aria-current=page] { outline: 2px solid Highlight; outline-offset: -2px; }
+  .page-editor-preview-widget { border: 1px solid CanvasText; }
+}

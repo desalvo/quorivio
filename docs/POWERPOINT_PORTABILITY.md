@@ -1,3 +1,10 @@
+## 2026-10-24 — Native PPTX table-cell recovery (current behavior)
+PowerPoint native table text is flattened into **editable, independently positioned text widgets**, one per nonempty cell, up to the existing **16-widget/page** capacity. Original native table formatting, borders, merged-cell semantics, and underlying OOXML table objects are **NOT preserved**. The fidelity report exposes `editable_table_cells`, `table_cells_over_page_limit`, and `unsupported_tables`; a PPTX containing tables is always marked lossy. The browser/worker path uses this same converter; physical browser and Kubernetes tests remain pending.
+
+**IT:** il testo delle celle delle tabelle PPTX diventa modificabile come widget singoli; la struttura tabellare originale non è conservata. La diagnostica segnala le perdite e il limite massimo di widget.
+
+**Important:** Historical sections below document prior limitations when written; consult this section and source/tests for the current table behavior.
+
 
 ## October 23: embedded-image PPTX export
 Browser export now stages referenced PNG/JPEG session media through the authenticated API into a private converter workspace. SHA-256 and size are checked before isolation; images are exported as PowerPoint picture elements with editable geometry and rotation. A session with missing image files, unsupported image formats or excessive media size fails explicitly instead of silently dropping them. The export does not preserve live quiz interactivity. Browser and Kubernetes acceptance remain pending.
@@ -101,3 +108,11 @@ shapes, tables, charts and full OOXML visual fidelity remain open.**
 
 ### Native rectangular shapes
 Rectangular and rounded rectangular auto-shapes containing text now import as editable `postit` widgets; exporting a postit uses a native editable PowerPoint rectangle. Original fills, outlines, corner radius and group structure are not preserved.
+
+
+### Native shapes: fills and strokes
+Rectangular and rounded rectangle text shapes preserve explicit RGB fill, stroke, and rounded geometry in the editable widget style; theme-driven colors, gradients, complex paths, group transforms, and shape adjustments remain unsupported.
+
+### Native editable ellipses and triangles (2026-10-23)
+
+PPTX oval and isosceles-triangle autoshapes containing text now import as editable `postit` widgets with a validated `shapeType` (`ellipse` or `triangle`). Both re-export as native, editable OOXML shapes. Explicit RGB fills and outlines use the existing `fillColor` / `strokeColor` widget styling. The presenter displays ellipses using elliptical corners and triangles using a CSS clip-path; this is an approximation of PowerPoint's precise text layout and outline. Shape adjustments, gradients, theme-driven colors, grouping, non-text autoshapes and animation remain unsupported. Existing rectangular widget data is unchanged. End-to-end browser fidelity acceptance remains pending.

@@ -11,6 +11,85 @@ sys.path.insert(0, str(ROOT / 'tools'))
 from pptx_portable import portable_to_pptx, pptx_to_portable, inspect_pptx_fidelity
 
 class PptxPortability(unittest.TestCase):
+    def test_decorative_empty_shapes_roundtrip(self):
+        from pptx import Presentation
+        from pptx.util import Inches
+        from pptx.enum.shapes import MSO_AUTO_SHAPE_TYPE
+        from pptx.dml.color import RGBColor
+        with tempfile.TemporaryDirectory() as d:
+            source = Path(d) / 'decorative.pptx'
+            deck = Presentation()
+            slide = deck.slides.add_slide(deck.slide_layouts[6])
+            for kind in (MSO_AUTO_SHAPE_TYPE.RECTANGLE, MSO_AUTO_SHAPE_TYPE.OVAL,
+                         MSO_AUTO_SHAPE_TYPE.ISOSCELES_TRIANGLE):
+                shape = slide.shapes.add_shape(kind, Inches(1), Inches(1), Inches(2), Inches(2))
+                shape.fill.solid()
+                shape.fill.fore_color.rgb = RGBColor(0x12, 0x34, 0x56)
+            deck.save(source)
+            converted = pptx_to_portable(source)
+            widgets = converted['activities'][0]['page_design']['widgets']
+            self.assertEqual(len(widgets), 3)
+            self.assertTrue(all(w['kind'] == 'postit' and w['label'] == '' for w in widgets))
+            self.assertEqual(inspect_pptx_fidelity(source)['unsupported_other_shapes'], 0)
+            self.assertEqual(inspect_pptx_fidelity(source)['editable_decorative_shapes'], 3)
+            target = Path(d) / 'out.pptx'
+            portable_to_pptx(converted, target)
+            exported = Presentation(target).slides[0].shapes
+            self.assertEqual([sh.auto_shape_type for sh in exported],
+                             [MSO_AUTO_SHAPE_TYPE.RECTANGLE, MSO_AUTO_SHAPE_TYPE.OVAL,
+                              MSO_AUTO_SHAPE_TYPE.ISOSCELES_TRIANGLE])
+            self.assertTrue(all(str(sh.fill.fore_color.rgb) == '123456' for sh in exported))
+
+    def test_oval_and_triangle_roundtrip(self):
+        from pptx import Presentation
+        from pptx.util import Inches
+        from pptx.enum.shapes import MSO_AUTO_SHAPE_TYPE
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / 'shapes.pptx'
+            deck = Presentation()
+            slide = deck.slides.add_slide(deck.slide_layouts[6])
+            for kind, text in ((MSO_AUTO_SHAPE_TYPE.OVAL, 'Editable ellipse'),
+                               (MSO_AUTO_SHAPE_TYPE.ISOSCELES_TRIANGLE, 'Editable triangle')):
+                slide.shapes.add_shape(kind, Inches(1), Inches(1), Inches(2), Inches(2)).text = text
+            deck.save(source)
+            portable = pptx_to_portable(source)
+            widgets = portable['activities'][0]['page_design']['widgets']
+            self.assertEqual([w['style']['shapeType'] for w in widgets], ['ellipse', 'triangle'])
+            self.assertTrue(all(w['kind'] == 'postit' for w in widgets))
+            output = Path(directory) / 'result.pptx'
+            portable_to_pptx(portable, output)
+            exported = Presentation(output).slides[0].shapes
+            self.assertEqual([shape.auto_shape_type for shape in exported],
+                             [MSO_AUTO_SHAPE_TYPE.OVAL, MSO_AUTO_SHAPE_TYPE.ISOSCELES_TRIANGLE])
+
+
+    def test_rounded_shape_colors_roundtrip(self):
+        from pptx import Presentation
+        from pptx.util import Inches
+        from pptx.enum.shapes import MSO_AUTO_SHAPE_TYPE
+        from pptx.dml.color import RGBColor
+        with tempfile.TemporaryDirectory() as d:
+            source = Path(d) / 'colors.pptx'
+            deck = Presentation()
+            shape = deck.slides.add_slide(deck.slide_layouts[6]).shapes.add_shape(
+                MSO_AUTO_SHAPE_TYPE.ROUNDED_RECTANGLE, Inches(1), Inches(1), Inches(4), Inches(2))
+            shape.text = 'Colored shape'
+            shape.fill.solid()
+            shape.fill.fore_color.rgb = RGBColor(0x12, 0xAB, 0x34)
+            shape.line.color.rgb = RGBColor(0x56, 0x78, 0x9A)
+            deck.save(source)
+            portable = pptx_to_portable(source)
+            style = portable['activities'][0]['page_design']['widgets'][0]['style']
+            self.assertEqual(style['fillColor'], '#12AB34')
+            self.assertEqual(style['strokeColor'], '#56789A')
+            self.assertTrue(style['rounded'])
+            target = Path(d) / 'out.pptx'
+            portable_to_pptx(portable, target)
+            result = Presentation(target).slides[0].shapes[0]
+            self.assertEqual(result.auto_shape_type, MSO_AUTO_SHAPE_TYPE.ROUNDED_RECTANGLE)
+            self.assertEqual(str(result.fill.fore_color.rgb), '12AB34')
+            self.assertEqual(str(result.line.color.rgb), '56789A')
+
     def test_rectangular_autoshape_remains_editable(self):
         from pptx import Presentation
         from pptx.util import Inches

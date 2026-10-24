@@ -10,7 +10,7 @@ class CanvasKeyboardAccess(unittest.TestCase):
     def test_all_geometry_modes_and_limits(self):
         src=(ROOT/'apps/web/src/main.tsx').read_text()
         start=src.index(' function keyboardGeometry(')
-        snippet=src[start:src.index(' function end()',start)]
+        snippet=src[start:src.index(' function end(',start)]
         for value in ['e.altKey','e.shiftKey','position.rotation','position.width','position.height','position.x','position.y','100-position.width','100-position.height','patch(w.id,{position})']:
             self.assertIn(value,snippet)
     def test_keyboard_focus_is_visible(self):

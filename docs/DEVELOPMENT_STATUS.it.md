@@ -1,3 +1,69 @@
+## 2026-10-24 — Ciclo unificato: recupero modificabile delle celle delle tabelle PPTX (verifiche locali)
+- Le tabelle PowerPoint importano ora il testo delle celle come widget indipendenti modificabili, mantenendo le coordinate proporzionali e il limite di 16 widget per pagina.
+- La diagnostica conta celle importate e celle scartate; la struttura tabellare nativa (bordi, stili, fusioni e OOXML) rimane esplicitamente **non conservata**.
+- Test locali: **220/220 Python, 120/120 Node.js**. Build completa tentata ma bloccata dalle tipizzazioni npm non installate nell'ambiente; nessuna nuova certificazione CI.
+- **Rimangono sviluppi software**, non soltanto collaudi: PowerPoint complesso, MFA/SSO, flussi live, integrazione browser, portabilità tra istanze, build pulita, sicurezza e GDPR. Matrice RC invariata al 37,5%; non è una RC.
+
+## 2026-10-24 — Verifica media PPTX e coerenza del rapporto di fedeltà (locale)
+- L'importazione PPTX controlla anche la firma effettiva di PNG/JPEG, oltre al MIME dichiarato e alla dimensione; un media con tipo dichiarato non corrispondente non viene registrato come immagine modificabile.
+- Il rapporto di fedeltà applica lo stesso ordine degli oggetti, il limite di 16 widget per pagina, il limite di 200 asset, il budget dei file e la deduplicazione dell'importatore.
+- Test di regressione su firme non coerenti e su 18 caselle di testo. Verifiche locali: 218 test Python e 116 Node.js superati. La precedente CI era verde secondo l'utente, ma questa revisione non ha subito build completa o deployment.
+- **NON COMPLETO:** restano gruppi/grafici/SmartArt/temi PPTX complessi, conclusione MFA e accettazione browser mobile. Avanzamento RC ponderato invariato al 37,5%.
+
+## 2026-10-24 — Consolidamento accessibilità e descrizioni PowerPoint (verifica locale)
+- Migliorati focus da tastiera, movimento ridotto, alto contrasto, target touch mobile e descrizione import PPTX. Python 216/216, Node 116/116. Build completa/browser/Kubernetes non verificati; RC 37,5%. Vedi docs/LOCAL_COMPLETION_AUDIT.it.md.
+
+## 2026-10-24 — Gesti touch del canvas mobile (verifica locale)
+- Corretto un conflitto CSS: sui telefoni `touch-action: manipulation` prevaleva sulla cattura dei Pointer Events durante trascinamento, ridimensionamento e rotazione. L’override è limitato all’editor e non altera i moduli dei partecipanti.
+- Rimossi dal canvas mobile un’altezza minima e uno scorrimento interno in conflitto con la geometria 16:9 e lo scorrimento del contenitore esterno.
+- Test: 213 Python e 116 Node superati. Build completa, test su dispositivi touch e Kubernetes da verificare. RC invariata al 37,5%.
+- Aperti: accettazione editor/mobile, oggetti PPTX complessi, rifiniture MFA, workflow live, build riproducibile e audit sicurezza.
+
+## 2026-10-24 — Isolamento dell’editor tra pagine (verifica locale)
+- Il canvas ora è identificato dalla sessione e dalla pagina selezionata: selezione, editing e menu contestuali non persistono erroneamente passando a un’altra pagina. Pulizia dei riferimenti ai widget rimossi.
+- Test: 211 Python unittest e 116 Node.js superati. Build completa e browser non certificati; RC invariata al 37,5%.
+
+## 2026-10-24 — Accessibilità tastiera e cancellazione widget
+- Aggiunti Canc/Backspace sul widget selezionato e Esc per deselezionare; campi di testo e controlli interni non vengono intercettati. La rimozione ripulisce il pannello proprietà e il menu contestuale.
+- Test locali: 207/207 Python, 116/116 Node.js. Build completa e collaudi end-to-end non verificati; RC invariata al 37,5%. Le altre macroaree restano aperte.
+
+## 2026-10-24 — Duplicazione indipendente widget e correzione risposte quiz
+- La duplicazione dei widget copia indipendentemente opzioni e geometria, seleziona la copia e mantiene coordinate non negative ai bordi del canvas.
+- Il pannello quiz interpreta il vecchio campo correctOptionId quando correctOptionIds è vuoto, coerentemente con il punteggio backend.
+- Aggiunti tre controlli di regressione. Build TypeScript/Vite e collaudi browser/Kubernetes non certificati; RC invariata al 37,5%.
+
+## 2026-10-24 — Persistenza selezione canvas e pannello attività
+- Corretta la selezione che veniva annullata al rilascio del puntatore: il pannello di configurazione domanda/quiz scompariva. Ora la selezione persiste dopo il rilascio, supporta clic e focus da tastiera e si azzera eliminando il widget.
+- Test locali: 198/198 Python e 116/116 Node.js. Build di produzione e collaudi browser/Kubernetes ancora necessari; RC 37,5% invariata.
+
+## 2026-10-24 — Stabilizzazione geometria editor mobile (verifica locale)
+- Eliminata la regola CSS sotto 480px che sovrascriveva posizione, dimensioni e rotazione dei widget mentre il motore pointer continuava a utilizzare coordinate assolute.
+- L'editor mobile mantiene il canvas 16:9, scorrevole orizzontalmente e largo almeno 600px, senza alterare la geometria salvata; la vista partecipante può invece adattarsi verticalmente.
+- Aggiunti due test di regressione: **195/195 Python** e **116/116 Node.js** superati.
+- Tentata installazione npm offline: **bloccata** da `@types/bcryptjs` non disponibile nella cache. Non dichiarare riuscite build TypeScript/Vite o verifiche browser.
+- **Ancora aperti**: collaudi mobile/accessibilità, PowerPoint complesso, widget live, MFA, lockfile, benchmark e accettazione Kubernetes. Matrice RC invariata al 37,5%; sviluppo globale non concluso.
+
+## 2026-10-24 — Coerenza del salvataggio asincrono dell'editor (verifica locale)
+- Impediti salvataggi sovrapposti e cambi di pagina mentre è in corso un salvataggio.
+- La versione segnata come salvata corrisponde esattamente ai dati inviati al server, non alle modifiche effettuate successivamente. Le modifiche ulteriori restano indicate come non salvate.
+- Aggiunta la scorciatoia Ctrl/Cmd+S nell'editor e disabilitato il pulsante Salva durante la richiesta.
+- Test: 190/190 Python unittest e 113/113 Node.js. Build TypeScript/Vite completa e collaudi browser/Kubernetes non eseguiti. RC invariata al 37,5%.
+- **Ancora aperti:** fedeltà agli oggetti PowerPoint complessi, formato portabile con asset, prove mobile end-to-end, installazione npm riproducibile, benchmark 500 utenti e accettazione dei gate RC. Nessuna dichiarazione di completamento del software.
+
+## 2026-10-23 — Selezione pagine editor e comandi per sessioni chiuse
+- Dopo la duplicazione viene selezionata automaticamente la nuova pagina confrontando gli ID degli snapshot; le miniature supportano frecce e Home/Fine; i comandi di modifica pagine sono disabilitati per sessioni chiuse.
+- Tre test di regressione aggiunti. Build completa, collaudi browser e Kubernetes pendenti. RC invariata al 37,5%.
+
+## 2026-10-23 — Editor pagine dedicato e correzione ciclo di vita
+- Corretto `internal_error` durante la creazione di una pagina vuota: la query SQL aveva cinque parametri ma riceveva solo quattro valori.
+- Aggiunto endpoint DELETE autorizzato e transazionale: azzeramento della pagina corrente quando necessario, compattazione degli ordinamenti e notifica ai client. **La cancellazione elimina anche le risposte associate**.
+- Nuovo workspace editor a schermo intero con miniature verticali, riordino drag-and-drop o tramite pulsanti, creazione, duplicazione e cancellazione pagine e barra widget orizzontale. Il pulsante principale apre ora l'editor.
+- Test locali: 177 Python e 113 Node superati; build completa e collaudi browser/Kubernetes non rieseguiti. RC invariata al 37,5%.
+
+## 2026-10-23 — Forme decorative PPTX native modificabili
+- Rettangoli, rettangoli arrotondati, ellissi e triangoli senza testo sono importati come widget `postit` modificabili, conservando colori RGB supportati, geometria e rotazione. In esportazione sono nuovamente forme native PowerPoint. Il rapporto di fedeltà conteggia separatamente le forme decorative.
+- Test locali: 174/174 Python e 113/113 Node.js; collaudi browser/Kubernetes non effettuati. Restano aperte altre forme vettoriali, grafici e temi. RC al 37,5%.
+
 
 ## Hotfix CI — 23/10/2026
 
@@ -633,3 +699,68 @@ Il listener PostgreSQL per le notifiche tra pod ora risincronizza le sessioni We
 - Aggiunto test di regressione in `tools/tests/test_pptx_portability.py`.
 - Verifiche locali: 170 test Python e 113 test Node superati; build frontend di produzione e collaudi browser/PostgreSQL/Kubernetes non certificati.
 - Forme vettoriali PPTX modificabili e fedeltà completa ancora aperte; matrice RC invariata.
+
+
+### 2026-10-23 forme PPTX colori
+Sviluppo successivo al commit confermato: riempimenti, contorni e angoli arrotondati delle forme PPTX ora salvati nello stile dei widget e riprodotti in export e proiezione. Test locali superati; collaudi browser/Kubernetes pendenti.
+
+#### 2026-10-23 — Native PPTX ellipse and triangle shape round-trip
+- Added editable shapeType support for oval and isosceles-triangle PPTX text autoshapes, including validated API styles and presenter approximations; preserved rectangle compatibility.
+- Round-trip regression added, 173 Python tests and 113 Node tests passed locally. Full production build/browser/Kubernetes acceptance not claimed.
+- RC gate percentage remains 37.5%; no external changes or commits performed.
+
+### 2026-10-24 — Modifiche non salvate nell’editor
+Aggiunti confronto tra layout corrente e salvato, indicatore delle modifiche, conferme per cambio pagina/chiusura e protezione beforeunload. Resta il collaudo browser completo.
+
+### 2026-10-24 — Anteprime miniature editor e sicurezza delle modifiche
+- Le miniature verticali mostrano ora posizioni, dimensioni, titoli e sfondi URL dei widget del layout **salvato**, invece del solo titolo; anteprima non interattiva, limite di 24 widget per pagina.
+- Il riordino (trascinamento e pulsanti) e il ritorno alla dashboard richiedono conferma in caso di modifiche al canvas non salvate.
+- Verifiche locali: 186 test Python e 113 test Node superati. Build completa TypeScript/Vite e collaudi browser/Kubernetes **non verificati** in questo ciclo.
+- RC invariata al **37,5%**; rimangono aperti i contenuti PPTX complessi, la fruizione mobile, la sincronizzazione multi-replica end-to-end e l'accessibilità.
+
+## Ciclo formato Quorivio portabile (2026-10-24)
+Implementati import/export ZIP `.quorivio` con manifest degli asset, verifica SHA-256, convalida rigorosa dell’archivio, nuovi codici di accesso e comandi dashboard. Il JSON legacy senza allegati resta compatibile. Verifiche locali: 190 test Python e 116 test Node superati. Mancano collaudo browser/database su istanze distinte e build completa TypeScript/Vite. Gate RC invariato al 37,5%.
+
+### 2026-10-24 — Stabilizzazione geometria editor
+- Allineati i limiti di ridimensionamento con mouse/touch e tastiera allo 0,01% già supportato da backend e convertitore PPTX. Conservati quattro decimali per non ingrandire involontariamente gli oggetti molto piccoli.
+- Verificato che le scorciatoie geometriche non intercettino le frecce all'interno dei campi di modifica.
+- Test locali: 193 Python e 116 Node.js superati. Build di produzione/browser e Kubernetes non collaudati in questo ciclo; RC invariata al 37,5%.
+
+### 2026-10-24 — Stabilizzazione concorrenza riordino pagine (cumulativo successivo al commit)
+- Serializzate le richieste di riordino preservando la conferma delle modifiche non salvate e la navigazione nell'editor a pagina intera.
+- Aggiunto `aria-busy`, disabilitati trascinamento/riordino delle miniature durante il salvataggio dell'ordine e ignorati gli snapshot tardivi appartenenti a una sessione precedentemente selezionata.
+- Aggiunti test di regressione Python. Nessuna migrazione DB, modifica API pubbliche, operazione GitHub o deployment Kubernetes.
+- **Non** è completato l'intero backlog: restano la fedeltà OOXML complessa, MFA e mobile, build di produzione/integrata, sicurezza e accettazione Kubernetes. Gate RC invariato al **37,5%**.
+- Verifiche di questo ciclo: 204 test Python e 116 Node superati; integrità ZIP superata. `npm run build` locale **non** superata (tipizzazioni Node assenti nel container, TS2580 in `totp.ts`); CI/browser/Kubernetes non rieseguiti.
+
+## 2026-10-24 — Gestione dei puntatori multipli sul canvas
+- Assegnata ogni operazione di trascinamento, ridimensionamento e rotazione all'identificativo del puntatore iniziale: un secondo dito non può sostituire il gesto e i suoi movimenti/rilasci/annullamenti vengono ignorati. Il mouse accetta soltanto il pulsante principale.
+- Aggiornati i test dei gesti e aggiunti due test multipuntatore. Verifiche locali: 209 test Python e 116 Node superati.
+- La build TypeScript/Vite non è stata convalidata: `npm install --offline` termina con ENOTCACHED per `@types/bcryptjs`. Collaudi browser/device/Kubernetes non eseguiti; il gate editor rimane aperto.
+- RC verificata invariata: 37,5%. Nessun commit o modifica remota.
+
+### 2026-10-24 — Verifica unificata: attivazione indipendente dell'autenticatore
+- Eliminato il requisito SMTP erroneamente imposto all'attivazione TOTP. L'autenticatore funziona indipendentemente dalla posta; il secondo fattore email continua a richiedere SMTP.
+- La risposta contenente il segreto TOTP usa `Cache-Control: no-store, private`, come già il QR.
+- Aggiunti test Node specifici e corretto il precedente controllo Python che imponeva l'accoppiamento errato.
+- Sul nuovo cumulativo: 218 test Python superati, 118 test Node superati. `npm run build` FALLISCE localmente perché mancano le definizioni Node in questo ambiente; non è una certificazione della build. Restano APERTI integrazione browser/PostgreSQL, multi-replica, OOXML avanzato, sicurezza e GDPR.
+- Percentuale RC invariata all'ultima baseline verificata (37,5%). Non dichiarare concluso il software.
+
+### 24/10/2026 — Consolidamento unificato / integrità degli archivi
+- Rafforzati coerenza ZIP, intervalli senza sovrapposizioni, firme MIME e test avversari.
+- Test: 218 Python e 120 Node superati; build completa e integrazione reale non certificate.
+- Vedere `docs/UNIFIED_COMPLETION_PROGRESS_2026-10-24.it.md`. Gate RC invariato al 37,5%.
+
+## 2026-10-24 — Recupero forme PowerPoint raggruppate
+- Conversione di gruppi annidati in widget modificabili indipendenti con coordinate trasformate.
+- Rapporto di fedeltà segnala i gruppi appiattiti come conversione con perdita.
+- Verifiche locali: 223 Python, 120 Node.js API. Build bloccata dalle tipizzazioni Node non installate; non RC.
+- Vedere `docs/UNIFIED_COMPLETION_PROGRESS_2026-10-24.it.md`.
+
+## 2026-10-24 — Prosecuzione integrata delle macroaree: titoli grafici e controlli OIDC
+
+- I titoli dei grafici PPTX nativi vengono importati come widget di testo modificabili, rispettando il limite esistente di 16 widget/pagina. Serie, assi, dati e formattazione dei grafici non sono conservati e sono dichiarati esplicitamente nel rapporto di fedeltà.
+- I token ID OIDC vengono respinti se la data `iat` è troppo remota, la durata è superiore a 24 ore o i valori temporali non sono finiti, mantenendo le verifiche di firma, emittente, destinatario e nonce. Aggiunti test.
+- Evidenze locali: 224 test Python OK e 121 test Node.js OK. La build npm completa è stata tentata ma interrotta perché mancano le definizioni TypeScript Node (`TS2580`). Non è quindi certificata per questa revisione.
+- **Ancora aperti:** Release Candidate globale, grafici PowerPoint completi/SmartArt, MFA/SSO end-to-end, flussi live con PostgreSQL, trasferimento archivi tra istanze, verifica accessibilità su browser/dispositivi, capacità reale di 500 partecipanti, audit sicurezza/GDPR e CI riproducibile di questa revisione. Servono ulteriori sviluppi o verifiche esterne.
+- Nessuna modifica a repository, server o Kubernetes.

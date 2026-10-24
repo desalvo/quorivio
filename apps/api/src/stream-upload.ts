@@ -35,7 +35,7 @@ export async function receiveAssetStream(source:AsyncIterable<Uint8Array>,folder
    if(!stream.write(chunk))await once(stream,'drain');
   }
   if(received!==expected)throw Error('upload_length_mismatch');
-  if(sniffAsset(prefix)!==declared)throw Error('invalid_media_signature');
+  if(sniffAsset(prefix)!==declared&&!(declared==='application/vnd.quorivio.session+zip'&&sniffAsset(prefix)==='application/vnd.openxmlformats-officedocument.presentationml.presentation'))throw Error('invalid_media_signature');
   stream.end();await once(stream,'finish');
   // Exclusive destination creation prevents overwriting previously uploaded media.
   const target=await open(destination,'wx',0o600);await target.close();

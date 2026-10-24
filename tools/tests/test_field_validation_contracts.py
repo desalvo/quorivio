@@ -18,7 +18,7 @@ class FieldValidationContracts(unittest.TestCase):
         self.assertIn("app.put('/api/admin/smtp',requireAuth,requireAdmin", api)
         self.assertIn('aes-256-gcm', store)
         self.assertIn('password_configured', store)
-        self.assertIn('smtp_required_before_mfa', api)
+        self.assertIn('smtp_required_before_email_mfa', api)
         self.assertIn("res.setHeader('Cache-Control','no-store, private')", api)
 
     def test_schedule_multi_dates(self):
