@@ -996,6 +996,19 @@ async function publicSession(secretOrCode:string){const r=await db.query('SELECT
 app.get('/api/join/:code',async(req,res)=>{try{const s=await publicSession(req.params.code);if(!s){res.status(404).json({error:'session_unavailable'});return}const a=s.current_activity_id?(await db.query('SELECT * FROM activities WHERE id=$1',[s.current_activity_id])).rows[0]:null;res.json({session:{id:s.id,title:s.title,status:s.status},activity:a?publicActivity(a):null,allow_anonymous:s.allow_anonymous,show_results:s.show_results,theme:s.theme})}catch(e){sendError(res,e)}});
 // Read-only QR endpoint; embeds only the public participant URL, never access privileges.
 app.get('/api/join/:code/qr.svg',async(req,res)=>{try{const s=await publicSession(req.params.code);if(!s){res.status(404).end();return}const url=`${publicBase}/join/${s.join_secret}`;res.setHeader('Cache-Control','no-store');res.type('image/svg+xml').send(await QRCode.toString(url,{type:'svg',margin:2}))}catch(e){sendError(res,e)}});
+// Read-only participation recovery: returns only a boolean, never a token or pseudonym.
+// A browser reload can recover its existing HttpOnly participant cookie without
+// creating a duplicate participant or disclosing another attendee's identity.
+app.get('/api/join/:code/participation',async(req,res)=>{try{
+ res.setHeader('Cache-Control','no-store, private');
+ const s=await publicSession(req.params.code);
+ if(!s){res.status(404).json({error:'session_unavailable'});return}
+ if(!s.allow_anonymous){res.json({joined:false});return}
+ const token=cookies(req.headers.cookie)[`q_part_${s.id}`];
+ if(!token){res.json({joined:false});return}
+ const found=await db.query('SELECT 1 FROM participants WHERE session_id=$1 AND token_hash=$2 LIMIT 1',[s.id,hash(token)]);
+ res.json({joined:(found.rowCount??0)>0});
+}catch(e){sendError(res,e)}});
 app.post('/api/join/:code',async(req,res)=>{try{const s=await publicSession(req.params.code);if(!s){res.status(404).json({error:'session_unavailable'});return}const pseudonym=req.body?.pseudonym;if(!s.allow_anonymous){res.status(403).json({error:'anonymous_disabled'});return}if(!validPseudonym(pseudonym)){res.status(400).json({error:'pseudonym_required'});return}const existing=cookies(req.headers.cookie)[`q_part_${s.id}`];if(existing&&(await db.query('SELECT 1 FROM participants WHERE session_id=$1 AND token_hash=$2',[s.id,hash(existing)])).rowCount){res.json({ok:true,rejoined:true});return}const token=randomBytes(32).toString('base64url'),id=randomUUID();await db.query('INSERT INTO participants(id,session_id,token_hash,pseudonym) VALUES($1,$2,$3,$4)',[id,s.id,hash(token),pseudonym.trim()]);res.cookie(`q_part_${s.id}`,token,{httpOnly:true,sameSite:'strict',secure:base.startsWith('https:'),maxAge:86400000,path:'/'});res.json({ok:true})}catch(e){sendError(res,e)}});
 app.post('/api/join/:code/reactions',async(req,res)=>{try{
  const s=await publicSession(req.params.code);if(!s||s.status!=='active'){res.status(404).json({error:'session_unavailable'});return}
@@ -1009,6 +1022,7 @@ app.post('/api/join/:code/reactions',async(req,res)=>{try{
  }catch(e){sendError(res,e)}});
 app.post('/api/join/:code/ratings',async(req,res)=>{try{
  const s=await publicSession(req.params.code);if(!s){res.status(404).json({error:'session_unavailable'});return}
+ if(!s.allow_anonymous){res.json({joined:false});return}
  const token=cookies(req.headers.cookie)[`q_part_${s.id}`];const part=token?await db.query('SELECT id FROM participants WHERE session_id=$1 AND token_hash=$2',[s.id,hash(token)]):null;
  if(!part?.rowCount){res.status(401).json({error:'join_first'});return}
  const aid=req.body?.activity_id,score=req.body?.score,widgetId=req.body?.widget_id;const comment=req.body?.comment; if(comment!==undefined&&(typeof comment!=='string'||comment.length>1000||/[\x00-\x08\x0b\x0c\x0e-\x1f]/.test(comment))){res.status(400).json({error:'invalid_rating_comment'});return}

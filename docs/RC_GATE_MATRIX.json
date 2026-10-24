@@ -7,8 +7,8 @@
       "area": "A-editor",
       "weight": 6,
       "status": "partial",
-      "evidence": "Canvas 16:9, free placement, resizing, rotation, rulers, keyboard code and local build documented; page-scoped bounded widget undo/redo, drag grouping, and keyboard shortcuts implemented; local 163 Node tests and web build PASS (2026-10-24); multi-widget selection (shift-click, accessible checkbox, Ctrl/Cmd+A), 10 alignment/equal-size/distribution commands with bounded geometry and one-step undo/redo, 8 Node regressions PASS (2026-10-25); group move/copy/cut/paste with bounded geometry and eight additional Node tests locally PASS (2026-10-25); Chromium workflow 40141207000 reached multi-selection, alignment, undo/redo and group paste, but failed on test-only disabled deselect click (2026-10-25). CI 40141894130 / job 121015403855: opt-in Chromium PASS (multi-selection, alignment, undo/redo, group paste, accessible selection, clear selection, zero JS page errors). Following 20-intervention batch adds stable layer groups, gap distribution, canvas centering, multi-delete/duplicate, bounded keyboard/group nudge, and new opt-in browser persistence/mobile smoke (not yet executed).",
-      "remaining": "Rerun expanded Chromium acceptance in CI (including mocked PATCH persistence and 390px touch viewport); real PostgreSQL save/reload, screen-reader, desktop/mobile device lab and visual-fidelity acceptance remain."
+      "evidence": "Canvas 16:9, free placement, resizing, rotation, rulers, keyboard code and local build documented; page-scoped bounded widget undo/redo, drag grouping, and keyboard shortcuts implemented; local 163 Node tests and web build PASS (2026-10-24); multi-widget selection (shift-click, accessible checkbox, Ctrl/Cmd+A), 10 alignment/equal-size/distribution commands with bounded geometry and one-step undo/redo, 8 Node regressions PASS (2026-10-25); group move/copy/cut/paste with bounded geometry and eight additional Node tests locally PASS (2026-10-25); Chromium workflow 40141207000 reached multi-selection, alignment, undo/redo and group paste, but failed on test-only disabled deselect click (2026-10-25). CI 40141894130 / job 121015403855: opt-in Chromium PASS (multi-selection, alignment, undo/redo, group paste, accessible selection, clear selection, zero JS page errors). Following 20-intervention batch adds stable layer groups, gap distribution, canvas centering, multi-delete/duplicate, bounded keyboard/group nudge, and new opt-in browser persistence/mobile smoke (not yet executed). GitHub workflow 40143475939 / quality job 121019855513: expanded Chromium editor PASS including group editing, layer order, keyboard interactions, simulated PATCH persistence/reload and 390px mobile viewport; 205 Node and 277 Python PASS; container build job 121020208222 SUCCESS (maintainer confirmed, verified 2026-10-25).",
+      "remaining": "Real PostgreSQL editor persistence (browser editor currently uses a mocked PATCH fixture), independent accessibility/screen-reader and device lab, cross-browser visual fidelity. New audience-specific browser integration is separate and pending CI."
     },
     {
       "id": "A2",
@@ -31,8 +31,8 @@
       "area": "A-editor",
       "weight": 6,
       "status": "open",
-      "evidence": "Responsive styles exist; no device test report in package",
-      "remaining": "Mobile/tablet touch usability, keyboard and screenreader review"
+      "evidence": "Responsive styles exist; no device test report in package New 2026-10-25 audience UI local implementation: narrow-screen absolute widget reflow, >=44px touch targets, keyboard skip link, accessible choice state and forced-colors CSS; local build PASS. Not yet validated in device lab or new Chromium CI.",
+      "remaining": "Run opt-in real-PostgreSQL Chromium participant UI, independent mobile/tablet and screen-reader/keyboard usability and accessibility acceptance."
     },
     {
       "id": "B1",
@@ -63,8 +63,8 @@
       "area": "B-sessions",
       "weight": 5,
       "status": "partial",
-      "evidence": "Anonymous participation, polling and QR routes implemented; disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24); two-replica participant/presenter privacy and notification smoke added to CI, pending execution; opt-in 500-client disposable PostgreSQL CI load with presenter observer and privacy assertion authored, not yet executed (2026-10-24) Maintainer confirmed green two-replica CI (2026-10-24). CI 40141894130: opt-in 500 independent participants PASS with presenter-observed peak >=475 and zero errors; PostgreSQL two-replica WebSocket privacy PASS.",
-      "remaining": "Browser participant privacy/QR acceptance and representative production-like throughput, latency, memory and recovery under sustained load; CI-only load is not a production SLA."
+      "evidence": "Anonymous participation, polling and QR routes implemented; disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24); two-replica participant/presenter privacy and notification smoke added to CI, pending execution; opt-in 500-client disposable PostgreSQL CI load with presenter observer and privacy assertion authored, not yet executed (2026-10-24) Maintainer confirmed green two-replica CI (2026-10-24). CI 40141894130: opt-in 500 independent participants PASS with presenter-observed peak >=475 and zero errors; PostgreSQL two-replica WebSocket privacy PASS. New 2026-10-25 participant flow implements HttpOnly-cookie reload recovery (boolean-only no-store endpoint), duplicate-vote UI guard, server-filtered results and mobile reflow; adds opt-in Chromium real PostgreSQL two-browser acceptance (not yet run). Local Node/Python suites and builds PASS.",
+      "remaining": "Run new real-PostgreSQL Chromium participant opt-in, validate QR/cookie recovery/privacy/mobile; sustained production-like throughput, memory, latency and recovery acceptance remains."
     },
     {
       "id": "C1",
@@ -103,7 +103,7 @@
       "area": "D-validation",
       "weight": 6,
       "status": "accepted",
-      "evidence": "Baseline CI green confirmed by maintainer (2026-10-24); new cycle local backend TypeScript and frontend TypeScript/Vite builds PASS with archived Node 22 dependencies. 126 Node and 224 Python tests PASS; new PostgreSQL HTTP CI test authored, NOT yet run.; latest cycle backend/frontend full builds PASS, 143 Node and 235 Python local tests PASS (2026-10-24) CI 40141894130 production quality and container build jobs SUCCESS, including Chromium and 500-user opt-ins; maintainer confirmed commit of previous hotfix.",
+      "evidence": "Baseline CI green confirmed by maintainer (2026-10-24); new cycle local backend TypeScript and frontend TypeScript/Vite builds PASS with archived Node 22 dependencies. 126 Node and 224 Python tests PASS; new PostgreSQL HTTP CI test authored, NOT yet run.; latest cycle backend/frontend full builds PASS, 143 Node and 235 Python local tests PASS (2026-10-24) CI 40141894130 production quality and container build jobs SUCCESS, including Chromium and 500-user opt-ins; maintainer confirmed commit of previous hotfix. Maintainer confirmed workflow 40143475939: quality job 121019855513 and container build job 121020208222 SUCCESS; publication skipped as designed. Following audience batch local tests/build PASS, new opt-in browser test pending CI.",
       "remaining": "Run full GitHub CI on the next package; retain mandatory scans and reproducible builds."
     },
     {
@@ -127,7 +127,7 @@
       "area": "D-validation",
       "weight": 5,
       "status": "partial",
-      "evidence": "Isolated document converter, upload validation, CSRF and security tests exist; offline 500-user shard reconciler and eight unit tests added (unexecuted against real staging). Follow-up: aggregate pre-inflate ZIP quotas and strict UTF-8 manifest checks tested locally; does not constitute runtime security acceptance.; native PPTX OOXML security/roundtrip regression locally PASS (11 cases, 2026-10-24) CI 40141894130: real disposable PostgreSQL/WebSocket opt-in 500 independent participants PASS, presenter-observed peak >=475, zero errors; high/critical vulnerability gate and image scans PASS; converter/portability unit and Python suites PASS. This is partial evidence, not complete production security acceptance.",
+      "evidence": "Isolated document converter, upload validation, CSRF and security tests exist; offline 500-user shard reconciler and eight unit tests added (unexecuted against real staging). Follow-up: aggregate pre-inflate ZIP quotas and strict UTF-8 manifest checks tested locally; does not constitute runtime security acceptance.; native PPTX OOXML security/roundtrip regression locally PASS (11 cases, 2026-10-24) CI 40141894130: real disposable PostgreSQL/WebSocket opt-in 500 independent participants PASS, presenter-observed peak >=475, zero errors; high/critical vulnerability gate and image scans PASS; converter/portability unit and Python suites PASS. This is partial evidence, not complete production security acceptance. Additional boolean-only participant recovery and browser privacy acceptance authored 2026-10-25, pending real CI execution.",
       "remaining": "Production-like load/latency, actual PDF/PPTX conversion and AV integration, pentest, security threat model and operator sign-off."
     },
     {

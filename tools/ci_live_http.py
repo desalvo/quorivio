@@ -39,7 +39,10 @@ def call(opener, method, path, payload=None, expected=200):
 
 def participant(index, code, aid):
     visitor = client()
+    assert call(visitor, 'GET', f'/api/join/{code}/participation') == {'joined': False}
     call(visitor, 'POST', f'/api/join/{code}', {'pseudonym': f'CI-{index}'})
+    assert call(visitor, 'GET', f'/api/join/{code}/participation') == {'joined': True}
+    assert call(client(), 'GET', f'/api/join/{code}/participation') == {'joined': False}
     answer = {'activity_id': aid, 'option_id': 'yes'}
     first = call(visitor, 'POST', f'/api/join/{code}/respond', answer)
     second = call(visitor, 'POST', f'/api/join/{code}/respond', answer)
@@ -93,6 +96,7 @@ def run():
          {'activity_id': aid, 'option_id': 'no'}, 409)
     call(admin, 'POST', f'/api/sessions/{sid}/status', {'status': 'closed'})
     call(client(), 'GET', f'/api/join/{code}', expected=404)
+    call(visitors[0], 'GET', f'/api/join/{code}/participation', expected=404)
     print('PASS PostgreSQL HTTP live: 24 independent concurrent participants, idempotency, timed expiry, privacy, closed-state rejection')
 
 

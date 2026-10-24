@@ -342,3 +342,21 @@
 .widget-canvas-item [data-resize-edge],.widget-canvas-item [data-rotate-handle]{touch-action:none}
 
 .widget-history-toolbar{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin:.5rem 0}
+
+/* Participant journey: keyboard navigation, mobile touch and graceful layout
+   fallback for authored absolute-positioned widgets on narrow viewports. */
+.skip-link{position:absolute;top:-100px;left:12px;z-index:20000;background:#fff;color:#16235c;padding:12px 18px;border:3px solid #195dbe;border-radius:8px}
+.skip-link:focus{top:12px}
+#main-content:focus{outline:none}
+.participant-connection{font-size:.85rem;line-height:1.5;color:inherit;margin:0 0 1rem}
+.choices button[aria-pressed="true"]{outline:3px solid #195dbe;outline-offset:2px}
+.choices button:focus-visible,.reaction-bar button:focus-visible,.rating-scale button:focus-visible,.join-by-code button:focus-visible{outline:3px solid #195dbe;outline-offset:3px}
+@media(max-width:700px){
+ .audience-widget-layout:has(> .page-widget[style*="absolute"]){min-height:0!important}
+ .audience-widget-layout>.page-widget[style*="absolute"]{position:relative!important;left:auto!important;top:auto!important;width:100%!important;height:auto!important;max-height:none!important;transform:none!important;overflow-wrap:anywhere}
+ .choices button,.reaction-bar button,.rating-scale button,.join-by-code button,.narrow button{min-height:44px}
+ .audience-widget-layout .page-widget{max-width:100%;box-sizing:border-box}
+ .join-by-code{flex-wrap:wrap}
+ .join-by-code input{flex:1;min-width:150px}
+}
+@media(forced-colors:active){.choices button[aria-pressed="true"]{outline:3px solid Highlight}}
