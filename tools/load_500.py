@@ -11,6 +11,7 @@ import asyncio
 import json
 import math
 import statistics
+import re
 import time
 from pathlib import Path
 from urllib.parse import urlparse, unquote
@@ -40,6 +41,8 @@ def options():
     if url.scheme not in ('https', 'http') or not url.netloc or len(parts) != 3 or parts[:2] != ['', 'join'] or not parts[2]:
         p.error('join-url must be an absolute http(s) URL ending in /join/<QR-token>')
     if url.username or url.password or url.query or url.fragment: p.error('URL must not include credentials, query or fragment')
+    if not re.fullmatch(r'[0-9a-fA-F-]{36}', args.session_id): p.error('session-id must be a UUID')
+    if not re.fullmatch(r'[A-Za-z0-9_-]{8,128}', unquote(parts[2])): p.error('invalid QR token')
     args.origin = f'{url.scheme}://{url.netloc}'
     args.code = unquote(parts[2])
     args.wsurl = f'{"wss" if url.scheme == "https" else "ws"}://{url.netloc}/live?session={args.session_id}'
@@ -87,7 +90,7 @@ async def main():
         await asyncio.sleep(i*a.ramp_seconds/max(a.users,1))
         bind = a.source_ips[i % len(a.source_ips)] if a.source_ips else None
         connector=aiohttp.TCPConnector(local_addr=(bind,0) if bind else None,limit=0)
-        async with aiohttp.ClientSession(connector=connector, timeout=timeout, trust_env=False, cookie_jar=aiohttp.CookieJar()) as client:
+        async with aiohttp.ClientSession(connector=connector, timeout=timeout, trust_env=False, cookie_jar=aiohttp.CookieJar(unsafe=True)) as client:
             t0=time.monotonic()
             try:
                 # Mirror the QR flow: fetch landing page, discover session, join anonymously, open WS.
@@ -110,6 +113,11 @@ async def main():
                             if msg.type == aiohttp.WSMsgType.TEXT:
                                 obj=json.loads(msg.data)
                                 if obj.get('type')=='snapshot' and not seen:
+                                    data=obj.get('data') or {}
+                                    if 'participants' in data or 'connected_participants' in data:
+                                        raise RuntimeError('participant snapshot leaked presenter-only fields')
+                                    if not data.get('session') or data['session'].get('id')!=a.session_id:
+                                        raise RuntimeError('participant snapshot has wrong session')
                                     first_snapshots.append((time.monotonic()-t0)*1000)
                                     seen=True
                             elif msg.type in (aiohttp.WSMsgType.CLOSED,aiohttp.WSMsgType.ERROR):
@@ -128,7 +136,7 @@ async def main():
     def percentile(series,p):
         s=sorted(series)
         return round(s[min(len(s)-1,math.ceil(len(s)*p)-1)],1) if s else None
-    output={'shard':a.shard_index,'shards':a.shards,'target_total':a.users,'target_shard':len(indices),
+    output={'elapsed_seconds':round(time.monotonic()-started,3),'shard':a.shard_index,'shards':a.shards,'target_total':a.users,'target_shard':len(indices),
             'anonymous_joins':len(joins),'websocket_completed':close_count,'errors':len(failures),
             'presenter_peak_distinct':presenter_peak if observe else None,
             'join_latency_ms':{f'p{p}':percentile(joins,p/100) for p in (50,95,99)},

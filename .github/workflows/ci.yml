@@ -5,6 +5,11 @@ on:
     branches: [main]
     tags: ['v*', '0.*', '1.*', '2.*']
   workflow_dispatch:
+    inputs:
+      capacity_test:
+        description: 'Run 500-participant disposable PostgreSQL acceptance (manual only)'
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -86,9 +91,50 @@ jobs:
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
           QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
         run: python3 tools/ci_live_http.py
+      - name: Start second API replica against shared PostgreSQL 18
+        env:
+          DATABASE_URL: postgres://quorivio:ci-only-secret@127.0.0.1:5432/quorivio
+          AUTH_SECRET: ci-only-integration-secret-must-be-long-enough-123
+          PUBLIC_BASE_URL: http://127.0.0.1:8080
+          PORT: '8081'
+          QUORIVIO_ASSET_DIR: /tmp/quorivio-ci-assets
+          QUORIVIO_CONVERSION_DIR: /tmp/quorivio-ci-conversions
+          LOAD_TEST_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
+        run: |
+          node apps/api/dist/server.js > /tmp/quorivio-ci-replica.log 2>&1 &
+          echo $! > /tmp/quorivio-ci-replica.pid
+          for i in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:8081/api/health/ready >/dev/null; then break; fi
+            if ! kill -0 $(cat /tmp/quorivio-ci-replica.pid) 2>/dev/null; then cat /tmp/quorivio-ci-replica.log; exit 1; fi
+            sleep 1
+          done
+          curl --fail --show-error http://127.0.0.1:8081/api/health/ready
+      - name: PostgreSQL two-replica WebSocket and privacy E2E
+        env:
+          QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
+          QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
+          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
+        run: |
+          python3 -m pip install --disable-pip-version-check --break-system-packages 'aiohttp>=3.9,<4'
+          python3 tools/ci_live_replicas.py
+      - name: Optional 500-participant PostgreSQL/WebSocket acceptance
+        if: github.event_name == 'workflow_dispatch' && inputs.capacity_test
+        timeout-minutes: 6
+        env:
+          QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
+          QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
+          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
+        run: python3 tools/ci_capacity_500.py
+      - name: PostgreSQL 18 disaster recovery backup and restore acceptance
+        env:
+          DATABASE_URL: postgres://quorivio:ci-only-secret@127.0.0.1:5432/quorivio
+          QUORIVIO_ASSET_DIR: /tmp/quorivio-ci-assets
+        run: python3 tools/ci_backup_restore.py
       - name: Stop integration API
         if: always()
         run: |
+          if [ -f /tmp/quorivio-ci-replica.pid ]; then kill $(cat /tmp/quorivio-ci-replica.pid) || true; fi
+          if [ -f /tmp/quorivio-ci-replica.log ]; then tail -60 /tmp/quorivio-ci-replica.log; fi
           if [ -f /tmp/quorivio-ci-api.pid ]; then kill $(cat /tmp/quorivio-ci-api.pid) || true; fi
           if [ -f /tmp/quorivio-ci-api.log ]; then tail -60 /tmp/quorivio-ci-api.log; fi
       - name: Vulnerability gate (high and critical)

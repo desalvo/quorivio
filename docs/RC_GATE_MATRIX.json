@@ -39,8 +39,8 @@
       "area": "B-sessions",
       "weight": 6,
       "status": "partial",
-      "evidence": "Presenter dashboard, synced server-driven navigation and participant preview in source; live WebSocket authorization re-audits sessions, presenter memberships/roles and participants every 10s (local policy tests PASS, 2026-10-24); per-session coalesced snapshot delivery and 2 MiB slow-consumer protection, local tests PASS (2026-10-24); LISTEN startup/resync failure now forces reconnection, with local regression tests (2026-10-24); retired listener notification fencing and rejected handler reconnect regression tests PASS (2026-10-24); coalesced snapshot callers now await the final read and failed DB snapshots propagate to listener recovery (152 Node and 252 Python tests PASS, builds PASS, 2026-10-24); disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24)",
-      "remaining": "Real PostgreSQL multi-replica and two-browser acceptance, recovery and latency tests; local queue regressions do not satisfy this gate; await CI result for new live HTTP smoke"
+      "evidence": "Presenter dashboard, synced server-driven navigation and participant preview in source; live WebSocket authorization re-audits sessions, presenter memberships/roles and participants every 10s (local policy tests PASS, 2026-10-24); per-session coalesced snapshot delivery and 2 MiB slow-consumer protection, local tests PASS (2026-10-24); LISTEN startup/resync failure now forces reconnection, with local regression tests (2026-10-24); retired listener notification fencing and rejected handler reconnect regression tests PASS (2026-10-24); coalesced snapshot callers now await the final read and failed DB snapshots propagate to listener recovery (152 Node and 252 Python tests PASS, builds PASS, 2026-10-24); disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24); added mandatory CI PostgreSQL two-process WebSocket notification acceptance (not yet run on CI, 2026-10-24); replica smoke now drains pre-mutation notifications to require a fresh post-vote participant snapshot (2026-10-24).",
+      "remaining": "Await CI execution of actual two-replica WebSocket smoke; still need browser and latency/recovery acceptance."
     },
     {
       "id": "B2",
@@ -63,8 +63,8 @@
       "area": "B-sessions",
       "weight": 5,
       "status": "partial",
-      "evidence": "Anonymous participation, polling and QR routes implemented; disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24)",
-      "remaining": "Authenticated/anonymous participants load and privacy E2E; await CI result for new live HTTP smoke"
+      "evidence": "Anonymous participation, polling and QR routes implemented; disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24); two-replica participant/presenter privacy and notification smoke added to CI, pending execution; opt-in 500-client disposable PostgreSQL CI load with presenter observer and privacy assertion authored, not yet executed (2026-10-24)",
+      "remaining": "Execute new two-replica CI and manually dispatch 500-client same-session capacity gate; review presenter peak and browser privacy acceptance."
     },
     {
       "id": "C1",
@@ -110,9 +110,9 @@
       "id": "D2",
       "area": "D-validation",
       "weight": 6,
-      "status": "open",
-      "evidence": "Schema and additive migrations present; a new real PostgreSQL API smoke script covers portable roundtrips, identity-safe media cloning and admin photo/settings. It has NOT been executed against PostgreSQL.",
-      "remaining": "Run new CI PostgreSQL smoke and external PostgreSQL 18 migration, backup/restore, transactional and concurrent request acceptance."
+      "status": "partial",
+      "evidence": "Maintainer confirmed PostgreSQL 18 CI green on 2026-10-24 baseline: schema bootstrapping and portable/profile HTTP lifecycle integration executed successfully. Two-replica new smoke still awaits CI.; atomic checksum-verified backup and staged restore hardened with 7 new adversarial Python tests (255 Python tests pass locally, 2026-10-24); new disposable PostgreSQL 18 fresh-database backup/restore acceptance added to mandatory CI, awaiting execution.",
+      "remaining": "Await PostgreSQL 18 fresh-database backup/restore CI result; external disaster-recovery rehearsal, migration, retention/rotation and production-like RPO/RTO acceptance remain open."
     },
     {
       "id": "D3",

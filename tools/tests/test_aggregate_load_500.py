@@ -36,4 +36,15 @@ class AggregateLoadTests(unittest.TestCase):
         reports[2]['errors']=1
         self.assertFalse(reconcile(reports)['pass'])
 
+
+    def test_invalid_latency_rejected(self):
+        reports=[shard(i,peak=500 if i==0 else None) for i in range(5)]
+        for bad in (-1, float('nan'), True, float('inf')):
+            reports[0]['join_latency_ms']={'p50':bad,'p95':10,'p99':20}
+            with self.subTest(bad=bad), self.assertRaises(ValueError): reconcile(reports)
+    def test_nonmonotonic_latency_rejected(self):
+        reports=[shard(i,peak=500 if i==0 else None) for i in range(5)]
+        reports[0]['first_snapshot_ms']={'p50':50,'p95':30,'p99':100}
+        with self.assertRaises(ValueError): reconcile(reports)
+
 if __name__=='__main__':unittest.main()

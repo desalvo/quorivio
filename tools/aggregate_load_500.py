@@ -6,6 +6,7 @@ prove globally distinct concurrent WebSocket identities or presenter peak.
 """
 import argparse
 import json
+import math
 import sys
 from pathlib import Path
 
@@ -43,6 +44,16 @@ def reconcile(reports, *, expected=500):
         joins += r['anonymous_joins']
         sockets += r['websocket_completed']
         errors += r['errors']
+        for metric in ('join_latency_ms', 'first_snapshot_ms'):
+            latency=r.get(metric)
+            if latency is not None:
+                if not isinstance(latency,dict) or set(latency)!={'p50','p95','p99'}:
+                    raise ValueError(f'invalid {metric} summary')
+                values=[latency[k] for k in ('p50','p95','p99')]
+                if any(type(v) not in (int,float) or not math.isfinite(v) or v<0 for v in values if v is not None):
+                    raise ValueError(f'invalid {metric} values')
+                if any(values[i] is not None and values[i+1] is not None and values[i]>values[i+1] for i in range(2)):
+                    raise ValueError(f'nonmonotonic {metric} percentiles')
         peak = r.get('presenter_peak_distinct')
         if peak is not None:
             if type(peak) is not int or not 0 <= peak <= total:

@@ -53,3 +53,34 @@ class LiveRateLimitCiTests(unittest.TestCase):
         self.assertIn('X-Quorivio-Load-Token', script)
         self.assertIn("process.env.NODE_ENV!=='production'", server)
         self.assertIn('timingSafeEqual(a,b)', server)
+
+class TwoReplicaLiveCiTests(unittest.TestCase):
+    def test_real_two_process_postgresql_websocket_gate(self):
+        flow = (ROOT / '.github/workflows/ci.yml').read_text()
+        self.assertIn('Start second API replica against shared PostgreSQL 18', flow)
+        self.assertIn('PostgreSQL two-replica WebSocket and privacy E2E', flow)
+        self.assertIn('python3 tools/ci_live_replicas.py', flow)
+        self.assertIn("PORT: '8081'", flow)
+        self.assertLess(flow.index('python3 tools/ci_live_http.py'), flow.index('python3 tools/ci_live_replicas.py'))
+        self.assertLess(flow.index('python3 tools/ci_live_replicas.py'), flow.index('Stop integration API'))
+        self.assertIn('/tmp/quorivio-ci-replica.pid', flow)
+
+    def test_cross_replica_acceptance_has_real_websocket_checks(self):
+        script = (ROOT / 'tools/ci_live_replicas.py').read_text()
+        for requirement in ('ws_connect', 'snapshot_matching', 'current_activity_id',
+                            "'Origin': A", 'not participant.get(\'results\')',
+                            "'count') == 1", "'status') == 'closed'", 'asyncio.run(main())'):
+            self.assertIn(requirement, script)
+
+
+class CapacityAcceptanceCiTests(unittest.TestCase):
+    def test_capacity_is_opt_in_not_an_automatic_public_load(self):
+        flow=(ROOT/'.github/workflows/ci.yml').read_text()
+        self.assertIn('capacity_test:',flow)
+        self.assertIn("github.event_name == 'workflow_dispatch' && inputs.capacity_test",flow)
+        self.assertIn('python3 tools/ci_capacity_500.py',flow)
+        self.assertLess(flow.index('python3 tools/ci_live_replicas.py'),flow.index('python3 tools/ci_capacity_500.py'))
+    def test_capacity_only_uses_disposable_loopback_api(self):
+        script=(ROOT/'tools/ci_capacity_500.py').read_text()
+        for token in ('127.0.0.1', 'localhost', "'500'", "'--presenter-cookie'", "'--load-token'", 'reconcile(', 'finally:'):
+            self.assertIn(token,script)

@@ -1036,3 +1036,78 @@ GitHub Actions run 40128742733, job 120975700188: the PostgreSQL-backed portable
 
 ### 2026-10-24 — CI concurrent live throttle hotfix
 CI hotfix: PostgreSQL HTTP portable test now passes; live concurrent smoke reached the database-backed shared IP rate limit (429). Added ephemeral, 64-hex-character CI-only load token to the existing non-production bypass, preserving production throttling. CI rerun required.
+
+## 2026-10-24 — Mandatory PostgreSQL two-replica WebSocket acceptance (after green CI baseline)
+
+- Added `tools/ci_live_replicas.py`, a real two-process HTTP/WebSocket integration test with both API replicas connected to the same PostgreSQL 18 service.
+- CI now starts the second API on port 8081, verifies readiness, executes the two-replica test, and always terminates both processes while printing their logs.
+- The test validates presenter and participant sockets on opposite replicas, cross-replica activity opening, answer aggregation, activity closing, session closing, and withholding unpublished results from participants.
+- CI test uses an ephemeral, non-production-only load token; production rate limits remain enforced.
+- The user confirmed the previous `ci-live-throttle-hotfix` baseline committed and CI green. This change is **after** that baseline.
+- Gate B1/B4 **remain partial** pending execution of the new CI gate and independent browser/500-client acceptance; do not infer success from static tests.
+- Local verification for this cycle: 154/154 Node tests PASS, 242 Python tests PASS (unittest discovery), backend TypeScript and frontend Vite builds PASS. New two-replica runtime smoke is not executable locally (no PostgreSQL daemon/container); awaiting CI.
+
+### Ten-cycle consolidated capacity / multi-replica acceptance batch (2026-10-24)
+
+**Single-package policy:** no intermediate archives; this batch consolidates ten focused
+implementation/validation interventions before the next maintainer commit.
+
+1. Fixed aiohttp loopback IP cookie persistence for anonymous load clients.
+2. Enforced UUID session identifiers and safe QR token syntax in the load CLI.
+3. Enforced participant WebSocket snapshot privacy and session identity during load.
+4. Recorded measured shard elapsed time for operator reconciliation.
+5. Validated finite, ordered percentile summaries in the shard aggregator.
+6. Added an HTTP test proving participant cookies cannot access presenter reports.
+7. Asserted unpublished results remain hidden when a cross-replica activity opens.
+8. Tested cross-replica duplicate response idempotency.
+9. Added a post-vote WebSocket privacy check on the second replica.
+10. Added an opt-in disposable 500-participant same-session CI acceptance runner, with
+    ephemeral load credentials, a single presenter observer and guaranteed cleanup.
+
+**Gate audit correction:** D2 moves from `open` to `partial` (40.0% -> 43.0%) because
+the maintainer explicitly confirmed a green PostgreSQL 18 CI baseline including the
+schema bootstrap and portable/profile HTTP smoke. This is a correction to the
+conservative evidence ledger, not a claim of completed backup/restore or migration.
+No additional gate has been accepted. The two-replica test and the 500-client test
+are **not claimed passed** until the remote CI reports their results. The capacity
+run is explicitly opt-in under GitHub Actions `workflow_dispatch` / `capacity_test`;
+normal commits do not generate 500 clients. PostgreSQL 18 local execution, multi-
+architecture runtime, browser and production-provider acceptance remain open.
+
+**Local validation for this batch:** 154 Node unit tests, 248 Python tests, API
+TypeScript and Vite production builds PASS. No live PostgreSQL or browser run in
+this environment. See `docs/RC_GATE_MATRIX.json` for the 43.0% audit.
+
+## 2026-10-24 — consolidated functional batch: disaster recovery and replica acceptance
+
+**Baseline:** maintainer-confirmed green `ci-live-throttle-hotfix` commit. The previous ten-cycle
+archive was **not confirmed committed**, and this cumulative batch retains its changes.
+
+**Ten substantive internal interventions, one package:**
+
+1. **Atomic backup publication:** write a private temporary archive on the destination filesystem,
+   verify it and publish with an exclusive hard link, refusing overwrites and incomplete archives.
+2. **Bounded archive generation:** cap individual objects, total bytes, file count and manifest size;
+   hash source files without loading whole assets into memory.
+3. **Strict archive path validation:** enforce canonical two-component asset paths and reject
+   traversal, absolute paths, backslashes, duplicate archive members and malformed records.
+4. **Backup integrity before publication:** re-open and verify the completed archive, catching
+   checksum mismatch or source mutations during capture.
+5. **Restore staging:** verify and stage all assets in a temporary sibling directory before
+   attempting PostgreSQL restore; publish only after database restore succeeds.
+6. **Destination safety:** refuse symlink/nonempty asset destinations and re-check before publication.
+7. **Adversarial regression coverage:** seven additional tests cover traversal, duplicates,
+   corrupt metadata, symlink destinations, failed database restores and overwrite refusal.
+8. **Real PostgreSQL 18 DR acceptance:** new `tools/ci_backup_restore.py` backs up the disposable
+   CI database, restores to a separate fresh database, compares user/session/activity/answer
+   row counts and verifies asset bytes and overwrite rejection.
+9. **Mandatory CI integration:** run the DR acceptance against the existing PostgreSQL 18 service
+   and clean up the temporary restored database even on failure.
+10. **WebSocket replica acceptance accuracy:** discard queued pre-vote snapshots before requiring
+    a fresh participant notification; avoid falsely passing the post-vote privacy check.
+
+**Locally verified:** 154/154 Node tests, 255/255 Python tests, backend TypeScript and
+frontend Vite production builds PASS. PostgreSQL 18 fresh-database restore and the two-replica
+WebSocket scenario require the next CI run. No claims of remote execution or RPO/RTO
+acceptance are made. D2 remains `partial` and the overall gate audit remains 43.0% until
+its PostgreSQL acceptance evidence is available. No GitHub commit/push/tag/release was made.

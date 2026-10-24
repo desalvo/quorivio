@@ -860,3 +860,48 @@ GitHub Actions run 40128742733, job 120975700188: il test HTTP del formato porta
 
 ### 2026-10-24 — CI concurrent live throttle hotfix
 Hotfix CI: il test HTTP di portabilità PostgreSQL ora passa; il test concorrente live incontrava il rate limiter condiviso per IP (429). Aggiunto token di carico effimero solo CI per il bypass già presente e non disponibile in produzione. Necessaria nuova esecuzione CI.
+
+## 2026-10-24 — Collaudo obbligatorio PostgreSQL WebSocket su due repliche (dopo baseline CI verde)
+
+- Aggiunto `tools/ci_live_replicas.py`: prova HTTP/WebSocket reale con due processi API e database PostgreSQL 18 condiviso.
+- La CI avvia una seconda API sulla porta 8081, verifica la disponibilità, esegue il collaudo e arresta entrambe le istanze anche in caso di errore, stampando i log.
+- Verifica socket presentatore/partecipante su repliche opposte, propagazione di apertura, aggregazione risposte, chiusura attività e sessione e riservatezza dei risultati non pubblicati.
+- Usa token di carico effimero, valido soltanto fuori produzione; i limiti di produzione rimangono attivi.
+- L'utente ha confermato commit e CI verde per la baseline `ci-live-throttle-hotfix`; queste modifiche sono successive.
+- Gate B1/B4 ancora **parziali** fino all'esecuzione del nuovo test CI e ai collaudi browser/500 utenti.
+- Verifiche locali del ciclo: 154/154 test Node PASS, 242 test Python PASS (unittest discovery), build backend TypeScript e frontend Vite PASS. Il nuovo test runtime su due repliche non è eseguibile localmente (assenza PostgreSQL/container); in attesa della CI.
+
+### Lotto consolidato di dieci interventi — capacità e repliche (24 ottobre 2026)
+
+Un solo package cumulativo, senza ZIP intermedi. Gli interventi riguardano:
+(1) cookie HTTP su IP locali; (2) validazione UUID e token QR; (3) privacy degli
+snapshot WebSocket; (4) durata effettiva dei test; (5) percentili dei report;
+(6) accesso ai report riservato al presentatore; (7) risultati non pubblicati
+protetti all'apertura; (8) idempotenza risposte tra repliche; (9) privacy anche
+dopo il voto; (10) collaudo opzionale di 500 partecipanti sulla stessa sessione
+con PostgreSQL effimero, osservatore unico e pulizia finale.
+
+**Avanzamento verificato: 43,0%** (prima 40,0%). Il gate D2 passa da `open` a
+`partial` sulla base della CI PostgreSQL 18 confermata verde dal manutentore:
+bootstrap dello schema e test HTTP portabilità/profilo. Si tratta di una
+riclassificazione delle prove già ottenute, non di una nuova certificazione
+backup/restore o migrazione. Nessun gate nuovo è `accepted`.
+
+Verifiche locali: 154 test Node, 248 test Python, build TypeScript backend e Vite
+frontend superate. I test WebSocket su due repliche e il carico reale di 500
+partecipanti richiedono esecuzione CI: il carico è **solo su richiesta manuale**
+con `workflow_dispatch` e `capacity_test`, mai su ogni commit. Non dichiarare RC.
+
+## 24 ottobre 2026 — lotto funzionale consolidato: disaster recovery e replica live
+
+**Dieci interventi, un solo package:** pubblicazione atomica dei backup, limiti di
+quota, validazione rigorosa dei percorsi, verifica completa dei checksum prima della
+pubblicazione, staging degli allegati prima del ripristino PostgreSQL, protezione contro
+link simbolici e destinazioni non vuote, sette nuovi test avversariali, collaudo reale
+PostgreSQL 18 su database nuovo, integrazione obbligatoria nella CI e rafforzamento del
+test WebSocket contro notifiche obsolete dopo il voto.
+
+**Verifiche locali:** 154/154 Node, 255/255 Python, build backend e frontend superate.
+**Ancora da verificare in CI:** ripristino PostgreSQL 18 e sincronizzazione su due repliche.
+Il gate D2 rimane `partial` e la percentuale complessiva rimane **43,0%**: nessun
+incremento non giustificato da evidenze di accettazione. Nessun commit/push/tag/release.

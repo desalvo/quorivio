@@ -69,6 +69,7 @@ def run():
     row = next(row for row in report['totals'] if row['activity_id'] == aid)
     assert row['valid'] == 24 and row['total'] == 24, row
     assert 'participants' not in report and 'pseudonym' not in json.dumps(report)
+    call(visitors[0], 'GET', f'/api/sessions/{sid}/report.json', expected=401)
     call(admin, 'POST', f'/api/sessions/{sid}/activities/{aid}/close', {})
     # Exercise the independent timed-quiz path against PostgreSQL's clock.
     timed = call(admin, 'POST', f'/api/sessions/{sid}/activities', {
