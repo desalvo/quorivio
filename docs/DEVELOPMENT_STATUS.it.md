@@ -953,3 +953,8 @@ avanzamento verificato 43,0%. Nessun commit/push/tag/release.
 - Verificati 171 test Node, 272 test Python e build backend/frontend.
 - Test browser non superato: Chromium non può navigare verso localhost o file locali in questo ambiente (`ERR_BLOCKED_BY_ADMINISTRATOR`). Script Playwright opzionale incluso; necessaria esecuzione su host abilitato.
 - A1 ancora parziale, completamento verificato 43,0%; restano test browser, corpus PPTX e carico reale 500 partecipanti.
+
+
+### Correzione navigazione collaudo Chromium (25 ottobre 2026)
+
+La CI browser falliva perché Playwright espandeva la scheda della sessione senza premere il pulsante Apri sessione al suo interno. Il test ora apre la dashboard prima di accedere all’editor. Riesecuzione Chromium ancora necessaria; A1 non è dichiarato concluso.

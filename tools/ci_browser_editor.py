@@ -30,7 +30,11 @@ async def main():
   await page.route('**/api/**',mock)
   await page.goto(os.environ.get('QUORIVIO_WEB_URL','http://127.0.0.1:5173/'),wait_until='domcontentloaded')
   await page.get_by_role('button',name='Apri sessione').first.click()
-  await page.get_by_text('Browser acceptance').last.click()
+  await page.get_by_text('Browser acceptance',exact=True).wait_for()
+  # Expanding the session summary is not the same as opening its dashboard.
+  session_card=page.locator('details').filter(has=page.get_by_text('Browser acceptance',exact=True))
+  await session_card.locator('summary').click()
+  await session_card.get_by_role('button',name='Apri sessione').click()
   await page.get_by_role('button',name='✎ Modifica le pagine').first.click()
   await page.get_by_role('group',name='Canvas grafico widget').wait_for()
   await page.locator('.widget-canvas-item').first.click()

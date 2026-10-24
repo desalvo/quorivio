@@ -1161,3 +1161,8 @@ No commit/push/tag/release performed.
 - Evidence: 171/171 Node tests, 272/272 Python tests, TypeScript API/web builds PASS; new arrange-widget unit suite PASS.
 - Browser acceptance NOT passed: headless Chromium was available but navigation to localhost and file URLs was blocked by the execution environment (`ERR_BLOCKED_BY_ADMINISTRATOR`). Optional `tools/ci_browser_editor.py` provided for an unrestricted Playwright host. No fabricated browser sign-off.
 - RC A1 remains partial and verified score unchanged at 43.0%; real-browser interaction, persistence, PPTX corpus and 500-participant capacity remain open.
+
+
+### Chromium browser acceptance navigation hotfix (2026-10-25)
+
+The GitHub Actions browser gate failed because the Playwright fixture expanded the session details but never clicked the nested Open session button. The test now opens the session dashboard before requesting the page editor. Browser rerun is pending; no A1 acceptance claimed.
