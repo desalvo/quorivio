@@ -45,3 +45,40 @@ test('distribute equal centers deterministically, preserve stable ID order',()=>
  const same=[{id:'z',position:{x:20,y:20,width:10,height:10}},{id:'a',position:{x:20,y:20,width:10,height:10}},{id:'m',position:{x:20,y:20,width:10,height:10}}];
  assert.deepEqual(arrangeWidgets(same,['z','a','m'],'distribute-x'),same);
 });
+test('horizontal equal gaps use widget edges rather than unequal centers',()=>{
+ const result=run('space-x').slice(0,3).map(w=>w.position);
+ const ordered=[...result].sort((a,b)=>a.x-b.x);
+ const gaps=[ordered[1].x-(ordered[0].x+ordered[0].width),ordered[2].x-(ordered[1].x+ordered[1].width)];
+ assert.ok(Math.abs(gaps[0]-gaps[1])<.0002,gaps.join(','));
+});
+test('vertical equal gaps use widget edges',()=>{
+ const result=run('space-y').slice(0,3).map(w=>w.position);
+ const ordered=[...result].sort((a,b)=>a.y-b.y);
+ const gaps=[ordered[1].y-(ordered[0].y+ordered[0].height),ordered[2].y-(ordered[1].y+ordered[1].height)];
+ assert.ok(Math.abs(gaps[0]-gaps[1])<.0002,gaps.join(','));
+});
+test('horizontal group canvas centering preserves relative x spacing',()=>{
+ const result=run('canvas-center-x');const rects=result.slice(0,3).map(w=>w.position);
+ const left=Math.min(...rects.map(p=>p.x)),right=Math.max(...rects.map(p=>p.x+p.width));
+ assert.ok(Math.abs((left+right)/2-50)<.0001);
+ assert.ok(Math.abs((rects[1].x-rects[0].x)-35)<.0001);
+});
+test('vertical group canvas centering preserves relative y spacing',()=>{
+ const result=run('canvas-center-y');const rects=result.slice(0,3).map(w=>w.position);
+ const top=Math.min(...rects.map(p=>p.y)),bottom=Math.max(...rects.map(p=>p.y+p.height));
+ assert.ok(Math.abs((top+bottom)/2-50)<.0001);
+ assert.ok(Math.abs((rects[1].y-rects[0].y)-25)<.0001);
+});
+test('single widget can be centered on either canvas axis',()=>{
+ const x=arrangeWidgets(widgets,['a'],'canvas-center-x');
+ const y=arrangeWidgets(widgets,['a'],'canvas-center-y');
+ assert.equal(x[0].position.x,40);assert.equal(y[0].position.y,40);
+});
+test('equal-gap distribution requires three widgets and is a no-op for two',()=>{
+ assert.equal(arrangeWidgets(widgets,['a','b'],'space-x'),widgets);
+ assert.equal(arrangeWidgets(widgets,['a','b'],'space-y'),widgets);
+});
+test('canvas centering leaves all unselected widgets unchanged',()=>{
+ assert.equal(run('canvas-center-x')[3],widgets[3]);
+ assert.equal(run('canvas-center-y')[3],widgets[3]);
+});

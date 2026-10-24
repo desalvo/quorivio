@@ -11,7 +11,7 @@ class RcGateAuditTests(unittest.TestCase):
     def test_weighted_ledger_is_normalized(self):
         report=module.audit()
         self.assertEqual(report['total_points'],100)
-        self.assertEqual(report['score'],43.0) # D2 partial: maintainer-confirmed PostgreSQL CI baseline
+        self.assertEqual(report['score'],45.5) # D4 partial: 500-client and security gates confirmed in CI 40141894130
         self.assertEqual(sum(v['weight'] for v in report['by_area'].values()),100)
     def test_open_gates_not_claimed_as_accepted(self):
         report=module.audit()

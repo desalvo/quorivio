@@ -17,8 +17,9 @@ class EditorCompositionContract(unittest.TestCase):
 
     def test_layer_order_preserves_existing_items(self):
         self.assertIn("direction:'front'|'back'", self.tsx)
-        self.assertIn("widgets.filter(w=>w.id!==id),item", self.tsx)
-        self.assertIn("[item,...widgets.filter(w=>w.id!==id)]", self.tsx)
+        self.assertIn("reorderWidgetLayers(widgets,[id],direction)", self.tsx)
+        self.assertIn("reorderWidgetLayers(widgets,groupSelection(),direction)", self.tsx)
+        self.assertTrue((ROOT / 'apps/web/src/widget-layer.ts').is_file())
 
     def test_grid_is_optional_and_keyboard_access_retained(self):
         self.assertIn('const [snapGrid,setSnapGrid]', self.tsx)

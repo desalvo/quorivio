@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Chromium UI acceptance with deterministic API fixture; no production database needed."""
 import asyncio
+import copy
 import os
 from pathlib import Path
 from playwright.async_api import async_playwright, expect
@@ -17,14 +18,20 @@ async def main():
   page=await browser.new_page(viewport={'width':1440,'height':1000})
   page.set_default_timeout(10000)
   errors=[]
+  state={'widgets':copy.deepcopy(WIDGETS),'saves':0}
   page.on('pageerror',lambda error:errors.append(str(error)))
   async def mock(route):
    from urllib.parse import urlparse
    path=urlparse(route.request.url).path
-   if path=='/api/auth/me':data={'id':'user-test','email':'test@example.org','nickname':'Test','role':'presenter'}
+   if path==f'/api/sessions/{SESSION}/activities/{ACTIVITY}/design' and route.request.method=='PATCH':
+    payload=route.request.post_data_json
+    state['widgets']=copy.deepcopy(payload['page_design']['widgets'])
+    state['saves']+=1
+    data={'ok':True}
+   elif path=='/api/auth/me':data={'id':'user-test','email':'test@example.org','nickname':'Test','role':'presenter'}
    elif path=='/api/auth/oidc/providers':data={'providers':[]}
    elif path=='/api/sessions':data={'items':[SES],'total':1}
-   elif path==f'/api/sessions/{SESSION}':data=SNAP
+   elif path==f'/api/sessions/{SESSION}':data={**SNAP,'activities':[{**ACT,'page_design':{'widgets':copy.deepcopy(state['widgets'])}}]}
    elif path.endswith('/assets') or path.endswith('/presenter-profiles') or path.endswith('/appointments') or path.endswith('/schedule'):data=[]
    elif path=='/api/calendar':data=[]
    else:data=[]
@@ -80,6 +87,102 @@ async def main():
     await expect(checks.nth(0)).not_to_be_checked()
     await expect(checks.nth(1)).not_to_be_checked()
     await expect(deselect).to_be_disabled()
+    # Stable z-order operations must preserve selected relative order and undo.
+    await checks.nth(0).check()
+    await checks.nth(1).check()
+    await page.get_by_role('button',name='Porta selezione davanti').click()
+    order=await page.locator('.widget-canvas-item').evaluate_all('(els)=>els.map(e=>e.querySelector("input")?.value)')
+    assert order==['Third','First','Second'],order
+    await page.keyboard.press('Control+z')
+    order=await page.locator('.widget-canvas-item').evaluate_all('(els)=>els.map(e=>e.querySelector("input")?.value)')
+    assert order==['First','Second','Third'],order
+    # Accessible toolbar group nudging, duplication, deletion and undo.
+    await checks.nth(0).check()
+    await checks.nth(1).check()
+    await page.get_by_role('button',name='Sposta selezione a destra').click()
+    coords=await page.locator('.widget-canvas-item').evaluate_all('(els)=>els.map(e=>parseFloat(e.style.left))')
+    assert coords[:2]==[11,11],coords  # Earlier redo aligned these two widgets.
+    await page.keyboard.press('Control+z')
+    coords=await page.locator('.widget-canvas-item').evaluate_all('(els)=>els.map(e=>parseFloat(e.style.left))')
+    assert coords[:2]==[10,10],coords
+    await checks.nth(0).check()
+    await checks.nth(1).check()
+    await page.get_by_role('button',name='Duplica selezione').click()
+    assert await page.locator('.widget-canvas-item').count()==5
+    await page.keyboard.press('Control+z')
+    assert await page.locator('.widget-canvas-item').count()==3
+    await expect(selection.get_by_text('0 selezionati')).to_be_visible()
+    await checks.nth(0).check()
+    await checks.nth(1).check()
+    await page.get_by_role('button',name='Elimina selezione').click()
+    assert await page.locator('.widget-canvas-item').count()==1
+    await page.keyboard.press('Control+z')
+    assert await page.locator('.widget-canvas-item').count()==3
+    # Browser-to-API persistence contract: PATCH stores the layout; reload restores it.
+    await checks.nth(0).check()
+    await checks.nth(1).check()
+    await page.get_by_role('button',name='Sposta selezione a destra').click()
+    await page.get_by_role('button',name='Salva layout').click()
+    await expect(page.get_by_text('Layout domanda e risultati aggiornato')).to_be_visible()
+    await expect(page.get_by_role('button',name='Salva layout')).to_be_disabled()
+    assert state['saves']==1,state
+    assert [w['position']['x'] for w in state['widgets'][:2]]==[11,11],state['widgets']
+    await page.reload(wait_until='domcontentloaded')
+    await page.get_by_role('button',name='Apri sessione').first.click()
+    session_card=page.locator('details').filter(has=page.get_by_text('Browser acceptance',exact=True))
+    await session_card.locator('summary').click()
+    await session_card.get_by_role('button',name='Apri sessione').click()
+    await page.get_by_role('button',name='✎ Modifica le pagine').first.click()
+    coords=await page.locator('.widget-canvas-item').evaluate_all('(els)=>els.map(e=>parseFloat(e.style.left))')
+    assert coords[:2]==[11,11],coords
+    # Keyboard-only editing on the saved document: multi-selection is retained
+    # while arrows move the group; Delete removes it; both operations undo.
+    accessible=page.get_by_role('region',name='Organizzazione accessibile dei widget')
+    checks=accessible.get_by_role('checkbox',name='Seleziona')
+    await checks.nth(0).check()
+    await checks.nth(1).check()
+    await page.locator('.widget-canvas-item').first.focus()
+    await page.keyboard.press('ArrowRight')
+    coords=await page.locator('.widget-canvas-item').evaluate_all('(els)=>els.map(e=>parseFloat(e.style.left))')
+    assert coords[:2]==[12,12],coords
+    await page.keyboard.press('Control+z')
+    coords=await page.locator('.widget-canvas-item').evaluate_all('(els)=>els.map(e=>parseFloat(e.style.left))')
+    assert coords[:2]==[11,11],coords
+    await page.locator('.widget-canvas-item').first.focus()
+    await page.keyboard.press('Delete')
+    assert await page.locator('.widget-canvas-item').count()==1
+    await page.keyboard.press('Control+z')
+    assert await page.locator('.widget-canvas-item').count()==3
+    # Responsive/touch-capable viewport smoke: accessible selection and toolbar
+    # remain usable on a phone-sized Chromium viewport (not a device lab).
+    mobile=await browser.new_page(viewport={'width':390,'height':844},is_mobile=True,has_touch=True)
+    mobile.set_default_timeout(10000)
+    await mobile.route('**/api/**',mock)
+    try:
+     await mobile.goto(os.environ.get('QUORIVIO_WEB_URL','http://127.0.0.1:5173/'),wait_until='domcontentloaded')
+     await mobile.get_by_role('button',name='Apri sessione').first.click()
+     card=mobile.locator('details').filter(has=mobile.get_by_text('Browser acceptance',exact=True))
+     await card.locator('summary').click()
+     await card.get_by_role('button',name='Apri sessione').click()
+     await mobile.get_by_role('button',name='✎ Modifica le pagine').first.click()
+     await expect(mobile.get_by_role('group',name='Canvas grafico widget')).to_be_visible()
+     mchecks=mobile.get_by_role('region',name='Organizzazione accessibile dei widget').get_by_role('checkbox',name='Seleziona')
+     await mchecks.nth(0).check()
+     await mchecks.nth(1).check()
+     await mobile.get_by_role('button',name='Sposta selezione a sinistra').click()
+     mcoords=await mobile.locator('.widget-canvas-item').evaluate_all('(els)=>els.map(e=>parseFloat(e.style.left))')
+     assert mcoords[:2]==[10,10],mcoords
+    except Exception:
+     directory=Path(os.environ.get('QUORIVIO_BROWSER_ARTIFACT_DIR','/tmp/quorivio-browser-artifacts'))
+     directory.mkdir(parents=True,exist_ok=True)
+     try:
+      await mobile.screenshot(path=str(directory/'mobile-failure.png'),full_page=True,timeout=5000)
+      (directory/'mobile-failure.html').write_text(await mobile.content(),encoding='utf-8')
+     except Exception as capture_error:
+      print('Mobile diagnostic capture failed:',capture_error)
+     raise
+    finally:
+     await mobile.close()
     assert not errors,errors
   except Exception:
    # Disposable CI fixture only: capture enough context to diagnose failures
@@ -96,5 +199,5 @@ async def main():
    raise
   finally:
    await browser.close()
-  print('PASS Chromium editor: multi-selection, alignment, undo, redo, group paste, orphan cleanup, accessible selection, clear selection; no page errors')
+  print('PASS Chromium editor: multi-selection, alignment, undo/redo, group paste, accessible selection, layer order, group nudge/duplicate/delete, PATCH persistence/reload and keyboard group editing and mobile/touch viewport; no page errors')
 if __name__=='__main__':asyncio.run(main())

@@ -1,19 +1,19 @@
-# Ricalcolo di accettazione RC — 23 ottobre 2026
+# Matrice di accettazione RC — 25 ottobre 2026
 
-**Versione:** 0.1.0-dev. **Avanzamento ponderato verificabile: 37,5 punti su 100.** Sostituisce la vecchia stima ripetuta del 67%, non derivata da una matrice di accettazione mantenuta. **Non significa che sia stato scritto il 37,5% del codice** e non è una misura statistica della qualità.
+**Versione 0.1.0-dev. Punteggio ponderato verificabile: 45,5/100. NON è una release candidate.**
 
-La fonte riproducibile è `docs/RC_GATE_MATRIX.json`. Eseguire `python3 tools/rc_gate_audit.py`. Ogni gate possiede peso, stato, evidenza e condizione residua; i pesi sommano a 100. `accepted` vale il 100% del peso, `partial` il 50%, `open`/`blocked` zero. Si tratta di una convenzione prudenziale **di project management**, non di percentuale di copertura dei test. Stati e pesi richiedono verifica umana delle prove reali.
+Il punteggio è una convenzione prudenziale di gestione dei gate, non una misura del codice scritto, della copertura dei test o uno SLA. `accepted` vale 100% del peso, `partial` 50%, `open`/`blocked` zero. Fonte: `docs/RC_GATE_MATRIX.json`; ricalcolo: `python3 tools/rc_gate_audit.py`.
 
-| Area | Punti acquisiti / totali | Accettazione |
+| Area | Punti / totale | Percentuale |
 | --- | ---: | ---: |
-| A: editor grafico | 9 / 24 | 37,5% |
-| B: sessioni e risultati | 11,5 / 23 | 50,0% |
-| C: amministrazione, MFA e SSO | 8,5 / 22 | 38,6% |
-| D: validazione release | 8,5 / 31 | 27,4% |
-| **Totale** | **37,5 / 100** | **37,5%** |
+| A-editor | 9 / 24 | 37.5% |
+| B-sessions | 11.5 / 23 | 50.0% |
+| C-admin | 11 / 22 | 50.0% |
+| D-validation | 14 / 31 | 45.2% |
+| **Totale** | **45.5 / 100** | **45.5%** |
 
-I sorgenti comprendono già editor, API di sincronizzazione delle sessioni, quiz a tempo indipendenti, risultati per il presentatore, TOTP e revoca delle sessioni. Non sono accettati end-to-end senza PostgreSQL, browser simultanei e, quando pertinente, repliche multiple. Le ultime build frontend/backend riuscite, 95 test Node e 93 Python sono evidenze del package precedente, non certificazioni di deployment.
+**CI verde confermata:** workflow GitHub Actions `40141894130` (quality e container), Chromium opt-in PASS, 500 partecipanti indipendenti PASS (picco presentatore >=475, zero errori), WebSocket su due repliche PostgreSQL 18 PASS e DR PostgreSQL 18 PASS. D4 passa da aperto a parziale: 43,0 -> 45,5 punti.
 
-**Collaudi esterni indispensabili:** PostgreSQL 18 e migrazioni, simultaneità e latenza presentatore/partecipanti, accessibilità desktop/tablet/smartphone, SMTP e provider OAuth/OIDC reali, conversione PDF/PPTX e antivirus, container AMD64/ARM64, Podman rootless, Kubernetes multi-replica, disaster recovery, GDPR e revisione di sicurezza/licenze. Il secondo fattore email è ancora mancante: il supporto SMTP non equivale a email MFA.
+**Nuovo sviluppo editor:** lotto di 20 interventi con 205 test Node e 277 Python PASS, build API/web PASS; il browser test ampliato non è ancora stato eseguito in CI. La fixture di salvataggio/reload non è una prova PostgreSQL reale.
 
-**Regola di aggiornamento:** modificare gli stati soltanto in presenza di test effettivamente eseguiti e conservare gli esiti negativi. La CI verde valida i gate configurati nella CI, non l'intera RC. Il punteggio può crescere raccogliendo evidenza senza modificare i sorgenti. Non dichiarare la RC raggiunta fino all'accettazione di tutti i gate obbligatori.
+**Ancora aperti:** dispositivi/screen reader reali, corpus PPTX, latenza/fairness live, DR staging e RPO/RTO, ARM64/Podman rootless, Kubernetes HA, provider SMTP/SSO, antivirus/pentest, GDPR/licenze.

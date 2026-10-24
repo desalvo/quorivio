@@ -7,8 +7,8 @@
       "area": "A-editor",
       "weight": 6,
       "status": "partial",
-      "evidence": "Canvas 16:9, free placement, resizing, rotation, rulers, keyboard code and local build documented; page-scoped bounded widget undo/redo, drag grouping, and keyboard shortcuts implemented; local 163 Node tests and web build PASS (2026-10-24); multi-widget selection (shift-click, accessible checkbox, Ctrl/Cmd+A), 10 alignment/equal-size/distribution commands with bounded geometry and one-step undo/redo, 8 Node regressions PASS (2026-10-25); group move/copy/cut/paste with bounded geometry and eight additional Node tests locally PASS (2026-10-25); Chromium workflow 40141207000 reached multi-selection, alignment, undo/redo and group paste, but failed on test-only disabled deselect click (2026-10-25).",
-      "remaining": "Rerun corrected Chromium browser acceptance, validate persistence and desktop/mobile behavior; current local browser blocked by policy."
+      "evidence": "Canvas 16:9, free placement, resizing, rotation, rulers, keyboard code and local build documented; page-scoped bounded widget undo/redo, drag grouping, and keyboard shortcuts implemented; local 163 Node tests and web build PASS (2026-10-24); multi-widget selection (shift-click, accessible checkbox, Ctrl/Cmd+A), 10 alignment/equal-size/distribution commands with bounded geometry and one-step undo/redo, 8 Node regressions PASS (2026-10-25); group move/copy/cut/paste with bounded geometry and eight additional Node tests locally PASS (2026-10-25); Chromium workflow 40141207000 reached multi-selection, alignment, undo/redo and group paste, but failed on test-only disabled deselect click (2026-10-25). CI 40141894130 / job 121015403855: opt-in Chromium PASS (multi-selection, alignment, undo/redo, group paste, accessible selection, clear selection, zero JS page errors). Following 20-intervention batch adds stable layer groups, gap distribution, canvas centering, multi-delete/duplicate, bounded keyboard/group nudge, and new opt-in browser persistence/mobile smoke (not yet executed).",
+      "remaining": "Rerun expanded Chromium acceptance in CI (including mocked PATCH persistence and 390px touch viewport); real PostgreSQL save/reload, screen-reader, desktop/mobile device lab and visual-fidelity acceptance remain."
     },
     {
       "id": "A2",
@@ -39,16 +39,16 @@
       "area": "B-sessions",
       "weight": 6,
       "status": "partial",
-      "evidence": "Presenter dashboard, synced server-driven navigation and participant preview in source; live WebSocket authorization re-audits sessions, presenter memberships/roles and participants every 10s (local policy tests PASS, 2026-10-24); per-session coalesced snapshot delivery and 2 MiB slow-consumer protection, local tests PASS (2026-10-24); LISTEN startup/resync failure now forces reconnection, with local regression tests (2026-10-24); retired listener notification fencing and rejected handler reconnect regression tests PASS (2026-10-24); coalesced snapshot callers now await the final read and failed DB snapshots propagate to listener recovery (152 Node and 252 Python tests PASS, builds PASS, 2026-10-24); disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24); added mandatory CI PostgreSQL two-process WebSocket notification acceptance (not yet run on CI, 2026-10-24); replica smoke now drains pre-mutation notifications to require a fresh post-vote participant snapshot (2026-10-24). Maintainer confirmed green CI including two-replica PostgreSQL 18 WebSocket test (2026-10-24).",
-      "remaining": "Browser and latency/recovery acceptance; multi-replica stress beyond two processes."
+      "evidence": "Presenter dashboard, synced server-driven navigation and participant preview in source; live WebSocket authorization re-audits sessions, presenter memberships/roles and participants every 10s (local policy tests PASS, 2026-10-24); per-session coalesced snapshot delivery and 2 MiB slow-consumer protection, local tests PASS (2026-10-24); LISTEN startup/resync failure now forces reconnection, with local regression tests (2026-10-24); retired listener notification fencing and rejected handler reconnect regression tests PASS (2026-10-24); coalesced snapshot callers now await the final read and failed DB snapshots propagate to listener recovery (152 Node and 252 Python tests PASS, builds PASS, 2026-10-24); disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24); added mandatory CI PostgreSQL two-process WebSocket notification acceptance (not yet run on CI, 2026-10-24); replica smoke now drains pre-mutation notifications to require a fresh post-vote participant snapshot (2026-10-24). Maintainer confirmed green CI including two-replica PostgreSQL 18 WebSocket test (2026-10-24). CI 40141894130: PostgreSQL 18 two-replica WebSocket opening, response propagation, privacy and close PASS; 24 concurrent HTTP clients PASS.",
+      "remaining": "Production-like latency/recovery measurements and multi-replica stress beyond two processes."
     },
     {
       "id": "B2",
       "area": "B-sessions",
       "weight": 6,
       "status": "partial",
-      "evidence": "Timed quiz APIs, per-widget results and server timestamps implemented; shared PostgreSQL-clock deadlines for legacy and widget timed answers, local contract and unit tests PASS (2026-10-24); open timed-widget edits now reject duplicate/missing widget IDs (154 Node PASS, 2026-10-24); disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24)",
-      "remaining": "Concurrent clients, fairness under latency, timed quiz widget PostgreSQL E2E; await CI result for new live HTTP smoke"
+      "evidence": "Timed quiz APIs, per-widget results and server timestamps implemented; shared PostgreSQL-clock deadlines for legacy and widget timed answers, local contract and unit tests PASS (2026-10-24); open timed-widget edits now reject duplicate/missing widget IDs (154 Node PASS, 2026-10-24); disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24) CI 40141894130: 24 independent concurrent PostgreSQL-backed HTTP participants, idempotency and timed expiry PASS.",
+      "remaining": "Timed quiz widget concurrency/fairness under variable latency and UI/browser acceptance."
     },
     {
       "id": "B3",
@@ -63,8 +63,8 @@
       "area": "B-sessions",
       "weight": 5,
       "status": "partial",
-      "evidence": "Anonymous participation, polling and QR routes implemented; disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24); two-replica participant/presenter privacy and notification smoke added to CI, pending execution; opt-in 500-client disposable PostgreSQL CI load with presenter observer and privacy assertion authored, not yet executed (2026-10-24) Maintainer confirmed green two-replica CI (2026-10-24).",
-      "remaining": "Execute opt-in 500-client same-session capacity test and browser privacy acceptance; 500-participant workflow step not reached in 40141207000 due to earlier Chromium failure."
+      "evidence": "Anonymous participation, polling and QR routes implemented; disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24); two-replica participant/presenter privacy and notification smoke added to CI, pending execution; opt-in 500-client disposable PostgreSQL CI load with presenter observer and privacy assertion authored, not yet executed (2026-10-24) Maintainer confirmed green two-replica CI (2026-10-24). CI 40141894130: opt-in 500 independent participants PASS with presenter-observed peak >=475 and zero errors; PostgreSQL two-replica WebSocket privacy PASS.",
+      "remaining": "Browser participant privacy/QR acceptance and representative production-like throughput, latency, memory and recovery under sustained load; CI-only load is not a production SLA."
     },
     {
       "id": "C1",
@@ -103,32 +103,32 @@
       "area": "D-validation",
       "weight": 6,
       "status": "accepted",
-      "evidence": "Baseline CI green confirmed by maintainer (2026-10-24); new cycle local backend TypeScript and frontend TypeScript/Vite builds PASS with archived Node 22 dependencies. 126 Node and 224 Python tests PASS; new PostgreSQL HTTP CI test authored, NOT yet run.; latest cycle backend/frontend full builds PASS, 143 Node and 235 Python local tests PASS (2026-10-24)",
-      "remaining": "Run GitHub CI on this new package and review the new integration gate; retain existing security scans."
+      "evidence": "Baseline CI green confirmed by maintainer (2026-10-24); new cycle local backend TypeScript and frontend TypeScript/Vite builds PASS with archived Node 22 dependencies. 126 Node and 224 Python tests PASS; new PostgreSQL HTTP CI test authored, NOT yet run.; latest cycle backend/frontend full builds PASS, 143 Node and 235 Python local tests PASS (2026-10-24) CI 40141894130 production quality and container build jobs SUCCESS, including Chromium and 500-user opt-ins; maintainer confirmed commit of previous hotfix.",
+      "remaining": "Run full GitHub CI on the next package; retain mandatory scans and reproducible builds."
     },
     {
       "id": "D2",
       "area": "D-validation",
       "weight": 6,
       "status": "partial",
-      "evidence": "Maintainer confirmed CI green (2026-10-24) including PostgreSQL 18 backup/restore into fresh disposable database, schema bootstrap and two-replica WebSocket acceptance. New local DR preflight and staged checksum regressions pass (2026-10-24); negative populated-DB restore, schema parity and timing instrumentation added to CI, awaiting next run.",
-      "remaining": "CI execution of new negative restore acceptance; external operational restore drill, encryption/key rotation, retention, representative dataset and production-like RPO/RTO sign-off."
+      "evidence": "Maintainer confirmed CI green (2026-10-24) including PostgreSQL 18 backup/restore into fresh disposable database, schema bootstrap and two-replica WebSocket acceptance. New local DR preflight and staged checksum regressions pass (2026-10-24); negative populated-DB restore, schema parity and timing instrumentation added to CI, awaiting next run. CI 40141894130: PostgreSQL 18 backup/restore PASS including populated-database refusal, schema/row parity, private assets, integrity and overwrite rejection; measured CI sample backup=0.18s restore=0.34s (not SLA).",
+      "remaining": "Production-like restore drill, encryption/key rotation, retention, representative dataset and RPO/RTO operational sign-off."
     },
     {
       "id": "D3",
       "area": "D-validation",
       "weight": 4,
       "status": "open",
-      "evidence": "Docker/Podman/Helm manifests and workflows exist",
-      "remaining": "ARM64/AMD64, rootless Podman and multi-replica Kubernetes runtime checks"
+      "evidence": "Docker/Podman/Helm manifests and workflows exist CI 40141894130 container build gate SUCCESS, including runtime and converter image scans (runner architecture only).",
+      "remaining": "ARM64/AMD64 multi-architecture execution, rootless Podman and Kubernetes multi-replica runtime acceptance."
     },
     {
       "id": "D4",
       "area": "D-validation",
       "weight": 5,
-      "status": "open",
-      "evidence": "Isolated document converter, upload validation, CSRF and security tests exist; offline 500-user shard reconciler and eight unit tests added (unexecuted against real staging). Follow-up: aggregate pre-inflate ZIP quotas and strict UTF-8 manifest checks tested locally; does not constitute runtime security acceptance.; native PPTX OOXML security/roundtrip regression locally PASS (11 cases, 2026-10-24)",
-      "remaining": "Real PDF/PPTX conversion, malware pipeline, pentest, load and WebSocket acceptance; aggregate an actual same-session shard run and verify independent server telemetry."
+      "status": "partial",
+      "evidence": "Isolated document converter, upload validation, CSRF and security tests exist; offline 500-user shard reconciler and eight unit tests added (unexecuted against real staging). Follow-up: aggregate pre-inflate ZIP quotas and strict UTF-8 manifest checks tested locally; does not constitute runtime security acceptance.; native PPTX OOXML security/roundtrip regression locally PASS (11 cases, 2026-10-24) CI 40141894130: real disposable PostgreSQL/WebSocket opt-in 500 independent participants PASS, presenter-observed peak >=475, zero errors; high/critical vulnerability gate and image scans PASS; converter/portability unit and Python suites PASS. This is partial evidence, not complete production security acceptance.",
+      "remaining": "Production-like load/latency, actual PDF/PPTX conversion and AV integration, pentest, security threat model and operator sign-off."
     },
     {
       "id": "D5",
@@ -143,7 +143,7 @@
       "area": "D-validation",
       "weight": 5,
       "status": "open",
-      "evidence": "GDPR registers and CI security scanning configuration documented",
+      "evidence": "GDPR registers and CI security scanning configuration documented CI 40141894130 vulnerability and credential-leak gates PASS; not a GDPR audit.",
       "remaining": "Runtime privacy controls, dependency license audit, operations and security sign-off"
     }
   ]

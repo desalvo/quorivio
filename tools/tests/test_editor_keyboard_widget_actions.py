@@ -10,7 +10,8 @@ class EditorWidgetKeyboardActions(unittest.TestCase):
 
     def test_delete_backspace_remove_focused_widget(self):
         self.assertIn("e.key==='Delete'||e.key==='Backspace'", self.source)
-        self.assertIn('onChange(widgets.filter(item=>item.id!==w.id))', self.source)
+        self.assertIn('onChange(deleteWidgetSelection(widgets,ids))', self.source)
+        self.assertIn('selectedWidgets.includes(w.id)?selectedWidgets:[w.id]', self.source)
 
     def test_typing_in_form_fields_is_not_intercepted(self):
         snippet = self.source.split('function keyboardGeometry', 1)[1].split('function end()', 1)[0]
