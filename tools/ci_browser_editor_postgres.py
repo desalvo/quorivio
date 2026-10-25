@@ -10,6 +10,7 @@ import os
 from pathlib import Path
 from urllib.parse import urlsplit
 from playwright.async_api import async_playwright, expect
+from ci_editor_collaboration_fixtures import label_only_remote_patch
 
 BASE=os.environ.get('QUORIVIO_CI_BASE_URL','http://127.0.0.1:8080')
 assert urlsplit(BASE).hostname in ('127.0.0.1','localhost') and urlsplit(BASE).scheme=='http'
@@ -86,9 +87,20 @@ async def main():
    assert saved['design_revision']==3 and [w['position']['x'] for w in saved['page_design']['widgets'][:2]]==[11,41]
    await open_editor(page,title)
    assert (await canvas.evaluate_all('(els)=>els.map(e=>parseFloat(e.style.left))'))[:2]==[11,41]
-   # Simulate a collaborator saving after the editor loaded, without intercepting HTTP.
-   collaborator=await call(context,'PATCH',path,{**draft('Remote collaborator'),'expected_design_revision':3})
+   # Simulate a collaborator changing ONLY the label after this editor loaded.
+   # Reusing draft('Remote collaborator') here would reset x=11 to x=10 and
+   # manufacture a real same-field conflict with the local x=12 change.
+   remote_before=await call(context,'GET',f'/api/sessions/{sid}')
+   remote_activity=next(x for x in remote_before['activities'] if x['id']==aid)
+   assert remote_activity['design_revision']==3
+   remote_patch=label_only_remote_patch(remote_activity,'pg-first','Remote collaborator')
+   assert remote_patch['page_design']['widgets'][0]['position']['x']==11
+   collaborator=await call(context,'PATCH',path,remote_patch)
    assert collaborator['design_revision']==4
+   remote_after=await call(context,'GET',f'/api/sessions/{sid}')
+   remote_saved=next(x for x in remote_after['activities'] if x['id']==aid)
+   assert remote_saved['page_design']['widgets'][0]['label']=='Remote collaborator'
+   assert [w['position']['x'] for w in remote_saved['page_design']['widgets']]==[11,41,75]
    region=page.get_by_role('region',name='Organizzazione accessibile dei widget')
    await region.get_by_role('checkbox',name='Seleziona').first.check()
    await page.get_by_role('button',name='Sposta selezione a destra').click()
