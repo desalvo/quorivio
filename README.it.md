@@ -1,3 +1,5 @@
+**Hotfix CI full Chromium (25 ottobre 2026):** l’informativa sui cookie funzionali usa un portale React sul `document.body` per evitare che la dashboard intercetti il clic di conferma. La CI standard 40213703957 è verde; la CI full Chromium deve essere rieseguita.
+
 **Hotfix CI Chromium (25/10/2026):** Il collaudo browser dell’editor conferma ora il dialogo accessibile dei cookie funzionali nei contesti desktop/mobile e PostgreSQL reale prima dei clic sui controlli. Nessun clic forzato o cookie iniettato; dettagli in `docs/DEVELOPMENT_STATUS.it.md`.
 
 
