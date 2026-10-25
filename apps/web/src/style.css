@@ -385,3 +385,9 @@
 .page-draft-import input{max-width:13rem;font-size:.8rem}
 .page-draft-import:focus-within{outline:2px solid currentColor;outline-offset:2px}
 @media(max-width:600px){.page-draft-import{width:100%}.page-draft-import input{max-width:100%}}
+
+/* A native modal dialog is promoted to the browser top layer. Unlike a fixed
+ * portal with z-index, it cannot be covered by the dashboard stacking context.
+ * Acknowledgement is an explicit action: Escape cannot silently dismiss it. */
+.functional-cookie-dialog{position:fixed;inset:auto 18px 18px;width:min(680px,calc(100vw - 36px));max-width:calc(100vw - 36px);max-height:calc(100dvh - 36px);overflow:auto;margin:0 auto;color:#e9eafa;box-shadow:0 4px 36px #0007}
+.functional-cookie-dialog::backdrop{background:rgba(12,16,35,.4)}

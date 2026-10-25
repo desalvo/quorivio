@@ -20,6 +20,7 @@ async def acknowledge_functional_cookie_notice(page):
     """
     notice=page.get_by_role('dialog',name='Informativa cookie funzionali')
     await expect(notice).to_be_visible()
+    assert await notice.evaluate("element => element.matches(':modal')"), 'Functional cookie notice must be in the browser top layer'
     await notice.get_by_role('button',name='Ho capito').click()
     await expect(notice).to_have_count(0)
 

@@ -127,3 +127,7 @@ Convertitore presentazioni isolato: vedere [le istruzioni di distribuzione](docs
 ### Checkpoint sviluppo — settimo lotto conversione senza commit (25 ottobre 2026)
 
 Il package cumulativo include **sette lotti di conversione ancora non committati (210 interventi/scenari)** successivi all'ultimo commit Audience 20 Cycles con CI verde. Il lotto più recente preserva il ritaglio nativo modificabile delle immagini PowerPoint durante importazione, editor, proiezione/anteprima ed esportazione PPTX. Inventario e verifiche: [`docs/RC_CONVERSION_SEVENTH_30_CYCLES.it.md`](docs/RC_CONVERSION_SEVENTH_30_CYCLES.it.md). **La CI GitHub dei sette lotti non è stata ancora eseguita**; nessun gate RC promosso.
+
+
+### Chromium native top-layer hotfix (2026-10-25)
+La CI full 40215782964 falliva perché la dashboard intercettava il clic di conferma dei cookie, nonostante il portal nel body. L’informativa usa ora il dialog HTML nativo showModal() nel top layer del browser; i test opt-in verificano :modal ed eseguono il clic reale. Localmente Node 314/314, Python 630/630 e build API/web PASS; serve rieseguire Chromium end-to-end.

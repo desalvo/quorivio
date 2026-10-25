@@ -161,3 +161,7 @@ Isolated presentation converter: see [deployment instructions](docs/ISOLATED_CON
 ### Development checkpoint — seventh uncommitted conversion batch (2026-10-25)
 
 The current cumulative development package contains **seven uncommitted conversion batches (210 intervention/acceptance items)** after the last maintainer-confirmed green Audience 20 Cycles commit. The latest batch preserves editable native PowerPoint picture crops through import, canvas metadata, browser projection/rehearsal and PPTX export. Full evidence and 30-case inventory: [`docs/RC_CONVERSION_SEVENTH_30_CYCLES.en.md`](docs/RC_CONVERSION_SEVENTH_30_CYCLES.en.md). **GitHub CI has not yet been run on these seven batches**; no RC gate is promoted.
+
+
+### Chromium native top-layer hotfix (2026-10-25)
+Full Chromium CI 40215782964 failed because the dashboard intercepted the cookie acknowledgement click despite the previous body portal. The notice now uses native HTML dialog.showModal() in the browser top layer; the opt-in browser tests assert :modal and perform a real click. Local Node 314/314, Python 630/630, API/web builds PASS; full-app browser rerun required.

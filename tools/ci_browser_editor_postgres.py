@@ -33,6 +33,7 @@ async def open_editor(page,title):
  await page.get_by_role('button',name='Apri sessione').first.wait_for()
  notice=page.get_by_role('dialog',name='Informativa cookie funzionali')
  if await notice.is_visible():
+  assert await notice.evaluate("element => element.matches(':modal')"), 'Functional cookie notice must be in the browser top layer'
   await notice.get_by_role('button',name='Ho capito').click()
   await expect(notice).to_have_count(0)
  await page.get_by_role('button',name='Apri sessione').first.click()
