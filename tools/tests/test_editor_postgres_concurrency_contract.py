@@ -26,6 +26,10 @@ class EditorPostgresConcurrencyContracts(unittest.TestCase):
  def test_real_browser_is_opt_in(self):self.assertIn('run: python3 tools/ci_browser_editor_postgres.py',WORKFLOW)
  def test_browser_does_not_mock_routes(self):self.assertNotIn('.route(',BROWSER)
  def test_browser_tests_real_db_reload(self):self.assertIn("await call(context,'GET',f'/api/sessions/{sid}')",BROWSER)
+ def test_independent_slide_uses_canvas_pages_endpoint(self):
+  self.assertIn("second=api(a,'POST',path+'/pages',{'title':'Independent'},201)",REAL)
+  self.assertIn("app.post('/api/sessions/:id/pages'",API)
+  self.assertNotIn("'type':'slide','options':[]",REAL)
  def test_concurrent_http_test_has_two_real_writers(self):self.assertIn('ThreadPoolExecutor(max_workers=2)',REAL)
  def test_test_scripts_refuse_remote_servers(self):self.assertIn("'127.0.0.1'",REAL);self.assertIn("'127.0.0.1'",BROWSER)
  def test_browser_artifacts_contain_no_cookie_dump(self):self.assertNotIn('storage_state(',BROWSER)

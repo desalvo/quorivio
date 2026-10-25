@@ -12,6 +12,17 @@ WIDGETS=[{'id':'widget-a','kind':'text','label':'First','position':{'x':10,'y':1
 ACT={'id':ACTIVITY,'title':'Slide browser','type':'poll','status':'draft','options':[],'page_design':{'widgets':WIDGETS},'result_design':{}}
 SES={'id':SESSION,'title':'Browser acceptance','reference_date':'2026-10-25','status':'draft','join_code':'ABCDEF','join_url':'/join/ABCDEF','current_activity_id':None,'retention_days':90,'allow_anonymous':True,'show_results':False}
 SNAP={'session':SES,'activities':[ACT],'results':[],'connected_participants':0}
+async def acknowledge_functional_cookie_notice(page):
+    """Dismiss the real accessible notice, without bypassing pointer checks.
+
+    A fresh browser context has no q_cookie_notice cookie; the fixed-position
+    notice can overlap editor controls after the canvas has been opened.
+    """
+    notice=page.get_by_role('dialog',name='Informativa cookie funzionali')
+    await expect(notice).to_be_visible()
+    await notice.get_by_role('button',name='Ho capito').click()
+    await expect(notice).to_have_count(0)
+
 async def main():
  async with async_playwright() as pw:
   browser=await pw.chromium.launch(**({'executable_path':os.environ['QUORIVIO_CHROMIUM_PATH']} if os.environ.get('QUORIVIO_CHROMIUM_PATH') else {}),headless=True,args=['--no-sandbox'])
@@ -39,6 +50,8 @@ async def main():
   await page.route('**/api/**',mock)
   try:
     await page.goto(os.environ.get('QUORIVIO_WEB_URL','http://127.0.0.1:5173/'),wait_until='domcontentloaded')
+    await page.get_by_role('button',name='Apri sessione').first.wait_for()
+    await acknowledge_functional_cookie_notice(page)
     await page.get_by_role('button',name='Apri sessione').first.click()
     await page.get_by_text('Browser acceptance',exact=True).wait_for()
     # Expanding the session summary is not the same as opening its dashboard.
@@ -128,6 +141,7 @@ async def main():
     assert state['saves']==1,state
     assert [w['position']['x'] for w in state['widgets'][:2]]==[11,11],state['widgets']
     await page.reload(wait_until='domcontentloaded')
+    await expect(page.get_by_role('dialog',name='Informativa cookie funzionali')).to_have_count(0)
     await page.get_by_role('button',name='Apri sessione').first.click()
     session_card=page.locator('details').filter(has=page.get_by_text('Browser acceptance',exact=True))
     await session_card.locator('summary').click()
@@ -160,6 +174,8 @@ async def main():
     await mobile.route('**/api/**',mock)
     try:
      await mobile.goto(os.environ.get('QUORIVIO_WEB_URL','http://127.0.0.1:5173/'),wait_until='domcontentloaded')
+     await mobile.get_by_role('button',name='Apri sessione').first.wait_for()
+     await acknowledge_functional_cookie_notice(mobile)
      await mobile.get_by_role('button',name='Apri sessione').first.click()
      card=mobile.locator('details').filter(has=mobile.get_by_text('Browser acceptance',exact=True))
      await card.locator('summary').click()

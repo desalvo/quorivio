@@ -30,6 +30,11 @@ async def call(context,method,path,body=None,status=200):
 
 async def open_editor(page,title):
  await page.goto(BASE+'/',wait_until='domcontentloaded')
+ await page.get_by_role('button',name='Apri sessione').first.wait_for()
+ notice=page.get_by_role('dialog',name='Informativa cookie funzionali')
+ if await notice.is_visible():
+  await notice.get_by_role('button',name='Ho capito').click()
+  await expect(notice).to_have_count(0)
  await page.get_by_role('button',name='Apri sessione').first.click()
  card=page.locator('details').filter(has=page.get_by_text(title,exact=True))
  await card.locator('summary').click()

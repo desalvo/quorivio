@@ -64,7 +64,7 @@ def run():
  styled=api(a,'PATCH',edit,{**valid,'expected_design_revision':3});assert styled['design_revision']==4
  assert api(a,'GET',path)['activities'][0]['page_design']['widgets'][0]['style']==valid['page_design']['widgets'][0]['style']
  # A separate activity starts its own revision, unaffected by this page.
- second=api(a,'POST',path+'/activities',{'title':'Independent','type':'slide','options':[]},201)
+ second=api(a,'POST',path+'/pages',{'title':'Independent'},201)
  second_path=f'{path}/activities/{second["id"]}/design'
  assert next(x for x in api(a,'GET',path)['activities'] if x['id']==second['id'])['design_revision']==1
  assert api(b,'PATCH',second_path,{**design('Second'),'expected_design_revision':1})['design_revision']==2

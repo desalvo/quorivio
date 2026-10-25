@@ -1,3 +1,5 @@
+**CI Chromium regression hotfix (2026-10-25):** Browser editor acceptance now acknowledges the accessible functional-cookie dialog in desktop/mobile and real PostgreSQL contexts before clicking editor controls. No forced clicks or cookie injection; see `docs/DEVELOPMENT_STATUS.md`.
+
 
 ### Latest development cycle — Concurrent authoring
 

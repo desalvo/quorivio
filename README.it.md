@@ -1,3 +1,5 @@
+**Hotfix CI Chromium (25/10/2026):** Il collaudo browser dell’editor conferma ora il dialogo accessibile dei cookie funzionali nei contesti desktop/mobile e PostgreSQL reale prima dei clic sui controlli. Nessun clic forzato o cookie iniettato; dettagli in `docs/DEVELOPMENT_STATUS.it.md`.
+
 
 ### Ultimo ciclo di sviluppo — Editing concorrente
 
