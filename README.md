@@ -1,3 +1,5 @@
+**Development checkpoint (2026-10-25):** Eight uncommitted conversion batches, 240 cumulative acceptance/intervention cases since Audience 20 Cycles CI-green commit; new editable PowerPoint shape fill/outline fidelity. Local: 583 Python + 232 Node PASS, API/web build PASS. GitHub CI not yet rerun; RC 45.5%. See `docs/RC_CONVERSION_EIGHTH_30_CYCLES.en.md`.
+
 > **Latest development cycle (2026-10-22):** Transactional session page ordering and definition-only page duplication are implemented in source. See `docs/PAGE_SEQUENCE.en.md` / `docs/PAGE_SEQUENCE.it.md`. Local unit tests passed; browser/PostgreSQL integration and production validation remain pending. Functional estimate **80%**, readiness **35%**.
 
 # Quorivio — 0.1.0-dev
@@ -146,3 +148,7 @@ The application stack automatically starts private ClamAV with fail-closed uploa
 
 
 Isolated presentation converter: see [deployment instructions](docs/ISOLATED_CONVERTER.en.md). Configure `QUORIVIO_WORKER_TOKEN` before enabling stack conversions.
+
+### Development checkpoint — seventh uncommitted conversion batch (2026-10-25)
+
+The current cumulative development package contains **seven uncommitted conversion batches (210 intervention/acceptance items)** after the last maintainer-confirmed green Audience 20 Cycles commit. The latest batch preserves editable native PowerPoint picture crops through import, canvas metadata, browser projection/rehearsal and PPTX export. Full evidence and 30-case inventory: [`docs/RC_CONVERSION_SEVENTH_30_CYCLES.en.md`](docs/RC_CONVERSION_SEVENTH_30_CYCLES.en.md). **GitHub CI has not yet been run on these seven batches**; no RC gate is promoted.

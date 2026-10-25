@@ -1,3 +1,9 @@
+## 2026-10-25 — Eighth uncommitted 30-case conversion batch: editable native PowerPoint shape paints
+- Added native editable shape outline widths (0.25–12 pt), solid/dashed/dotted patterns, no-fill and no-outline across import/export, canvas inspector, projection, rehearsal and thumbnails. API/export input validation rejects malformed shape paint. 12 real LibreOffice+Poppler visual roundtrip comparisons, 18 native behavior/validation cases, 7 Node and 5 UI contract regressions.
+- New 30-case suite PASS; **232/232 Node PASS; API/web production builds PASS**. **583/583 Python PASS**; GitHub CI pending. All eight conversion batches (240 acceptance/intervention items) remain **uncommitted** since green Audience 20 Cycles workflow 40144692900. Weighted RC **45.5%**, A3/D4 partial; not a release candidate. See `docs/RC_CONVERSION_EIGHTH_30_CYCLES.en.md`. No commit/push.
+
+## 2026-10-25 — Sixth uncommitted 30-case conversion batch: real LibreOffice+Poppler 12-slide native PPTX→portable→PPTX raster comparisons, whitespace/Unicode import fixes, presenter typography and non-duplicated text, honest fidelity flags for mixed runs/theme colors/gradients/crops. Local Python 512/512, Node 221/221, API/web build PASS; CI pending. Conversion batches 1–6 (180 cases) uncommitted since green Audience 20 Cycles 40144692900; weighted RC remains 45.5%, not RC. See `docs/RC_CONVERSION_SIXTH_30_CYCLES.en.md`. No commit/push.
+
 ## 2026-10-25 — Audience journey, 20 substantial interventions (after green CI 40143475939)
 - User confirmed commit of `editor-20-cycle-rc-evidence` and green quality/container jobs `121019855513`/`121020208222`. This is the new baseline; no changes from that commit are included in the suggested new commit message.
 - Delivered a cohesive 20-intervention participant workflow: robust code/QR join, HttpOnly cookie participation recovery with boolean-only no-store API, loading/unavailable/retry states, join/vote concurrency guards, accessible choices and feedback, keyboard skip link, responsive mobile widget reflow, bounded WebSocket reconnection and server-authoritative result privacy.
@@ -1184,3 +1190,33 @@ No commit/push/tag/release performed.
 ### Chromium browser acceptance navigation hotfix (2026-10-25)
 
 The GitHub Actions browser gate failed because the Playwright fixture expanded the session details but never clicked the nested Open session button. The test now opens the session dashboard before requesting the page editor. Browser rerun is pending; no A1 acceptance claimed.
+
+### 2026-10-25 — 30-intervention conversion/atomic-publication batch
+
+**Committed baseline:** audience 20-cycle package; GitHub run 40144692900 quality and container build SUCCESS, browser editor + real PostgreSQL participant acceptance PASS, publication SKIPPED. The earlier 500-user opt-in PASS remains valid.
+
+Delivered 30 grouped functional/security interventions across flattened PPTX admission, PDF rendering, input identity, numeric slide order, PNG validation and quotas, private atomic import/export, strict worker HTTP and mandatory CI conversion prerequisites. See `docs/RC_CONVERSION_30_CYCLES.en.md` and `.it.md` for the exact 30-item inventory, remaining criteria and tests.
+
+**Local:** 215 Node, 340 Python (58 new), TypeScript API and Vite web builds PASS; real 12-page Poppler PDF and LibreOffice PPTX conversion PASS. **New CI not run.** D4 remains partial; overall RC audit stays **45.5%**. No commit/push/tag/release.
+
+### 2026-10-25 — Second 30-intervention batch, both conversion batches uncommitted
+
+The confirmed committed baseline is Audience 20 Cycles. Both the preceding conversion 30-intervention batch and this second 30-intervention batch remain **uncommitted** and are combined in the new cumulative package. Improved full PNG/JPEG stream verification, OOXML admission and XML relationship parsing, fail-closed export preflight, media budgets, atomic exclusive PPTX/JSON publication, private permissions, SHA-256 source identity and worker-root symlink rejection. Detailed inventory: `docs/RC_CONVERSION_SECOND_30_CYCLES.en.md`. Local checks: **375 Python, 215 Node, API/web builds PASS**. New GitHub CI has not run. D4 remains partial; RC **45.5%**. No commit/push/tag/release.
+
+
+### 2026-10-25 — Third 30-intervention conversion batch, still uncommitted
+
+The cumulative package now includes **90 interventions since the confirmed Audience 20 Cycles commit**. Added full PNG chunk CRC and pixel decoding, encrypted/JavaScript PDF rejection, complete OOXML XML/DTD/URI/ActiveX/OLE/macro preflight, and strict worker HTTP Bearer/framing handling. **43 new behavioral tests** (418 Python, 215 Node); backend/frontend builds PASS. See `docs/RC_CONVERSION_THIRD_30_CYCLES.it.md` and `.en.md`. New GitHub CI and container build are still pending; D4 remains partial, **45.5%**. No commit/push/tag/release.
+
+### 2026-10-25 — Fourth 30-case conversion hardening batch (still uncommitted)
+
+Added OOXML relationship, encoded URI/path, traversal, numeric geometry, font, color, shape-type, media-ID and symlink safeguards. Export now serializes verified image bytes without reopening mutable media paths. 30 new behavioral regressions: **448/448 Python PASS**. Node/build not rerun because npm dependencies are absent locally. New CI and container build pending. Details in `docs/RC_CONVERSION_FOURTH_30_CYCLES.en.md`. Declared cumulative total since Audience commit: **120 interventions/checks**; **45.5%** unchanged, D4 partial. No commit/push/tag/release.
+
+
+### 2026-10-25 — Fifth conversion batch: native slide backgrounds and text alignment (uncommitted)
+
+Thirty real PPTX behavior scenarios now cover editable solid RGB backgrounds, horizontal text alignment and vertical anchoring, negative export admission and truthful fidelity warnings for gradients/mixed alignment. API validates the new style and page properties; editor, presenter projection and rehearsal expose them. Added six Node API tests. **221 Node, 478 Python, API/web production builds PASS locally**. The five conversion batches since the committed Audience 20 Cycles baseline total **150 distinct interventions/checks**, not 150 new macrofeatures. CI and independent real-world PPTX visual corpus pending; RC remains **45.5%**, no commit/push/tag/release. Inventory: `docs/RC_CONVERSION_FIFTH_30_CYCLES.en.md`.
+
+### 2026-10-25 — Seventh 30-case conversion batch (210 uncommitted cumulative)
+
+Native PowerPoint picture crop now survives editable import/export as fractional metadata, with deduplicated original images, crop-aware projection/rehearsal, keyboard-accessible crop editor and reset, strict API/export validation and truthful loss reporting for unsupported negative overscan. 30 acceptance scenarios include 12 actual LibreOffice/Poppler image comparisons. Local **225 Node / 548 Python PASS**, API/web builds PASS. See `docs/RC_CONVERSION_SEVENTH_30_CYCLES.en.md`. CI not yet run; A3/D4 partial, RC **45.5%**. No commit/push/tag/release.

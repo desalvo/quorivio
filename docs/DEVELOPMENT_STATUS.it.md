@@ -1,3 +1,9 @@
+## 2026-10-25 — Ottavo lotto non committato (30 casi): riempimenti e contorni PowerPoint modificabili
+- Conservazione nativa di spessori 0,25–12 pt, linee continue/tratteggiate/puntinate, assenza di riempimento e di contorno; editor, proiezione, anteprima, miniature, validazione API ed export aggiornati. 12 confronti visivi LibreOffice/Poppler, 18 casi comportamentali, 7 test Node e 5 controlli UI.
+- 30 nuovi casi PASS; **232/232 Node PASS; build API/web PASS**. **583/583 Python PASS**; CI GitHub in attesa. Otto lotti cumulativi (240 interventi/scenari) ancora **non committati** dopo workflow verde Audience 20 Cycles 40144692900. RC **45,5%**, A3/D4 parziali; non RC. Vedi `docs/RC_CONVERSION_EIGHTH_30_CYCLES.it.md`. Nessun commit/push.
+
+## 2026-10-25 — Sesto lotto non committato: 30 verifiche di fedeltà, incluse 12 diapositive renderizzate con LibreOffice/Poppler prima e dopo PPTX→Quorivio→PPTX; conservazione spazi/Unicode, correzione duplicazione e stile del testo nella proiezione, report di perdita di fedeltà per temi/sfumature/stili misti/ritagli. Python 512/512, Node 221/221, build PASS; CI in attesa. Sei lotti (180 casi) non committati dall’ultima baseline verde 40144692900; RC 45,5% invariato. Vedi `docs/RC_CONVERSION_SIXTH_30_CYCLES.it.md`. Nessun commit/push.
+
 ## 25 ottobre 2026 — Percorso partecipante, 20 interventi dopo CI verde 40143475939
 - L'utente ha confermato commit e CI verde dei job qualità e container `121019855513` e `121020208222`: nuova baseline. Nessuna modifica già committata sarà inclusa nel prossimo messaggio di commit.
 - Venti interventi accorpati su accesso tramite codice/QR, ripristino cookie HttpOnly con endpoint booleano no-store, errori/riprova, protezione doppi invii, scelte accessibili, scorciatoia al contenuto, reflow mobile, riconnessione WebSocket e risultati live controllati dal server. Nuovo test Chromium opt-in con PostgreSQL reale e due browser isolati, più test HTTP, Node/Python e diagnostica. Inventario completo in `docs/RC_AUDIENCE_20_CYCLES.it.md` e `.en.md`.
@@ -975,3 +981,33 @@ avanzamento verificato 43,0%. Nessun commit/push/tag/release.
 ### Correzione navigazione collaudo Chromium (25 ottobre 2026)
 
 La CI browser falliva perché Playwright espandeva la scheda della sessione senza premere il pulsante Apri sessione al suo interno. Il test ora apre la dashboard prima di accedere all’editor. Riesecuzione Chromium ancora necessaria; A1 non è dichiarato concluso.
+
+### 25 ottobre 2026 — Lotto da 30 interventi: conversione e pubblicazione atomica
+
+**Baseline committata:** package Audience 20 Cycles; run GitHub 40144692900 con gate qualità e container verdi, browser editor e partecipanti PostgreSQL PASS, pubblicazione saltata. Resta valido il precedente test dei 500 partecipanti.
+
+Completati 30 interventi raggruppati su sicurezza OOXML delle importazioni rasterizzate, conversione PDF, identità dei sorgenti, ordine numerico delle pagine, integrità/limiti PNG, import/export atomici e privati, HTTP del worker e prerequisiti CI. Inventario dettagliato in `docs/RC_CONVERSION_30_CYCLES.it.md` e `.en.md`.
+
+**Verifiche locali:** 215 Node, 340 Python (58 nuovi), build API TypeScript e frontend Vite PASS; conversione reale PDF di 12 pagine e PPTX LibreOffice PASS. **Nuova CI non ancora eseguita.** D4 resta parziale e l'audit RC rimane al **45,5%**. Nessun commit/push/tag/release.
+
+### 25 ottobre 2026 — Secondo lotto da 30 interventi, ancora senza commit
+
+Si prosegue dalla baseline Audience 20 Cycles già committata: il lotto conversione precedente (30 interventi) e il nuovo lotto (30 interventi) sono **entrambi non committati** e cumulati nel nuovo package. Migliorate verifica completa delle immagini PNG/JPEG, ammissione OOXML, parsing delle relazioni XML, validazione preventiva dell’export, limiti media, pubblicazione atomica di PPTX/JSON, permessi privati, identità SHA-256 dei sorgenti e protezione delle root del worker. Inventario dettagliato: `docs/RC_CONVERSION_SECOND_30_CYCLES.it.md`. Test locali: **375 Python, 215 Node, build backend/frontend PASS**. Nuova CI ancora da eseguire. D4 parziale, RC **45,5%**. Nessun commit/push/tag/release.
+
+
+### 25 ottobre 2026 — Terzo lotto da 30 interventi, senza commit
+
+Il terzo lotto cumulativo porta a **90 gli interventi dichiarati dal commit Audience 20 Cycles**. Aggiunta verifica integrale dei chunk PNG e decodifica pixel con Pillow, protezione PDF cifrati/JavaScript, controllo completo dei componenti XML/OOXML (DTD, URI, ActiveX/OLE, macro mascherate) e autenticazione/framing HTTP rigorosi del worker. **43 nuovi test comportamentali** (418 Python, 215 Node), build backend e frontend PASS. Dettaglio in `docs/RC_CONVERSION_THIRD_30_CYCLES.it.md` e `.en.md`. La nuova CI e il build container non sono ancora stati eseguiti; D4 resta parziale, **45,5%**. Nessun commit/push/tag/release.
+
+### 25 ottobre 2026 — Quarto lotto da 30 verifiche di conversione (ancora senza commit)
+
+Aggiunte protezioni su relazioni OOXML, URI/percorsi codificati, traversal, geometria numerica, font, colori, tipi di forma, identificativi media e symlink. Le immagini vengono serializzate dai byte già verificati per evitare riaperture del file. 30 nuove regressioni comportamentali: **448/448 Python PASS**. Node/build non rieseguiti per assenza delle dipendenze npm locali. Nuova CI e build container da eseguire. Dettagli in `docs/RC_CONVERSION_FOURTH_30_CYCLES.it.md`. Totale dichiarato dal commit Audience: **120 interventi/verifiche**; **45,5%** invariato, D4 parziale. Nessun commit/push/tag/release.
+
+
+### 25 ottobre 2026 — Quinto lotto di conversione: sfondi e allineamento testo (non committato)
+
+Trenta scenari comportamentali PowerPoint su sfondi RGB modificabili, allineamento orizzontale e verticale, rifiuto input non validi e report fedele per gradienti e paragrafi misti. Validazione API e controlli UI, proiezione e anteprima aggiornati. Sei nuovi test Node. **221 Node, 478 Python e build API/web PASS locali**. Cinque lotti cumulativi dall’ultimo commit Audience 20 Cycles: **150 interventi/scenari**, non 150 macrofunzionalità. CI e corpus grafico reale ancora aperti; RC **45,5% invariato**. Nessun commit/push/tag/release. Inventario: `docs/RC_CONVERSION_FIFTH_30_CYCLES.it.md`.
+
+### 25 ottobre 2026 — Settimo lotto da 30 casi (210 cumulativi senza commit)
+
+Preservazione del ritaglio nativo delle immagini PowerPoint come metadati modificabili, deduplicazione degli originali, proiezione/anteprima ritagliate, editor accessibile e ripristino, validazione API/export e segnalazione delle geometrie non supportate. 30 casi, fra cui 12 confronti reali LibreOffice/Poppler. Localmente **225 Node / 548 Python PASS**, build API/web PASS. Dettagli: `docs/RC_CONVERSION_SEVENTH_30_CYCLES.it.md`. CI ancora da eseguire; A3/D4 parziali, RC **45,5%**. Nessun commit/push/tag/release.

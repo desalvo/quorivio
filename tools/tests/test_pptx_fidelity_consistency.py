@@ -11,8 +11,14 @@ from pptx_portable import _supported_image, inspect_pptx_fidelity, pptx_to_porta
 
 class PptxFidelityConsistency(unittest.TestCase):
     def test_media_magic_must_match_declared_type(self):
-        png = b'\x89PNG\r\n\x1a\n' + b'contents'
-        jpg = b'\xff\xd8\xff' + b'contents'
+        from PIL import Image
+        import io
+        buffer = io.BytesIO()
+        Image.new('RGB', (1, 1), (255, 0, 0)).save(buffer, format='PNG')
+        png = buffer.getvalue()
+        buffer = io.BytesIO()
+        Image.new('RGB', (1, 1), (255, 0, 0)).save(buffer, format='JPEG')
+        jpg = buffer.getvalue()
         self.assertTrue(_supported_image(png, 'image/png'))
         self.assertTrue(_supported_image(jpg, 'image/jpeg'))
         self.assertFalse(_supported_image(jpg, 'image/png'))

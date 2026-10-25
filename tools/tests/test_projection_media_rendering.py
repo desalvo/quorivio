@@ -15,10 +15,12 @@ class ProjectionMediaRendering(unittest.TestCase):
         self.assertIn('encodeURIComponent(assetId)',self.source)
 
     def test_media_and_document_have_real_rendering(self):
-        for element in ('<img className="projection-media"','<video className="projection-media"','<iframe src={url}'):
+        for element in ('<CroppedImage className="projection-media"','<video className="projection-media"','<iframe src={url}'):
             self.assertIn(element,self.source)
         self.assertIn('rel="noopener noreferrer"',self.source)
         self.assertIn('<ProjectionWidgetContent sessionId={sessionId} widget={w} activity={activity}/>',self.source)
         self.assertIn('.projection-media{',self.style)
+        self.assertIn('function CroppedImage(',self.source)
+        self.assertIn('.pptx-cropped-image{',self.style)
 
 if __name__=='__main__':unittest.main()

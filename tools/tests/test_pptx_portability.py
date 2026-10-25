@@ -192,7 +192,7 @@ class PptxPortability(unittest.TestCase):
         from base64 import b64decode
         with tempfile.TemporaryDirectory() as d:
             image = Path(d) / 'one.png'
-            image.write_bytes(b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9cUqUAAAAASUVORK5CYII='))
+            image.write_bytes(b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC'))
             path = Path(d) / 'with-image.pptx'
             deck = Presentation()
             deck.slides.add_slide(deck.slide_layouts[6]).shapes.add_picture(str(image), Inches(1), Inches(1))
@@ -210,7 +210,7 @@ class PptxPortability(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             image = root / 'pixel.png'
-            image.write_bytes(b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9cUqUAAAAASUVORK5CYII='))
+            image.write_bytes(b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC'))
             deck = Presentation()
             deck.slides.add_slide(deck.slide_layouts[6]).shapes.add_picture(str(image), Inches(1), Inches(1))
             source = root / 'source.pptx'
@@ -230,7 +230,7 @@ class PptxPortability(unittest.TestCase):
         from base64 import b64decode
         with tempfile.TemporaryDirectory() as d:
             picture = Path(d) / 'picture.png'
-            picture.write_bytes(b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9cUqUAAAAASUVORK5CYII='))
+            picture.write_bytes(b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC'))
             deck = Presentation()
             slide = deck.slides.add_slide(deck.slide_layouts[6])
             slide.shapes.add_picture(str(picture), Inches(1), Inches(2), Inches(4))
@@ -252,7 +252,7 @@ class PptxPortability(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)
             picture = root / 'pixel.png'
-            picture.write_bytes(b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9cUqUAAAAASUVORK5CYII='))
+            picture.write_bytes(b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC'))
             deck = Presentation()
             shape = deck.slides.add_slide(deck.slide_layouts[6]).shapes.add_picture(str(picture), Inches(1), Inches(1))
             shape.rotation = 25
@@ -275,7 +275,7 @@ class PptxPortability(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)
             picture = root / 'pixel.png'
-            picture.write_bytes(b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Y9cUqUAAAAASUVORK5CYII='))
+            picture.write_bytes(b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGP4z8AAAAMBAQDJ/pLvAAAAAElFTkSuQmCC'))
             deck = Presentation()
             for _ in range(2):
                 slide = deck.slides.add_slide(deck.slide_layouts[6])

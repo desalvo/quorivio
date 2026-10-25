@@ -3,7 +3,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-ins
     && rm -rf /var/lib/apt/lists/* \
     && useradd -u 1000 -m converter && mkdir /conversions && chown converter:converter /conversions
 WORKDIR /app/tools
-RUN pip install --no-cache-dir python-pptx==1.0.2
+RUN pip install --no-cache-dir python-pptx==1.0.2 'Pillow>=11,<14'
 COPY tools/import_presentation.py tools/conversion_worker.py tools/pptx_portable.py ./
 USER converter
 ENV PYTHONDONTWRITEBYTECODE=1 QUORIVIO_CONVERSION_DIR=/conversions
