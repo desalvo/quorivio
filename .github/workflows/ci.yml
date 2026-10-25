@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       browser_test:
-        description: 'Run Chromium editor UI acceptance (manual opt-in until fixture is validated)'
+        description: 'Run Chromium editor, participant and real PostgreSQL editor UI acceptance (manual opt-in)'
         type: boolean
         default: false
       capacity_test:
@@ -126,6 +126,12 @@ jobs:
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
           QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
         run: python3 tools/ci_live_http.py
+      - name: PostgreSQL editor concurrent authoring and conflict E2E
+        env:
+          QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
+          QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
+          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
+        run: python3 tools/ci_editor_postgres.py
       - name: Chromium participant UI and PostgreSQL lifecycle (opt-in)
         if: github.event_name == 'workflow_dispatch' && inputs.browser_test
         timeout-minutes: 5
@@ -138,6 +144,22 @@ jobs:
           # This preserves the strict same-origin CSRF/WebSocket policy.
           curl --fail --silent http://127.0.0.1:8080/ >/dev/null
           python3 tools/ci_browser_participant.py
+      - name: Chromium editor PostgreSQL persistence and conflict acceptance (opt-in)
+        if: github.event_name == 'workflow_dispatch' && inputs.browser_test
+        timeout-minutes: 5
+        env:
+          QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
+          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
+          QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
+        run: python3 tools/ci_browser_editor_postgres.py
+      - name: Upload Chromium real editor failure diagnostics
+        if: failure() && github.event_name == 'workflow_dispatch' && inputs.browser_test
+        uses: actions/upload-artifact@v4
+        with:
+          name: chromium-real-editor-failure
+          path: /tmp/quorivio-browser-artifacts/
+          if-no-files-found: ignore
+          retention-days: 3
       - name: Upload Chromium participant failure diagnostics
         if: failure() && github.event_name == 'workflow_dispatch' && inputs.browser_test
         uses: actions/upload-artifact@v4

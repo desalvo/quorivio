@@ -23,6 +23,7 @@ class AsyncEditorSaveSafety(unittest.TestCase):
     def test_keyboard_save_and_disabled_control(self):
         self.assertIn("event.key.toLowerCase()==='s'", SOURCE)
         self.assertIn('event.preventDefault()', SOURCE)
-        self.assertIn('disabled={!pageHasUnsavedChanges||pageSavePending}>Salva layout', SOURCE)
+        self.assertIn('disabled={!pageHasUnsavedChanges||pageSavePending||pageConflict}>Salva layout', SOURCE)
+        self.assertIn('if(pageHasUnsavedChanges&&!pendingPageSave.current&&!pageConflict)', SOURCE)
 
 if __name__ == '__main__': unittest.main()

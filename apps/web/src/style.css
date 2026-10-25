@@ -368,3 +368,20 @@
 
 .picture-crop-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:10px;margin:12px 0}
 .picture-crop-controls input{width:100%;min-height:44px}
+/* Collaborative page recovery: readable, keyboard-operable conflict choices. */
+.page-merge-panel{width:100%;min-width:0;margin:12px 0;padding:16px;border:1px solid var(--border,#aab4c0);border-radius:12px;background:var(--panel,#f6f8fb);color:inherit}
+.page-merge-panel h4{margin:0 0 8px;font-size:1rem}
+.page-merge-choice{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--border,#aab4c0);overflow-wrap:anywhere}
+.page-merge-choice select{width:auto;min-width:220px;max-width:100%;min-height:44px}
+.page-merge-panel button{min-height:44px}
+.page-merge-panel :focus-visible{outline:3px solid #2768c4;outline-offset:2px}
+@media(max-width:600px){.page-merge-panel{padding:12px}.page-merge-choice{align-items:stretch;flex-direction:column}.page-merge-choice select{width:100%}}
+.page-merge-diff{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;gap:8px;margin:4px 0 6px}
+.page-merge-diff span{display:block;min-width:0;overflow-wrap:anywhere;font-size:.82rem}
+.page-merge-diff code{white-space:pre-wrap;overflow-wrap:anywhere}
+@media(max-width:600px){.page-merge-diff{grid-template-columns:minmax(0,1fr)}}
+/* Explicit local draft recovery; no background browser storage. */
+.page-draft-import{display:inline-flex;align-items:center;gap:.4rem;flex-wrap:wrap;font-size:.85rem;max-width:100%;padding:.35rem .5rem;border:1px solid var(--border,#a0a0a0);border-radius:.5rem}
+.page-draft-import input{max-width:13rem;font-size:.8rem}
+.page-draft-import:focus-within{outline:2px solid currentColor;outline-offset:2px}
+@media(max-width:600px){.page-draft-import{width:100%}.page-draft-import input{max-width:100%}}

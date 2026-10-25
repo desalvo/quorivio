@@ -37,6 +37,8 @@ ALTER TABLE sessions ADD COLUMN IF NOT EXISTS show_results boolean NOT NULL DEFA
 ALTER TABLE sessions ADD COLUMN IF NOT EXISTS reference_date date NOT NULL DEFAULT CURRENT_DATE;
 CREATE TABLE IF NOT EXISTS session_presenters(session_id uuid NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,added_at timestamptz NOT NULL DEFAULT now(),PRIMARY KEY(session_id,user_id));
 ALTER TABLE activities ADD COLUMN IF NOT EXISTS revision integer NOT NULL DEFAULT 1;
+-- Separate compare-and-swap version for editable page layout, independent of live quiz revisions.
+ALTER TABLE activities ADD COLUMN IF NOT EXISTS design_revision integer NOT NULL DEFAULT 1;
 ALTER TABLE responses ADD COLUMN IF NOT EXISTS invalidated_at timestamptz;
 ALTER TABLE responses ADD COLUMN IF NOT EXISTS invalidated_by uuid REFERENCES users(id) ON DELETE SET NULL;
 CREATE INDEX IF NOT EXISTS idx_session_presenters_user ON session_presenters(user_id);

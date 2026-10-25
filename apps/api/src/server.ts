@@ -717,8 +717,17 @@ app.patch('/api/sessions/:id/activities/:aid/design',requireAuth,async(req,res)=
  if(s.status==='closed'){res.status(409).json({error:'session_closed'});return}
  if(!validPageDesign(req.body?.page_design)||!validPageDesign(req.body?.result_design)){res.status(400).json({error:'invalid_page_design'});return}
  await cx.query('BEGIN');
- const a=await cx.query('SELECT page_design,result_design,status FROM activities WHERE id=$1 AND session_id=$2 FOR UPDATE',[req.params.aid,s.id]);
+ const a=await cx.query('SELECT page_design,result_design,status,design_revision FROM activities WHERE id=$1 AND session_id=$2 FOR UPDATE',[req.params.aid,s.id]);
  if(!a.rowCount){await cx.query('ROLLBACK');res.status(404).end();return}
+ // Optimistic concurrency: never overwrite a collaborator's newer layout.
+ // Omitted expected_design_revision is retained for legacy API clients only.
+ const expected=req.body?.expected_design_revision;
+ if(expected!==undefined&&(!Number.isSafeInteger(expected)||expected<1)){
+  await cx.query('ROLLBACK');res.status(400).json({error:'invalid_design_revision'});return;
+ }
+ if(expected!==undefined&&expected!==a.rows[0].design_revision){
+  await cx.query('ROLLBACK');res.status(409).json({error:'design_revision_conflict',current_design_revision:a.rows[0].design_revision});return;
+ }
  // Page background assets use the same ownership boundary as embedded widgets.
  for(const design of [req.body.page_design,req.body.result_design]){
   if(design.backgroundAssetId){
@@ -749,8 +758,8 @@ app.patch('/api/sessions/:id/activities/:aid/design',requireAuth,async(req,res)=
   }
  }
  // Removed questions remain in audit/history; never delete their submissions implicitly.
- await cx.query('UPDATE activities SET page_design=$3,result_design=$4 WHERE id=$1 AND session_id=$2',[req.params.aid,s.id,JSON.stringify(req.body.page_design),JSON.stringify(req.body.result_design)]);
- await cx.query('COMMIT');await broadcast(s.id);res.json({ok:true});
+ const saved=await cx.query('UPDATE activities SET page_design=$3,result_design=$4,design_revision=design_revision+1 WHERE id=$1 AND session_id=$2 RETURNING design_revision',[req.params.aid,s.id,JSON.stringify(req.body.page_design),JSON.stringify(req.body.result_design)]);
+ await cx.query('COMMIT');await broadcast(s.id);res.json({ok:true,design_revision:saved.rows[0].design_revision});
  }catch(e){await cx.query('ROLLBACK');sendError(res,e)}finally{cx.release()}});
 app.post('/api/sessions/:id/activities/:aid/duplicate',requireAuth,async(req,res)=>{
  const cx=await db.connect();let begun=false;

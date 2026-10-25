@@ -1,3 +1,8 @@
+
+### Latest development cycle — Concurrent authoring
+
+After green CI 40192172978 (quality, container build and publication), this batch introduces PostgreSQL protection against concurrent page saves, explicit conflict recovery without silent draft loss, corrected background dirty tracking, and new real PostgreSQL/Chromium acceptance. This new batch is **not yet CI-verified**; see `docs/RC_EDITOR_NINTH_30_CYCLES.en.md`.
+
 **Development checkpoint (2026-10-25):** Eight uncommitted conversion batches, 240 cumulative acceptance/intervention cases since Audience 20 Cycles CI-green commit; new editable PowerPoint shape fill/outline fidelity. Local: 583 Python + 232 Node PASS, API/web build PASS. GitHub CI not yet rerun; RC 45.5%. See `docs/RC_CONVERSION_EIGHTH_30_CYCLES.en.md`.
 
 > **Latest development cycle (2026-10-22):** Transactional session page ordering and definition-only page duplication are implemented in source. See `docs/PAGE_SEQUENCE.en.md` / `docs/PAGE_SEQUENCE.it.md`. Local unit tests passed; browser/PostgreSQL integration and production validation remain pending. Functional estimate **80%**, readiness **35%**.

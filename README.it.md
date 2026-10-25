@@ -1,3 +1,8 @@
+
+### Ultimo ciclo di sviluppo — Editing concorrente
+
+Dopo la CI verde 40192172978 (qualità, build container e pubblicazione), questo batch introduce la protezione PostgreSQL contro salvataggi concorrenti della stessa pagina, recupero esplicito delle bozze in conflitto, correzione del rilevamento degli sfondi modificati e nuovi test reali PostgreSQL/Chromium. Il nuovo batch **non è ancora validato dalla CI**; vedere `docs/RC_EDITOR_NINTH_30_CYCLES.it.md`.
+
 **Checkpoint sviluppo (25 ottobre 2026):** Otto lotti di conversione non committati, 240 interventi/scenari cumulativi dopo la baseline Audience 20 Cycles con CI verde; nuova fedeltà di riempimenti e contorni PowerPoint modificabili. Locale: 583 Python + 232 Node PASS, build API/web PASS. Nuova CI GitHub da eseguire; RC 45,5%. Vedi `docs/RC_CONVERSION_EIGHTH_30_CYCLES.it.md`.
 
 > **Ultimo ciclo (22/10/2026):** Aggiunti riordino transazionale delle pagine e duplicazione delle definizioni senza voti. Vedere `docs/PAGE_SEQUENCE.it.md`. Test unitari locali superati; integrazione PostgreSQL/browser ancora da verificare. Funzionalità stimate **80%**, readiness **35%**.
