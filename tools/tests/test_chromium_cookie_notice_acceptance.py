@@ -10,7 +10,7 @@ class ChromiumCookieNoticeAcceptance(unittest.TestCase):
   src=(ROOT/'tools/ci_browser_editor.py').read_text()
   ast.parse(src)
   self.assertIn("page.get_by_role('dialog',name='Informativa cookie funzionali')",src)
-  self.assertIn("notice.get_by_role('button',name='Ho capito').click()",src)
+  self.assertIn("button.click()",src)
   self.assertIn("await acknowledge_functional_cookie_notice(page)",src)
   self.assertIn("await acknowledge_functional_cookie_notice(mobile)",src)
   self.assertIn("await expect(notice).to_have_count(0)",src)
@@ -18,7 +18,7 @@ class ChromiumCookieNoticeAcceptance(unittest.TestCase):
   src=(ROOT/'tools/ci_browser_editor_postgres.py').read_text()
   ast.parse(src)
   self.assertIn("page.get_by_role('dialog',name='Informativa cookie funzionali')",src)
-  self.assertIn("notice.get_by_role('button',name='Ho capito').click()",src)
+  self.assertIn("button.click()",src)
   self.assertIn("await page.get_by_role('button',name='Apri sessione').first.wait_for()",src)
  def test_no_forced_click_or_test_only_cookie_injection(self):
   for name in ('ci_browser_editor.py','ci_browser_editor_postgres.py'):

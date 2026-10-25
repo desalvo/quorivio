@@ -34,7 +34,17 @@ async def open_editor(page,title):
  notice=page.get_by_role('dialog',name='Informativa cookie funzionali')
  if await notice.is_visible():
   assert await notice.evaluate("element => element.matches(':modal')"), 'Functional cookie notice must be in the browser top layer'
-  await notice.get_by_role('button',name='Ho capito').click()
+  button=notice.get_by_role('button',name='Ho capito')
+  visible_hit=await button.evaluate("""element => {
+    const box=element.getBoundingClientRect(), viewport=window.visualViewport;
+    const left=viewport?.offsetLeft ?? 0, top=viewport?.offsetTop ?? 0;
+    const right=left+(viewport?.width ?? window.innerWidth);
+    const bottom=top+(viewport?.height ?? window.innerHeight);
+    const cx=box.left+box.width/2, cy=box.top+box.height/2;
+    return box.width>0 && box.height>0 && cx>=left && cx<right && cy>=top && cy<bottom;
+  }""")
+  assert visible_hit, 'Cookie acknowledgement button must be inside the visual viewport before a real click'
+  await button.click()
   await expect(notice).to_have_count(0)
  await page.get_by_role('button',name='Apri sessione').first.click()
  card=page.locator('details').filter(has=page.get_by_text(title,exact=True))

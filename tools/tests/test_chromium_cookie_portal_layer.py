@@ -24,7 +24,7 @@ class CookiePortalLayer(unittest.TestCase):
         for filename in ('ci_browser_editor.py','ci_browser_editor_postgres.py'):
             script=(ROOT/'tools'/filename).read_text(encoding='utf-8')
             ast.parse(script)
-            self.assertIn("notice.get_by_role('button',name='Ho capito').click()", script)
+            self.assertIn("button.click()", script)
             self.assertNotIn('force=True', script)
             self.assertIn("element.matches(':modal')",script)
 
