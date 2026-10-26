@@ -1,6 +1,6 @@
 {
   "release_candidate_ready": false,
-  "score": 45.5,
+  "score": 48.0,
   "missing_required_files": [],
   "unaccepted_gates": [
     {
@@ -61,7 +61,7 @@
       "id": "C2",
       "area": "C-admin",
       "status": "partial",
-      "remaining": "Real SMTP delivery/expiry/concurrency, recovery UX, browser flow and PostgreSQL/multi-replica acceptance still required."
+      "remaining": "Run new real PostgreSQL/TLS SMTPS acceptance in CI; independent real-world SMTP provider, cross-replica retry/outage test, browser recovery UI, deliverability and operator sign-off."
     },
     {
       "id": "C3",
@@ -73,7 +73,7 @@
       "id": "C4",
       "area": "C-admin",
       "status": "partial",
-      "remaining": "Real anonymous-browser presenter photo visibility, concurrent profile save/photo upload on PostgreSQL, actual RWX Kubernetes volume/ClamAV, accessibility and device acceptance. Verify PostgreSQL real retention defaults, per-session overrides and owner isolation in next CI. New post-commit photo erasure/update account-deletion PostgreSQL CI, multi-replica RWX acceptance and UI operator verification remain pending."
+      "remaining": "Real anonymous-browser presenter photo visibility, concurrent profile save/photo upload on PostgreSQL, actual RWX Kubernetes volume/ClamAV, accessibility and device acceptance. Verify PostgreSQL real retention defaults, per-session overrides and owner isolation in next CI. New post-commit photo erasure/update account-deletion PostgreSQL CI, multi-replica RWX acceptance and UI operator verification remain pending. Replay fixed asset/profile durable erasure test on real PostgreSQL (new CI run)."
     },
     {
       "id": "D2",
@@ -102,8 +102,8 @@
     {
       "id": "D6",
       "area": "D-validation",
-      "status": "open",
-      "remaining": "Run new real PostgreSQL and filesystem erasure acceptance in GitHub CI, including account deletion and replica conflicts; verify actual RWX permissions, durable backup erasure schedules and log lifecycle; obtain independent security/AGID accessibility/GDPR legal and operator sign-off. This remains open until verified."
+      "status": "partial",
+      "remaining": "Independent GDPR/legal and AGID accessibility sign-off; representative multi-replica RWX volume/ClamAV operational tests; formal encrypted backup, retention, erasure and log lifecycle validation. Run any new CI changes before promoting further."
     }
   ],
   "gate_count": 18,

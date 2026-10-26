@@ -25,7 +25,7 @@ test('email factor enrollment is proof-of-inbox before account MFA activation',(
  const schema=readFileSync(path.join(dir,'../src/schema.sql'),'utf8');
  assert.match(schema,/CREATE TABLE IF NOT EXISTS email_mfa_enrollments/);
  assert.match(schema,/attempts integer NOT NULL DEFAULT 0 CHECK\(attempts BETWEEN 0 AND 5\)/);
- assert.match(settings,/sendEmailOtp\(smtp,r\.rows\[0\]\.email,code\)/);
+ assert.match(settings,/sendEmailOtp\(smtp,r\.rows\[0\]\.email,code,10\)/);
  assert.match(settings,/pending_confirmation:true/);
  assert.doesNotMatch(settings.split('if(enabled){')[1]?.split('const cx=')[0]||'',/email_mfa_enabled=true/);
  assert.match(confirm,/FOR UPDATE/);

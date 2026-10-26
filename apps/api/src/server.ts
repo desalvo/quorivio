@@ -242,9 +242,9 @@ app.post('/api/auth/mfa/challenge/email',async(req,res)=>{try{
  const count=await client.query(`INSERT INTO api_rate_windows(client_hash,bucket,hits) VALUES($1,$2,1) ON CONFLICT(client_hash,bucket) DO UPDATE SET hits=api_rate_windows.hits+1 RETURNING hits`,[key,bucket]);
  if(Number(count.rows[0].hits)>3){await client.query('COMMIT');res.status(429).json({error:'email_mfa_rate_limited'});return}
  const smtp=await activeSmtpConfig();if(!smtp){await client.query('ROLLBACK');res.status(503).json({error:'email_mfa_smtp_unavailable'});return}
- const code=createEmailOtp();await client.query('UPDATE email_mfa_challenges SET digest=$2 WHERE id=$1',[id,emailOtpDigest(code,r.rows[0].user_id,id,secret)]);await client.query('COMMIT');mail={smtp,email:r.rows[0].email,code};
+ const code=createEmailOtp();await client.query('UPDATE email_mfa_challenges SET digest=$2 WHERE id=$1',[id,emailOtpDigest(code,r.rows[0].user_id,id,secret)]);await client.query('COMMIT');mail={smtp,email:r.rows[0].email,code,userId:r.rows[0].user_id};
  }catch(e){await client.query('ROLLBACK');throw e}finally{client.release()}
- try{await sendEmailOtp(mail.smtp,mail.email,mail.code)}catch{await db.query('DELETE FROM email_mfa_challenges WHERE id=$1',[id]);res.status(502).json({error:'email_mfa_delivery_failed'});return}
+ try{await sendEmailOtp(mail.smtp,mail.email,mail.code)}catch{await db.query('DELETE FROM email_mfa_challenges WHERE id=$1 AND digest=$2',[id,emailOtpDigest(mail.code,mail.userId,id,secret)]);res.status(502).json({error:'email_mfa_delivery_failed'});return}
  res.json({ok:true});
  }catch(e){sendError(res,e)}});
 app.post('/api/auth/mfa/challenge/verify',async(req,res)=>{try{
@@ -297,7 +297,7 @@ app.post('/api/auth/email-mfa/settings',requireAuth,async(req,res)=>{try{
    await client.query(`INSERT INTO email_mfa_enrollments(id,user_id,digest,expires_at,attempts) VALUES($1,$2,$3,now()+interval '10 minutes',0) ON CONFLICT(user_id) DO UPDATE SET id=$1,digest=$3,expires_at=now()+interval '10 minutes',attempts=0,created_at=now()`,[id,uid,digest]);
    await client.query('COMMIT');
   }catch(e){await client.query('ROLLBACK').catch(()=>{});throw e}finally{client.release()}
-  try{await sendEmailOtp(smtp,r.rows[0].email,code)}catch{
+  try{await sendEmailOtp(smtp,r.rows[0].email,code,10)}catch{
    await db.query('DELETE FROM email_mfa_enrollments WHERE id=$1 AND user_id=$2',[id,uid]);
    res.status(502).json({error:'email_mfa_delivery_failed'});return;
   }
