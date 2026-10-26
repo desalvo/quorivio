@@ -53,6 +53,32 @@ ALTER TABLE responses ADD COLUMN IF NOT EXISTS invalidated_by uuid REFERENCES us
 CREATE INDEX IF NOT EXISTS idx_session_presenters_user ON session_presenters(user_id);
 INSERT INTO platform_settings(key,value) VALUES('max_upload_mb','100') ON CONFLICT DO NOTHING;
 
+-- Old presenter photos and deleted users must not lose erasure intent on I/O failure.
+CREATE TABLE IF NOT EXISTS profile_photo_cleanup_jobs(
+ photo_id uuid PRIMARY KEY,
+ queued_at timestamptz NOT NULL DEFAULT now(),
+ next_attempt_at timestamptz NOT NULL DEFAULT now(),
+ claimed_until timestamptz,
+ attempts integer NOT NULL DEFAULT 0,
+ last_error text
+);
+CREATE INDEX IF NOT EXISTS idx_profile_photo_cleanup_due ON profile_photo_cleanup_jobs(next_attempt_at,queued_at);
+
+-- Failed individual-file deletions must remain retryable after their metadata row
+-- is removed. No foreign keys: sessions themselves may be erased first.
+CREATE TABLE IF NOT EXISTS session_asset_file_cleanup_jobs(
+ session_id uuid NOT NULL,
+ asset_id uuid NOT NULL,
+ queued_at timestamptz NOT NULL DEFAULT now(),
+ next_attempt_at timestamptz NOT NULL DEFAULT now(),
+ claimed_until timestamptz,
+ attempts integer NOT NULL DEFAULT 0,
+ last_error text,
+ PRIMARY KEY(session_id,asset_id)
+);
+CREATE INDEX IF NOT EXISTS idx_asset_file_cleanup_due ON session_asset_file_cleanup_jobs(next_attempt_at,queued_at);
+CREATE INDEX IF NOT EXISTS idx_session_cleanup_pending ON session_asset_cleanup_jobs(queued_at) WHERE claimed_until IS NULL;
+
 -- Private session asset metadata; binary content resides on an explicit persistent volume.
 CREATE TABLE IF NOT EXISTS session_assets(
  id uuid PRIMARY KEY, session_id uuid NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,

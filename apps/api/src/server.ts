@@ -4,6 +4,7 @@ import {encodeBundle,decodeBundle,referencedAssets,remapPortableAssets,BUNDLE_MI
 import {parseLeaderboardPage} from './pagination-policy.js';
 import {validateSettingsPatch} from './platform-settings.js';
 import {SESSION_RETENTION_DEFAULT_SQL, SESSION_RETENTION_PURGE_SQL, SESSION_DELETE_WITH_CLEANUP_SQL, SESSION_CLEANUP_CLAIM_SQL} from './session-retention.js';
+import {ASSET_DELETE_WITH_CLEANUP_SQL,drainAssetErasureJobs,PROFILE_ERASURE_ENQUEUE_SQL,drainProfileErasureJobs,erasureFailureCode} from './asset-erasure.js';
 import {profilePhotoId,publicPresenterProfiles} from './profile-photo.js';
 import {inspectProfileImage} from './profile-image.js';
 import {authCookieIssuedAt,presenterAuthActive} from './live-auth.js';
@@ -490,7 +491,42 @@ app.patch('/api/admin/users/:id',requireAuth,requireAdmin,async(req,res)=>{
  }finally{cx.release()}
 });
 
-app.delete('/api/admin/users/:id',requireAuth,requireAdmin,async(req,res)=>{try{if(req.params.id===auth(req)){res.status(409).json({error:'cannot_delete_self'});return}if((await db.query('SELECT is_primary_admin FROM users WHERE id=$1',[req.params.id])).rows[0]?.is_primary_admin){res.status(409).json({error:'primary_admin_immutable'});return}const r=await db.query('DELETE FROM users WHERE id=$1 RETURNING id',[req.params.id]);if(!r.rowCount){res.status(409).json({error:'user_has_dependent_data_or_not_found'});return}res.status(204).end()}catch(e){if((e as any)?.code==='23503'){res.status(409).json({error:'user_has_dependent_data'});return}sendError(res,e)}});
+// Account erasure and avatar cleanup intent commit together. Dependent-data
+// refusals still roll back both changes, preserving the existing 409 contract.
+app.delete('/api/admin/users/:id',requireAuth,requireAdmin,async(req,res)=>{
+ if(req.params.id===auth(req)){res.status(409).json({error:'cannot_delete_self'});return}
+ const cx=await db.connect();
+ try{
+  await cx.query('BEGIN');
+  const r=await cx.query('DELETE FROM users WHERE id=$1 AND is_primary_admin=false RETURNING id,profile_photo_url',[req.params.id]);
+  if(!r.rowCount){await cx.query('ROLLBACK');res.status(409).json({error:'primary_admin_immutable_or_not_found'});return}
+  const oldId=profilePhotoId(r.rows[0].profile_photo_url);
+  if(oldId)await cx.query(PROFILE_ERASURE_ENQUEUE_SQL,[oldId]);
+  await cx.query('COMMIT');
+  if(oldId)await drainProfileErasureJobs(db,assetRoot).catch(()=>console.error('profile erasure queued for retry'));
+  for(const peers of sockets.values())for(const ws of peers)if((ws as any).uid===req.params.id)ws.close(1008,'account deleted');
+  res.status(204).end();
+ }catch(e){await cx.query('ROLLBACK').catch(()=>{});
+  if((e as any)?.code==='23503'){res.status(409).json({error:'user_has_dependent_data'});return}
+  sendError(res,e)
+ }finally{cx.release()}
+});
+// Aggregate observability only: never return UUIDs, private paths or filenames.
+app.get('/api/admin/privacy/erasure-status',requireAuth,requireAdmin,async(_req,res)=>{try{
+ const result=await db.query(`SELECT
+  (SELECT count(*)::integer FROM session_asset_cleanup_jobs) AS pending_session_directories,
+  (SELECT count(*)::integer FROM session_asset_file_cleanup_jobs) AS pending_session_files,
+  (SELECT count(*)::integer FROM profile_photo_cleanup_jobs) AS pending_profile_photos,
+  (SELECT count(*)::integer FROM session_asset_file_cleanup_jobs WHERE next_attempt_at<=now() AND (claimed_until IS NULL OR claimed_until<now())) AS due_session_files,
+  (SELECT count(*)::integer FROM profile_photo_cleanup_jobs WHERE next_attempt_at<=now() AND (claimed_until IS NULL OR claimed_until<now())) AS due_profile_photos,
+  (SELECT greatest(0,coalesce(floor(extract(epoch from now()-min(queued_at)))::bigint,0)) FROM (
+   SELECT queued_at FROM session_asset_cleanup_jobs
+   UNION ALL SELECT queued_at FROM session_asset_file_cleanup_jobs
+   UNION ALL SELECT queued_at FROM profile_photo_cleanup_jobs
+  ) outstanding) AS oldest_pending_seconds`);
+ res.setHeader('Cache-Control','private, no-store');res.json(result.rows[0]);
+ }catch(e){sendError(res,e)}
+});
 app.get('/api/admin/settings',requireAuth,requireAdmin,async(_req,res)=>{try{const r=await db.query('SELECT key,value FROM platform_settings');res.json(Object.fromEntries(r.rows.map(x=>[x.key,x.value])))}catch(e){sendError(res,e)}});
 app.patch('/api/admin/settings',requireAuth,requireAdmin,async(req,res)=>{
  const patch=validateSettingsPatch(req.body);
@@ -521,13 +557,14 @@ async function replaceProfilePhoto(uid:string,url:string|null):Promise<string|nu
   const existing=await cx.query('SELECT profile_photo_url FROM users WHERE id=$1 FOR UPDATE',[uid]);
   if(!existing.rowCount)throw Error('profile_not_found');
   await cx.query('UPDATE users SET profile_photo_url=$2 WHERE id=$1',[uid,url]);
+  const oldId=profilePhotoId(existing.rows[0].profile_photo_url);
+  if(oldId && existing.rows[0].profile_photo_url!==url)await cx.query(PROFILE_ERASURE_ENQUEUE_SQL,[oldId]);
   await cx.query('COMMIT');return existing.rows[0].profile_photo_url||null;
  }catch(e){await cx.query('ROLLBACK').catch(()=>{});throw e}
  finally{cx.release()}
 }
 async function cleanOldProfilePhoto(url:unknown){
- const old=profilePhotoId(url);
- if(old)await unlink(profilePhotoPath(old)).catch(e=>{if((e as NodeJS.ErrnoException).code!=='ENOENT')console.error('profile photo cleanup pending',old)});
+ if(profilePhotoId(url))await drainProfileErasureJobs(db,assetRoot).catch(()=>console.error('profile erasure queued for retry'));
 }
 app.post('/api/auth/profile/photo',requireAuth,async(req,res)=>{
  const uid=auth(req)!;const type=String(req.headers['content-type']||'').split(';')[0].trim().toLowerCase();
@@ -653,7 +690,7 @@ async function createFromPortable(data:any,uid:string,importMediaDir?:string,bun
 // Asset endpoints accept raw bytes with a strictly bounded Content-Length and file signatures.
 // Storage is intentionally private and local; configure a shared persistent volume before production.
 const assetRoot=path.resolve(process.env.QUORIVIO_ASSET_DIR||'/app/assets');
-async function cleanupSessionFiles(sessionId:string){if(!/^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(sessionId))throw Error('invalid session id');await rm(path.join(assetRoot,sessionId),{recursive:true,force:true})}
+async function cleanupSessionFiles(sessionId:string){if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(sessionId))throw Error('invalid session id');await rm(path.join(assetRoot,sessionId),{recursive:true,force:true})}
 async function allowedUploadBytes(){const r=await db.query("SELECT value FROM platform_settings WHERE key='max_upload_mb'");return Math.max(1,Math.min(1024,Number(r.rows[0]?.value||100)))*1024*1024}
 // Participant file submissions are scoped to the currently open page and to an actual file widget.
 // The server never trusts a client-supplied session id, participant id, or asset owner.
@@ -700,9 +737,9 @@ app.delete('/api/sessions/:id/assets/:assetId',requireAuth,async(req,res)=>{try{
  if(widgetLink.rowCount){res.status(409).json({error:'asset_in_use_by_widget'});return}
  const linked=await db.query('SELECT 1 FROM presentation_slide_assets WHERE asset_id=$1 LIMIT 1',[req.params.assetId]);
  if(linked.rowCount){res.status(409).json({error:'asset_in_use_by_slide'});return}
- const r=await db.query('DELETE FROM session_assets WHERE id=$1 AND session_id=$2 RETURNING id',[req.params.assetId,s.id]);
+ const r=await db.query(ASSET_DELETE_WITH_CLEANUP_SQL,[req.params.assetId,s.id]);
  if(!r.rowCount){res.status(404).end();return}
- await unlink(path.join(assetRoot,s.id,req.params.assetId)).catch(e=>{if((e as NodeJS.ErrnoException).code!=='ENOENT')console.error('asset cleanup pending',s.id,req.params.assetId)});
+ await drainAssetErasureJobs(db,assetRoot).catch(()=>console.error('individual asset erasure queued for retry'));
  res.status(204).end();
  }catch(e){sendError(res,e)}});
 // A deliberately one-way reporting export: never import historical votes from JSON definitions.
@@ -1078,8 +1115,8 @@ async function cleanupPendingSessionFiles(){
    await db.query('DELETE FROM session_asset_cleanup_jobs WHERE session_id=$1 AND claimed_until=$2',[job.session_id,job.claimed_until]);
   }catch(e){
    // Persist failures for operators and retry after lease expiry; no raw path or tokens in logs.
-   await db.query('UPDATE session_asset_cleanup_jobs SET last_error=$3 WHERE session_id=$1 AND claimed_until=$2',[job.session_id,job.claimed_until,(e instanceof Error?e.message:'unknown').slice(0,240)]).catch(()=>{});
-   console.error('asset cleanup queued for retry',job.session_id);
+   await db.query('UPDATE session_asset_cleanup_jobs SET last_error=$3 WHERE session_id=$1 AND claimed_until=$2',[job.session_id,job.claimed_until,erasureFailureCode(e)]).catch(()=>{});
+   console.error('session asset cleanup queued for retry');
   }
  }
 }
@@ -1087,6 +1124,8 @@ async function purgeExpiredSessions(){
  const r=await db.query(SESSION_RETENTION_PURGE_SQL);
  for(const row of r.rows)for(const ws of sockets.get(row.id)||[])ws.close(1008,'expired');
  await cleanupPendingSessionFiles();
+ await drainAssetErasureJobs(db,assetRoot);
+ await drainProfileErasureJobs(db,assetRoot);
 }
 app.get('/api/sessions/:id/export.csv',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}const r=await db.query('SELECT a.title,a.type,r.option_id,r.correct,r.submitted_at FROM responses r JOIN activities a ON a.id=r.activity_id WHERE a.session_id=$1 AND r.invalidated_at IS NULL ORDER BY r.submitted_at',[s.id]);const esc=escapeCsvCell;res.setHeader('Content-Type','text/csv; charset=utf-8');res.setHeader('Content-Disposition',`attachment; filename="quorivio-${s.join_code}.csv"`);res.send('\uFEFF' + [['activity','type','option_id','correct','submitted_at'],...r.rows.map(x=>[x.title,x.type,x.option_id,x.correct,x.submitted_at.toISOString()])].map(row=>row.map(esc).join(',')).join('\r\n'))}catch(e){sendError(res,e)}});
 async function publicSession(secretOrCode:string){const r=await db.query('SELECT * FROM sessions WHERE (join_secret=$1 OR join_code=$1) AND status=$2 AND expires_at>now()',[secretOrCode,'active']);return r.rows[0]}
@@ -1310,5 +1349,5 @@ wss.on('connection',(ws:WebSocket,_req:unknown,sid:string)=>{
 });
 function participantSnapshot(data:any){if(!data)return data;const aid=data.session.status==='active'?data.session.current_activity_id:null;const published=aid?data.activities.find((a:Activity)=>a.id===aid&&a.status==='open'):null;return {session:{id:data.session.id,title:data.session.title,status:data.session.status,current_activity_id:published?aid:null},activities:published?[publicActivity(published)]:[],results:published&&data.session.show_results?data.results.filter((r:any)=>r.activity_id===aid):[],totals:published&&data.session.show_results?data.totals.filter((r:any)=>r.activity_id===aid):[]}}
 const webRoot=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../../web/dist');if(existsSync(webRoot)){app.use(express.static(webRoot));app.get('*',(_,res)=>res.sendFile(path.join(webRoot,'index.html')))}
-async function initialize(){const schema=readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)),'../src/schema.sql'),'utf8');await db.query(schema);publicBase=(await db.query("SELECT value FROM platform_settings WHERE key='public_base_url'")).rows[0]?.value||base;const email=process.env.ADMIN_EMAIL?.toLowerCase(),password=process.env.ADMIN_PASSWORD;if(email&&password){if(password.length<12&&!(process.env.ALLOW_INSECURE_DEV_BOOTSTRAP==='true'&&process.env.NODE_ENV!=='production'&&password==='000000'))throw new Error('ADMIN_PASSWORD must be >=12 characters (insecure demo bootstrap allowed only outside production)');const count=await db.query('SELECT count(*)::int AS n FROM users');if(count.rows[0].n===0){const oid=randomUUID(),uid=randomUUID();await db.query('INSERT INTO organizations(id,name) VALUES($1,$2)',[oid,'Default']);await db.query('INSERT INTO users(id,organization_id,email,password_hash,role) VALUES($1,$2,$3,$4,$5)',[uid,oid,email,await bcrypt.hash(password,12),'platform_admin']);await db.query('UPDATE users SET approved=true,must_change_password=true,is_primary_admin=true,nickname=$2 WHERE id=$1',[uid,'admin']);const demoClient=await db.connect();try{await demoClient.query('BEGIN');await provisionDemo(demoClient,uid,oid);await demoClient.query('COMMIT')}catch(e){await demoClient.query('ROLLBACK');throw e}finally{demoClient.release()}console.log('Initial admin provisioned; password change required')}}await db.query("UPDATE users SET is_primary_admin=true,nickname='admin' WHERE id=(SELECT id FROM users WHERE role='platform_admin' AND approved=true ORDER BY created_at ASC LIMIT 1) AND NOT EXISTS (SELECT 1 FROM users WHERE is_primary_admin=true)");startSessionBus(async()=>{const client=new pg.Client({connectionString:process.env.DATABASE_URL});await client.connect();return client},broadcastLocal,console.error,async()=>{await Promise.all([...sockets.keys()].map(sid=>broadcastLocal(sid)))});await db.query("DELETE FROM live_connections WHERE last_seen<now()-interval '2 minutes'");setInterval(()=>db.query("DELETE FROM live_connections WHERE last_seen<now()-interval '2 minutes'").catch(()=>{}),60000).unref();await purgeExpiredSessions();setInterval(()=>purgeExpiredSessions().catch(e=>console.error('retention purge error',e instanceof Error?e.message:'unknown')),3600000).unref();setInterval(()=>db.query("DELETE FROM auth_flows WHERE expires_at<now(); DELETE FROM email_mfa_challenges WHERE expires_at<now(); DELETE FROM email_mfa_enrollments WHERE expires_at<now(); DELETE FROM api_rate_windows WHERE bucket<floor(extract(epoch from now())/60)-3").catch(e=>console.error('auth cleanup error',e instanceof Error?e.message:'unknown')),3600000).unref();server.listen(Number(process.env.PORT||8080),'0.0.0.0',()=>console.log('Quorivio API ready'))}
+async function initialize(){const schema=readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)),'../src/schema.sql'),'utf8');await db.query(schema);publicBase=(await db.query("SELECT value FROM platform_settings WHERE key='public_base_url'")).rows[0]?.value||base;const email=process.env.ADMIN_EMAIL?.toLowerCase(),password=process.env.ADMIN_PASSWORD;if(email&&password){if(password.length<12&&!(process.env.ALLOW_INSECURE_DEV_BOOTSTRAP==='true'&&process.env.NODE_ENV!=='production'&&password==='000000'))throw new Error('ADMIN_PASSWORD must be >=12 characters (insecure demo bootstrap allowed only outside production)');const count=await db.query('SELECT count(*)::int AS n FROM users');if(count.rows[0].n===0){const oid=randomUUID(),uid=randomUUID();await db.query('INSERT INTO organizations(id,name) VALUES($1,$2)',[oid,'Default']);await db.query('INSERT INTO users(id,organization_id,email,password_hash,role) VALUES($1,$2,$3,$4,$5)',[uid,oid,email,await bcrypt.hash(password,12),'platform_admin']);await db.query('UPDATE users SET approved=true,must_change_password=true,is_primary_admin=true,nickname=$2 WHERE id=$1',[uid,'admin']);const demoClient=await db.connect();try{await demoClient.query('BEGIN');await provisionDemo(demoClient,uid,oid);await demoClient.query('COMMIT')}catch(e){await demoClient.query('ROLLBACK');throw e}finally{demoClient.release()}console.log('Initial admin provisioned; password change required')}}await db.query("UPDATE users SET is_primary_admin=true,nickname='admin' WHERE id=(SELECT id FROM users WHERE role='platform_admin' AND approved=true ORDER BY created_at ASC LIMIT 1) AND NOT EXISTS (SELECT 1 FROM users WHERE is_primary_admin=true)");startSessionBus(async()=>{const client=new pg.Client({connectionString:process.env.DATABASE_URL});await client.connect();return client},broadcastLocal,console.error,async()=>{await Promise.all([...sockets.keys()].map(sid=>broadcastLocal(sid)))});await db.query("DELETE FROM live_connections WHERE last_seen<now()-interval '2 minutes'");setInterval(()=>db.query("DELETE FROM live_connections WHERE last_seen<now()-interval '2 minutes'").catch(()=>{}),60000).unref();await purgeExpiredSessions();setInterval(()=>purgeExpiredSessions().catch(e=>console.error('retention purge error',e instanceof Error?e.message:'unknown')),3600000).unref();setInterval(()=>cleanupPendingSessionFiles().catch(()=>console.error('session asset cleanup worker retry pending')),60000).unref();setInterval(()=>drainAssetErasureJobs(db,assetRoot).catch(()=>console.error('asset erasure worker retry pending')),60000).unref();setInterval(()=>drainProfileErasureJobs(db,assetRoot).catch(()=>console.error('profile erasure worker retry pending')),60000).unref();setInterval(()=>db.query("DELETE FROM auth_flows WHERE expires_at<now(); DELETE FROM email_mfa_challenges WHERE expires_at<now(); DELETE FROM email_mfa_enrollments WHERE expires_at<now(); DELETE FROM api_rate_windows WHERE bucket<floor(extract(epoch from now())/60)-3").catch(e=>console.error('auth cleanup error',e instanceof Error?e.message:'unknown')),3600000).unref();server.listen(Number(process.env.PORT||8080),'0.0.0.0',()=>console.log('Quorivio API ready'))}
 initialize().catch(e=>{console.error('startup failed',e);process.exit(1)});

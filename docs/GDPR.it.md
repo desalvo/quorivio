@@ -16,8 +16,8 @@
 | Minimizzazione | identificativi pseudonimi nei sondaggi | registro finalità e basi giuridiche |
 | Accessi | controlli del proprietario API | test isolamento organizzazioni e audit |
 | Sicurezza archivio | PostgreSQL e Secret referenziati | policy cifratura, TLS, backup |
-| Conservazione | non applicata automaticamente | scadenze, cancellazione, retention backup |
-| Diritti interessati | non implementati | accesso, portabilità, rettifica, cancellazione |
+| Conservazione | purge per sessione e code durevoli di cancellazione sessioni, allegati e avatar | verifica reale su volume condiviso, retention dei backup e controlli operativi |
+| Diritti interessati | eliminazione sessione da proprietario ed eliminazione account da amministratore limitate; gli export non costituiscono workflow GDPR completo | procedure verificate di accesso, portabilità, rettifica e cancellazione |
 | Incidenti | sola documentazione | procedura e registro degli incidenti |
 | Responsabili trattamento | hosting autonomo possibile | DPA e trasparenza sui fornitori |
 | Informative | non implementate | informative IT/EN al momento della raccolta |
@@ -26,7 +26,7 @@
 Non definire una sessione «rigorosamente anonima» senza prove sulla non riconducibilità dei dati. PostgreSQL non deve essere esposto pubblicamente. I manuali sono istruzioni, non una certificazione di conformità.
 
 ## Ciclo di sviluppo: controlli operativi introdotti
-- `PATCH /api/sessions/:id/retention` consente al proprietario di fissare la conservazione della sessione fra 1 e 3650 giorni (predefinito: 90). Il valore conta dalla creazione; la cancellazione automatica avviene solo quando la sessione è chiusa o scaduta.
+- `PATCH /api/sessions/:id/retention` consente al proprietario di fissare la conservazione della sessione fra 1 e 3650 giorni (predefinito: 60). Il valore conta dalla chiusura/scadenza; la cancellazione automatica avviene solo quando la sessione è chiusa o scaduta.
 - `POST /api/sessions/:id/revoke` chiude la sessione, fa scadere l'accesso pubblico, ruota link e codice, disconnette le sottoscrizioni WebSocket.
 - `DELETE /api/sessions/:id` cancella la sessione e, con i vincoli PostgreSQL `ON DELETE CASCADE`, attività, risposte e partecipanti associati. Non cancella copie già esportate e backup: documentare il ciclo di vita dei backup prima del rilascio.
 - Le esportazioni CSV neutralizzano le celle potenzialmente interpretabili come formule.
@@ -44,3 +44,9 @@ In questo ciclo le immagini del profilo rimangono autenticate e il file preceden
 ## Addendum 2026-10-26 — Conservazione effettiva e cancellazione media
 
 Il purge applica `retention_days` della sessione a partire dalla chiusura/scadenza; il valore globale è solo il default per nuove sessioni. Solo il proprietario può modificarlo. Le cancellazioni database accodano atomicamente la rimozione dei media in PostgreSQL e i job falliti vengono ritentati dopo un lease. La cancellazione dei dati nei backup e la validazione operativa multi-replica restano responsabilità da verificare prima della produzione. Questi controlli non equivalgono a certificazione GDPR.
+
+## Addendum 26/10/2026, dopo commit — cancellazione atomica media e avatar
+
+Ora la cancellazione del record PostgreSQL di un allegato e l'accodamento del file fisico avvengono atomicamente; i file inesistenti o di altra sessione non producono nuovi job. In precedenza un errore `unlink` dopo aver eliminato il record poteva lasciare file privati senza una procedura di recupero. Anche sostituzione/rimozione foto e cancellazione amministrativa utente accodano il vecchio avatar **nella stessa transazione bloccata**. Tre worker gestiscono directory di sessioni, allegati e foto con lease, retry limitato e frequenza di un minuto. Endpoint amministratore aggregato senza percorsi o dati identificativi. Inventario: `docs/RC_ERASURE_RECOVERY_BATCH.it.md`.
+
+Verifiche effettuate solo su file temporanei locali e contratti SQL; **test con PostgreSQL reale pendenti**. Restano invariati backup, export, snapshot, log e dati presso fornitori esterni: servono politiche del titolare, rettifica/portabilità ed esercizio completo del diritto alla cancellazione (art. 17) prima della produzione. Nessuna attestazione di conformità GDPR.

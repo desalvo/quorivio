@@ -73,7 +73,7 @@
       "id": "C4",
       "area": "C-admin",
       "status": "partial",
-      "remaining": "Real anonymous-browser presenter photo visibility, concurrent profile save/photo upload on PostgreSQL, actual RWX Kubernetes volume/ClamAV, accessibility and device acceptance. Verify PostgreSQL real retention defaults, per-session overrides and owner isolation in next CI."
+      "remaining": "Real anonymous-browser presenter photo visibility, concurrent profile save/photo upload on PostgreSQL, actual RWX Kubernetes volume/ClamAV, accessibility and device acceptance. Verify PostgreSQL real retention defaults, per-session overrides and owner isolation in next CI. New post-commit photo erasure/update account-deletion PostgreSQL CI, multi-replica RWX acceptance and UI operator verification remain pending."
     },
     {
       "id": "D2",
@@ -103,7 +103,7 @@
       "id": "D6",
       "area": "D-validation",
       "status": "open",
-      "remaining": "Runtime privacy controls, dependency license audit, operations and security sign-off Verify new PostgreSQL retention/cleanup acceptance on CI, audit shared-volume erasure, backups/restore retention, rights-request process, incident response, legal sign-off and independent security review."
+      "remaining": "Run new real PostgreSQL and filesystem erasure acceptance in GitHub CI, including account deletion and replica conflicts; verify actual RWX permissions, durable backup erasure schedules and log lifecycle; obtain independent security/AGID accessibility/GDPR legal and operator sign-off. This remains open until verified."
     }
   ],
   "gate_count": 18,

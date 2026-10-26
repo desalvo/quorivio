@@ -1,3 +1,9 @@
+## 26/10/2026 — Batch RC dopo commit: cancellazione durevole allegati e avatar
+- **Baseline ufficiale committata:** `quorivio-0.1.0-dev-rc-acceleration-retention-erasure-preflight-cumulative.zip`; GitHub `40322399238`, quality `121570698068` e container `121572390069` **SUCCESS**, pubblicazione **SKIPPED** intenzionalmente. Le modifiche qui sotto **non sono committate**.
+- **22 interventi tecnici/operativi raggruppati** su file delle sessioni, foto profilo/account, osservabilità e accettazione CI: cancellazione metadata+coda atomica, foto precedente accodata durante la transazione, worker con lease/retry limitati, path sicuri, retry ogni minuto, diagnostica aggregata accessibile solo all'admin. Dettagli: `docs/RC_ERASURE_RECOVERY_BATCH.it.md`.
+- Aggiunti **44 casi Node** e **10 casi Python**: test locali **430/430 Node e 707/707 Python PASS**. Sintassi TS/JS verificata su Node 22. PostgreSQL reale non eseguito qui; la build completa TypeScript/Vite è **bloccata dalle dipendenze npm mancanti**; la prossima CI deve verificare i nuovi file.
+- **RC 45,5% invariato**: D1 accettato per la baseline committata, C4 parziale, D6 aperto. Seguono collaudi PostgreSQL/browser, sicurezza, accessibilità, operatori e GDPR. Nessun commit/push/tag/release eseguito.
+
 ## 2026-10-26 — Batch cumulativo di 40 interventi su profili, media e amministrazione
 - 40 verifiche/interventi documentati in un solo batch, non 40 release o esecuzioni CI indipendenti. Inventario: `docs/RC_PROFILE_ADMIN_40_INTERVENTIONS.it.md`.
 - Validazione dimensioni PNG/JPEG/WebP, 4096 px/lato e 16 megapixel; rifiuto upload e immagini memorizzate corrotte; endpoint profilo universale, operazioni foto e salvataggio serializzate.

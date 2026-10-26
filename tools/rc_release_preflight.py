@@ -14,7 +14,8 @@ REQUIRED = (
  'README.md', 'README.it.md', 'docs/GDPR.en.md', 'docs/GDPR.it.md',
  'docs/DEVELOPMENT_STATUS.md', 'docs/DEVELOPMENT_STATUS.it.md',
  'docs/RC_GATE_MATRIX.json', '.github/workflows/ci.yml',
- 'apps/api/src/schema.sql', 'helm', 'compose.yaml', 'Dockerfile',
+ 'apps/api/src/schema.sql', 'apps/api/src/asset-erasure.ts',
+ 'tools/ci_retention_postgres.mjs', 'helm', 'compose.yaml', 'Dockerfile',
 )
 
 def preflight(root: Path = ROOT, ledger: Path = LEDGER) -> dict:
