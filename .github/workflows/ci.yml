@@ -108,8 +108,12 @@ jobs:
           /usr/lib/postgresql/18/bin/pg_restore --version | grep -Eq '^pg_restore \(PostgreSQL\) 18\.'
       - name: Generate ephemeral CI load and SMTP credentials
         run: |
-          echo "QUORIVIO_CI_LOAD_TOKEN=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
-          echo "QUORIVIO_CI_SMTP_PASSWORD=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
+          load_token="$(openssl rand -hex 32)"
+          smtp_password="$(openssl rand -hex 32)"
+          echo "::add-mask::$load_token"
+          echo "::add-mask::$smtp_password"
+          echo "QUORIVIO_CI_LOAD_TOKEN=$load_token" >> "$GITHUB_ENV"
+          echo "QUORIVIO_CI_SMTP_PASSWORD=$smtp_password" >> "$GITHUB_ENV"
       - name: Start disposable loopback SMTPS for real email MFA acceptance
         shell: bash
         run: |
@@ -119,7 +123,7 @@ jobs:
             -keyout /tmp/quorivio-ci-smtps/key.pem -out /tmp/quorivio-ci-smtps/cert.pem \
             -subj '/CN=localhost' -addext 'subjectAltName=DNS:localhost,IP:127.0.0.1' >/dev/null 2>&1
           chmod 600 /tmp/quorivio-ci-smtps/key.pem /tmp/quorivio-ci-smtps/cert.pem
-          QUORIVIO_CI_SMTP_PASSWORD="${{ env.QUORIVIO_CI_SMTP_PASSWORD }}" \
+          QUORIVIO_CI_SMTP_PASSWORD="$QUORIVIO_CI_SMTP_PASSWORD" \
           QUORIVIO_CI_SMTP_TEST=1 \
           QUORIVIO_CI_SMTP_CERT=/tmp/quorivio-ci-smtps/cert.pem \
           QUORIVIO_CI_SMTP_KEY=/tmp/quorivio-ci-smtps/key.pem \
@@ -177,6 +181,9 @@ jobs:
         run: python3 tools/ci_portable_http.py
       - name: PostgreSQL and real TLS SMTP email MFA lifecycle acceptance
         env:
+          # This shared, disposable test IP exceeds 100 requests/min across suites.
+          # The server accepts the token only when NODE_ENV is not production.
+          QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
           DATABASE_URL: postgres://quorivio:ci-only-secret@127.0.0.1:5432/quorivio
           QUORIVIO_CI_MFA_TEST: '1'
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com

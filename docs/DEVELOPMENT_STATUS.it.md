@@ -1100,3 +1100,13 @@ CI estesa GitHub 40220288310 / quality job 121250301296: superati i precedenti p
 ### 2026-10-26 — Batch accelerazione RC: retention, cleanup affidabile e preflight
 
 Corretto un difetto GDPR concreto: il purge ignorava la retention della sessione. Ora la retention globale è soltanto il default per nuove sessioni; il proprietario mantiene la propria scelta e soltanto lui può modificarla. Introdotta coda PostgreSQL transazionale per cancellazione dei file, con retry persistente e lease tra repliche. Aggiunti test di accettazione PostgreSQL e controllo RC fail-closed (`tools/rc_release_preflight.py --strict`). Documentazione in `docs/RC_RETENTION_AND_RELEASE_PREFLIGHT.it.md`. Test locali: 386 Node, 697 Python (ricontrollare in consegna), build API/web PASS. **La RC non è pronta**: nuovi test PostgreSQL/CI e collaudi indipendenti pendenti; punteggio verificato 45,5%, invariato. Nessun commit/push/tag/release.
+
+### 2026-10-26 — Hotfix CI MFA: quota condivisa per IP (dopo commit della pubblicazione opt-in)
+
+**Baseline committata**: SHA `723dda022eedb6412bb305f58f6ddab48be0e8ef`; run GitHub Actions `40349577790`, quality job `121675471288` FAILED in `tools/ci_email_mfa_postgres.py` (ultimo `GET /api/auth/me`: atteso 200, ricevuto **429**). I **433 test Node**, la build frontend/backend e il collaudo PostgreSQL dei profili sono PASS; build container SKIPPED; pubblicazione Docker correttamente SKIPPED.
+
+**Causa**: la suite profili e quella MFA condividono lo stesso IP loopback e il limite PostgreSQL di **100 chiamate API/minuto**. Il test MFA esauriva la quota prima dell'asserzione finale; non è provato un errore dell'OTP. Il bypass già esistente `LOAD_TEST_TOKEN` è permesso esclusivamente fuori produzione, con segreto di almeno 32 caratteri e confronto `timingSafeEqual`. Il test MFA ora richiede questo token solo nel contesto CI effimero e locale, lo invia su entrambe le funzioni HTTP (anche verifiche concorrenti), e il workflow lo passa esplicitamente. Rimangono invariati il rate limiting di produzione e i controlli specifici MFA (tentativi, scadenza, anti-replay).
+
+**Sicurezza log CI**: mascheramento immediato dei due segreti generati con `::add-mask::`; il processo SMTP riceve la password dall'ambiente anziché da una interpolazione GitHub esposta nei comandi. Aggiunti **5 test Python** per richieste, esiti OTP negativi, precondizioni loopback/token e limite di produzione.
+
+**Da verificare in GitHub**: dopo il commit dell'hotfix, CI standard con MFA PostgreSQL/SMTP TLS, retention, concorrenza, build container PASS e pubblicazione SKIPPED. Matrice RC invariata **48,0%** (1 accepted / 15 partial / 2 open). Nessuna promozione dei gate basata solo sui test locali. Nessun commit/push/tag/release eseguito dall'assistente.

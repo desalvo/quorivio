@@ -27,6 +27,11 @@ def assert_disposable() -> None:
         raise RuntimeError('MFA CI requires an explicit local HTTP API')
     if os.environ.get('QUORIVIO_CI_MFA_TEST') != '1':
         raise RuntimeError('MFA CI requires QUORIVIO_CI_MFA_TEST=1')
+    # All suites share the same loopback IP and PostgreSQL fixed-window limit.
+    # CI uses the existing non-production-only token to prevent test-order 429s.
+    token = os.environ.get('QUORIVIO_CI_LOAD_TOKEN', '')
+    if len(token) < 32 or '\n' in token or '\r' in token:
+        raise RuntimeError('MFA CI requires a valid, ephemeral non-production load token')
     if not CAPTURE.is_file() or CAPTURE.is_symlink() or os.stat(CAPTURE).st_mode & 0o077:
         raise RuntimeError('MFA CI requires a private disposable SMTPS capture file')
 
@@ -35,9 +40,14 @@ def client():
     return build_opener(HTTPCookieProcessor(http.cookiejar.CookieJar()))
 
 
+def ci_headers():
+    token = os.environ.get('QUORIVIO_CI_LOAD_TOKEN', '')
+    return {'Content-Type':'application/json', **({'X-Quorivio-Load-Token': token} if token else {})}
+
+
 def request(opener,method,path,data=None,expected=200):
     raw=json.dumps(data).encode() if data is not None else None
-    req=Request(BASE+path,data=raw,method=method,headers={'Content-Type':'application/json'})
+    req=Request(BASE+path,data=raw,method=method,headers=ci_headers())
     try:
         with opener.open(req,timeout=10) as r:status,body=r.status,r.read()
     except HTTPError as e:status,body=e.code,e.read()
@@ -47,7 +57,7 @@ def request(opener,method,path,data=None,expected=200):
 
 def request_status(opener, method, path, data):
     raw=json.dumps(data).encode()
-    req=Request(BASE+path,data=raw,method=method,headers={'Content-Type':'application/json'})
+    req=Request(BASE+path,data=raw,method=method,headers=ci_headers())
     try:
         with opener.open(req,timeout=10) as r:return r.status
     except HTTPError as e:return e.code
@@ -130,8 +140,9 @@ def run():
     for _ in range(5):
         request(client(),'POST','/api/auth/email-mfa/verify',{'challenge_id':brute['challenge_id'],'code':wrong},401)
     request(client(),'POST','/api/auth/email-mfa/verify',{'challenge_id':brute['challenge_id'],'code':locked_otp},401)
-    # Account-level message throttling is separately tested under the SQL
-    # concurrency contract; avoid CI flakes at an exact UTC minute boundary.
+    # The temporary CI load token bypasses ONLY the shared IP-based test quota
+    # outside production. OTP attempt lockout, expiry and replay checks remain
+    # enforced in the application and are asserted above.
     # Password authentication cannot bypass email MFA, and an expired challenge
     # is never accepted even with a matching valid-looking OTP.
     other=client()
