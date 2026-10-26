@@ -18,7 +18,7 @@ import {smtpConfigFromEnv,sendTestEmail,sendPasswordResetEmail,sendEmailOtp} fro
 import {createEmailOtp,emailOtpDigest,matchesEmailOtp,validEmailOtp} from './email-otp.js';
 import {sealSmtpConfig,openSmtpConfig,validateSmtpInput,publicSmtpConfig} from './smtp-store.js';
 import {widgetAnswerShapeChanged,aggregateWidgetAnswerRevisions,liveTimedWidgetMutation} from './widget-revisions.js';
-import {normalizeWord,validateQuestion,moderationStatus,safeFrequency} from './audience-tools.js';
+import {normalizeWord,validateQuestion,moderationStatus,safeFrequency,parseModerationQueueQuery,parseModerationBulk} from './audience-tools.js';
 import {validPageOrder} from './page-sequence.js';
 import express from 'express';import helmet from 'helmet';import pg from 'pg';import bcrypt from 'bcryptjs';import QRCode from 'qrcode';import {WebSocketServer,WebSocket} from 'ws';import {liveSessionActive,livePresenterAuthorized,liveParticipantAuthorized} from './live-socket-policy.js';import {createLiveSnapshotQueue} from './live-snapshot-queue.js';import {shouldDropSlowSocket} from './live-delivery-policy.js';import {createServer} from 'node:http';import {randomUUID,randomBytes,createHash,createHmac,timingSafeEqual} from 'node:crypto';import {readFileSync,existsSync} from 'node:fs';import {mkdir,writeFile,readFile,unlink,rm} from 'node:fs/promises';import {validAsset} from './asset-policy.js';import {receiveAssetStream} from './stream-upload.js';import {scanUploadedFile} from './malware-scan.js';import {readdir,stat} from 'node:fs/promises';import path from 'node:path';import {fileURLToPath} from 'node:url';import {validTransition,validateOptions,checkAnswer,publicActivity,escapeCsvCell,validRetentionDays,validPageDesign,validPseudonym,validAnswerMode,validateSubmittedAnswer,validReaction,type Activity,type SessionStatus} from './domain.js';
 const db=new pg.Pool({connectionString:process.env.DATABASE_URL});const secret=process.env.AUTH_SECRET||'';if(secret.length<32)throw new Error('AUTH_SECRET must have >= 32 characters');
@@ -68,44 +68,102 @@ async function audienceIdentity(req:express.Request,code:string,activityId:strin
  const a=await db.query("SELECT id FROM activities WHERE id=$1 AND session_id=$2 AND status='open'",[activityId,s.id]);
  return p.rowCount&&a.rowCount?{sessionId:s.id,participantId:p.rows[0].id}:null;
 }
-app.post('/api/join/:code/activities/:aid/words',async(req,res)=>{try{
+// Freeze the currently published page for writes. This shares the presenter's
+// session -> activity lock order, so a page switch cannot race an accepted write.
+async function lockAudiencePage(cx:pg.PoolClient,sessionId:string,activityId:string):Promise<boolean>{
+ const live=await cx.query("SELECT id FROM sessions WHERE id=$1 AND status='active' AND current_activity_id=$2 AND expires_at>now() AND allow_anonymous=true FOR SHARE",[sessionId,activityId]);
+ if(!live.rowCount)return false;
+ const page=await cx.query("SELECT id FROM activities WHERE id=$1 AND session_id=$2 AND status='open' FOR SHARE",[activityId,sessionId]);
+ return !!page.rowCount;
+}
+// The database transaction has already committed; a failed NOTIFY must not
+// make clients retry a successful write and duplicate their submissions.
+async function notifyAudience(sessionId:string){try{await broadcast(sessionId)}catch(e){console.error('audience notification retryable',e instanceof Error?e.message:'unknown')}}
+app.post('/api/join/:code/activities/:aid/words',async(req,res)=>{const cx=await db.connect();try{
  const word=normalizeWord(req.body?.word);if(!word){res.status(400).json({error:'invalid_word'});return}
  const who=await audienceIdentity(req,req.params.code,req.params.aid);
  if(!who){res.status(403).json({error:'join_or_open_activity_required'});return}
- await db.query('INSERT INTO audience_words(session_id,activity_id,participant_id,word) VALUES($1,$2,$3,$4) ON CONFLICT (activity_id,participant_id) DO NOTHING',[who.sessionId,req.params.aid,who.participantId,word]);
- await broadcast(who.sessionId);res.status(202).json({ok:true});
- }catch(e){sendError(res,e)}});
+ await cx.query('BEGIN');
+ if(!await lockAudiencePage(cx,who.sessionId,req.params.aid)){await cx.query('ROLLBACK');res.status(409).json({error:'activity_not_open'});return}
+ const created=await cx.query('INSERT INTO audience_words(session_id,activity_id,participant_id,word) VALUES($1,$2,$3,$4) ON CONFLICT (activity_id,participant_id) DO NOTHING RETURNING participant_id',[who.sessionId,req.params.aid,who.participantId,word]);
+ await cx.query('COMMIT');if(created.rowCount)await notifyAudience(who.sessionId);
+ res.status(202).json({ok:true,already_submitted:!created.rowCount});
+ }catch(e){await cx.query('ROLLBACK');sendError(res,e)}finally{cx.release()}});
 app.get('/api/sessions/:id/activities/:aid/words',requireAuth,async(req,res)=>{try{
  const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}
  const rows=await db.query('SELECT word,count(*)::int AS count FROM audience_words WHERE session_id=$1 AND activity_id=$2 GROUP BY word ORDER BY count DESC,word LIMIT 100',[s.id,req.params.aid]);
  res.json(safeFrequency(rows.rows));
  }catch(e){sendError(res,e)}});
-app.post('/api/join/:code/activities/:aid/questions',async(req,res)=>{try{
+app.post('/api/join/:code/activities/:aid/questions',async(req,res)=>{const cx=await db.connect();try{
  const body=validateQuestion(req.body?.body);if(!body){res.status(400).json({error:'invalid_question'});return}
  const who=await audienceIdentity(req,req.params.code,req.params.aid);
  if(!who){res.status(403).json({error:'join_or_open_activity_required'});return}
- const n=await db.query('SELECT count(*)::int AS n FROM audience_questions WHERE activity_id=$1 AND participant_id=$2',[req.params.aid,who.participantId]);
- if(n.rows[0].n>=3){res.status(429).json({error:'question_limit_reached'});return}
- await db.query('INSERT INTO audience_questions(id,session_id,activity_id,participant_id,body) VALUES($1,$2,$3,$4,$5)',[randomUUID(),who.sessionId,req.params.aid,who.participantId,body]);
- res.status(202).json({status:'pending_moderation'});
- }catch(e){sendError(res,e)}});
+ await cx.query('BEGIN');
+ if(!await lockAudiencePage(cx,who.sessionId,req.params.aid)){await cx.query('ROLLBACK');res.status(409).json({error:'activity_not_open'});return}
+ // Serialize a participant's submissions, including on separate API replicas.
+ // A count followed by INSERT without this row lock can bypass the 3-question cap.
+ const participant=await cx.query('SELECT id FROM participants WHERE id=$1 AND session_id=$2 FOR UPDATE',[who.participantId,who.sessionId]);
+ if(!participant.rowCount){await cx.query('ROLLBACK');res.status(403).json({error:'participant_unavailable'});return}
+ const n=await cx.query('SELECT count(*)::int AS n FROM audience_questions WHERE activity_id=$1 AND participant_id=$2',[req.params.aid,who.participantId]);
+ if(n.rows[0].n>=3){await cx.query('ROLLBACK');res.status(429).json({error:'question_limit_reached'});return}
+ const id=randomUUID();
+ await cx.query('INSERT INTO audience_questions(id,session_id,activity_id,participant_id,body) VALUES($1,$2,$3,$4,$5)',[id,who.sessionId,req.params.aid,who.participantId,body]);
+ await cx.query('COMMIT');await notifyAudience(who.sessionId);
+ res.status(202).json({status:'pending_moderation',id,remaining:2-n.rows[0].n});
+ }catch(e){await cx.query('ROLLBACK');sendError(res,e)}finally{cx.release()}});
 app.get('/api/join/:code/activities/:aid/questions',async(req,res)=>{try{
- const s=await publicSession(req.params.code);if(!s||s.current_activity_id!==req.params.aid){res.status(404).end();return}
- const r=await db.query("SELECT q.id,q.body,count(v.participant_id)::int AS votes FROM audience_questions q LEFT JOIN audience_question_votes v ON v.question_id=q.id WHERE q.session_id=$1 AND q.activity_id=$2 AND q.status='approved' GROUP BY q.id ORDER BY votes DESC,q.created_at LIMIT 100",[s.id,req.params.aid]);res.json(r.rows);
+ const s=await publicSession(req.params.code);if(!s||s.status!=='active'||s.current_activity_id!==req.params.aid){res.status(404).end();return}
+ const page=await db.query("SELECT id FROM activities WHERE id=$1 AND session_id=$2 AND status='open'",[req.params.aid,s.id]);
+ if(!page.rowCount){res.status(404).end();return}
+ const r=await db.query("SELECT q.id,q.body,count(v.participant_id)::int AS votes FROM audience_questions q LEFT JOIN audience_question_votes v ON v.question_id=q.id WHERE q.session_id=$1 AND q.activity_id=$2 AND q.status='approved' GROUP BY q.id ORDER BY votes DESC,q.created_at,q.id LIMIT 100",[s.id,req.params.aid]);res.json(r.rows);
  }catch(e){sendError(res,e)}});
-app.post('/api/join/:code/activities/:aid/questions/:qid/upvote',async(req,res)=>{try{
+app.post('/api/join/:code/activities/:aid/questions/:qid/upvote',async(req,res)=>{const cx=await db.connect();try{
  const who=await audienceIdentity(req,req.params.code,req.params.aid);if(!who){res.status(403).json({error:'join_or_open_activity_required'});return}
- const q=await db.query("SELECT id FROM audience_questions WHERE id=$1 AND session_id=$2 AND activity_id=$3 AND status='approved'",[req.params.qid,who.sessionId,req.params.aid]);if(!q.rowCount){res.status(404).end();return}
- await db.query('INSERT INTO audience_question_votes(question_id,participant_id) VALUES($1,$2) ON CONFLICT DO NOTHING',[req.params.qid,who.participantId]);res.json({ok:true});
- }catch(e){sendError(res,e)}});
+ await cx.query('BEGIN');
+ if(!await lockAudiencePage(cx,who.sessionId,req.params.aid)){await cx.query('ROLLBACK');res.status(409).json({error:'activity_not_open'});return}
+ // Lock against a concurrent presenter rejection: never accept a vote on a
+ // question while its moderation state is being changed.
+ const q=await cx.query("SELECT id FROM audience_questions WHERE id=$1 AND session_id=$2 AND activity_id=$3 AND status='approved' FOR SHARE",[req.params.qid,who.sessionId,req.params.aid]);
+ if(!q.rowCount){await cx.query('ROLLBACK');res.status(404).end();return}
+ const vote=await cx.query('INSERT INTO audience_question_votes(question_id,participant_id) VALUES($1,$2) ON CONFLICT DO NOTHING RETURNING participant_id',[req.params.qid,who.participantId]);
+ await cx.query('COMMIT');if(vote.rowCount)await notifyAudience(who.sessionId);
+ res.json({ok:true,already_voted:!vote.rowCount});
+ }catch(e){await cx.query('ROLLBACK');sendError(res,e)}finally{cx.release()}});
 app.get('/api/sessions/:id/activities/:aid/questions',requireAuth,async(req,res)=>{try{
  const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}
- const r=await db.query('SELECT q.id,q.body,q.status,q.created_at,count(v.participant_id)::int AS votes FROM audience_questions q LEFT JOIN audience_question_votes v ON v.question_id=q.id WHERE q.session_id=$1 AND q.activity_id=$2 GROUP BY q.id ORDER BY q.created_at LIMIT 200',[s.id,req.params.aid]);res.json(r.rows);
+ const r=await db.query('SELECT q.id,q.body,q.status,q.created_at,count(v.participant_id)::int AS votes FROM audience_questions q LEFT JOIN audience_question_votes v ON v.question_id=q.id WHERE q.session_id=$1 AND q.activity_id=$2 GROUP BY q.id ORDER BY q.created_at,q.id LIMIT 200',[s.id,req.params.aid]);res.json(r.rows);
  }catch(e){sendError(res,e)}});
+// Paginated presenter queue: stable ordering, server-side status filters, and
+// aggregate counts without publishing pending/rejected content to participants.
+app.get('/api/sessions/:id/activities/:aid/questions/queue',requireAuth,async(req,res)=>{try{
+ const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}
+ const query=parseModerationQueueQuery(req.query.status,req.query.page);
+ if(!query){res.status(400).json({error:'invalid_moderation_query'});return}
+ const counts=await db.query('SELECT status,count(*)::int AS count FROM audience_questions WHERE session_id=$1 AND activity_id=$2 GROUP BY status',[s.id,req.params.aid]);
+ const totals={pending:0,approved:0,rejected:0};for(const r of counts.rows){const state=r.status as keyof typeof totals;if(moderationStatus(state))totals[state]=Number(r.count)}
+ const total=query.status==='all'?totals.pending+totals.approved+totals.rejected:totals[query.status];
+ const where=query.status==='all'?'':' AND q.status=$4';
+ const args:any[]=[s.id,req.params.aid,query.offset];if(query.status!=='all')args.push(query.status);
+ const results=await db.query(`SELECT q.id,q.body,q.status,q.created_at,q.moderated_at,count(v.participant_id)::int AS votes FROM audience_questions q LEFT JOIN audience_question_votes v ON v.question_id=q.id WHERE q.session_id=$1 AND q.activity_id=$2${where} GROUP BY q.id ORDER BY q.created_at DESC,q.id DESC LIMIT 20 OFFSET $3`,args);
+ res.setHeader('Cache-Control','no-store');res.json({page:query.page,page_size:20,total,total_pages:Math.max(1,Math.ceil(total/20)),counts:totals,items:results.rows});
+ }catch(e){sendError(res,e)}});
+// Bulk review applies all changes or none: IDs from other sessions are not
+// silently ignored. Limit to one visible queue page (20) to bound locks.
+app.patch('/api/sessions/:id/activities/:aid/questions/bulk',requireAuth,async(req,res)=>{const cx=await db.connect();try{
+ const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}
+ const selection=parseModerationBulk(req.body);if(!selection){res.status(400).json({error:'invalid_bulk_moderation'});return}
+ await cx.query('BEGIN');
+ const locked=await cx.query('SELECT id FROM audience_questions WHERE session_id=$1 AND activity_id=$2 AND id = ANY($3::uuid[]) ORDER BY id FOR UPDATE',[s.id,req.params.aid,selection.ids]);
+ if(locked.rowCount!==selection.ids.length){await cx.query('ROLLBACK');res.status(404).json({error:'question_not_found'});return}
+ const updated=await cx.query('UPDATE audience_questions SET status=$4,moderated_at=now() WHERE session_id=$1 AND activity_id=$2 AND id = ANY($3::uuid[]) RETURNING id',[s.id,req.params.aid,selection.ids,selection.status]);
+ await cx.query('COMMIT');await notifyAudience(s.id);
+ res.json({ok:true,updated:updated.rowCount});
+ }catch(e){await cx.query('ROLLBACK');sendError(res,e)}finally{cx.release()}});
 app.patch('/api/sessions/:id/activities/:aid/questions/:qid',requireAuth,async(req,res)=>{try{
  const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}
  if(!moderationStatus(req.body?.status)||req.body.status==='pending'){res.status(400).json({error:'invalid_moderation_status'});return}
- const r=await db.query('UPDATE audience_questions SET status=$4,moderated_at=now() WHERE id=$1 AND session_id=$2 AND activity_id=$3 RETURNING id',[req.params.qid,s.id,req.params.aid,req.body.status]);if(!r.rowCount){res.status(404).end();return}res.json({ok:true});
+ const r=await db.query('UPDATE audience_questions SET status=$4,moderated_at=now() WHERE id=$1 AND session_id=$2 AND activity_id=$3 RETURNING id',[req.params.qid,s.id,req.params.aid,req.body.status]);
+ if(!r.rowCount){res.status(404).end();return}await notifyAudience(s.id);res.json({ok:true});
  }catch(e){sendError(res,e)}});
 app.get('/api/health/live',(_,res)=>res.json({status:'ok'}));app.get('/api/health/ready',async(_,res)=>{try{await db.query('SELECT 1');res.json({status:'ok'})}catch{res.status(503).json({status:'unavailable'})}});
 async function activeSmtpConfig(){const r=await db.query('SELECT encrypted_config FROM smtp_configuration WHERE id=1');return r.rowCount?openSmtpConfig(r.rows[0].encrypted_config,secret):smtpConfigFromEnv(process.env)}

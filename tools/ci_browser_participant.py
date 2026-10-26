@@ -119,10 +119,30 @@ async def run():
    button=p2.get_by_role('group',name='Opzioni di risposta').get_by_role('button',name='Yes')
    bounds=await button.bounding_box()
    assert bounds and bounds['x']>=0 and bounds['x']+bounds['width']<=392,bounds
-   # 7. Server-issued QR resolves to the same participant URL, not a privileged URL.
+   # 7. Real Chromium Q&A: participant submits privately, presenter approves,
+   #    an upvote is visible, and revocation immediately removes it from public view.
+   tools=p1.get_by_role('region',name='Strumenti interattivi')
+   await tools.get_by_label('La tua domanda').fill('Chromium browser moderation and privacy check')
+   await tools.get_by_role('button',name='Invia per moderazione').click()
+   await expect(tools.get_by_role('status')).to_contain_text('Domanda inviata per approvazione')
+   queue=api(admin,'GET',f'/api/sessions/{sid}/activities/{aid}/questions/queue')
+   assert queue['counts']['pending']==1 and queue['total']==1,queue
+   question=queue['items'][0]
+   assert 'Chromium browser moderation' not in await tools.inner_text()
+   api(admin,'PATCH',f'/api/sessions/{sid}/activities/{aid}/questions/{question["id"]}',{'status':'approved'})
+   await tools.get_by_role('button',name='Aggiorna domande approvate').click()
+   await expect(tools.get_by_text('Chromium browser moderation and privacy check',exact=False)).to_be_visible()
+   await tools.get_by_role('button',name='Vota').click()
+   await expect(tools.get_by_role('status')).to_contain_text('Voto registrato')
+   approved=api(admin,'GET',f'/api/sessions/{sid}/activities/{aid}/questions/queue?status=approved')
+   assert approved['total']==1 and approved['items'][0]['votes']==1,approved
+   api(admin,'PATCH',f'/api/sessions/{sid}/activities/{aid}/questions/{question["id"]}',{'status':'rejected'})
+   await tools.get_by_role('button',name='Aggiorna domande approvate').click()
+   await expect(tools.get_by_text('Chromium browser moderation and privacy check',exact=False)).to_have_count(0)
+   # 8. Server-issued QR resolves to the same participant URL, not a privileged URL.
    qr=await p2.request.get(WEB+f'/api/join/{code}/qr.svg')
    assert qr.ok and '<svg' in await qr.text()
-   # 8. Closed session invalidates public read and participation recovery.
+   # 9. Closed session invalidates public read and participation recovery.
    api(admin,'POST',f'/api/sessions/{sid}/status',{'status':'closed'})
    assert (await p1.request.get(WEB+f'/api/join/{secret}')).status==404
    assert (await p2.request.get(WEB+f'/api/join/{code}/participation')).status==404
@@ -133,6 +153,6 @@ async def run():
    raise
   finally:
    await desktop.close();await mobile.close();await browser.close()
- print('PASS Chromium + PostgreSQL audience: QR/short-code join, two isolated participants, vote persistence, HttpOnly reload recovery, idempotency, report privacy, mobile touch, QR and closure')
+ print('PASS Chromium + PostgreSQL audience: QR/short-code join, two isolated participants, vote persistence, HttpOnly reload recovery, idempotency, report privacy, mobile touch, Q&A moderation/revocation and voting, QR and closure')
 
 if __name__=='__main__':asyncio.run(run())

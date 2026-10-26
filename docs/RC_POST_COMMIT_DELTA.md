@@ -1,26 +1,28 @@
-# Changes since maintainer-committed baseline 40322399238
+# Quorivio RC — Post-commit cumulative delta (2026-10-26)
 
-Only the following source and document files have changed. The original baseline remains intact.
+**Verified committed baseline:** `c44a3cb884b37ad20cc8c46203e16c24c6520412` (GitHub Actions `40359804334`: production quality and container build SUCCESS; publication SKIPPED). Only changes after this commit are listed below.
 
-## Modified baseline files (10)
-- `apps/api/src/schema.sql`
+## Modified baseline files (11)
+
+- `.github/workflows/ci.yml`
+- `apps/api/src/audience-tools.ts`
 - `apps/api/src/server.ts`
-- `docs/DEVELOPMENT_STATUS.it.md`
+- `apps/api/test/audience-tools.test.ts`
+- `apps/web/src/main.tsx`
 - `docs/DEVELOPMENT_STATUS.md`
-- `docs/GDPR.en.md`
-- `docs/GDPR.it.md`
+- `docs/DEVELOPMENT_STATUS.it.md`
 - `docs/RC_GATE_MATRIX.json`
 - `docs/RC_READINESS_REPORT.json`
-- `tools/ci_retention_postgres.mjs`
-- `tools/rc_release_preflight.py`
+- `docs/RC_POST_COMMIT_DELTA.md` (this manifest)
+- `tools/ci_browser_participant.py`
 
-## Added source / test / documentation files (7, including this manifest)
-- `apps/api/src/asset-erasure.ts`
-- `apps/api/test/asset-erasure.test.ts`
-- `apps/api/test/profile-erasure.test.ts`
-- `docs/RC_ERASURE_RECOVERY_BATCH.en.md`
-- `docs/RC_ERASURE_RECOVERY_BATCH.it.md`
-- `tools/tests/test_asset_erasure_delivery.py`
-- `docs/RC_POST_COMMIT_DELTA.md`
+## New files (4)
 
-No baseline files removed. No commit/push/tag/release. No `node_modules`, generated `dist`, cache files or local logs are packaged.
+- `tools/ci_audience_moderation_postgres.py`
+- `tools/tests/test_audience_moderation_delivery.py`
+- `docs/RC_MODERATION_CONCURRENCY_BATCH.en.md`
+- `docs/RC_MODERATION_CONCURRENCY_BATCH.it.md`
+
+All 548 files from the committed baseline remain present and no baseline file has been removed. See the two B3 reports for the audited, 40-item functional/security/acceptance inventory.
+
+No commit, push, tag, release or image publication performed in this batch. Production publication remains strictly manual opt-in.

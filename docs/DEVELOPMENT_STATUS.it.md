@@ -1117,3 +1117,7 @@ Corretto un difetto GDPR concreto: il purge ignorava la retention della sessione
 **Sicurezza log CI**: mascheramento immediato dei due segreti generati con `::add-mask::`; il processo SMTP riceve la password dall'ambiente anziché da una interpolazione GitHub esposta nei comandi. Aggiunti **5 test Python** per richieste, esiti OTP negativi, precondizioni loopback/token e limite di produzione.
 
 **Da verificare in GitHub**: dopo il commit dell'hotfix, CI standard con MFA PostgreSQL/SMTP TLS, retention, concorrenza, build container PASS e pubblicazione SKIPPED. Matrice RC invariata **48,0%** (1 accepted / 15 partial / 2 open). Nessuna promozione dei gate basata solo sui test locali. Nessun commit/push/tag/release eseguito dall'assistente.
+
+### 26 ottobre 2026 — Lotto moderazione e concorrenza Q&A dopo la CI verde
+
+Dalla baseline `c44a3cb...`, run `40359804334` verde, sviluppato lotto coerente da 40 attività B3: limite domande transazionale PostgreSQL, lock di pagina, domande e voti coerenti con moderazione, parole idempotenti, coda privata paginata, filtri e contatori, revoca delle approvazioni, moderazione multipla atomica, UI e test HTTP/Chromium. **442 Node PASS, 52 Python pertinenti PASS**. Nuovi test GitHub da eseguire; suite Python totale e build locale non validate. B3 partial, RC **48,0%**. Pubblicazione solo opt-in; nessun commit/push/tag/release. Dettagli in `docs/RC_MODERATION_CONCURRENCY_BATCH.it.md`.

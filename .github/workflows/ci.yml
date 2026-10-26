@@ -201,6 +201,13 @@ jobs:
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
           QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
         run: python3 tools/ci_live_http.py
+      - name: PostgreSQL audience Q&A concurrency, moderation, privacy and pagination
+        env:
+          QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
+          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
+          QUORIVIO_CI_MODERATION_TEST: '1'
+          QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
+        run: python3 tools/ci_audience_moderation_postgres.py
       - name: PostgreSQL editor concurrent authoring and conflict E2E
         env:
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}

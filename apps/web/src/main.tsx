@@ -116,12 +116,31 @@ function PresenterPageResults({sessionId,activity,snapshot,renderResults}:{sessi
  </>;
 }
 function AudienceExtensions({joinCode,activityId,joined}:{joinCode:string;activityId:string;joined:boolean}){
- const [word,setWord]=useState('');const [question,setQuestion]=useState('');const [questions,setQuestions]=useState<any[]>([]);const [status,setStatus]=useState('');
+ const [word,setWord]=useState(''),[question,setQuestion]=useState('');
+ const [questions,setQuestions]=useState<any[]>([]),[status,setStatus]=useState('');
+ const [busy,setBusy]=useState(false);
  const prefix=`/join/${encodeURIComponent(joinCode)}/activities/${encodeURIComponent(activityId)}`;
- const refresh=()=>request<any[]>(`${prefix}/questions`).then(setQuestions).catch(()=>{});
- useEffect(()=>{setWord('');setQuestion('');setStatus('');refresh()},[joinCode,activityId]);
- async function submit(endpoint:string,body:unknown){try{await request(`${prefix}/${endpoint}`,'POST',body);setStatus('Invio registrato');refresh()}catch(e){setStatus(e instanceof Error?e.message:String(e))}}
- return <section className="panel" aria-label="Strumenti interattivi"><h3>Nuvola di parole e domande dal pubblico</h3><p className="muted tiny">Una parola per partecipante, fino a tre domande per pagina. Le domande diventano pubbliche solo dopo approvazione.</p><label>Una parola per descrivere la pagina<input maxLength={48} value={word} onChange={e=>setWord(e.target.value)}/></label><button className="outline small" disabled={!joined||!word.trim()} onClick={()=>{void submit('words',{word});setWord('')}}>Invia parola</button><label>La tua domanda<textarea maxLength={500} rows={3} value={question} onChange={e=>setQuestion(e.target.value)}/></label><button className="outline small" disabled={!joined||question.trim().length<5} onClick={()=>{void submit('questions',{body:question});setQuestion('')}}>Invia per moderazione</button><div aria-live="polite">{status}</div><button className="outline small" onClick={refresh}>Aggiorna domande approvate</button>{questions.map(q=><div key={q.id} className="activity-row"><span>{q.body} · {q.votes} voti</span><button className="outline small" disabled={!joined} onClick={()=>void submit(`questions/${q.id}/upvote`,{})}>▲ Vota</button></div>)}</section>
+ useEffect(()=>{setWord('');setQuestion('');setStatus('');setQuestions([])},[joinCode,activityId]);
+ useEffect(()=>{let active=true;const refresh=()=>request<any[]>(`${prefix}/questions`).then(rows=>{if(active)setQuestions(rows)}).catch(()=>{if(active)setStatus(v=>v||'Aggiornamento delle domande non disponibile')});void refresh();const timer=window.setInterval(refresh,6000);return()=>{active=false;window.clearInterval(timer)}},[prefix]);
+ async function submit(endpoint:string,body:unknown,clear:()=>void){
+  if(busy)return;setBusy(true);setStatus('Invio in corso…');
+  try{
+   const result=await request<any>(`${prefix}/${endpoint}`,'POST',body);
+   clear();
+   setStatus(endpoint==='words'?(result.already_submitted?'Hai già inviato una parola per questa pagina':'Parola registrata'):endpoint==='questions'?`Domanda inviata per approvazione · ${result.remaining} disponibili`:result.already_voted?'Voto già registrato':'Voto registrato');
+   void request<any[]>(`${prefix}/questions`).then(setQuestions).catch(()=>{});
+  }catch(e){setStatus(e instanceof Error?e.message:String(e))}finally{setBusy(false)}
+ }
+ return <section className="panel" aria-label="Strumenti interattivi"><h3>Nuvola di parole e domande dal pubblico</h3><p className="muted tiny">Una parola per partecipante, fino a tre domande per pagina. Le domande diventano pubbliche solo dopo approvazione.</p>
+ <label>Una parola per descrivere la pagina<input maxLength={48} value={word} disabled={busy} onChange={e=>setWord(e.target.value)}/></label>
+ <button type="button" className="outline small" disabled={!joined||busy||!word.trim()} onClick={()=>void submit('words',{word},()=>setWord(''))}>Invia parola</button>
+ <label>La tua domanda<textarea maxLength={500} rows={3} value={question} disabled={busy} onChange={e=>setQuestion(e.target.value)}/></label>
+ <button type="button" className="outline small" disabled={!joined||busy||question.trim().length<5} onClick={()=>void submit('questions',{body:question},()=>setQuestion(''))}>Invia per moderazione</button>
+ <div role="status" aria-live="polite">{status}</div>
+ <button type="button" className="outline small" disabled={busy} onClick={()=>void request<any[]>(`${prefix}/questions`).then(setQuestions).catch(e=>setStatus(String(e)))}>Aggiorna domande approvate</button>
+ {questions.length===0&&<p className="muted">Nessuna domanda approvata.</p>}
+ {questions.map(q=><div key={q.id} className="activity-row"><span>{q.body} · {q.votes} voti</span><button type="button" className="outline small" disabled={!joined||busy} onClick={()=>void submit(`questions/${q.id}/upvote`,{},()=>{})}>▲ Vota</button></div>)}
+ </section>
 }
 function TopicQuestionWidget({code,activityId,widget}:{code:string;activityId:string;widget:any}){
  const [body,setBody]=useState('');const [message,setMessage]=useState('');
@@ -133,12 +152,56 @@ function TopicPresenterList({sessionId,activityId,widget}:{sessionId:string;acti
  useEffect(()=>{let mounted=true;const refresh=()=>{void request<any>(`/sessions/${sessionId}/activities/${activityId}/topic-widgets/${encodeURIComponent(widget.id)}/questions?page=${page}`).then(v=>{if(mounted)setData(v)}).catch(()=>{})};refresh();const timer=window.setInterval(refresh,5000);return()=>{mounted=false;window.clearInterval(timer)}},[sessionId,activityId,widget.id,page]);
  return <section className="panel"><h4>{widget.label||'Domande per argomento'}</h4><p>{data.total} domande · massimo 10 per pagina</p>{data.items.map(q=><div className="activity-row" key={q.id}><span>{q.body}</span><small>{q.participant_name||'Anonimo'}</small></div>)}<button disabled={page<=1} onClick={()=>setPage(v=>v-1)}>Precedente</button><span> Pagina {page} </span><button disabled={page*10>=data.total} onClick={()=>setPage(v=>v+1)}>Successiva</button></section>
 }
+type ModerationQueue={page:number;page_size:number;total:number;total_pages:number;counts:{pending:number;approved:number;rejected:number};items:{id:string;body:string;status:'pending'|'approved'|'rejected';votes:number;created_at:string}[]};
 function PresenterAudienceExtensions({sessionId,activityId}:{sessionId:string;activityId:string}){
- const [questions,setQuestions]=useState<any[]>([]);const [words,setWords]=useState<any[]>([]);const [error,setError]=useState('');const prefix=`/sessions/${sessionId}/activities/${activityId}`;
- const refresh=()=>Promise.all([request<any[]>(`${prefix}/questions`),request<any[]>(`${prefix}/words`)]).then(([q,w])=>{setQuestions(q);setWords(w)}).catch(e=>setError(String(e)));
- useEffect(()=>{void refresh()},[sessionId,activityId]);
- async function moderate(id:string,status:'approved'|'rejected'){try{await request(`${prefix}/questions/${id}`,'PATCH',{status});await refresh()}catch(e){setError(String(e))}}
- return <section className="panel"><h3>Moderazione Q&A e nuvola di parole</h3><button className="outline small" onClick={()=>void refresh()}>Aggiorna</button><div aria-live="polite">{error}</div><h4>Parole più frequenti</h4><div className="word-cloud">{words.map(w=><span key={w.word} style={{fontSize:`${Math.min(30,14+w.count*2)}px`,marginRight:12}}>{w.word} ({w.count})</span>)}</div><h4>Domande del pubblico</h4>{questions.map(q=><div className="activity-row" key={q.id}><span>{q.body} · {q.status} · {q.votes} voti</span>{q.status==='pending'&&<div><button className="outline small" onClick={()=>void moderate(q.id,'approved')}>Approva</button><button className="outline small" onClick={()=>void moderate(q.id,'rejected')}>Rifiuta</button></div>}</div>)}</section>
+ const [filter,setFilter]=useState<'pending'|'approved'|'rejected'|'all'>('pending'),[page,setPage]=useState(1);
+ const [queue,setQueue]=useState<ModerationQueue|null>(null),[words,setWords]=useState<any[]>([]);
+ const [error,setError]=useState(''),[busy,setBusy]=useState<string|null>(null);
+ const [selectedQuestions,setSelectedQuestions]=useState<string[]>([]);
+ const prefix=`/sessions/${encodeURIComponent(sessionId)}/activities/${encodeURIComponent(activityId)}`;
+ useEffect(()=>{setPage(1);setFilter('pending');setQueue(null);setWords([]);setError('')},[sessionId,activityId]);
+ useEffect(()=>{setSelectedQuestions([]);setQueue(null)},[prefix,filter,page]);
+ async function refresh(){
+  const [q,w]=await Promise.all([request<ModerationQueue>(`${prefix}/questions/queue?status=${filter}&page=${page}`),request<any[]>(`${prefix}/words`)]);
+  setQueue(q);setWords(w);setError('');
+ }
+ useEffect(()=>{let active=true;const load=async()=>{try{
+   const [q,w]=await Promise.all([request<ModerationQueue>(`${prefix}/questions/queue?status=${filter}&page=${page}`),request<any[]>(`${prefix}/words`)]);
+   if(active){setQueue(q);setWords(w);setError('');if(q.page>q.total_pages)setPage(q.total_pages)}
+  }catch(e){if(active)setError(e instanceof Error?e.message:String(e))}};
+  void load();const timer=window.setInterval(load,6000);return()=>{active=false;window.clearInterval(timer)}
+ },[prefix,filter,page]);
+ async function bulkModerate(status:'approved'|'rejected'){
+  if(busy||selectedQuestions.length===0)return;setBusy('bulk');setError('');
+  try{await request(`${prefix}/questions/bulk`,'PATCH',{status,ids:selectedQuestions});setSelectedQuestions([]);await refresh()}
+  catch(e){setError(e instanceof Error?e.message:String(e))}finally{setBusy(null)}
+ }
+ async function moderate(id:string,status:'approved'|'rejected'){
+  if(busy)return;setBusy(id);setError('');
+  try{await request(`${prefix}/questions/${encodeURIComponent(id)}`,'PATCH',{status});await refresh();if(queue?.items.length===1&&page>1&&filter!==status)setPage(p=>p-1)}
+  catch(e){setError(e instanceof Error?e.message:String(e))}finally{setBusy(null)}
+ }
+ const counts=queue?.counts;
+ return <section className="panel" aria-label="Moderazione domande del pubblico"><h3>Moderazione Q&A e nuvola di parole</h3>
+ <button type="button" className="outline small" onClick={()=>void refresh().catch(e=>setError(String(e)))}>Aggiorna</button>
+ <p role="status" aria-live="polite">{error}</p>
+ <h4>Parole più frequenti</h4><div className="word-cloud" aria-label="Nuvola di parole">{words.length?words.map(w=><span key={w.word} style={{fontSize:`${Math.min(30,14+w.count*2)}px`,marginRight:12}}>{w.word} ({w.count})</span>):<p className="muted">Ancora nessuna parola.</p>}</div>
+ <h4>Domande del pubblico</h4>
+ <div className="downloads" role="group" aria-label="Moderazione multipla">
+ <button type="button" className="outline small" disabled={!queue?.items.length||!!busy} onClick={()=>setSelectedQuestions(queue?.items.map(q=>q.id)||[])}>Seleziona pagina</button>
+ <button type="button" className="outline small" disabled={!selectedQuestions.length||!!busy} onClick={()=>setSelectedQuestions([])}>Deseleziona</button>
+ <button type="button" className="outline small" disabled={!selectedQuestions.length||!!busy} onClick={()=>void bulkModerate('approved')}>Approva selezionate ({selectedQuestions.length})</button>
+ <button type="button" className="outline small" disabled={!selectedQuestions.length||!!busy} onClick={()=>void bulkModerate('rejected')}>Rifiuta selezionate ({selectedQuestions.length})</button>
+ </div>
+ {counts&&<p className="muted" aria-live="polite">In attesa: {counts.pending} · Approvate: {counts.approved} · Rifiutate: {counts.rejected}</p>}
+ <label>Filtro domande<select value={filter} onChange={e=>{setPage(1);setFilter(e.target.value as typeof filter)}}><option value="pending">In attesa</option><option value="approved">Approvate</option><option value="rejected">Rifiutate</option><option value="all">Tutte</option></select></label>
+ {queue?.items.length===0&&<p className="muted">Nessuna domanda in questa categoria.</p>}
+ {queue?.items.map(q=><div className="activity-row" key={q.id}><label className="small"><input type="checkbox" aria-label={`Seleziona domanda ${q.body}`} checked={selectedQuestions.includes(q.id)} disabled={!!busy} onChange={e=>setSelectedQuestions(old=>e.target.checked?[...old,q.id]:old.filter(id=>id!==q.id))}/>{q.body} · {q.status} · {q.votes} voti</label><div className="row-actions">
+ {q.status!=='approved'&&<button type="button" className="outline small" disabled={!!busy} onClick={()=>void moderate(q.id,'approved')}>Approva</button>}
+ {q.status!=='rejected'&&<button type="button" className="outline small" disabled={!!busy} onClick={()=>void moderate(q.id,'rejected')}>Rifiuta</button>}
+ </div></div>)}
+ {queue&&<nav aria-label="Pagine della moderazione"><button type="button" className="outline small" disabled={page<=1} onClick={()=>setPage(p=>Math.max(1,p-1))}>Precedente</button><span> Pagina {page} di {queue.total_pages} · {queue.total} domande </span><button type="button" className="outline small" disabled={page>=queue.total_pages} onClick={()=>setPage(p=>p+1)}>Successiva</button></nav>}
+ </section>
 }
 function PresenterProfileWidget({code,presenterId,label}:{code:string;presenterId?:string;label?:string}){const [profiles,setProfiles]=useState<any[]>([]);useEffect(()=>{fetch(`/api/join/${encodeURIComponent(code)}/presenter-profiles`).then(r=>r.ok?r.json():[]).then(setProfiles).catch(()=>setProfiles([]))},[code]);const chosen=presenterId?profiles.filter(p=>p.id===presenterId):profiles.slice(0,1);return <div className="page-widget"><strong>{label||'Presentatore'}</strong>{chosen.map(p=><div key={p.id}>{p.photo_url&&<img src={p.photo_url} alt="Foto presentatore" style={{maxWidth:96,maxHeight:96,borderRadius:'50%'}}/>}<p>{p.name}</p></div>)}</div>}
 function QuestionWidget({code,activityId,widget}:{code:string;activityId:string;widget:any}){
