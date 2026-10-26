@@ -33,10 +33,12 @@ WITH deleted AS (
  RETURNING session_id
 ) SELECT session_id AS id FROM queued`;
 
-/** Workers claim batches without racing other replicas; a crash expires the lease. */
+/** Workers claim batches without racing other replicas; a crash expires the lease.
+ * Truncate to JavaScript Date milliseconds so equality-fenced ACKs can match.
+ */
 export const SESSION_CLEANUP_CLAIM_SQL = `
 UPDATE session_asset_cleanup_jobs
-SET claimed_until=now()+interval '5 minutes', attempts=attempts+1
+SET claimed_until=date_trunc('milliseconds', now()+interval '5 minutes'), attempts=attempts+1
 WHERE session_id IN (
  SELECT session_id FROM session_asset_cleanup_jobs
  WHERE claimed_until IS NULL OR claimed_until < now()

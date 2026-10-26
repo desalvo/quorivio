@@ -46,6 +46,9 @@ test('retention: automated purge atomically enqueues filesystem erasure',()=>{
  assert.match(SESSION_RETENTION_PURGE_SQL,/SELECT id FROM deleted/);
  assert.match(SESSION_RETENTION_PURGE_SQL,/COALESCE\(closed_at, expires_at\)/);
 });
+test('session directory lease round-trips through millisecond-resolution JavaScript Dates',()=>{
+ assert.match(SESSION_CLEANUP_CLAIM_SQL,/claimed_until=date_trunc\('milliseconds', now\(\)\+interval '5 minutes'\)/);
+});
 test('retention: cleanup workers lease work without colliding across replicas',()=>{
  assert.match(SESSION_CLEANUP_CLAIM_SQL,/FOR UPDATE SKIP LOCKED/);
  assert.match(SESSION_CLEANUP_CLAIM_SQL,/claimed_until < now\(\)/);

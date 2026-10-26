@@ -25,6 +25,13 @@ test('SQL: atomic metadata erasure and durable per-file enqueue',()=>{
 test('SQL: claim is bounded, replica-safe and due-time scoped',()=>{
  for(const fragment of [/FOR UPDATE SKIP LOCKED/,/LIMIT 50/,/next_attempt_at<=now\(\)/,/attempts=attempts\+1/,/claimed_until < now\(\)/,/RETURNING session_id,asset_id,claimed_until/])assert.match(ASSET_ERASURE_CLAIM_SQL,fragment);
 });
+test('asset lease round-trips through the millisecond-resolution Node PostgreSQL driver',()=>{
+ // Without this truncation PostgreSQL records microseconds which node-postgres
+ // discards, so a worker can delete the file but never ACK or retry its job.
+ assert.match(ASSET_ERASURE_CLAIM_SQL,/claimed_until=date_trunc\('milliseconds', now\(\)\+interval '5 minutes'\)/);
+ assert.match(ASSET_ERASURE_ACK_SQL,/claimed_until=\$3/);
+ assert.match(ASSET_ERASURE_RETRY_SQL,/claimed_until=\$3/);
+});
 test('SQL: completion and retry are both fenced by lease and asset identity',()=>{
  for(const query of [ASSET_ERASURE_ACK_SQL,ASSET_ERASURE_RETRY_SQL]) {
   for(const fragment of [/session_id=\$1/,/asset_id=\$2/,/claimed_until=\$3/])assert.match(query,fragment);

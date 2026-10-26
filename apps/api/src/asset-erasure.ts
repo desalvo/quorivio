@@ -16,10 +16,13 @@ WITH deleted AS (
  RETURNING session_id,asset_id
 ) SELECT asset_id AS id FROM queued`;
 
-/** A lease is shared by replicas but scoped to each file, not its session. */
+/** A lease is shared by replicas but scoped to each file, not its session.
+ * PostgreSQL stores microseconds while node-postgres Date values keep only milliseconds.
+ * Truncate *when claiming*, otherwise ACK/RETRY fences never match returned lease values.
+ */
 export const ASSET_ERASURE_CLAIM_SQL = `
 UPDATE session_asset_file_cleanup_jobs
-SET claimed_until=now()+interval '5 minutes', attempts=attempts+1
+SET claimed_until=date_trunc('milliseconds', now()+interval '5 minutes'), attempts=attempts+1
 WHERE (session_id,asset_id) IN (
  SELECT session_id,asset_id FROM session_asset_file_cleanup_jobs
  WHERE (claimed_until IS NULL OR claimed_until < now())
@@ -91,7 +94,7 @@ export const PROFILE_ERASURE_ENQUEUE_SQL = `INSERT INTO profile_photo_cleanup_jo
  VALUES($1) ON CONFLICT(photo_id) DO UPDATE SET
  next_attempt_at=now(),claimed_until=NULL,last_error=NULL`;
 export const PROFILE_ERASURE_CLAIM_SQL = `UPDATE profile_photo_cleanup_jobs
- SET claimed_until=now()+interval '5 minutes', attempts=attempts+1
+ SET claimed_until=date_trunc('milliseconds', now()+interval '5 minutes'), attempts=attempts+1
  WHERE photo_id IN (
  SELECT photo_id FROM profile_photo_cleanup_jobs
  WHERE (claimed_until IS NULL OR claimed_until<now()) AND next_attempt_at<=now()

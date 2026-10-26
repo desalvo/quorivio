@@ -22,6 +22,11 @@ test('profile cleanup schema commands are idempotent and lease fenced',()=>{
  }
  assert.match(PROFILE_ERASURE_RETRY_SQL,/LEAST\(3600/);
 });
+test('profile lease round-trips through the millisecond-resolution PostgreSQL Date parser',()=>{
+ assert.match(PROFILE_ERASURE_CLAIM_SQL,/claimed_until=date_trunc\('milliseconds', now\(\)\+interval '5 minutes'\)/);
+ assert.match(PROFILE_ERASURE_ACK_SQL,/claimed_until=\$2/);
+ assert.match(PROFILE_ERASURE_RETRY_SQL,/claimed_until=\$2/);
+});
 test('unlink only the old photo while keeping current photo',async()=>{
  const root=await setup();try{
   const other=randomUUID();await writeFile(path.join(root,'profile-photos',photo),'old');

@@ -44,6 +44,15 @@ try {
  const queued=await client.query('SELECT session_id FROM session_asset_cleanup_jobs WHERE session_id=ANY($1::uuid[])',[[due,expired,manual]]);
  assert.equal(queued.rowCount,3,'every deletion must have durable cleanup work');
  const claims=await client.query(SESSION_CLEANUP_CLAIM_SQL);
+ assert.ok(claims.rows.every(row=>row.claimed_until instanceof Date),'session leases must decode as JavaScript Dates');
+ // Validate the third (session-directory) worker's exact lease ACK using the
+ // same timestamp returned by node-postgres, not a server-side expression.
+ const dueClaim=claims.rows.find(row=>row.session_id===due);
+ assert.ok(dueClaim,'due session cleanup must be claimable');
+ const staleAck=await client.query('DELETE FROM session_asset_cleanup_jobs WHERE session_id=$1 AND claimed_until=$2',[due,new Date(dueClaim.claimed_until.getTime()+1)]);
+ assert.equal(staleAck.rowCount,0,'superseded lease must never ACK another worker');
+ const claimedAck=await client.query('DELETE FROM session_asset_cleanup_jobs WHERE session_id=$1 AND claimed_until=$2',[due,dueClaim.claimed_until]);
+ assert.equal(claimedAck.rowCount,1,'session cleanup ACK must match its Node Date lease');
  assert.ok(claims.rows.some(row=>row.session_id===manual),'manual erasure must be claimable');
  const twice=await client.query(SESSION_CLEANUP_CLAIM_SQL);
  assert.ok(!twice.rows.some(row=>row.session_id===manual),'leased job must not be claimed twice');
@@ -66,6 +75,8 @@ try {
  await writeFile(path.join(fixtureRoot,held,asset),'private');
  const otherFile=id();await writeFile(path.join(fixtureRoot,held,otherFile),'preserve');
  const assetSummary=await drainAssetErasureJobs(client,fixtureRoot);
+ assert.equal(assetSummary.claimed,1,'one file outbox job must be claimed in clean CI');
+ assert.equal(assetSummary.retryQueued,0,'file removal and ACK must not need a retry');
  assert.ok(assetSummary.erased>=1,'physical file worker must acknowledge after actual unlink');
  await assert.rejects(stat(path.join(fixtureRoot,held,asset)),{code:'ENOENT'});
  assert.equal(await readFile(path.join(fixtureRoot,held,otherFile),'utf8'),'preserve');
@@ -75,6 +86,8 @@ try {
  await writeFile(path.join(fixtureRoot,'profile-photos',photo),'private-profile');
  await client.query(PROFILE_ERASURE_ENQUEUE_SQL,[photo]);
  const photoSummary=await drainProfileErasureJobs(client,fixtureRoot);
+ assert.equal(photoSummary.claimed,1,'one avatar outbox job must be claimed in clean CI');
+ assert.equal(photoSummary.retryQueued,0,'avatar removal and ACK must not need a retry');
  assert.ok(photoSummary.erased>=1);
  await assert.rejects(stat(path.join(fixtureRoot,'profile-photos',photo)),{code:'ENOENT'});
  assert.equal((await client.query('SELECT count(*)::int AS n FROM profile_photo_cleanup_jobs WHERE photo_id=$1',[photo])).rows[0].n,0);

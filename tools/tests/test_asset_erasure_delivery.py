@@ -55,6 +55,13 @@ class ErasureContracts(unittest.TestCase):
   self.assertIn('drainAssetErasureJobs',CI)
   self.assertIn('drainProfileErasureJobs',CI)
   self.assertIn('cross-session deletion',CI)
+ def test_all_worker_leases_survive_postgres_node_timestamp_roundtrip(self):
+  session=(R/'apps/api/src/session-retention.ts').read_text()
+  self.assertEqual(WORKER.count("claimed_until=date_trunc('milliseconds', now()+interval '5 minutes')"),2)
+  self.assertEqual(session.count("claimed_until=date_trunc('milliseconds', now()+interval '5 minutes')"),1)
+  self.assertIn('claimed_until=$2',SRC)
+  self.assertIn('claimed_until=$3',WORKER)
+  self.assertIn('claimed_until=$2',WORKER)
  def test_no_reliance_on_public_profile_photo_endpoint(self):
   self.assertIn('publicPresenterProfiles',SRC)
   self.assertIn('profilePhotoId(url)',SRC)
