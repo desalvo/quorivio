@@ -94,6 +94,9 @@ async def main():
    first=await call(context,'PATCH',path,draft())
    assert first['design_revision']==2
    await open_editor(page,title)
+   await page.get_by_role('button',name='Apri menu contestuale canvas, sfondi e proprietà pagina').click()
+   if not await page.locator('.canvas-accessible-controls').get_attribute('open'):
+    await page.locator('.canvas-accessible-controls > summary').click()
    canvas=page.locator('.widget-canvas-item')
    await expect(canvas).to_have_count(3)
    assert await canvas.evaluate_all('(els)=>els.map(e=>parseFloat(e.style.left))')==[10,40,75]
@@ -102,6 +105,7 @@ async def main():
    checks=region.get_by_role('checkbox',name='Seleziona')
    await checks.nth(0).check();await checks.nth(1).check()
    await page.get_by_role('button',name='Sposta selezione a destra').click()
+   await page.get_by_role('button',name='Apri menu contestuale canvas, sfondi e proprietà pagina').click()
    assert (await canvas.evaluate_all('(els)=>els.map(e=>parseFloat(e.style.left))'))[:2]==[11,41]
    await page.get_by_role('button',name='Salva layout').click()
    await expect(page.get_by_text('Layout domanda e risultati aggiornato')).to_be_visible()
@@ -109,6 +113,9 @@ async def main():
    saved=next(x for x in persisted['activities'] if x['id']==aid)
    assert saved['design_revision']==3 and [w['position']['x'] for w in saved['page_design']['widgets'][:2]]==[11,41]
    await open_editor(page,title)
+   await page.get_by_role('button',name='Apri menu contestuale canvas, sfondi e proprietà pagina').click()
+   if not await page.locator('.canvas-accessible-controls').get_attribute('open'):
+    await page.locator('.canvas-accessible-controls > summary').click()
    assert (await canvas.evaluate_all('(els)=>els.map(e=>parseFloat(e.style.left))'))[:2]==[11,41]
    # Simulate a collaborator changing ONLY the label after this editor loaded.
    # Reusing draft('Remote collaborator') here would reset x=11 to x=10 and
@@ -127,6 +134,7 @@ async def main():
    region=page.get_by_role('region',name='Organizzazione accessibile dei widget')
    await region.get_by_role('checkbox',name='Seleziona').first.check()
    await page.get_by_role('button',name='Sposta selezione a destra').click()
+   await page.get_by_role('button',name='Apri menu contestuale canvas, sfondi e proprietà pagina').click()
    await page.get_by_role('button',name='Salva layout').click()
    await expect(page.get_by_role('alert').filter(has_text='Un altro presentatore')).to_be_visible()
    await expect(page.get_by_role('button',name='Salva layout')).to_be_disabled()

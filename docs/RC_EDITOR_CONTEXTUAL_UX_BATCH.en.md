@@ -1,0 +1,5 @@
+# Quorivio — contextual page editor UX batch (2026-10-26)
+
+See `DEVELOPMENT_STATUS.md` for baseline and verification. This batch replaces the editor ribbon with a right-hand icon-only toolbox, contextual canvas/widget settings, selected/drag-sortable 16:9 slide thumbnails, and thumbnail context actions (insert before/after, duplicate, delete, reorder). Tooltips respond to hover, focus and touch; menu text controls also expose touch help. A decorative photorealistic alpine visual is bundled locally; it is not saved as the presentation background. All changes preserve the existing persistence APIs and session activity identifiers.
+
+**Validation:** 135 focused Python tests PASS, TSX AST PASS, Python fixtures compile. Existing CI Chromium tests were adapted to deliberately open contextual tools and verify thumbnail menus and accessible tooltips. GitHub CI, browser visual verification and full TypeScript/Vite build remain mandatory. RC 48.0% unchanged. Docker publication remains opt-in; no commit/push/tag/release.

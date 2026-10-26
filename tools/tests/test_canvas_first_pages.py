@@ -20,7 +20,10 @@ class CanvasFirstPageTests(unittest.TestCase):
         self.assertIn("await cx.query('ROLLBACK').catch(()=>{})", self.api)
 
     def test_canvas_page_creation_opens_widget_editor(self):
-        self.assertIn('async function createCanvasPage()', self.web)
+        self.assertIn('async function createCanvasPageAt(anchorId?:string', self.web)
+        self.assertIn('function createCanvasPage(){return createCanvasPageAt()}',self.web)
+        self.assertIn("void createCanvasPageAt(a.id,'before')",self.web)
+        self.assertIn("void createCanvasPageAt(a.id,'after')",self.web)
         self.assertIn('beginPageDesign(page)', self.web)
         self.assertIn('onClick={createCanvasPage}', self.web)
         self.assertIn('Crea contenuti con i widget', self.web)

@@ -23,7 +23,7 @@ class FullPageEditorTests(unittest.TestCase):
         self.assertIn('current_activity_id=NULL',section)
         self.assertIn('await broadcast(req.params.id)',section)
     def test_editor_navigation_and_actions(self):
-        for text in ['page-editor-sidebar','page-editor-thumbnails','page-editor-thumb-actions','deleteCanvasPage','duplicatePage','Modifica le pagine','widget-palette']:
+        for text in ['page-editor-sidebar','page-editor-thumbnails','page-editor-thumb-menu','deleteCanvasPage','duplicatePage','Modifica le pagine','editor-widget-rail']:
             self.assertIn(text,WEB)
         self.assertIn('position:fixed!important;inset:0',CSS)
         self.assertIn('overflow-y:auto',CSS)

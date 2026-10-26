@@ -208,6 +208,14 @@ jobs:
           QUORIVIO_CI_MODERATION_TEST: '1'
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
         run: python3 tools/ci_audience_moderation_postgres.py
+      - name: PostgreSQL timed-widget fairness, retry and topic concurrency acceptance
+        env:
+          QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
+          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
+          QUORIVIO_CI_TIMED_TEST: '1'
+          DATABASE_URL: postgres://quorivio:ci-only-secret@127.0.0.1:5432/quorivio
+        run: python3 tools/ci_timed_widgets_postgres.py
+
       - name: PostgreSQL editor concurrent authoring and conflict E2E
         env:
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}

@@ -12,16 +12,18 @@ class PageEditorFollowupTests(unittest.TestCase):
     def test_duplicate_opens_newly_created_page(self):
         self.assertIn('const previousIds=new Set(snap?.activities.map(a=>a.id)||[])', self.ui)
         self.assertIn('const copy=updated.activities.find(a=>!previousIds.has(a.id))', self.ui)
-        self.assertIn('if(copy)beginPageDesign(copy)', self.ui)
+        self.assertIn('if(copy)beginPageDesign(updated.activities.find(a=>a.id===copy.id)||copy)', self.ui)
+        self.assertIn('ids.splice(at+1,0,copy.id)', self.ui)
 
     def test_thumbnail_keyboard_selection(self):
-        self.assertIn('"ArrowUp","ArrowDown","Home","End"', self.ui)
-        self.assertIn('requestAnimationFrame(()=>document.querySelectorAll<HTMLButtonElement>(".page-editor-thumb")[pos]?.focus())', self.ui)
+        self.assertIn("['ArrowUp','ArrowDown','Home','End']", self.ui)
+        self.assertIn("requestAnimationFrame(()=>document.querySelectorAll<HTMLButtonElement>('.page-editor-thumb')[to]?.focus())",self.ui)
 
     def test_closed_session_actions_disabled(self):
-        for action in ('title="Duplica"', 'title="Elimina"', 'title="Sposta su"', 'title="Sposta giù"'):
-            pos = self.ui.index(action)
-            self.assertIn("snap.session.status==='closed'", self.ui[pos:pos+140])
+        self.assertIn("{snap.session.status!=='closed'&&<>",self.ui)
+        for action in ('Nuova pagina prima','Nuova pagina dopo','Duplica pagina','Sposta su','Sposta giù','Elimina pagina'):
+            self.assertIn(action,self.ui)
+        self.assertIn("draggable={snap.session.status!=='closed'&&!pageOrderPending}",self.ui)
 
 if __name__ == '__main__':
     unittest.main()

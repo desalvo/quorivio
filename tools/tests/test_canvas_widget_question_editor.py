@@ -6,7 +6,7 @@ SOURCE=(ROOT/'apps/web/src/main.tsx').read_text()
 
 class WidgetQuestionEditorRegression(unittest.TestCase):
     def test_editing_panel_is_embedded_in_canvas(self):
-        self.assertIn('{questionEditor}{cropEditor}{shapePaintEditor}<div className="canvas-editor-tools">',SOURCE)
+        self.assertIn('contextWidget&&<div className="canvas-context-properties">{questionEditor}{cropEditor}{shapePaintEditor}</div>',SOURCE)
     def test_question_modes(self):
         self.assertIn('Modalità risposta widget',SOURCE)
         self.assertIn('<option value="multiple">',SOURCE)

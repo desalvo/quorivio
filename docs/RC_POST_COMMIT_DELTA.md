@@ -1,28 +1,23 @@
-# Quorivio RC — Post-commit cumulative delta (2026-10-26)
+# Post-commit cumulative delta — Quorivio RC timed fairness / topic quota
 
-**Verified committed baseline:** `c44a3cb884b37ad20cc8c46203e16c24c6520412` (GitHub Actions `40359804334`: production quality and container build SUCCESS; publication SKIPPED). Only changes after this commit are listed below.
+- Verified baseline: `d4ccead518f00ce00f6cd58cb0ff93fc81a26f91` (CI standard 40368807527 and full browser 40369919680 GREEN).
+- This package contains the full Quorivio source, including all baseline files, and only post-baseline changes.
+- Mandatory next GitHub gate: Python real PostgreSQL timed fairness/topic concurrent acceptance, Node/Python suites, API/web build, container build. Publishing must remain SKIPPED.
+- RC gate status: **48.0%, unchanged** pending CI and independent cross-browser/accessibility acceptance.
 
-## Modified baseline files (11)
+## Modified relative to the committed baseline
+- `quorivio/.github/workflows/ci.yml`
+- `quorivio/apps/api/src/server.ts`
+- `quorivio/apps/web/src/main.tsx`
+- `quorivio/docs/DEVELOPMENT_STATUS.it.md`
+- `quorivio/docs/DEVELOPMENT_STATUS.md`
+- `quorivio/docs/RC_GATE_MATRIX.json`
 
-- `.github/workflows/ci.yml`
-- `apps/api/src/audience-tools.ts`
-- `apps/api/src/server.ts`
-- `apps/api/test/audience-tools.test.ts`
-- `apps/web/src/main.tsx`
-- `docs/DEVELOPMENT_STATUS.md`
-- `docs/DEVELOPMENT_STATUS.it.md`
-- `docs/RC_GATE_MATRIX.json`
-- `docs/RC_READINESS_REPORT.json`
-- `docs/RC_POST_COMMIT_DELTA.md` (this manifest)
-- `tools/ci_browser_participant.py`
+## New files relative to the committed baseline
+- `quorivio/apps/api/test/timed-fairness-contract.test.ts`
+- `quorivio/docs/RC_TIMED_AUDIENCE_FAIRNESS_BATCH.en.md`
+- `quorivio/docs/RC_TIMED_AUDIENCE_FAIRNESS_BATCH.it.md`
+- `quorivio/tools/ci_timed_widgets_postgres.py`
+- `quorivio/tools/tests/test_timed_widget_delivery.py`
 
-## New files (4)
-
-- `tools/ci_audience_moderation_postgres.py`
-- `tools/tests/test_audience_moderation_delivery.py`
-- `docs/RC_MODERATION_CONCURRENCY_BATCH.en.md`
-- `docs/RC_MODERATION_CONCURRENCY_BATCH.it.md`
-
-All 548 files from the committed baseline remain present and no baseline file has been removed. See the two B3 reports for the audited, 40-item functional/security/acceptance inventory.
-
-No commit, push, tag, release or image publication performed in this batch. Production publication remains strictly manual opt-in.
+**Note:** This manifest is the sole additional generated file and is not included in its own diff table. No baseline file was removed.

@@ -71,8 +71,23 @@ async def main():
     await session_card.get_by_role('button',name='Apri sessione').click()
     await page.get_by_role('button',name='✎ Modifica le pagine').first.click()
     await page.get_by_role('group',name='Canvas grafico widget').wait_for()
+    # Thumbnail context actions are available with mouse, keyboard and touch, without a permanent action strip.
+    thumb_menu=page.get_by_role('button',name='Menu pagina 1: crea, duplica, elimina, sposta')
+    await thumb_menu.click()
+    actions=page.get_by_role('group',name='Azioni pagina 1')
+    await expect(actions.get_by_role('button',name='Nuova pagina prima')).to_be_visible()
+    await expect(actions.get_by_role('button',name='Nuova pagina dopo')).to_be_visible()
+    await expect(actions.get_by_role('button',name='Duplica pagina')).to_be_visible()
+    await expect(actions.get_by_role('button',name='Elimina pagina')).to_be_visible()
+    await thumb_menu.click()
+    icon=page.get_by_role('button',name='Aggiungi widget: Testo')
+    await icon.hover()
+    await expect(page.get_by_role('tooltip').filter(has_text='Aggiungi widget: Testo')).to_be_visible()
+    # The ribbon was removed: arrangement tools are available only via the canvas context.
+    await page.locator('.canvas-accessible-controls > summary').click()
     await page.locator('.widget-canvas-item').first.click()
     await page.locator('.widget-canvas-item').nth(1).click(modifiers=['Shift'])
+    await page.get_by_role('button',name='Apri menu contestuale canvas, sfondi e proprietà pagina').click()
     assert await page.get_by_role('group',name='Allineamento widget selezionati').get_by_text('2 selezionati').count()==1
     await page.get_by_role('button',name='Sinistra',exact=True).click()
     coords=await page.locator('.widget-canvas-item').evaluate_all('(els)=>els.map(e=>parseFloat(e.style.left))')
@@ -162,6 +177,7 @@ async def main():
     assert coords[:2]==[11,11],coords
     # Keyboard-only editing on the saved document: multi-selection is retained
     # while arrows move the group; Delete removes it; both operations undo.
+    await page.locator('.canvas-accessible-controls > summary').click()
     accessible=page.get_by_role('region',name='Organizzazione accessibile dei widget')
     checks=accessible.get_by_role('checkbox',name='Seleziona')
     await checks.nth(0).check()
@@ -193,6 +209,8 @@ async def main():
      await card.get_by_role('button',name='Apri sessione').click()
      await mobile.get_by_role('button',name='✎ Modifica le pagine').first.click()
      await expect(mobile.get_by_role('group',name='Canvas grafico widget')).to_be_visible()
+     await mobile.get_by_role('button',name='Apri menu contestuale canvas, sfondi e proprietà pagina').tap()
+     await mobile.locator('.canvas-accessible-controls > summary').click()
      mchecks=mobile.get_by_role('region',name='Organizzazione accessibile dei widget').get_by_role('checkbox',name='Seleziona')
      await mchecks.nth(0).check()
      await mchecks.nth(1).check()

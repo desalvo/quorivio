@@ -1258,15 +1258,25 @@ app.get('/api/sessions/:id/reactions/stats',requireAuth,async(req,res)=>{try{
  res.json({by_page:groups,by_user:perUser,by_session:groups.reduce((acc:any,row:any)=>{acc[row.emoji]=(acc[row.emoji]||0)+row.count;return acc},{})});
  }catch(e){sendError(res,e)}});
 // Each topic widget has its own question stream; it never modifies quiz results.
-app.post('/api/join/:code/activities/:aid/topic-widgets/:wid/questions',async(req,res)=>{try{
- const who=await audienceIdentity(req,req.params.code,req.params.aid);if(!who){res.status(403).json({error:'join_or_open_activity_required'});return}
+// Topic-widget questions are serialized per participant: concurrent requests must
+// never bypass the ten-question quota or write after the page has been closed.
+app.post('/api/join/:code/activities/:aid/topic-widgets/:wid/questions',async(req,res)=>{let cx:pg.PoolClient|undefined;try{
  const body=req.body?.body;if(typeof body!=='string'||body.trim().length<5||body.length>2000){res.status(400).json({error:'invalid_topic_question'});return}
- const a=await db.query('SELECT page_design FROM activities WHERE id=$1 AND session_id=$2',[req.params.aid,who.sessionId]);
- if(!a.rows[0]?.page_design?.widgets?.some((w:any)=>w.id===req.params.wid&&w.kind==='topic-question')){res.status(404).json({error:'topic_widget_not_found'});return}
- const count=await db.query('SELECT count(*)::int AS n FROM topic_widget_questions WHERE participant_id=$1 AND activity_id=$2 AND widget_id=$3',[who.participantId,req.params.aid,req.params.wid]);
- if(count.rows[0].n>=10){res.status(429).json({error:'topic_question_limit'});return}
- await db.query('INSERT INTO topic_widget_questions(id,session_id,activity_id,widget_id,participant_id,body) VALUES($1,$2,$3,$4,$5,$6)',[randomUUID(),who.sessionId,req.params.aid,req.params.wid,who.participantId,body.trim()]);await broadcast(who.sessionId);res.status(201).json({ok:true});
- }catch(e){sendError(res,e)}});
+ const who=await audienceIdentity(req,req.params.code,req.params.aid);
+ if(!who){res.status(403).json({error:'join_or_open_activity_required'});return}
+ cx=await db.connect();await cx.query('BEGIN');
+ if(!await lockAudiencePage(cx,who.sessionId,req.params.aid)){await cx.query('ROLLBACK');res.status(409).json({error:'activity_not_open'});return}
+ const a=await cx.query('SELECT page_design FROM activities WHERE id=$1 AND session_id=$2',[req.params.aid,who.sessionId]);
+ if(!a.rows[0]?.page_design?.widgets?.some((w:any)=>w.id===req.params.wid&&w.kind==='topic-question')){await cx.query('ROLLBACK');res.status(404).json({error:'topic_widget_not_found'});return}
+ // A participant row lock serializes all replicas writing the same participant's
+ // questions. The activity lock above also fences page edits and removal.
+ await cx.query('SELECT id FROM participants WHERE id=$1 AND session_id=$2 FOR UPDATE',[who.participantId,who.sessionId]);
+ const count=await cx.query('SELECT count(*)::int AS n FROM topic_widget_questions WHERE participant_id=$1 AND activity_id=$2 AND widget_id=$3',[who.participantId,req.params.aid,req.params.wid]);
+ if(count.rows[0].n>=10){await cx.query('ROLLBACK');res.status(429).json({error:'topic_question_limit'});return}
+ await cx.query('INSERT INTO topic_widget_questions(id,session_id,activity_id,widget_id,participant_id,body) VALUES($1,$2,$3,$4,$5,$6)',[randomUUID(),who.sessionId,req.params.aid,req.params.wid,who.participantId,body.trim()]);
+ await cx.query('COMMIT');cx.release();cx=undefined;
+ await notifyAudience(who.sessionId);res.status(201).json({ok:true});
+ }catch(e){if(cx)try{await cx.query('ROLLBACK')}catch{}sendError(res,e)}finally{cx?.release()}});
 app.get('/api/sessions/:id/activities/:aid/topic-widgets/:wid/questions',requireAuth,async(req,res)=>{try{
  const session=await owner(req.params.id,auth(req)!);if(!session){res.status(404).end();return}
  const a=await db.query('SELECT page_design FROM activities WHERE id=$1 AND session_id=$2',[req.params.aid,session.id]);
@@ -1286,10 +1296,10 @@ function widgetCorrectOptionIds(widget:any):string[]{
  return Array.isArray(widget.correctOptionIds)&&widget.correctOptionIds.length===1?widget.correctOptionIds:[];
 }
 // Question widgets have independent submissions; an activity's primary answer is unaffected.
-app.post('/api/join/:code/activities/:aid/widgets/:wid/respond',async(req,res)=>{const cx=await db.connect();try{
+app.post('/api/join/:code/activities/:aid/widgets/:wid/respond',async(req,res)=>{let cx:pg.PoolClient|undefined;try{
  const who=await audienceIdentity(req,req.params.code,req.params.aid);
  if(!who){res.status(403).json({error:'join_or_open_activity_required'});return}
- await cx.query('BEGIN');
+ cx=await db.connect();await cx.query('BEGIN');
  // Recheck the live session under a shared row lock. The earlier identity check can
  // become stale if the presenter pauses, closes, or switches pages concurrently.
  // Lock session first, matching the presenter publication transaction lock order.
@@ -1315,6 +1325,10 @@ app.post('/api/join/:code/activities/:aid/widgets/:wid/respond',async(req,res)=>
  if(answer.assetId){const owned=await cx.query('SELECT id FROM session_assets WHERE id=$1 AND session_id=$2 AND (participant_id IS NULL OR participant_id=$3)',[answer.assetId,who.sessionId,who.participantId]);if(!owned.rowCount){await cx.query('ROLLBACK');res.status(400).json({error:'attachment_not_in_session'});return}}
  const rev=await cx.query('SELECT coalesce(max(revision),1)::int AS revision FROM widget_revisions WHERE activity_id=$1 AND widget_id=$2',[req.params.aid,req.params.wid]);
  const revision=Number(rev.rows[0].revision);
+ // A retry of a committed answer remains idempotent even when the timer has
+ // subsequently expired. Never overwrite the first answer or change its score.
+ const existing=await cx.query('SELECT id FROM widget_answers WHERE activity_id=$1 AND participant_id=$2 AND widget_id=$3 AND revision=$4',[req.params.aid,who.participantId,req.params.wid,revision]);
+ if(existing.rowCount){await cx.query('COMMIT');res.json({ok:true,already_submitted:true,revision});return}
  const correctIds=timed?widgetCorrectOptionIds(widget):[];
  const correct=timed&&answer.optionIds.length===correctIds.length&&answer.optionIds.every((id:string)=>correctIds.includes(id));
  // Read PostgreSQL's wall clock immediately before the write, not at the start of
@@ -1328,8 +1342,8 @@ app.post('/api/join/:code/activities/:aid/widgets/:wid/respond',async(req,res)=>
   if(!timing.valid){await cx.query('ROLLBACK');res.status(409).json({error:'timer_elapsed'});return}
  }
  const r=await cx.query('INSERT INTO widget_answers(id,session_id,activity_id,participant_id,widget_id,answer_mode,answer_payload,revision,correct,elapsed_ms) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) ON CONFLICT(activity_id,participant_id,widget_id,revision) DO NOTHING RETURNING id',[randomUUID(),who.sessionId,req.params.aid,who.participantId,req.params.wid,mode,JSON.stringify(answer),revision,timed?correct:null,elapsed]);
- await cx.query('COMMIT');if(r.rowCount)await broadcast(who.sessionId);res.json({ok:true,already_submitted:!r.rowCount,revision});
- }catch(e){await cx.query('ROLLBACK');sendError(res,e)}finally{cx.release()}});
+ await cx.query('COMMIT');cx.release();cx=undefined;if(r.rowCount)await notifyAudience(who.sessionId);res.json({ok:true,already_submitted:!r.rowCount,revision});
+ }catch(e){if(cx)try{await cx.query('ROLLBACK')}catch{}sendError(res,e)}finally{cx?.release()}});
 app.get('/api/sessions/:id/widget-answers',requireAuth,async(req,res)=>{try{
  const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}
  const r=await db.query('SELECT activity_id,widget_id,revision,answer_mode,count(*)::int AS responses FROM widget_answers WHERE session_id=$1 GROUP BY activity_id,widget_id,revision,answer_mode ORDER BY activity_id,widget_id,revision',[s.id]);
@@ -1352,8 +1366,12 @@ app.get('/api/sessions/:id/activities/:aid/widgets/:wid/timed-leaderboard',requi
  const rev=await db.query('SELECT coalesce(max(revision),1)::int AS revision FROM widget_revisions WHERE activity_id=$1 AND widget_id=$2',[req.params.aid,req.params.wid]);
  const revision=Number(rev.rows[0].revision),page=parseLeaderboardPage(req.query.page);if(page===null){res.status(400).json({error:'invalid_pagination'});return}const size=20;
  const stats=await db.query('SELECT count(*)::int AS answers,count(*) FILTER (WHERE correct IS TRUE)::int AS correct FROM widget_answers WHERE activity_id=$1 AND widget_id=$2 AND revision=$3',[req.params.aid,req.params.wid,revision]);
- const ranked=await db.query(`SELECT p.pseudonym AS participant_name,w.elapsed_ms AS duration_ms,w.submitted_at FROM widget_answers w JOIN participants p ON p.id=w.participant_id WHERE w.activity_id=$1 AND w.widget_id=$2 AND w.revision=$3 AND w.correct IS TRUE AND w.elapsed_ms IS NOT NULL ORDER BY w.elapsed_ms,w.submitted_at,w.id LIMIT $4 OFFSET $5`,[req.params.aid,req.params.wid,revision,size,(page-1)*size]);
- res.json({widget_id:req.params.wid,revision,opened_at:a.rows[0].opened_at,...stats.rows[0],page,page_size:size,total_pages:Math.max(1,Math.ceil(stats.rows[0].correct/size)),ranking:ranked.rows.map((r:any,i:number)=>({...r,rank:(page-1)*size+i+1}))});
+ const ranked=await db.query(`SELECT p.pseudonym AS participant_name,w.elapsed_ms AS duration_ms,w.submitted_at,
+ rank() OVER (ORDER BY w.elapsed_ms)::int AS rank
+ FROM widget_answers w JOIN participants p ON p.id=w.participant_id
+ WHERE w.activity_id=$1 AND w.widget_id=$2 AND w.revision=$3 AND w.correct IS TRUE AND w.elapsed_ms IS NOT NULL
+ ORDER BY w.elapsed_ms,w.submitted_at,w.id LIMIT $4 OFFSET $5`,[req.params.aid,req.params.wid,revision,size,(page-1)*size]);
+ res.json({widget_id:req.params.wid,revision,opened_at:a.rows[0].opened_at,...stats.rows[0],page,page_size:size,total_pages:Math.max(1,Math.ceil(stats.rows[0].correct/size)),ranking:ranked.rows});
  }catch(e){sendError(res,e)}});
 // Only authorized presenters can read identities and rankings; the start is the server's page-open timestamp.
 app.get('/api/sessions/:id/activities/:aid/timed-leaderboard',requireAuth,async(req,res)=>{try{
@@ -1362,16 +1380,25 @@ app.get('/api/sessions/:id/activities/:aid/timed-leaderboard',requireAuth,async(
  const page=parseLeaderboardPage(req.query.page);if(page===null){res.status(400).json({error:'invalid_pagination'});return}
  const pageSize=20;
  const summary=await db.query('SELECT count(*)::int AS answers,count(*) FILTER (WHERE correct)::int AS correct FROM responses WHERE activity_id=$1 AND invalidated_at IS NULL',[req.params.aid]);
- const ranking=await db.query(`SELECT p.pseudonym AS participant_name,r.elapsed_ms AS duration_ms,r.submitted_at FROM responses r JOIN participants p ON p.id=r.participant_id WHERE r.activity_id=$1 AND r.correct=true AND r.invalidated_at IS NULL AND r.elapsed_ms IS NOT NULL ORDER BY r.elapsed_ms ASC,r.submitted_at ASC,r.id ASC LIMIT $2 OFFSET $3`,[req.params.aid,pageSize,(page-1)*pageSize]);
- res.json({activity_id:req.params.aid,opened_at:a.rows[0].opened_at,...summary.rows[0],page,page_size:pageSize,total_pages:Math.max(1,Math.ceil(Number(summary.rows[0].correct)/pageSize)),ranking:ranking.rows.map((r:any,i:number)=>({...r,rank:(page-1)*pageSize+i+1}))});
+ const ranking=await db.query(`SELECT p.pseudonym AS participant_name,r.elapsed_ms AS duration_ms,r.submitted_at,
+ rank() OVER (ORDER BY r.elapsed_ms)::int AS rank
+ FROM responses r JOIN participants p ON p.id=r.participant_id
+ WHERE r.activity_id=$1 AND r.correct=true AND r.invalidated_at IS NULL AND r.elapsed_ms IS NOT NULL
+ ORDER BY r.elapsed_ms ASC,r.submitted_at ASC,r.id ASC LIMIT $2 OFFSET $3`,[req.params.aid,pageSize,(page-1)*pageSize]);
+ res.json({activity_id:req.params.aid,opened_at:a.rows[0].opened_at,...summary.rows[0],page,page_size:pageSize,total_pages:Math.max(1,Math.ceil(Number(summary.rows[0].correct)/pageSize)),ranking:ranking.rows});
  }catch(e){sendError(res,e)}});
-app.post('/api/join/:code/respond',async(req,res)=>{const cx=await db.connect();try{await cx.query('BEGIN');const s=await cx.query("SELECT * FROM sessions WHERE (join_secret=$1 OR join_code=$1) AND status='active' AND expires_at>now() FOR SHARE",[req.params.code]);if(!s.rowCount){await cx.query('ROLLBACK');res.status(404).json({error:'session_unavailable'});return}if(!s.rows[0].allow_anonymous){await cx.query('ROLLBACK');res.status(403).json({error:'anonymous_disabled'});return}const sid=s.rows[0].id;const token=cookies(req.headers.cookie)[`q_part_${sid}`];const p=token?await cx.query('SELECT id FROM participants WHERE session_id=$1 AND token_hash=$2',[sid,hash(token)]):null;if(!p?.rowCount){await cx.query('ROLLBACK');res.status(401).json({error:'join_first'});return}const a=await cx.query("SELECT * FROM activities WHERE id=$1 AND session_id=$2 AND status='open' FOR SHARE",[req.body?.activity_id,sid]);if(!a.rowCount||s.rows[0].current_activity_id!==req.body?.activity_id){await cx.query('ROLLBACK');res.status(409).json({error:'activity_not_open'});return}const act=a.rows[0] as Activity & {opened_at:Date};const mode=validAnswerMode((act as any).answer_mode)?(act as any).answer_mode:'single';
+app.post('/api/join/:code/respond',async(req,res)=>{let cx:pg.PoolClient|undefined;try{cx=await db.connect();await cx.query('BEGIN');const s=await cx.query("SELECT * FROM sessions WHERE (join_secret=$1 OR join_code=$1) AND status='active' AND expires_at>now() FOR SHARE",[req.params.code]);if(!s.rowCount){await cx.query('ROLLBACK');res.status(404).json({error:'session_unavailable'});return}if(!s.rows[0].allow_anonymous){await cx.query('ROLLBACK');res.status(403).json({error:'anonymous_disabled'});return}const sid=s.rows[0].id;const token=cookies(req.headers.cookie)[`q_part_${sid}`];const p=token?await cx.query('SELECT id FROM participants WHERE session_id=$1 AND token_hash=$2',[sid,hash(token)]):null;if(!p?.rowCount){await cx.query('ROLLBACK');res.status(401).json({error:'join_first'});return}const a=await cx.query("SELECT * FROM activities WHERE id=$1 AND session_id=$2 AND status='open' FOR SHARE",[req.body?.activity_id,sid]);if(!a.rowCount||s.rows[0].current_activity_id!==req.body?.activity_id){await cx.query('ROLLBACK');res.status(409).json({error:'activity_not_open'});return}const act=a.rows[0] as Activity & {opened_at:Date};const mode=validAnswerMode((act as any).answer_mode)?(act as any).answer_mode:'single';
 const raw=mode==='single'?req.body?.option_id:mode==='multiple'?req.body?.option_ids:mode==='text'?req.body?.text:req.body?.asset_id;
 const answer=validateSubmittedAnswer(mode,(act as any).answer_required!==false,raw,act.options);
 if(!answer){await cx.query('ROLLBACK');res.status(400).json({error:'invalid_answer'});return}
 if(answer.assetId){const asset=await cx.query('SELECT id FROM session_assets WHERE id=$1 AND session_id=$2 AND (participant_id IS NULL OR participant_id=$3)',[answer.assetId,sid,p.rows[0].id]);if(!asset.rowCount){await cx.query('ROLLBACK');res.status(400).json({error:'attachment_not_in_session'});return}}
-const option=answer.optionIds.join(',');const clock=act.duration_seconds||act.type==='timed_quiz'?await cx.query('SELECT clock_timestamp() AS database_now'):null;const timing=clock?timedDeadline(act.opened_at,Number(act.duration_seconds),clock.rows[0].database_now):null;if(timing&&!timing.valid){await cx.query('ROLLBACK');res.status(409).json({error:'timer_elapsed'});return}const correct=mode==='single'?checkAnswer(act,option):mode==='multiple'&&Array.isArray((act as any).correct_option_ids)&&answer.optionIds.length>0&&answer.optionIds.length===(act as any).correct_option_ids.length&&answer.optionIds.every(x=>(act as any).correct_option_ids.includes(x));
-const elapsedMs=act.type==='timed_quiz'?timing!.elapsedMs:null;const r=await cx.query('INSERT INTO responses(id,activity_id,participant_id,option_id,correct,answer_payload,elapsed_ms) VALUES($1,$2,$3,$4,$5,$6,$7) ON CONFLICT(activity_id,participant_id) WHERE invalidated_at IS NULL DO NOTHING RETURNING id',[randomUUID(),act.id,p.rows[0].id,option,correct,JSON.stringify(answer),elapsedMs]);await cx.query('COMMIT');if(r.rowCount)await broadcast(sid);res.json({ok:true,already_submitted:!r.rowCount})}catch(e){await cx.query('ROLLBACK');sendError(res,e)}finally{cx.release()}});
+const option=answer.optionIds.join(',');
+// Expiry must not turn a previously successful submission into a misleading error.
+const existing=await cx.query('SELECT id FROM responses WHERE activity_id=$1 AND participant_id=$2 AND invalidated_at IS NULL',[act.id,p.rows[0].id]);
+if(existing.rowCount){await cx.query('COMMIT');res.json({ok:true,already_submitted:true});return}
+const clock=act.type==='timed_quiz'?await cx.query('SELECT clock_timestamp() AS database_now'):null;
+const timing=clock?timedDeadline(act.opened_at,Number(act.duration_seconds),clock.rows[0].database_now):null;if(timing&&!timing.valid){await cx.query('ROLLBACK');res.status(409).json({error:'timer_elapsed'});return}const correct=mode==='single'?checkAnswer(act,option):mode==='multiple'&&Array.isArray((act as any).correct_option_ids)&&answer.optionIds.length>0&&answer.optionIds.length===(act as any).correct_option_ids.length&&answer.optionIds.every(x=>(act as any).correct_option_ids.includes(x));
+const elapsedMs=act.type==='timed_quiz'?timing!.elapsedMs:null;const r=await cx.query('INSERT INTO responses(id,activity_id,participant_id,option_id,correct,answer_payload,elapsed_ms) VALUES($1,$2,$3,$4,$5,$6,$7) ON CONFLICT(activity_id,participant_id) WHERE invalidated_at IS NULL DO NOTHING RETURNING id',[randomUUID(),act.id,p.rows[0].id,option,correct,JSON.stringify(answer),elapsedMs]);await cx.query('COMMIT');cx.release();cx=undefined;if(r.rowCount)await notifyAudience(sid);res.json({ok:true,already_submitted:!r.rowCount})}catch(e){if(cx)try{await cx.query('ROLLBACK')}catch{}sendError(res,e)}finally{cx?.release()}});
 server.on('upgrade',async(req,socket,head)=>{try{const origin=req.headers.origin;if(!allowedLiveOrigin(origin,base)){socket.destroy();return}const url=new URL(req.url||'/',base);if(url.pathname!=='/live'){socket.destroy();return}const sid=url.searchParams.get('session');if(!sid){socket.destroy();return}const s=(await db.query('SELECT * FROM sessions WHERE id=$1',[sid])).rows[0];if(!s||s.status==='closed'||new Date(s.expires_at).getTime()<=Date.now()){socket.destroy();return}const uid=auth(req as express.Request);const part=cookies(req.headers.cookie)[`q_part_${sid}`];const ownerAccount=uid&&(uid===s.owner_id||(await db.query('SELECT 1 FROM session_presenters WHERE session_id=$1 AND user_id=$2',[sid,uid])).rowCount)?(await db.query("SELECT 1 FROM users WHERE id=$1 AND approved=true AND must_change_password=false AND role IN ('presenter','platform_admin','org_admin') AND (auth_revoked_at IS NULL OR auth_revoked_at <= to_timestamp($2::double precision / 1000.0)) AND (password_changed_at IS NULL OR password_changed_at <= to_timestamp($2::double precision / 1000.0))",[uid,Number(cookies(req.headers.cookie).q_auth?.split('.')[1]||0)-8*3600*1000])).rowCount:false;const allowed=ownerAccount||(part&&s.allow_anonymous&&(await db.query('SELECT id FROM participants WHERE session_id=$1 AND token_hash=$2',[sid,hash(part)])).rowCount);if(!allowed){socket.destroy();return}const participantId=ownerAccount?null:(await db.query('SELECT id FROM participants WHERE session_id=$1 AND token_hash=$2',[sid,hash(part||'')])).rows[0]?.id;wss.handleUpgrade(req,socket,head,ws=>{(ws as any).view=ownerAccount?'owner':'participant';(ws as any).uid=ownerAccount?uid:null;(ws as any).issuedAt=ownerAccount?authCookieIssuedAt(req.headers.cookie):null;(ws as any).participantId=participantId;wss.emit('connection',ws,req,sid)})}catch{socket.destroy()}});
 // Recheck existing presenter sockets on every replica against the shared database.
 // Fail closed on database outages: never continue streaming protected results to an
