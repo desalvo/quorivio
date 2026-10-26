@@ -79,25 +79,32 @@ async function lockAudiencePage(cx:pg.PoolClient,sessionId:string,activityId:str
 // The database transaction has already committed; a failed NOTIFY must not
 // make clients retry a successful write and duplicate their submissions.
 async function notifyAudience(sessionId:string){try{await broadcast(sessionId)}catch(e){console.error('audience notification retryable',e instanceof Error?e.message:'unknown')}}
-app.post('/api/join/:code/activities/:aid/words',async(req,res)=>{const cx=await db.connect();try{
+app.post('/api/join/:code/activities/:aid/words',async(req,res)=>{let cx:pg.PoolClient|undefined;try{
  const word=normalizeWord(req.body?.word);if(!word){res.status(400).json({error:'invalid_word'});return}
  const who=await audienceIdentity(req,req.params.code,req.params.aid);
  if(!who){res.status(403).json({error:'join_or_open_activity_required'});return}
+ // Do not hold a pool client while audienceIdentity performs independent pool queries.
+ // Otherwise >= pool.max concurrent requests can starve all identity lookups.
+ cx=await db.connect();
  await cx.query('BEGIN');
  if(!await lockAudiencePage(cx,who.sessionId,req.params.aid)){await cx.query('ROLLBACK');res.status(409).json({error:'activity_not_open'});return}
  const created=await cx.query('INSERT INTO audience_words(session_id,activity_id,participant_id,word) VALUES($1,$2,$3,$4) ON CONFLICT (activity_id,participant_id) DO NOTHING RETURNING participant_id',[who.sessionId,req.params.aid,who.participantId,word]);
- await cx.query('COMMIT');if(created.rowCount)await notifyAudience(who.sessionId);
+ await cx.query('COMMIT');cx.release();cx=undefined;
+ if(created.rowCount)await notifyAudience(who.sessionId);
  res.status(202).json({ok:true,already_submitted:!created.rowCount});
- }catch(e){await cx.query('ROLLBACK');sendError(res,e)}finally{cx.release()}});
+ }catch(e){if(cx)try{await cx.query('ROLLBACK')}catch{}sendError(res,e)}finally{cx?.release()}});
 app.get('/api/sessions/:id/activities/:aid/words',requireAuth,async(req,res)=>{try{
  const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}
  const rows=await db.query('SELECT word,count(*)::int AS count FROM audience_words WHERE session_id=$1 AND activity_id=$2 GROUP BY word ORDER BY count DESC,word LIMIT 100',[s.id,req.params.aid]);
  res.json(safeFrequency(rows.rows));
  }catch(e){sendError(res,e)}});
-app.post('/api/join/:code/activities/:aid/questions',async(req,res)=>{const cx=await db.connect();try{
+app.post('/api/join/:code/activities/:aid/questions',async(req,res)=>{let cx:pg.PoolClient|undefined;try{
  const body=validateQuestion(req.body?.body);if(!body){res.status(400).json({error:'invalid_question'});return}
  const who=await audienceIdentity(req,req.params.code,req.params.aid);
  if(!who){res.status(403).json({error:'join_or_open_activity_required'});return}
+ // Do not hold a pool client while audienceIdentity performs independent pool queries.
+ // Otherwise >= pool.max concurrent requests can starve all identity lookups.
+ cx=await db.connect();
  await cx.query('BEGIN');
  if(!await lockAudiencePage(cx,who.sessionId,req.params.aid)){await cx.query('ROLLBACK');res.status(409).json({error:'activity_not_open'});return}
  // Serialize a participant's submissions, including on separate API replicas.
@@ -108,17 +115,21 @@ app.post('/api/join/:code/activities/:aid/questions',async(req,res)=>{const cx=a
  if(n.rows[0].n>=3){await cx.query('ROLLBACK');res.status(429).json({error:'question_limit_reached'});return}
  const id=randomUUID();
  await cx.query('INSERT INTO audience_questions(id,session_id,activity_id,participant_id,body) VALUES($1,$2,$3,$4,$5)',[id,who.sessionId,req.params.aid,who.participantId,body]);
- await cx.query('COMMIT');await notifyAudience(who.sessionId);
+ await cx.query('COMMIT');cx.release();cx=undefined;
+ await notifyAudience(who.sessionId);
  res.status(202).json({status:'pending_moderation',id,remaining:2-n.rows[0].n});
- }catch(e){await cx.query('ROLLBACK');sendError(res,e)}finally{cx.release()}});
+ }catch(e){if(cx)try{await cx.query('ROLLBACK')}catch{}sendError(res,e)}finally{cx?.release()}});
 app.get('/api/join/:code/activities/:aid/questions',async(req,res)=>{try{
  const s=await publicSession(req.params.code);if(!s||s.status!=='active'||s.current_activity_id!==req.params.aid){res.status(404).end();return}
  const page=await db.query("SELECT id FROM activities WHERE id=$1 AND session_id=$2 AND status='open'",[req.params.aid,s.id]);
  if(!page.rowCount){res.status(404).end();return}
  const r=await db.query("SELECT q.id,q.body,count(v.participant_id)::int AS votes FROM audience_questions q LEFT JOIN audience_question_votes v ON v.question_id=q.id WHERE q.session_id=$1 AND q.activity_id=$2 AND q.status='approved' GROUP BY q.id ORDER BY votes DESC,q.created_at,q.id LIMIT 100",[s.id,req.params.aid]);res.json(r.rows);
  }catch(e){sendError(res,e)}});
-app.post('/api/join/:code/activities/:aid/questions/:qid/upvote',async(req,res)=>{const cx=await db.connect();try{
+app.post('/api/join/:code/activities/:aid/questions/:qid/upvote',async(req,res)=>{let cx:pg.PoolClient|undefined;try{
  const who=await audienceIdentity(req,req.params.code,req.params.aid);if(!who){res.status(403).json({error:'join_or_open_activity_required'});return}
+ // Do not hold a pool client while audienceIdentity performs independent pool queries.
+ // Otherwise >= pool.max concurrent requests can starve all identity lookups.
+ cx=await db.connect();
  await cx.query('BEGIN');
  if(!await lockAudiencePage(cx,who.sessionId,req.params.aid)){await cx.query('ROLLBACK');res.status(409).json({error:'activity_not_open'});return}
  // Lock against a concurrent presenter rejection: never accept a vote on a
@@ -126,9 +137,10 @@ app.post('/api/join/:code/activities/:aid/questions/:qid/upvote',async(req,res)=
  const q=await cx.query("SELECT id FROM audience_questions WHERE id=$1 AND session_id=$2 AND activity_id=$3 AND status='approved' FOR SHARE",[req.params.qid,who.sessionId,req.params.aid]);
  if(!q.rowCount){await cx.query('ROLLBACK');res.status(404).end();return}
  const vote=await cx.query('INSERT INTO audience_question_votes(question_id,participant_id) VALUES($1,$2) ON CONFLICT DO NOTHING RETURNING participant_id',[req.params.qid,who.participantId]);
- await cx.query('COMMIT');if(vote.rowCount)await notifyAudience(who.sessionId);
+ await cx.query('COMMIT');cx.release();cx=undefined;
+ if(vote.rowCount)await notifyAudience(who.sessionId);
  res.json({ok:true,already_voted:!vote.rowCount});
- }catch(e){await cx.query('ROLLBACK');sendError(res,e)}finally{cx.release()}});
+ }catch(e){if(cx)try{await cx.query('ROLLBACK')}catch{}sendError(res,e)}finally{cx?.release()}});
 app.get('/api/sessions/:id/activities/:aid/questions',requireAuth,async(req,res)=>{try{
  const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}
  const r=await db.query('SELECT q.id,q.body,q.status,q.created_at,count(v.participant_id)::int AS votes FROM audience_questions q LEFT JOIN audience_question_votes v ON v.question_id=q.id WHERE q.session_id=$1 AND q.activity_id=$2 GROUP BY q.id ORDER BY q.created_at,q.id LIMIT 200',[s.id,req.params.aid]);res.json(r.rows);

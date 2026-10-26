@@ -7,6 +7,7 @@ CI administrator. Does not require a browser or access to external services.
 from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor
+from copy import copy
 import http.cookiejar
 import json
 import os
@@ -60,11 +61,18 @@ def run():
     first=visitor(code,0)
     assert request(first,'GET',f'{pub}/questions')==[]
     request(first,'GET',f'{api}/questions/queue',expected=401)
-    # Multiple requests from one participant on a shared session, as happens
-    # with tabs and separate HTTP replicas, must never exceed three questions.
+    # All workers must be the SAME participant but use independent HTTP clients.
+    # Sharing an urllib opener/cookie jar between worker threads is not safe.
+    # More requests than the default PostgreSQL pool size (10) is a regression
+    # test for acquiring a client before identity verification (pool starvation).
+    source_jar=next(h.cookiejar for h in first.handlers if isinstance(h,HTTPCookieProcessor))
+    def same_participant_client():
+        jar=http.cookiejar.CookieJar()
+        for cookie in source_jar: jar.set_cookie(copy(cookie))
+        return build_opener(HTTPCookieProcessor(jar))
     def post_one(n):
         try:
-            result=request(first,'POST',f'{pub}/questions',{'body':f'Concurrent Q&A request number {n}'},202)
+            result=request(same_participant_client(),'POST',f'{pub}/questions',{'body':f'Concurrent Q&A request number {n}'},202)
             return 'accepted',result
         except AssertionError as error:
             if 'got 429' in str(error):return 'limited',None

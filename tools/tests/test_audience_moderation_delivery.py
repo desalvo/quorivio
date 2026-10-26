@@ -32,6 +32,38 @@ class AudienceModerationDelivery(unittest.TestCase):
         self.assertLess(block.index('count(*)::int'),block.index('INSERT INTO audience_questions'))
         self.assertIn('ROLLBACK',block)
 
+    def test_all_participant_writes_resolve_identity_before_checkout(self):
+        # Pool max is 10; 12 submissions must not hold every connection while
+        # identity lookup tries to get a second one from the same pool.
+        boundaries=(
+            ("app.post('/api/join/:code/activities/:aid/words'", "app.get('/api/sessions/:id/activities/:aid/words'"),
+            ("app.post('/api/join/:code/activities/:aid/questions'", "app.get('/api/join/:code/activities/:aid/questions'"),
+            ("app.post('/api/join/:code/activities/:aid/questions/:qid/upvote'", "app.get('/api/sessions/:id/activities/:aid/questions'"),
+        )
+        for start,end in boundaries:
+            with self.subTest(route=start):
+                block=API.split(start,1)[1].split(end,1)[0]
+                self.assertLess(block.index('await audienceIdentity('),block.index('cx=await db.connect()'))
+                self.assertLess(block.index('cx=await db.connect()'),block.index("await cx.query('BEGIN')"))
+                self.assertIn('cx?.release()',block)
+                self.assertIn("if(cx)try{await cx.query('ROLLBACK')}catch{}",block)
+
+    def test_notifications_do_not_hold_pool_connections_after_commit(self):
+        for start,end in (
+            ("app.post('/api/join/:code/activities/:aid/words'", "app.get('/api/sessions/:id/activities/:aid/words'"),
+            ("app.post('/api/join/:code/activities/:aid/questions'", "app.get('/api/join/:code/activities/:aid/questions'"),
+            ("app.post('/api/join/:code/activities/:aid/questions/:qid/upvote'", "app.get('/api/sessions/:id/activities/:aid/questions'"),
+        ):
+            with self.subTest(route=start):
+                block=API.split(start,1)[1].split(end,1)[0]
+                self.assertLess(block.index("await cx.query('COMMIT');cx.release();cx=undefined"),block.index('await notifyAudience('))
+
+    def test_ci_concurrency_uses_distinct_clients_with_same_cookie(self):
+        for token in ('ThreadPoolExecutor(max_workers=12)', 'source_jar',
+                      'same_participant_client()', 'jar.set_cookie(copy(cookie))',
+                      "request(same_participant_client(),'POST'"):
+            self.assertIn(token,CI)
+
     def test_page_open_state_and_expiry_checked_inside_transactions(self):
         block=API.split('async function lockAudiencePage(')[1].split("app.post('/api/join/:code/activities/:aid/words'")[0]
         for guard in ("status='active'","current_activity_id=$2","expires_at>now()","allow_anonymous=true","status='open'","FOR SHARE"):
