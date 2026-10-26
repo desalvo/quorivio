@@ -1,3 +1,5 @@
+**Hotfix CI Chromium PostgreSQL: modifica titoli (26/10/2026):** Il collaudo editor reale utilizza il menu contestuale accessibile del widget (`Menu contestuale text` → `Modifica titolo`) anziché fare doppio clic sull’input `readonly` che non riceve eventi del puntatore. Un test isolato Chromium precede il collaudo con database; CI estesa ancora da confermare. Dettagli in `docs/DEVELOPMENT_STATUS.it.md`.
+
 **Hotfix CI full Chromium (25 ottobre 2026):** l’informativa sui cookie funzionali usa un portale React sul `document.body` per evitare che la dashboard intercetti il clic di conferma. La CI standard 40213703957 è verde; la CI full Chromium deve essere rieseguita.
 
 **Hotfix CI Chromium (25/10/2026):** Il collaudo browser dell’editor conferma ora il dialogo accessibile dei cookie funzionali nei contesti desktop/mobile e PostgreSQL reale prima dei clic sui controlli. Nessun clic forzato o cookie iniettato; dettagli in `docs/DEVELOPMENT_STATUS.it.md`.

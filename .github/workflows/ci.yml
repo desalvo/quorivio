@@ -151,7 +151,9 @@ jobs:
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
           QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
-        run: python3 tools/ci_browser_editor_postgres.py
+        run: |
+          python3 tools/ci_widget_title_menu.py
+          python3 tools/ci_browser_editor_postgres.py
       - name: Upload Chromium real editor failure diagnostics
         if: failure() && github.event_name == 'workflow_dispatch' && inputs.browser_test
         uses: actions/upload-artifact@v4

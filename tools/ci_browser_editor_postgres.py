@@ -55,20 +55,27 @@ async def open_editor(page,title):
  await expect(page.get_by_role('group',name='Canvas grafico widget')).to_be_visible()
 
 async def edit_canvas_widget_title(canvas, title):
- """Use the editor's real double-click affordance before typing a widget title.
+  """Edit through the visible, accessible widget menu (real pointer actions).
 
- Canvas titles are intentionally read-only until the user enters edit mode;
- filling a read-only field directly times out in real Chromium. Pressing Enter
- commits the edit and restores the read-only interaction/drag mode.
- """
- field=canvas.first.get_by_role('textbox',name='Titolo text')
- await expect(field).not_to_be_editable()
- await field.dblclick()
- await expect(field).to_be_editable()
- await field.fill(title)
- await field.press('Enter')
- await expect(field).to_have_value(title)
- await expect(field).not_to_be_editable()
+  The canvas title input is intentionally read-only and has pointer-events:none
+  until edit mode. Clicking/double-clicking that input directly is intercepted
+  by its draggable parent in Chromium. The production menu has a supported
+  "Modifica titolo" action which enables the input without bypassing the UI.
+  """
+  item=canvas.first
+  field=item.get_by_role('textbox',name='Titolo text')
+  await expect(field).not_to_be_editable()
+  trigger=item.get_by_role('button',name='Menu contestuale text')
+  await trigger.click()
+  menu=item.get_by_role('group',name='Azioni widget text')
+  await expect(menu).to_be_visible()
+  await menu.get_by_role('button',name='Modifica titolo').click()
+  await expect(menu).to_have_count(0)
+  await expect(field).to_be_editable()
+  await field.fill(title)
+  await field.press('Enter')
+  await expect(field).to_have_value(title)
+  await expect(field).not_to_be_editable()
 
 async def main():
  async with async_playwright() as pw:

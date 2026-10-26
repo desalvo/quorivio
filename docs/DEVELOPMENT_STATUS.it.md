@@ -1,3 +1,7 @@
+## 26 ottobre 2026 — Chromium PostgreSQL: bersaglio del puntatore per modifica titoli (run 40300651081)
+- Il quality gate ha superato l'editor Chromium con fixture e il percorso partecipanti Chromium+PostgreSQL. Il test editor PostgreSQL reale è arrivato al conflitto sullo stesso titolo, ma `dblclick()` sull'input `readonly` è fallito: il widget trascinabile intercetta gli eventi perché il CSS imposta intenzionalmente `pointer-events:none` sui titoli non modificabili.
+- Il test ora utilizza il percorso accessibile reale `Menu contestuale text` → `Modifica titolo`, poi verifica l'editabilità, modifica il testo, conferma con Invio e verifica il ritorno a sola lettura. Stesso helper per quattro scenari di conflitto/recupero; nessun clic forzato, modifica CSS, cambiamento di produzione o indebolimento della protezione CAS. Aggiunti contratti di regressione e test isolato Chromium. CI estesa con PostgreSQL reale da confermare; RC 45,5%.
+
 ## 2026-10-25 — Hotfix Chromium completo: modifica titoli widget (run 40225491747)
 - La CI estesa ha superato la riconciliazione di campi indipendenti e i test PostgreSQL CAS/Chromium partecipanti, ma è fallita quando il test ha usato `.fill()` su un input titolo intenzionalmente `readonly` (`Titolo text`, valore `Remote collaborator`).
 - L’editor richiede il doppio clic per attivare la modifica e Invio per concluderla. Sostituite **tutte e quattro** le scritture dirette con un helper che fa doppio clic reale, attende il campo modificabile, inserisce il testo, preme Invio e verifica il ritorno alla modalità sola lettura.

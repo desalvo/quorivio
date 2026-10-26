@@ -1,3 +1,5 @@
+**Chromium PostgreSQL title-edit CI hotfix (2026-10-26):** The opt-in real-editor browser acceptance now edits read-only canvas titles using the accessible widget context menu (`Menu contestuale text` → `Modifica titolo`) instead of double-clicking a pointer-disabled input. An isolated Chromium hit-target smoke runs before the database browser test; full CI confirmation remains pending. See `docs/DEVELOPMENT_STATUS.md`.
+
 **CI full Chromium hotfix (2026-10-25):** functional cookie notice now uses a React portal to the document body to prevent dashboard overlays intercepting the acknowledgement click. Standard CI run 40213703957 passed; full browser CI awaits rerun.
 
 **CI Chromium regression hotfix (2026-10-25):** Browser editor acceptance now acknowledges the accessible functional-cookie dialog in desktop/mobile and real PostgreSQL contexts before clicking editor controls. No forced clicks or cookie injection; see `docs/DEVELOPMENT_STATUS.md`.

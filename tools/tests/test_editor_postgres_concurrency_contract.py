@@ -23,7 +23,10 @@ class EditorPostgresConcurrencyContracts(unittest.TestCase):
  def test_ui_disables_save_while_conflicted(self):self.assertIn('pageSavePending||pageConflict',UI)
  def test_ui_loaded_signature_includes_background_colors(self):self.assertIn('serializePageDraft(pageDraftFromActivity(x))',UI)
  def test_real_postgres_http_gate_is_mandatory(self):self.assertIn('run: python3 tools/ci_editor_postgres.py',WORKFLOW)
- def test_real_browser_is_opt_in(self):self.assertIn('run: python3 tools/ci_browser_editor_postgres.py',WORKFLOW)
+ def test_real_browser_is_opt_in(self):
+  self.assertIn('python3 tools/ci_browser_editor_postgres.py',WORKFLOW)
+  self.assertIn("if: github.event_name == 'workflow_dispatch' && inputs.browser_test",WORKFLOW)
+  self.assertIn('name: Chromium editor PostgreSQL persistence and conflict acceptance (opt-in)',WORKFLOW)
  def test_browser_does_not_mock_routes(self):self.assertNotIn('.route(',BROWSER)
  def test_browser_tests_real_db_reload(self):self.assertIn("await call(context,'GET',f'/api/sessions/{sid}')",BROWSER)
  def test_independent_slide_uses_canvas_pages_endpoint(self):
