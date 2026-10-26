@@ -20,13 +20,13 @@ PNG = base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4
 OPENER = build_opener(HTTPCookieProcessor(http.cookiejar.CookieJar()))
 
 
-def api(method: str, url: str, data=None, mime='application/json', expected=200):
+def api(method: str, url: str, data=None, mime='application/json', expected=200, opener=None):
     if isinstance(data, (dict, list)):
         data = json.dumps(data, separators=(',', ':')).encode()
     headers = {'Content-Type': mime} if data is not None else {}
     req = Request(BASE + url, data=data, headers=headers, method=method)
     try:
-        with OPENER.open(req, timeout=15) as response:
+        with (opener or OPENER).open(req, timeout=15) as response:
             status, body = response.status, response.read()
     except HTTPError as err:
         status, body = err.code, err.read()
@@ -47,14 +47,86 @@ def run():
     api('POST', '/api/auth/change-password', {'current_password': PASSWORD, 'new_password': NEW_PASSWORD})
     api('POST', '/api/auth/login', {'email': EMAIL, 'password': NEW_PASSWORD})
 
+    admin_id = api('GET', '/api/auth/me')['id']
+    # Atomic user administration: role, approval and nickname must not partially persist.
+    first = api('POST', '/api/admin/users', {
+        'email': 'ci-profile-first@example.invalid',
+        'temporary_password': 'ci-temporary-password-123', 'role': 'user'
+    }, expected=201)
+    second = api('POST', '/api/admin/users', {
+        'email': 'ci-profile-second@example.invalid',
+        'temporary_password': 'ci-temporary-password-123', 'role': 'user'
+    }, expected=201)
+    changed = api('PATCH', f'/api/admin/users/{first["id"]}', {
+        'nickname': 'ci_first', 'role': 'presenter', 'approved': False
+    })
+    assert changed['nickname'] == 'ci_first' and changed['role'] == 'presenter' and not changed['approved']
+    # A conflicting nickname must roll back the whole admin update.
+    api('PATCH', f'/api/admin/users/{second["id"]}', {
+        'nickname': 'ci_first', 'role': 'moderator', 'approved': False
+    }, expected=409)
+    users = api('GET', '/api/admin/users')
+    current = next(u for u in users if u['id'] == second['id'])
+    assert current['nickname'] is None and current['role'] == 'user' and current['approved']
+    api('PATCH', f'/api/admin/users/{second["id"]}', {
+        'nickname': 'invalid space', 'role': 'moderator', 'approved': False
+    }, expected=400)
+    api('PATCH', f'/api/admin/users/{first["id"]}', {
+        'nickname': 'ci_first', 'role': 'presenter', 'approved': True
+    })
+    # The immutable primary admin cannot be demoted or renamed via the unified route.
+    api('PATCH', f'/api/admin/users/{admin_id}', {
+        'nickname': 'other', 'role': 'platform_admin', 'approved': True
+    }, expected=409)
     before = api('GET', '/api/admin/settings')
     api('PATCH', '/api/admin/settings', {'closed_session_retention_days': 40, 'max_upload_mb': 0}, expected=400)
     assert api('GET', '/api/admin/settings') == before, 'partial admin settings update was persisted'
+    # Platform retention is the DEFAULT for new sessions; each session may override it.
+    api('PATCH', '/api/admin/settings', {'closed_session_retention_days': 7})
+    retention_session = api('POST', '/api/sessions', {'title': 'CI retention policy'}, expected=201)
+    assert retention_session['retention_days'] == 7, 'new session ignored admin retention default'
+    api('PATCH', f'/api/sessions/{retention_session["id"]}/retention', {'retention_days': 3})
+    assert api('GET', f'/api/sessions/{retention_session["id"]}')['session']['retention_days'] == 3
+    api('PATCH', '/api/admin/settings', {'closed_session_retention_days': int(before['closed_session_retention_days'])})
+    assert api('GET', f'/api/sessions/{retention_session["id"]}')['session']['retention_days'] == 3, 'admin change must not overwrite session-specific policy'
 
+
+    # The same authenticated profile API works for every approved account role.
+    profile = api('GET', '/api/auth/profile')
+    assert profile['email'] == EMAIL and profile['profile_photo_url'] is None
+    api('PATCH', '/api/auth/profile', {'display_name': 'CI Presenter Profile'})
+    assert api('GET', '/api/auth/profile')['display_name'] == 'CI Presenter Profile'
+    # Metadata validation must reject spoofed and decompression-bomb images.
+    malformed = bytearray(PNG)
+    malformed[16:20] = (4097).to_bytes(4, 'big')
+    api('POST', '/api/auth/profile/photo', bytes(malformed), 'image/png', expected=415)
+    assert api('GET', '/api/auth/profile')['profile_photo_url'] is None
     photo = api('POST', '/api/auth/profile/photo', PNG, 'image/png', 201)
     assert api('GET', photo['profile_photo_url']) == PNG
-    api('DELETE', '/api/auth/profile/photo')
+    assert api('GET', '/api/auth/profile')['profile_photo_url'] == photo['profile_photo_url']
+    # An anonymous participant sees only a scoped public URL for an active session.
+    session_for_photo = api('POST', '/api/sessions', {'title': 'CI public presenter profile'}, expected=201)
+    sid_photo = session_for_photo['id']
+    code_photo = session_for_photo['join_code']
+    api('POST', f'/api/sessions/{sid_photo}/status', {'status': 'active'})
+    anonymous = build_opener(HTTPCookieProcessor(http.cookiejar.CookieJar()))
+    profiles = api('GET', f'/api/join/{code_photo}/presenter-profiles', opener=anonymous)
+    assert len(profiles) == 1 and profiles[0]['name'] == 'CI Presenter Profile'
+    assert 'email' not in profiles[0] and 'profile_photo_url' not in profiles[0]
+    assert profiles[0]['photo_url'].startswith(f'/api/join/{code_photo}/presenters/')
+    assert api('GET', profiles[0]['photo_url'], opener=anonymous) == PNG
+    api('GET', photo['profile_photo_url'], expected=401, opener=anonymous)
+    # Replacement revokes old media, and the public URL follows the current photo.
+    replacement = api('POST', '/api/auth/profile/photo', PNG, 'image/png', 201)
+    assert replacement['profile_photo_url'] != photo['profile_photo_url']
     api('GET', photo['profile_photo_url'], expected=404)
+    assert api('GET', profiles[0]['photo_url'], opener=anonymous) == PNG
+    api('DELETE', '/api/auth/profile/photo')
+    api('GET', replacement['profile_photo_url'], expected=404)
+    api('GET', profiles[0]['photo_url'], expected=404, opener=anonymous)
+    assert api('GET', f'/api/join/{code_photo}/presenter-profiles', opener=anonymous)[0]['photo_url'] is None
+    api('POST', f'/api/sessions/{sid_photo}/status', {'status': 'closed'})
+    api('GET', f'/api/join/{code_photo}/presenter-profiles', expected=404, opener=anonymous)
 
     session = api('POST', '/api/sessions', {'title': 'CI portable media integration'}, expected=201)
     sid = session['id']
@@ -103,7 +175,7 @@ def run():
     malformed[-1] ^= 0x10
     api('POST', '/api/sessions/import.quorivio', bytes(malformed),
         'application/vnd.quorivio.session+zip', expected=400)
-    print('PASS PostgreSQL-backed HTTP: admin atomicity, private photo lifecycle, PNG bundle import twice, collision-free duplication, invalid ZIP rejection')
+    print('PASS PostgreSQL HTTP: atomic profile, photo dimensions, anonymous session avatars, revocation, bundle import/duplication, invalid ZIP')
 
 
 if __name__ == '__main__':

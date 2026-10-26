@@ -1,3 +1,5 @@
+**Latest profile cycle (2026-10-26, uncommitted):** Anonymous audience presenter-photo widgets now use session-scoped public photo URLs; nickname and display name save atomically with one button and automatic profile loading. Previous full CI run `40304413948` is committed and quality/container gates passed. Local 317 Node + 660 Python tests and API/web builds PASS; new end-to-end PostgreSQL/browser acceptance pending. See `docs/DEVELOPMENT_STATUS.md`.
+
 **Chromium PostgreSQL title-edit CI hotfix (2026-10-26):** The opt-in real-editor browser acceptance now edits read-only canvas titles using the accessible widget context menu (`Menu contestuale text` → `Modifica titolo`) instead of double-clicking a pointer-disabled input. An isolated Chromium hit-target smoke runs before the database browser test; full CI confirmation remains pending. See `docs/DEVELOPMENT_STATUS.md`.
 
 **CI full Chromium hotfix (2026-10-25):** functional cookie notice now uses a React portal to the document body to prevent dashboard overlays intercepting the acknowledgement click. Standard CI run 40213703957 passed; full browser CI awaits rerun.

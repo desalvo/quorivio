@@ -26,7 +26,7 @@
 Never advertise a session as strictly anonymous without proving unlinkability under the chosen deployment. Restrict access to PostgreSQL and avoid exposing it publicly. Treat the manual PDFs as guidance, not evidence of compliance.
 
 ## Development cycle: added operational controls
-- `PATCH /api/sessions/:id/retention` allows the owner to choose retention between 1 and 3650 days (default 90). The interval starts at creation; automatic deletion occurs only once the session is closed or expired.
+- `PATCH /api/sessions/:id/retention` allows the owner to choose retention between 1 and 3650 days (default 60). The retention interval starts at closure or expiry, not at creation. Existing sessions keep their own retention value when the administrator changes the default for new sessions.
 - `POST /api/sessions/:id/revoke` closes a session, expires public access, rotates join credentials and disconnects WebSocket subscribers.
 - `DELETE /api/sessions/:id` erases a session and associated activities, responses and participants via PostgreSQL `ON DELETE CASCADE`. Previously downloaded exports and backup copies are not covered; backup expiry must be documented before release.
 - CSV export neutralizes potentially executable spreadsheet formulas.
@@ -39,3 +39,8 @@ Never advertise a session as strictly anonymous without proving unlinkability un
 During this cycle, account avatar images remain authenticated and are deleted from local storage after replacement/removal; the underlying PostgreSQL user row is locked during updates to prevent concurrent stale paths. Portable session imports receive independent asset identifiers and never transfer prior participants or answers. Email MFA enrollment requires proof of mailbox control with an expiring, attempt-limited code; disabled/enabled changes revoke old sessions, while TOTP remains separate. A new CI PostgreSQL API smoke is pending execution.
 
 **These controls are not evidence of GDPR compliance.** Verify filesystem and backup retention, private asset paths in shared volumes, email provider data processing, revocation across replicas and organizational deletion requests. Existing GDPR obligations listed above remain open.
+
+
+## 2026-10-26 addendum — Enforced session retention and media cleanup
+
+The purge now uses each session's own retention value, measured from closure or expiry; the global administrator setting defaults new sessions only. Only the session owner can change it. Session deletion atomically queues filesystem media erasure in PostgreSQL, with retry after lease expiration. Backup copies and operational multi-replica erasure remain independently governed and unverified; these changes are not a claim of GDPR compliance.

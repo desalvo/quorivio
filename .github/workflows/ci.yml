@@ -45,6 +45,8 @@ jobs:
         with: {node-version: '22'} # npm caching requires a committed package-lock.json
       - name: Install reproducibly
         run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Publish evidence-based RC readiness diagnostics (non-blocking)
+        run: python3 tools/rc_release_preflight.py --output /tmp/quorivio-rc-readiness.json
       - name: Unit tests
         run: npm test
       - name: Compile frontend and backend
@@ -120,6 +122,11 @@ jobs:
           QUORIVIO_CI_ADMIN_PASSWORD: ci-only-administrator-password-123
           QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
         run: python3 tools/ci_portable_http.py
+      - name: PostgreSQL session retention and durable erasure outbox acceptance
+        env:
+          DATABASE_URL: postgres://quorivio:ci-only-secret@127.0.0.1:5432/quorivio
+          QUORIVIO_CI_RETENTION_TEST: '1'
+        run: node tools/ci_retention_postgres.mjs
       - name: PostgreSQL-backed concurrent live lifecycle E2E
         env:
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
@@ -154,6 +161,14 @@ jobs:
         run: |
           python3 tools/ci_widget_title_menu.py
           python3 tools/ci_browser_editor_postgres.py
+      - name: Chromium presenter profile upload and anonymous avatar acceptance (opt-in)
+        if: github.event_name == 'workflow_dispatch' && inputs.browser_test
+        timeout-minutes: 5
+        env:
+          QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
+          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
+          QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
+        run: python3 tools/ci_browser_profile.py
       - name: Upload Chromium real editor failure diagnostics
         if: failure() && github.event_name == 'workflow_dispatch' && inputs.browser_test
         uses: actions/upload-artifact@v4

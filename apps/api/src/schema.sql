@@ -8,7 +8,7 @@ CREATE INDEX IF NOT EXISTS idx_activities_session ON activities(session_id);
 CREATE INDEX IF NOT EXISTS idx_responses_activity ON responses(activity_id);
 CREATE INDEX IF NOT EXISTS idx_sessions_org ON sessions(organization_id);
 
--- Additive schema evolution; default retention is 90 days (administrator may select 1-3650).
+-- Additive schema evolution; default retention is 60 days (administrator may select 1-3650).
 ALTER TABLE sessions ADD COLUMN IF NOT EXISTS retention_days integer NOT NULL DEFAULT 60;
 
 -- Identity approval, privacy and presentation configuration (additive migrations).
@@ -30,6 +30,15 @@ ALTER TABLE participants ADD COLUMN IF NOT EXISTS pseudonym text;
 ALTER TABLE participants ADD COLUMN IF NOT EXISTS user_id uuid REFERENCES users(id) ON DELETE SET NULL;
 CREATE TABLE IF NOT EXISTS platform_settings(key text PRIMARY KEY,value text NOT NULL,updated_at timestamptz NOT NULL DEFAULT now());
 INSERT INTO platform_settings(key,value) VALUES('closed_session_retention_days','60') ON CONFLICT DO NOTHING;
+-- Durable GDPR session-media erasure outbox. Must be created before startup purge.
+CREATE TABLE IF NOT EXISTS session_asset_cleanup_jobs(
+ session_id uuid PRIMARY KEY,
+ queued_at timestamptz NOT NULL DEFAULT now(),
+ claimed_until timestamptz,
+ attempts integer NOT NULL DEFAULT 0,
+ last_error text
+);
+
 
 ALTER TABLE sessions ADD COLUMN IF NOT EXISTS show_results boolean NOT NULL DEFAULT false;
 

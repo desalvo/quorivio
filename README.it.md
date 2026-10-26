@@ -1,3 +1,5 @@
+**Ultimo ciclo profili (26 ottobre 2026, non committato):** Foto presentatore accessibili nelle sessioni pubbliche tramite URL limitati alla sessione; nickname e nome salvati atomicamente con un unico pulsante e caricamento automatico. La CI estesa precedente `40304413948` è verde e committata. Localmente 317 test Node, 660 Python e build API/web PASS; collaudo PostgreSQL/browser del nuovo ciclo ancora da eseguire. Vedi `docs/DEVELOPMENT_STATUS.it.md`.
+
 **Hotfix CI Chromium PostgreSQL: modifica titoli (26/10/2026):** Il collaudo editor reale utilizza il menu contestuale accessibile del widget (`Menu contestuale text` → `Modifica titolo`) anziché fare doppio clic sull’input `readonly` che non riceve eventi del puntatore. Un test isolato Chromium precede il collaudo con database; CI estesa ancora da confermare. Dettagli in `docs/DEVELOPMENT_STATUS.it.md`.
 
 **Hotfix CI full Chromium (25 ottobre 2026):** l’informativa sui cookie funzionali usa un portale React sul `document.body` per evitare che la dashboard intercetti il clic di conferma. La CI standard 40213703957 è verde; la CI full Chromium deve essere rieseguita.

@@ -1,0 +1,51 @@
+#!/usr/bin/env node
+/** Real PostgreSQL transactional acceptance of retention and durable media cleanup.
+ * Disposable CI only; transaction is always rolled back. No credentials logged.
+ */
+import assert from 'node:assert/strict';
+import {randomUUID,randomBytes} from 'node:crypto';
+import pg from 'pg';
+import {SESSION_RETENTION_PURGE_SQL,SESSION_DELETE_WITH_CLEANUP_SQL,SESSION_CLEANUP_CLAIM_SQL,SESSION_RETENTION_DEFAULT_SQL} from '../apps/api/dist/session-retention.js';
+if (!process.env.DATABASE_URL || process.env.QUORIVIO_CI_RETENTION_TEST !== '1') throw Error('Disposable CI database and explicit opt-in required');
+const client=new pg.Client({connectionString:process.env.DATABASE_URL});
+await client.connect();
+const id=()=>randomUUID();
+const insert=async (name,status,expiry,closed,days)=>{
+ const sid=id();
+ await client.query(`INSERT INTO sessions(id,organization_id,owner_id,title,join_code,join_secret,status,expires_at,closed_at,retention_days)
+ SELECT $1,organization_id,id,$2,$3,$4,$5,now()+($6::int * interval '1 day'),
+ CASE WHEN $7::int IS NULL THEN NULL ELSE now()+($7::int * interval '1 day') END,$8
+ FROM users WHERE is_primary_admin=true LIMIT 1`,[sid,name,randomBytes(5).toString('hex'),randomBytes(20).toString('hex'),status,expiry,closed,days]);
+ return sid;
+};
+try {
+ await client.query('BEGIN');
+ const admin=(await client.query('SELECT id FROM users WHERE is_primary_admin=true LIMIT 1')).rows[0]?.id;
+ assert.ok(admin,'CI bootstrap administrator is required');
+ const due=await insert('CI retention due','closed',-100,-5,1);
+ const held=await insert('CI retention held','closed',-100,-5,60);
+ const expired=await insert('CI retention expired','active',-10,null,1);
+ const live=await insert('CI retention live','active',10,null,1);
+ const legacy=await insert('CI retention legacy','closed',10,null,1);
+ const manual=await insert('CI retention manual','draft',10,null,1);
+ const wrongOwner=await client.query(SESSION_DELETE_WITH_CLEANUP_SQL,[manual,id()]);
+ assert.equal(wrongOwner.rowCount,0,'non-owner must not erase or queue');
+ const manualDelete=await client.query(SESSION_DELETE_WITH_CLEANUP_SQL,[manual,admin]);
+ assert.equal(manualDelete.rowCount,1,'owner deletion must enqueue media');
+ const purge=await client.query(SESSION_RETENTION_PURGE_SQL);
+ const ids=new Set(purge.rows.map(row=>row.id));
+ assert.ok(ids.has(due) && ids.has(expired),'due and expired sessions must purge');
+ for(const untouched of [held,live,legacy])assert.ok(!ids.has(untouched),'session retained too briefly');
+ const queued=await client.query('SELECT session_id FROM session_asset_cleanup_jobs WHERE session_id=ANY($1::uuid[])',[[due,expired,manual]]);
+ assert.equal(queued.rowCount,3,'every deletion must have durable cleanup work');
+ const claims=await client.query(SESSION_CLEANUP_CLAIM_SQL);
+ assert.ok(claims.rows.some(row=>row.session_id===manual),'manual erasure must be claimable');
+ const twice=await client.query(SESSION_CLEANUP_CLAIM_SQL);
+ assert.ok(!twice.rows.some(row=>row.session_id===manual),'leased job must not be claimed twice');
+ const setting=await client.query(`SELECT ${SESSION_RETENTION_DEFAULT_SQL} AS days`);
+ assert.ok(Number(setting.rows[0].days)>=1,'administrator retention default is present');
+ console.log('PASS PostgreSQL retention: per-session expiry, closed/active boundaries, legacy safety, owner isolation, atomic outbox, lease, default');
+} finally {
+ await client.query('ROLLBACK').catch(()=>{});
+ await client.end();
+}

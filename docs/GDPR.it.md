@@ -39,3 +39,8 @@ Non definire una sessione «rigorosamente anonima» senza prove sulla non ricond
 In questo ciclo le immagini del profilo rimangono autenticate e il file precedente viene eliminato dopo sostituzione/rimozione; la riga utente PostgreSQL è bloccata per impedire aggiornamenti concorrenti incoerenti. Le importazioni portabili assegnano identificativi indipendenti ai media e non trasferiscono risposte né partecipanti precedenti. L'attivazione MFA email richiede una verifica del possesso della casella con codice a scadenza e tentativi limitati; cambio stato revoca le vecchie sessioni, mantenendo il TOTP indipendente. Un nuovo controllo HTTP PostgreSQL in CI è ancora in attesa di esecuzione.
 
 **Questi controlli non attestano conformità GDPR.** Restano da verificare retention dei filesystem/backup, percorsi degli asset su volumi condivisi, trattamento dati da parte del fornitore email, revoche tra repliche e cancellazione organizzativa. Gli obblighi elencati sopra rimangono aperti.
+
+
+## Addendum 2026-10-26 — Conservazione effettiva e cancellazione media
+
+Il purge applica `retention_days` della sessione a partire dalla chiusura/scadenza; il valore globale è solo il default per nuove sessioni. Solo il proprietario può modificarlo. Le cancellazioni database accodano atomicamente la rimozione dei media in PostgreSQL e i job falliti vengono ritentati dopo un lease. La cancellazione dei dati nei backup e la validazione operativa multi-replica restano responsabilità da verificare prima della produzione. Questi controlli non equivalgono a certificazione GDPR.

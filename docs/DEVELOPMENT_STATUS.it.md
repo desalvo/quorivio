@@ -1,3 +1,17 @@
+## 2026-10-26 — Batch cumulativo di 40 interventi su profili, media e amministrazione
+- 40 verifiche/interventi documentati in un solo batch, non 40 release o esecuzioni CI indipendenti. Inventario: `docs/RC_PROFILE_ADMIN_40_INTERVENTIONS.it.md`.
+- Validazione dimensioni PNG/JPEG/WebP, 4096 px/lato e 16 megapixel; rifiuto upload e immagini memorizzate corrotte; endpoint profilo universale, operazioni foto e salvataggio serializzate.
+- Un solo salvataggio amministrativo atomico PostgreSQL per nickname, ruolo e approvazione; protezione amministratore principale, collisioni, rollback, opzione moderatore e approvazione in bozza.
+- Test PostgreSQL HTTP e Chromium reale aggiunti alla CI ma **non ancora eseguiti** per questo package. Test locali: Node **375/375**, Python **692/692**, build API/web PASS. RC **45,5% invariato**, non certificata. Nessun commit/push/tag/release.
+
+## 26 ottobre 2026 — Profilo presentatore e avatar pubblico (dopo CI verde 40304413948 già committata)
+- L'utente ha confermato il commit dell'ultimo hotfix menu contestuale. GitHub run `40304413948`: quality gate `121510438909` e container build `121512122765` SUCCESS; pubblicazione SKIPPED. Nuova baseline committata: non ripetere i vecchi hotfix nel messaggio di commit successivo.
+- **Correzione funzionale:** il widget profilo pubblico utilizzava l'URL privato `/api/auth/profile/photo/:id`, inaccessibile ai partecipanti anonimi. L'endpoint pubblico ora restituisce soltanto `id`, `name` e `photo_url` riferito alla sessione, con segmenti URL codificati. Non espone URL privati né altre colonne dell'utente; `Cache-Control: no-store`.
+- **Un solo salvataggio:** nickname e nome visualizzato vengono validati e aggiornati atomicamente in PostgreSQL, con lock per utente, un solo UPDATE, protezione nickname admin primario e gestione dei duplicati. Restano compatibili gli endpoint legacy di modifica singola.
+- **Concorrenza foto:** il PATCH legacy del nome non riscrive più una `profile_photo_url` letta prima, evitando di annullare caricamenti o cancellazioni concorrenti.
+- **Interfaccia:** caricamento automatico del profilo, un solo pulsante «Salva profilo», caricamento/rimozione foto separati. Il widget pubblico usa esclusivamente `photo_url`.
+- Verifiche locali: 3 nuovi test Node e 8 contratti Python; **317/317 Node**, **660/660 Python**, build API TypeScript e web TypeScript/Vite PASS. Transazione PostgreSQL reale e visualizzazione avatar nel browser anonimo ancora da collaudare in CI. RC **45,5%**, C4 parziale. Nessun commit/push/tag/release eseguito in questo ciclo.
+
 ## 26 ottobre 2026 — Chromium PostgreSQL: bersaglio del puntatore per modifica titoli (run 40300651081)
 - Il quality gate ha superato l'editor Chromium con fixture e il percorso partecipanti Chromium+PostgreSQL. Il test editor PostgreSQL reale è arrivato al conflitto sullo stesso titolo, ma `dblclick()` sull'input `readonly` è fallito: il widget trascinabile intercetta gli eventi perché il CSS imposta intenzionalmente `pointer-events:none` sui titoli non modificabili.
 - Il test ora utilizza il percorso accessibile reale `Menu contestuale text` → `Modifica titolo`, poi verifica l'editabilità, modifica il testo, conferma con Invio e verifica il ritorno a sola lettura. Stesso helper per quattro scenari di conflitto/recupero; nessun clic forzato, modifica CSS, cambiamento di produzione o indebolimento della protezione CAS. Aggiunti contratti di regressione e test isolato Chromium. CI estesa con PostgreSQL reale da confermare; RC 45,5%.
@@ -401,7 +415,7 @@ Versione `0.1.0-dev`. Realizzati nei sorgenti: backend/frontend, sessioni, sonda
 ## Ciclo gestione dati e partecipanti (22 ottobre 2026)
 
 - L'utente conferma CI precedente completamente verde e commit del cumulativo precedente; queste modifiche **non sono state committate**.
-- Implementati cancellazione della sessione autorizzata al proprietario, revoca con rotazione dei link e chiusura WebSocket, retention configurabile (1–3650 giorni, predefinita a 90).
+- Implementati cancellazione della sessione autorizzata al proprietario, revoca con rotazione dei link e chiusura WebSocket, retention configurabile (1–3650 giorni, predefinita a 60).
 - Aggiunto cleanup orario delle sessioni chiuse/scadute oltre la retention, con cancellazione PostgreSQL a cascata; riconnessione del partecipante con cookie valido senza crearne uno nuovo.
 - Esportazione CSV protetta contro formula injection e nuovi test dedicati.
 - Verifiche: **6/6 test Node superati**, **11/11 test wizard Kubernetes superati**. API/database reali, migrazioni, CI, Docker e conformità GDPR ancora **non verificati** in questo ciclo.
@@ -1060,3 +1074,8 @@ Analizzato l’artefatto della run 40218596128: il clic su «Ho capito» fallisc
 
 ### 25 ottobre 2026 — Hotfix fixture editor Chromium con PostgreSQL reale
 CI estesa GitHub 40220288310 / quality job 121250301296: superati i precedenti passi Chromium editor mock, CAS HTTP PostgreSQL e Chromium partecipanti; fallimento nel merge dell'editor PostgreSQL reale (`ci_browser_editor_postgres.py:101`). Il browser ha correttamente segnalato un conflitto sulla coordinata x (locale 12, server 10), causato dal fixture che riportava a x=10 la coordinata già salvata x=11 durante la modifica dell'etichetta. Il test costruisce ora una PATCH remota della sola etichetta dall'ultimo snapshot del server e verifica che le coordinate rimangano [11,41,75]; rimane il successivo conflitto intenzionale con scelta esplicita. Undici nuove regressioni comportamentali. Dettagli in `docs/RC_CHROMIUM_REAL_EDITOR_MERGE_FIXTURE_HOTFIX.it.md`. Verifiche locali: **644/644 Python**, **314/314 Node**, build TypeScript backend e frontend TypeScript/Vite PASS; Chromium isolato desktop/mobile PASS. End-to-end Chromium/PostgreSQL da rieseguire. RC 45,5% invariata; nessun commit/push dell'assistente.
+
+
+### 2026-10-26 — Batch accelerazione RC: retention, cleanup affidabile e preflight
+
+Corretto un difetto GDPR concreto: il purge ignorava la retention della sessione. Ora la retention globale è soltanto il default per nuove sessioni; il proprietario mantiene la propria scelta e soltanto lui può modificarla. Introdotta coda PostgreSQL transazionale per cancellazione dei file, con retry persistente e lease tra repliche. Aggiunti test di accettazione PostgreSQL e controllo RC fail-closed (`tools/rc_release_preflight.py --strict`). Documentazione in `docs/RC_RETENTION_AND_RELEASE_PREFLIGHT.it.md`. Test locali: 386 Node, 697 Python (ricontrollare in consegna), build API/web PASS. **La RC non è pronta**: nuovi test PostgreSQL/CI e collaudi indipendenti pendenti; punteggio verificato 45,5%, invariato. Nessun commit/push/tag/release.

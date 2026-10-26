@@ -3,7 +3,9 @@ import {allowedWriteOrigin,allowedLiveOrigin} from './origin-policy.js';
 import {encodeBundle,decodeBundle,referencedAssets,remapPortableAssets,BUNDLE_MIME,MAX_BUNDLE_BYTES,type BundleAsset,type BundleManifest} from './portable-bundle.js';
 import {parseLeaderboardPage} from './pagination-policy.js';
 import {validateSettingsPatch} from './platform-settings.js';
-import {profilePhotoId} from './profile-photo.js';
+import {SESSION_RETENTION_DEFAULT_SQL, SESSION_RETENTION_PURGE_SQL, SESSION_DELETE_WITH_CLEANUP_SQL, SESSION_CLEANUP_CLAIM_SQL} from './session-retention.js';
+import {profilePhotoId,publicPresenterProfiles} from './profile-photo.js';
+import {inspectProfileImage} from './profile-image.js';
 import {authCookieIssuedAt,presenterAuthActive} from './live-auth.js';
 import {SESSION_CHANNEL,startSessionBus} from './session-bus.js';
 import {socialProviders,socialState,socialAuthorizationUrl,exchangeSocialCode,socialSubject} from './social-oauth.js';
@@ -380,13 +382,40 @@ app.post('/api/admin/smtp/test',requireAuth,requireAdmin,async(req,res)=>{try{
  const recipient=String(req.body?.recipient||'');if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(recipient)||recipient.length>254){res.status(400).json({error:'invalid_recipient'});return}
  await sendTestEmail(config,recipient);res.json({sent:true});
  }catch(e){console.error('smtp test failed',e instanceof Error?e.message:'unknown');res.status(502).json({error:'smtp_delivery_failed'})}});
-app.patch('/api/auth/profile',requireAuth,async(req,res)=>{try{
- const nickname=req.body?.nickname===null?null:String(req.body?.nickname||'').trim().toLowerCase();
- if(nickname!==null&&!/^[a-z][a-z0-9_.-]{2,31}$/.test(nickname)){res.status(400).json({error:'invalid_nickname'});return}
- const current=await db.query('SELECT is_primary_admin FROM users WHERE id=$1',[auth(req)]);
- if(current.rows[0]?.is_primary_admin&&nickname!=='admin'){res.status(409).json({error:'primary_admin_nickname_immutable'});return}
- const result=await db.query('UPDATE users SET nickname=$2 WHERE id=$1 RETURNING id,email,nickname',[auth(req),nickname]);res.json(result.rows[0]);
- }catch(e){if((e as any)?.code==='23505'){res.status(409).json({error:'nickname_already_taken'});return}sendError(res,e)}});
+// Every approved account can edit its own profile, independently of presenter role.
+app.get('/api/auth/profile',requireAuth,async(req,res)=>{try{
+ const u=await db.query('SELECT id,email,nickname,display_name,profile_photo_url FROM users WHERE id=$1',[auth(req)]);
+ if(!u.rowCount){res.status(404).json({error:'profile_not_found'});return}
+ res.setHeader('Cache-Control','private, no-store');res.json(u.rows[0]);
+ }catch(e){sendError(res,e)}});
+// A single atomic profile save keeps nickname and display name consistent across replicas.
+// The photo URL is deliberately excluded: photo uploads/deletes own that field.
+app.patch('/api/auth/profile',requireAuth,async(req,res)=>{
+ let cx:import("pg").PoolClient|null=null;
+ try{
+  const body=req.body&&typeof req.body==='object'&&!Array.isArray(req.body)?req.body:{};
+  const hasNickname=Object.prototype.hasOwnProperty.call(body,'nickname');
+  const hasName=Object.prototype.hasOwnProperty.call(body,'display_name');
+  if(!hasNickname&&!hasName){res.status(400).json({error:'empty_profile_update'});return}
+  const nickname=hasNickname?(body.nickname===null?null:typeof body.nickname==='string'?body.nickname.trim().toLowerCase():undefined):null;
+  const name=hasName?(typeof body.display_name==='string'?body.display_name.trim():undefined):null;
+  if((hasNickname&&(nickname===undefined||(nickname!==null&&!/^[a-z][a-z0-9_.-]{2,31}$/.test(nickname))))
+    ||(hasName&&(name===undefined||name.length<2||name.length>100))){res.status(400).json({error:'invalid_profile'});return}
+  cx=await db.connect();
+  await cx.query('BEGIN');
+  const current=await cx.query('SELECT nickname,is_primary_admin FROM users WHERE id=$1 FOR UPDATE',[auth(req)]);
+  if(!current.rowCount){await cx.query('ROLLBACK');res.status(404).json({error:'profile_not_found'});return}
+  if(current.rows[0].is_primary_admin&&(hasNickname?nickname:current.rows[0].nickname)!=='admin'){
+   await cx.query('ROLLBACK');res.status(409).json({error:'primary_admin_nickname_immutable'});return;
+  }
+  const result=await cx.query(`UPDATE users SET
+   nickname=CASE WHEN $2::boolean THEN $3::text ELSE nickname END,
+   display_name=CASE WHEN $4::boolean THEN $5::text ELSE display_name END
+   WHERE id=$1 RETURNING id,email,nickname,display_name,profile_photo_url`,[auth(req),hasNickname,nickname,hasName,name]);
+  await cx.query('COMMIT');res.json(result.rows[0]);
+ }catch(e){if(cx)await cx.query('ROLLBACK').catch(()=>{});if((e as any)?.code==='23505'){res.status(409).json({error:'nickname_already_taken'});return}sendError(res,e)}
+ finally{cx?.release()}
+});
 // Security-sensitive helpdesk MFA reset. Never disclose TOTP seeds or recovery codes.
 app.post('/api/admin/users/:id/mfa/reset',requireAuth,requireAdmin,async(req,res)=>{try{
  const actor=auth(req)!;
@@ -426,7 +455,41 @@ app.get('/api/admin/users',requireAuth,requireAdmin,async(req,res)=>{try{
  const rows=await db.query(`SELECT id,email,nickname,is_primary_admin,role,approved,totp_enabled,created_at FROM users WHERE ${terms} ORDER BY created_at DESC,id DESC LIMIT $3 OFFSET $4`,[search,status,pageSize,(page-1)*pageSize]);
  res.json(req.query.page===undefined?rows.rows:{items:rows.rows,total:total.rows[0].total,page,page_size:pageSize});
  }catch(e){sendError(res,e)}});
-app.patch('/api/admin/users/:id',requireAuth,requireAdmin,async(req,res)=>{try{const role=req.body?.role,approved=req.body?.approved;const primary=await db.query('SELECT is_primary_admin FROM users WHERE id=$1',[req.params.id]);if(primary.rows[0]?.is_primary_admin&&(!approved||role!=='platform_admin')){res.status(409).json({error:'primary_admin_immutable'});return}if(!['platform_admin','org_admin','presenter','moderator','user'].includes(role)||typeof approved!=='boolean'){res.status(400).json({error:'invalid_update'});return}if(req.params.id===auth(req)&&(!approved||role!=='platform_admin')){res.status(409).json({error:'cannot_demote_self'});return}const r=await db.query('UPDATE users SET role=$2,approved=$3 WHERE id=$1 RETURNING id,email,role,approved',[req.params.id,role,approved]);if(r.rowCount)for(const peers of sockets.values())for(const ws of peers)if((ws as any).uid===req.params.id)ws.close(1008,'account permissions changed');if(!r.rowCount){res.status(404).end();return}res.json(r.rows[0])}catch(e){sendError(res,e)}});
+// One row-locked admin save: nickname, role and approval either all commit or none.
+// Existing clients can omit nickname; the legacy nickname route remains available.
+app.patch('/api/admin/users/:id',requireAuth,requireAdmin,async(req,res)=>{
+ const role=req.body?.role,approved=req.body?.approved;
+ const hasNickname=req.body&&Object.prototype.hasOwnProperty.call(req.body,'nickname');
+ const nickname=hasNickname?(req.body.nickname===null||req.body.nickname===''?null:typeof req.body.nickname==='string'?req.body.nickname.trim().toLowerCase():undefined):null;
+ if(!['platform_admin','org_admin','presenter','moderator','user'].includes(role)||typeof approved!=='boolean'||
+   (hasNickname&&(nickname===undefined||(nickname!==null&&(!/^[a-z][a-z0-9_.-]{2,31}$/.test(nickname)||nickname==='admin'))))){
+  res.status(400).json({error:'invalid_update'});return;
+ }
+ const cx=await db.connect();let changedPermissions=false;
+ try{
+  await cx.query('BEGIN');
+  const current=await cx.query('SELECT id,nickname,role,approved,is_primary_admin FROM users WHERE id=$1 FOR UPDATE',[req.params.id]);
+  if(!current.rowCount){await cx.query('ROLLBACK');res.status(404).json({error:'user_not_found'});return}
+  const before=current.rows[0];
+  if(before.is_primary_admin&&(!approved||role!=='platform_admin'||hasNickname&&nickname!==before.nickname)){
+   await cx.query('ROLLBACK');res.status(409).json({error:'primary_admin_immutable'});return;
+  }
+  if(req.params.id===auth(req)&&(!approved||role!=='platform_admin')){
+   await cx.query('ROLLBACK');res.status(409).json({error:'cannot_demote_self'});return;
+  }
+  const result=await cx.query(`UPDATE users SET role=$2,approved=$3,
+   nickname=CASE WHEN $4::boolean THEN $5::text ELSE nickname END
+   WHERE id=$1 RETURNING id,email,nickname,role,approved`,[req.params.id,role,approved,hasNickname,nickname]);
+  changedPermissions=before.role!==role||before.approved!==approved;
+  await cx.query('COMMIT');
+  if(changedPermissions)for(const peers of sockets.values())for(const ws of peers)if((ws as any).uid===req.params.id)ws.close(1008,'account permissions changed');
+  res.json(result.rows[0]);
+ }catch(e){await cx.query('ROLLBACK').catch(()=>{});
+  if((e as any)?.code==='23505'){res.status(409).json({error:'nickname_already_taken'});return}
+  sendError(res,e)
+ }finally{cx.release()}
+});
+
 app.delete('/api/admin/users/:id',requireAuth,requireAdmin,async(req,res)=>{try{if(req.params.id===auth(req)){res.status(409).json({error:'cannot_delete_self'});return}if((await db.query('SELECT is_primary_admin FROM users WHERE id=$1',[req.params.id])).rows[0]?.is_primary_admin){res.status(409).json({error:'primary_admin_immutable'});return}const r=await db.query('DELETE FROM users WHERE id=$1 RETURNING id',[req.params.id]);if(!r.rowCount){res.status(409).json({error:'user_has_dependent_data_or_not_found'});return}res.status(204).end()}catch(e){if((e as any)?.code==='23503'){res.status(409).json({error:'user_has_dependent_data'});return}sendError(res,e)}});
 app.get('/api/admin/settings',requireAuth,requireAdmin,async(_req,res)=>{try{const r=await db.query('SELECT key,value FROM platform_settings');res.json(Object.fromEntries(r.rows.map(x=>[x.key,x.value])))}catch(e){sendError(res,e)}});
 app.patch('/api/admin/settings',requireAuth,requireAdmin,async(req,res)=>{
@@ -475,37 +538,45 @@ app.post('/api/auth/profile/photo',requireAuth,async(req,res)=>{
  try{
   const received=await receiveAssetStream(req,profilePhotoFolder(),id,type,limit,size);
   destination=received.destination;
+  // The signature-only streaming check is insufficient for profile photos:
+  // reject invalid/dangerously large pixel dimensions before publishing.
+  inspectProfileImage(await readFile(destination),type);
   await scanUploadedFile(destination);
   const url=`/api/auth/profile/photo/${id}`;
   const old=await replaceProfilePhoto(uid,url);
   destination=null; // the newly committed profile now owns the file
   await cleanOldProfilePhoto(old);
   res.status(201).json({profile_photo_url:url});
- }catch(e){if(destination)await unlink(destination).catch(()=>{});sendError(res,e)}
+ }catch(e){if(destination)await unlink(destination).catch(()=>{});
+  if(e instanceof Error&&e.message==='invalid_profile_image'){res.status(415).json({error:'invalid_profile_image'});return}
+  if(e instanceof Error&&['invalid_media_signature','invalid_upload_size','upload_length_mismatch','upload_too_large'].includes(e.message)){res.status(400).json({error:e.message});return}
+  sendError(res,e)}
 });
 app.get('/api/auth/profile/photo/:imageId',requireAuth,async(req,res)=>{try{
- const id=String(req.params.imageId);if(!/^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(id)){res.status(404).end();return}
+ const id=String(req.params.imageId);if(!profilePhotoId(`/api/auth/profile/photo/${id}`)){res.status(404).end();return}
  const r=await db.query('SELECT profile_photo_url FROM users WHERE id=$1',[auth(req)]);
  if(r.rows[0]?.profile_photo_url!==`/api/auth/profile/photo/${id}`){res.status(404).end();return}
- const data=await readFile(profilePhotoPath(id));let type='image/png';if(data[0]===255&&data[1]===216)type='image/jpeg';else if(data.toString('ascii',8,12)==='WEBP')type='image/webp';
+ const data=await readFile(profilePhotoPath(id));const type=data[0]===255&&data[1]===216?'image/jpeg':data.toString('ascii',8,12)==='WEBP'?'image/webp':'image/png';
+ inspectProfileImage(data,type);
  res.setHeader('Content-Type',type);res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Cache-Control','private, no-store');res.send(data);
- }catch(e){if((e as NodeJS.ErrnoException).code==='ENOENT'){res.status(404).end();return}sendError(res,e)}});
+ }catch(e){if((e as NodeJS.ErrnoException).code==='ENOENT'||(e as Error).message==='invalid_profile_image'){res.status(404).end();return}sendError(res,e)}});
 app.delete('/api/auth/profile/photo',requireAuth,async(req,res)=>{try{
  const old=await replaceProfilePhoto(auth(req)!,null);
  await cleanOldProfilePhoto(old);
  res.json({profile_photo_url:null});
  }catch(e){sendError(res,e)}});
 app.get('/api/presenters/me/profile',requireAuth,requirePresenter,async(req,res)=>{try{const u=await db.query('SELECT id,email,display_name,profile_photo_url FROM users WHERE id=$1',[auth(req)]);res.json(u.rows[0])}catch(e){sendError(res,e)}});
-app.patch('/api/presenters/me/profile',requireAuth,requirePresenter,async(req,res)=>{try{const name=String(req.body?.display_name||'').trim();const saved=await db.query('SELECT profile_photo_url FROM users WHERE id=$1',[auth(req)]);const photo=saved.rows[0]?.profile_photo_url||null;if(name.length<2||name.length>100){res.status(400).json({error:'invalid_profile'});return}const u=await db.query('UPDATE users SET display_name=$2,profile_photo_url=$3 WHERE id=$1 RETURNING id,email,display_name,profile_photo_url',[auth(req),name,photo]);res.json(u.rows[0])}catch(e){sendError(res,e)}});
+app.patch('/api/presenters/me/profile',requireAuth,requirePresenter,async(req,res)=>{try{const name=String(req.body?.display_name||'').trim();if(name.length<2||name.length>100){res.status(400).json({error:'invalid_profile'});return}const u=await db.query('UPDATE users SET display_name=$2 WHERE id=$1 RETURNING id,email,display_name,profile_photo_url',[auth(req),name]);res.json(u.rows[0])}catch(e){sendError(res,e)}});
 app.get('/api/join/:code/presenters/:presenterId/photo',async(req,res)=>{try{
  const session=await publicSession(req.params.code);if(!session||session.status==='closed'){res.status(404).end();return}
  const profile=await db.query(`SELECT profile_photo_url FROM users WHERE id=$1 AND (id=$2 OR EXISTS(SELECT 1 FROM session_presenters WHERE session_id=$3 AND user_id=$1))`,[req.params.presenterId,session.owner_id,session.id]);
- const url=String(profile.rows[0]?.profile_photo_url||'');const match=/^\/api\/auth\/profile\/photo\/([0-9a-f-]{36})$/.exec(url);
- if(!match){res.status(404).end();return}
- const data=await readFile(profilePhotoPath(match[1]));let mime='image/png';if(data[0]===255&&data[1]===216)mime='image/jpeg';else if(data.toString('ascii',8,12)==='WEBP')mime='image/webp';
+ const id=profilePhotoId(profile.rows[0]?.profile_photo_url);
+ if(!id){res.status(404).end();return}
+ const data=await readFile(profilePhotoPath(id));const mime=data[0]===255&&data[1]===216?'image/jpeg':data.toString('ascii',8,12)==='WEBP'?'image/webp':'image/png';
+ inspectProfileImage(data,mime);
  res.setHeader('Content-Type',mime);res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Cache-Control','no-store');res.send(data);
- }catch(e){if((e as NodeJS.ErrnoException).code==='ENOENT'){res.status(404).end();return}sendError(res,e)}});
-app.get('/api/join/:code/presenter-profiles',async(req,res)=>{try{const session=await publicSession(req.params.code);if(!session||session.status==='closed'){res.status(404).end();return}const profiles=await db.query("SELECT u.id,coalesce(nullif(u.display_name,''),'Presentatore') AS name,u.profile_photo_url FROM users u WHERE u.id=$1 OR u.id IN (SELECT user_id FROM session_presenters WHERE session_id=$2)",[session.owner_id,session.id]);res.json(profiles.rows)}catch(e){sendError(res,e)}});
+ }catch(e){if((e as NodeJS.ErrnoException).code==='ENOENT'||(e as Error).message==='invalid_profile_image'){res.status(404).end();return}sendError(res,e)}});
+app.get('/api/join/:code/presenter-profiles',async(req,res)=>{try{const session=await publicSession(req.params.code);if(!session||session.status==='closed'){res.status(404).end();return}const profiles=await db.query("SELECT u.id,coalesce(nullif(u.display_name,''),'Presentatore') AS name,u.profile_photo_url FROM users u WHERE u.id=$1 OR u.id IN (SELECT user_id FROM session_presenters WHERE session_id=$2)",[session.owner_id,session.id]);res.setHeader('Cache-Control','no-store');res.json(publicPresenterProfiles(profiles.rows,req.params.code))}catch(e){sendError(res,e)}});
 // A session may have no scheduled dates, or any explicitly selected set of dates.
 app.get('/api/sessions/:id/schedule',requireAuth,async(req,res)=>{try{
  const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}
@@ -542,7 +613,7 @@ app.get('/api/sessions',requireAuth,requirePresenter,async(req,res)=>{try{
  const result=await db.query(`SELECT s.*,CASE WHEN s.owner_id=$1 THEN 'owner' ELSE 'collaborator' END AS access_role FROM sessions s WHERE ${where} ORDER BY s.created_at DESC,s.id DESC LIMIT $4 OFFSET $5`,[...params,pageSize,(page-1)*pageSize]);
  res.json(req.query.page===undefined?result.rows.map(strip):{items:result.rows.map(strip),total:total.rows[0].total,page,page_size:pageSize});
  }catch(e){sendError(res,e)}});
-app.post('/api/sessions',requireAuth,requirePresenter,async(req,res)=>{try{const title=String(req.body?.title||'').trim();const referenceDate=String(req.body?.reference_date||new Date().toISOString().slice(0,10));if(!title||title.length>160||!validDate(referenceDate)){res.status(400).json({error:'invalid_title'});return}const uid=auth(req)!;const u=(await db.query('SELECT organization_id FROM users WHERE id=$1',[uid])).rows[0];if(!u){res.status(401).end();return}const id=randomUUID(),code=randomBytes(5).toString('hex').toUpperCase(),joinSecret=randomBytes(20).toString('base64url');const r=await db.query("INSERT INTO sessions(id,organization_id,owner_id,title,join_code,join_secret,expires_at,reference_date) VALUES($1,$2,$3,$4,$5,$6,now()+interval '1 day',$7) RETURNING *",[id,u.organization_id,uid,title,code,joinSecret,referenceDate]);res.status(201).json(strip(r.rows[0]))}catch(e){sendError(res,e)}});
+app.post('/api/sessions',requireAuth,requirePresenter,async(req,res)=>{try{const title=String(req.body?.title||'').trim();const referenceDate=String(req.body?.reference_date||new Date().toISOString().slice(0,10));if(!title||title.length>160||!validDate(referenceDate)){res.status(400).json({error:'invalid_title'});return}const uid=auth(req)!;const u=(await db.query('SELECT organization_id FROM users WHERE id=$1',[uid])).rows[0];if(!u){res.status(401).end();return}const id=randomUUID(),code=randomBytes(5).toString('hex').toUpperCase(),joinSecret=randomBytes(20).toString('base64url');const r=await db.query(`INSERT INTO sessions(id,organization_id,owner_id,title,join_code,join_secret,expires_at,reference_date,retention_days) VALUES($1,$2,$3,$4,$5,$6,now()+interval '1 day',$7,${SESSION_RETENTION_DEFAULT_SQL}) RETURNING *`,[id,u.organization_id,uid,title,code,joinSecret,referenceDate]);res.status(201).json(strip(r.rows[0]))}catch(e){sendError(res,e)}});
 
 // Portable definition exports intentionally omit participant data and join credentials.
 async function portableSession(id:string){const session=(await db.query('SELECT title,reference_date::text AS reference_date,theme,allow_anonymous,show_results FROM sessions WHERE id=$1',[id])).rows[0];const activities=(await db.query('SELECT type,title,options,correct_option_id,correct_option_ids,answer_mode,answer_required,duration_seconds,page_design,result_design FROM activities WHERE session_id=$1 ORDER BY position',[id])).rows;return {format:'quorivio-session',version:1,session,activities}}
@@ -555,7 +626,7 @@ async function createFromPortable(data:any,uid:string,importMediaDir?:string,bun
   await cx.query('BEGIN');
   const u=(await cx.query('SELECT organization_id FROM users WHERE id=$1',[uid])).rows[0];
   if(!u)throw Error('missing_user');
-  await cx.query("INSERT INTO sessions(id,organization_id,owner_id,title,reference_date,join_code,join_secret,expires_at,theme,allow_anonymous,show_results) VALUES($1,$2,$3,$4,$5,$6,$7,now()+interval '1 day',$8,$9,$10)",[sid,u.organization_id,uid,definition.session.title,definition.session.reference_date,randomBytes(5).toString('hex').toUpperCase(),randomBytes(20).toString('base64url'),JSON.stringify(definition.session.theme),definition.session.allow_anonymous,definition.session.show_results]);
+  await cx.query(`INSERT INTO sessions(id,organization_id,owner_id,title,reference_date,join_code,join_secret,expires_at,theme,allow_anonymous,show_results,retention_days) VALUES($1,$2,$3,$4,$5,$6,$7,now()+interval '1 day',$8,$9,$10,${SESSION_RETENTION_DEFAULT_SQL})`,[sid,u.organization_id,uid,definition.session.title,definition.session.reference_date,randomBytes(5).toString('hex').toUpperCase(),randomBytes(20).toString('base64url'),JSON.stringify(definition.session.theme),definition.session.allow_anonymous,definition.session.show_results]);
   for(let i=0;i<definition.activities.length;i++){
    const a=definition.activities[i];
    await cx.query('INSERT INTO activities(id,session_id,type,title,options,correct_option_id,duration_seconds,page_design,result_design,position,answer_mode,answer_required,correct_option_ids) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)',[randomUUID(),sid,a.type,a.title,JSON.stringify(a.options),['quiz','timed_quiz'].includes(a.type)?a.correct_option_id:null,a.duration_seconds,JSON.stringify(a.page_design),JSON.stringify(a.result_design),i,a.answer_mode||'single',a.answer_required??true,JSON.stringify(a.correct_option_ids||[])]);
@@ -996,10 +1067,27 @@ app.post('/api/sessions/:id/activities/:aid/close',requireAuth,async(req,res)=>{
 app.get('/api/sessions/:id/qr',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}const url=`${publicBase}/join/${s.join_secret}`;const type=req.query.format==='svg'?'svg':'png';res.setHeader('Content-Disposition',`attachment; filename="quorivio-${s.join_code}.${type}"`);if(type==='svg'){res.type('image/svg+xml').send(await QRCode.toString(url,{type:'svg',margin:2}))}else{res.type('png').send(await QRCode.toBuffer(url,{width:800,margin:2}))}}catch(e){sendError(res,e)}});
 // GDPR data lifecycle: only the session owner can revoke access, set retention or erase a session.
 app.post('/api/sessions/:id/revoke',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}if(s.owner_id!==auth(req)){res.status(403).json({error:'owner_required'});return}const updated=await db.query("UPDATE sessions SET join_code=$2,join_secret=$3,status='closed',closed_at=now(),expires_at=now() WHERE id=$1 RETURNING *",[s.id,randomBytes(5).toString('hex').toUpperCase(),randomBytes(20).toString('base64url')]);await db.query("UPDATE activities SET status='closed' WHERE session_id=$1 AND status='open'",[s.id]);await broadcast(s.id);for(const ws of sockets.get(s.id)||[])ws.close(1008,'access revoked');res.json({ok:true,session:strip(updated.rows[0])})}catch(e){sendError(res,e)}});
-app.patch('/api/sessions/:id/retention',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}const days=req.body?.retention_days;if(!validRetentionDays(days)){res.status(400).json({error:'invalid_retention_days'});return}const r=await db.query("UPDATE sessions SET retention_days=$2 WHERE id=$1 RETURNING retention_days",[s.id,days]);res.json(r.rows[0])}catch(e){sendError(res,e)}});
-app.delete('/api/sessions/:id',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}if(s.owner_id!==auth(req)){res.status(403).json({error:'owner_required'});return}await db.query('DELETE FROM sessions WHERE id=$1 AND owner_id=$2',[s.id,auth(req)]);await cleanupSessionFiles(s.id).catch(e=>console.error('asset directory cleanup pending',s.id,e instanceof Error?e.message:'unknown'));for(const ws of sockets.get(s.id)||[])ws.close(1008,'session deleted');res.status(204).end()}catch(e){sendError(res,e)}});
+app.patch('/api/sessions/:id/retention',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}if(s.owner_id!==auth(req)){res.status(403).json({error:'owner_required'});return}const days=req.body?.retention_days;if(!validRetentionDays(days)){res.status(400).json({error:'invalid_retention_days'});return}const r=await db.query("UPDATE sessions SET retention_days=$2 WHERE id=$1 RETURNING retention_days",[s.id,days]);res.json(r.rows[0])}catch(e){sendError(res,e)}});
+app.delete('/api/sessions/:id',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}if(s.owner_id!==auth(req)){res.status(403).json({error:'owner_required'});return}await db.query(SESSION_DELETE_WITH_CLEANUP_SQL,[s.id,auth(req)]);await cleanupPendingSessionFiles().catch(e=>console.error('asset directory cleanup pending',s.id,e instanceof Error?e.message:'unknown'));for(const ws of sockets.get(s.id)||[])ws.close(1008,'session deleted');res.status(204).end()}catch(e){sendError(res,e)}});
 // A session may be auto-purged only after its retention window AND after closure/expiry.
-async function purgeExpiredSessions(){const r=await db.query("DELETE FROM sessions WHERE (status='closed' OR expires_at<now()) AND COALESCE(closed_at,expires_at) + (SELECT value::int FROM platform_settings WHERE key='closed_session_retention_days') * interval '1 day' < now() RETURNING id");for(const row of r.rows){await cleanupSessionFiles(row.id).catch(e=>console.error('expired asset cleanup pending',row.id,e instanceof Error?e.message:'unknown'));for(const ws of sockets.get(row.id)||[])ws.close(1008,'expired')}}
+async function cleanupPendingSessionFiles(){
+ const jobs=await db.query(SESSION_CLEANUP_CLAIM_SQL);
+ for(const job of jobs.rows){
+  try{
+   await cleanupSessionFiles(job.session_id);
+   await db.query('DELETE FROM session_asset_cleanup_jobs WHERE session_id=$1 AND claimed_until=$2',[job.session_id,job.claimed_until]);
+  }catch(e){
+   // Persist failures for operators and retry after lease expiry; no raw path or tokens in logs.
+   await db.query('UPDATE session_asset_cleanup_jobs SET last_error=$3 WHERE session_id=$1 AND claimed_until=$2',[job.session_id,job.claimed_until,(e instanceof Error?e.message:'unknown').slice(0,240)]).catch(()=>{});
+   console.error('asset cleanup queued for retry',job.session_id);
+  }
+ }
+}
+async function purgeExpiredSessions(){
+ const r=await db.query(SESSION_RETENTION_PURGE_SQL);
+ for(const row of r.rows)for(const ws of sockets.get(row.id)||[])ws.close(1008,'expired');
+ await cleanupPendingSessionFiles();
+}
 app.get('/api/sessions/:id/export.csv',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}const r=await db.query('SELECT a.title,a.type,r.option_id,r.correct,r.submitted_at FROM responses r JOIN activities a ON a.id=r.activity_id WHERE a.session_id=$1 AND r.invalidated_at IS NULL ORDER BY r.submitted_at',[s.id]);const esc=escapeCsvCell;res.setHeader('Content-Type','text/csv; charset=utf-8');res.setHeader('Content-Disposition',`attachment; filename="quorivio-${s.join_code}.csv"`);res.send('\uFEFF' + [['activity','type','option_id','correct','submitted_at'],...r.rows.map(x=>[x.title,x.type,x.option_id,x.correct,x.submitted_at.toISOString()])].map(row=>row.map(esc).join(',')).join('\r\n'))}catch(e){sendError(res,e)}});
 async function publicSession(secretOrCode:string){const r=await db.query('SELECT * FROM sessions WHERE (join_secret=$1 OR join_code=$1) AND status=$2 AND expires_at>now()',[secretOrCode,'active']);return r.rows[0]}
 app.get('/api/join/:code',async(req,res)=>{try{const s=await publicSession(req.params.code);if(!s){res.status(404).json({error:'session_unavailable'});return}const a=s.current_activity_id?(await db.query('SELECT * FROM activities WHERE id=$1',[s.current_activity_id])).rows[0]:null;res.json({session:{id:s.id,title:s.title,status:s.status},activity:a?publicActivity(a):null,allow_anonymous:s.allow_anonymous,show_results:s.show_results,theme:s.theme})}catch(e){sendError(res,e)}});
