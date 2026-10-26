@@ -16,7 +16,7 @@ HOST = '127.0.0.1'
 PORT = int(os.getenv('QUORIVIO_CI_SMTP_PORT', '2465'))
 OUT = Path(os.getenv('QUORIVIO_CI_SMTP_CAPTURE', '/tmp/quorivio-ci-mail.jsonl'))
 USER = os.getenv('QUORIVIO_CI_SMTP_USER', 'ci-smtp-user')
-PASS = os.getenv('QUORIVIO_CI_SMTP_PASSWORD', 'ci-smtp-password-should-not-leave-runner')
+PASS = os.getenv('QUORIVIO_CI_SMTP_PASSWORD', '')
 
 async def connection(reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
     authenticated = False
@@ -32,7 +32,7 @@ async def connection(reader: asyncio.StreamReader, writer: asyncio.StreamWriter)
             cmd = line.decode('utf-8', 'replace').strip()
             verb, _, arg = cmd.partition(' ')
             if verb.upper() in ('EHLO', 'HELO'):
-                await reply('250-localhost'); await reply('250-AUTH PLAIN LOGIN'); await reply('250 8BITMIME')
+                await reply('250-localhost'); await reply('250-AUTH PLAIN'); await reply('250 8BITMIME')
             elif verb.upper() == 'AUTH':
                 try:
                     method, _, token = arg.partition(' ')
@@ -84,6 +84,8 @@ async def connection(reader: asyncio.StreamReader, writer: asyncio.StreamWriter)
 async def main() -> None:
     if os.getenv('QUORIVIO_CI_SMTP_TEST') != '1':
         raise SystemExit('Disposable SMTP requires QUORIVIO_CI_SMTP_TEST=1')
+    if not PASS:
+        raise SystemExit('Disposable SMTP requires QUORIVIO_CI_SMTP_PASSWORD')
     OUT.parent.mkdir(parents=True,exist_ok=True)
     OUT.touch(mode=0o600,exist_ok=True)
     os.chmod(OUT,0o600)
