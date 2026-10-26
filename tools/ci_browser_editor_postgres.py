@@ -54,6 +54,22 @@ async def open_editor(page,title):
  await page.get_by_role('button',name='✎ Modifica le pagine').first.click()
  await expect(page.get_by_role('group',name='Canvas grafico widget')).to_be_visible()
 
+async def edit_canvas_widget_title(canvas, title):
+ """Use the editor's real double-click affordance before typing a widget title.
+
+ Canvas titles are intentionally read-only until the user enters edit mode;
+ filling a read-only field directly times out in real Chromium. Pressing Enter
+ commits the edit and restores the read-only interaction/drag mode.
+ """
+ field=canvas.first.get_by_role('textbox',name='Titolo text')
+ await expect(field).not_to_be_editable()
+ await field.dblclick()
+ await expect(field).to_be_editable()
+ await field.fill(title)
+ await field.press('Enter')
+ await expect(field).to_have_value(title)
+ await expect(field).not_to_be_editable()
+
 async def main():
  async with async_playwright() as pw:
   launch={'executable_path':os.environ['QUORIVIO_CHROMIUM_PATH']} if os.environ.get('QUORIVIO_CHROMIUM_PATH') else {}
@@ -131,7 +147,7 @@ async def main():
    remote_result=json.loads(json.dumps(current['result_design']))
    remote_result['header']='Remote results heading'
    await call(context,'PATCH',path,{'page_design':remote_design,'result_design':remote_result,'expected_design_revision':5})
-   await canvas.first.locator('input').fill('Local second edit')
+   await edit_canvas_widget_title(canvas,'Local second edit')
    await page.get_by_role('button',name='Salva layout').click()
    await expect(page.get_by_role('alert').filter(has_text='Un altro presentatore')).to_be_visible()
    await page.get_by_role('button',name='Confronta e riconcilia le modifiche').click()
@@ -150,7 +166,7 @@ async def main():
    remote_design=json.loads(json.dumps(current['page_design']))
    remote_design['widgets'][0]['label']='Remote final edit'
    await call(context,'PATCH',path,{'page_design':remote_design,'result_design':current['result_design'],'expected_design_revision':7})
-   await canvas.first.locator('input').fill('Local final edit')
+   await edit_canvas_widget_title(canvas,'Local final edit')
    await page.get_by_role('button',name='Salva layout').click()
    await expect(page.get_by_role('alert').filter(has_text='Un altro presentatore')).to_be_visible()
    page.once('dialog',lambda d:asyncio.create_task(d.dismiss()))
@@ -162,7 +178,7 @@ async def main():
    await expect(page.get_by_role('button',name='Salva layout')).to_be_disabled()
    assert await page.locator('.widget-canvas-item').first.locator('input').input_value()=='Remote final edit'
    # User-initiated local backup: no persistent browser storage and no implicit PATCH.
-   await canvas.first.locator('input').fill('Restored from local JSON')
+   await edit_canvas_widget_title(canvas,'Restored from local JSON')
    async with page.expect_download() as download_info:
     await page.get_by_role('button',name='Esporta bozza JSON').click()
    download=await download_info.value
@@ -171,7 +187,7 @@ async def main():
    assert backup['base_revision']==8
    assert backup['base_draft']['widgets'][0]['label']=='Remote final edit'
    assert backup['draft']['widgets'][0]['label']=='Restored from local JSON'
-   await canvas.first.locator('input').fill('Discarded temporary local edit')
+   await edit_canvas_widget_title(canvas,'Discarded temporary local edit')
    page.once('dialog',lambda d:asyncio.create_task(d.accept()))
    await page.locator('.page-draft-import input').set_input_files({'name':'recovery.json','mimeType':'application/json','buffer':json.dumps(backup).encode()})
    await expect(canvas.first.locator('input')).to_have_value('Restored from local JSON')

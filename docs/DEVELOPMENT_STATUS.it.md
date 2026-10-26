@@ -1,3 +1,8 @@
+## 2026-10-25 — Hotfix Chromium completo: modifica titoli widget (run 40225491747)
+- La CI estesa ha superato la riconciliazione di campi indipendenti e i test PostgreSQL CAS/Chromium partecipanti, ma è fallita quando il test ha usato `.fill()` su un input titolo intenzionalmente `readonly` (`Titolo text`, valore `Remote collaborator`).
+- L’editor richiede il doppio clic per attivare la modifica e Invio per concluderla. Sostituite **tutte e quattro** le scritture dirette con un helper che fa doppio clic reale, attende il campo modificabile, inserisce il testo, preme Invio e verifica il ritorno alla modalità sola lettura.
+- Aggiunti cinque test di regressione Python. Nessuna modifica alla produzione, alla sicurezza o al motore CAS/merge. Test end-to-end Chromium+PostgreSQL ancora da confermare con `browser_test=true`; avanzamento RC invariato al 45,5%.
+
 ## 2026-10-25 — Hotfix livello informativa cookie nella CI Chromium full
 - Run standard GitHub 40213703957 confermata verde (quality, container e pubblicazione). Run full opt-in 40214402565 bloccata in Chromium: il pulsante «Ho capito» è visibile e abilitato, ma `.welcome` intercetta gli eventi del puntatore.
 - L'informativa cookie accessibile viene renderizzata tramite `createPortal(..., document.body)` al di fuori dei contesti di sovrapposizione dell'editor/dashboard, mantenendo il clic reale senza `force=True`, cookie iniettati o aumento del timeout.

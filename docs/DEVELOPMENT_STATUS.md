@@ -1,3 +1,8 @@
+## 2026-10-25 — Full Chromium PostgreSQL title-edit acceptance hotfix (run 40225491747)
+- The opt-in Chromium+PostgreSQL run advanced beyond the independent-field merge, and passed real PostgreSQL editor CAS and participant Chromium tests. It failed at `tools/ci_browser_editor_postgres.py` when `.fill()` was used on an intentionally `readonly` canvas title input (`Titolo text`, value `Remote collaborator`).
+- The editor deliberately requires a double-click to enter title edit mode, and Enter to commit/restore read-only canvas dragging. Replaced **all four** direct `.fill()` calls in the real-editor acceptance with a helper that double-clicks, waits for editability, fills, presses Enter, and verifies the value and return to read-only.
+- Added five Python regression tests for all four scenarios and the UI contract. No production behavior, security policy or CAS/merge implementation changed. Full Chromium+PostgreSQL acceptance remains pending the next `browser_test=true` CI; RC score remains 45.5%.
+
 ## 2026-10-25 — Chromium full-gate cookie notice layering hotfix
 - Maintainer confirmed standard GitHub run 40213703957: quality, container and publication jobs SUCCESS. Full opt-in run 40214402565 failed only at Chromium's functional cookie notice acknowledgement: Playwright located the enabled button, but the dashboard `.welcome` subtree intercepted its pointer events.
 - Render the existing accessible cookie notice through React `createPortal(..., document.body)` so its fixed, high-z-index layer is outside the editor/dashboard stacking context. Preserve real pointer-based acceptance (no `force=True`, injected cookies or increased timeout), functional cookie semantics and existing user action.
