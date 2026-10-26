@@ -19,6 +19,9 @@ async def ensure_canvas_tools_open(page):
         trigger=page.get_by_role('button',name='Apri menu contestuale canvas, sfondi e proprietà pagina')
         await trigger.click()  # Real pointer path; never force clicks or mutate DOM state.
     await expect(group).to_be_visible()
+    # Layer actions live in a nested .canvas-editor-tools panel. All controls
+    # must be present in the accessibility tree before the test uses them.
+    await expect(group.get_by_role('group',name='Ordine e spostamento widget selezionati')).to_be_visible()
     return group
 
 

@@ -465,6 +465,11 @@
 .editor-ux-v2 .canvas-context-properties{position:absolute;top:0;left:0;right:auto;z-index:30;max-width:min(420px,90%);max-height:80vh;overflow:auto;background:#fff;border-radius:12px;padding:8px 14px;color:#193046;box-shadow:0 16px 44px #0008}
 .editor-ux-v2 .canvas-editor-tools{display:none!important}
 .editor-ux-v2 .canvas-editor-group[data-tools-open=true]>.canvas-editor-tools{display:flex!important;position:relative;max-height:130px;overflow:auto;gap:8px;padding:9px;margin:0 0 10px;background:#10273bfa;color:#ecfbff;border-radius:10px;box-shadow:0 8px 20px #0008}
+/* Keep nested layer/nudge actions inside their parent contextual panel visible.
+   The blanket .canvas-editor-tools display:none must only hide panels while
+   the menu is closed, not descendants of an opened panel (CI 40392423273). */
+.editor-ux-v2 .canvas-editor-group[data-tools-open=true]>.canvas-editor-tools .canvas-editor-tools{display:flex!important;position:static;max-height:none;overflow:visible;flex:1 1 100%;gap:8px;margin:4px 0 0;padding:4px 0;border-top:1px solid #ffffff29}
+
 .editor-ux-v2 .canvas-editor-tools button{background:#fff;color:#14344b;border:1px solid #9ebccc;border-radius:6px;font-size:12px}
 .editor-ux-v2 .canvas-accessible-controls{margin:9px 0 0;padding:0;border:1px solid #ffffff24;border-radius:9px;background:#102b4299;color:#e3f5ff}
 .editor-ux-v2 .canvas-accessible-controls summary{padding:9px 12px;cursor:pointer;color:#d0e6f8;font-size:12px}

@@ -87,6 +87,8 @@ jobs:
             sleep 1
           done
           curl --fail --show-error http://127.0.0.1:5173/
+          # Real browser CSS preflight: catch hidden nested actions before UI acceptance.
+          python3 tools/ci_nested_context_css_chromium.py
           python3 tools/ci_browser_editor.py
       - name: Upload Chromium failure diagnostics
         if: failure() && github.event_name == 'workflow_dispatch' && inputs.browser_test

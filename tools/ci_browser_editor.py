@@ -146,6 +146,11 @@ async def main():
     await context_trigger.click()
     await expect(selection).to_be_hidden()
     await ensure_canvas_tools_open(page)
+    # Regression CI 40392423273: nested layering controls must be exposed
+    # when the canvas context opens, not suppressed by the parent's CSS.
+    layer_group=page.get_by_role('group',name='Ordine e spostamento widget selezionati')
+    await expect(layer_group).to_be_visible()
+    await expect(layer_group.get_by_role('button',name='Porta selezione davanti')).to_be_visible()
     # Stable z-order operations must preserve selected relative order and undo.
     await checks.nth(0).check()
     await checks.nth(1).check()
