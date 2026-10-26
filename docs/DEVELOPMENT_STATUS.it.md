@@ -1,3 +1,9 @@
+## 26 ottobre 2026 — Chromium 40385480205: visibilità comandi contestuali (hotfix non committato)
+- **Baseline committata:** `a415b2655d4d0e648777c3a65efbc28e011663f0`. Full CI manuale `40385480205`: qualità **FAILED**, attesa del pulsante nascosto `Porta selezione davanti`; controlli menu miniature superati. Altri Chromium e build container **SKIPPED**; pubblicazione Docker **SKIPPED**.
+- **Causa:** la nuova UI nasconde intenzionalmente `.canvas-editor-tools` quando il menu del canvas non è aperto; il test ipotizzava che rimanesse aperto durante undo/redo/selezione.
+- **Correzione:** helper Playwright condivisi per aprire/usare/chiudere il contesto con clic reali; aggiornati test Chromium simulato e PostgreSQL, contratti e 4 nuove regressioni. **Nessuna modifica al codice di produzione**.
+- **Verifica:** test locali pertinenti e Node PASS; Full CI PostgreSQL/Chromium da rieseguire. **RC 48,0% invariato**. Vedi `docs/RC_CHROMIUM_CONTEXT_TOOL_VISIBILITY_HOTFIX.it.md`.
+
 ## 26/10/2026 — Chromium 40382686414: menu miniature intercetta il puntatore (hotfix, nuova CI in attesa)
 - **Baseline committata:** `ac4254173ee7f56bf0ed4f4ba71d2ebe004f800a`. CI standard `40381561104` qualità e container **SUCCESS**, pubblicazione **SKIPPED**; CI manuale full `40382686414` FALLITA in `tools/ci_browser_editor.py` quando Playwright tentava di richiudere il menu ⋮ della prima miniatura: `.page-editor-thumb-menu` **intercettava gli eventi del puntatore** destinati a `.page-editor-thumb-menu-trigger`. Test browser successivi e container saltati. Gli avvisi Vite `ws proxy ECONNREFUSED` non costitivano la causa dell'errore.
 - **Causa:** la regola CSS per le ultime due miniature (`:nth-last-child(-n+2)`) comprendeva anche la prima e unica pagina, posizionando il menu lungo **sopra** il suo pulsante. Il pulsante era identificato da Playwright ma il clic normale terminava per timeout. Non si aggira l'errore con clic forzati.

@@ -11,6 +11,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 from playwright.async_api import async_playwright, expect
 from ci_editor_collaboration_fixtures import label_only_remote_patch
+from ci_editor_context_tools import ensure_canvas_tools_open, click_canvas_tool, close_canvas_tools
 
 BASE=os.environ.get('QUORIVIO_CI_BASE_URL','http://127.0.0.1:8080')
 assert urlsplit(BASE).hostname in ('127.0.0.1','localhost') and urlsplit(BASE).scheme=='http'
@@ -94,7 +95,7 @@ async def main():
    first=await call(context,'PATCH',path,draft())
    assert first['design_revision']==2
    await open_editor(page,title)
-   await page.get_by_role('button',name='Apri menu contestuale canvas, sfondi e proprietà pagina').click()
+   await ensure_canvas_tools_open(page)
    if not await page.locator('.canvas-accessible-controls').get_attribute('open'):
     await page.locator('.canvas-accessible-controls > summary').click()
    canvas=page.locator('.widget-canvas-item')
@@ -104,8 +105,8 @@ async def main():
    region=page.get_by_role('region',name='Organizzazione accessibile dei widget')
    checks=region.get_by_role('checkbox',name='Seleziona')
    await checks.nth(0).check();await checks.nth(1).check()
-   await page.get_by_role('button',name='Sposta selezione a destra').click()
-   await page.get_by_role('button',name='Apri menu contestuale canvas, sfondi e proprietà pagina').click()
+   await click_canvas_tool(page,'Sposta selezione a destra')
+   await close_canvas_tools(page)
    assert (await canvas.evaluate_all('(els)=>els.map(e=>parseFloat(e.style.left))'))[:2]==[11,41]
    await page.get_by_role('button',name='Salva layout').click()
    await expect(page.get_by_text('Layout domanda e risultati aggiornato')).to_be_visible()
@@ -113,7 +114,7 @@ async def main():
    saved=next(x for x in persisted['activities'] if x['id']==aid)
    assert saved['design_revision']==3 and [w['position']['x'] for w in saved['page_design']['widgets'][:2]]==[11,41]
    await open_editor(page,title)
-   await page.get_by_role('button',name='Apri menu contestuale canvas, sfondi e proprietà pagina').click()
+   await ensure_canvas_tools_open(page)
    if not await page.locator('.canvas-accessible-controls').get_attribute('open'):
     await page.locator('.canvas-accessible-controls > summary').click()
    assert (await canvas.evaluate_all('(els)=>els.map(e=>parseFloat(e.style.left))'))[:2]==[11,41]
@@ -133,8 +134,8 @@ async def main():
    assert [w['position']['x'] for w in remote_saved['page_design']['widgets']]==[11,41,75]
    region=page.get_by_role('region',name='Organizzazione accessibile dei widget')
    await region.get_by_role('checkbox',name='Seleziona').first.check()
-   await page.get_by_role('button',name='Sposta selezione a destra').click()
-   await page.get_by_role('button',name='Apri menu contestuale canvas, sfondi e proprietà pagina').click()
+   await click_canvas_tool(page,'Sposta selezione a destra')
+   await close_canvas_tools(page)
    await page.get_by_role('button',name='Salva layout').click()
    await expect(page.get_by_role('alert').filter(has_text='Un altro presentatore')).to_be_visible()
    await expect(page.get_by_role('button',name='Salva layout')).to_be_disabled()

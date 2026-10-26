@@ -5,6 +5,7 @@ import copy
 import os
 from pathlib import Path
 from playwright.async_api import async_playwright, expect
+from ci_editor_context_tools import ensure_canvas_tools_open, click_canvas_tool
 
 SESSION='11111111-1111-4111-8111-111111111111'
 ACTIVITY='22222222-2222-4222-8222-222222222222'
@@ -97,9 +98,9 @@ async def main():
     await page.locator('.canvas-accessible-controls > summary').click()
     await page.locator('.widget-canvas-item').first.click()
     await page.locator('.widget-canvas-item').nth(1).click(modifiers=['Shift'])
-    await page.get_by_role('button',name='Apri menu contestuale canvas, sfondi e proprietà pagina').click()
+    await ensure_canvas_tools_open(page)
     assert await page.get_by_role('group',name='Allineamento widget selezionati').get_by_text('2 selezionati').count()==1
-    await page.get_by_role('button',name='Sinistra',exact=True).click()
+    await click_canvas_tool(page,'Sinistra')
     coords=await page.locator('.widget-canvas-item').evaluate_all('(els)=>els.map(e=>parseFloat(e.style.left))')
     assert coords[:2]==[10,10],coords
     await page.keyboard.press('Control+z')
@@ -109,8 +110,8 @@ async def main():
     coords=await page.locator('.widget-canvas-item').evaluate_all('(els)=>els.map(e=>parseFloat(e.style.left))')
     assert coords[:2]==[10,10],coords
     # A group paste must preserve both selected widgets, their spacing, and unique IDs.
-    await page.get_by_role('button',name='Copia selezione').click()
-    await page.get_by_role('button',name='Incolla selezione').click()
+    await click_canvas_tool(page,'Copia selezione')
+    await click_canvas_tool(page,'Incolla selezione')
     assert await page.locator('.widget-canvas-item').count()==5
     pasted=await page.locator('.widget-canvas-item').evaluate_all('(els)=>els.slice(-2).map(e=>parseFloat(e.style.left))')
     assert pasted[1]-pasted[0]==0,pasted
@@ -121,6 +122,7 @@ async def main():
     # valid acceptance check: it waits until Playwright times out.
     selection=page.get_by_role('group',name='Allineamento widget selezionati')
     deselect=selection.get_by_role('button',name='Deseleziona')
+    await ensure_canvas_tools_open(page)
     await expect(selection.get_by_text('0 selezionati')).to_be_visible()  # Undo clears orphaned IDs
     await expect(deselect).to_be_disabled()
     # Exercise the accessible widget list, then verify the real clear action.
@@ -131,15 +133,23 @@ async def main():
     await checks.nth(1).check()
     await expect(selection.get_by_text('2 selezionati')).to_be_visible()
     await expect(deselect).to_be_enabled()
+    await ensure_canvas_tools_open(page)
     await deselect.click()
     await expect(selection.get_by_text('0 selezionati')).to_be_visible()
     await expect(checks.nth(0)).not_to_be_checked()
     await expect(checks.nth(1)).not_to_be_checked()
     await expect(deselect).to_be_disabled()
+    # A dismissed canvas menu hides commands, but the same selection remains
+    # available after reopening it. Never depend on accidental persistent menus.
+    await ensure_canvas_tools_open(page)
+    context_trigger=page.get_by_role('button',name='Apri menu contestuale canvas, sfondi e proprietà pagina')
+    await context_trigger.click()
+    await expect(selection).to_be_hidden()
+    await ensure_canvas_tools_open(page)
     # Stable z-order operations must preserve selected relative order and undo.
     await checks.nth(0).check()
     await checks.nth(1).check()
-    await page.get_by_role('button',name='Porta selezione davanti').click()
+    await click_canvas_tool(page,'Porta selezione davanti')
     order=await page.locator('.widget-canvas-item').evaluate_all('(els)=>els.map(e=>e.querySelector("input")?.value)')
     assert order==['Third','First','Second'],order
     await page.keyboard.press('Control+z')
@@ -148,7 +158,7 @@ async def main():
     # Accessible toolbar group nudging, duplication, deletion and undo.
     await checks.nth(0).check()
     await checks.nth(1).check()
-    await page.get_by_role('button',name='Sposta selezione a destra').click()
+    await click_canvas_tool(page,'Sposta selezione a destra')
     coords=await page.locator('.widget-canvas-item').evaluate_all('(els)=>els.map(e=>parseFloat(e.style.left))')
     assert coords[:2]==[11,11],coords  # Earlier redo aligned these two widgets.
     await page.keyboard.press('Control+z')
@@ -156,21 +166,22 @@ async def main():
     assert coords[:2]==[10,10],coords
     await checks.nth(0).check()
     await checks.nth(1).check()
-    await page.get_by_role('button',name='Duplica selezione').click()
+    await click_canvas_tool(page,'Duplica selezione')
     assert await page.locator('.widget-canvas-item').count()==5
     await page.keyboard.press('Control+z')
     assert await page.locator('.widget-canvas-item').count()==3
+    await ensure_canvas_tools_open(page)
     await expect(selection.get_by_text('0 selezionati')).to_be_visible()
     await checks.nth(0).check()
     await checks.nth(1).check()
-    await page.get_by_role('button',name='Elimina selezione').click()
+    await click_canvas_tool(page,'Elimina selezione')
     assert await page.locator('.widget-canvas-item').count()==1
     await page.keyboard.press('Control+z')
     assert await page.locator('.widget-canvas-item').count()==3
     # Browser-to-API persistence contract: PATCH stores the layout; reload restores it.
     await checks.nth(0).check()
     await checks.nth(1).check()
-    await page.get_by_role('button',name='Sposta selezione a destra').click()
+    await click_canvas_tool(page,'Sposta selezione a destra')
     await page.get_by_role('button',name='Salva layout').click()
     await expect(page.get_by_text('Layout domanda e risultati aggiornato')).to_be_visible()
     await expect(page.get_by_role('button',name='Salva layout')).to_be_disabled()
@@ -227,12 +238,12 @@ async def main():
      assert await mobile_thumb.evaluate("""b=>{const r=b.getBoundingClientRect();const h=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return h===b||b.contains(h)}"""), 'Touch thumbnail menu overlays its own trigger'
      await mobile_thumb.tap()
      await expect(mobile_actions).to_have_count(0)
-     await mobile.get_by_role('button',name='Apri menu contestuale canvas, sfondi e proprietà pagina').tap()
+     await ensure_canvas_tools_open(mobile)
      await mobile.locator('.canvas-accessible-controls > summary').click()
      mchecks=mobile.get_by_role('region',name='Organizzazione accessibile dei widget').get_by_role('checkbox',name='Seleziona')
      await mchecks.nth(0).check()
      await mchecks.nth(1).check()
-     await mobile.get_by_role('button',name='Sposta selezione a sinistra').click()
+     await click_canvas_tool(mobile,'Sposta selezione a sinistra')
      mcoords=await mobile.locator('.widget-canvas-item').evaluate_all('(els)=>els.map(e=>parseFloat(e.style.left))')
      assert mcoords[:2]==[10,10],mcoords
     except Exception:
