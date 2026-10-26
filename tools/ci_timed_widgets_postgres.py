@@ -25,6 +25,19 @@ def duplicate_client(original):
     return build_opener(HTTPCookieProcessor(jar))
 
 
+def duration_milliseconds(value: object) -> int:
+    """Read node-postgres BIGINT as a lossless JSON decimal string.
+
+    The source column elapsed_ms is PostgreSQL int8. The pg driver deliberately
+    returns int8 as text, rather than rounding values to JS Number precision.
+    """
+    if not isinstance(value, str) or not value.isascii() or not value.isdecimal():
+        raise AssertionError(f'Expected decimal-string duration_ms from PostgreSQL int8, got {value!r}')
+    parsed = int(value)
+    if parsed > (2**63 - 1):
+        raise AssertionError('PostgreSQL int8 duration_ms exceeds signed BIGINT range')
+    return parsed
+
 def run():
     address=urlsplit(BASE)
     if address.scheme != 'http' or address.hostname not in ('127.0.0.1','localhost') or not address.port:
@@ -76,7 +89,10 @@ def run():
     assert all(x['participant_name'] is None for x in page['items'])
     ranking=request(admin,'GET',f'/api/sessions/{sid}/activities/{aid}/widgets/timed1/timed-leaderboard')
     assert ranking['answers']==1 and ranking['correct']==1 and len(ranking['ranking'])==1, ranking
-    assert ranking['ranking'][0]['rank']==1 and ranking['ranking'][0]['duration_ms']>=0
+    # PostgreSQL BIGINT / int8 is serialized by node-postgres as a decimal
+    # string, not a JSON number. Preserve that lossless API representation.
+    initial_duration=ranking['ranking'][0]['duration_ms']
+    assert duration_milliseconds(initial_duration)>=0, ranking
     assert all('participant_id' not in x for x in ranking['ranking'])
     # Confirm a retry of the original answer remains idempotent after expiry,
     # while a NEW answer arriving after expiry is rejected by PostgreSQL clock.
@@ -102,7 +118,7 @@ def run():
                    env=pg_env,capture_output=True,text=True,check=True)
     ranks=request(admin,'GET',f'/api/sessions/{sid}/activities/{aid}/widgets/timed1/timed-leaderboard')['ranking']
     assert [r['rank'] for r in ranks]==[1,1,3],ranks
-    assert [int(r['duration_ms']) for r in ranks]==[1000,1000,2000],ranks
+    assert [duration_milliseconds(r['duration_ms']) for r in ranks]==[1000,1000,2000],ranks
     time.sleep(max(0,deadline-time.time()+0.25))
     already=request(duplicate_client(same),'POST',widget,{'option_id':'yes'})
     assert already['already_submitted'] is True and already['revision']==1
@@ -121,6 +137,7 @@ def run():
     request(newcomer,'POST',f'/api/join/{code}/respond',{'activity_id':lid,'option_id':'yes'},expected=409)
     old_rank=request(admin,'GET',f'/api/sessions/{sid}/activities/{lid}/timed-leaderboard')
     assert old_rank['correct']==1 and old_rank['ranking'][0]['rank']==1
+    assert duration_milliseconds(old_rank['ranking'][0]['duration_ms'])>=0,old_rank
     # An old page may not accept topic submissions after switching activities.
     request(same,'POST',topic,{'body':'This page is no longer active'},expected=403)
     request(admin,'POST',f'/api/sessions/{sid}/status',{'status':'closed'})
