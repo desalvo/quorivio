@@ -441,10 +441,13 @@
 .editor-ux-v2 .page-editor-preview-title{color:#fff;font-size:clamp(8px,.75vw,13px);font-weight:750;white-space:normal;max-height:55%;text-shadow:0 2px 7px #000d;top:12%;left:10%;right:7%;line-height:1.15;overflow:hidden;z-index:2}
 .editor-ux-v2 .page-editor-preview-widget{z-index:1;font-size:5px;color:#16263a;overflow:hidden;box-shadow:0 2px 4px #0003}
 .editor-ux-v2 .page-editor-thumb-number{position:absolute;bottom:5px;left:6px;z-index:3;min-width:18px;padding:3px;background:#07172bc4;color:#f0fbff;border-radius:4px;font-size:10px;font-weight:700}
-.editor-ux-v2 .page-editor-thumb-menu-trigger{position:absolute;z-index:6;right:5px;top:5px;display:grid;place-items:center;width:34px;height:34px;min-width:34px;min-height:34px;border:1px solid #b7e7ef66;border-radius:8px;background:#0b1a2fc9!important;color:#fff!important;padding:5px!important;opacity:.76}
+.editor-ux-v2 .page-editor-thumb-menu-trigger{position:absolute;z-index:100;right:5px;top:5px;display:grid;place-items:center;width:34px;height:34px;min-width:34px;min-height:34px;border:1px solid #b7e7ef66;border-radius:8px;background:#0b1a2fc9!important;color:#fff!important;padding:5px!important;opacity:.76}
 .editor-ux-v2 .page-editor-thumb-menu-trigger:hover,.editor-ux-v2 .page-editor-thumb-menu-trigger:focus-visible,.editor-ux-v2 .page-editor-thumb-menu-trigger[aria-expanded=true]{opacity:1;background:#225475!important;outline:2px solid #6ad8e8}
-.editor-ux-v2 .page-editor-thumb-menu{position:absolute;top:38px;left:min(25px,12%);z-index:80;display:grid;gap:2px;width:min(245px,calc(100vw - 36px));max-height:65vh;overflow-y:auto;padding:7px;background:#0e1b30f7;border:1px solid #749ac2;border-radius:12px;box-shadow:0 18px 44px #000c;backdrop-filter:blur(20px)}
-.editor-ux-v2 .page-editor-thumb-row:nth-last-child(-n+2) .page-editor-thumb-menu{top:auto;bottom:38px}
+.editor-ux-v2 .page-editor-thumb-menu{position:absolute;top:calc(100% + 8px);left:min(25px,12%);z-index:80;display:grid;gap:2px;width:min(245px,calc(100vw - 36px));max-height:65vh;overflow-y:auto;padding:7px;background:#0e1b30f7;border:1px solid #749ac2;border-radius:12px;box-shadow:0 18px 44px #000c;backdrop-filter:blur(20px)}
+/* Position menus away from their toggles. The first two thumbnails open
+   downwards even when they are also the last rows (1-2 page sessions).
+   Near the end of a longer page list, menus open above the row. */
+.editor-ux-v2 .page-editor-thumb-row:nth-last-child(-n+2):not(:nth-child(-n+2)) .page-editor-thumb-menu{top:auto;bottom:calc(100% + 8px)}
 .editor-ux-v2 .page-editor-thumb-menu button{display:block;text-align:left;min-height:38px;width:100%;border:0;border-radius:7px;padding:8px 12px;background:transparent;color:#f5faff;font-size:13px;font-weight:500}
 .editor-ux-v2 .page-editor-thumb-menu button:hover,.editor-ux-v2 .page-editor-thumb-menu button:focus-visible{background:#28627e;outline:2px solid #79e4f0}
 .editor-ux-v2 .page-editor-thumb-menu .editor-delete-action{color:#ffbdc4}
@@ -514,7 +517,10 @@
  .editor-ux-v2 .editor-icon-tool{width:38px;height:38px;min-height:38px}
  .editor-ux-v2 .editor-secondary-workflow{max-height:18vh}
  .editor-ux-v2 .page-editor-preview-title{font-size:7px}
- .editor-ux-v2 .page-editor-thumb-menu{position:fixed;left:8px;top:20%!important;bottom:auto!important;max-width:min(250px,85vw)}
+ /* On mobile the menu floats beside—not over—the narrow thumbnail rail.
+    This also avoids clipping by its scrolling container. */
+ .editor-ux-v2 .page-editor-sidebar{position:relative;z-index:5}
+ .editor-ux-v2 .page-editor-thumb-menu{position:fixed;left:calc(clamp(98px,23vw,150px) + 8px);top:20%!important;bottom:auto!important;max-width: min(250px,calc(100vw - clamp(98px,23vw,150px) - 20px))}
 }
 @media(prefers-reduced-motion:reduce){.editor-ux-v2 *{transition:none!important;animation:none!important}}
 

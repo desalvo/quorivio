@@ -79,7 +79,17 @@ async def main():
     await expect(actions.get_by_role('button',name='Nuova pagina dopo')).to_be_visible()
     await expect(actions.get_by_role('button',name='Duplica pagina')).to_be_visible()
     await expect(actions.get_by_role('button',name='Elimina pagina')).to_be_visible()
+    # Regression from CI 40382686414: with only one slide the last-row CSS
+    # must not place the contextual menu over its own toggle button.
+    # Assert the browser's real hit target, not merely an accessible locator.
+    can_close=await thumb_menu.evaluate("""button => {
+      const r=button.getBoundingClientRect();
+      const hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);
+      return hit===button || button.contains(hit);
+    }""")
+    assert can_close, 'Open thumbnail menu intercepts its own trigger in Chromium'
     await thumb_menu.click()
+    await expect(actions).to_have_count(0)
     icon=page.get_by_role('button',name='Aggiungi widget: Testo')
     await icon.hover()
     await expect(page.get_by_role('tooltip').filter(has_text='Aggiungi widget: Testo')).to_be_visible()
@@ -209,6 +219,14 @@ async def main():
      await card.get_by_role('button',name='Apri sessione').click()
      await mobile.get_by_role('button',name='✎ Modifica le pagine').first.click()
      await expect(mobile.get_by_role('group',name='Canvas grafico widget')).to_be_visible()
+     # The thumbnail menu must open AND close on touch without covering its trigger.
+     mobile_thumb=mobile.get_by_role('button',name='Menu pagina 1: crea, duplica, elimina, sposta')
+     await mobile_thumb.tap()
+     mobile_actions=mobile.get_by_role('group',name='Azioni pagina 1')
+     await expect(mobile_actions.get_by_role('button',name='Nuova pagina dopo')).to_be_visible()
+     assert await mobile_thumb.evaluate("""b=>{const r=b.getBoundingClientRect();const h=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return h===b||b.contains(h)}"""), 'Touch thumbnail menu overlays its own trigger'
+     await mobile_thumb.tap()
+     await expect(mobile_actions).to_have_count(0)
      await mobile.get_by_role('button',name='Apri menu contestuale canvas, sfondi e proprietà pagina').tap()
      await mobile.locator('.canvas-accessible-controls > summary').click()
      mchecks=mobile.get_by_role('region',name='Organizzazione accessibile dei widget').get_by_role('checkbox',name='Seleziona')
