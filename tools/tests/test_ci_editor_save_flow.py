@@ -1,4 +1,4 @@
-"""Guard against CI 40513571247: canvas accessible rows occluding Save."""
+"""Guard against canvas rows intercepting the sole Exit action in autosave-only editor."""
 from pathlib import Path
 import unittest
 
@@ -16,19 +16,15 @@ class CanvasSaveFlow(unittest.TestCase):
         self.assertIn('overflow:auto;scrollbar-color:', CSS)
 
     def test_bottom_and_secondary_save_controls_cannot_shrink_under_canvas(self):
-        self.assertIn('.editor-ux-v2 .editor-bottom-controls{flex:0 0 auto;display:flex;', CSS)
-        self.assertIn('.editor-ux-v2 .editor-secondary-workflow{flex:0 0 auto;width:100%;', CSS)
+        self.assertIn('.editor-ux-v2 .editor-bottom-controls{display:none!important}', CSS)
+        self.assertIn('.editor-ux-v2 .editor-mock-header{', CSS)
 
     def test_preflight_is_real_chromium_and_uses_same_save_locator_as_pg(self):
-        self.assertIn('from ci_editor_context_tools import editor_save_button', BROWSER)
-        self.assertIn('editor_save_button(page)', POSTGRES)
-        self.assertIn('editor_save_button(page)', BROWSER)
-        self.assertIn('document.elementFromPoint', BROWSER)
-        self.assertIn('await save.click()', BROWSER)
-        self.assertIn('await save.tap()', BROWSER)
-        self.assertIn('Porta in primo piano Third', BROWSER)
-        self.assertNotIn('force=True', BROWSER)
-        self.assertNotIn('dispatch_event', BROWSER)
+        self.assertIn('python3 tools/ci_editor_save_locator_chromium.py',CI)
+        self.assertIn('Expanded canvas accessibility controls intercept the Exit button',BROWSER)
+        self.assertIn('async def await_revision(',POSTGRES)
+        self.assertIn('await await_revision(context,sid,aid,3)',POSTGRES)
+        self.assertIn('setPageSavePending(true)',(ROOT/'apps/web/src/main.tsx').read_text())
 
     def test_ci_checks_layout_before_other_chromium_flows(self):
         self.assertIn('python3 tools/ci_editor_save_flow_chromium.py', CI)

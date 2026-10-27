@@ -13,5 +13,9 @@ class EditorDraftImport(unittest.TestCase):
  def test_stale_requires_reconciliation(self):self.assertIn("plan.mode==='reconcile'",MAIN);self.assertIn('base:backup.base_draft,local:backup.draft',MAIN)
  def test_server_freshness(self):self.assertIn('latestPageDraft.current!==signature',MAIN);self.assertIn('loadedDesignRevision.current=revision',MAIN)
  def test_recovery_never_calls_save(self):self.assertNotIn('updatePageDesign()',MAIN[MAIN.index('async function importPageDraft('):MAIN.index('const pageHasUnsavedChanges=')])
- def test_browser_covers_import_export_and_stale_merge(self):self.assertIn('page.expect_download()',BROWSER);self.assertIn('page-draft-import input',BROWSER);self.assertIn("final_page['design_revision']==10",BROWSER)
+ def test_browser_covers_import_export_and_stale_merge(self):
+     self.assertIn('page.expect_download()',BROWSER)
+     self.assertIn('Esporta layout JSON',BROWSER)
+     self.assertIn("await expect(editor.get_by_text('Conflitto di revisione'))",BROWSER)
+     self.assertIn("choice.select_option('local')",BROWSER)
 if __name__=='__main__':unittest.main()

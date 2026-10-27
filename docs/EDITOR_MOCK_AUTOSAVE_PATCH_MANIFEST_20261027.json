@@ -1,0 +1,49 @@
+{
+  "baseline_committed_sha": "551396cdaafb8765140355557eae8f8ceb59c8d4",
+  "cumulative_from": "quorivio-0.1.0-dev-rc-editor-layout-widget-save-reliability-cumulative.zip",
+  "readiness_percent": 53.0,
+  "updated": [
+    "quorivio/.github/workflows/ci.yml",
+    "quorivio/apps/web/src/main.tsx",
+    "quorivio/apps/web/src/style.css",
+    "quorivio/docs/DEVELOPMENT_STATUS.it.md",
+    "quorivio/docs/DEVELOPMENT_STATUS.md",
+    "quorivio/tools/ci_browser_editor.py",
+    "quorivio/tools/ci_browser_editor_postgres.py",
+    "quorivio/tools/ci_editor_context_tools.py",
+    "quorivio/tools/ci_editor_save_flow_chromium.py",
+    "quorivio/tools/ci_editor_save_locator_chromium.py",
+    "quorivio/tools/tests/test_chromium_cookie_notice_acceptance.py",
+    "quorivio/tools/tests/test_chromium_selection_acceptance_contract.py",
+    "quorivio/tools/tests/test_ci_browser_editor_readonly_title.py",
+    "quorivio/tools/tests/test_ci_editor_collaboration_fixtures.py",
+    "quorivio/tools/tests/test_ci_editor_context_tool_visibility.py",
+    "quorivio/tools/tests/test_ci_editor_nested_layer_visibility.py",
+    "quorivio/tools/tests/test_ci_editor_save_flow.py",
+    "quorivio/tools/tests/test_ci_editor_thumb_menu_pointer_hit.py",
+    "quorivio/tools/tests/test_ci_mobile_disclosure_overlap.py",
+    "quorivio/tools/tests/test_editor_async_save_safety.py",
+    "quorivio/tools/tests/test_editor_contextual_layout_v2.py",
+    "quorivio/tools/tests/test_editor_draft_import.py",
+    "quorivio/tools/tests/test_editor_merge_recovery.py",
+    "quorivio/tools/tests/test_editor_save_locator_strict.py",
+    "quorivio/tools/tests/test_editor_twenty_cycle_contract.py"
+  ],
+  "added": [
+    "quorivio/apps/web/public/editor-quorivio-logo.svg",
+    "quorivio/docs/RC_EDITOR_MOCK_AUTOSAVE_20261027.en.md",
+    "quorivio/docs/RC_EDITOR_MOCK_AUTOSAVE_20261027.it.md",
+    "quorivio/tools/ci_editor_mock_layout_chromium.py",
+    "quorivio/tools/tests/test_editor_autosave_mock_fidelity.py"
+  ],
+  "removed": [],
+  "verification": {
+    "node": "447/447 local PASS",
+    "python": "833/833 local PASS",
+    "typescript_syntax": "PASS",
+    "isolated_chromium": "PASS desktop/mobile",
+    "frontend_full_build": "not verified locally; npm packages unavailable",
+    "real_PG_browser": "pending Github full CI"
+  },
+  "caveat": "Not a release candidate; do not publish images or tag."
+}

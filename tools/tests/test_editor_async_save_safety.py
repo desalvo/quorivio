@@ -11,8 +11,10 @@ class AsyncEditorSaveSafety(unittest.TestCase):
         self.assertIn('finally{pendingPageSave.current=false;setPageSavePending(false)}', SOURCE)
 
     def test_navigation_waits_for_inflight_save(self):
-        self.assertIn('if(pendingPageSave.current){setNotice(', SOURCE)
-        self.assertIn('Attendi la conclusione del salvataggio', SOURCE)
+        self.assertIn('if(pendingPageSave.current||pageHasUnsavedChanges)',SOURCE)
+        self.assertIn('Salvataggio automatico in corso',SOURCE)
+        self.assertIn('async function exitPageEditor()',SOURCE)
+        self.assertIn('await updatePageDesign()',SOURCE)
 
     def test_save_captures_exact_submitted_draft(self):
         self.assertIn('const savedSignature=pageDraftSignature()', SOURCE)

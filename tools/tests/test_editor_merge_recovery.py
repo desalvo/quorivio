@@ -29,18 +29,19 @@ class EditorMergeRecovery(unittest.TestCase):
  def test_rebase_retains_remote_revision(self):
   self.assertIn('loadedDesignRevision.current=mergeCandidate.revision',MAIN)
  def test_json_draft_export_is_user_initiated(self):
-  self.assertIn('onClick={downloadPageDraft}',MAIN)
-  self.assertIn('createPageDraftBackup(selected,designActivity',MAIN)
+     self.assertIn('onClick={()=>{downloadPageDraftFor(a);setPageThumbMenu(',MAIN)
+     self.assertIn('createPageDraftBackup(selected,designActivity',MAIN)
+     self.assertIn('Esporta layout JSON',MAIN)
  def test_browser_acceptance_uses_real_database_not_mock(self):
-  self.assertIn("current['design_revision']==7",BROWSER)
-  self.assertNotIn('page.route(',BROWSER)
-  self.assertIn('expected_design_revision',BROWSER)
+     self.assertIn("resolved=await await_revision(context,sid,aid,7)",BROWSER)
+     self.assertNotIn('page.route(',BROWSER)
+     self.assertIn('expected_design_revision',BROWSER)
  def test_browser_checks_server_unchanged_until_explicit_save(self):
   self.assertIn("current['design_revision']==4",BROWSER)
   self.assertIn("get_by_role('button',name='Applica riconciliazione alla bozza')",BROWSER)
  def test_browser_checks_same_field_resolution_and_remote_disjoint_field(self):
-  self.assertIn("choice.select_option('local')",BROWSER)
-  self.assertIn("current['result_design']['header']=='Remote results heading'",BROWSER)
+     self.assertIn("choice.select_option('local')",BROWSER)
+     self.assertIn("resolved['result_design']['header']=='Remote results heading'",BROWSER)
  def test_recovery_is_keyboard_and_mobile_operable(self):
   self.assertIn('.page-merge-panel :focus-visible',CSS)
   self.assertIn('.page-merge-choice select{width:100%',CSS)

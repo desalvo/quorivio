@@ -1,3 +1,9 @@
+### 2026-10-27 — Editor user issue batch: viewport/menus/widget IDs and save-readback (uncommitted)
+See `docs/RC_EDITOR_USER_ISSUES_20261027.en.md`. Reported save failure traced to widget IDs exceeding backend 48-character limit; local Python 824, Node 447 PASS; production Chromium/PostgreSQL recheck pending. RC 53.0% unchanged.
+
+### 2026-10-27 — CI 40522786396: dynamic RC ledger regression fix (pending commit)
+The maintainer confirmed commit `551396cdaafb8765140355557eae8f8ceb59c8d4` of the RC 53.0%/keyboard thumbnail batch. Standard push CI `40522786396` quality **FAILED** in the general Python suite (reported under Kubernetes wizard and worker integration): 1/817 tests compared 53.0 against obsolete hard-coded 48.0. Container build and production publisher SKIPPED. Three test modules now compute the current score from gate weights/statuses, preserve the historical 53.0 evidence floor, and permit future accepted gates without static blockers. Production app, score ledger, CI jobs and Docker policy untouched. Local complete Python suite **819/819 PASS**; gate audit 53.0, release_candidate_ready=false. New GitHub rerun **PENDING**. Details: `docs/RC_SCORE_LEDGER_CI_FIX_2026-10-27.en.md`.
+
 ### 2026-10-27 — Verified full CI + scoped RC advancement (48.0 → 53.0%)
 Full CI/publish run `40517573850` SHA `e372a3ae`: quality, Chromium/PG, 500 participants, container and authorized multiarch publisher all SUCCESS. Independently reviewed gate changes: **A4 open→partial (+3)** and **D3 open→partial (+2)**, with independent device/screen-reader/ARM64/rootless/K8s acceptance still pending. New keyboard thumbnail reordering, focus restoration and live announcements added after this commit; GitHub rerun required. RC **53.0%**; not yet candidate-ready. See `docs/RC_EVIDENCE_REVIEW_2026-10-27.en.md`.
 
@@ -1403,3 +1409,7 @@ Maintainer reported GitHub workflow `40479089027`, quality job `122104572150`, S
 ### 2026-10-27 — Chromium real-PostgreSQL editor Save overflow hotfix (post-commit)
 
 Run `40513571247` (commit `45145d73c23b3466c2944e385decd336df129765`): Chromium mock editor, real participant PostgreSQL/browser and contextual CSS/tool preflights **PASS**; real PostgreSQL editor browser **FAIL** at first Save after accessibility controls were expanded: `Porta in primo piano Third` intercepted `Salva layout` in the overflowed flex stage. Production CSS now gives the canvas slot, bottom actions and secondary workflow natural nonshrinking flex heights; the existing stage scrolls instead of overlapping its own Save controls. New mandatory real Chromium preflight reproduces the original pointer blockage and checks desktop/mobile Save plus subsequent accessible layer controls; previous CSS fails, updated CSS passes locally. See `docs/RC_CHROMIUM_EDITOR_SAVE_OVERFLOW_HOTFIX.en.md`. Real full GitHub CI rerun is **pending**; RC remains **48.0%**; no assistant commit/push/tag/release.
+
+
+### 2026-10-27 — Mock-aligned editor and autosave (uncommitted)
+New responsive three-column shell with local Quorivio branding, distinct widget icons, right-click/touch context menus, per-thumbnail JSON import/export, and server-verified revision-CAS debounced autosave. Replaced obsolete Chromium preflights referring to removed Save controls. 447 Node PASS, 832 Python PASS before one additional targeted regression, isolated Chromium preflights PASS. **Production web build and full PostgreSQL browser E2E still pending in CI.** RC 53.0% unchanged; details `docs/RC_EDITOR_MOCK_AUTOSAVE_20261027.en.md`. No assistant commit/push/tag/release.

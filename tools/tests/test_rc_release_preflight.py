@@ -13,7 +13,11 @@ class ReleasePreflightTest(unittest.TestCase):
  def test_current_release_not_accepted(self):
   report=preflight()
   self.assertFalse(report['release_candidate_ready'])
-  self.assertEqual(report['score'],53.0)
+  ledger=json.loads((ROOT/'docs/RC_GATE_MATRIX.json').read_text(encoding='utf-8'))
+  earned=sum(g['weight']*{'accepted':1, 'partial':.5, 'open':0, 'blocked':0}[g['status']] for g in ledger['gates'])
+  self.assertEqual(report['score'],round(earned,1))
+  self.assertEqual({g['id'] for g in report['unaccepted_gates']},
+                   {g['id'] for g in ledger['gates'] if g['status']!='accepted'})
   self.assertGreater(len(report['unaccepted_gates']),0)
   self.assertEqual(report['missing_required_files'],[])
  def test_missing_file_blocks_release(self):

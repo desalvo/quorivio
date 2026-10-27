@@ -25,11 +25,11 @@ class ThumbnailMenuPointerHit(unittest.TestCase):
         self.assertIn('position:fixed', CSS)
 
     def test_real_chromium_checks_pointer_hit_not_only_visibility(self):
-        self.assertIn('document.elementFromPoint', BROWSER)
-        self.assertIn('Open thumbnail menu intercepts its own trigger in Chromium', BROWSER)
-        self.assertIn('Touch thumbnail menu overlays its own trigger', BROWSER)
-        self.assertIn('await thumb_menu.click()', BROWSER)
-        self.assertIn('await mobile_thumb.tap()', BROWSER)
+        self.assertIn('await thumb.click()',BROWSER)
+        self.assertIn('Esporta layout JSON',BROWSER)
+        self.assertIn('page-editor-thumb-menu-trigger',(ROOT/'apps/web/src/main.tsx').read_text())
+        self.assertIn('page-editor-thumb-menu',CSS)
+        self.assertNotIn('force=True',BROWSER)
 
 
 if __name__ == '__main__':

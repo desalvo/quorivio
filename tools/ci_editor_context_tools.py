@@ -16,8 +16,12 @@ async def ensure_canvas_tools_open(page):
     """
     group=page.get_by_role('group',name='Allineamento widget selezionati')
     if not await group.is_visible():
-        trigger=page.get_by_role('button',name='Apri menu contestuale canvas, sfondi e proprietà pagina')
-        await trigger.click()  # Real pointer path; never force clicks or mutate DOM state.
+        canvas=page.get_by_role('group',name='Canvas grafico widget')
+        # If the background/context menu is already open, use its selection entry.
+        entry=page.get_by_role('button',name='Strumenti di selezione e allineamento')
+        if not await entry.is_visible():
+            await canvas.click(button='right',position={'x':7,'y':7})  # Native context menu; no synthetic DOM mutation.
+        await page.get_by_role('button',name='Strumenti di selezione e allineamento').click()
     await expect(group).to_be_visible()
     # Layer actions live in a nested .canvas-editor-tools panel. All controls
     # must be present in the accessibility tree before the test uses them.
@@ -40,21 +44,14 @@ async def close_canvas_tools(page):
     """Dismiss the contextual overlay before unrelated Save/reconcile actions."""
     group=page.get_by_role('group',name='Allineamento widget selezionati')
     if await group.is_visible():
-        trigger=page.get_by_role('button',name='Apri menu contestuale canvas, sfondi e proprietà pagina')
-        await trigger.click()
+        canvas=page.get_by_role('group',name='Canvas grafico widget')
+        await canvas.click(button='right',position={'x':7,'y':7})
     await expect(group).to_be_hidden()
 
 
 
-def editor_save_button(page):
-    """Exactly the editor's labelled Save button, not the longer icon label.
 
-    The editor intentionally exposes two distinct controls, 'Salva layout'
-    and 'Salva layout della pagina'.  Playwright matches accessible names
-    by substring unless exact=True, producing a strict-mode violation.
-    Scope to the editor region as an additional guard against dashboard
-    controls with the same accessible label. Never arbitrarily choose the first element or force a click.
-    """
-    return page.get_by_role('region', name='Editor grafico delle pagine').get_by_role(
-        'button', name='Salva layout', exact=True
-    )
+async def wait_for_editor_sync(page,timeout=12000):
+    """Wait for the *server-verified* autosave state instead of pressing a removed Save button."""
+    from playwright.async_api import expect
+    return await expect(page.get_by_role('region',name='Editor grafico delle pagine').get_by_role('status').filter(has_text='Salvato automaticamente')).to_be_visible(timeout=timeout)

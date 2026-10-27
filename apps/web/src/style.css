@@ -547,3 +547,104 @@
 
 /* Announce page ordering changes to screen readers without obscuring thumbnails. */
 .editor-ux-v2 .page-editor-order-status{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+/* RC editor 2026-10-27: a full-width, responsive artboard and isolated menus. */
+.editor-ux-v2{grid-template-columns:clamp(120px,14vw,205px) minmax(0,1fr) clamp(78px,8vw,112px)!important}
+.editor-ux-v2 .editor-stage{width:100%;min-width:0;max-width:none;align-items:stretch}
+.editor-ux-v2 .editor-canvas-slot{width:100%;min-width:0;min-height:0;display:block;flex:0 0 auto}
+.editor-ux-v2 .canvas-editor-group{width:100%;max-width:none;margin:0}
+.editor-ux-v2 .canvas-with-rulers{width:100%;max-width:none;overflow:visible}
+.editor-ux-v2 .canvas-with-rulers .widget-canvas{width:100%;height:auto;aspect-ratio:16/9;min-height:0}
+/* A thumbnail menu must be above the stage and must not be clipped by its rail. */
+.editor-ux-v2 .page-editor-sidebar:has(.page-editor-thumb-menu){z-index:120!important}
+.editor-ux-v2 .page-editor-thumb-row:has(.page-editor-thumb-menu){z-index:125;overflow:visible}
+.editor-ux-v2 .page-editor-thumbnails:has(.page-editor-thumb-menu){overflow:visible;min-height:0}
+.editor-ux-v2 .page-editor-thumb-menu{z-index:140;left:calc(100% + 4px);top:0;bottom:auto;max-width:min(260px,calc(100vw - 170px));}
+/* Only a single authored tooltip, not the native title tooltip. */
+.editor-ux-v2 .editor-icon-tooltip{pointer-events:none}
+/* The background popover must not be obscured by the arrangement group. */
+.editor-ux-v2 .canvas-background-context{z-index:110;max-width:min(350px,calc(100% - 16px));max-height:min(72vh,530px)}
+.editor-ux-v2 .canvas-context-properties{z-index:112;left:10px;top:55px}
+/* Keep all eight resize handles and the rotation handle above widget content. */
+.editor-ux-v2 .widget-canvas-item{overflow:visible}
+.editor-ux-v2 .widget-resize-edge{z-index:70;opacity:1;pointer-events:auto;touch-action:none}
+.editor-ux-v2 .widget-rotate-handle{z-index:72;pointer-events:auto;touch-action:none}
+@media(max-width:760px){
+ .editor-ux-v2,.editor-ux-v2:fullscreen{grid-template-columns:clamp(98px,23vw,150px) minmax(0,1fr)!important}
+ .editor-ux-v2 .page-editor-thumb-menu{position:fixed;left:calc(clamp(98px,23vw,150px) + 8px);top:20%!important;max-width:calc(100vw - clamp(98px,23vw,150px) - 20px)}
+}
+
+.editor-ux-v2 .editor-save-feedback{padding:8px 12px;max-height:72px;overflow:auto;color:#f8fdff;background:#184058;border:1px solid #7fb3cb;border-radius:9px;font-size:13px}
+
+/* Lightweight editor preview uses saved option labels and the same widget bounds as projection. */
+.editor-ux-v2 .canvas-widget-answer-preview{display:grid;gap:3px;max-width:100%;max-height:calc(100% - 24px);overflow:hidden;padding:3px 0;color:inherit;font-size:clamp(8px,.8vw,13px);pointer-events:none}
+.editor-ux-v2 .canvas-widget-answer-preview span{display:flex;align-items:center;gap:5px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+.editor-ux-v2 .canvas-widget-answer-preview i{display:inline-block;flex:none;width:9px;height:9px;border:1px solid currentColor;border-radius:50%}
+
+/* RC mock-fidelity editor: exactly one brand header, thumbnail rail, slide stage and icon palette. */
+.editor-ux-v2,.editor-ux-v2:fullscreen{
+  display:grid!important;grid-template-columns:clamp(158px,16vw,240px) minmax(0,1fr) clamp(98px,10vw,156px)!important;
+  grid-template-rows:68px minmax(0,1fr)!important;
+  align-items:stretch!important;gap:0!important;
+  background:linear-gradient(105deg,rgba(4,14,29,.53),rgba(10,29,45,.19),rgba(4,14,29,.60)),url('/editor-alpine-atmosphere.webp') center / cover no-repeat,#071628!important;
+}
+.editor-ux-v2 .editor-mock-header{
+  grid-column:1/-1;grid-row:1;position:relative;z-index:140;display:flex;align-items:center;justify-content:space-between;
+  gap:20px;min-height:0;padding:8px clamp(12px,2.4vw,35px);background:rgba(5,16,30,.93);border-bottom:1px solid #ffffff27;
+  box-shadow:0 8px 30px #0007;color:#f9fbff;backdrop-filter:blur(18px)
+}
+.editor-ux-v2 .editor-mock-brand,.editor-ux-v2 .editor-mock-actions{display:flex;align-items:center;gap:18px;min-width:0}
+.editor-ux-v2 .editor-mock-brand img{display:block;width:174px;max-width:28vw;max-height:48px;object-fit:contain;object-position:left center}
+.editor-ux-v2 .editor-mock-brand>span:not(.editor-online-chip){overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:clamp(13px,1.2vw,18px);font-weight:700}
+.editor-ux-v2 .editor-online-chip{border:1px solid #4db69375;border-radius:24px;padding:5px 12px;background:#17493266;color:#72e4b1;font-size:12px}
+.editor-ux-v2 .editor-autosave-indicator{white-space:nowrap;max-width:40vw;overflow:hidden;text-overflow:ellipsis;font-size:12px;color:#c0d2e5}
+.editor-ux-v2 .editor-autosave-indicator.has-error{color:#ffb3ab;font-weight:700}
+.editor-ux-v2 .editor-mock-header .editor-exit{min-height:42px;padding:9px 20px;border:1px solid #8596a9;border-radius:9px;background:#283b56!important;color:#fff!important;font-size:14px;font-weight:750}
+.editor-ux-v2 .page-editor-sidebar{grid-row:2;grid-column:1;z-index:40!important;background:#102135e8!important;backdrop-filter:blur(18px)}
+.editor-ux-v2 .editor-stage{grid-row:2;grid-column:2;position:relative;z-index:1;min-width:0;min-height:0;display:flex;align-items:center;justify-content:center;overflow:auto;padding:clamp(8px,1.6vw,24px)!important}
+.editor-ux-v2 .editor-canvas-slot{align-self:center;width:100%;max-width:calc((100dvh - 126px)*16/9);padding:0!important;border-radius:13px;box-shadow:0 24px 70px #0008;background:transparent;overflow:visible}
+.editor-ux-v2 .canvas-editor-group{width:100%;margin:0 auto;max-width:none}
+.editor-ux-v2 .canvas-with-rulers{width:100%;box-shadow:0 16px 65px #0008;border-radius:14px}
+.editor-ux-v2 .canvas-with-rulers .widget-canvas{width:100%;aspect-ratio:16/9;height:auto;border-radius:13px!important;min-height:0!important;overflow:visible!important}
+.editor-ux-v2 .editor-widget-rail{grid-row:2;grid-column:3;z-index:12;display:flex;flex-direction:column;min-width:0;max-height:none;overflow:visible;background:#0d1828ef;backdrop-filter:blur(18px);padding:15px 9px}
+.editor-ux-v2 .editor-widget-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:start;justify-items:center;gap:12px;overflow-y:auto;overflow-x:visible}
+.editor-ux-v2 .editor-widget-grid .editor-icon-tool{width:clamp(40px,4.2vw,63px);height:clamp(40px,4.2vw,63px);max-width:100%;padding:7px!important;background:#1a2a3fe9!important;border:1px solid #ffffff32;border-radius:13px}
+.editor-ux-v2 .editor-widget-grid .editor-icon-tool svg{width:clamp(20px,2.1vw,27px);height:clamp(20px,2.1vw,27px)}
+.editor-ux-v2 .editor-context-drawer{position:absolute;z-index:91;right:12px;top:12px;left:auto;width:min(420px,calc(100% - 24px));max-height:min(78vh,790px);overflow:auto;border:1px solid #8eb8c4;box-shadow:0 18px 52px #000b}
+.editor-ux-v2 .canvas-context-properties{z-index:90;max-height:min(75vh,720px)}
+.editor-ux-v2 .canvas-background-context{z-index:93;right:12px!important;top:12px!important}
+.editor-ux-v2 .canvas-blank-menu-trigger{display:none!important}
+.editor-ux-v2 .page-editor-thumb-menu{z-index:160!important}
+.editor-ux-v2 .editor-thumb-import{position:relative;display:block;cursor:pointer;min-height:40px;padding:9px 12px;color:#f5faff;background:#1e3d53;border-radius:7px;font-size:13px;line-height:23px}
+.editor-ux-v2 .editor-thumb-import input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.editor-ux-v2 .editor-thumb-import:focus-within{outline:2px solid #79e4f0}
+/* Reconciliation remains available only for genuine concurrent-edit conflicts. */
+.editor-ux-v2 .editor-secondary-workflow{position:absolute;z-index:100;inset:auto 12px 12px;max-height:min(60vh,700px);overflow:auto;background:#11283deb;border:1px solid #9cbcd0;border-radius:12px;padding:12px}
+.editor-ux-v2 .editor-bottom-controls{display:none!important}
+.editor-ux-v2 .editor-icon-tooltip{pointer-events:none;user-select:none}
+@media(max-width:760px){
+ .editor-ux-v2,.editor-ux-v2:fullscreen{grid-template-columns:clamp(84px,20vw,125px) minmax(0,1fr) clamp(51px,13vw,82px)!important;grid-template-rows:60px minmax(0,1fr)!important}
+ .editor-ux-v2 .editor-mock-header{gap:6px;padding:6px 9px}
+ .editor-ux-v2 .editor-mock-brand{gap:6px}
+ .editor-ux-v2 .editor-mock-brand img{width:94px;max-width:23vw}
+ .editor-ux-v2 .editor-online-chip{display:none}
+ .editor-ux-v2 .editor-mock-brand>span:not(.editor-online-chip){font-size:11px;max-width:28vw}
+ .editor-ux-v2 .editor-mock-actions{gap:6px}
+ .editor-ux-v2 .editor-autosave-indicator{max-width:95px;font-size:10px}
+ .editor-ux-v2 .editor-mock-header .editor-exit{min-height:36px;padding:7px;font-size:12px}
+ .editor-ux-v2 .editor-stage{grid-row:2;grid-column:2;padding:4px!important;min-width:0}
+ .editor-ux-v2 .page-editor-sidebar{grid-row:2;grid-column:1;padding:8px 3px!important;min-width:0}
+ .editor-ux-v2 .editor-widget-rail{grid-row:2;grid-column:3;display:flex;flex-direction:column;max-height:none;padding:6px 2px;border-top:0;border-left:1px solid var(--editor-line)}
+ .editor-ux-v2 .editor-widget-rail header{display:flex;padding:3px 0!important;font-size:10px}
+ .editor-ux-v2 .editor-widget-grid{display:grid;grid-template-columns:1fr;overflow-y:auto;overflow-x:visible;gap:7px;padding:6px 0}
+ .editor-ux-v2 .editor-widget-grid .editor-icon-tool{width:42px;height:42px;min-width:36px;min-height:36px}
+ .editor-ux-v2 .editor-canvas-slot{width:100%;min-height:0}
+ .editor-ux-v2 .page-editor-preview-title{font-size:7px}
+ .editor-ux-v2 .page-editor-thumb-menu{left:calc(clamp(84px,20vw,125px) + 5px)!important;top:18%!important;max-width:calc(100vw - clamp(84px,20vw,125px) - 60px)}
+ .editor-ux-v2 .editor-widget-grid .editor-icon-tooltip{left:auto;right:calc(100% + 8px);bottom:50%;max-width:140px;transform:translateY(50%)}
+ .editor-ux-v2 .editor-widget-grid .editor-icon-wrapper:is(:hover,:focus-within,.touch-tooltip-open)>.editor-icon-tooltip{transform:translateY(50%)}
+}
+/* Prevent legacy panel or dashboard width constraints from centering a smaller editor. */
+.editor-ux-v2,.editor-ux-v2:fullscreen{position:fixed!important;inset:0!important;left:0!important;top:0!important;right:0!important;bottom:0!important;width:100vw!important;height:100dvh!important;max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;border-radius:0!important}
+/* Override the older non-fullscreen editor selector, which used dashboard sidebar padding. */
+.editor-ux-v2.powerpoint-editor:not(:fullscreen){position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;max-width:none!important;max-height:none!important;padding:0!important;margin:0!important;border:0!important;border-radius:0!important}

@@ -10,21 +10,15 @@ class EditorTwentyCycleContracts(unittest.TestCase):
         source=(ROOT/'tools/ci_browser_editor.py').read_text()
         ast.parse(source)
         self.assertIn("state['widgets']=copy.deepcopy(payload['page_design']['widgets'])",source)
-        self.assertIn("await editor_save_button(page).click()",source)
+        self.assertIn("state['revision']+=1",source)
         self.assertIn("await page.reload(wait_until='domcontentloaded')",source)
-        self.assertIn("assert state['saves']==1",source)
+        self.assertIn("assert state['saves']>=1",source)
 
     def test_browser_exercises_group_layer_and_keyboard_operations(self):
         source=(ROOT/'tools/ci_browser_editor.py').read_text()
-        # Contextual editor controls are no longer a permanent ribbon; the
-        # real browser fixture must open their menu before each operation.
-        for command in ("await click_canvas_tool(page,'Porta selezione davanti')",
-                        "await click_canvas_tool(page,'Sposta selezione a destra')",
-                        "await click_canvas_tool(page,'Duplica selezione')",
-                        "await click_canvas_tool(page,'Elimina selezione')",
-                        "await page.keyboard.press('ArrowRight')", "await page.keyboard.press('Delete')"):
+        for command in ("await click_canvas_tool(page,'Porta selezione davanti')", "await click_canvas_tool(page,'Sposta selezione a destra')", "await click_canvas_tool(page,'Duplica selezione')", "await click_canvas_tool(page,'Elimina selezione')", "await page.keyboard.press('ArrowRight')", "await page.keyboard.press('Control+z')"):
             with self.subTest(command=command):self.assertIn(command,source)
-        self.assertIn('await ensure_canvas_tools_open(page)',source)
+        self.assertNotIn('force=True',source)
 
     def test_canvas_exposes_accessible_commands_and_no_forced_click(self):
         source=(ROOT/'apps/web/src/main.tsx').read_text()

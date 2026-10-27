@@ -1,0 +1,22 @@
+{
+  "base_sha": "551396cdaafb8765140355557eae8f8ceb59c8d4",
+  "rc_progress": 53.0,
+  "modified": [
+    "quorivio/apps/web/src/main.tsx",
+    "quorivio/apps/web/src/style.css",
+    "quorivio/docs/DEVELOPMENT_STATUS.it.md",
+    "quorivio/docs/DEVELOPMENT_STATUS.md",
+    "quorivio/tools/ci_editor_context_tools.py",
+    "quorivio/tools/tests/test_ci_browser_editor_readonly_title.py",
+    "quorivio/tools/tests/test_ci_editor_context_tool_visibility.py",
+    "quorivio/tools/tests/test_editor_contextual_layout_v2.py",
+    "quorivio/tools/tests/test_editor_postgres_concurrency_contract.py"
+  ],
+  "added": [
+    "quorivio/docs/RC_EDITOR_USER_ISSUES_20261027.it.md",
+    "quorivio/docs/RC_EDITOR_USER_ISSUES_20261027.en.md",
+    "quorivio/tools/tests/test_editor_reported_bugs_20261027.py"
+  ],
+  "removed": [],
+  "zip_sha256_note": "See delivery response; this manifest describes compared file contents and does not certify new production deployment."
+}

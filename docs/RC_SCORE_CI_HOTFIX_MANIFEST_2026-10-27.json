@@ -1,0 +1,37 @@
+{
+  "project": "Quorivio",
+  "version": "0.1.0-dev",
+  "last_maintainer_confirmed_commit": "551396cdaafb8765140355557eae8f8ceb59c8d4",
+  "failed_standard_ci_run": 40522786396,
+  "failed_job": 122254095095,
+  "root_cause": "Obsolete fixed 48.0 assertion although weighted audit correctly computes 53.0",
+  "rc_score_before": 53.0,
+  "rc_score_after": 53.0,
+  "release_candidate_ready": false,
+  "verification": "819/819 full Python unit tests passed locally; new GitHub CI pending",
+  "changes": {
+    "modified": [
+      "docs/DEVELOPMENT_STATUS.it.md",
+      "docs/DEVELOPMENT_STATUS.md",
+      "tools/tests/test_rc_evidence_20261027.py",
+      "tools/tests/test_rc_gate_audit.py",
+      "tools/tests/test_rc_release_preflight.py"
+    ],
+    "added": [
+      "docs/RC_SCORE_LEDGER_CI_FIX_2026-10-27.en.md",
+      "docs/RC_SCORE_LEDGER_CI_FIX_2026-10-27.it.md",
+      "docs/RC_SCORE_CI_HOTFIX_MANIFEST_2026-10-27.json"
+    ],
+    "removed": []
+  },
+  "content_sha256": {
+    "docs/DEVELOPMENT_STATUS.it.md": "0dc30ad0c023c47297513aa6e36a1bc15f45096d304790b6c9bdddbd12665918",
+    "docs/DEVELOPMENT_STATUS.md": "a3def41bf9069951922913fa7035589d31b5b321d06243ab58f20583212f34a9",
+    "docs/RC_SCORE_LEDGER_CI_FIX_2026-10-27.en.md": "d2d9646970b36395e45d7f54eb9f29f3d0053bbe6a97603069db23c412a2b240",
+    "docs/RC_SCORE_LEDGER_CI_FIX_2026-10-27.it.md": "e0f664a00943b0dea7e5c2780bf6197eb2b56ac4f1777aa10b1322de94de58a9",
+    "tools/tests/test_rc_evidence_20261027.py": "d082e012f0a34c27cdcc40dd3174b490dcc3a097e9923c5fc8f18e373d94903b",
+    "tools/tests/test_rc_gate_audit.py": "f984d0ffc770ad950e0eace0a2a271d3263e8945d52238b99cf373b68fdac2da",
+    "tools/tests/test_rc_release_preflight.py": "d7d350ba1e340ed5919e69aa30abce8c650814e1bebfa68ab51fbf2f291ebe47"
+  },
+  "commit_push_publish_performed": false
+}

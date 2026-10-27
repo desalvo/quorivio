@@ -1,3 +1,9 @@
+### 2026-10-27 — Correzioni editor: viewport/menu/ID e verifica salvataggio (non committate)
+Dettagli in `docs/RC_EDITOR_USER_ISSUES_20261027.it.md`. ID widget troppo lunghi per il backend (limite 48); Python 824 e Node 447 PASS locali; Chromium/PostgreSQL da verificare. RC 53,0% invariata.
+
+### 27/10/2026 — CI 40522786396: correzione regressioni dinamiche della matrice RC (da committare)
+Il maintainer ha confermato il commit `551396cdaafb8765140355557eae8f8ceb59c8d4` del cumulativo RC 53,0%/miniature da tastiera. La CI push `40522786396` qualità **FAILED** nella suite Python generale (passo denominato Kubernetes wizard and worker integration): un solo test su 817 confrontava 53,0 con la costante obsoleta 48,0. Build container e publisher SKIPPED. I tre moduli di test ricavano ora il punteggio dai pesi/stati correnti, conservano il livello storico minimo 53,0 e consentono future promozioni documentate dei gate senza blocchi statici. Applicazione, matrice, workflow e pubblicazione immutati. Suite Python locale completa **819/819 PASS**, audit 53,0 e release_candidate_ready=false. Nuova CI GitHub **DA VERIFICARE**. Dettagli: `docs/RC_SCORE_LEDGER_CI_FIX_2026-10-27.it.md`.
+
 ### 27 ottobre 2026 — Full CI verificata e avanzamento RC (48,0 → 53,0%)
 Full CI/publish `40517573850` SHA `e372a3ae`: quality, Chromium/PostgreSQL, 500 partecipanti, container e pubblicazione multiarchitettura autorizzata tutti SUCCESS. Gate **A4 open→partial (+3)** e **D3 open→partial (+2)**, senza certificare dispositivi, screen reader, ARM64 in esecuzione, Podman rootless o Kubernetes. Nuove scorciatoie da tastiera, recupero focus ed annunci sulle miniature dopo il commit: nuova CI necessaria. RC **53,0%**, non pronta. Vedi `docs/RC_EVIDENCE_REVIEW_2026-10-27.it.md`.
 
@@ -1190,3 +1196,7 @@ Full CI GitHub `40479089027` (job qualità `122104572150`, commit `238e184...`) 
 ### 27 ottobre 2026 — Hotfix canvas/salvataggio editor Chromium PostgreSQL (dopo commit)
 
 Run `40513571247`, commit `45145d73c23b3466c2944e385decd336df129765`: editor Chromium simulato e Chromium partecipanti con PostgreSQL **PASS**, ma editor con PostgreSQL reale **FAIL** al primo salvataggio: il controllo accessibile `Porta in primo piano Third` copriva `Salva layout`. Corretto il layout flex dei tre blocchi (canvas, barra inferiore, salvataggio/riconciliazione): ciascuno conserva la propria altezza e lo stage scorre senza sovrapposizioni. Nuovo preflight Chromium con CSS reale, desktop e touch: CSS precedente fallisce, quello corretto supera la prova con clic reali, controlli accessibili ancora utilizzabili. Report `docs/RC_CHROMIUM_EDITOR_SAVE_OVERFLOW_HOTFIX.it.md`. **Full CI aggiornata ancora da verificare**, RC **48,0%** invariato. Nessun commit/push/tag/release dell'assistente.
+
+
+### 27 ottobre 2026 — Editor conforme al mock e autosalvataggio (non ancora committato)
+Nuova cornice responsive a tre colonne, logo, menu contestuali desktop/touch, icone widget distinte, import/export JSON su miniatura e autosalvataggio con compare-and-swap e rilettura del server. Corretti i vecchi preflight Chromium che cercavano pulsanti Salva rimossi. Node 447 PASS, Python 832 PASS prima dell'ultimo controllo aggiunto, Chromium isolato PASS. **Build Vite e browser PostgreSQL reali da verificare in CI.** Gate RC 53,0% invariato. Dettagli: `docs/RC_EDITOR_MOCK_AUTOSAVE_20261027.it.md`. Nessun commit/push/tag/rilascio dell'assistente.

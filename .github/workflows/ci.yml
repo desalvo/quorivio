@@ -98,6 +98,7 @@ jobs:
           python3 tools/ci_editor_save_locator_chromium.py
           # Actual editor geometry: expanded keyboard/touch controls must not cover Save.
           python3 tools/ci_editor_save_flow_chromium.py
+          python3 tools/ci_editor_mock_layout_chromium.py
           python3 tools/ci_browser_editor.py
       - name: Upload Chromium failure diagnostics
         if: failure() && github.event_name == 'workflow_dispatch' && inputs.browser_test

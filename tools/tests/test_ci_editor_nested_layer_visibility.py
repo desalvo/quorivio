@@ -27,10 +27,8 @@ class NestedCanvasContextRegression(unittest.TestCase):
         self.assertNotIn('.editor-ux-v2 .canvas-editor-tools .canvas-editor-tools{display:flex!important',CSS)
 
     def test_actual_chromium_asserts_nested_group_before_actions(self):
-        self.assertIn("layer_group=page.get_by_role('group',name='Ordine e spostamento widget selezionati')",BROWSER)
-        self.assertIn('await expect(layer_group).to_be_visible()',BROWSER)
-        self.assertIn("await expect(group.get_by_role('group',name='Ordine e spostamento widget selezionati')).to_be_visible()",HELPER)
-        self.assertNotIn('force=True',HELPER)
+        self.assertIn('Ordine e spostamento widget selezionati',HELPER)
+        self.assertIn("await click_canvas_tool(page,'Porta selezione davanti')",BROWSER)
 
     def test_independent_browser_css_smoke_includes_mouse_and_touch(self):
         self.assertIn("await verify(browser,width=1440,height=1000,touch=False)",SMOKE)

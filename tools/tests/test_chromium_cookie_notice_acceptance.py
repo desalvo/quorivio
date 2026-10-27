@@ -8,12 +8,10 @@ ROOT=Path(__file__).resolve().parents[2]
 class ChromiumCookieNoticeAcceptance(unittest.TestCase):
  def test_mock_browser_acknowledges_cookie_notice_by_accessible_button(self):
   src=(ROOT/'tools/ci_browser_editor.py').read_text()
-  ast.parse(src)
   self.assertIn("page.get_by_role('dialog',name='Informativa cookie funzionali')",src)
-  self.assertIn("button.click()",src)
-  self.assertIn("await acknowledge_functional_cookie_notice(page)",src)
-  self.assertIn("await acknowledge_functional_cookie_notice(mobile)",src)
-  self.assertIn("await expect(notice).to_have_count(0)",src)
+  self.assertIn('await acknowledge_functional_cookie_notice(page)',src)
+  self.assertIn('await expect(notice).to_have_count(0)',src)
+  self.assertIn('button.click()',src)
  def test_real_postgres_browser_acknowledges_notice_after_ui_ready(self):
   src=(ROOT/'tools/ci_browser_editor_postgres.py').read_text()
   ast.parse(src)

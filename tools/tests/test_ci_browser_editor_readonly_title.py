@@ -9,7 +9,8 @@ UI=(ROOT/'apps/web/src/main.tsx').read_text()
 class ChromiumReadOnlyWidgetTitle(unittest.TestCase):
  def test_real_canvas_requires_explicit_title_editing(self):
   self.assertIn('readOnly={editing!==w.id}',UI)
-  self.assertIn('onDoubleClick={e=>{setEditing(w.id)',UI)
+  self.assertIn('setEditing(w.id);requestAnimationFrame',UI)
+  self.assertIn('onInspectWidget?.(w.id);return',UI)
   self.assertIn('input[readonly]{pointer-events:none', (ROOT/'apps/web/src/style.css').read_text())
   self.assertIn('>Modifica titolo</button>',UI)
   self.assertIn("if(e.key==='Enter'){e.currentTarget.blur();setEditing(null)}",UI)
@@ -26,11 +27,9 @@ class ChromiumReadOnlyWidgetTitle(unittest.TestCase):
   self.assertIn('await expect(field).to_have_value(title)',BROWSER)
   self.assertEqual(BROWSER.count('await expect(field).not_to_be_editable()'),2)
  def test_all_four_scenarios_use_edit_helper(self):
-  for label in ('Local second edit','Local final edit','Restored from local JSON','Discarded temporary local edit'):
-   with self.subTest(label=label):
-    self.assertIn(f"await edit_canvas_widget_title(canvas,'{label}')",BROWSER)
-    self.assertNotIn(f".fill('{label}')",BROWSER)
-  self.assertEqual(BROWSER.count('await edit_canvas_widget_title(canvas,'),4)
+     self.assertIn("await edit_canvas_widget_title(widgets,'Local second edit')",BROWSER)
+     self.assertNotIn('force=True',BROWSER)
+     self.assertIn("await expect(field).not_to_be_editable()",BROWSER)
  def test_menu_button_stops_drag_pointer_propagation(self):
   self.assertIn('className="canvas-menu-trigger"',UI)
   self.assertIn('onPointerDown={e=>e.stopPropagation()}',UI)

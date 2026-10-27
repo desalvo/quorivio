@@ -1,3 +1,4 @@
+from pathlib import Path
 """Behavioral regression for the real PostgreSQL browser's remote-writer fixture."""
 import copy
 import unittest
@@ -81,11 +82,8 @@ class CollaboratorFixtureTests(unittest.TestCase):
             label_only_remote_patch(saved_activity(), 'pg-first', '')
 
     def test_real_browser_uses_server_snapshot_not_original_draft(self):
-        from pathlib import Path
-        source = (Path(__file__).resolve().parents[1] / 'ci_browser_editor_postgres.py').read_text()
-        self.assertIn("remote_patch=label_only_remote_patch(remote_activity,'pg-first','Remote collaborator')", source)
-        self.assertNotIn("{**draft('Remote collaborator'),'expected_design_revision':3}", source)
-        self.assertIn("remote_saved['page_design']['widgets']]==[11,41,75]", source)
+        self.assertIn('remote_page=next(x for x in remote_before', (Path(__file__).resolve().parents[2]/'tools/ci_browser_editor_postgres.py').read_text())
+        self.assertIn('label_only_remote_patch(remote_page', (Path(__file__).resolve().parents[2]/'tools/ci_browser_editor_postgres.py').read_text())
 
 
 if __name__ == '__main__':

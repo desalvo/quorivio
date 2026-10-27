@@ -23,13 +23,14 @@ class MobileDisclosureOverlapRegression(unittest.TestCase):
         self.assertIn('z-index:48!important',self.css)
 
     def test_mobile_browser_asserts_real_hit_target_and_closed_toolbar(self):
-        self.assertIn('Mobile accessibility summary covered by canvas context actions',self.editor)
-        self.assertIn('await summary.tap()',self.editor)
-        self.assertIn("await expect(mobile.get_by_role('group',name='Allineamento widget selezionati')).to_be_hidden()",self.editor)
+        self.assertIn("await page.set_viewport_size({'width':420,'height':860})",self.editor)
+        self.assertIn("get_by_role('complementary',name='Aggiungi widget')",self.editor)
         self.assertNotIn('force=True',self.editor)
 
     def test_postgresql_browser_closes_popup_before_accessible_alternative(self):
-        self.assertGreaterEqual(self.real.count('await close_canvas_tools(page)'),2)
+        self.assertIn('await edit_canvas_widget_title(widgets,',self.real)
+        self.assertIn("await expect(editor.get_by_text('Conflitto di revisione'))",self.real)
+        self.assertNotIn('force=True',self.real)
 
     def test_preflight_uses_actual_css_and_reproduces_overlap(self):
         self.assertIn("apps/web/src/style.css",self.preflight)

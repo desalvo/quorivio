@@ -19,7 +19,8 @@ class ContextualEditorUX(unittest.TestCase):
 
     def test_touch_focus_hover_tooltip(self):
         self.assertIn("if(e.pointerType!=='mouse')setTouchTip", WEB)
-        self.assertIn('title={label} aria-label={label}', WEB)
+        self.assertIn('className="editor-icon-tool" aria-label={label}', WEB)
+        self.assertNotIn('className="editor-icon-tool" title={label}',WEB)
         self.assertIn('role="tooltip"', WEB)
         self.assertIn('.touch-tooltip-open', CSS)
         self.assertIn(':focus-within', CSS)
@@ -54,11 +55,12 @@ class ContextualEditorUX(unittest.TestCase):
         self.assertIn("aria-expanded={pageThumbMenu===a.id}",WEB)
 
     def test_page_context_not_ribbon(self):
-        self.assertIn('onOpenPageSettings={()=>', WEB)
-        self.assertIn('onContextMenu={e=>{if((e.target as HTMLElement).closest(".widget-canvas-item"))return', WEB)
-        self.assertIn('pageContextOpen&&<section className="editor-context-drawer"', WEB)
-        self.assertIn('className="canvas-blank-menu-trigger"', WEB)
-        self.assertNotIn('className="editor-heading"', WEB)
+        self.assertIn('onOpenPageSettings={()=>',WEB)
+        self.assertIn('onContextMenu={e=>{if((e.target as HTMLElement).closest(".widget-canvas-item"))return',WEB)
+        self.assertIn('pageContextOpen&&<section className="editor-context-drawer"',WEB)
+        self.assertNotIn('className="canvas-blank-menu-trigger"',WEB)
+        self.assertIn('contextHold.current=setTimeout(openBlankMenu,580)',WEB)
+        self.assertNotIn('className="editor-heading"',WEB)
 
     def test_widget_context_properties_are_scoped(self):
         self.assertIn("onInspectWidget={id=>",WEB)
@@ -80,9 +82,8 @@ class ContextualEditorUX(unittest.TestCase):
         self.assertIn('backdrop-filter:blur',CSS)
 
     def test_browser_scenarios_include_context_and_touch(self):
-        self.assertIn("name='Aggiungi widget: Testo'",BROWSER)
-        self.assertIn("name='Nuova pagina prima'",BROWSER)
-        self.assertIn("name='Nuova pagina dopo'",BROWSER)
-        self.assertIn('.tap()',BROWSER)
+        self.assertIn("canvas.click(button='right'",BROWSER)
+        self.assertIn("await page.set_viewport_size({'width':420,'height':860})",BROWSER)
+        self.assertIn("await expect(editor.get_by_role('img',name='Quorivio'))",BROWSER)
 
 if __name__=='__main__':unittest.main()

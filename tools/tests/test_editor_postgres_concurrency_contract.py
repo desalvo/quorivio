@@ -18,7 +18,7 @@ class EditorPostgresConcurrencyContracts(unittest.TestCase):
  def test_api_increments_revision_atomically(self):self.assertIn('design_revision=design_revision+1',API)
  def test_api_returns_new_revision(self):self.assertIn('design_revision:saved.rows[0].design_revision',API)
  def test_ui_sends_expected_revision(self):self.assertIn('expected_design_revision:loadedDesignRevision.current',UI)
- def test_ui_preserves_unsaved_draft_on_conflict(self):self.assertIn('setPageConflict(true)',UI);self.assertIn('Le modifiche locali non sono state sovrascritte',UI)
+ def test_ui_preserves_unsaved_draft_on_conflict(self):self.assertIn('setPageConflict(true)',UI);self.assertIn('La tua bozza è conservata',UI)
  def test_ui_requires_confirmation_to_discard_conflicted_draft(self):self.assertIn('Scartare le modifiche locali',UI)
  def test_ui_disables_save_while_conflicted(self):self.assertIn('pageSavePending||pageConflict',UI)
  def test_ui_loaded_signature_includes_background_colors(self):self.assertIn('serializePageDraft(pageDraftFromActivity(x))',UI)
