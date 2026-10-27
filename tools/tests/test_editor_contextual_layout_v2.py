@@ -18,11 +18,12 @@ class ContextualEditorUX(unittest.TestCase):
         self.assertNotIn('className="widget-palette"', WEB)
 
     def test_touch_focus_hover_tooltip(self):
-        self.assertIn("if(e.pointerType!=='mouse')setTouchTip", WEB)
-        self.assertIn('className="editor-icon-tool" aria-label={label}', WEB)
+        self.assertIn("if(e.pointerType!=='mouse')showTip()", WEB)
+        self.assertIn('className="editor-icon-tool" data-widget-kind={kind} aria-label={label}', WEB)
         self.assertNotIn('className="editor-icon-tool" title={label}',WEB)
         self.assertIn('role="tooltip"', WEB)
-        self.assertIn('.touch-tooltip-open', CSS)
+        self.assertIn('.editor-floating-tooltip', CSS)
+        self.assertIn('createPortal(<span className=', WEB)
         self.assertIn(':focus-within', CSS)
 
     def test_thumbnail_is_preview_only(self):

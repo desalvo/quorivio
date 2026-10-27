@@ -42,16 +42,24 @@ async def main():
   browser=await pw.chromium.launch(**launch,headless=True,args=['--no-sandbox'])
   page=await browser.new_page(viewport={'width':1440,'height':940},accept_downloads=True)
   page.set_default_timeout(12000)
-  state={'widgets':copy.deepcopy(WIDGETS),'revision':1,'saves':0}
+  state={'widgets':copy.deepcopy(WIDGETS),'revision':1,'saves':0,'drop_before':False,'drop_after':False}
   errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
   async def mock(route):
    from urllib.parse import urlparse
    path=urlparse(route.request.url).path
    if path==f'/api/sessions/{SESSION}/activities/{ACTIVITY}/design' and route.request.method=='PATCH':
+    # Exercise both ambiguous transport outcomes against the real React UI:
+    # an unsuccessful request, then a committed write with a lost response.
+    if state['drop_before']:
+     state['drop_before']=False
+     await route.abort('failed');return
     payload=route.request.post_data_json
     if payload.get('expected_design_revision')!=state['revision']:
      await route.fulfill(status=409,content_type='application/json',json={'error':'design_revision_conflict'});return
     state['widgets']=copy.deepcopy(payload['page_design']['widgets']);state['revision']+=1;state['saves']+=1
+    if state['drop_after']:
+     state['drop_after']=False
+     await route.abort('failed');return
     data={'ok':True,'design_revision':state['revision']}
    elif path=='/api/auth/me':data={'id':'user-test','email':'test@example.org','nickname':'Test','role':'presenter'}
    elif path=='/api/auth/oidc/providers':data={'providers':[]}
@@ -124,13 +132,15 @@ async def main():
    names=await buttons.evaluate_all('(els)=>els.map(e=>e.querySelector("svg")?.getAttribute("class"))')
    assert len(set(names))==len(names),names
    assert await buttons.evaluate_all('(els)=>els.every(e=>!e.hasAttribute("title"))')
+   state['drop_before']=True;state['drop_after']=True
    await page.get_by_role('button',name='Aggiungi widget: Testo').click()
    await expect(page.locator('.widget-canvas-item')).to_have_count(4)
    # Browser->API autosave->server read-back and reload: no Save button.
-   for _ in range(65):
+   for _ in range(95):
     if state['saves']>=1 and await editor.get_by_text('Salvato automaticamente').is_visible():break
     await asyncio.sleep(.15)
-   assert state['saves']>=1 and len(state['widgets'])==4,state
+   assert state['saves']>=1
+   assert state['saves']==1 and len(state['widgets'])==4 and not state['drop_before'] and not state['drop_after'],state
    await expect(editor.get_by_text('Salvato automaticamente')).to_be_visible()
    await page.reload(wait_until='domcontentloaded')
    await page.get_by_role('button',name='Apri sessione').first.click()
@@ -175,6 +185,6 @@ async def main():
    except Exception:pass
    raise
   finally:await browser.close()
- print('PASS Chromium editor mock fidelity, contextual right-click, unique widget icons, page JSON menu, automatic PATCH/verification/reload and safe exit')
+ print('PASS Chromium editor mock fidelity, transient network retry, committed response-loss recovery, contextual menus, unique icons, autosave/reload and safe exit')
 
 if __name__=='__main__':asyncio.run(main())

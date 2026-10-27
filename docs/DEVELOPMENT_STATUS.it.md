@@ -1,3 +1,15 @@
+## 27 ottobre 2026 — Stili widget evoluti e copia sessioni terminate (non committato)
+
+Vedi `docs/RC_WIDGET_SHAPES_CLOSED_DUPLICATION_20261027.it.md`: sessioni terminate duplicabili da owner/collaboratori, nuova bozza/nuovi identificatori senza dati partecipanti; forme, riempimenti, immagini per widget, aggancio magnetico, prevenzione collisioni, conferme prima di cancellare, palette e anteprime. Full CI browser/PG PENDENTE; RC **53,0%** invariato.
+
+## 2026-10-27 — Dashboard/Editor widget appearance and contextual UX (uncommitted)
+
+Dettagli in `docs/RC_DASHBOARD_WIDGET_APPEARANCE_20261027.it.md`. Dashboard semplificata, owner/collaboratori distinti, icone colorate, menu widget con clic destro/pressione prolungata, aspetto widget completo con riempimento/bordi e rendering coerente. Node API 447, frontend 15 e Python 856 test PASS nella prima suite completa; Chromium isolato PASS, Full CI GitHub da verificare. RC **53,0%** invariato.
+
+## 27 ottobre 2026 — Widget, rinomina e anteprima pulita (non committato)
+
+Vedi `docs/RC_EDITOR_WIDGETS_PAGE_RENAME_REHEARSAL_20261027.it.md`. Cumulativo da `67a7be93`: recupero autosave, geometria unificata, ispettore unico con X, opzioni complete, selettori a sinistra, tooltip flottanti, rinomina pagina da miniatura/canvas, anteprima senza titoli duplicati e senza barra viola, partecipante vincolato alla pagina del presentatore, nuova accettazione browser/PG. Python 851/851 e Node 447/447 PASS locali; Full CI nuova da confermare. RC 53,0% invariata.
+
 ## 27 ottobre 2026 — Full Chromium 40549836288: clic contestuale coperto dall'intestazione
 
 Baseline committata `b6736aaab6b7dc11e33bedecd4ceb9954d7e8ed3`. La run manuale 40549836288 è fallita al primo spostamento della selezione (`Sposta selezione a destra`) nel test `ci_browser_editor.py`: dopo lo scorrimento dell'area accessibile, il clic destro fissato a 7 px dall'angolo del canvas colpiva l'intestazione sovrapposta. Prima del fallimento erano PASSATI i preflight Chromium desktop/mobile, il layout mock, lo stato autosave e il pulsante Esci. I test successivi PostgreSQL non sono stati eseguiti; non è un errore dimostrato dell'autosave.
@@ -1206,3 +1218,8 @@ Run `40513571247`, commit `45145d73c23b3466c2944e385decd336df129765`: editor Chr
 
 ### 27 ottobre 2026 — Editor conforme al mock e autosalvataggio (non ancora committato)
 Nuova cornice responsive a tre colonne, logo, menu contestuali desktop/touch, icone widget distinte, import/export JSON su miniatura e autosalvataggio con compare-and-swap e rilettura del server. Corretti i vecchi preflight Chromium che cercavano pulsanti Salva rimossi. Node 447 PASS, Python 832 PASS prima dell'ultimo controllo aggiunto, Chromium isolato PASS. **Build Vite e browser PostgreSQL reali da verificare in CI.** Gate RC 53,0% invariato. Dettagli: `docs/RC_EDITOR_MOCK_AUTOSAVE_20261027.it.md`. Nessun commit/push/tag/rilascio dell'assistente.
+
+
+## Batch RC 27/10/2026 — autosalvataggio resiliente e geometria condivisa
+
+Formal weighted score **53.0%** (unchanged until new CI + independent acceptance). Baseline `67a7be939a5930e2f9a49ce3932a4b7f29a682ac`; changed recovery after ambiguous PATCH responses, bounded retries, common CSS geometry, and mandatory frontend Node test step. Local Python 842/842, backend Node 447/447, frontend Node 12/12 PASS. New Full GitHub CI pending. Detailed report: `docs/RC_AUTOSAVE_RECOVERY_VISUAL_PARITY_20261027.it.md`. No automatic commit/push/release.

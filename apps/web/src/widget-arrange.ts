@@ -1,5 +1,5 @@
 /** Deterministic, page-local multi-widget alignment; never mutates the draft. */
-export type ArrangeMode='left'|'right'|'top'|'bottom'|'center-x'|'center-y'|'same-width'|'same-height'|'distribute-x'|'distribute-y'|'space-x'|'space-y'|'canvas-center-x'|'canvas-center-y';
+export type ArrangeMode='left'|'right'|'top'|'bottom'|'center-x'|'center-y'|'same-width'|'same-height'|'distribute-x'|'distribute-y'|'space-x'|'space-y'|'canvas-center-x'|'canvas-center-y'|'canvas-left'|'canvas-right'|'canvas-top'|'canvas-bottom';
 type Rect={x:number;y:number;width:number;height:number;rotation?:number};
 type Item={id:string;position?:Partial<Rect>};
 const bounded=(n:number,limit:number)=>Math.max(0,Math.min(Math.max(0,limit),n));
@@ -12,7 +12,7 @@ const rect=(w:Item):Rect=>{
 const round=(v:number)=>+v.toFixed(4);
 export function arrangeWidgets<T extends Item>(widgets:T[],ids:readonly string[],mode:ArrangeMode):T[]{
  const chosen=new Set(ids),selected=widgets.filter(w=>chosen.has(w.id));
- if(selected.length<(mode.startsWith('canvas-center')?1:mode.startsWith('distribute')||mode.startsWith('space')?3:2))return widgets;
+ if(selected.length<(mode.startsWith('canvas-')?1:mode.startsWith('distribute')||mode.startsWith('space')?3:2))return widgets;
  const positions=new Map(selected.map(w=>[w.id,rect(w)]));
  const all=selected.map(w=>positions.get(w.id)!);
  const left=Math.min(...all.map(p=>p.x)),top=Math.min(...all.map(p=>p.y));
@@ -24,6 +24,7 @@ export function arrangeWidgets<T extends Item>(widgets:T[],ids:readonly string[]
    case 'left':q.x=left;break;case 'right':q.x=right-p.width;break;
    case 'top':q.y=top;break;case 'bottom':q.y=bottom-p.height;break;
    case 'center-x':q.x=centerX-p.width/2;break;case 'center-y':q.y=centerY-p.height/2;break;
+   case 'canvas-left':q.x=0;break;case 'canvas-right':q.x=100-q.width;break;case 'canvas-top':q.y=0;break;case 'canvas-bottom':q.y=100-q.height;break;
    case 'canvas-center-x':q.x=p.x+(50-centerX);break;case 'canvas-center-y':q.y=p.y+(50-centerY);break;
    case 'same-width':q.width=Math.min(100-p.x,positions.get(ids.find(id=>positions.has(id))!)!.width);break;
    case 'same-height':q.height=Math.min(100-p.y,positions.get(ids.find(id=>positions.has(id))!)!.height);break;

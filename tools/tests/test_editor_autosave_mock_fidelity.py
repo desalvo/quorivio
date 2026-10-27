@@ -27,7 +27,10 @@ class EditorMockAutosave(unittest.TestCase):
   self.assertTrue((ROOT/'apps/web/public/editor-quorivio-logo.svg').is_file())
 
  def test_autosave_verifies_server_readback(self):
-  self.assertIn('const timer=window.setTimeout(()=>{if(!pendingPageSave.current)void updatePageDesign()},850)',WEB)
+  self.assertIn('retryAutosaveDelay(attempts)',WEB)
+  self.assertIn('autosaveRecoveryDecision(remote,requestedDraft,expectedRevision,confirmedPatchRevision)',WEB)
+  self.assertIn('autoSaveRetry.signature===designActivity+',WEB)
+  self.assertIn('setAutoSaveBlockedSignature(savedSignature)',WEB)
   self.assertIn('expected_design_revision:loadedDesignRevision.current',WEB)
   self.assertIn('verify_design_revision=${saved.design_revision}',WEB)
   self.assertIn('stableJson(persisted.page_design?.widgets||[])!==stableJson(question.widgets)',WEB)

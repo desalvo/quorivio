@@ -15,7 +15,8 @@ class CanvasBackgroundNativeContext(unittest.TestCase):
   self.assertIn('onBackgroundUpload={file=>{void uploadBackground(file,false)}}',SOURCE)
   self.assertIn('onBackgroundSelect("")',SOURCE)
  def test_existing_widget_menu_is_preserved(self):
-  self.assertIn('setContextWidget(w.id)',SOURCE)
+  self.assertIn('setContextWidget(onInspectWidget?null:w.id)',SOURCE)
+  self.assertIn('onInspectWidget?.(w.id)',SOURCE)
   self.assertIn('.canvas-background-context',CSS)
 
 if __name__=='__main__': unittest.main()

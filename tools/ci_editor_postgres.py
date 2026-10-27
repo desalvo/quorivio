@@ -57,10 +57,13 @@ def run():
  assert api(a,'GET',path)['activities'][0]['design_revision']==3
  duplicate=design('Duplicate');duplicate['page_design']['widgets'].append(dict(duplicate['page_design']['widgets'][0]))
  assert api(a,'PATCH',edit,{**duplicate,'expected_design_revision':3},400)['error']=='invalid_page_design'
+ # Private image-fill identifiers cannot reference another session or an unknown file.
+ invalid_fill=design('Foreign fill');invalid_fill['page_design']['widgets'][0]['style']={'fillMode':'image','fillImageAssetId':'11111111-1111-4111-8111-111111111111'}
+ assert api(a,'PATCH',edit,{**invalid_fill,'expected_design_revision':3},400)['error']=='invalid_widget_fill_image'
  invalid_style=design('Invalid style');invalid_style['page_design']['widgets'][0]['style']={'strokeDash':'not-a-pattern'}
  assert api(a,'PATCH',edit,{**invalid_style,'expected_design_revision':3},400)['error']=='invalid_page_design'
  # Legitimate new editable shape style survives the database roundtrip.
- valid=design('Styled','#123456');valid['page_design']['widgets'][0]['style']={'fillNone':True,'strokeWidth':2.5,'strokeDash':'dot','strokeColor':'#445566'}
+ valid=design('Styled','#123456');valid['page_design']['widgets'][0]['style']={'fillMode':'gradient','fillColor':'#123456','gradientEndColor':'#aabbcc','fillOpacity':0.4,'shapeType':'diamond','strokeWidth':2.5,'strokeDash':'dot','strokeColor':'#445566'}
  styled=api(a,'PATCH',edit,{**valid,'expected_design_revision':3});assert styled['design_revision']==4
  assert api(a,'GET',path)['activities'][0]['page_design']['widgets'][0]['style']==valid['page_design']['widgets'][0]['style']
  # A separate activity starts its own revision, unaffected by this page.

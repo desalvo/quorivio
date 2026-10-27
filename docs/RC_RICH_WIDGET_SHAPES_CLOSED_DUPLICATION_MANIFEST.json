@@ -1,0 +1,45 @@
+{
+  "source_baseline": "quorivio-0.1.0-dev-rc-dashboard-consolidation-widget-appearance-cumulative.zip",
+  "last_user_confirmed_commit": "67a7be939a5930e2f9a49ce3932a4b7f29a682ac",
+  "rc_score_percent": 53.0,
+  "source_file_count": 635,
+  "modified_count": 16,
+  "added_count": 8,
+  "deleted_count": 0,
+  "modified": [
+    "apps/api/src/domain.ts",
+    "apps/api/src/portable-bundle.ts",
+    "apps/api/src/server.ts",
+    "apps/web/src/main.tsx",
+    "apps/web/src/style.css",
+    "apps/web/src/widget-appearance.ts",
+    "apps/web/src/widget-arrange.ts",
+    "docs/DEVELOPMENT_STATUS.it.md",
+    "docs/DEVELOPMENT_STATUS.md",
+    "docs/RC_GATE_MATRIX.json",
+    "tools/ci_editor_postgres.py",
+    "tools/ci_portable_http.py",
+    "tools/tests/test_canvas_context_menu.py",
+    "tools/tests/test_canvas_keyboard_access.py",
+    "tools/tests/test_editor_reported_bugs_20261027.py",
+    "tools/tests/test_rc_dashboard_widget_appearance_20261027.py"
+  ],
+  "added": [
+    "apps/api/test/widget-rich-style.test.ts",
+    "apps/web/src/widget-placement.ts",
+    "apps/web/test/widget-appearance-rich.test.ts",
+    "apps/web/test/widget-placement.test.ts",
+    "docs/RC_WIDGET_SHAPES_CLOSED_DUPLICATION_20261027.en.md",
+    "docs/RC_WIDGET_SHAPES_CLOSED_DUPLICATION_20261027.it.md",
+    "tools/tests/test_rc_widget_shapes_and_closed_copy.py",
+    "docs/RC_RICH_WIDGET_SHAPES_CLOSED_DUPLICATION_MANIFEST.json"
+  ],
+  "tested": {
+    "node": "471/471",
+    "python_rc": "321/321",
+    "python_full_prior": "862/862 before final UI touches",
+    "tsx_parsing": "PASS",
+    "real_postgresql_browser": "PENDING GitHub opt-in"
+  },
+  "deployment": "No commit/push/tag/publish by assistant"
+}

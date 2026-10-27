@@ -1,3 +1,15 @@
+## 2026-10-27 — Rich widget styles and closed-session duplication (uncommitted)
+
+See `docs/RC_WIDGET_SHAPES_CLOSED_DUPLICATION_20261027.en.md`: session duplication from closed sources with owner/collaborator authorization, draft with new joining identity, media remap without participant data; multi-shape independent alpha/gradient/image fills, magnetic placement, collision checks, delete confirmation, contextual quick palette and useful widget previews. GitHub real-browser/PG acceptance PENDING; RC **53.0%** unchanged.
+
+## 2026-10-27 — Dashboard/Editor widget appearance and contextual UX (uncommitted)
+
+See `docs/RC_DASHBOARD_WIDGET_APPEARANCE_20261027.en.md`. Authenticated owner/collaborator chips, icon-only contextual widget menu, fully visible background/border controls for all widgets and consistent editor/projection/participant styling; redundant legacy dashboard removed, advanced live controls retained. Node API 447, Node web 15, Python 856 tests PASS in initial full run; isolated Chromium pointer menu PASS. Full new GitHub E2E pending. RC **53.0%** unchanged.
+
+## 2026-10-27 — Editor widget UX, page rename, clean participant rehearsal (uncommitted)
+
+See `docs/RC_EDITOR_WIDGETS_PAGE_RENAME_REHEARSAL_20261027.en.md`. Cumulative on committed `67a7be93`, including autosave recovery/shared geometry, one dismissible inspector, complete question/quiz option rows, left-aligned selection controls, portal tooltips, rename page API+thumbnail/canvas menu, participant preview without duplicate headings/purple rail, real participant active-page-only, and new Chromium/PG acceptance. Local Python 851/851 and Node 447/447 PASS; full browser PG acceptance pending. RC remains 53.0%.
+
 ## 2026-10-27 — Full Chromium 40549836288: fixed-header canvas pointer acceptance
 
 Committed baseline `b6736aaab6b7dc11e33bedecd4ceb9954d7e8ed3`. Manual run 40549836288 FAILED in the first `ci_browser_editor.py` grouped-arrangement action (`Sposta selezione a destra`). The brand header intercepted an old fixed-position right-click at `(7,7)` on the canvas after the accessible selection view was scrolled into place. Earlier checks of the three-column mock fidelity, real Chromium desktop/touch CSS, contextual autosave and Exit ALL PASSED; later PostgreSQL browser checks did not run. This does **not** establish a broken production autosave endpoint.
@@ -1419,3 +1431,8 @@ Run `40513571247` (commit `45145d73c23b3466c2944e385decd336df129765`): Chromium 
 
 ### 2026-10-27 — Mock-aligned editor and autosave (uncommitted)
 New responsive three-column shell with local Quorivio branding, distinct widget icons, right-click/touch context menus, per-thumbnail JSON import/export, and server-verified revision-CAS debounced autosave. Replaced obsolete Chromium preflights referring to removed Save controls. 447 Node PASS, 832 Python PASS before one additional targeted regression, isolated Chromium preflights PASS. **Production web build and full PostgreSQL browser E2E still pending in CI.** RC 53.0% unchanged; details `docs/RC_EDITOR_MOCK_AUTOSAVE_20261027.en.md`. No assistant commit/push/tag/release.
+
+
+## RC batch 2026-10-27 — resilient autosave & visual parity
+
+Formal weighted score **53.0%** (unchanged until new CI + independent acceptance). Baseline `67a7be939a5930e2f9a49ce3932a4b7f29a682ac`; changed recovery after ambiguous PATCH responses, bounded retries, common CSS geometry, and mandatory frontend Node test step. Local Python 842/842, backend Node 447/447, frontend Node 12/12 PASS. New Full GitHub CI pending. Detailed report: `docs/RC_AUTOSAVE_RECOVERY_VISUAL_PARITY_20261027.en.md`. No automatic commit/push/release.

@@ -28,9 +28,11 @@ class CookiePortalLayer(unittest.TestCase):
             self.assertNotIn('force=True', script)
             self.assertIn("element.matches(':modal')",script)
 
-    def test_portal_is_used_only_for_functional_notice(self):
+    def test_modal_cookie_portal_and_nonblocking_widget_tooltip_are_distinct(self):
         source=(ROOT/'apps/web/src/main.tsx').read_text(encoding='utf-8')
-        self.assertEqual(source.count('createPortal('),1)
+        self.assertEqual(source.count('createPortal('),2)
+        self.assertIn('createPortal(<span className=',source)
+        self.assertEqual(source.count('<dialog ref={node=>{if(node&&!node.open)node.showModal()}'),1)
         self.assertEqual(source.count('>Ho capito</button>'),1)
 
 

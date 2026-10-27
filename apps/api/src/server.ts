@@ -711,7 +711,7 @@ app.put('/api/sessions/:id/appointments',requireAuth,async(req,res)=>{const cx=a
  for(const a of appointments)await cx.query('INSERT INTO session_appointments(id,session_id,scheduled_date,start_time,duration_minutes,time_zone) VALUES($1,$2,$3,$4,$5,$6)',[randomUUID(),session.id,a.date,a.start_time,a.duration_minutes,a.time_zone]);
  await cx.query('COMMIT');res.json({ok:true});
  }catch(e){await cx.query('ROLLBACK');sendError(res,e)}finally{cx.release()}});
-app.get('/api/sessions/:id/presenter-profiles',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}const users=await db.query("SELECT u.id,coalesce(nullif(u.display_name,''),'Presentatore') AS name,u.profile_photo_url FROM users u WHERE u.id=$1 OR u.id IN (SELECT user_id FROM session_presenters WHERE session_id=$2)",[s.owner_id,s.id]);res.json(users.rows)}catch(e){sendError(res,e)}});
+app.get('/api/sessions/:id/presenter-profiles',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}const users=await db.query("SELECT u.id,coalesce(nullif(u.display_name,''),'Presentatore') AS name,u.profile_photo_url,(u.id=$1) AS is_owner FROM users u WHERE u.id=$1 OR u.id IN (SELECT user_id FROM session_presenters WHERE session_id=$2)",[s.owner_id,s.id]);res.json(users.rows)}catch(e){sendError(res,e)}});
 app.get('/api/sessions',requireAuth,requirePresenter,async(req,res)=>{try{
  const page=Number(req.query.page||1),pageSize=Number(req.query.page_size||(req.query.page===undefined?100:10)),search=String(req.query.search||'').trim().slice(0,160),role=String(req.query.role||'all');
  if(!Number.isSafeInteger(page)||page<1||!Number.isSafeInteger(pageSize)||pageSize<1||pageSize>100||!['all','owner','collaborator'].includes(role)){res.status(400).json({error:'invalid_pagination'});return}
@@ -867,6 +867,8 @@ app.post('/api/sessions/import.quorivio',requireAuth,requirePresenter,async(req,
 
 app.post('/api/sessions/:id/duplicate',requireAuth,async(req,res)=>{try{
  const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}
+ // Includes terminated sessions: the portable projection omits responses, votes,
+ // participants, moderation, usage statistics, presenter invitations and join credentials.
  const portable=await portableSession(s.id);portable.session.title=(portable.session.title+' — Copia').slice(0,160);
  const refs=[...referencedAssets(portable)];
  const rows=refs.length?(await db.query('SELECT id,mime_type AS mime,byte_size AS bytes,sha256 FROM session_assets WHERE session_id=$1 AND participant_id IS NULL AND id=ANY($2::uuid[])',[s.id,refs])).rows:[];
@@ -876,12 +878,33 @@ app.post('/api/sessions/:id/duplicate',requireAuth,async(req,res)=>{try{
  // require safe numeric byte counts; normalize before validating and cloning.
  const assets=rows.map((row:any)=>({...row,bytes:Number(row.bytes)}));
  const id=await createFromPortable({...portable,import_assets:assets},auth(req)!,refs.length?path.join(assetRoot,s.id):undefined,true);
- res.status(201).json({id});
+ res.status(201).json({id,status:'draft',data_copied:false,source_status:s.status});
  }catch(e){sendError(res,e)}});
 app.get('/api/sessions/:id/presenters',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}const r=await db.query('SELECT u.id,u.email FROM users u JOIN session_presenters sp ON u.id=sp.user_id WHERE sp.session_id=$1',[s.id]);res.json(r.rows)}catch(e){sendError(res,e)}});
 app.post('/api/sessions/:id/presenters',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}if(s.owner_id!==auth(req)){res.status(403).json({error:'owner_required'});return}const email=String(req.body?.email||'').toLowerCase();const r=await db.query("SELECT id FROM users WHERE organization_id=$1 AND email=$2 AND approved=true AND must_change_password=false AND role IN ('presenter','org_admin','platform_admin')",[s.organization_id,email]);if(!r.rowCount){res.status(404).json({error:'eligible_presenter_not_found'});return}await db.query('INSERT INTO session_presenters(session_id,user_id) VALUES($1,$2) ON CONFLICT DO NOTHING',[s.id,r.rows[0].id]);res.status(201).json({ok:true})}catch(e){sendError(res,e)}});
 app.delete('/api/sessions/:id/presenters/:uid',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}if(s.owner_id!==auth(req)){res.status(403).end();return}await db.query('DELETE FROM session_presenters WHERE session_id=$1 AND user_id=$2',[s.id,req.params.uid]);res.status(204).end()}catch(e){sendError(res,e)}});
 app.patch('/api/sessions/:id/activities/:aid',requireAuth,async(req,res)=>{const cx=await db.connect();try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}if(s.status==='closed'){res.status(409).json({error:'session_closed'});return}const {title,options,correct_option_id}=req.body||{};if(typeof title!=='string'||!title.trim()||title.length>240||!validateOptions(options)){res.status(400).json({error:'invalid_activity'});return}await cx.query('BEGIN');const a=await cx.query('SELECT * FROM activities WHERE id=$1 AND session_id=$2 FOR UPDATE',[req.params.aid,s.id]);if(!a.rowCount){await cx.query('ROLLBACK');res.status(404).end();return}if(['quiz','timed_quiz'].includes(a.rows[0].type)&&!options.some((o:any)=>o.id===correct_option_id)){await cx.query('ROLLBACK');res.status(400).json({error:'invalid_correct_option'});return}const newIds=new Set(options.map((o:any)=>o.id));const historical=(await cx.query('SELECT DISTINCT option_id FROM responses WHERE activity_id=$1',[req.params.aid])).rows.map(x=>x.option_id);if(['quiz','timed_quiz'].includes(a.rows[0].type) && correct_option_id!==a.rows[0].correct_option_id && (await cx.query('SELECT 1 FROM responses WHERE activity_id=$1 AND invalidated_at IS NULL LIMIT 1',[req.params.aid])).rowCount){await cx.query('ROLLBACK');res.status(409).json({error:'invalidate_answers_before_changing_correct_option'});return}if(historical.some(x=>!newIds.has(x))){await cx.query('ROLLBACK');res.status(409).json({error:'existing_response_option_must_remain'});return}await cx.query('UPDATE activities SET title=$3,options=$4,correct_option_id=$5,revision=revision+1 WHERE id=$1 AND session_id=$2',[req.params.aid,s.id,title,JSON.stringify(options),['quiz','timed_quiz'].includes(a.rows[0].type)?correct_option_id:null]);await cx.query('COMMIT');await broadcast(s.id);res.json({ok:true})}catch(e){await cx.query('ROLLBACK');sendError(res,e)}finally{cx.release()}});
+// Rename a single page without rewriting answer options, votes, or its widget layout.
+// Renaming must remain possible even after a quiz has received answers.
+app.patch('/api/sessions/:id/pages/:aid/title',requireAuth,async(req,res)=>{
+ const title=req.body?.title;
+ if(typeof title!=='string'||!title.trim()||title.trim().length>240||/[\x00-\x1f\x7f]/.test(title)){
+  res.status(400).json({error:'invalid_page_title'});return;
+ }
+ let cx:pg.PoolClient|undefined;let begun=false;
+ try{
+  const s=await owner(req.params.id,auth(req)!);
+  if(!s){res.status(404).end();return}
+  cx=await db.connect();await cx.query('BEGIN');begun=true;
+  const live=await cx.query('SELECT status FROM sessions WHERE id=$1 FOR UPDATE',[s.id]);
+  if(!live.rowCount){await cx.query('ROLLBACK');begun=false;res.status(404).end();return}
+  if(live.rows[0].status==='closed'){await cx.query('ROLLBACK');begun=false;res.status(409).json({error:'session_closed'});return}
+  const updated=await cx.query('UPDATE activities SET title=$3,revision=revision+1 WHERE session_id=$1 AND id=$2 RETURNING id,title',[s.id,req.params.aid,title.trim()]);
+  if(!updated.rowCount){await cx.query('ROLLBACK');begun=false;res.status(404).end();return}
+  await cx.query('COMMIT');begun=false;cx.release();cx=undefined;
+  await broadcast(s.id);res.json(updated.rows[0]);
+ }catch(e){if(begun&&cx)await cx.query('ROLLBACK').catch(()=>{});sendError(res,e)}finally{cx?.release()}
+});
 app.post('/api/sessions/:id/activities/:aid/invalidate',requireAuth,async(req,res)=>{const cx=await db.connect();try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}await cx.query('BEGIN');const a=await cx.query('SELECT id FROM activities WHERE id=$1 AND session_id=$2 FOR UPDATE',[req.params.aid,s.id]);if(!a.rowCount){await cx.query('ROLLBACK');res.status(404).end();return}const r=await cx.query('UPDATE responses SET invalidated_at=now(),invalidated_by=$2 WHERE activity_id=$1 AND invalidated_at IS NULL RETURNING id',[req.params.aid,auth(req)]);await cx.query('COMMIT');await broadcast(s.id);res.json({invalidated:r.rowCount})}catch(e){await cx.query('ROLLBACK');sendError(res,e)}finally{cx.release()}});
 app.get('/api/sessions/:id',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}res.json(await snapshot(s.id))}catch(e){sendError(res,e)}});
 
@@ -916,6 +939,14 @@ app.patch('/api/sessions/:id/activities/:aid/design',requireAuth,async(req,res)=
  const previous=a.rows[0].page_design?.widgets||[];
  const next=req.body.page_design.widgets||[];
  // Every referenced asset must belong to this session and match the widget type.
+ // A private image used as a widget fill has the same session-level security
+ // boundary as the background and cannot be borrowed from another session.
+ for(const w of [...next,...(req.body.result_design.widgets||[])].filter((item:any)=>item.style?.fillMode==='image')){
+  const imageId=w.style?.fillImageAssetId;
+  if(!imageId){await cx.query('ROLLBACK');res.status(400).json({error:'missing_widget_fill_image'});return}
+  const image=await cx.query('SELECT mime_type FROM session_assets WHERE id=$1 AND session_id=$2 AND participant_id IS NULL',[imageId,s.id]);
+  if(!['image/png','image/jpeg','image/gif','image/webp'].includes(image.rows[0]?.mime_type)){await cx.query('ROLLBACK');res.status(400).json({error:'invalid_widget_fill_image'});return}
+ }
  const mediaWidgets=next.filter((w:any)=>['image','logo','video','pdf'].includes(w.kind));
  for(const w of mediaWidgets){
   const match=await cx.query('SELECT mime_type FROM session_assets WHERE id=$1 AND session_id=$2 AND participant_id IS NULL',[w.assetId,s.id]);
@@ -1152,7 +1183,7 @@ app.get('/api/join/:code/activities/:aid/media/:assetId',async(req,res)=>{try{
  const s=await publicSession(req.params.code);
  if(!s||s.status!=='active'||s.current_activity_id!==req.params.aid){res.status(404).end();return}
  const a=await db.query('SELECT page_design FROM activities WHERE id=$1 AND session_id=$2 AND status=$3',[req.params.aid,s.id,'open']);
- if(!a.rowCount||!(a.rows[0].page_design?.backgroundAssetId===req.params.assetId||(a.rows[0].page_design?.widgets||[]).some((w:any)=>['image','video','logo','pdf'].includes(w.kind)&&w.assetId===req.params.assetId))){res.status(404).end();return}
+ if(!a.rowCount||!(a.rows[0].page_design?.backgroundAssetId===req.params.assetId||(a.rows[0].page_design?.widgets||[]).some((w:any)=>(['image','video','logo','pdf'].includes(w.kind)&&w.assetId===req.params.assetId||w.style?.fillMode==='image'&&w.style?.fillImageAssetId===req.params.assetId)))){res.status(404).end();return}
  const r=await db.query('SELECT mime_type FROM session_assets WHERE id=$1 AND session_id=$2',[req.params.assetId,s.id]);
  if(!r.rowCount||!['image/png','image/jpeg','image/gif','image/webp','video/mp4','video/webm','application/pdf'].includes(r.rows[0].mime_type)){res.status(404).end();return}
  res.setHeader('Cache-Control','private, no-store');res.setHeader('X-Content-Type-Options','nosniff');res.type(r.rows[0].mime_type);

@@ -28,13 +28,13 @@ class EditorReportedBugs(unittest.TestCase):
         self.assertIn('aspect-ratio:16/9', CSS)
 
     def test_no_native_duplicate_tooltip_and_menu_overlap(self):
-        self.assertIn('className="editor-icon-tool" aria-label={label}', UI)
+        self.assertIn('className="editor-icon-tool" data-widget-kind={kind} aria-label={label}', UI)
         self.assertIn('data-tools-open={arrangeMenu}', UI)
         self.assertIn('Strumenti di selezione e allineamento', UI)
         self.assertIn('.page-editor-sidebar:has(.page-editor-thumb-menu){z-index:120', CSS)
 
     def test_geometry_and_question_editing(self):
-        self.assertIn('position:{x:4+(i%4)*24,y:4+Math.floor(i/4)*24,width:22,height:20,rotation:0}', UI)
+        self.assertIn('freeWidgetPosition(old,{x:4+(i%4)*24,y:4+Math.floor(i/4)*24},22,20)', UI)
         self.assertIn("['question','timed-quiz','topic-question'].includes(w.kind)", UI)
         self.assertIn('data-rotate-handle', UI)
         self.assertIn('data-resize-edge', UI)

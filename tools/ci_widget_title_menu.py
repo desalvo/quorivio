@@ -13,19 +13,19 @@ HTML = '''<!doctype html><html lang="it"><meta charset="utf-8">
 .widget-canvas-item { position:relative; width:340px; height:140px; padding:9px 23px 9px 9px; background:white; border:1px solid #877cbb; }
 .widget-canvas-item input { box-sizing:border-box; height:100%; width:100%; background:transparent; border:0; }
 .widget-canvas-item input[readonly] { pointer-events:none; cursor:move; }
-.canvas-menu-trigger { position:absolute;right:22px;top:2px;z-index:14;min-width:24px;min-height:24px; }
+/* Contextual actions open with right-click or the keyboard Menu key. */
 .canvas-context-menu { position:absolute;left:10px;top:28px;z-index:30;display:flex;flex-direction:column;background:white; }
 </style>
 <div class="widget-canvas-item" role="group" aria-label="Widget text; frecce spostano">
 <input aria-label="Titolo text" readonly value="Remote collaborator">
-<button type="button" class="canvas-menu-trigger" aria-label="Menu contestuale text" aria-expanded="false">⋮</button>
 <div class="canvas-context-menu" role="group" aria-label="Azioni widget text" hidden>
 <button type="button">Modifica titolo</button></div></div>
 <script>
 const item=document.querySelector('.widget-canvas-item'), input=item.querySelector('input');
-const trigger=item.querySelector('.canvas-menu-trigger'), menu=item.querySelector('.canvas-context-menu');
-trigger.addEventListener('click',()=>{menu.hidden=false;trigger.setAttribute('aria-expanded','true')});
-menu.querySelector('button').addEventListener('click',()=>{input.readOnly=false;menu.hidden=true;trigger.setAttribute('aria-expanded','false')});
+const menu=item.querySelector('.canvas-context-menu');
+item.addEventListener('contextmenu',event=>{event.preventDefault();menu.hidden=false});
+item.addEventListener('keydown',event=>{if(event.key==='ContextMenu'||(event.shiftKey&&event.key==='F10')){event.preventDefault();menu.hidden=false}});
+menu.querySelector('button').addEventListener('click',()=>{input.readOnly=false;menu.hidden=true});
 input.addEventListener('keydown',e=>{if(e.key==='Enter'){input.readOnly=true;input.blur()}});
 </script></html>'''
 
@@ -46,7 +46,7 @@ async def main():
     raise AssertionError('Expected readonly title double-click to be intercepted')
    except PlaywrightTimeout:
     pass
-   await item.get_by_role('button',name='Menu contestuale text').click()
+   await item.click(button='right',position={'x':12,'y':12})
    menu=item.get_by_role('group',name='Azioni widget text')
    await expect(menu).to_be_visible()
    await menu.get_by_role('button',name='Modifica titolo').click()

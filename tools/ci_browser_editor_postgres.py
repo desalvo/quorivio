@@ -67,8 +67,7 @@ async def edit_canvas_widget_title(canvas, title):
   item=canvas.first
   field=item.get_by_role('textbox',name='Titolo text')
   await expect(field).not_to_be_editable()
-  trigger=item.get_by_role('button',name='Menu contestuale text')
-  await trigger.click()
+  await item.click(button='right',position={'x':12,'y':12})
   menu=item.get_by_role('group',name='Azioni widget text')
   await expect(menu).to_be_visible()
   await menu.get_by_role('button',name='Modifica titolo').click()
@@ -116,6 +115,19 @@ async def main():
    await expect(editor.get_by_text('Salvato automaticamente')).to_be_visible()
    await open_editor(page,title)
    assert await widgets.first.evaluate('(e)=>parseFloat(e.style.left)')==11
+   # Rename the current page through the thumbnail menu. No question options,
+   # response history, or widget geometry may be overwritten by a title edit.
+   await page.get_by_role('button',name='Menu pagina 1: crea, duplica, elimina, sposta').click()
+   page.once('dialog',lambda dialog:asyncio.create_task(dialog.accept('Renamed browser slide')))
+   await page.get_by_role('button',name='Rinomina pagina',exact=True).click()
+   await expect(page.get_by_role('button',name='Mostra pagina 1: Renamed browser slide',exact=False)).to_be_visible()
+   renamed=await call(context,'GET',f'/api/sessions/{sid}')
+   renamed_activity=next(x for x in renamed['activities'] if x['id']==aid)
+   assert renamed_activity['title']=='Renamed browser slide'
+   assert renamed_activity['design_revision']==3
+   assert renamed_activity['options']==[{'id':'yes','label':'Yes'},{'id':'no','label':'No'}]
+   assert renamed_activity['page_design']['widgets'][0]['position']['x']==11
+   await open_editor(page,title)
    # Concurrent presenter modifies another field while browser retains stale revision.
    remote_before=await call(context,'GET',f'/api/sessions/{sid}')
    remote_page=next(x for x in remote_before['activities'] if x['id']==aid)

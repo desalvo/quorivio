@@ -648,3 +648,106 @@
 .editor-ux-v2,.editor-ux-v2:fullscreen{position:fixed!important;inset:0!important;left:0!important;top:0!important;right:0!important;bottom:0!important;width:100vw!important;height:100dvh!important;max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;border-radius:0!important}
 /* Override the older non-fullscreen editor selector, which used dashboard sidebar padding. */
 .editor-ux-v2.powerpoint-editor:not(:fullscreen){position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;max-width:none!important;max-height:none!important;padding:0!important;margin:0!important;border:0!important;border-radius:0!important}
+
+/* Editor RC: tooltip portal is rendered under document.body, independent of
+   the palette scroll container, canvas clipping and their stacking contexts. */
+.editor-floating-tooltip{
+ position:fixed;z-index:2147483000;box-sizing:border-box;max-width:min(230px,75vw);
+ padding:9px 12px;background:#091b30f5;border:1px solid #84dbe3;
+ border-radius:9px;box-shadow:0 10px 28px #000a;color:#fff;
+ font-size:13px;font-weight:600;line-height:1.35;white-space:normal;
+ pointer-events:none;text-align:center;overflow-wrap:anywhere;
+}
+.editor-floating-tooltip.tooltip-left{transform:translate(-100%,-50%)}
+.editor-floating-tooltip.tooltip-right{transform:translate(0,-50%)}
+.editor-floating-tooltip.tooltip-above{transform:translate(-50%,-100%)}
+/* Only the detailed inspector is visible in the integrated slide editor. */
+.editor-ux-v2 .editor-widget-drawer{z-index:150;overscroll-behavior:contain}
+.editor-ux-v2 .editor-drawer-close{
+ flex:0 0 42px;width:42px;height:42px;display:grid;place-items:center;
+ border-radius:9px;border:1px solid #86d4e5;background:#264b67;
+ color:#fff;font-size:28px;font-weight:700;line-height:1;
+}
+.editor-ux-v2 .editor-drawer-close:hover{background:#376b86}
+.editor-ux-v2 .editor-widget-choices{display:grid;gap:11px;min-width:0;border:1px solid #6788a2;border-radius:12px;padding:11px;margin:8px 0;color:#f1f8ff}
+.editor-ux-v2 .editor-widget-choices legend{padding:0 8px;font-weight:750;color:#f4fbff}
+.editor-ux-v2 .widget-choice-list{display:grid;gap:10px;min-width:0}
+.editor-ux-v2 .widget-choice-caption{font-size:12px;line-height:1.4;color:#c8dbee;margin:0}
+.editor-ux-v2 .widget-choice-editor-row{display:flex;gap:8px;align-items:end;min-width:0;border-bottom:1px solid #50667f;padding-bottom:10px}
+.editor-ux-v2 .widget-choice-text{flex:1 1 auto;min-width:0}
+.editor-ux-v2 .widget-choice-correct{display:flex!important;flex:0 0 auto;flex-direction:row!important;align-items:center;gap:5px;white-space:nowrap;font-size:12px}
+.editor-ux-v2 .widget-choice-correct input{margin:0;flex:none}
+.editor-ux-v2 .widget-choice-editor-row>button{align-self:end;flex:0 0 36px}
+/* Option controls in preview, projection and the real participant form have
+   the SAME reading order: marker at left, answer text immediately to its right. */
+.projection-interactive-options{list-style:none;padding:0;margin:.6em 0;display:grid;gap:.4em}
+.projection-interactive-options li{display:flex;align-items:flex-start;gap:9px;text-align:left;min-width:0}
+.widget-choice-marker,.canvas-widget-answer-preview .widget-choice-marker{flex:none;display:inline-block;box-sizing:border-box;width:14px;height:14px;border:2px solid currentColor;border-radius:50%;margin-top:2px;background:transparent}
+.projection-interactive-options[data-answer-mode=multiple] .widget-choice-marker,
+.canvas-widget-answer-preview[data-answer-mode=multiple] .widget-choice-marker{border-radius:3px}
+.editor-ux-v2 .canvas-widget-answer-preview .widget-choice-marker{width:11px;height:11px;margin-top:0}
+.widget-question>label:has(>input[type=radio]),
+.widget-question>label:has(>input[type=checkbox]),
+.rehearsal-widget>label:has(>input[type=radio]),
+.rehearsal-widget>label:has(>input[type=checkbox]){
+ display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start;
+ gap:8px;text-align:left;min-width:0;
+}
+.widget-question>label>input:is([type=radio],[type=checkbox]),
+.rehearsal-widget>label>input:is([type=radio],[type=checkbox]){
+ width:18px;min-width:18px;height:18px;flex:0 0 18px;margin:0;order:0;
+}
+@media(max-width:760px){
+ .editor-ux-v2 .widget-choice-editor-row{flex-wrap:wrap}
+ .editor-ux-v2 .widget-choice-text{flex:1 0 100%}
+}
+
+/* Rehearsal: participants see only the presented slide. In preview, the footer
+   exclusively controls simulated page navigation; no purple left slide rail. */
+.rehearsal-stage{display:block;overflow:auto;min-height:0}
+.rehearsal-stage>.rehearsal-slide{width:100%;min-width:0;box-sizing:border-box}
+.rehearsal-slide>h2{margin:0 0 .75rem}
+
+/* Unified RC dashboard: legacy controls are accessible only for maintenance and live operations. */
+.session-tab-pages > div:first-child > section:not(:nth-of-type(3)){display:none}
+.session-tab-pages > div:last-child > .legacy-page-admin{display:block}
+.session-tab-overview > div:last-child > .legacy-page-admin,
+.session-tab-results > div:last-child > .legacy-page-admin{display:none}
+.legacy-page-admin>summary{cursor:pointer;padding:12px 16px;font-weight:650}
+.legacy-page-admin:not([open]){padding:0!important}
+.legacy-page-admin[open]{padding:12px}
+/* Presentation editors expose a single consistent appearance inspector. */
+.editor-ux-v2 .editor-widget-appearance{display:grid;gap:12px;border:1px solid #547d96;padding:14px;border-radius:12px;background:#112c44}
+.editor-ux-v2 .editor-widget-appearance legend{padding:0 5px;font-weight:750;color:#e6f8ff}
+.editor-ux-v2 .editor-widget-appearance label{display:grid;gap:5px;min-width:0}
+.editor-ux-v2 .editor-widget-appearance label.appearance-switch{display:flex;align-items:center;gap:10px}
+.editor-ux-v2 .editor-widget-appearance input[type=color]{width:100%;min-height:39px;padding:2px}
+/* Distinct, colorful icons with a small colored-glass tile for each widget. */
+.editor-ux-v2 .editor-widget-grid .editor-icon-tool[data-widget-kind]{color:var(--widget-accent,#5ce1ff)!important;background:linear-gradient(145deg,color-mix(in srgb,var(--widget-accent,#5ce1ff) 29%,#19273e),#14233a 72%)!important;border:1px solid color-mix(in srgb,var(--widget-accent,#5ce1ff) 55%,#3b4c63)!important;box-shadow:inset 0 1px 0 #ffffff2e,0 8px 18px #0005}
+.editor-ux-v2 .editor-widget-grid .editor-icon-tool[data-widget-kind] svg{height:26px;width:26px;filter:drop-shadow(0 1px 6px color-mix(in srgb,var(--widget-accent) 42%,transparent))}
+.editor-icon-tool[data-widget-kind=rating],.editor-icon-tool[data-widget-kind=timer]{--widget-accent:#ffbe42}
+.editor-icon-tool[data-widget-kind=reactions],.editor-icon-tool[data-widget-kind=logo]{--widget-accent:#46e5ab}
+.editor-icon-tool[data-widget-kind=text],.editor-icon-tool[data-widget-kind=qr]{--widget-accent:#48d7ff}
+.editor-icon-tool[data-widget-kind=divider],.editor-icon-tool[data-widget-kind=pdf]{--widget-accent:#d5e7fa}
+.editor-icon-tool[data-widget-kind=profile],.editor-icon-tool[data-widget-kind=postit]{--widget-accent:#9e80ff}
+.editor-icon-tool[data-widget-kind=question],.editor-icon-tool[data-widget-kind=topic-question]{--widget-accent:#6db7ff}
+.editor-icon-tool[data-widget-kind=image],.editor-icon-tool[data-widget-kind=results-button]{--widget-accent:#59e3c9}
+.editor-icon-tool[data-widget-kind=video],.editor-icon-tool[data-widget-kind=timed-quiz]{--widget-accent:#ff688c}
+.editor-icon-tool[data-widget-kind=participant-count]{--widget-accent:#80b6ff}
+/* The owner and invited presenters are explicitly distinguishable in the editor header. */
+.editor-mock-brand .editor-presenter-identities{display:flex;align-items:center;gap:6px;min-width:0;overflow:hidden;flex-wrap:wrap}
+.editor-presenter-identities>span{display:inline-block;border-radius:99px;border:1px solid transparent;padding:4px 9px;font-size:11px;white-space:nowrap;max-width:210px;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.editor-presenter-identities .editor-owner-chip{border-color:#f4c77377;color:#ffda94;background:#71491d55}
+.editor-presenter-identities .editor-collaborator-chip{border-color:#62d9f277;color:#a6edff;background:#185d7855}
+@media(max-width:900px){.editor-mock-brand .editor-presenter-identities{max-width:35vw}.editor-presenter-identities>span{font-size:9px;max-width:130px}}
+/* Mouse right-click, touch long-press and keyboard context key replace widget menu buttons. */
+.editor-ux-v2 .canvas-menu-trigger{display:none!important}
+
+/* Contextual, non-modal palette appears below the stage only while selected. */
+.widget-selection-palette{display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:center;margin:9px auto 3px;padding:7px 10px;background:#101e30;border:1px solid #33516a;border-radius:13px;color:#f5f9ff;max-width:100%;z-index:4}
+.widget-selection-palette .palette-widget-label{font-size:12px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:5px}
+.widget-selection-palette button{border:1px solid #3a5876;border-radius:8px;color:#eff8ff;background:#243b53;min-height:33px;min-width:34px;padding:5px 8px;cursor:pointer}
+.widget-selection-palette button[aria-pressed=true]{background:#156b83;border-color:#48cfcb}
+.widget-selection-palette label{display:flex;align-items:center;gap:2px;min-height:33px;color:#eff8ff}
+.widget-selection-palette input[type=color]{width:28px;height:30px;border:none;padding:1px;background:transparent}
+@media(max-width:650px){.widget-selection-palette{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap}.widget-selection-palette button{flex:none}}

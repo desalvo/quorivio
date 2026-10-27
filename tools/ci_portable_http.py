@@ -162,8 +162,19 @@ def run():
         assert api('GET', f'/api/sessions/{imported["id"]}/assets/{iid}') == PNG
         ids.append(iid)
 
+    # A closed source is explicitly duplicable by its owner/collaborator;
+    # the new object is a fresh draft with independent access credentials.
+    api('POST', f'/api/sessions/{sid}/status', {'status': 'closed'})
+    source_closed = api('GET', f'/api/sessions/{sid}')
+    assert source_closed['session']['status'] == 'closed'
     duplicated = api('POST', f'/api/sessions/{sid}/duplicate', {}, expected=201)
+    assert duplicated['status']=='draft' and duplicated['data_copied'] is False and duplicated['source_status']=='closed'
     copy = api('GET', f'/api/sessions/{duplicated["id"]}')
+    assert copy['session']['status']=='draft' and copy['session']['join_code'] != source_closed['session']['join_code']
+    assert copy['session']['id'] != source_closed['session']['id']
+    assert copy['activities'][0]['id'] != source_closed['activities'][0]['id']
+    assert copy['session'].get('current_activity_id') is None
+
     cid = asset_id(copy)
     assert cid not in ids and cid != src
     assert copy['activities'][0]['result_design']['backgroundAssetId'] == cid

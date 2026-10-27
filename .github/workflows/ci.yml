@@ -71,6 +71,8 @@ jobs:
         run: python3 tools/rc_release_preflight.py --strict
       - name: Unit tests
         run: npm test
+      - name: Editor autosave recovery and shared geometry unit tests
+        run: node --experimental-strip-types --test apps/web/test/*.test.ts
       - name: Compile frontend and backend
         run: npm run build
       - name: Chromium editor UI acceptance (opt-in)
