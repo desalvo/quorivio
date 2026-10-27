@@ -245,7 +245,14 @@ async def main():
      await mobile_thumb.tap()
      await expect(mobile_actions).to_have_count(0)
      await ensure_canvas_tools_open(mobile)
-     await mobile.locator('.canvas-accessible-controls > summary').click()
+     # CI 40510491774: at phone width the open alignment popover extended
+     # beyond the 16:9 canvas and intercepted the accessibility disclosure.
+     # A real pointer must be able to open the disclosure even while the
+     # context menu is visible; opening it must dismiss that menu.
+     summary=mobile.locator('.canvas-accessible-controls > summary')
+     assert await summary.evaluate('el=>{const r=el.getBoundingClientRect();const hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return hit===el||el.contains(hit)}'), 'Mobile accessibility summary covered by canvas context actions'
+     await summary.tap()
+     await expect(mobile.get_by_role('group',name='Allineamento widget selezionati')).to_be_hidden()
      mchecks=mobile.get_by_role('region',name='Organizzazione accessibile dei widget').get_by_role('checkbox',name='Seleziona')
      await mchecks.nth(0).check()
      await mchecks.nth(1).check()

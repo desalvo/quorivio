@@ -96,7 +96,7 @@ async def main():
    first=await call(context,'PATCH',path,draft())
    assert first['design_revision']==2
    await open_editor(page,title)
-   await ensure_canvas_tools_open(page)
+   await close_canvas_tools(page)
    if not await page.locator('.canvas-accessible-controls').get_attribute('open'):
     await page.locator('.canvas-accessible-controls > summary').click()
    canvas=page.locator('.widget-canvas-item')
@@ -115,7 +115,7 @@ async def main():
    saved=next(x for x in persisted['activities'] if x['id']==aid)
    assert saved['design_revision']==3 and [w['position']['x'] for w in saved['page_design']['widgets'][:2]]==[11,41]
    await open_editor(page,title)
-   await ensure_canvas_tools_open(page)
+   await close_canvas_tools(page)
    if not await page.locator('.canvas-accessible-controls').get_attribute('open'):
     await page.locator('.canvas-accessible-controls > summary').click()
    assert (await canvas.evaluate_all('(els)=>els.map(e=>parseFloat(e.style.left))'))[:2]==[11,41]

@@ -1177,3 +1177,9 @@ Dalla baseline `c44a3cb...`, run `40359804334` verde, sviluppato lotto coerente 
 ### 2026-10-27 — Hotfix Chromium per selettore Salva layout ambiguo
 
 Full CI GitHub `40479089027` (job qualità `122104572150`, commit `238e184...`) FALLITA al test browser `ci_browser_editor.py:190` per violazione strict-mode Playwright: «Salva layout» corrispondeva sia al pulsante testuale sia all'icona «Salva layout della pagina». Bootstrap e preflight CSS desktop/mobile sono PASSATI. Nuovo helper condiviso per individuare il pulsante esatto nella regione editor; corretti i test Chromium simulati e quelli PostgreSQL, comprese le verifiche abilitato/disabilitato. Aggiunti controlli statici e test isolato Chromium reale desktop/touch, integrato come preflight nella Full CI. Nessuna modifica a React/API/database. Esecuzione Full CI aggiornata ancora da verificare; avanzamento RC **48,0%** invariato. Nessun commit/push/tag/release.
+
+
+## 2026-10-27 — Sovrapposizione menu e pannello accessibile mobile Chromium (CI 40510491774)
+
+- Commit analizzato: `a26ce48ea7d90bfdfe06e114398e2971e7846810`. Preflight CSS e Salva verdi, ma il pannello allineamento aperto intercettava il clic sul riepilogo accessibile in mobile; nessun errore JS.
+- Corretti livello CSS e chiusura automatica con toggle React; aggiornati test browser simulato e PostgreSQL, preflight Chromium reale della sovrapposizione obbligatorio e sei regressioni. Con il CSS precedente il difetto si riproduce; con CSS aggiornato Chromium desktop/mobile PASS. Node 447/447 e Python mirati 182/182. Full CI da eseguire, **RC 48,0% invariato**. Vedi `docs/RC_CHROMIUM_ACCESSIBLE_DISCLOSURE_HOTFIX.it.md`.

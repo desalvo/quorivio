@@ -474,6 +474,15 @@
 .editor-ux-v2 .canvas-accessible-controls{margin:9px 0 0;padding:0;border:1px solid #ffffff24;border-radius:9px;background:#102b4299;color:#e3f5ff}
 .editor-ux-v2 .canvas-accessible-controls summary{padding:9px 12px;cursor:pointer;color:#d0e6f8;font-size:12px}
 .editor-ux-v2 .canvas-accessible-controls[open]{padding:10px}
+/* On narrow/touch canvases the floating arrangement panel may extend below
+   the 16:9 artboard. Keep the collapsed accessible-summary hit target above
+   that panel, so users can open the keyboard/touch alternative directly.
+   Opening the disclosure dismisses the context panel in WidgetCanvas.
+   Once expanded, release this temporary stacking priority so reopening
+   context actions remains clickable without forced pointer events. */
+.editor-ux-v2 .canvas-accessible-controls:not([open]){position:relative;z-index:52}
+.editor-ux-v2 .canvas-accessible-controls[open]{position:relative;z-index:auto}
+
 .editor-ux-v2 .editor-bottom-controls{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-height:54px;max-width:100%;padding:7px 10px;border:1px solid var(--editor-line);border-radius:13px;background:#0d1c30e6;backdrop-filter:blur(12px)}
 .editor-ux-v2 .editor-current-page{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:#d6e9fa;font-size:13px;font-weight:600;min-width:0}
 .editor-ux-v2 .editor-secondary-workflow{width:100%;padding:0 8px;max-height:25vh;overflow:auto;display:grid;gap:8px;color:#ecf3fd}
