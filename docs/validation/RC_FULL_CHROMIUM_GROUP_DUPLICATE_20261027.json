@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-27",
+  "baseline_commit": "f4d0a768b468a64654cc72a261eec22e7ae0c4ee",
+  "workflow_run": 40592859476,
+  "workflow_conclusion": "failure",
+  "passing_github_preflight": "fixed editor header contextual popover and arrangement panel: desktop+mobile genuine Chromium clicks",
+  "failed_step": "Chromium editor UI acceptance (opt-in)",
+  "failure": "tools/ci_browser_editor.py expected five .widget-canvas-item elements after duplicating two of three, observed three",
+  "root_cause": "fixed 5-point canvas offset for group duplication intersects existing widgets and collision policy rejects the whole operation",
+  "changes": [
+    "shared group duplication and clipboard paste now search an in-bounds non-overlapping translation while preserving relative group geometry",
+    "explicit null/no-space handling continues to reject impossible insertions without changing the canvas",
+    "Chromium acceptance checks for duplication rejection alert and explicitly confirms multi-delete using the real browser confirmation dialog",
+    "five frontend Node regressions and five Python CI contract regressions added"
+  ],
+  "local_tests": {
+    "npm run build": "PASS (TypeScript backend and frontend plus Vite bundle)",
+    "npm test": "450 passed, 0 failed",
+    "node --import tsx --test apps/web/test/*.test.ts": "28 passed, 0 failed",
+    "python -m unittest discover -s tools/tests -p test_canvas_*.py -q": "27 passed, 0 failed",
+    "python -m unittest discover -s tools/tests -p test_full_ci_group_duplicate_20261027.py -q": "5 passed, 0 failed",
+    "Chromium editor end-to-end": "BLOCKED locally: managed Chromium URLBlocklist blocks localhost (ERR_BLOCKED_BY_ADMINISTRATOR)"
+  },
+  "github_tests": "Full CI 40592859476 failed before later browser + PostgreSQL acceptance; new fix not yet checked in GitHub Actions",
+  "rc_score_percent": 53.0,
+  "gates_promoted": [],
+  "rc_ready": false,
+  "commit_push_tag_release_or_docker_publish": "none"
+}

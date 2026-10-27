@@ -108,13 +108,39 @@ async def main():
    await click_canvas_tool(page,'Porta selezione davanti')
    await page.keyboard.press('Control+z')
    await checks.nth(0).check();await checks.nth(1).check()
+   # A rejected group duplication raises an alert. Capture it rather than letting
+   # Playwright silently dismiss it before the widget-count assertion.
+   duplication_alerts=[]
+   async def handle_duplication_alert(dialog):
+    duplication_alerts.append((dialog.type,dialog.message))
+    await dialog.dismiss()
+   def observe_duplication_dialog(dialog):
+    asyncio.create_task(handle_duplication_alert(dialog))
+   page.on('dialog',observe_duplication_dialog)
    await click_canvas_tool(page,'Duplica selezione')
    await expect(page.locator('.widget-canvas-item')).to_have_count(5)
+   assert not duplication_alerts,duplication_alerts
+   page.remove_listener('dialog',observe_duplication_dialog)
    await page.keyboard.press('Control+z')
    await expect(page.locator('.widget-canvas-item')).to_have_count(3)
    await checks.nth(0).check();await checks.nth(1).check()
+   # The product requires an explicit confirmation for every destructive action.
+   # Playwright otherwise auto-dismisses native confirm dialogs, making this
+   # acceptance test fail even when the UI correctly asks the user.
+   deletion_confirmations=[]
+   async def accept_deletion(dialog):
+    deletion_confirmations.append((dialog.type,dialog.message))
+    if dialog.type=='confirm' and dialog.message=='Eliminare 2 widget selezionati?':
+     await dialog.accept()
+    else:
+     await dialog.dismiss()
+   def on_delete_dialog(dialog):
+    asyncio.create_task(accept_deletion(dialog))
+   page.on('dialog',on_delete_dialog)
    await click_canvas_tool(page,'Elimina selezione')
    await expect(page.locator('.widget-canvas-item')).to_have_count(1)
+   assert deletion_confirmations==[('confirm','Eliminare 2 widget selezionati?')],deletion_confirmations
+   page.remove_listener('dialog',on_delete_dialog)
    await page.keyboard.press('Control+z')
    await expect(page.locator('.widget-canvas-item')).to_have_count(3)
    await page.locator('.widget-canvas-item').first.focus()
