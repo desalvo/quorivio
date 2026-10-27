@@ -528,17 +528,19 @@ const selectedSessionRef=useRef(selected);
 selectedSessionRef.current=selected;
 const pageOrderRequestInFlight=useRef(false);
 const [pageOrderPending,setPageOrderPending]=useState(false);
+const [pageOrderAnnouncement,setPageOrderAnnouncement]=useState('');
 async function persistPageOrder(activityIds:string[]){
  if(pageOrderRequestInFlight.current)return;
  pageOrderRequestInFlight.current=true;
  setPageOrderPending(true);
+ setPageOrderAnnouncement('Riordino delle pagine in corso');
  const sessionId=selected;
  try{
   await request(`/sessions/${sessionId}/pages/order`,'PUT',{activity_ids:activityIds});
   const updated=await request<Snapshot>(`/sessions/${sessionId}`);
   // A response for a former session must never overwrite the active session.
-  if(selectedSessionRef.current===sessionId)setSnap(updated);
- }catch(e){notify(e)}finally{pageOrderRequestInFlight.current=false;setPageOrderPending(false)}
+  if(selectedSessionRef.current===sessionId){setSnap(updated);setPageOrderAnnouncement('Ordine delle pagine salvato')}
+ }catch(e){setPageOrderAnnouncement('Riordino non riuscito, ordine precedente conservato');notify(e)}finally{pageOrderRequestInFlight.current=false;setPageOrderPending(false)}
 }
 async function dropPage(sourceId:string,targetId:string){
  if(!snap||snap.session.status==='closed'||sourceId===targetId||!confirmPageNavigation()||pageOrderRequestInFlight.current)return;
@@ -663,6 +665,7 @@ me===undefined?<main id="main-content" className="narrow">Caricamento...</main>:
  <div><small>{String(i+1).padStart(2,'0')} · {a.type.toUpperCase()} · {a.status}</small><h4>{a.title}</h4></div><div className="activity-actions">{snap.session.status!=='closed'&&<><button type="button" className="small outline" onClick={()=>void duplicatePage(a.id)}>Duplica pagina</button><button type="button" className="small outline" aria-label={`Sposta pagina ${i+1} su`} disabled={i===0} onClick={()=>void movePage(i,i-1)}>↑</button><button type="button" className="small outline" aria-label={`Sposta pagina ${i+1} giù`} disabled={i===snap.activities.length-1} onClick={()=>void movePage(i,i+1)}>↓</button></>}{snap.session.status!=='closed'&&<><button className="small outline" onClick={()=>beginActivityEdit(a)}>Modifica dati legacy</button><button className="small outline" onClick={()=>beginPageDesign(a)}>Apri editor widget</button></>}{snap.session.status!=='closed'&&<><button className="small outline" onClick={()=>void deleteCanvasPage(a)}>Elimina pagina</button><button className="small outline" onClick={()=>invalidateActivity(a)}>Invalida risposte</button></>}{snap.session.status==='active'&&a.status!=='open'&&<button className="small outline" onClick={()=>activate(a)}>Apri</button>}{a.status==='open'&&<button className="small outline" onClick={()=>closeActivity(a)}>Chiudi</button>}</div></div>)}</>}</section>{designActivity&&<section className="panel powerpoint-editor editor-ux-v2" id="quorivio-slide-editor" aria-label="Editor grafico delle pagine" onPointerDown={e=>{if(e.pointerType==='mouse')return;const button=(e.target as HTMLElement).closest('button');if(button)setEditorTouchHint(button.title||button.getAttribute('aria-label')||button.textContent?.trim()||'')}}>
 <aside className="page-editor-sidebar" aria-label="Miniature delle pagine">
   <header><strong>Pagine</strong><span aria-label={`Totale ${snap.activities.length} pagine`}>{snap.activities.length}</span></header>
+  <p className="page-editor-order-status" role="status" aria-live="polite">{pageOrderAnnouncement}</p>
   <div className="page-editor-thumbnails" aria-busy={pageOrderPending}>
    {snap.activities.map((a,i)=><div className={'page-editor-thumb-row'+(designActivity===a.id?' is-active':'')} key={a.id}
       draggable={snap.session.status!=='closed'&&!pageOrderPending}
@@ -671,14 +674,15 @@ me===undefined?<main id="main-content" className="narrow">Caricamento...</main>:
       onDrop={e=>{e.preventDefault();const dragged=e.dataTransfer.getData('application/x-quorivio-page');if(dragged)void dropPage(dragged,a.id)}}
       onContextMenu={e=>{e.preventDefault();setPageThumbMenu(a.id)}}>
      <button type="button" className="page-editor-thumb" aria-current={designActivity===a.id?'page':undefined}
-       aria-label={`Mostra pagina ${i+1}: ${a.title}`} title={`Mostra pagina ${i+1}: ${a.title}`}
-       onClick={()=>beginPageDesign(a)} onKeyDown={e=>{if(!['ArrowUp','ArrowDown','Home','End'].includes(e.key))return;e.preventDefault();const pages=snap.activities;const to=e.key==='Home'?0:e.key==='End'?pages.length-1:Math.max(0,Math.min(pages.length-1,i+(e.key==='ArrowDown'?1:-1)));if(pages[to]){beginPageDesign(pages[to]);requestAnimationFrame(()=>document.querySelectorAll<HTMLButtonElement>('.page-editor-thumb')[to]?.focus())}}}>
+       aria-label={`Mostra pagina ${i+1}: ${a.title}; Alt+Freccia su/giù per riordinare`} title={`Mostra pagina ${i+1}: ${a.title}`}
+       aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown"
+       onClick={()=>beginPageDesign(a)} onKeyDown={e=>{if(!['ArrowUp','ArrowDown','Home','End'].includes(e.key))return;e.preventDefault();const pages=snap.activities;const to=e.key==='Home'?0:e.key==='End'?pages.length-1:Math.max(0,Math.min(pages.length-1,i+(e.key==='ArrowDown'?1:-1)));if(e.altKey){if((e.key==='ArrowUp'||e.key==='ArrowDown')&&to!==i)void dropPage(a.id,pages[to].id);return}if(pages[to]){beginPageDesign(pages[to]);requestAnimationFrame(()=>document.querySelectorAll<HTMLButtonElement>('.page-editor-thumb')[to]?.focus())}}}>
        <span className="page-editor-thumb-number" aria-hidden="true">{String(i+1).padStart(2,'0')}</span>
        <span className="page-editor-preview" aria-hidden="true" style={{backgroundImage:(a as any).page_design?.backgroundAssetId?`url(${assets.find(x=>x.id===(a as any).page_design.backgroundAssetId)?.url||''})`:(a as any).page_design?.backgroundUrl?`url(${(a as any).page_design.backgroundUrl})`:undefined,backgroundSize:'cover',backgroundPosition:'center'}}><span className="page-editor-preview-title">{(a as any).page_design?.header||a.title}</span>{((a as any).page_design?.widgets||[]).slice(0,24).map((w:any,i:number)=>{const p=w.position||{x:(i%2)*50,y:Math.floor(i/2)*14,width:48,height:24};return <span key={w.id||i} className="page-editor-preview-widget" style={{left:`${Math.max(0,Math.min(100,Number(p.x)||0))}%`,top:`${Math.max(0,Math.min(100,Number(p.y)||0))}%`,width:`${Math.max(1,Math.min(100,Number(p.width)||20))}%`,height:`${Math.max(1,Math.min(100,Number(p.height)||15))}%`,transform:`rotate(${Number(p.rotation)||0}deg)`,backgroundColor:w.style?.fillNone?'transparent':w.style?.fillColor||'#e7e8f4',borderColor:w.style?.strokeNone?'transparent':w.style?.strokeColor||'#9da5c9',borderStyle:w.style?.strokeNone?'none':w.style?.strokeDash==='dot'?'dotted':w.style?.strokeDash==='dash'?'dashed':'solid',borderWidth:w.style?.strokeWidth?(w.style.strokeWidth+'pt'):undefined}} title={w.label||w.kind}>{w.label||w.kind}</span>})}</span>
      </button>
      <button type="button" className="page-editor-thumb-menu-trigger" title={`Menu pagina ${i+1}`} aria-label={`Menu pagina ${i+1}: crea, duplica, elimina, sposta`}
        aria-expanded={pageThumbMenu===a.id} onClick={()=>setPageThumbMenu(v=>v===a.id?'':a.id)}><MoreVertical size={19}/></button>
-     {pageThumbMenu===a.id&&<div className="page-editor-thumb-menu" role="group" aria-label={`Azioni pagina ${i+1}`} onKeyDown={e=>{if(e.key==='Escape')setPageThumbMenu('')}}>
+     {pageThumbMenu===a.id&&<div className="page-editor-thumb-menu" role="group" aria-label={`Azioni pagina ${i+1}`} onKeyDown={e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation();setPageThumbMenu('');const trigger=e.currentTarget.previousElementSibling as HTMLButtonElement|null;requestAnimationFrame(()=>trigger?.focus())}}}>
        <button type="button" title="Mostra questa pagina nell'editor" onClick={()=>{beginPageDesign(a);setPageThumbMenu('')}}>Apri pagina</button>
        {snap.session.status!=='closed'&&<>
        <button type="button" title="Inserisce una pagina prima di questa" onClick={()=>{setPageThumbMenu('');void createCanvasPageAt(a.id,'before')}}>Nuova pagina prima</button>

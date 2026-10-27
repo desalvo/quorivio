@@ -1,0 +1,43 @@
+{
+  "project": "Quorivio",
+  "version": "0.1.0-dev",
+  "last_maintainer_confirmed_committed_sha": "e372a3aec8ba6b028283e9d00f68305a39562ed8",
+  "full_workflow_run": 40517573850,
+  "release_index_before": 48.0,
+  "release_index_after": 53.0,
+  "promoted_gates": {
+    "A4": "open→partial",
+    "D3": "open→partial"
+  },
+  "new_changes_status": "Local unit/contract tests passed; changed frontend pending CI",
+  "modified_files": [
+    "apps/web/src/main.tsx",
+    "apps/web/src/style.css",
+    "docs/DEVELOPMENT_STATUS.it.md",
+    "docs/DEVELOPMENT_STATUS.md",
+    "docs/RC_GATE_MATRIX.json",
+    "tools/tests/test_editor_page_order_inflight.py",
+    "tools/tests/test_rc_release_preflight.py"
+  ],
+  "new_files": [
+    "docs/RC_EVIDENCE_REVIEW_2026-10-27.en.md",
+    "docs/RC_EVIDENCE_REVIEW_2026-10-27.it.md",
+    "tools/tests/test_editor_thumbnail_keyboard_rc.py",
+    "tools/tests/test_rc_evidence_20261027.py"
+  ],
+  "removed_files": [],
+  "explicitly_no_auto_commit_push_or_publish": true,
+  "files_sha256": {
+    "apps/web/src/main.tsx": "23760116a9ae95714ed4b51a7423c8b75745b9976114ce9957fb4c1252906064",
+    "apps/web/src/style.css": "c6ca3272b872355bfdd0d51a8c122d63cfb0513de518f1efe6ae40704c09acf0",
+    "docs/DEVELOPMENT_STATUS.it.md": "2dafd333c2d4c4dd94c2a6bbbff47db4eeba780a0da11a8c2e5a8314f8ba0db6",
+    "docs/DEVELOPMENT_STATUS.md": "235460274aa6e6698a93b513940ae4b918460d7ed178c4a048f947a959ba0460",
+    "docs/RC_EVIDENCE_REVIEW_2026-10-27.en.md": "22642c5813434e285c1ee5da6271d28a9659b1ee006d08a042fbf6274c94c777",
+    "docs/RC_EVIDENCE_REVIEW_2026-10-27.it.md": "9543a29406d14d978bdd0f8651e949fbf209de2e1eaa1e38a449a519b31f0c38",
+    "docs/RC_GATE_MATRIX.json": "880ab63eeeb5ff86aed66d1181426da47145898a54bb8fd46c795f4c024dce29",
+    "tools/tests/test_editor_page_order_inflight.py": "9ee08a57333b01363b43c7b7fa8b6cb8ee462655ee20b6705d36cae1d628917e",
+    "tools/tests/test_editor_thumbnail_keyboard_rc.py": "d36126fb1163f87dade59eab6ba5acfa7e38538342689b5b7662b010145b1124",
+    "tools/tests/test_rc_evidence_20261027.py": "463700a813fa0b3738f7b2cc3d4333cea26b33e01b4613b920857632e2da9dca",
+    "tools/tests/test_rc_release_preflight.py": "9d1cee0c6b7ada1eee076f9fe83dd3f904a570fa21b8fb626c167c71efe07b02"
+  }
+}

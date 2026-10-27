@@ -13,7 +13,7 @@ class ReleasePreflightTest(unittest.TestCase):
  def test_current_release_not_accepted(self):
   report=preflight()
   self.assertFalse(report['release_candidate_ready'])
-  self.assertEqual(report['score'],48.0)
+  self.assertEqual(report['score'],53.0)
   self.assertGreater(len(report['unaccepted_gates']),0)
   self.assertEqual(report['missing_required_files'],[])
  def test_missing_file_blocks_release(self):

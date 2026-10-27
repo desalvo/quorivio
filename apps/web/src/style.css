@@ -544,3 +544,6 @@
 
 /* Touch hints for all editor buttons, including text menu commands. */
 .editor-ux-v2 .editor-touch-assist{position:fixed;z-index:99999;bottom:94px;left:50%;transform:translateX(-50%);max-width:min(340px,85vw);padding:10px 14px;text-align:center;font-size:13px;line-height:1.35;color:#fff;background:#081e33fa;border:1px solid #8bdbe7;border-radius:10px;box-shadow:0 12px 30px #0009;pointer-events:none}
+
+/* Announce page ordering changes to screen readers without obscuring thumbnails. */
+.editor-ux-v2 .page-editor-order-status{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
