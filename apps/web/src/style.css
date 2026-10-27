@@ -452,7 +452,7 @@
 .editor-ux-v2 .page-editor-thumb-menu button:hover,.editor-ux-v2 .page-editor-thumb-menu button:focus-visible{background:#28627e;outline:2px solid #79e4f0}
 .editor-ux-v2 .page-editor-thumb-menu .editor-delete-action{color:#ffbdc4}
 .editor-ux-v2 .editor-stage{display:flex;flex-direction:column;min-height:0;min-width:0;padding:clamp(12px,2.1vw,26px);gap:10px;overflow:auto;scrollbar-color:#40536d transparent}
-.editor-ux-v2 .editor-canvas-slot{position:relative;display:grid;place-items:center;flex:1;min-height:min(290px,45vh);min-width:0;background:rgba(13,25,42,.45);border-radius:18px;box-shadow:inset 0 0 0 1px #ffffff13,0 18px 50px #01091657;overflow:visible;padding:clamp(8px,1.6vw,20px)}
+.editor-ux-v2 .editor-canvas-slot{position:relative;display:grid;place-items:center;flex:0 0 auto;min-height:min(290px,45vh);min-width:0;background:rgba(13,25,42,.45);border-radius:18px;box-shadow:inset 0 0 0 1px #ffffff13,0 18px 50px #01091657;overflow:visible;padding:clamp(8px,1.6vw,20px)}
 .editor-ux-v2 .canvas-editor-group{position:relative;display:block;width:100%;min-width:0;max-width:min(100%,1450px);margin:auto}
 .editor-ux-v2 .canvas-with-rulers{max-width:100%;overflow-x:auto;background:transparent;padding:0;grid-template-columns:0 minmax(0,1fr);grid-template-rows:0 auto;box-shadow:0 14px 46px #0009;border-radius:10px}
 .editor-ux-v2 .canvas-ruler-horizontal,.editor-ux-v2 .canvas-ruler-vertical{display:none}
@@ -483,9 +483,9 @@
 .editor-ux-v2 .canvas-accessible-controls:not([open]){position:relative;z-index:52}
 .editor-ux-v2 .canvas-accessible-controls[open]{position:relative;z-index:auto}
 
-.editor-ux-v2 .editor-bottom-controls{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-height:54px;max-width:100%;padding:7px 10px;border:1px solid var(--editor-line);border-radius:13px;background:#0d1c30e6;backdrop-filter:blur(12px)}
+.editor-ux-v2 .editor-bottom-controls{flex:0 0 auto;display:flex;align-items:center;justify-content:flex-end;gap:8px;min-height:54px;max-width:100%;padding:7px 10px;border:1px solid var(--editor-line);border-radius:13px;background:#0d1c30e6;backdrop-filter:blur(12px)}
 .editor-ux-v2 .editor-current-page{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:#d6e9fa;font-size:13px;font-weight:600;min-width:0}
-.editor-ux-v2 .editor-secondary-workflow{width:100%;padding:0 8px;max-height:25vh;overflow:auto;display:grid;gap:8px;color:#ecf3fd}
+.editor-ux-v2 .editor-secondary-workflow{flex:0 0 auto;width:100%;padding:0 8px;max-height:25vh;overflow:auto;display:grid;gap:8px;color:#ecf3fd}
 .editor-ux-v2 .editor-secondary-workflow .downloads{display:flex;justify-content:flex-end;gap:8px;align-items:center;flex-wrap:wrap}
 .editor-ux-v2 .editor-secondary-workflow .downloads button,.editor-ux-v2 .editor-secondary-workflow .downloads label,.editor-ux-v2 .editor-exit{border:1px solid #6484a7;border-radius:8px;background:#183b56!important;color:#f2fbff!important;font-size:12px;padding:9px 12px;line-height:1.2}
 .editor-ux-v2 .editor-secondary-workflow .downloads .primary{background:#176ea2!important}
