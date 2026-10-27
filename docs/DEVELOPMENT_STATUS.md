@@ -1,3 +1,7 @@
+## 2026-10-27 — CI compile hotfix verified locally (post-6395b0b)
+
+See `docs/RC_TYPESCRIPT_WIDGET_FILL_HOTFIX_20261027.en.md` and `docs/validation/RC_WIDGET_STYLE_TYPECHECK_20261027.json`. Backend/frontend `tsc`, Vite production build **PASS**; 450 API + 23 web Node unit tests **PASS**; 7 isolated Chromium preflights **PASS**. Removed silent image transparency/render drift and missing inspector delete confirmation; API union/validator aligned for participant counter and results views. Real PostgreSQL browser/duplicate isolation acceptance, full Python suite, GitHub CI rerun and external accessibility review **PENDING**. **RC remains 53.0%; no gate promoted.**
+
 ## 2026-10-27 — Rich widget styles and closed-session duplication (uncommitted)
 
 See `docs/RC_WIDGET_SHAPES_CLOSED_DUPLICATION_20261027.en.md`: session duplication from closed sources with owner/collaborator authorization, draft with new joining identity, media remap without participant data; multi-shape independent alpha/gradient/image fills, magnetic placement, collision checks, delete confirmation, contextual quick palette and useful widget previews. GitHub real-browser/PG acceptance PENDING; RC **53.0%** unchanged.

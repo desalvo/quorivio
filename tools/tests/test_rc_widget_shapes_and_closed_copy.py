@@ -29,6 +29,7 @@ class ClosedSessionDuplication(unittest.TestCase):
  def test_destructive_actions_require_confirmation(self):
   self.assertGreaterEqual(UI.count('window.confirm('),5)
   self.assertIn('Eliminare questo widget dal canvas?',UI)
+  self.assertIn("onClick={()=>{if(!window.confirm('Eliminare questo widget dal canvas?'))return;setPageWidgets(old=>old.filter(z=>z.id!==w.id))}",UI)
  def test_rich_editor_has_magnetic_and_formatting_ui(self):
   for needle in ['freeWidgetPosition','magneticSnapWidget','rejectWidgetCollisions','widget-selection-palette','Forma del widget','Tipo riempimento','Trasparenza riempimento']:
    self.assertIn(needle,UI)

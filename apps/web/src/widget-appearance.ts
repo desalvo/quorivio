@@ -1,10 +1,10 @@
 /** Consistent, server-validated appearance for editor, rehearsal and live view. */
-export type WidgetAppearance = {
- fillColor?:string;fillNone?:boolean;fillMode?:'solid'|'gradient'|'image';fillOpacity?:number;
- gradientEndColor?:string;fillImageAssetId?:string;ratingView?:'buttons'|'select';strokeColor?:string;strokeNone?:boolean;
- strokeWidth?:number;strokeDash?:'solid'|'dash'|'dot';rounded?:boolean;
- shapeType?:'rectangle'|'rounded-rectangle'|'ellipse'|'circle'|'triangle'|'diamond'|'cloud'|'speech'|'hexagon'
-};
+import type {WidgetTextStyle} from '../../api/src/domain';
+/** Exact subset of the server-validated style contract, not an independent schema. */
+export type WidgetAppearance = Pick<WidgetTextStyle,
+ 'fillColor'|'fillNone'|'fillMode'|'fillOpacity'|'gradientEndColor'|'fillImageAssetId'|
+ 'ratingView'|'strokeColor'|'strokeNone'|'strokeWidth'|'strokeDash'|'rounded'|'shapeType'>;
+
 const rgbaHex=(hex:string,alpha:number)=>/^#[a-f\d]{6}$/i.test(hex)?hex+Math.round(Math.max(0,Math.min(1,alpha))*255).toString(16).padStart(2,'0'):undefined;
 const polygon:Record<string,string>={
  triangle:'polygon(50% 0%,100% 100%,0% 100%)',
@@ -20,7 +20,7 @@ export function widgetAppearanceStyle(style:WidgetAppearance|undefined,imageUrl?
  const alpha=style.fillOpacity??1;
  const color=rgbaHex(style.fillColor||'#ffffff',alpha);
  const end=rgbaHex(style.gradientEndColor||'#57a6f8',alpha);
- const image=style.fillMode==='image'&&style.fillImageAssetId&&imageUrl?`url("${imageUrl}")`:undefined;
+ const image=style.fillMode==='image'&&!style.fillNone&&style.fillImageAssetId&&imageUrl?`url("${imageUrl}")`:undefined;
  const gradient=style.fillMode==='gradient'&&!style.fillNone?`linear-gradient(135deg, ${color}, ${end})`:undefined;
  const shape=style.shapeType||'';
  const result:Record<string,string|number|undefined>={

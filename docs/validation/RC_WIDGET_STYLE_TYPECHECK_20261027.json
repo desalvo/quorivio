@@ -1,0 +1,65 @@
+{
+  "date_utc": "2026-10-27T20:59:36.956943+00:00",
+  "version": "0.1.0-dev",
+  "baseline_commit": "6395b0b9982bbcd898d921eab836d3ee63b305eb",
+  "github_failed_run": 40574076999,
+  "checks": {
+    "backend_tsc": {
+      "state": "passed_local",
+      "command": "npm run build -w @quorivio/api"
+    },
+    "frontend_tsc_vite": {
+      "state": "passed_local",
+      "command": "npm run build -w @quorivio/web",
+      "vite_transformed_modules": 1594
+    },
+    "backend_node_tests": {
+      "state": "passed_local",
+      "passed": 450,
+      "failed": 0,
+      "command": "npm test"
+    },
+    "web_node_tests": {
+      "state": "passed_local",
+      "passed": 23,
+      "failed": 0,
+      "command": "node --experimental-strip-types --test apps/web/test/*.test.ts"
+    },
+    "focused_python": {
+      "state": "passed_local",
+      "passed": 26,
+      "failed": 0
+    },
+    "chromium_isolated_smokes": {
+      "state": "passed_local",
+      "scripts": 7,
+      "scripts_total": 7,
+      "executable": "/usr/bin/chromium",
+      "desktop_mobile": true
+    },
+    "python_full_suite": {
+      "state": "timeout_local",
+      "accepted": false
+    },
+    "postgres18_browser_e2e": {
+      "state": "not_run_local",
+      "accepted": false
+    },
+    "github_ci_on_new_revision": {
+      "state": "pending_user_commit",
+      "accepted": false
+    },
+    "independent_accessibility_devices": {
+      "state": "pending_manual",
+      "accepted": false
+    }
+  },
+  "rc": {
+    "weighted_score_before": 53.0,
+    "weighted_score_after": 53.0,
+    "newly_accepted_gates": [],
+    "ready": false
+  },
+  "docker_published": false,
+  "git_actions_performed": []
+}

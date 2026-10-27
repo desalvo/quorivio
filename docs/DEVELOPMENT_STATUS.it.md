@@ -1,3 +1,7 @@
+## 27 ottobre 2026 — Hotfix compilazione verificato localmente (dopo 6395b0b)
+
+Vedere `docs/RC_TYPESCRIPT_WIDGET_FILL_HOTFIX_20261027.it.md` e `docs/validation/RC_WIDGET_STYLE_TYPECHECK_20261027.json`. `tsc` backend/frontend e build Vite **PASS**; 450 test Node API e 23 test web **PASS**; 7 preflight Chromium isolati **PASS**. Corretti trasparenza immagine e cancellazione senza conferma dal pannello proprietà; allineati tipo/validazione dei contatori partecipanti e delle viste dei risultati. Prove browser con PostgreSQL, verifica isolamento duplicazione, suite Python globale, nuova CI GitHub e accessibilità indipendente **DA VERIFICARE**. **RC 53,0%; nessun gate promosso.**
+
 ## 27 ottobre 2026 — Stili widget evoluti e copia sessioni terminate (non committato)
 
 Vedi `docs/RC_WIDGET_SHAPES_CLOSED_DUPLICATION_20261027.it.md`: sessioni terminate duplicabili da owner/collaboratori, nuova bozza/nuovi identificatori senza dati partecipanti; forme, riempimenti, immagini per widget, aggancio magnetico, prevenzione collisioni, conferme prima di cancellare, palette e anteprime. Full CI browser/PG PENDENTE; RC **53,0%** invariato.

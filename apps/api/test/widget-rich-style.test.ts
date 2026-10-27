@@ -18,3 +18,9 @@ test('an image fill is a first-class private bundle asset and receives a new ID'
  const after=imported.definition.activities[0].page_design.widgets[0].style.fillImageAssetId;
  assert.notEqual(after,id);assert.equal(after,imported.ids.get(id));assert.equal(source.activities[0].page_design.widgets[0].style.fillImageAssetId,id);
 });
+
+test('participant count and results view persist through the authoritative API schema',()=>{
+ assert.equal(validPageDesign({widgets:[{id:'connected',kind:'participant-count',style:{fillMode:'gradient',fillOpacity:0.5,gradientEndColor:'#123456'}}]}),true);
+ assert.equal(validPageDesign({widgets:[{id:'stats',kind:'results-button',resultsView:'cloud',style:{fillMode:'image',fillImageAssetId:id}}]}),true);
+ assert.equal(validPageDesign({widgets:[{id:'stats',kind:'results-button',resultsView:'javascript'}]}),false);
+});
