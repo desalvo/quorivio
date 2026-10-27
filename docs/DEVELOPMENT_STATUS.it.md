@@ -1,3 +1,7 @@
+## 2026-10-26 — Full CI Chromium 40395950707: timeout mirror apt Ubuntu (dopo commit a6ecaf1)
+
+Il job Chromium della run manuale `40395950707` ha raggiunto il timeout di 8 minuti **prima dei test applicativi**, mentre scaricava dipendenze OS con `playwright install --with-deps chromium`. Non è stato rilevato un nuovo bug dell’editor. Quality FAILED, build container SKIPPED, pubblicazione Docker opt-in SKIPPED. Correzione non committata: quality runner `ubuntu-24.04` con Chromium/Chrome già installati, solo pacchetto Python Playwright, selezione/smoke del browser reale e propagazione del percorso a tutti i test Chromium. Sette regressioni Python e smoke/CSS Chromium locale PASS. Full CI da verificare, nessun aumento del punteggio RC **48,0%**. Dettagli: `docs/RC_CHROMIUM_RUNNER_BOOTSTRAP_FIX.it.md`.
+
 ## 26 ottobre 2026 — Correzione CSS della toolbar annidata (dopo commit b8b08fd)
 
 **Nuova baseline committata:** `b8b08fd1fd61fcf15ff49c98ed530df7693c7e38`. Full CI manuale `40392423273`, quality job `121816969728`, **FAILED** nella prima accettazione Chromium su `Porta selezione davanti`: il gruppo di allineamento è visibile, quello annidato per livelli/spostamenti no. **Difetto reale:** `.editor-ux-v2 .canvas-editor-tools{display:none!important}` nasconde qualsiasi livello, mentre il selettore condizionale riattiva solamente i figli diretti. Il precedente helper dei test non poteva risolvere il CSS dell'applicazione.

@@ -38,7 +38,7 @@ concurrency:
 jobs:
   validate:
     name: Production quality gate
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     services:
       postgres:
@@ -78,7 +78,11 @@ jobs:
         timeout-minutes: 8
         run: |
           python3 -m pip install --disable-pip-version-check --break-system-packages 'playwright>=1.50,<2'
-          python3 -m playwright install --with-deps chromium
+          # GitHub-hosted ubuntu-24.04 already has Chrome/Chromium. Avoid apt
+          # mirror stalls from installing system packages (CI 40395950707).
+          # Smoke and export the exact browser used by every subsequent UI test.
+          python3 tools/ci_browser_bootstrap.py --smoke --github-env "$GITHUB_ENV"
+          export QUORIVIO_CHROMIUM_PATH="$(sed -n 's/^QUORIVIO_CHROMIUM_PATH=//p' "$GITHUB_ENV" | tail -1)"
           npm run dev:web > /tmp/quorivio-ci-vite.log 2>&1 &
           echo $! > /tmp/quorivio-ci-vite.pid
           trap 'kill $(cat /tmp/quorivio-ci-vite.pid) || true; tail -80 /tmp/quorivio-ci-vite.log' EXIT
