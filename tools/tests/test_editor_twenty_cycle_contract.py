@@ -10,7 +10,7 @@ class EditorTwentyCycleContracts(unittest.TestCase):
         source=(ROOT/'tools/ci_browser_editor.py').read_text()
         ast.parse(source)
         self.assertIn("state['widgets']=copy.deepcopy(payload['page_design']['widgets'])",source)
-        self.assertIn("await page.get_by_role('button',name='Salva layout').click()",source)
+        self.assertIn("await editor_save_button(page).click()",source)
         self.assertIn("await page.reload(wait_until='domcontentloaded')",source)
         self.assertIn("assert state['saves']==1",source)
 

@@ -12,6 +12,7 @@ from urllib.parse import urlsplit
 from playwright.async_api import async_playwright, expect
 from ci_editor_collaboration_fixtures import label_only_remote_patch
 from ci_editor_context_tools import ensure_canvas_tools_open, click_canvas_tool, close_canvas_tools
+from ci_editor_context_tools import editor_save_button
 
 BASE=os.environ.get('QUORIVIO_CI_BASE_URL','http://127.0.0.1:8080')
 assert urlsplit(BASE).hostname in ('127.0.0.1','localhost') and urlsplit(BASE).scheme=='http'
@@ -108,7 +109,7 @@ async def main():
    await click_canvas_tool(page,'Sposta selezione a destra')
    await close_canvas_tools(page)
    assert (await canvas.evaluate_all('(els)=>els.map(e=>parseFloat(e.style.left))'))[:2]==[11,41]
-   await page.get_by_role('button',name='Salva layout').click()
+   await editor_save_button(page).click()
    await expect(page.get_by_text('Layout domanda e risultati aggiornato')).to_be_visible()
    persisted=await call(context,'GET',f'/api/sessions/{sid}')
    saved=next(x for x in persisted['activities'] if x['id']==aid)
@@ -136,21 +137,21 @@ async def main():
    await region.get_by_role('checkbox',name='Seleziona').first.check()
    await click_canvas_tool(page,'Sposta selezione a destra')
    await close_canvas_tools(page)
-   await page.get_by_role('button',name='Salva layout').click()
+   await editor_save_button(page).click()
    await expect(page.get_by_role('alert').filter(has_text='Un altro presentatore')).to_be_visible()
-   await expect(page.get_by_role('button',name='Salva layout')).to_be_disabled()
+   await expect(editor_save_button(page)).to_be_disabled()
    assert (await call(context,'GET',f'/api/sessions/{sid}'))['activities'][0]['page_design']['widgets'][0]['label']=='Remote collaborator'
    # Safe three-way merge: remote label + local coordinate are independent.
    await page.get_by_role('button',name='Confronta e riconcilia le modifiche').click()
    await expect(page.get_by_text('Nessun conflitto sui singoli campi')).to_be_visible()
    await page.get_by_role('button',name='Applica riconciliazione alla bozza').click()
    await expect(page.get_by_role('alert').filter(has_text='Un altro presentatore')).to_have_count(0)
-   await expect(page.get_by_role('button',name='Salva layout')).to_be_enabled()
+   await expect(editor_save_button(page)).to_be_enabled()
    # Rebase is strictly local until an explicit save; the server is still revision 4.
    before_save=await call(context,'GET',f'/api/sessions/{sid}')
    current=next(x for x in before_save['activities'] if x['id']==aid)
    assert current['design_revision']==4 and current['page_design']['widgets'][0]['position']['x']==11
-   await page.get_by_role('button',name='Salva layout').click()
+   await editor_save_button(page).click()
    await expect(page.get_by_text('Layout domanda e risultati aggiornato')).to_be_visible()
    merged=await call(context,'GET',f'/api/sessions/{sid}')
    current=next(x for x in merged['activities'] if x['id']==aid)
@@ -164,7 +165,7 @@ async def main():
    remote_result['header']='Remote results heading'
    await call(context,'PATCH',path,{'page_design':remote_design,'result_design':remote_result,'expected_design_revision':5})
    await edit_canvas_widget_title(canvas,'Local second edit')
-   await page.get_by_role('button',name='Salva layout').click()
+   await editor_save_button(page).click()
    await expect(page.get_by_role('alert').filter(has_text='Un altro presentatore')).to_be_visible()
    await page.get_by_role('button',name='Confronta e riconcilia le modifiche').click()
    choice=page.get_by_role('combobox',name='Risolvi Widget pg-first · label')
@@ -172,7 +173,7 @@ async def main():
    await expect(page.get_by_role('button',name='Applica riconciliazione alla bozza')).to_be_disabled()
    await choice.select_option('local')
    await page.get_by_role('button',name='Applica riconciliazione alla bozza').click()
-   await page.get_by_role('button',name='Salva layout').click()
+   await editor_save_button(page).click()
    resolved=await call(context,'GET',f'/api/sessions/{sid}')
    current=next(x for x in resolved['activities'] if x['id']==aid)
    assert current['design_revision']==7
@@ -183,7 +184,7 @@ async def main():
    remote_design['widgets'][0]['label']='Remote final edit'
    await call(context,'PATCH',path,{'page_design':remote_design,'result_design':current['result_design'],'expected_design_revision':7})
    await edit_canvas_widget_title(canvas,'Local final edit')
-   await page.get_by_role('button',name='Salva layout').click()
+   await editor_save_button(page).click()
    await expect(page.get_by_role('alert').filter(has_text='Un altro presentatore')).to_be_visible()
    page.once('dialog',lambda d:asyncio.create_task(d.dismiss()))
    await page.get_by_role('button',name='Ricarica layout dal server').click()
@@ -191,7 +192,7 @@ async def main():
    page.once('dialog',lambda d:asyncio.create_task(d.accept()))
    await page.get_by_role('button',name='Ricarica layout dal server').click()
    await expect(page.get_by_role('alert').filter(has_text='Un altro presentatore')).to_have_count(0)
-   await expect(page.get_by_role('button',name='Salva layout')).to_be_disabled()
+   await expect(editor_save_button(page)).to_be_disabled()
    assert await page.locator('.widget-canvas-item').first.locator('input').input_value()=='Remote final edit'
    # User-initiated local backup: no persistent browser storage and no implicit PATCH.
    await edit_canvas_widget_title(canvas,'Restored from local JSON')
@@ -221,7 +222,7 @@ async def main():
    await choice.select_option('local')
    await page.get_by_role('button',name='Applica riconciliazione alla bozza').click()
    assert (await call(context,'GET',f'/api/sessions/{sid}'))['activities'][0]['design_revision']==9
-   await page.get_by_role('button',name='Salva layout').click()
+   await editor_save_button(page).click()
    final=await call(context,'GET',f'/api/sessions/{sid}')
    final_page=next(x for x in final['activities'] if x['id']==aid)
    assert final_page['design_revision']==10

@@ -44,3 +44,17 @@ async def close_canvas_tools(page):
         await trigger.click()
     await expect(group).to_be_hidden()
 
+
+
+def editor_save_button(page):
+    """Exactly the editor's labelled Save button, not the longer icon label.
+
+    The editor intentionally exposes two distinct controls, 'Salva layout'
+    and 'Salva layout della pagina'.  Playwright matches accessible names
+    by substring unless exact=True, producing a strict-mode violation.
+    Scope to the editor region as an additional guard against dashboard
+    controls with the same accessible label. Never arbitrarily choose the first element or force a click.
+    """
+    return page.get_by_role('region', name='Editor grafico delle pagine').get_by_role(
+        'button', name='Salva layout', exact=True
+    )

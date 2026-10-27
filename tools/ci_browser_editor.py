@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 from playwright.async_api import async_playwright, expect
 from ci_editor_context_tools import ensure_canvas_tools_open, click_canvas_tool
+from ci_editor_context_tools import editor_save_button
 
 SESSION='11111111-1111-4111-8111-111111111111'
 ACTIVITY='22222222-2222-4222-8222-222222222222'
@@ -187,9 +188,9 @@ async def main():
     await checks.nth(0).check()
     await checks.nth(1).check()
     await click_canvas_tool(page,'Sposta selezione a destra')
-    await page.get_by_role('button',name='Salva layout').click()
+    await editor_save_button(page).click()
     await expect(page.get_by_text('Layout domanda e risultati aggiornato')).to_be_visible()
-    await expect(page.get_by_role('button',name='Salva layout')).to_be_disabled()
+    await expect(editor_save_button(page)).to_be_disabled()
     assert state['saves']==1,state
     assert [w['position']['x'] for w in state['widgets'][:2]]==[11,11],state['widgets']
     await page.reload(wait_until='domcontentloaded')
