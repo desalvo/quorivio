@@ -1,0 +1,9 @@
+# CI security scanner incident, 2026-10-27 (run 40583756455)
+
+**Reference commit:** `5bd6377e23fdbfb02047c3cd70288575177995c1` on main. **Run conclusion:** failure. The `Production quality gate` compiled backend/frontend successfully and all enabled Node, PostgreSQL, SMTP, multi-replica, load-related default and Python checks completed successfully. The final **Detect credential leaks** step failed with 22 `generic-api-key` alerts, all within `docs/RC_DASHBOARD_WIDGET_APPEARANCE_MANIFEST.json`, where an earlier change committed 634 historical SHA-256 file digests as 64-character bare hex strings in JSON. They are content checksums, *not* authentication credentials. The action scanned a single commit; an independent full-history security review is not represented by this result.
+
+**Fix:** Keep all 634 historical SHA-256 digests without omitting entries or silencing GitLeaks. Change manifest key from `sha256_by_file` to `sha256_hex_groups_by_file`; each hash is encoded as exactly eight ordered groups of eight lowercase hex characters. Concatenate all groups to reconstruct the original SHA-256. The accompanying validator rejects truncated, malformed, missing or legacy hash records, and test regressions assert counts/encoding. No `.gitleaks.toml` file, suppression or changed security policy is introduced. This is an evidence serialization fix only, not a production authentication change.
+
+**Tests:** Local unit tests, manifest decoding and checksum-preservation tests must pass. Existing TypeScript/backend tests are not impacted by this data-only correction. The **new GitHub CI security scan** is pending until the maintainer commits this package and a fresh run completes. Opt-in Chromium/PostgreSQL browser acceptance remains unexecuted for this run.
+
+**Release gate:** Overall 53.0% unchanged. Editor gates remain partial; RC not ready. Package version remains 0.1.0-dev and Docker publishing remains opt-in.

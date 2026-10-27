@@ -1,3 +1,7 @@
+## 2026-10-27 — GitHub run 40583756455 security-scanner manifest hotfix (post-5bd6377)
+
+GitHub push CI 40583756455 (5bd6377) compiled frontend/backend and passed enabled Node, PostgreSQL 18, MFA SMTP, distributed WebSocket, recovery, audit and Python tests; the only failure was **Detect credential leaks**: 22 GitLeaks `generic-api-key` false positives in historical raw SHA-256 manifest. Converted 634 digests to lossless eight-by-eight hex words, added fail-closed validator and five regression tests. No security exclusions or gate bypass. New GitHub CI **PENDING**. Opt-in Chromium still not executed in this run. **Overall RC 53.0%, no promotion; RC not ready.** See `docs/RC_GITLEAKS_SHA256_MANIFEST_HOTFIX_20261027.en.md`.
+
 ## 2026-10-27 — CI compile hotfix verified locally (post-6395b0b)
 
 See `docs/RC_TYPESCRIPT_WIDGET_FILL_HOTFIX_20261027.en.md` and `docs/validation/RC_WIDGET_STYLE_TYPECHECK_20261027.json`. Backend/frontend `tsc`, Vite production build **PASS**; 450 API + 23 web Node unit tests **PASS**; 7 isolated Chromium preflights **PASS**. Removed silent image transparency/render drift and missing inspector delete confirmation; API union/validator aligned for participant counter and results views. Real PostgreSQL browser/duplicate isolation acceptance, full Python suite, GitHub CI rerun and external accessibility review **PENDING**. **RC remains 53.0%; no gate promoted.**

@@ -1,3 +1,7 @@
+## 2026-10-27 — Hotfix del controllo credenziali in CI GitHub 40583756455 (dopo 5bd6377)
+
+La CI del commit 5bd6377 ha superato compilazione TypeScript frontend/backend, test Node, PostgreSQL 18, MFA SMTP, WebSocket distribuiti, backup e suite Python; solo **Detect credential leaks** è fallito: 22 falsi positivi GitLeaks `generic-api-key` causati dagli hash SHA-256 nel manifest storico. Tutti i 634 hash sono conservati in otto gruppi esadecimali da otto caratteri e ricostruibili; aggiunti validatore rigoroso e cinque regressioni. Nessuna esclusione o indebolimento della scansione credenziali. Nuova CI GitHub **DA ESEGUIRE**; Chromium opzionale non eseguito in questa run. **RC 53,0% invariato**, nessun gate promosso. Dettagli: `docs/RC_GITLEAKS_SHA256_MANIFEST_HOTFIX_20261027.it.md`.
+
 ## 27 ottobre 2026 — Hotfix compilazione verificato localmente (dopo 6395b0b)
 
 Vedere `docs/RC_TYPESCRIPT_WIDGET_FILL_HOTFIX_20261027.it.md` e `docs/validation/RC_WIDGET_STYLE_TYPECHECK_20261027.json`. `tsc` backend/frontend e build Vite **PASS**; 450 test Node API e 23 test web **PASS**; 7 preflight Chromium isolati **PASS**. Corretti trasparenza immagine e cancellazione senza conferma dal pannello proprietà; allineati tipo/validazione dei contatori partecipanti e delle viste dei risultati. Prove browser con PostgreSQL, verifica isolamento duplicazione, suite Python globale, nuova CI GitHub e accessibilità indipendente **DA VERIFICARE**. **RC 53,0%; nessun gate promosso.**
