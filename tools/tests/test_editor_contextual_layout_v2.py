@@ -82,7 +82,7 @@ class ContextualEditorUX(unittest.TestCase):
         self.assertIn('backdrop-filter:blur',CSS)
 
     def test_browser_scenarios_include_context_and_touch(self):
-        self.assertIn("canvas.click(button='right'",BROWSER)
+        self.assertIn('await open_canvas_context(page)',BROWSER)
         self.assertIn("await page.set_viewport_size({'width':420,'height':860})",BROWSER)
         self.assertIn("await expect(editor.get_by_role('img',name='Quorivio'))",BROWSER)
 

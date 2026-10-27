@@ -75,7 +75,7 @@ class EditorMockAutosave(unittest.TestCase):
   self.assertIn("state['revision']+=1",MOCK)
   self.assertIn("await expect(editor.get_by_text('Salvato automaticamente'))",MOCK)
   self.assertIn('Input.dispatchTouchEvent',MOCK)
-  self.assertIn("canvas.click(button='right'",MOCK)
+  self.assertIn('await open_canvas_context(page)',MOCK)
   self.assertIn('await await_revision(context,sid,aid,3)',DB)
   self.assertIn("current['design_revision']==4",DB)
   self.assertIn('async def await_revision(',DB)

@@ -1,0 +1,48 @@
+{
+  "version": "0.1.0-dev",
+  "committed_baseline_sha": "b6736aaab6b7dc11e33bedecd4ceb9954d7e8ed3",
+  "source_zip": "quorivio-0.1.0-dev-rc-mock-fidelity-autosave-context-ui-cumulative.zip",
+  "weighted_rc_percent": 53.0,
+  "changed": [
+    "quorivio/.github/workflows/ci.yml",
+    "quorivio/docs/DEVELOPMENT_STATUS.it.md",
+    "quorivio/docs/DEVELOPMENT_STATUS.md",
+    "quorivio/docs/RC_GATE_MATRIX.json",
+    "quorivio/tools/ci_browser_editor.py",
+    "quorivio/tools/ci_editor_context_tools.py",
+    "quorivio/tools/tests/test_ci_editor_context_tool_visibility.py",
+    "quorivio/tools/tests/test_editor_autosave_mock_fidelity.py",
+    "quorivio/tools/tests/test_editor_contextual_layout_v2.py"
+  ],
+  "added": [
+    "quorivio/docs/RC_CHROMIUM_CANVAS_VISIBLE_POINTER_20261027.en.md",
+    "quorivio/docs/RC_CHROMIUM_CANVAS_VISIBLE_POINTER_20261027.it.md",
+    "quorivio/tools/ci_canvas_context_hit_target_chromium.py",
+    "quorivio/tools/tests/test_canvas_context_hit_target.py"
+  ],
+  "removed": [],
+  "sha256_of_changed_and_added": {
+    "quorivio/.github/workflows/ci.yml": "b064b5efe23308fdacd3d757a671a0fd1b4424d1ec7b6a799786ec689c1b8713",
+    "quorivio/docs/DEVELOPMENT_STATUS.it.md": "afd2a42ac3491b7faca32ddc0e84014f166bc3a50b203fffad31835eca7043a3",
+    "quorivio/docs/DEVELOPMENT_STATUS.md": "9353d270550a1fcbf9a2118a55d3dcef26dcd230eeb14b47b8193fde69bb6bea",
+    "quorivio/docs/RC_GATE_MATRIX.json": "740ce66d34320951d809272fd148d6e2d5be2f931fb4546b52b9df728a745a47",
+    "quorivio/tools/ci_browser_editor.py": "6a797eb44c72eab2d8955c58228e5349d64707e9971aaff42b28cc7e43022a0f",
+    "quorivio/tools/ci_editor_context_tools.py": "f3ec066efae7c435aa973c620e469bf05a4a50906de94f6b6e6dc95c03df9db3",
+    "quorivio/tools/tests/test_ci_editor_context_tool_visibility.py": "c0ff7f72fd2d30dddaa7c4780989c9a06ca4c68573613b02e30d67c5a01eba6b",
+    "quorivio/tools/tests/test_editor_contextual_layout_v2.py": "0cb9843b684c9fec9676e8b4a8f69aeaf2c75bebb14c127db64d0e28808904a3",
+    "quorivio/tools/tests/test_editor_autosave_mock_fidelity.py": "89d0d135b895c461a54f1f255ca3c8f77dd1eae70fd882490165e3408f80b300",
+    "quorivio/docs/RC_CHROMIUM_CANVAS_VISIBLE_POINTER_20261027.en.md": "afe3c7ba5f149981bf09c2d7832778777872b9d93fc61b6c98374e3dc93e934f",
+    "quorivio/docs/RC_CHROMIUM_CANVAS_VISIBLE_POINTER_20261027.it.md": "8e05f4b93231dacec4afb5db76db9cc0519f2c385f88fef7c261e7e82d85a6cf",
+    "quorivio/tools/ci_canvas_context_hit_target_chromium.py": "f625ab80c633f2d932f07fe13e23fd189fcf821ff13639c12bcd925566054333",
+    "quorivio/tools/tests/test_canvas_context_hit_target.py": "94519ebb6e378bbd8086f96b93f0cba82d2181ca7d2e59fa5ac3b3bf1e015335"
+  },
+  "checks": {
+    "python": "836/836 PASS",
+    "node": "447/447 PASS",
+    "rc": "319/319 PASS after report update",
+    "isolated_chromium": "desktop and mobile PASS; old corner fails by design",
+    "workflow_yaml": "PASS",
+    "github_full_browser": "PENDING"
+  },
+  "publish": "disabled; owner manages commit and production release"
+}

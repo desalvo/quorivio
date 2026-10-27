@@ -7,6 +7,52 @@ user opens the canvas menu, including after React rerenders or undo/reload.
 """
 from playwright.async_api import expect
 
+async def canvas_background_point(page):
+    """Find a real, uncovered background hit-target inside the visible canvas.
+
+    After scrolling, the editor's fixed header can cover the old (7, 7)
+    locator-relative context-click position. Only read DOM hit-testing here;
+    never mutate UI state or bypass normal browser pointer validation.
+    """
+    canvas = page.get_by_role('group', name='Canvas grafico widget')
+    await canvas.scroll_into_view_if_needed()
+    point = await canvas.evaluate("""el => {
+      const rect = el.getBoundingClientRect();
+      const stage = el.closest('.editor-stage');
+      const clip = stage ? stage.getBoundingClientRect() : rect;
+      const vv = window.visualViewport;
+      const viewLeft = vv ? vv.offsetLeft : 0;
+      const viewTop = vv ? vv.offsetTop : 0;
+      const viewRight = viewLeft + (vv ? vv.width : window.innerWidth);
+      const viewBottom = viewTop + (vv ? vv.height : window.innerHeight);
+      const left = Math.max(rect.left + 3, clip.left + 3, viewLeft + 3);
+      const top = Math.max(rect.top + 3, clip.top + 3, viewTop + 3);
+      const right = Math.min(rect.right - 3, clip.right - 3, viewRight - 3);
+      const bottom = Math.min(rect.bottom - 3, clip.bottom - 3, viewBottom - 3);
+      if (right <= left || bottom <= top) return null;
+      const rows = [.85, .60, .35, .12, .95, .50, .05];
+      const cols = [.03, .97, .50, .20, .80, .35, .65];
+      for (const row of rows) for (const col of cols) {
+        const x = left + (right - left) * col;
+        const y = top + (bottom - top) * row;
+        const hit = document.elementFromPoint(x, y);
+        if (!hit || (hit !== el && !el.contains(hit))) continue;
+        if (hit.closest('.widget-canvas-item, .canvas-background-context, .canvas-context-menu, button, input, select, textarea')) continue;
+        return {x, y};
+      }
+      return null;
+    }""")
+    if not point:
+        raise AssertionError('No visible uncovered canvas background for contextual pointer action')
+    return point
+
+
+async def open_canvas_context(page):
+    """Send a genuine right-mouse click to the browser-verified canvas pixel."""
+    point = await canvas_background_point(page)
+    await page.mouse.click(point['x'], point['y'], button='right')
+
+
 async def ensure_canvas_tools_open(page):
     """Enter the actual contextual canvas UI before using arrangement actions.
 
@@ -16,11 +62,10 @@ async def ensure_canvas_tools_open(page):
     """
     group=page.get_by_role('group',name='Allineamento widget selezionati')
     if not await group.is_visible():
-        canvas=page.get_by_role('group',name='Canvas grafico widget')
         # If the background/context menu is already open, use its selection entry.
         entry=page.get_by_role('button',name='Strumenti di selezione e allineamento')
         if not await entry.is_visible():
-            await canvas.click(button='right',position={'x':7,'y':7})  # Native context menu; no synthetic DOM mutation.
+            await open_canvas_context(page)  # Genuine pointer to visible canvas background.
         await page.get_by_role('button',name='Strumenti di selezione e allineamento').click()
     await expect(group).to_be_visible()
     # Layer actions live in a nested .canvas-editor-tools panel. All controls
@@ -44,8 +89,7 @@ async def close_canvas_tools(page):
     """Dismiss the contextual overlay before unrelated Save/reconcile actions."""
     group=page.get_by_role('group',name='Allineamento widget selezionati')
     if await group.is_visible():
-        canvas=page.get_by_role('group',name='Canvas grafico widget')
-        await canvas.click(button='right',position={'x':7,'y':7})
+        await open_canvas_context(page)
     await expect(group).to_be_hidden()
 
 

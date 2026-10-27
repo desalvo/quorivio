@@ -5,7 +5,7 @@ import copy
 import os
 from pathlib import Path
 from playwright.async_api import async_playwright, expect
-from ci_editor_context_tools import ensure_canvas_tools_open, click_canvas_tool
+from ci_editor_context_tools import ensure_canvas_tools_open, click_canvas_tool, open_canvas_context, canvas_background_point
 from ci_editor_context_tools import wait_for_editor_sync
 
 SESSION='11111111-1111-4111-8111-111111111111'
@@ -79,7 +79,7 @@ async def main():
    canvas=page.get_by_role('group',name='Canvas grafico widget')
    await expect(canvas).to_be_visible()
    # Canvas's native context menu can only be activated by right-click (long press on touch).
-   await canvas.click(button='right',position={'x':7,'y':7})
+   await open_canvas_context(page)
    await expect(page.get_by_role('group',name='Menu contestuale sfondo canvas')).to_be_visible()
    await expect(page.get_by_role('button',name='Salva ora')).to_be_visible()
    await page.get_by_role('button',name='Chiudi menu',exact=True).click()
@@ -159,8 +159,8 @@ async def main():
    await card.locator('summary').click();await card.get_by_role('button',name='Apri sessione').click()
    await mobile.get_by_role('button',name='✎ Modifica le pagine').first.click()
    canvas=mobile.get_by_role('group',name='Canvas grafico widget')
-   rect=await canvas.bounding_box();assert rect, 'Touch canvas is missing'
-   x,y=rect['x']+7,rect['y']+7
+   point=await canvas_background_point(mobile)
+   x,y=point['x'],point['y']
    cdp=await touch_context.new_cdp_session(mobile)
    await cdp.send('Input.dispatchTouchEvent',{'type':'touchStart','touchPoints':[{'x':x,'y':y}]})
    await asyncio.sleep(.68)

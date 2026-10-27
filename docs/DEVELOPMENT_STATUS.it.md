@@ -1,3 +1,9 @@
+## 27 ottobre 2026 — Full Chromium 40549836288: clic contestuale coperto dall'intestazione
+
+Baseline committata `b6736aaab6b7dc11e33bedecd4ceb9954d7e8ed3`. La run manuale 40549836288 è fallita al primo spostamento della selezione (`Sposta selezione a destra`) nel test `ci_browser_editor.py`: dopo lo scorrimento dell'area accessibile, il clic destro fissato a 7 px dall'angolo del canvas colpiva l'intestazione sovrapposta. Prima del fallimento erano PASSATI i preflight Chromium desktop/mobile, il layout mock, lo stato autosave e il pulsante Esci. I test successivi PostgreSQL non sono stati eseguiti; non è un errore dimostrato dell'autosave.
+
+Hotfix non committato: l'helper Playwright individua un pixel effettivamente visibile del canvas usando geometria, clipping e `document.elementFromPoint()`, evitando widget e menu. Usa un vero clic destro senza `force=True`, eventi DOM sintetici o coordinate fisse. Il test mock e il percorso PostgreSQL riusano la stessa logica; la pressione prolungata touch usa il punto verificato. Nuovo preflight Chromium obbligatorio riproduce l'intestazione che copre l'angolo e prova apertura/azione/chiusura/riapertura desktop/touch. Localmente **836/836 Python**, **447/447 Node**, **Chromium isolato PASS**. Full CI GitHub **da ripetere**; punteggio RC **53,0%**, rilascio ancora bloccato. Vedere `docs/RC_CHROMIUM_CANVAS_VISIBLE_POINTER_20261027.it.md`.
+
 ### 2026-10-27 — Correzioni editor: viewport/menu/ID e verifica salvataggio (non committate)
 Dettagli in `docs/RC_EDITOR_USER_ISSUES_20261027.it.md`. ID widget troppo lunghi per il backend (limite 48); Python 824 e Node 447 PASS locali; Chromium/PostgreSQL da verificare. RC 53,0% invariata.
 

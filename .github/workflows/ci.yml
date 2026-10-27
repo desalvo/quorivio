@@ -99,6 +99,8 @@ jobs:
           # Actual editor geometry: expanded keyboard/touch controls must not cover Save.
           python3 tools/ci_editor_save_flow_chromium.py
           python3 tools/ci_editor_mock_layout_chromium.py
+          # Regression: a fixed mock header may cover the 7px canvas corner after scrolling.
+          python3 tools/ci_canvas_context_hit_target_chromium.py
           python3 tools/ci_browser_editor.py
       - name: Upload Chromium failure diagnostics
         if: failure() && github.event_name == 'workflow_dispatch' && inputs.browser_test
