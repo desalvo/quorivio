@@ -751,3 +751,31 @@
 .widget-selection-palette label{display:flex;align-items:center;gap:2px;min-height:33px;color:#eff8ff}
 .widget-selection-palette input[type=color]{width:28px;height:30px;border:none;padding:1px;background:transparent}
 @media(max-width:650px){.widget-selection-palette{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap}.widget-selection-palette button{flex:none}}
+
+/* RC browser acceptance 40589103128: the contextual background menu and the
+   nested arrangement panels must stay BELOW the editor's 60px header even when
+   the stage is scrolled or its 16:9 canvas is partially outside the viewport.
+   Keep genuine pointer hit targets; never rely on Playwright force clicks. */
+.editor-ux-v2 .canvas-background-context{
+  position:fixed!important;
+  top:max(76px,calc(72px + env(safe-area-inset-top,0px)))!important;
+  right:clamp(94px,11vw,170px)!important;
+  left:auto!important;
+  width:min(350px,calc(100dvw - 180px))!important;
+  max-width:calc(100dvw - 180px)!important;
+  max-height:calc(100dvh - 94px)!important;
+  overflow-y:auto!important;
+}
+.editor-ux-v2 .canvas-editor-group[data-tools-open=true]>.canvas-editor-tools{
+  position:fixed!important;
+  top:max(76px,calc(72px + env(safe-area-inset-top,0px)))!important;
+  left:clamp(66px,17vw,250px)!important;
+  right:auto!important;
+  width:min(440px,calc(100dvw - 160px))!important;
+  max-width:calc(100dvw - 160px)!important;
+  max-height:min(126px,calc(100dvh - 170px))!important;
+}
+.editor-ux-v2 .canvas-editor-group[data-tools-open=true]>.canvas-editor-tools+.canvas-editor-tools{
+  top:max(204px,calc(200px + env(safe-area-inset-top,0px)))!important;
+  max-height:min(31dvh,calc(100dvh - 225px))!important;
+}

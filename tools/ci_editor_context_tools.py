@@ -66,7 +66,24 @@ async def ensure_canvas_tools_open(page):
         entry=page.get_by_role('button',name='Strumenti di selezione e allineamento')
         if not await entry.is_visible():
             await open_canvas_context(page)  # Genuine pointer to visible canvas background.
-        await page.get_by_role('button',name='Strumenti di selezione e allineamento').click()
+        entry=page.get_by_role('button',name='Strumenti di selezione e allineamento')
+        await expect(entry).to_be_visible()
+        # The actual clickable point, not merely DOM visibility, must be clear.
+        # Regression: Full Chromium 40589103128 timed out because the fixed
+        # editor header intercepted this menu entry after scrolling.
+        await entry.scroll_into_view_if_needed()
+        uncovered=await entry.evaluate("""element => {
+          const b=element.getBoundingClientRect();
+          const x=b.left+b.width/2, y=b.top+b.height/2;
+          const hit=document.elementFromPoint(x,y);
+          const viewport=window.visualViewport;
+          return b.width>0 && b.height>0 && y >= 64 &&
+            x >= 0 && x < (viewport?.width ?? window.innerWidth) &&
+            y < (viewport?.height ?? window.innerHeight) &&
+            Boolean(hit && (hit===element || element.contains(hit)));
+        }""")
+        assert uncovered, 'Canvas selection menu is covered by the editor header or another element'
+        await entry.click()
     await expect(group).to_be_visible()
     # Layer actions live in a nested .canvas-editor-tools panel. All controls
     # must be present in the accessibility tree before the test uses them.
