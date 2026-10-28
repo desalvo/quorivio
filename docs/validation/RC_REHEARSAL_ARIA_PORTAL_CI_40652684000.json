@@ -1,0 +1,29 @@
+{
+  "version": "0.1.0-dev",
+  "date": "2026-10-28",
+  "baseline_commit": "1a0bea5918098af52fdf9958b8e8e664d09c11d5",
+  "source_run": "https://github.com/desalvo/quorivio/actions/runs/40652684000",
+  "failed_job": 122696239668,
+  "failed_step": "Chromium editor UI acceptance (opt-in)",
+  "failure": "tools/ci_browser_editor.py:95: visually rendered side-by-side rehearsal modal absent from the accessible dialog role tree",
+  "artifact": "chromium-editor-failure/editor-autosave-failure.png: modal visible with two rehearsal canvases",
+  "fix": [
+    "Render the existing SessionRehearsal JSX via createPortal into document.body, outside editor/dashboard accessibility isolation",
+    "Assert body-level portal ownership and no inert/aria-hidden ancestors in the real mock Chromium acceptance",
+    "Extend offline Chromium keyboard fixture for a portaled dialog and restoration of the app root",
+    "Update the cookie/tooltip portal count test to include the third rehearsal portal"
+  ],
+  "local_verifications": {
+    "typescript_and_vite_build": "pass",
+    "node_backend": "474 passed",
+    "node_frontend": "58 passed using --experimental-strip-types",
+    "chromium_keyboard_accessible_portal": "pass at 1440 and 390 px, isolated actual focus module",
+    "python_portal_contracts": "10 passed",
+    "authenticated_full_app_chromium": "pending GitHub CI; localhost navigation blocked by local browser policy",
+    "full_python_suite": "not confirmed locally; exceeded tool time limit"
+  },
+  "rc_percentage": 67.0,
+  "new_accepted_gates": [],
+  "strict_release_candidate_ready": false,
+  "commit_push_release_image_publish_performed": false
+}

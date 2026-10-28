@@ -333,11 +333,16 @@
     "prior_score": 53.0
   },
   "pending_local_batch": {
-    "scope": "Google/GitHub/Facebook OAuth/OIDC egress hardening: callback path validation, no redirect following during token/userinfo/discovery, secret never in URL for Facebook token exchange, access token only in bearer header with HMAC appsecret_proof. Added six deterministic provider stubs; entire previous uncommitted cumulative baseline retained.",
+    "scope": "CI 40652684000 visual rehearsal modal is inaccessible to role-based Chromium locators after editor preview opens. Render rehearsal in body-level React portal and assert correct accessible ownership with real mocked browser and offline focus-module Chromium tests.",
     "new_feature_promoted": false,
     "new_ci_required": true,
     "opt_in_command": "workflow_dispatch browser_test=true publish_image=false",
-    "last_user_confirmed_commit": "a32ef78902a656262d346a0fa622604a4deda405"
+    "last_user_confirmed_commit": "1a0bea5918098af52fdf9958b8e8e664d09c11d5",
+    "failed_ci_run": 40652684000,
+    "failed_job": 122696239668,
+    "first_failed_step": "Chromium editor UI acceptance (opt-in)",
+    "strict_rc_ready": false,
+    "score_unchanged": 67.0
   },
   "scoring_reconciliation_20261028": {
     "baseline_score": 53.0,

@@ -374,11 +374,14 @@ function SessionRehearsal({snapshot,onClose,initialPageId,initialMode='participa
    </div>;
   })}</div>
  </section>;
- return <div className="rehearsal-backdrop" role="dialog" aria-modal="true" aria-label="Anteprima interattiva della sessione"><div ref={shellRef} tabIndex={-1} className={'rehearsal-shell rehearsal-mode-'+mode}>
+ // Render the modal at document.body. When it is nested inside editor/dashboard,
+ // an ancestor can become inert or aria-hidden during focus/background isolation,
+ // leaving a visually correct dialog invisible to the accessibility tree.
+ return createPortal(<div className="rehearsal-backdrop" role="dialog" aria-modal="true" aria-label="Anteprima interattiva della sessione"><div ref={shellRef} tabIndex={-1} className={'rehearsal-shell rehearsal-mode-'+mode}>
   <header className="rehearsal-toolbar"><strong>ANTEPRIMA · {snapshot.session.title}</strong><span>Nessuna risposta di prova viene salvata</span><div className="rehearsal-mode-switch" role="group" aria-label="Modalità anteprima"><button type="button" aria-pressed={mode==='presenter'} onClick={()=>setMode('presenter')}>Presentatore</button><button type="button" aria-pressed={mode==='participant'} onClick={()=>setMode('participant')}>Partecipante</button><button type="button" aria-pressed={mode==='both'} onClick={()=>setMode('both')}>Affiancate</button></div><button type="button" onClick={()=>void(document.fullscreenElement?document.exitFullscreen():shellRef.current?.requestFullscreen())} aria-pressed={fullScreen} aria-label="Visualizza anteprima a tutto schermo">{fullScreen?'Riduci':'⛶ Tutto schermo'}</button><button type="button" onClick={onClose} aria-label="Chiudi anteprima">× Chiudi</button></header>
   <div className="rehearsal-stage">{activity?<div className="rehearsal-panes">{(mode==='presenter'||mode==='both')&&<div className="rehearsal-pane"><strong className="rehearsal-pane-heading">Presentatore · statistiche simulate</strong>{renderSlide('presenter')}</div>}{(mode==='participant'||mode==='both')&&<div className="rehearsal-pane"><strong className="rehearsal-pane-heading">Partecipante · prova interattiva</strong>{renderSlide('participant')}</div>}</div>:<p>Questa sessione non contiene ancora pagine.</p>}</div>
   <footer className="rehearsal-footer"><button type="button" disabled={page===0} onClick={()=>setPage(v=>v-1)}>← Precedente</button><span>{Object.keys(submittedAnswers).filter(key=>!key.startsWith(REHEARSAL_REACTION_PREFIX)).length+Object.values(topicSubmissions).reduce((sum,count)=>sum+count,0)} interazioni simulate · non inviate</span><button type="button" disabled={page>=activities.length-1} onClick={()=>setPage(v=>v+1)}>Successiva →</button><button type="button" onClick={()=>{setResponses({});setSubmittedAnswers({});setTopicSubmissions({});setSeed(Math.floor(Math.random()*0x7fffffff));setPage(0)}}>Ricomincia prova</button></footer>
- </div></div>;
+ </div></div>,document.body);
 }
 
 const editorWidgetKinds=['rating','reactions','text','divider','timer','qr','profile','question','postit','image','video','logo','pdf','topic-question','timed-quiz','results-button','participant-count'] as const;

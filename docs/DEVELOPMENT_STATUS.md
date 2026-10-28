@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — Rehearsal accessibility CI hotfix 40652684000 (2026-10-28)
+
+**Latest user-confirmed commit:** `1a0bea5918098af52fdf9958b8e8e664d09c11d5` (previous 67% cumulative baseline). Opt-in extended CI failed at Chromium editor UI: the two-pane rehearsal was visible in its saved screenshot but the browser could not locate its accessible `dialog` role. Downstream PostgreSQL and container jobs were skipped in this run.
+
+**New uncommitted cumulative fix:** Portal the existing `SessionRehearsal` from editor/dashboard into `document.body`, outside branches isolated by modal `inert`/`aria-hidden`. Chromium mock application acceptance now asserts role visibility, direct body parent, no inaccessible ancestors, dual geometry, focus restoration; isolated real focus-module Chromium suite checks the body-portal scenario at desktop and mobile widths. Updated legacy cookie/tooltip portal-count contract for the third portal.
+
+**Local evidence:** TypeScript/Vite build PASS; backend 474 Node tests PASS; frontend 58 Node tests PASS; targeted 10 Python portal tests PASS; offline Chromium real focus module PASS at 1440/390 px. Authenticated app Chromium/PostgreSQL and full Python suite remain unverified on the new code pending Full CI. See `docs/validation/RC_REHEARSAL_ARIA_PORTAL_CI_40652684000.json`.
+
+**Verified RC score unchanged: 67.0%, 32 gates (15 accepted, 17 partial); strict RC NOT READY.** No credit from failed CI, no assistant commit/push/tag/image publication.
+
+---
+
 # Quorivio 0.1.0-dev — RC 67.0%: OAuth egress hardening and verified federated protocol gate (2026-10-28)
 
 **Baseline:** last user-confirmed commit `a32ef78902a656262d346a0fa622604a4deda405`; all subsequent uncommitted cumulative changes retained, including password reset/MFA hardening. No automated commit/push/release.

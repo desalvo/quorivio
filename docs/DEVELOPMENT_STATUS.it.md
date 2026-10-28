@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — Hotfix accessibilità anteprima, CI 40652684000 (28 ottobre 2026)
+
+**Ultimo commit confermato dall’utente:** `1a0bea5918098af52fdf9958b8e8e664d09c11d5` (cumulativo precedente al 67%). La CI estesa è fallita nello step Chromium editor UI: l’anteprima affiancata era visibile nello screenshot, ma Playwright non trovava il suo ruolo accessibile `dialog`. I job successivi PostgreSQL e container sono stati saltati; non considerarli verdi nella nuova run.
+
+**Correzione cumulativa NON committata:** `SessionRehearsal` ora viene montata tramite portal React direttamente in `document.body`, fuori dalla gerarchia editor/dashboard resa inerte durante la visualizzazione modale. Il test browser mock controlla esplicitamente ruolo accessibile, assenza di antenati `inert`/`aria-hidden`, appartenenza al body, proporzioni e ritorno al comando di apertura. Test Chromium offline esteso a portal, focus e ripristino; aggiornato il vecchio test che contava soltanto due portal (ora tre: cookie, tooltip, anteprima).
+
+**Evidenza locale:** build TypeScript/Vite PASS; 474 test Node backend PASS, 58 frontend PASS, 10 test Python mirati al portal PASS; Chromium offline modulo focus reale PASS a 1440 e 390 px. Full browser app con PostgreSQL e suite Python completa ancora da confermare nella prossima Full CI. Report: `docs/validation/RC_REHEARSAL_ARIA_PORTAL_CI_40652684000.json`.
+
+**Avanzamento RC invariato: 67,0%, 32 gate (15 accettati, 17 parziali); RC NON pronta.** Nessuna promozione basata su una CI fallita. Nessun commit/push/tag/Docker publish effettuato dall’assistente.
+
+---
+
 # Quorivio 0.1.0-dev — RC 67,0%: sicurezza OAuth e protocolli federati verificati (28 ottobre 2026)
 
 **Baseline:** ultimo commit dichiarato dall’utente `a32ef78902a656262d346a0fa622604a4deda405`. Nessun commit automatico; conservate integralmente tutte le modifiche dei cumulativi precedenti, incluso il recupero password/MFA non ancora validato in CI.

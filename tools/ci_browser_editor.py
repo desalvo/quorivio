@@ -91,6 +91,13 @@ async def main():
    # The modal must isolate the background and restore the exact invoker.
    preview_trigger=editor.locator('.editor-preview-open.preview-both')
    await preview_trigger.click()
+   # Regression: the overlay looked correct in screenshots but was inaccessible
+   # to role-based locators when nested under the inert editor/dashboard tree.
+   # Verify actual body-portal ownership before checking aria-modal semantics.
+   backdrop=page.locator('.rehearsal-backdrop')
+   await expect(backdrop).to_be_visible()
+   assert await backdrop.evaluate('(node)=>node.parentElement===document.body'), 'Rehearsal must use a body-level portal'
+   assert await backdrop.evaluate('(node)=>!node.closest("[inert],[aria-hidden=true]")'), 'Rehearsal portal was hidden from assistive technology'
    rehearsal=page.get_by_role('dialog',name='Anteprima interattiva della sessione')
    await expect(rehearsal).to_be_visible()
    await expect(rehearsal.locator('.rehearsal-pane')).to_have_count(2)

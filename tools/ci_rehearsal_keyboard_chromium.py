@@ -73,6 +73,16 @@ async def main():
                 assert await page.locator('#previous-inert').evaluate('(node)=>node.inert'),'Pre-existing inert state must remain unchanged'
                 assert await page.get_by_role('button',name='Pulsante pagina').count() == 1,'Background button not restored to accessibility tree'
                 assert not await page.locator('#overlay').evaluate('(node)=>node.classList.contains("open")')
+                # Match production's body-level React portal after the nested
+                # compatibility case. The real dialog must be discoverable by
+                # its accessible role even though the application becomes inert.
+                await page.locator('#overlay').evaluate('(node)=>document.body.appendChild(node)')
+                await page.locator('#launcher').click()
+                await page.get_by_role('dialog',name='Anteprima interattiva della sessione').wait_for(state='visible')
+                assert await page.locator('#react-root').evaluate('(node)=>node.inert'), 'Portal failed to isolate the editor root'
+                assert await page.locator('#overlay').evaluate('(node)=>node.parentElement===document.body&&!node.closest("[inert],[aria-hidden=true]")'), 'Portal must not be hidden from the accessibility tree'
+                await page.locator('#close').click()
+                assert not await page.locator('#react-root').evaluate('(node)=>node.inert'), 'Closing portal must restore the app root'
                 # Reopening must not leave stale key handlers, and explicit close restores focus.
                 await page.locator('#launcher').click()
                 await page.locator('#close').click()
