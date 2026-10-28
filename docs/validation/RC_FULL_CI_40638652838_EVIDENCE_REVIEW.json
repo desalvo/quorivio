@@ -1,0 +1,49 @@
+{
+  "project": "Quorivio",
+  "version": "0.1.0-dev",
+  "user_confirmed_sha": "a32ef78902a656262d346a0fa622604a4deda405",
+  "full_ci_run": 40638652838,
+  "url": "https://github.com/desalvo/quorivio/actions/runs/40638652838",
+  "trigger": "workflow_dispatch",
+  "run_conclusion": "success",
+  "observed_jobs": {
+    "Production quality gate": "success",
+    "Container build gate": "success",
+    "Production publication": "skipped"
+  },
+  "quality_steps": {
+    "api_tests": "467/467 PASS",
+    "web_tests": "49/49 PASS",
+    "python_tests": "910/910 PASS",
+    "chromium_editor": "PASS",
+    "chromium_editor_real_postgresql": "PASS",
+    "postgresql_legacy_question_migration": "PASS",
+    "postgresql_independent_multi_question": "PASS",
+    "two_replica_websocket": "PASS",
+    "load_500_participants": "PASS; observer peak >=475, no errors",
+    "image_published": "NO (publication job skipped)",
+    "strict_rc_gate": "SKIPPED"
+  },
+  "score_review": {
+    "baseline_score": 53.0,
+    "reconciled_score": 56.0,
+    "score_change": 3.0,
+    "original_gate_count": 18,
+    "reconciled_gate_count": 21,
+    "new_accepted_subgates": [
+      "A3-AUTO",
+      "B2-DB",
+      "B4-LOAD"
+    ],
+    "underlying_green_run_id": 40638652838,
+    "underlying_sha": "a32ef78902a656262d346a0fa622604a4deda405",
+    "new_feature_excluded_from_score": "topic-question source-linked results and simulation pending new GitHub Full CI",
+    "strict_rc_ready": false
+  },
+  "limitations": [
+    "bounded test fixtures do not constitute production SLO",
+    "not a physical device/Firefox/WebKit or assistive technology signoff",
+    "topic-linked results added AFTER run and must pass a new CI",
+    "RC readiness blocked by all unaccepted residual gates"
+  ]
+}

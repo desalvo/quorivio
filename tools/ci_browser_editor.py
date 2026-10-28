@@ -86,6 +86,38 @@ async def main():
    assert await editor.locator('.editor-secondary-workflow').count()==0,'Inactive recovery panel is still rendered'
    canvas=page.get_by_role('group',name='Canvas grafico widget')
    await expect(canvas).to_be_visible()
+   # Real authenticated-app rendering, exercised against the API fixture:
+   # the editor and its two rehearsal viewers must share the same geometry.
+   # The modal must isolate the background and restore the exact invoker.
+   preview_trigger=editor.locator('.editor-preview-open.preview-both')
+   await preview_trigger.click()
+   rehearsal=page.get_by_role('dialog',name='Anteprima interattiva della sessione')
+   await expect(rehearsal).to_be_visible()
+   await expect(rehearsal.locator('.rehearsal-pane')).to_have_count(2)
+   assert await editor.locator('.editor-exit').evaluate('(node)=>!!node.closest("[inert]")'), 'Editor background must be inert during rehearsal'
+   assert not await rehearsal.evaluate('(node)=>node.inert'), 'Rehearsal must remain interactive'
+   await expect(rehearsal.get_by_role('button',name='Chiudi anteprima')).to_be_focused()
+   layout=await page.evaluate('''() => {
+     const rect=s=>document.querySelector(s)?.getBoundingClientRect();
+     const art=rect('.editor-ux-v2 .widget-canvas');
+     const slide=rect('.rehearsal-pane .rehearsal-slide');
+     const widget=rect('.rehearsal-pane .rehearsal-widget');
+     if(!art||!slide||!widget)return null;
+     return { editorRatio:art.width/art.height, previewRatio:slide.width/slide.height,
+       widget:{x:(widget.left-slide.left)/slide.width*100,y:(widget.top-slide.top)/slide.height*100,
+               width:widget.width/slide.width*100,height:widget.height/slide.height*100}};
+   }''')
+   assert layout and abs(layout['editorRatio']-16/9)<.09 and abs(layout['previewRatio']-16/9)<.09, layout
+   for coordinate,expected in [('x',10),('y',10),('width',20),('height',20)]:
+    assert abs(layout['widget'][coordinate]-expected)<1.1,(layout,coordinate)
+   await rehearsal.get_by_role('button',name='Partecipante',exact=True).click()
+   await expect(rehearsal.locator('.rehearsal-pane')).to_have_count(1)
+   await rehearsal.get_by_role('button',name='Affiancate').click()
+   await expect(rehearsal.locator('.rehearsal-pane')).to_have_count(2)
+   await page.keyboard.press('Escape')
+   await expect(rehearsal).to_have_count(0)
+   assert await preview_trigger.evaluate('(node)=>document.activeElement===node'), 'Modal must restore preview trigger focus'
+   assert not await editor.locator('.editor-exit').evaluate('(node)=>!!node.closest("[inert]")'), 'Editor must be interactive after rehearsal'
    # Canvas's native context menu can only be activated by right-click (long press on touch).
    await open_canvas_context(page)
    await expect(page.get_by_role('group',name='Menu contestuale sfondo canvas')).to_be_visible()

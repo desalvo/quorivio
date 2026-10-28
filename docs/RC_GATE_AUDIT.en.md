@@ -17,3 +17,8 @@ This score is a conservative gate-management convention, not percent of source w
 **New editor work:** 20-intervention batch has 205 Node and 277 Python tests PASS and API/web build PASS; its expanded Chromium browser test is not yet executed in CI. The browser save/reload fixture does not constitute real PostgreSQL acceptance.
 
 **Still open:** real device/screen-reader acceptance, full PPTX corpus, live latency/fairness, staging DR RPO/RTO, ARM64 and rootless Podman, Kubernetes HA, SMTP/SSO providers, AV/pentest, GDPR/license sign-off.
+
+
+## 2026-10-28 — Full CI 40638652838 audited subgate reconciliation
+
+Full CI verified original multi-question PostgreSQL migration, real Chromium editor, timed fairness and bounded 500 participant tests. Separate A3-AUTO, B2-DB, B4-LOAD were accepted with a total weight of 6 redistributed from three partial gates; scoring formula unchanged, score 53.0 -> 56.0. The independent remainder stays partial, strict RC remains blocked, and the uncommitted topic-linked results receive no RC credit.

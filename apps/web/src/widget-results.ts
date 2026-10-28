@@ -1,5 +1,5 @@
 /** Page-scoped presenter statistics; result controls never reference participants directly. */
-export const STATISTICAL_WIDGET_KINDS=['question','timed-quiz','rating','reactions'] as const;
+export const STATISTICAL_WIDGET_KINDS=['question','timed-quiz','rating','reactions','topic-question'] as const;
 export type StatisticalWidget={id:string;kind:string;label?:string;options?:{id:string;label:string}[];targetWidgetId?:string;targetQuestionId?:string;questions?:{id:string;label:string;options?:{id:string;label:string}[]}[];resultsView?:string};
 export type StatRow={id:string;label:string;count:number};
 export function eligibleStatisticSources(widgets:StatisticalWidget[],excluding?:string):StatisticalWidget[]{
@@ -9,8 +9,15 @@ export function linkedStatisticSource(widget:StatisticalWidget,widgets:Statistic
  return eligibleStatisticSources(widgets,widget.id).find(w=>w.id===widget.targetWidgetId);
 }
 export const REHEARSAL_EMOJIS=['👍','❤️','😂','😮','👏','🎉','🤔','😕'] as const;
+/** The same safe, count-only projection is used by live PostgreSQL and by rehearsal.
+ * The presenter may see counts; participants never receive result-widget data. */
+export function topicQuestionRows(value:unknown):StatRow[]{
+ const count=typeof value==='number'&&Number.isSafeInteger(value)&&value>=0?value:0;
+ return [{id:'topic-count',label:'Domande ricevute',count}];
+}
+
 /** Stable per preview opening and per source; fresh preview openings have different seed. */
-export function sampleStatisticRows(source:StatisticalWidget,seed:number,choices:Record<string,string|string[]>={},questionId=''):StatRow[]{
+export function sampleStatisticRows(source:StatisticalWidget,seed:number,choices:Record<string,string|string[]>={},questionId='',topicSubmissions:Record<string,number>={}):StatRow[]{
  const part=questionId?source.questions?.find(q=>q.id===questionId):source;
  if(!part)return [];
  const options=source.kind==='rating'?Array.from({length:11},(_,n)=>({id:String(n),label:String(n)})):
@@ -19,6 +26,10 @@ export function sampleStatisticRows(source:StatisticalWidget,seed:number,choices
  let value=seed>>>0;
  for(const char of source.id+questionId)value=(Math.imul(value^char.charCodeAt(0),16777619))>>>0;
  const selected=choices[questionId?source.id+':'+questionId:source.id];
+ if(source.kind==='topic-question'){
+  const added=topicSubmissions[source.id];
+  return topicQuestionRows(2+(value%22)+(Number.isSafeInteger(added)&&added>0?added:0));
+ }
  return options.map((o,i)=>{
   value=(Math.imul(value^i,1664525)+1013904223)>>>0;
   const picked=Array.isArray(selected)?selected.includes(o.id):selected===o.id;

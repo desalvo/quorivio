@@ -11,3 +11,32 @@ test('generic provider registration accepts multiple configured OIDC providers',
 test('generic providers reject unsafe IDs, duplicates and callback mismatches',()=>{const base={id:'partner',issuer:'https://login.example.org',clientId:'client',clientSecret:'secret',redirectUri:'https://app.example.org/api/auth/oidc/partner/callback'};for(const item of [{...base,id:'github'},{...base,id:'BAD'}, {...base,redirectUri:'https://app.example.org/api/auth/oidc/another/callback'},{...base,label:'<script>'}])assert.throws(()=>providersFromEnv({OIDC_PROVIDERS_JSON:JSON.stringify([item])}));assert.throws(()=>providersFromEnv({OIDC_PROVIDERS_JSON:JSON.stringify([base,base])}));assert.throws(()=>providersFromEnv({OIDC_PROVIDERS_JSON:'invalid'}))});
 
 test('OIDC rejects implausibly old or oversized validity intervals',()=>{const c={iss:p.issuer,aud:p.clientId,exp:3000,iat:1000,nonce:'0123456789abcdefghijklmno',sub:'u1',email:'a@example.org',email_verified:true};assert.throws(()=>validateClaims({...c,iat:-100000},p,c.nonce,1100));assert.throws(()=>validateClaims({...c,exp:900000},p,c.nonce,1100));assert.throws(()=>validateClaims({...c,exp:Infinity},p,c.nonce,1100));assert.throws(()=>validateClaims(c,p,'short',1100));});
+
+test('OIDC legacy callback route is fixed and issuer cannot carry queries',()=>{
+ const env={OIDC_GOOGLE_ISSUER:'https://accounts.google.com',OIDC_GOOGLE_CLIENT_ID:'client',OIDC_GOOGLE_CLIENT_SECRET:'secret',OIDC_GOOGLE_REDIRECT_URI:'https://quorivio.example.org/api/auth/oidc/google/callback'};
+ assert.equal(providersFromEnv(env).length,1);
+ assert.equal(providersFromEnv({...env,OIDC_GOOGLE_REDIRECT_URI:'https://quorivio.example.org/api/auth/oidc/custom/callback'}).length,0);
+ assert.equal(providersFromEnv({...env,OIDC_GOOGLE_REDIRECT_URI:env.OIDC_GOOGLE_REDIRECT_URI+'?next=1'}).length,0);
+ assert.equal(providersFromEnv({...env,OIDC_GOOGLE_ISSUER:'https://accounts.google.com/?bad=1'}).length,0);
+});
+
+test('OIDC discovery rejects credential-bearing and fragment endpoints',()=>{
+ for(const endpoint of ['https://user:secret@idp.example.org/token','https://idp.example.org/token#key','http://idp.example.org/token']){
+  assert.throws(()=>validateDiscovery(p,{...d,token_endpoint:endpoint}));
+ }
+});
+
+test('OIDC discovery fetch disallows redirects before decoding provider JSON',async()=>{
+ const {fetchOidcJson}=await import('../src/oidc.ts');
+ const old=globalThis.fetch;
+ let redirectMode='';
+ globalThis.fetch=async (_url,options)=>{
+  redirectMode=String(options?.redirect);
+  return new Response('{"issuer":"https://identity.example.org"}',{status:200});
+ };
+ try{
+  assert.deepEqual(await fetchOidcJson('https://idp.example.org/.well-known/openid-configuration'),{issuer:'https://identity.example.org'});
+  assert.equal(redirectMode,'error');
+  await assert.rejects(fetchOidcJson('http://idp.example.org/config'));
+ }finally{globalThis.fetch=old}
+});

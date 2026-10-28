@@ -4,9 +4,12 @@ import {autosaveRecoveryDecision,recoverableAutosaveTransportError,retryAutosave
 import {widgetAppearanceStyle,widgetTypographyStyle} from './widget-appearance.js';
 import {styledSegments,inlineMarkCss,formatTextRange,remapMarks,changedRegion,inlineKeys,type InlineStyle,type TextMark} from './widget-text-marks.js';
 import {RichWidgetText} from './widget-rich-editor.js';
-import {eligibleStatisticSources,linkedStatisticSource,sampleStatisticRows,rowsFromWidgetAnswerDetail,REHEARSAL_EMOJIS,type StatRow} from './widget-results.js';
+import {eligibleStatisticSources,linkedStatisticSource,sampleStatisticRows,rowsFromWidgetAnswerDetail,topicQuestionRows,REHEARSAL_EMOJIS,type StatRow} from './widget-results.js';
 import {rejectWidgetCollisions,magneticSnapWidget,freeWidgetPosition} from './widget-placement.js';
 import {widgetGeometryStyle} from './widget-geometry';
+import {activateRehearsalDialog} from './rehearsal-dialog';
+import {canSubmitRehearsalAnswer,commitRehearsalAnswer,REHEARSAL_REACTION_PREFIX} from './rehearsal-responses';
+import {rehearsalDurationSeconds,rehearsalExpired,maySubmitTimedRehearsal} from './rehearsal-timer';
 import {mergePageDrafts,type MergeChoice} from './page-merge';
 import {createPageDraftBackup,parsePageDraftBackup,planPageDraftRecovery} from './page-draft-recovery';
 import {arrangeWidgets,type ArrangeMode} from './widget-arrange';
@@ -121,7 +124,10 @@ function PresenterLinkedResult({sessionId,activity,widget,widgets}:{sessionId:st
      const data=await request<any>(`/sessions/${encodeURIComponent(sessionId)}/activities/${encodeURIComponent(activity.id)}/widgets/${encodeURIComponent(source.id)}/timed-leaderboard?page=1`);
      next=[{id:'correct',label:'Corrette',count:Number(data.correct||0)},{id:'answers',label:'Totale',count:Number(data.answers||0)}];
     }else if(source.kind==='topic-question'){
-     next=[{id:'topic',label:'Domande del pubblico',count:0}]; // Topic moderation has its own scoped component.
+     // Presenter-authorized, source/page-scoped PostgreSQL total. Never send
+     // the free-text questions or their authors to participant projections.
+     const data=await request<any>(`/sessions/${encodeURIComponent(sessionId)}/activities/${encodeURIComponent(activity.id)}/topic-widgets/${encodeURIComponent(source.id)}/stats`);
+     next=topicQuestionRows(data.total);
     }
     if(alive)setRows(next);
    }catch{if(alive)setRows([])}
@@ -300,15 +306,51 @@ function SessionRehearsal({snapshot,onClose,initialPageId,initialMode='participa
  const [mode,setMode]=useState<RehearsalMode>(initialMode);
  const [page,setPage]=useState(()=>Math.max(0,snapshot.activities.findIndex(a=>a.id===initialPageId)));
  const [responses,setResponses]=useState<Record<string,string|string[]>>({});
+ // Draft edits never change presenter statistics until an explicit local submit.
+ const [submittedAnswers,setSubmittedAnswers]=useState<Record<string,string|string[]>>({});
+ // Page-scoped local counts: rehearsal is intentionally disconnected from POST APIs.
+ const [topicSubmissions,setTopicSubmissions]=useState<Record<string,number>>({});
  const [seed,setSeed]=useState(()=>Math.floor(Math.random()*0x7fffffff));
+ const [pageStartedAt,setPageStartedAt]=useState(()=>Date.now());
+ const [rehearsalNow,setRehearsalNow]=useState(()=>Date.now());
  const activities=snapshot.activities||[];const activity=activities[page] as any;
+ // One clock for both panes. It resets on page navigation or explicit restart,
+ // not when changing from presenter to participant or to side-by-side.
+ useEffect(()=>{const instant=Date.now();setPageStartedAt(instant);setRehearsalNow(instant)},[activity?.id,seed]);
+ useEffect(()=>{const timer=window.setInterval(()=>setRehearsalNow(Date.now()),250);return()=>window.clearInterval(timer)},[]);
  const widgets=(activity?.page_design?.widgets||[]) as any[];
  const [fullScreen,setFullScreen]=useState(false);const shellRef=useRef<HTMLDivElement>(null);
+ const closeRef=useRef(onClose);closeRef.current=onClose;
+ useEffect(()=>{const root=shellRef.current;return root?activateRehearsalDialog(root,()=>closeRef.current()):undefined},[]);
  useEffect(()=>{const handler=()=>setFullScreen(!!document.fullscreenElement);document.addEventListener('fullscreenchange',handler);return()=>document.removeEventListener('fullscreenchange',handler)},[]);
  const choose=(id:string,value:string,multiple=false)=>setResponses(previous=>{
   const before=previous[id];const list=Array.isArray(before)?before:[];
   return {...previous,[id]:multiple?(list.includes(value)?list.filter(item=>item!==value):[...list,value]):value};
  });
+ const submitDemoAnswer=(id:string,mode:string,timedSeconds?:number)=>{
+  const draft=responses[id];
+  // Guard in the callback too, not only disabled buttons: a queued click at
+  // the deadline must not submit a late answer.
+  if(timedSeconds!==undefined&&rehearsalExpired(pageStartedAt,timedSeconds,Date.now()))return;
+  setSubmittedAnswers(previous=>commitRehearsalAnswer(previous,id,draft,mode));
+ };
+ const submitDemoDirect=(widgetId:string,kind:'reactions'|'rating',value:string)=>{
+  setSubmittedAnswers(previous=>{
+   if(kind==='reactions'){
+    const pageKey=REHEARSAL_REACTION_PREFIX+activity.id;
+    if(previous[pageKey]!==undefined)return previous;
+    return {...previous,[pageKey]:value,[widgetId]:value};
+   }
+   return commitRehearsalAnswer(previous,widgetId,value,'rating');
+  });
+ };
+ const submitDemoTopic=(widgetId:string)=>{
+  const draft=responses[widgetId];const clean=typeof draft==='string'?draft.trim():'';
+  const key=activity?.id+':'+widgetId;
+  if(clean.length<5||clean.length>2000||(topicSubmissions[key]||0)>=10)return;
+  setTopicSubmissions(previous=>(previous[key]||0)>=10?previous:{...previous,[key]:(previous[key]||0)+1});
+  setResponses(previous=>({...previous,[widgetId]:''}));
+ };
  const renderSlide=(viewer:'presenter'|'participant')=><section className="rehearsal-slide" aria-label={viewer==='presenter'?'Pagina del presentatore':'Pagina del partecipante'} style={activity?.page_design?.backgroundAssetId?{backgroundImage:`url(/api/sessions/${snapshot.session.id}/assets/${activity.page_design.backgroundAssetId})`,backgroundSize:'cover',backgroundPosition:'center'}:activity?.page_design?.backgroundUrl?{backgroundImage:`url(${activity.page_design.backgroundUrl})`,backgroundSize:'cover',backgroundPosition:'center'}:activity?.page_design?.backgroundColor?{backgroundColor:activity.page_design.backgroundColor}:undefined}>
   {!widgets.length&&<h2 className="rehearsal-empty-title">{activity?.page_design?.header||activity?.title}</h2>}
   <div className="rehearsal-widgets">{widgets.filter(w=>viewer==='presenter'||w.kind!=='results-button').map(w=>{
@@ -316,24 +358,26 @@ function SessionRehearsal({snapshot,onClose,initialPageId,initialMode='participa
    const style={...{'--stage-x':`${w.position?.x??0}%`,'--stage-y':`${w.position?.y??0}%`,'--stage-width':`${w.position?.width??45}%`,'--stage-height':`${w.position?.height??24}%`},left:`${w.position?.x??0}%`,top:`${w.position?.y??0}%`,width:`${w.position?.width??45}%`,height:`${w.position?.height??24}%`,transform:`rotate(${w.position?.rotation||0}deg)`,...widgetAppearanceStyle(w.style,w.style?.fillImageAssetId?`/api/sessions/${snapshot.session.id}/assets/${w.style.fillImageAssetId}`:undefined),...widgetTypographyStyle(w.style)} as React.CSSProperties;
    const kind=w.kind;
    return <div key={w.id} data-widget-kind={kind} className={'rehearsal-widget rehearsal-'+kind} style={style}>
-    {kind==='results-button'?<LinkedResultChart widget={w} widgets={widgets} rows={linkedStatisticSource(w,widgets)?sampleStatisticRows(linkedStatisticSource(w,widgets)!,seed,responses,w.targetQuestionId||''):undefined} emptyLabel="simulazione"/>:
-    kind==='reactions'?<div className="projection-sample-reactions"><strong><WidgetStyledText text={w.label||'Reazioni'} widget={w} field="label"/></strong><div role="group" aria-label="Reazioni disponibili">{REHEARSAL_EMOJIS.map(emoji=><button type="button" key={emoji} aria-label={'Reazione '+emoji} aria-pressed={answer===emoji} disabled={viewer==='presenter'} onClick={()=>choose(w.id,emoji)}>{emoji}</button>)}</div></div>:
-    kind==='rating'?<div className="projection-sample-rating"><strong><WidgetStyledText text={w.label||'Gradimento'} widget={w} field="label"/></strong><div role="group" aria-label="Gradimento 0–10">{Array.from({length:11},(_,n)=><button type="button" key={n} aria-pressed={answer===String(n)} disabled={viewer==='presenter'} onClick={()=>choose(w.id,String(n))}>{n}</button>)}</div></div>:
+    {kind==='results-button'?<LinkedResultChart widget={w} widgets={widgets} rows={linkedStatisticSource(w,widgets)?sampleStatisticRows(linkedStatisticSource(w,widgets)!,seed,submittedAnswers,w.targetQuestionId||'',{[linkedStatisticSource(w,widgets)!.id]:topicSubmissions[activity.id+':'+linkedStatisticSource(w,widgets)!.id]||0}):undefined} emptyLabel="simulazione"/>:
+    kind==='reactions'?<div className="projection-sample-reactions"><strong><WidgetStyledText text={w.label||'Reazioni'} widget={w} field="label"/></strong><div role="group" aria-label="Reazioni disponibili">{REHEARSAL_EMOJIS.map(emoji=><button type="button" key={emoji} aria-label={'Reazione '+emoji} aria-pressed={submittedAnswers[w.id]===emoji} disabled={viewer==='presenter'||submittedAnswers[REHEARSAL_REACTION_PREFIX+activity.id]!==undefined} onClick={()=>submitDemoDirect(w.id,'reactions',emoji)}>{emoji}</button>)}</div></div>:
+    kind==='rating'?<div className="projection-sample-rating"><strong><WidgetStyledText text={w.label||'Gradimento'} widget={w} field="label"/></strong><div role="group" aria-label="Gradimento 0–10">{Array.from({length:11},(_,n)=><button type="button" key={n} aria-pressed={submittedAnswers[w.id]===String(n)} disabled={viewer==='presenter'||submittedAnswers[w.id]!==undefined} onClick={()=>submitDemoDirect(w.id,'rating',String(n))}>{n}</button>)}</div></div>:
     (kind==='question'||kind==='timed-quiz')?<div className="projection-question-group" aria-label="Domande interattive di prova">
      {[{...w,_questionId:''},...(w.questions||[]).map((q:any)=>({...q,_questionId:q.id}))].map((q:any)=>{
-      const questionId=q._questionId as string;const key=questionId?`${w.id}:${questionId}`:w.id;const current=responses[key];const multiple=q.answerMode==='multiple';const answerMode=q.answerMode||(kind==='timed-quiz'?'single':'text');const field=(key:string)=>questionId?'question:'+questionId+':'+key:key;
+      const questionId=q._questionId as string;const key=questionId?`${w.id}:${questionId}`:w.id;const current=responses[key];const sent=submittedAnswers[key]!==undefined;const multiple=q.answerMode==='multiple';const answerMode=q.answerMode||(kind==='timed-quiz'?'single':'text');const field=(key:string)=>questionId?'question:'+questionId+':'+key:key;const timedSeconds=kind==='timed-quiz'?rehearsalDurationSeconds(w.durationSeconds,activity?.duration_seconds):undefined;const canInteract=viewer==='participant'&&(timedSeconds===undefined||maySubmitTimedRehearsal(pageStartedAt,timedSeconds,rehearsalNow,sent));
       return <section className="projection-interactive-widget" data-question-id={questionId} key={key}><strong><WidgetStyledText text={q.label||'Domanda'} widget={w} field={field('label')}/></strong>{q.description&&<p><WidgetStyledText text={q.description} widget={w} field={field('description')}/></p>}
-       {['single','multiple'].includes(answerMode)?(q.options||[]).map((o:any)=><label key={o.id}><input type={multiple?'checkbox':'radio'} disabled={viewer==='presenter'} name={'rehearsal-'+key} checked={Array.isArray(current)?current.includes(o.id):current===o.id} onChange={()=>choose(key,o.id,multiple)}/><WidgetStyledText text={o.label} widget={w} field={field('option:'+o.id)}/></label>):<textarea aria-label={'Risposta simulata '+key} disabled={viewer==='presenter'} value={typeof current==='string'?current:''} placeholder="Scrivi una risposta di prova" onChange={e=>choose(key,e.target.value)}/>}</section>;
-     })}</div>:
-    kind==='topic-question'&&viewer==='participant'?<div><strong><WidgetStyledText text={w.label||'Domande del pubblico'} widget={w} field="label"/></strong><textarea aria-label={'Domanda simulata '+w.id} value={typeof answer==='string'?answer:''} onChange={e=>choose(w.id,e.target.value)}/></div>:
+       {['single','multiple'].includes(answerMode)?(q.options||[]).map((o:any)=><label key={o.id}><input type={multiple?'checkbox':'radio'} disabled={!canInteract} name={'rehearsal-'+key} checked={Array.isArray(current)?current.includes(o.id):current===o.id} onChange={()=>choose(key,o.id,multiple)}/><WidgetStyledText text={o.label} widget={w} field={field('option:'+o.id)}/></label>):answerMode==='file'?<label>Allegato di prova (non caricato)<input type="file" accept="image/png,image/jpeg,image/gif,image/webp,application/pdf,video/mp4,video/webm" disabled={!canInteract} onChange={e=>choose(key,e.target.files?.[0]?.name||'')}/></label>:<textarea aria-label={'Risposta simulata '+key} maxLength={5000} disabled={!canInteract} value={typeof current==='string'?current:''} placeholder="Scrivi una risposta di prova" onChange={e=>choose(key,e.target.value)}/>}{viewer==='participant'&&<button type="button" className="outline small" disabled={!canInteract||!canSubmitRehearsalAnswer(answerMode,current)} onClick={()=>submitDemoAnswer(key,answerMode,timedSeconds)}>Invia risposta di prova</button>}{sent&&<small role="status" aria-live="polite">Risposta simulata inviata · nessun dato salvato</small>}{timedSeconds!==undefined&&rehearsalExpired(pageStartedAt,timedSeconds,rehearsalNow)&&!sent&&<small role="status" aria-live="polite">Tempo scaduto: risposta di prova non più inviabile</small>}</section>;
+     })}{kind==='timed-quiz'&&<PageTimer openedAt={new Date(pageStartedAt).toISOString()} duration={rehearsalDurationSeconds(w.durationSeconds,activity?.duration_seconds)} label="Tempo rimanente nella prova"/>}</div>:
+    kind==='timer'?<div className="projection-sample-timer"><strong><WidgetStyledText text={w.label||'Timer'} widget={w} field="label"/></strong><PageTimer openedAt={new Date(pageStartedAt).toISOString()} duration={w.durationSeconds||activity?.duration_seconds||60} label="Tempo rimanente nella prova"/></div>:
+    kind==='topic-question'&&viewer==='participant'?<div className="projection-sample-topic"><strong><WidgetStyledText text={w.label||'Domande del pubblico'} widget={w} field="label"/></strong><textarea aria-label={'Domanda simulata '+w.id} maxLength={2000} value={typeof answer==='string'?answer:''} onChange={e=>choose(w.id,e.target.value)}/><button type="button" disabled={typeof answer!=='string'||answer.trim().length<5||(topicSubmissions[activity.id+':'+w.id]||0)>=10} onClick={()=>submitDemoTopic(w.id)}>Invia domanda di prova</button><small>{topicSubmissions[activity.id+':'+w.id]||0} / 10 domande simulate inviate, non salvate</small></div>:
+    kind==='topic-question'&&viewer==='presenter'?<div className="projection-sample-topic"><strong><WidgetStyledText text={w.label||'Domande del pubblico'} widget={w} field="label"/></strong><span>{topicSubmissions[activity.id+':'+w.id]||0} domande ricevute nella prova</span></div>:
     <ProjectionWidgetContent sessionId={snapshot.session.id} widget={w} activity={activity}/>}
    </div>;
   })}</div>
  </section>;
- return <div className="rehearsal-backdrop" role="dialog" aria-modal="true" aria-label="Anteprima interattiva della sessione" onKeyDown={e=>{if(e.key==='Escape')onClose()}}><div ref={shellRef} className={'rehearsal-shell rehearsal-mode-'+mode}>
+ return <div className="rehearsal-backdrop" role="dialog" aria-modal="true" aria-label="Anteprima interattiva della sessione"><div ref={shellRef} tabIndex={-1} className={'rehearsal-shell rehearsal-mode-'+mode}>
   <header className="rehearsal-toolbar"><strong>ANTEPRIMA · {snapshot.session.title}</strong><span>Nessuna risposta di prova viene salvata</span><div className="rehearsal-mode-switch" role="group" aria-label="Modalità anteprima"><button type="button" aria-pressed={mode==='presenter'} onClick={()=>setMode('presenter')}>Presentatore</button><button type="button" aria-pressed={mode==='participant'} onClick={()=>setMode('participant')}>Partecipante</button><button type="button" aria-pressed={mode==='both'} onClick={()=>setMode('both')}>Affiancate</button></div><button type="button" onClick={()=>void(document.fullscreenElement?document.exitFullscreen():shellRef.current?.requestFullscreen())} aria-pressed={fullScreen} aria-label="Visualizza anteprima a tutto schermo">{fullScreen?'Riduci':'⛶ Tutto schermo'}</button><button type="button" onClick={onClose} aria-label="Chiudi anteprima">× Chiudi</button></header>
   <div className="rehearsal-stage">{activity?<div className="rehearsal-panes">{(mode==='presenter'||mode==='both')&&<div className="rehearsal-pane"><strong className="rehearsal-pane-heading">Presentatore · statistiche simulate</strong>{renderSlide('presenter')}</div>}{(mode==='participant'||mode==='both')&&<div className="rehearsal-pane"><strong className="rehearsal-pane-heading">Partecipante · prova interattiva</strong>{renderSlide('participant')}</div>}</div>:<p>Questa sessione non contiene ancora pagine.</p>}</div>
-  <footer className="rehearsal-footer"><button type="button" disabled={page===0} onClick={()=>setPage(v=>v-1)}>← Precedente</button><span>{Object.keys(responses).length} interazioni simulate · non inviate</span><button type="button" disabled={page>=activities.length-1} onClick={()=>setPage(v=>v+1)}>Successiva →</button><button type="button" onClick={()=>{setResponses({});setSeed(Math.floor(Math.random()*0x7fffffff));setPage(0)}}>Ricomincia prova</button></footer>
+  <footer className="rehearsal-footer"><button type="button" disabled={page===0} onClick={()=>setPage(v=>v-1)}>← Precedente</button><span>{Object.keys(submittedAnswers).filter(key=>!key.startsWith(REHEARSAL_REACTION_PREFIX)).length+Object.values(topicSubmissions).reduce((sum,count)=>sum+count,0)} interazioni simulate · non inviate</span><button type="button" disabled={page>=activities.length-1} onClick={()=>setPage(v=>v+1)}>Successiva →</button><button type="button" onClick={()=>{setResponses({});setSubmittedAnswers({});setTopicSubmissions({});setSeed(Math.floor(Math.random()*0x7fffffff));setPage(0)}}>Ricomincia prova</button></footer>
  </div></div>;
 }
 

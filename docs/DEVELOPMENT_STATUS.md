@@ -1,3 +1,83 @@
+# Quorivio 0.1.0-dev — RC 67.0%: OAuth egress hardening and verified federated protocol gate (2026-10-28)
+
+**Baseline:** last user-confirmed commit `a32ef78902a656262d346a0fa622604a4deda405`; all subsequent uncommitted cumulative changes retained, including password reset/MFA hardening. No automated commit/push/release.
+
+**Locally implemented:** Facebook code exchange sends client credentials in POST form body, not query; Graph `/me` uses Bearer header with appsecret_proof but no access_token in query; redirects forbidden for token exchange and OIDC discovery/JWKS; configured callbacks must match their providers and contain no query or fragment; endpoint validation tightened. Deterministic stub-provider regression tests added. **New code has not run in GitHub CI and receives no RC point yet.** External OAuth providers and browser integration remain outstanding.
+
+**Verified RC score: 67.0% (+1 point)** from an already-green Full CI `40638652838`, accepting only `C3-AUTO` (bounded PKCE/JWKS, OIDC provider/claim, social state and scope automated primitives), while `C3` stays partial awaiting real provider browser acceptance. **32 gates: 15 accepted, 17 partial; RC NOT READY**. Total gate weight remains 100.
+
+# Quorivio 0.1.0-dev — 66.0% RC: real password recovery acceptance fixture, verified authentication subgate (28 October 2026)
+
+**Cumulative uncommitted work:** last maintainer-confirmed commit `a32ef78902a656262d346a0fa622604a4deda405`; all previous 65% features remain included. No assistant commit/push/tag/image publication.
+
+**New CI work:** disposable PostgreSQL 18 + TLS SMTP password-recovery E2E verifies delivery and account-existence privacy, per-minute issuance, digest-only token persistence, concurrent one-use redemption, expiry, password rotation and revocation of two existing cookies. GitHub workflow step added; **new Full CI pending, no points awarded for this new test**.
+
+**Verified gate reconciliation:** bounded `C1-AUTH` accepted only on prior green full CI `40638652838` for PostgreSQL authentication/user lifecycle, credential change, TLS SMTP MFA and session revocation; C1 residual still partial. **66.0% (+1), 31 gates: 14 accepted, 17 partial. Strict RC NOT READY.** See `docs/RC_PASSWORD_RECOVERY_AND_AUTH_GATE_20261028.en.md`.
+
+**Credential hardening:** password reset and authenticated change-password now revoke outstanding MFA login/enrollment challenges atomically. Final local checks: API/Web build PASS, Node 468+58, Python 944; real PostgreSQL/SMTPS recovery acceptance pending.
+
+---
+
+# Quorivio 0.1.0-dev — 65.0% RC: synchronized timed rehearsal and bounded verified CI gates (28 October 2026)
+
+**Uncommitted cumulative baseline:** last confirmed maintainer commit `a32ef78902a656262d346a0fa622604a4deda405`; includes all changes since the 63% ZIP. No assistant commit/push/tag/publish.
+
+**New code:** timed quiz rehearsal countdown from page entry; presenter and participant share one deadline; changing preview modes does not restart it; late answers blocked at both UI and submission callback; multiple questions share the deadline; Timer widget uses the rehearsal clock. Page navigation and reset restart the trial. Added Node and Chromium offline desktop/mobile tests wired to opt-in workflow. **New full CI pending; no credit for uncommitted features.**
+
+**Local verification:** production API/Web TypeScript/Vite build PASS, Node API **468/468**, Node Web **58/58**, full Python **940/940**, offline real Chromium 1440/390 desktop/mobile keyboard, submission and timer fixtures PASS. Authenticated new GitHub Full CI PENDING.
+
+**Reconciled RC score: 65.0% (+2)** from previously green Full CI 40638652838 only. Bounded security scanning `D4-SCAN` and bilingual documentation presence `D5-TECHDOC` separately accepted, parent D4 and D5 still partial. **30 gates: 13 accepted / 17 partial. Strict RC NOT READY.** See `docs/RC_TIMED_REHEARSAL_AND_BOUNDARY_GATES_20261028.en.md`.
+
+---
+
+# Quorivio 0.1.0-dev — 63.0% RC: rehearsal submission parity and two previously verified automated subgates (28 October 2026)
+
+**Cumulative uncommitted baseline:** last confirmed user commit `a32ef78902a656262d346a0fa622604a4deda405`; includes all pending work since 61% ZIP. No assistant Git mutation/publication.
+
+**New implementation:** preview drafts remain separate from submitted answers, question stats update on local send only, page-wide one-shot reactions and widget ratings, local-only file selection (filename only), atomic topic-question cap and true submitted interaction count. New offline real Chromium script included in opt-in GitHub workflow. **New full GitHub CI pending; zero credit for new UI.**
+
+**Locally verified:** backend 468/468, frontend 55/55, Python 934/934, API+Web build and five offline Chromium scripts PASS.
+
+**Reconciled RC: 63.0% (+2)** based solely on completed green GitHub Full CI `40638652838`: bounded B3-AUDIENCE (browser/PostgreSQL participant) and D6-ERASURE (durable PostgreSQL deletion) now separately accepted. Their broad gates remain partial. **28 gates, 11 accepted / 17 partial; STRICT RC NOT READY.** See `docs/RC_REHEARSAL_SUBMISSION_PARITY_AND_GATE_AUDIT_20261028.en.md`.
+
+---
+
+# Quorivio 0.1.0-dev — 61.0% RC: accessible rehearsal isolation and verified profile lifecycle (28 October 2026)
+
+**Uncommitted cumulative baseline:** last user-confirmed commit `a32ef78902a656262d346a0fa622604a4deda405`. All prior uncommitted topic-statistics and preview changes are retained. No commit/push/tag/image publication performed.
+
+**New work:** real reversible `inert` and `aria-hidden` isolation of background branches while rehearsal modal is open; original focus, scroll and attributes restored. Offline real Chromium desktop/mobile acceptance expanded; opt-in actual editor API-fixture Chromium browser test added for side-by-side 16:9 preview and mode switch. **GitHub Full CI on new code pending.**
+
+**Verified RC scoring: 61.0% (+1 point)**, 26 gates (9 accepted, 17 partial). `C4-PROFILE` bounded profile/photo PostgreSQL/Chromium acceptance is based exclusively on previously verified green runs `40638652838` and `40595463258`; residual C4 retains RWX/ClamAV and independent checks. Zero scoring credit for the new local-only rehearsal implementation. **Strict RC NOT ready.**
+
+See `docs/RC_REHEARSAL_BACKGROUND_ISOLATION_PROFILE_GATE_20261028.en.md`.
+
+---
+
+# Quorivio 0.1.0-dev — 60.0% evidence-scoped RC audit and rehearsal keyboard accessibility (28 October 2026)
+
+**User has not yet committed the prior 56% cumulative package.** Last confirmed commit `a32ef78902a656262d346a0fa622604a4deda405`; this cumulative update includes topic-statistics work and the new rehearsal keyboard focus/scroll lifecycle. No assistant commit/push/tag/release/publish.
+
+**Implementation:** keyboard-trapped presenter, participant, dual rehearsal modal; Escape/Close restores trigger focus, locks/unlocks background scroll. New real offline Chromium keyboard acceptance at 1440/390px; wired into manual browser CI. API/web build PASS, Node 468+50 PASS, Python 921 PASS, offline Chromium geometry/reaction/WYSIWYG/keyboard PASS. New authenticated CI pending.
+
+**Verified RC score: 60.0%** (56.0% baseline). Four narrowly bounded previously GitHub-verified engineering subgates were accepted: `B1-WS` (two-replica WebSocket), `C2-TLS` (disposable PostgreSQL/TLS SMTP MFA), `D2-DR` (disposable PostgreSQL DR), `D3-IMAGE` (multiarch build; **not** native ARM64 execution). Parent gates keep independent outstanding work; **25 gates, 8 accepted, 17 partial. NOT RC READY.** The new keyboard fix is **not credited** until future CI. See `docs/RC_REHEARSAL_KEYBOARD_AND_GATE_RECONCILIATION_20261028.en.md`.
+
+---
+
+# Quorivio 0.1.0-dev — verified full CI, topic results and RC audit (28 October 2026)
+
+**Confirmed maintainer commit:** `a32ef78902a656262d346a0fa622604a4deda405`. **Full CI 40638652838: GREEN**, including PostgreSQL 18 historical migration, independent question E2E, Chromium editor/participants, 500 users, container build and security gates. **Image publication skipped; strict RC gate skipped.**
+
+**Uncommitted changes in this package:** source-linked presenter-only Result widgets now support topic-question widgets using a dedicated count-only authenticated, scoped PostgreSQL endpoint; side-by-side participant rehearsal can locally submit up to ten topic questions, updating the presenter count without network writes. The API accepts only same-page eligible sources. No free-text topic questions or participant identifiers are exposed in result charts.
+
+**Local evidence:** API/Web TypeScript+Vite build PASS; Node backend 468/468, frontend 50/50 and full Python 917/917 PASS. New GitHub CI remains to be confirmed for this package.
+
+**Verified weighted RC progress: 56.0%** (previous 53.0%). Formula unchanged (accepted=100% weight, partial=50%); three narrowly scoped automatically verified gates (`A3-AUTO`, `B2-DB`, `B4-LOAD`, weight 2 each) split out of previously broad partial gates after successful GitHub Full CI. Original A3/B2/B4 retain partial status and all independent acceptance obligations. 21 gates, 4 accepted, 17 partial. **NOT RC READY.** No progress credit is given to the uncommitted topic result work.
+
+**Still required:** rerun CI, Firefox/WebKit, physical devices, screen reader and independently reviewed visual parity, production-like DR/security and Kubernetes/Podman/ARM64 acceptance, real social SSO and GDPR/AGID reviews. No commit, push or image publication performed.
+
+---
+
 # Quorivio 0.1.0-dev — CI 40614893046 WYSIWYG acceptance hotfix (2026-10-28)
 
 **Previous verified Full CI:** GitHub run 40595463258 (success), predates the present WYSIWYG/multi-question changes.

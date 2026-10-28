@@ -8,3 +8,10 @@ test('each results widget references an eligible widget on the same page',()=>{
  assert.equal(validPageDesign({widgets:[{...result,targetWidgetId:undefined}]}),true); // legacy migration
  assert.equal(validPageDesign({widgets:[{id:'text',kind:'text'},result]}),false);
 });
+
+test('topic questions qualify for a linked, presenter-only results widget',()=>{
+ const topic={id:'topic1',kind:'topic-question',label:'Questions from audience'};
+ assert.equal(validPageDesign({widgets:[topic,{id:'r',kind:'results-button',targetWidgetId:'topic1'}]}),true);
+ assert.equal(validPageDesign({widgets:[topic,{id:'r',kind:'results-button',targetWidgetId:'topic1',targetQuestionId:'not-applicable'}]}),false);
+ assert.equal(validPageDesign({widgets:[{id:'r',kind:'results-button',targetWidgetId:'topic1'}]}),false);
+});

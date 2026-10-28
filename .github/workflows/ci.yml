@@ -110,6 +110,11 @@ jobs:
           python3 tools/ci_widget_visual_geometry_20261028.py
           # Dual presenter/participant preview must preserve 16:9 and real reaction hit targets.
           python3 tools/ci_preview_layout_offline.py
+          # Actual TS keyboard module: modal focus trap, Escape and scroll cleanup, 1440/390px.
+          python3 tools/ci_rehearsal_keyboard_chromium.py
+          # Real preview response-state module: draft vs send, same-page reaction lock, reset.
+          python3 tools/ci_rehearsal_submission_chromium.py
+          python3 tools/ci_rehearsal_timer_chromium.py
           # Real production React WYSIWYG component, caret/selection and live styles.
           python3 tools/ci_browser_rich_text_offline.py
           python3 tools/ci_browser_editor.py
@@ -215,6 +220,15 @@ jobs:
           QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
           QUORIVIO_CI_SMTP_CAPTURE: /tmp/quorivio-ci-smtps/mail.jsonl
         run: python3 tools/ci_email_mfa_postgres.py
+      - name: PostgreSQL TLS SMTP password recovery and session revocation acceptance
+        env:
+          QUORIVIO_CI_RECOVERY_TEST: '1'
+          QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
+          DATABASE_URL: postgres://quorivio:ci-only-secret@127.0.0.1:5432/quorivio
+          QUORIVIO_CI_SMTP_CAPTURE: /tmp/quorivio-ci-smtps/mail.jsonl
+          QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
+          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
+        run: python3 tools/ci_password_recovery_postgres.py
       - name: PostgreSQL session retention and durable erasure outbox acceptance
         env:
           DATABASE_URL: postgres://quorivio:ci-only-secret@127.0.0.1:5432/quorivio

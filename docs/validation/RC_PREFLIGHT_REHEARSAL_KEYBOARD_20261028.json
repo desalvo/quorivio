@@ -1,0 +1,112 @@
+{
+  "release_candidate_ready": false,
+  "score": 60.0,
+  "missing_required_files": [],
+  "unaccepted_gates": [
+    {
+      "id": "A1",
+      "area": "A-editor",
+      "status": "partial",
+      "remaining": "Independent visual operator acceptance, Firefox/WebKit and physical-device canvas interactions, realistic latency and multi-editor workload sign-off. 2026-10-28 new batch pending GitHub opt-in acceptance and independent browser/device sign-off. Re-run full GitHub CI on linked results / dual rehearsal and independently confirm actual browser source-specific stats, accurate pixel-level editor/presenter/participant parity, real reaction workflow and format-selection interactions."
+    },
+    {
+      "id": "A2",
+      "area": "A-editor",
+      "status": "partial",
+      "remaining": "Independent pixel-accurate page/thumbnail comparisons and Firefox/WebKit drag-and-drop plus real touch/keyboard field validation. 2026-10-28 new batch pending GitHub opt-in acceptance and independent browser/device sign-off. Re-run full GitHub CI on linked results / dual rehearsal and independently confirm actual browser source-specific stats, accurate pixel-level editor/presenter/participant parity, real reaction workflow and format-selection interactions."
+    },
+    {
+      "id": "A3",
+      "area": "A-editor",
+      "status": "partial",
+      "remaining": "Independent editor/presenter/participant visual pixel-accuracy on a representative corpus, Firefox/WebKit, real touchscreen/keyboard and screen-reader evaluation, correct full PPTX roundtrip corpus, operator acceptance. Topic-question linked statistics added locally post-CI and require new authenticated CI acceptance."
+    },
+    {
+      "id": "A4",
+      "area": "A-editor",
+      "status": "partial",
+      "remaining": "Independent NVDA/VoiceOver/TalkBack screen-reader testing, keyboard-only operator review, real Android/iOS touch, Firefox/WebKit and WCAG/AGID sign-off. 2026-10-28 new batch pending GitHub opt-in acceptance and independent browser/device sign-off. Re-run full GitHub CI on linked results / dual rehearsal and independently confirm actual browser source-specific stats, accurate pixel-level editor/presenter/participant parity, real reaction workflow and format-selection interactions."
+    },
+    {
+      "id": "B1",
+      "area": "B-sessions",
+      "status": "partial",
+      "remaining": "Production-like long-running multi-replica load, network impairment/reconnection latency, recovery and operational SLO acceptance."
+    },
+    {
+      "id": "B2",
+      "area": "B-sessions",
+      "status": "partial",
+      "remaining": "Production-like variable-latency, long-lived concurrency across replicas and manual presenter/participant timing validation. Linked topic results and real dual-preview interaction added locally post-CI must pass new CI."
+    },
+    {
+      "id": "B3",
+      "area": "B-sessions",
+      "status": "partial",
+      "remaining": "Cross-browser Firefox/WebKit, physical-device input and independent screen-reader/keyboard accessibility acceptance."
+    },
+    {
+      "id": "B4",
+      "area": "B-sessions",
+      "status": "partial",
+      "remaining": "Sustained representative throughput/memory and latency percentiles, failure-injection recovery, independent real-device and accessibility acceptance."
+    },
+    {
+      "id": "C1",
+      "area": "C-admin",
+      "status": "partial",
+      "remaining": "Complete password/account recovery browser acceptance including error cases, multi-replica revocation and operational security review."
+    },
+    {
+      "id": "C2",
+      "area": "C-admin",
+      "status": "partial",
+      "remaining": "Independent real SMTP providers, outage and cross-replica retries, production deliverability, recovery UI and operator sign-off."
+    },
+    {
+      "id": "C3",
+      "area": "C-admin",
+      "status": "partial",
+      "remaining": "Real Google/GitHub/Facebook provider redirects, state/error/mismatch cases, browser E2E and operator approval."
+    },
+    {
+      "id": "C4",
+      "area": "C-admin",
+      "status": "partial",
+      "remaining": "Multi-replica RWX storage and ClamAV deployment with concurrent uploads, long-term data lifecycle and real-device/AT acceptance."
+    },
+    {
+      "id": "D2",
+      "area": "D-validation",
+      "status": "partial",
+      "remaining": "Production-like restore drill, encrypted backups/key rotation, complete retention policy and measured recovery objectives on representative datasets."
+    },
+    {
+      "id": "D3",
+      "area": "D-validation",
+      "status": "partial",
+      "remaining": "Actual native ARM64 start/smoke, rootless Podman, multi-replica Kubernetes with HAProxy and NGINX ingress, secrets/TLS, RWX/ClamAV failover."
+    },
+    {
+      "id": "D4",
+      "area": "D-validation",
+      "status": "partial",
+      "remaining": "Independent pentest/security and AGID accessibility sign-off, third-party Microsoft Office PPTX fidelity corpus and deployment threat review."
+    },
+    {
+      "id": "D5",
+      "area": "D-validation",
+      "status": "partial",
+      "remaining": "Independent editorial and IT/EN operator review, current screenshot verification and end-user acceptance of manuals."
+    },
+    {
+      "id": "D6",
+      "area": "D-validation",
+      "status": "partial",
+      "remaining": "Independent GDPR/legal and AGID assessment, encrypted backup and key rotation operational reviews, retention/erasure audit and RWX storage sign-off."
+    }
+  ],
+  "gate_count": 25,
+  "accepted_gates": 8,
+  "policy": "RC requires every gate accepted with reviewed evidence; local tests alone never promote gates."
+}

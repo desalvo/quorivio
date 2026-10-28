@@ -224,6 +224,10 @@ app.post('/api/auth/password-reset/confirm',async(req,res)=>{const token=req.bod
  if(!found.rowCount){await client.query('ROLLBACK');res.status(400).json({error:'invalid_or_expired_token'});return}
  await client.query('UPDATE users SET password_hash=$2,password_changed_at=now(),must_change_password=false WHERE id=$1',[found.rows[0].user_id,await bcrypt.hash(password,12)]);
  await client.query('UPDATE password_reset_tokens SET used_at=now() WHERE user_id=$1 AND used_at IS NULL',[found.rows[0].user_id]);
+ // A password reset revokes outstanding MFA challenges too: an OTP issued before
+ // the credential change must never mint a new session after recovery.
+ await client.query('DELETE FROM email_mfa_challenges WHERE user_id=$1',[found.rows[0].user_id]);
+ await client.query('DELETE FROM email_mfa_enrollments WHERE user_id=$1',[found.rows[0].user_id]);
  await client.query('COMMIT');res.clearCookie('q_auth',{path:'/'});res.json({ok:true,mfa_still_required:true});
  }catch(e){await client.query('ROLLBACK');sendError(res,e)}finally{client.release()}});
 // OIDC authorization code + PKCE. Accounts are never silently linked by email.
@@ -247,7 +251,7 @@ app.get('/api/auth/oidc/:provider/callback',async(req,res)=>{const state=typeof 
  if(!pending||pending.expires<Date.now()||pending.provider!==req.params.provider||cookies(req.headers.cookie).q_oidc_state!==state||typeof code!=='string'||code.length>4096){res.status(400).json({error:'oidc_state_invalid'});return}
  const p=oidcProviders.find(x=>x.id===pending.provider);if(!p){res.status(400).json({error:'oidc_provider_missing'});return}
  try{const d=validateDiscovery(p,await fetchOidcJson(p.issuer.replace(/\/$/,'')+'/.well-known/openid-configuration'));
- const tokenReply=await fetch(d.token_endpoint,{method:'POST',signal:AbortSignal.timeout(8000),headers:{'content-type':'application/x-www-form-urlencoded'},body:new URLSearchParams({grant_type:'authorization_code',code,redirect_uri:p.redirectUri,client_id:p.clientId,client_secret:p.clientSecret,code_verifier:pending.verifier})});
+ const tokenReply=await fetch(d.token_endpoint,{method:'POST',signal:AbortSignal.timeout(8000),redirect:'error',headers:{'content-type':'application/x-www-form-urlencoded'},body:new URLSearchParams({grant_type:'authorization_code',code,redirect_uri:p.redirectUri,client_id:p.clientId,client_secret:p.clientSecret,code_verifier:pending.verifier})});
  if(!tokenReply.ok){res.status(401).json({error:'oidc_exchange_failed'});return}
  const tokens=await tokenReply.json();if(typeof tokens.id_token!=='string'||tokens.id_token.length>20000){res.status(401).json({error:'oidc_token_missing'});return}
  const verified=await verifyIdToken(tokens.id_token,p,pending.nonce,await fetchOidcJson(d.jwks_uri));
@@ -409,7 +413,20 @@ app.post('/api/auth/email-mfa/enrollment/confirm',requireAuth,async(req,res)=>{t
 app.get('/api/auth/me',requireAuth,async(req,res)=>{try{const r=await db.query('SELECT id,email,nickname,is_primary_admin,role,approved,must_change_password,totp_enabled,email_mfa_enabled FROM users WHERE id=$1',[auth(req)]);res.json(r.rows[0]||null)}catch(e){sendError(res,e)}});
 async function requireAdmin(req:express.Request,res:express.Response,next:express.NextFunction){const u=await db.query('SELECT role,approved,must_change_password FROM users WHERE id=$1',[auth(req)]);if(!u.rowCount||!u.rows[0].approved||u.rows[0].must_change_password||u.rows[0].role!=='platform_admin'){res.status(403).json({error:'admin_required'});return}next()}
 async function requirePresenter(req:express.Request,res:express.Response,next:express.NextFunction){const u=await db.query('SELECT role,approved,must_change_password FROM users WHERE id=$1',[auth(req)]);if(!u.rowCount||!u.rows[0].approved||u.rows[0].must_change_password||!['presenter','platform_admin','org_admin'].includes(u.rows[0].role)){res.status(403).json({error:'approved_presenter_required'});return}next()}
-app.post('/api/auth/change-password',requireAuth,async(req,res)=>{try{const current=req.body?.current_password,next=req.body?.new_password;if(typeof current!=='string'||typeof next!=='string'||next.length<12||next.length>256||current===next){res.status(400).json({error:'invalid_password'});return}const r=await db.query('SELECT password_hash FROM users WHERE id=$1',[auth(req)]);if(!r.rowCount||!await bcrypt.compare(current,r.rows[0].password_hash)){res.status(403).json({error:'invalid_credentials'});return}await db.query('UPDATE users SET password_hash=$2,must_change_password=false,password_changed_at=now() WHERE id=$1',[auth(req),await bcrypt.hash(next,12)]);res.json({ok:true})}catch(e){sendError(res,e)}});
+app.post('/api/auth/change-password',requireAuth,async(req,res)=>{const current=req.body?.current_password,next=req.body?.new_password;
+ if(typeof current!=='string'||typeof next!=='string'||next.length<12||next.length>256||current===next){res.status(400).json({error:'invalid_password'});return}
+ const cx=await db.connect();try{
+  await cx.query('BEGIN');
+  const uid=auth(req)!;
+  const r=await cx.query('SELECT password_hash FROM users WHERE id=$1 FOR UPDATE',[uid]);
+  if(!r.rowCount||!await bcrypt.compare(current,r.rows[0].password_hash)){await cx.query('ROLLBACK');res.status(403).json({error:'invalid_credentials'});return}
+  await cx.query('UPDATE users SET password_hash=$2,must_change_password=false,password_changed_at=now() WHERE id=$1',[uid,await bcrypt.hash(next,12)]);
+  // Invalidate MFA login and enrollment challenges atomically with the password.
+  await cx.query('DELETE FROM email_mfa_challenges WHERE user_id=$1',[uid]);
+  await cx.query('DELETE FROM email_mfa_enrollments WHERE user_id=$1',[uid]);
+  await cx.query('COMMIT');res.json({ok:true});
+ }catch(e){await cx.query('ROLLBACK').catch(()=>{});sendError(res,e)}finally{cx.release()}
+});
 
 // TOTP is optional and bound to a fully authenticated user. Enrolment remains
 // inactive until a valid authenticator code is provided.
@@ -1319,6 +1336,16 @@ app.get('/api/sessions/:id/activities/:aid/topic-widgets/:wid/questions',require
  const total=await db.query('SELECT count(*)::int AS n FROM topic_widget_questions WHERE session_id=$1 AND activity_id=$2 AND widget_id=$3',[session.id,req.params.aid,req.params.wid]);
  const rows=await db.query(`SELECT q.id,q.body,q.created_at,p.pseudonym AS participant_name FROM topic_widget_questions q JOIN participants p ON p.id=q.participant_id WHERE q.session_id=$1 AND q.activity_id=$2 AND q.widget_id=$3 ORDER BY q.created_at,q.id LIMIT 10 OFFSET $4`,[session.id,req.params.aid,req.params.wid,(page-1)*10]);
  res.json({page,page_size:10,total:total.rows[0].n,items:rows.rows.map((r:any)=>({...r,participant_name:w.showNames?r.participant_name:null}))});
+ }catch(e){sendError(res,e)}});
+// Count-only result source: unlike the moderator question-list endpoint, this
+// never transfers free-text audience submissions or participant pseudonyms.
+app.get('/api/sessions/:id/activities/:aid/topic-widgets/:wid/stats',requireAuth,async(req,res)=>{try{
+ const session=await owner(req.params.id,auth(req)!);if(!session){res.status(404).end();return}
+ const a=await db.query('SELECT page_design FROM activities WHERE id=$1 AND session_id=$2',[req.params.aid,session.id]);
+ if(!a.rows[0]?.page_design?.widgets?.some((w:any)=>w.id===req.params.wid&&w.kind==='topic-question')){res.status(404).json({error:'topic_widget_not_found'});return}
+ const result=await db.query('SELECT count(*)::int AS total FROM topic_widget_questions WHERE session_id=$1 AND activity_id=$2 AND widget_id=$3',[session.id,req.params.aid,req.params.wid]);
+ res.setHeader('Cache-Control','no-store');
+ res.json({total:result.rows[0].total});
  }catch(e){sendError(res,e)}});
 // Resolve the correct answer consistently for both historic single-answer widgets and
 // new multi-answer widgets. An empty correctOptionIds array must not mask the

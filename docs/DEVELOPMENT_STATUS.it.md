@@ -1,3 +1,83 @@
+# Quorivio 0.1.0-dev — RC 67,0%: sicurezza OAuth e protocolli federati verificati (28 ottobre 2026)
+
+**Baseline:** ultimo commit dichiarato dall’utente `a32ef78902a656262d346a0fa622604a4deda405`. Nessun commit automatico; conservate integralmente tutte le modifiche dei cumulativi precedenti, incluso il recupero password/MFA non ancora validato in CI.
+
+**Implementazione locale:** codice di scambio Facebook spostato da URL con `client_secret` a POST con body; `access_token` passato nell’header `Authorization: Bearer` nella richiesta a Graph `/me` (con HMAC `appsecret_proof`), con URL senza token; redirect HTTP vietati nei client di token exchange e discovery OIDC; URL di callback vincolati al provider, senza query/fragment; validazione più stretta degli endpoint OIDC; nuove regressioni Node con provider simulati, nessuna credenziale reale. Nuova Full CI richiesta; **queste novità non ricevono punti RC** prima di un nuovo run GitHub.
+
+**Avanzamento ufficiale verificato: 67,0% (+1 punto)**. Separato `C3-AUTO` (2 punti accettati, evidenze già verdi Full CI `40638652838`: OIDC PKCE, RS256/JWKS, HTTPS/claim, social state/scope) dal residuo `C3` (4 punti parziali: provider Google/GitHub/Facebook reali, browser e sign-off). **32 gate: 15 accettati, 17 parziali; RC NON pronta**. Nessuna doppia attribuzione dei controlli e peso complessivo invariato 100.
+
+# Quorivio 0.1.0-dev — RC 66,0%: test completo recupero password e gate autenticazione verificato (28 ottobre 2026)
+
+**Sviluppi cumulativi non committati:** ultimo commit utente confermato `a32ef78902a656262d346a0fa622604a4deda405`, conservati tutti gli interventi dei precedenti package. Nessun commit/push/tag/Docker push automatico.
+
+**Nuovo test CI:** prova PostgreSQL 18 + SMTP TLS reale ma temporaneo del recupero password: privacy sull'esistenza dell'account, invio e scadenza link, digest token, utilizzo singolo concorrente, cambio credenziali, revoca di due sessioni. La nuova Full CI è ancora da eseguire: **nessun punto attribuito a questo test non ancora verificato su GitHub**.
+
+**Riconciliazione dei gate:** accettato il solo `C1-AUTH` già dimostrato dalla Full CI verde `40638652838` (login, ciclo account, modifica password, revoca, MFA SMTP TLS). Il gate C1 rimane parziale. **66,0% (+1), 31 gate: 14 accettati e 17 parziali; RC NON pronta.** Dettagli in `docs/RC_PASSWORD_RECOVERY_AND_AUTH_GATE_20261028.it.md`.
+
+**Hardening credenziali:** reset password e cambio password autenticato eliminano nella stessa transazione i challenge MFA ed enrollment residui. Test locali finali: build API/Web PASS, Node 468+58, Python 944, prova PostgreSQL/SMTPS pendente.
+
+---
+
+# Quorivio 0.1.0-dev — RC 65,0%: timer condiviso in anteprima e gate CI verificati (28 ottobre 2026)
+
+**Baseline cumulativa non committata:** ultimo commit utente confermato `a32ef78902a656262d346a0fa622604a4deda405`; tutti gli sviluppi dal package al 63% conservati. Nessuna operazione Git/Docker da parte dell'assistente.
+
+**Nuove funzioni:** conto alla rovescia dei quiz a tempo comune alle viste presentatore/partecipante; scadenza stabile passando da una modalità all'altra; invii tardivi respinti anche nel callback, domande indipendenti con scadenza comune; Timer della prova, reset e passaggio pagina. Nuovi test Node/Chromium offline e CI opt-in. **Nuova Full CI ancora da eseguire; nessun punto per modifiche non committate.**
+
+**Test locali:** build API/Web TypeScript/Vite PASS, Node backend **468/468**, frontend **58/58**, Python completo **940/940**, Chromium offline desktop/mobile per tastiera, invio e timer PASS. Nuova Full CI GitHub autenticata da eseguire.
+
+**Avanzamento RC: 65,0% (+2)** da Full CI precedente 40638652838: accettati i sottogate circoscritti `D4-SCAN` (scansioni) e `D5-TECHDOC` (documentazione bilingue presente), genitori D4/D5 ancora parziali. **30 gate: 13 accettati, 17 parziali. RC NON pronta.** Dettagli in `docs/RC_TIMED_REHEARSAL_AND_BOUNDARY_GATES_20261028.it.md`.
+
+---
+
+# Quorivio 0.1.0-dev — 63,0% RC: invio in anteprima fedele e due sottogate automatici verificati (28 ottobre 2026)
+
+**Baseline cumulativa non committata:** ultimo commit confermato `a32ef78902a656262d346a0fa622604a4deda405`. Tutte le modifiche precedenti conservate. Nessun commit, push o Docker push dell'assistente.
+
+**Implementato:** le risposte di prova modificano i grafici soltanto dopo l'invio, una reazione per pagina anche con più widget, un voto per valutazione, domande multiple indipendenti, file di prova solo locale, limite di dieci domande e contatore degli invii realmente effettuati. Nuovo controllo Chromium offline incluso nella Full CI opzionale, **nuova GitHub CI da eseguire**.
+
+**Test locali:** backend 468/468, frontend 55/55, Python 934/934, build API/Web e cinque test Chromium offline PASS.
+
+**Avanzamento RC: 63,0% (+2)** solo per le evidenze già accettate della Full CI `40638652838`: B3-AUDIENCE e D6-ERASURE. I gate più ampi restano parziali; nessun punto per il nuovo codice in attesa CI. **28 gate: 11 accettati, 17 parziali. RC NON pronta.** Dettagli in `docs/RC_REHEARSAL_SUBMISSION_PARITY_AND_GATE_AUDIT_20261028.it.md`.
+
+---
+
+# Quorivio 0.1.0-dev — 61,0% RC: isolamento accessibile e profili verificati (28 ottobre 2026)
+
+**Baseline cumulativa non ancora committata:** ultimo commit confermato `a32ef78902a656262d346a0fa622604a4deda405`. Rimangono incluse le novità precedenti (statistiche delle domande sul tema e anteprima accessibile). Nessun commit/push/tag/publish da parte dell'assistente.
+
+**Nuove modifiche:** anteprima che rende inerti e nascosti ai lettori di schermo i rami di sfondo, ripristinando esattamente gli stati preesistenti; test Chromium offline desktop/mobile ampliato; prova opt-in Chromium dell'editor con vera anteprima affiancata, 16:9, switching ed Esc; regressioni Python. **Full CI del nuovo codice ancora da eseguire.**
+
+**Progresso con evidenza pregressa:** **61,0% (+1 punto)**, 26 gate: 9 accettati, 17 parziali. Accettato `C4-PROFILE`, già dimostrato dalle Full CI `40638652838` e `40595463258`; C4 residuo parziale per RWX/ClamAV reale e validazioni indipendenti. Nuovi interventi di accessibilità **non** promossi con sole prove locali. **RC non pronta**.
+
+Dettagli: `docs/RC_REHEARSAL_BACKGROUND_ISOLATION_PROFILE_GATE_20261028.it.md`.
+
+---
+
+# Quorivio 0.1.0-dev — 60,0% RC e accessibilità anteprime (28 ottobre 2026)
+
+**Il cumulativo al 56% non è ancora stato committato dall'utente.** Ultimo commit confermato `a32ef78902a656262d346a0fa622604a4deda405`: tutte le modifiche successive restano cumulative. Nessun commit/push/tag/release/publish automatico.
+
+**Interventi:** focus iniziale dell'anteprima, navigazione Tab/Maiusc+Tab, Esc e restituzione del focus al pulsante di origine; blocco e ripristino dello scorrimento. Prova Chromium reale offline desktop/mobile inclusa nella futura CI estesa. Build PASS, 468 Node backend e 50 frontend, 921 Python, preflight Chromium offline PASS. Nuova GitHub CI non ancora eseguita.
+
+**Avanzamento RC verificato: 60,0%** (prima 56,0%). Quattro sottogate circoscritti già verificati nelle precedenti CI GitHub: `B1-WS`, `C2-TLS`, `D2-DR`, `D3-IMAGE`, con gate genitori ancora parziali. **25 gate: 8 accettati, 17 parziali. RC NON pronta.** Nessun punto assegnato alla modifica dell'anteprima non ancora collaudata in GitHub. Dettagli in `docs/RC_REHEARSAL_KEYBOARD_AND_GATE_RECONCILIATION_20261028.it.md`.
+
+---
+
+# Quorivio 0.1.0-dev — verifica Full CI, statistiche del tema e RC (28 ottobre 2026)
+
+**Ultimo commit utente confermato:** `a32ef78902a656262d346a0fa622604a4deda405`. **Full CI 40638652838: VERDE**, quality gate, PostgreSQL 18, migrazione storica, domande multiple, Chromium, 500 partecipanti, build container e security gate PASS. **Publication SKIPPED**, strict RC gate SKIPPED.
+
+**Novità di questo package ancora non verificate su GitHub:** `Risultati` può essere collegato a `Domande sul tema` e mostrare il **conteggio reale e autenticato** delle domande di quel widget specifico; l'anteprima partecipante invia domande **solo in memoria**, con limite dieci, aggiornando insieme la vista del presentatore. API valida il collegamento soltanto se la sorgente appartiene alla medesima pagina. Nessun testo/nickname di domanda viene trasferito nel widget Risultati.
+
+**Test locali:** build TypeScript/Vite PASS; Node API 468/468, Web 50/50, Python completa 917/917 PASS. Una nuova Full CI è da riconfermare su questo cumulativo.
+
+**Progresso RC verificato: 56,0%** (prima 53,0%). La formula accepted=100% / partial=50% non è cambiata; tre gate tecnici documentati e confermati dalla Full CI sono ora separati e accettati: `A3-AUTO`, `B2-DB`, `B4-LOAD`, ciascuno di peso 2 su 100. I gate residui `A3`, `B2`, `B4` restano **parziali**. 21 gate, 4 accettati, 17 parziali: release candidate NON pronta. Non si attribuisce alcun punto alle nuove statistiche del tema finché non passano in CI.
+
+**Ancora necessario:** CI su questo package, browser Firefox/WebKit, dispositivi fisici e screen-reader, validazione visiva esterna, DR/recovery operativi, infrastruttura Kubernetes/Podman/ARM64, verifica reale SSO e approvazioni AGID/GDPR. Nessun commit, push o Docker publish eseguito.
+
+---
+
 # Quorivio 0.1.0-dev — Correzione CI 40614893046 e WYSIWYG (28 ottobre 2026)
 
 **Ultima Full CI verificata:** GitHub run 40595463258 (success), precedente agli sviluppi WYSIWYG/domande indipendenti.

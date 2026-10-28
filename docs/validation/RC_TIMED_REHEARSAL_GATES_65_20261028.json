@@ -1,0 +1,67 @@
+{
+  "name": "RC cycle 5 — synchronized timed rehearsal and bounded previously verified gates",
+  "date": "2026-10-28",
+  "version": "0.1.0-dev",
+  "last_confirmed_commit": "a32ef78902a656262d346a0fa622604a4deda405",
+  "historical_github_full_ci": {
+    "run_id": 40638652838,
+    "conclusion": "success",
+    "security_vulnerability_gate": "success",
+    "credential_leak_gate": "success",
+    "bilingual_documentation_presence_gate": "success",
+    "container_build_gate": "success"
+  },
+  "score": {
+    "before": 63.0,
+    "after": 65.0,
+    "delta": 2.0,
+    "total_weight": 100,
+    "gates": 30,
+    "accepted": 13,
+    "partial": 17,
+    "new_previously_verified_subgates": [
+      "D4-SCAN",
+      "D5-TECHDOC"
+    ]
+  },
+  "new_uncommitted_feature": {
+    "title": "Timed rehearsal presenter/participant deadline parity",
+    "new_feature_promoted": false,
+    "new_full_ci_pending": true,
+    "shared_page_started_at": true,
+    "deadline_check_in_submit_callback": true,
+    "disposable_timer_and_reset": true
+  },
+  "local_testing": {
+    "typescript_api_build": "pass",
+    "typescript_web_vite_build": "pass",
+    "node_backend": {
+      "passed": 468,
+      "failed": 0
+    },
+    "node_frontend": {
+      "passed": 58,
+      "failed": 0
+    },
+    "python_suite": {
+      "passed": 940,
+      "failed": 0
+    },
+    "chromium_offline_viewports": [
+      1440,
+      390
+    ],
+    "chromium_offline_tests": [
+      "rehearsal_keyboard",
+      "rehearsal_submission",
+      "rehearsal_timer"
+    ]
+  },
+  "limits": [
+    "Previous green CI does not validate this uncommitted timer change.",
+    "Offline fixtures do not establish authenticated PostgreSQL full UI/browser acceptance.",
+    "External security audit, AGID/GDPR approvals, real screen readers, independent visual review, Firefox/WebKit, physical devices, and deployment DR/RWX/ClamAV remain open.",
+    "Strict RC readiness is false."
+  ],
+  "next_action": "User commit then full opt-in CI with browser_test=true publish_image=false"
+}

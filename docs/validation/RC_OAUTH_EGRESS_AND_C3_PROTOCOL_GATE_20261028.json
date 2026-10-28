@@ -1,0 +1,54 @@
+{
+  "date": "2026-10-28",
+  "version": "0.1.0-dev",
+  "previous_score": 66.0,
+  "current_score": 67.0,
+  "score_change": 1.0,
+  "accepted_scoped_subgate": "C3-AUTO",
+  "parent_gate": "C3",
+  "base_ci_run": 40638652838,
+  "commit_baseline": "a32ef78902a656262d346a0fa622604a4deda405",
+  "new_feature_promoted": false,
+  "existing_ci_tests": [
+    "OIDC PKCE/state #103",
+    "OIDC HTTPS configuration #104",
+    "RS256 JWKS verification #106",
+    "generic OIDC provider registration #107",
+    "claims validity #109",
+    "social state #360",
+    "Facebook scope #361"
+  ],
+  "new_local_changes": [
+    "Facebook POST token exchange without query credentials",
+    "Facebook Graph bearer token header without URL access_token, HMAC proof retained",
+    "OIDC and social callback path/fragment/query validation",
+    "OIDC discovery/token HTTP redirect rejection",
+    "six mock-provider Node regression tests"
+  ],
+  "not_verified": [
+    "new code Github Full CI",
+    "real Google/GitHub/Facebook provider login/callback",
+    "external OAuth and MFA provider acceptance",
+    "multi-replica/physical/browser signoff"
+  ],
+  "rc_ready": false,
+  "local_validation": {
+    "timestamp": "2026-10-28",
+    "api_node_tests": {
+      "passed": 474,
+      "failed": 0
+    },
+    "web_node_tests": {
+      "passed": 58,
+      "failed": 0
+    },
+    "python_tests": {
+      "passed": 949,
+      "failed": 0
+    },
+    "typescript_api_and_web": "PASS",
+    "vite_build": "PASS",
+    "real_provider_e2e": "NOT RUN",
+    "new_full_github_ci": "NOT RUN"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "date": "2026-10-28",
+  "version": "0.1.0-dev",
+  "last_confirmed_commit": "a32ef78902a656262d346a0fa622604a4deda405",
+  "last_confirmed_full_ci": "https://github.com/desalvo/quorivio/actions/runs/40638652838",
+  "scope": "topic result source and certified-technical RC subgate reconciliation",
+  "local": {
+    "typescript_api": "PASS",
+    "typescript_web": "PASS",
+    "vite": "PASS",
+    "node_api": "468/468 PASS",
+    "node_web": "50/50 PASS",
+    "python_all": "917/917 PASS local Python 3.13",
+    "chromium_css_1440": "PASS offline geometry/tooltip",
+    "chromium_css_390": "PASS offline geometry/tooltip",
+    "postgresql_topic_count_live": "NOT EXECUTED LOCALLY; new checks added to CI",
+    "full_authenticated_chromium": "NOT EXECUTED LOCALLY"
+  },
+  "rc_score": {
+    "previous": 53.0,
+    "new": 56.0,
+    "method": "accepted gate weight 100%, partial 50%, no changes to scoring formula",
+    "verified_subgates": [
+      "A3-AUTO",
+      "B2-DB",
+      "B4-LOAD"
+    ],
+    "verified_underlying_run_id": 40638652838,
+    "exclusion": "topic counter does not add credit before future GitHub validation",
+    "strict_rc": "NOT READY"
+  },
+  "code_security": [
+    "authenticated presenter-only GET /api/sessions/:id/activities/:aid/topic-widgets/:wid/stats",
+    "owner/session/activity/widget validation",
+    "count-only integer result; no text, aliases or participant IDs",
+    "preview sends no network requests and resets counts on restart"
+  ],
+  "unverified": [
+    "new CI after commit",
+    "full PostgreSQL stats endpoint live",
+    "independent Firefox/WebKit, real hardware and screen reader/AGID",
+    "production-like disaster recovery, operations, legal and SSO"
+  ]
+}

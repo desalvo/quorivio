@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-28",
+  "baseline_archive": "quorivio-0.1.0-dev-rc-rehearsal-keyboard-verified-gates-60-cumulative.zip",
+  "baseline_commit": "a32ef78902a656262d346a0fa622604a4deda405",
+  "changes": [
+    "Rehearsal modal background uses reversible inert and aria-hidden on sibling ancestor paths",
+    "Actual isolated Chromium tests accessibility visibility, focus, cleanup and prior aria-hidden/inert states on desktop and mobile",
+    "Existing opt-in full-app Chromium editor mock now checks both previews, 16:9 scale and Escape/focus restoration"
+  ],
+  "score": {
+    "before": 60.0,
+    "after": 61.0,
+    "delta": 1.0,
+    "method": "C4-PROFILE accepted 2 weighted points split from C4 partial 5 -> partial 3; same total 100; +1 weighted point",
+    "verified_prior_github_runs": [
+      40638652838,
+      40595463258
+    ],
+    "local_only_new_ui_promoted": false,
+    "strict_rc_ready": false
+  },
+  "tests": {
+    "build": "PASS TypeScript backend/frontend + Vite",
+    "node_backend": "PASS 468/468",
+    "node_frontend": "PASS 50/50",
+    "python_full": "PASS 925/925",
+    "offline_real_chromium": "PASS 1440px and 390px: real compiled TypeScript modal accessibility tree, prior aria-hidden/inert restoration, focus/Escape/IME/Tab; separate dual geometry and reaction pointer",
+    "authenticated_editor_chromium": "PENDING_GITHUB_CI; local attempted and blocked at page.goto with net::ERR_BLOCKED_BY_ADMINISTRATOR",
+    "cross_browser_and_screenreader": "PENDING_INDEPENDENT"
+  },
+  "published": false,
+  "new_package_files": 711
+}

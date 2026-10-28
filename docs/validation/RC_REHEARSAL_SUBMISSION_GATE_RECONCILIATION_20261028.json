@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-28",
+  "version": "0.1.0-dev",
+  "license": "EUPL-1.2",
+  "last_user_confirmed_commit": "a32ef78902a656262d346a0fa622604a4deda405",
+  "baseline_archive": "quorivio-0.1.0-dev-rc-accessible-rehearsal-profile-gate-61-cumulative.zip",
+  "last_verified_full_ci": 40638652838,
+  "changes": [
+    "rehearsal draft != sent: presenter statistics count only submissions",
+    "one reaction per page and one rating per widget",
+    "independent question submit guard",
+    "file picker demo stores filename only, never uploads",
+    "react question cap protected by functional setState",
+    "new real offline Chromium CI script for submitted-state module",
+    "bounded historical CI subgate audit"
+  ],
+  "local_tests": {
+    "api_node": "468/468 PASS",
+    "web_node": "55/55 PASS",
+    "python": "934/934 PASS",
+    "typescript_vite": "PASS",
+    "offline_chromium_1440_390": "5 scripts PASS"
+  },
+  "not_tested": [
+    "new GitHub CI after these edits",
+    "authenticated complete React app with PostgreSQL",
+    "Firefox/WebKit and physical screen readers/devices",
+    "GDPR AGID external signoff"
+  ],
+  "rc_gates": {
+    "score": 63.0,
+    "count": 28,
+    "accepted": 11,
+    "partial": 17,
+    "ready": false,
+    "new_github_verified_subgates": [
+      "B3-AUDIENCE",
+      "D6-ERASURE"
+    ],
+    "new_ui_feature_promoted": false
+  },
+  "commit_push_tag_publish": false
+}

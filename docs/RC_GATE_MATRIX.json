@@ -1,6 +1,6 @@
 {
   "version": "0.1.0-dev",
-  "method": "Conservative gate audit. accepted=100% weight, partial=50%, open or blocked=0%. Partial denotes implementation with important unverified acceptance evidence; this is NOT measured test coverage.",
+  "method": "Conservative evidence-scoped gate audit: accepted=100% of bounded gate weight, partial=50%, open/blocked=0%. On 2026-10-28 three previously broad partial gates (A3/B2/B4) were split into separately proven automated subgates and residual independent-acceptance gates; weights still total 100. This is finer granularity, not a claim that the external checks passed. The strict RC gate remains blocked until ALL gates, including residuals, are independently accepted.",
   "gates": [
     {
       "id": "A1",
@@ -25,12 +25,24 @@
     {
       "id": "A3",
       "area": "A-editor",
-      "weight": 6,
+      "weight": 4,
       "status": "partial",
-      "evidence": "Widget palette, page layouts, media, quiz and topic widgets present in source; editable PPTX import/export security and fidelity regression suite (11 tests) locally PASS, 2026-10-24; editable widget copy/cut/paste with new IDs and slide-bounded geometry, Node regression PASS (2026-10-24) Fifth uncommitted conversion batch: editable solid RGB slide backgrounds, uniform horizontal paragraph alignment and vertical text anchors; API validation, editor/presenter/rehearsal UI, truthful gradient/mixed-alignment loss reporting; 30 real python-pptx behavioral regressions + 6 Node tests locally PASS (2026-10-25). Seventh uncommitted conversion batch: native PPTX picture cropping preserved as editable fractional metadata across import/export, crop-aware projection/rehearsal, editor numeric controls and strict validation; 12 synthetic raster comparisons and local suites PASS (2026-10-25). Eighth uncommitted conversion batch: editable native PowerPoint shape no-fill/no-outline, RGB outline widths 0.25–12pt and solid/dash/dot line styles; 12 synthetic real raster comparisons and 30 behavior/validation scenarios PASS, Node 232 PASS, builds PASS (2026-10-25). 2026-10-26 post-baseline: both leaderboard widgets show explicit server-calculated ranks including ties without duplicate React keys; widget answer form adds double-click protection, submission state, disabled empty answers and accessible live status. Local Node 447/447; production frontend build and Chromium regression on this patch are PENDING.\n2026-10-27 opt-in Chromium production frontend/editor and presenter profile PASS, timed-widget PostgreSQL concurrency/fairness PASS in 40517573850. Cross-browser accessibility and independent visual review still pending.\n2026-10-27: Green maintainer Full CI 40553571012 on 67a7be939a5930e2f9a49ce3932a4b7f29a682ac confirmed real Chromium/PostgreSQL editor behavior. Subsequent local resilience batch: bounded retry with authority readback after ambiguous network failures, 12 frontend Node tests plus 842 Python and 447 backend Node pass; shared editor/presenter/audience geometry helper. New Chromium network-loss fixture and mandatory frontend Node CI step require a NEW GitHub run. No acceptance promotion.\n2026-10-27 local (pending new GitHub CI): rich per-widget shape and fill schema, shared appearance, image asset remapping, ratings/reactions/timer/QR preview and 0-connected count; verification and device fidelity still required.\n2026-10-27 post-6395b0b: server PageDesign union now matches validator for participant count; resultsView rejects unknown modes; local 450 API/23 web Node tests, TypeScript/Vite builds PASS. PostgreSQL + Chromium end-to-end still required. No status promotion.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: Chromium mock editor widget UI and real PostgreSQL widget semantics/timed concurrency PASS; full visual fidelity and representative PPTX corpus still outstanding. Strict RC gate was skipped; status unchanged.\n2026-10-28 local visual parity batch: editor projection-backed widget contents; 16:9 desktop/mobile geometry and rectangular tooltips Chromium preflight PASS; draft participant rehearsal/fullscreen; inline options and persistent bounded typography spans; backend/frontend builds, Node 454+36 PASS. New Full CI and visual operator/physical assistive technology sign-off PENDING. 2026-10-28 local uncommitted: per-widget source-linked results, independent presenter-only rendering, side-by-side simulated presenter/audience and responsive 16:9 CSS; Node backend 455/455, web 44/44, Python focused 58/58, Chromium offline CSS pointer+geometry 1440/390 PASS. New full GitHub Chromium+PostgreSQL pending; this is NOT acceptance evidence.\n2026-10-28 pending local batch (after last committed e2dc3a97): production WYSIWYG contentEditable DOM ownership fixes duplicated characters and buffers IME composition; desktop/mobile real Chromium offline acceptance PASS including Unicode input. Question-scoped answer revisions derived from existing immutable widget history prevent a change to q2 from reopening q1 responses or resetting its statistics/rankings; 6 API Node tests PASS, full backend 467/467 PASS, web 49/49 PASS. Actual PostgreSQL legacy migration and independent-answer transactional acceptance are added to manual CI but have NOT yet executed on GitHub. No independent sign-off or gate promotion.",
-      "remaining": "Verify new question-scoped revision SQL and historic migration on disposable PostgreSQL 18 in GitHub Full CI; run authenticated Chromium end-to-end, compare real editor/presenter/participant screenshots, Firefox/WebKit, physical devices and operator sign-off. Widget-by-widget rendering equality across editor/rehearsal/presenter with visual diff, third-party real-world PowerPoint corpus and accessibility operator review. 2026-10-28 new changes require Full Chromium/PostgreSQL CI and independent pixel/real-device testing. Native input while editing styled runs is not yet WYSIWYG; multiple independent question blocks per widget not yet supported. Re-run full GitHub CI on linked results / dual rehearsal and independently confirm actual browser source-specific stats, accurate pixel-level editor/presenter/participant parity, real reaction workflow and format-selection interactions.",
+      "evidence": "Widget palette, page layouts, media, quiz and topic widgets present in source; editable PPTX import/export security and fidelity regression suite (11 tests) locally PASS, 2026-10-24; editable widget copy/cut/paste with new IDs and slide-bounded geometry, Node regression PASS (2026-10-24) Fifth uncommitted conversion batch: editable solid RGB slide backgrounds, uniform horizontal paragraph alignment and vertical text anchors; API validation, editor/presenter/rehearsal UI, truthful gradient/mixed-alignment loss reporting; 30 real python-pptx behavioral regressions + 6 Node tests locally PASS (2026-10-25). Seventh uncommitted conversion batch: native PPTX picture cropping preserved as editable fractional metadata across import/export, crop-aware projection/rehearsal, editor numeric controls and strict validation; 12 synthetic raster comparisons and local suites PASS (2026-10-25). Eighth uncommitted conversion batch: editable native PowerPoint shape no-fill/no-outline, RGB outline widths 0.25–12pt and solid/dash/dot line styles; 12 synthetic real raster comparisons and 30 behavior/validation scenarios PASS, Node 232 PASS, builds PASS (2026-10-25). 2026-10-26 post-baseline: both leaderboard widgets show explicit server-calculated ranks including ties without duplicate React keys; widget answer form adds double-click protection, submission state, disabled empty answers and accessible live status. Local Node 447/447; production frontend build and Chromium regression on this patch are PENDING.\n2026-10-27 opt-in Chromium production frontend/editor and presenter profile PASS, timed-widget PostgreSQL concurrency/fairness PASS in 40517573850. Cross-browser accessibility and independent visual review still pending.\n2026-10-27: Green maintainer Full CI 40553571012 on 67a7be939a5930e2f9a49ce3932a4b7f29a682ac confirmed real Chromium/PostgreSQL editor behavior. Subsequent local resilience batch: bounded retry with authority readback after ambiguous network failures, 12 frontend Node tests plus 842 Python and 447 backend Node pass; shared editor/presenter/audience geometry helper. New Chromium network-loss fixture and mandatory frontend Node CI step require a NEW GitHub run. No acceptance promotion.\n2026-10-27 local (pending new GitHub CI): rich per-widget shape and fill schema, shared appearance, image asset remapping, ratings/reactions/timer/QR preview and 0-connected count; verification and device fidelity still required.\n2026-10-27 post-6395b0b: server PageDesign union now matches validator for participant count; resultsView rejects unknown modes; local 450 API/23 web Node tests, TypeScript/Vite builds PASS. PostgreSQL + Chromium end-to-end still required. No status promotion.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: Chromium mock editor widget UI and real PostgreSQL widget semantics/timed concurrency PASS; full visual fidelity and representative PPTX corpus still outstanding. Strict RC gate was skipped; status unchanged.\n2026-10-28 local visual parity batch: editor projection-backed widget contents; 16:9 desktop/mobile geometry and rectangular tooltips Chromium preflight PASS; draft participant rehearsal/fullscreen; inline options and persistent bounded typography spans; backend/frontend builds, Node 454+36 PASS. New Full CI and visual operator/physical assistive technology sign-off PENDING. 2026-10-28 local uncommitted: per-widget source-linked results, independent presenter-only rendering, side-by-side simulated presenter/audience and responsive 16:9 CSS; Node backend 455/455, web 44/44, Python focused 58/58, Chromium offline CSS pointer+geometry 1440/390 PASS. New full GitHub Chromium+PostgreSQL pending; this is NOT acceptance evidence.\n2026-10-28 pending local batch (after last committed e2dc3a97): production WYSIWYG contentEditable DOM ownership fixes duplicated characters and buffers IME composition; desktop/mobile real Chromium offline acceptance PASS including Unicode input. Question-scoped answer revisions derived from existing immutable widget history prevent a change to q2 from reopening q1 responses or resetting its statistics/rankings; 6 API Node tests PASS, full backend 467/467 PASS, web 49/49 PASS. Actual PostgreSQL legacy migration and independent-answer transactional acceptance are added to manual CI but have NOT yet executed on GitHub. No independent sign-off or gate promotion.\n2026-10-28: after successful Full CI 40638652838, the automated evidence-specific A3-AUTO subgate (weight 2) was formally separated and accepted. Parent remains partial and still requires every independent check listed below.",
+      "remaining": "Independent editor/presenter/participant visual pixel-accuracy on a representative corpus, Firefox/WebKit, real touchscreen/keyboard and screen-reader evaluation, correct full PPTX roundtrip corpus, operator acceptance. Topic-question linked statistics added locally post-CI and require new authenticated CI acceptance.",
       "current_verified_run": 40595463258,
       "pending_local_evidence_20261028": "WYSIWYG and independent-question implementation passes local TypeScript/Vite, 461 Node API, 46 frontend, 33 focused Python, Chromium component desktop/mobile. Unverified by GitHub and real PostgreSQL; prior accepted gates unchanged."
+    },
+    {
+      "id": "A3-AUTO",
+      "area": "A-editor",
+      "weight": 2,
+      "status": "accepted",
+      "scope": "Automated WYSIWYG and multi-question integrity: TypeScript and real Chromium/PostgreSQL acceptance",
+      "evidence": "GitHub Full CI 40638652838 (a32ef789): 467 API, 49 Web and 910 Python tests; Chromium editor mock fidelity and PostgreSQL authenticated editor PATCH/readback/reload/conflict/merge all PASS; PostgreSQL legacy widget-answer migration and independent multi-question E2E PASS.",
+      "remaining": "Maintain automated CI checks on every revision; human visual parity, assistive technologies, browser engines and actual devices remain explicitly required in A3.",
+      "verified_run_id": 40638652838,
+      "verified_sha": "a32ef78902a656262d346a0fa622604a4deda405",
+      "acceptance_kind": "bounded_automated_only"
     },
     {
       "id": "A4",
@@ -45,76 +57,163 @@
     {
       "id": "B1",
       "area": "B-sessions",
-      "weight": 6,
+      "weight": 4,
       "status": "partial",
-      "evidence": "Presenter dashboard, synced server-driven navigation and participant preview in source; live WebSocket authorization re-audits sessions, presenter memberships/roles and participants every 10s (local policy tests PASS, 2026-10-24); per-session coalesced snapshot delivery and 2 MiB slow-consumer protection, local tests PASS (2026-10-24); LISTEN startup/resync failure now forces reconnection, with local regression tests (2026-10-24); retired listener notification fencing and rejected handler reconnect regression tests PASS (2026-10-24); coalesced snapshot callers now await the final read and failed DB snapshots propagate to listener recovery (152 Node and 252 Python tests PASS, builds PASS, 2026-10-24); disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24); added mandatory CI PostgreSQL two-process WebSocket notification acceptance (not yet run on CI, 2026-10-24); replica smoke now drains pre-mutation notifications to require a fresh post-vote participant snapshot (2026-10-24). Maintainer confirmed green CI including two-replica PostgreSQL 18 WebSocket test (2026-10-24). CI 40141894130: PostgreSQL 18 two-replica WebSocket opening, response propagation, privacy and close PASS; 24 concurrent HTTP clients PASS.\n2026-10-27 local (pending real PG CI): closed-session owner/collaborator duplication exposed in session directory; portable definition-only copy creates fresh draft/credentials and independently remapped media, with no participant/responses/statistics.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: PostgreSQL live 24 concurrent participants, independent audience Chromium and two API replicas WebSocket PASS. Strict RC gate was skipped; status unchanged.",
+      "evidence": "Presenter dashboard, synced server-driven navigation and participant preview in source; live WebSocket authorization re-audits sessions, presenter memberships/roles and participants every 10s (local policy tests PASS, 2026-10-24); per-session coalesced snapshot delivery and 2 MiB slow-consumer protection, local tests PASS (2026-10-24); LISTEN startup/resync failure now forces reconnection, with local regression tests (2026-10-24); retired listener notification fencing and rejected handler reconnect regression tests PASS (2026-10-24); coalesced snapshot callers now await the final read and failed DB snapshots propagate to listener recovery (152 Node and 252 Python tests PASS, builds PASS, 2026-10-24); disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24); added mandatory CI PostgreSQL two-process WebSocket notification acceptance (not yet run on CI, 2026-10-24); replica smoke now drains pre-mutation notifications to require a fresh post-vote participant snapshot (2026-10-24). Maintainer confirmed green CI including two-replica PostgreSQL 18 WebSocket test (2026-10-24). CI 40141894130: PostgreSQL 18 two-replica WebSocket opening, response propagation, privacy and close PASS; 24 concurrent HTTP clients PASS.\n2026-10-27 local (pending real PG CI): closed-session owner/collaborator duplication exposed in session directory; portable definition-only copy creates fresh draft/credentials and independently remapped media, with no participant/responses/statistics.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: PostgreSQL live 24 concurrent participants, independent audience Chromium and two API replicas WebSocket PASS. Strict RC gate was skipped; status unchanged.\n2026-10-28 evidence reconciliation: automatic CI subgate B1-WS split from broad partial gate, without claiming outstanding external acceptance.",
       "remaining": "Production-like long-running multi-replica load, network impairment/reconnection latency, recovery and operational SLO acceptance.",
       "current_verified_run": 40595463258,
       "pending_local_evidence_20261028": "WYSIWYG and independent-question implementation passes local TypeScript/Vite, 461 Node API, 46 frontend, 33 focused Python, Chromium component desktop/mobile. Unverified by GitHub and real PostgreSQL; prior accepted gates unchanged."
     },
     {
+      "id": "B1-WS",
+      "area": "B-sessions",
+      "weight": 2,
+      "status": "accepted",
+      "evidence": "WebSocket two-process PostgreSQL CI: authenticated live opening/response/close, authorization and privacy across two replicas.",
+      "remaining": "Maintain the verified CI proof on future changes; all untested production and independent requirements stay within the partial parent gate B1.",
+      "verified_run_id": 40638652838,
+      "verified_commit_sha": "a32ef78902a656262d346a0fa622604a4deda405",
+      "scope": "bounded automatic engineering test (not independent production/operator signoff)"
+    },
+    {
       "id": "B2",
       "area": "B-sessions",
-      "weight": 6,
+      "weight": 4,
       "status": "partial",
-      "evidence": "Timed quiz APIs, per-widget results and server timestamps implemented; shared PostgreSQL-clock deadlines for legacy and widget timed answers, local contract and unit tests PASS (2026-10-24); open timed-widget edits now reject duplicate/missing widget IDs (154 Node PASS, 2026-10-24); disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24) CI 40141894130: 24 independent concurrent PostgreSQL-backed HTTP participants, idempotency and timed expiry PASS. 2026-10-26 post-baseline: widget responder avoids pool starvation by resolving identity first and releasing client before notification; already-submitted responses succeed after timed expiry without rescore; legacy timed responses behave analogously. Two presenter-only leaderboards now use PostgreSQL window RANK() for equal elapsed times, instead of ordinal page positions; UI exposes tied ranks. CI 40369919680 prior baseline is GREEN but these new changes still await mandatory PostgreSQL test with 12 clients, strict deadline retries and deterministic tied-rank SQL fixture; local Node 447/447 and focused Python regressions PASS. GitHub CI 40379416187 SHA 5369f438: concurrent audience moderation passed, but new timed-widget acceptance failed in Python at line 79 (duration_ms PG int8 serialized as decimal string; test compared to int). Lossless test-only parser and four regressions now pass locally; mandatory real PG rerun pending.\n2026-10-27 quality job 122235650919, run 40517573850: PostgreSQL timed-widget fairness, retry and topic concurrency acceptance SUCCESS, including deterministic tied ranks, expiry, 12 same-participant concurrent clients. Independent variable-latency/cross-engine/touch screen-reader review still pending.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: Real PostgreSQL timed-widget 12-way idempotency/concurrency/fairness and topic quotas PASS; variable latency, multi-replica load environment not signed off. Strict RC gate was skipped; status unchanged. 2026-10-28 local uncommitted: per-widget source-linked results, independent presenter-only rendering, side-by-side simulated presenter/audience and responsive 16:9 CSS; Node backend 455/455, web 44/44, Python focused 58/58, Chromium offline CSS pointer+geometry 1440/390 PASS. New full GitHub Chromium+PostgreSQL pending; this is NOT acceptance evidence.\n2026-10-28 pending local batch (after last committed e2dc3a97): production WYSIWYG contentEditable DOM ownership fixes duplicated characters and buffers IME composition; desktop/mobile real Chromium offline acceptance PASS including Unicode input. Question-scoped answer revisions derived from existing immutable widget history prevent a change to q2 from reopening q1 responses or resetting its statistics/rankings; 6 API Node tests PASS, full backend 467/467 PASS, web 49/49 PASS. Actual PostgreSQL legacy migration and independent-answer transactional acceptance are added to manual CI but have NOT yet executed on GitHub. No independent sign-off or gate promotion.",
-      "remaining": "Verify new question-scoped revision SQL and historic migration on disposable PostgreSQL 18 in GitHub Full CI; run authenticated Chromium end-to-end, compare real editor/presenter/participant screenshots, Firefox/WebKit, physical devices and operator sign-off. Cross-replica variable-latency timed fairness, presenter result agreement under failure/recovery and real-device acceptance. Re-run full GitHub CI on linked results / dual rehearsal and independently confirm actual browser source-specific stats, accurate pixel-level editor/presenter/participant parity, real reaction workflow and format-selection interactions.",
+      "evidence": "Timed quiz APIs, per-widget results and server timestamps implemented; shared PostgreSQL-clock deadlines for legacy and widget timed answers, local contract and unit tests PASS (2026-10-24); open timed-widget edits now reject duplicate/missing widget IDs (154 Node PASS, 2026-10-24); disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24) CI 40141894130: 24 independent concurrent PostgreSQL-backed HTTP participants, idempotency and timed expiry PASS. 2026-10-26 post-baseline: widget responder avoids pool starvation by resolving identity first and releasing client before notification; already-submitted responses succeed after timed expiry without rescore; legacy timed responses behave analogously. Two presenter-only leaderboards now use PostgreSQL window RANK() for equal elapsed times, instead of ordinal page positions; UI exposes tied ranks. CI 40369919680 prior baseline is GREEN but these new changes still await mandatory PostgreSQL test with 12 clients, strict deadline retries and deterministic tied-rank SQL fixture; local Node 447/447 and focused Python regressions PASS. GitHub CI 40379416187 SHA 5369f438: concurrent audience moderation passed, but new timed-widget acceptance failed in Python at line 79 (duration_ms PG int8 serialized as decimal string; test compared to int). Lossless test-only parser and four regressions now pass locally; mandatory real PG rerun pending.\n2026-10-27 quality job 122235650919, run 40517573850: PostgreSQL timed-widget fairness, retry and topic concurrency acceptance SUCCESS, including deterministic tied ranks, expiry, 12 same-participant concurrent clients. Independent variable-latency/cross-engine/touch screen-reader review still pending.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: Real PostgreSQL timed-widget 12-way idempotency/concurrency/fairness and topic quotas PASS; variable latency, multi-replica load environment not signed off. Strict RC gate was skipped; status unchanged. 2026-10-28 local uncommitted: per-widget source-linked results, independent presenter-only rendering, side-by-side simulated presenter/audience and responsive 16:9 CSS; Node backend 455/455, web 44/44, Python focused 58/58, Chromium offline CSS pointer+geometry 1440/390 PASS. New full GitHub Chromium+PostgreSQL pending; this is NOT acceptance evidence.\n2026-10-28 pending local batch (after last committed e2dc3a97): production WYSIWYG contentEditable DOM ownership fixes duplicated characters and buffers IME composition; desktop/mobile real Chromium offline acceptance PASS including Unicode input. Question-scoped answer revisions derived from existing immutable widget history prevent a change to q2 from reopening q1 responses or resetting its statistics/rankings; 6 API Node tests PASS, full backend 467/467 PASS, web 49/49 PASS. Actual PostgreSQL legacy migration and independent-answer transactional acceptance are added to manual CI but have NOT yet executed on GitHub. No independent sign-off or gate promotion.\n2026-10-28: after successful Full CI 40638652838, the automated evidence-specific B2-DB subgate (weight 2) was formally separated and accepted. Parent remains partial and still requires every independent check listed below.",
+      "remaining": "Production-like variable-latency, long-lived concurrency across replicas and manual presenter/participant timing validation. Linked topic results and real dual-preview interaction added locally post-CI must pass new CI.",
       "current_verified_run": 40595463258,
       "pending_local_evidence_20261028": "WYSIWYG and independent-question implementation passes local TypeScript/Vite, 461 Node API, 46 frontend, 33 focused Python, Chromium component desktop/mobile. Unverified by GitHub and real PostgreSQL; prior accepted gates unchanged."
     },
     {
+      "id": "B2-DB",
+      "area": "B-sessions",
+      "weight": 2,
+      "status": "accepted",
+      "scope": "Transactional independent-question and timed-widget correctness on PostgreSQL 18",
+      "evidence": "GitHub Full CI 40638652838 (a32ef789): PostgreSQL 18 legacy answer migration PASS, 3 independently identified widget questions with 2 participants and revision isolation PASS; timed-widget 12-way concurrency, fairness, retry/expiry and topic quotas PASS.",
+      "remaining": "Maintain PostgreSQL integration tests on changes; sustained variable-latency/multi-replica production acceptance still required in B2.",
+      "verified_run_id": 40638652838,
+      "verified_sha": "a32ef78902a656262d346a0fa622604a4deda405",
+      "acceptance_kind": "bounded_automated_only"
+    },
+    {
       "id": "B3",
       "area": "B-sessions",
-      "weight": 6,
+      "weight": 4,
       "status": "partial",
       "evidence": "Presenter-only Results, chart selection, paginated leaderboards and topic questions exist; word-cloud result projection filters malformed historical labels (2026-10-24); disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24) 2026-10-26 new post-commit delivery (local verification only): PostgreSQL transaction-scoped 3-question quota, page/session locks, vote/moderation fencing, post-commit notification reliability, filtered/paged private moderator queue with counts, 20-item atomic bulk review, reversible decisions, presenter and participant UX, 442 Node tests, targeted 52 Python tests; real PostgreSQL concurrency and Chromium acceptance added to CI, NOT yet executed for this batch. CI 40366108461 (commit 1d4f0e957da2a568c188279e8d8e4fa76cb6dd33) failed: 12-thread same-participant Q&A timed out from PostgreSQL pool starvation (client checked out before nested identity queries); post-failure local fix defers all three audience writes and frees clients before broadcasts, 442 Node/51 focused Python PASS, GitHub real database rerun pending. Verified GitHub CI 40368807527 (mandatory PostgreSQL Q&A 12 clients, quotas, bulk moderation) and full Chromium/PostgreSQL opt-in CI 40369919680 SUCCESS (moderation/revocation and voting, editor, profile, participant). 2026-10-26 post-baseline topic-widget cap corrected with participant FOR UPDATE transaction, session/page fencing, no stale-page write and post-commit notify; local 447 Node and focused Python tests pass, mandatory CI replay PENDING.\n2026-10-27 quality job 122235650919, run 40517573850: PostgreSQL audience Q&A and atomic topic quota, moderation, privacy and Chromium participant acceptance SUCCESS. Screen-reader/cross-browser/physical-device review still pending.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: Chromium + PostgreSQL audience QR join, Q&A moderation/revocation, vote persistence and mobile touch PASS. Strict RC gate was skipped; status unchanged.",
       "remaining": "Cross-browser Firefox/WebKit, physical-device input and independent screen-reader/keyboard accessibility acceptance.",
       "current_verified_run": 40595463258
     },
     {
+      "id": "B3-AUDIENCE",
+      "area": "B-sessions",
+      "weight": 2,
+      "status": "accepted",
+      "evidence": "Authenticated Chromium + PostgreSQL audience acceptance: QR/short-code join, isolated participant votes, HTTP-only reload, Q&A moderation/revocation and privacy; 40638652838. Bounded test receipt; does not certify independent physical-device, legal or operator acceptance.",
+      "remaining": "Maintain full Chromium/PostgreSQL checks on new commits; all independent audits, actual devices and operational requirements remain in parent B3.",
+      "verified_run_id": 40638652838,
+      "verified_commit_sha": "a32ef78902a656262d346a0fa622604a4deda405",
+      "scope": "bounded verified CI acceptance, not comprehensive release or regulatory signoff"
+    },
+    {
       "id": "B4",
       "area": "B-sessions",
-      "weight": 5,
+      "weight": 3,
       "status": "partial",
-      "evidence": "Anonymous participation, polling and QR routes implemented; disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24); two-replica participant/presenter privacy and notification smoke added to CI, pending execution; opt-in 500-client disposable PostgreSQL CI load with presenter observer and privacy assertion authored, not yet executed (2026-10-24) Maintainer confirmed green two-replica CI (2026-10-24). CI 40141894130: opt-in 500 independent participants PASS with presenter-observed peak >=475 and zero errors; PostgreSQL two-replica WebSocket privacy PASS. New 2026-10-25 participant flow implements HttpOnly-cookie reload recovery (boolean-only no-store endpoint), duplicate-vote UI guard, server-filtered results and mobile reflow; adds opt-in Chromium real PostgreSQL two-browser acceptance (not yet run). Local Node/Python suites and builds PASS. GitHub workflow 40144692900 / job 121023419425: Chromium + real PostgreSQL audience PASS for QR/short-code join, isolated participants, vote persistence, HttpOnly reload recovery, idempotency, report privacy, mobile touch and closure (2026-10-25).\n2026-10-27 quality job 122235650919, run 40517573850: opt-in 500-participant PostgreSQL/WebSocket acceptance SUCCESS and two-replica WebSocket/privacy E2E SUCCESS. Sustained operation and real-device acceptance still pending.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: PostgreSQL/WebSocket test: 500 independent participants, presenter-observed peak >=475, zero errors PASS; not production-like sustained throughput. Strict RC gate was skipped; status unchanged.",
+      "evidence": "Anonymous participation, polling and QR routes implemented; disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24); two-replica participant/presenter privacy and notification smoke added to CI, pending execution; opt-in 500-client disposable PostgreSQL CI load with presenter observer and privacy assertion authored, not yet executed (2026-10-24) Maintainer confirmed green two-replica CI (2026-10-24). CI 40141894130: opt-in 500 independent participants PASS with presenter-observed peak >=475 and zero errors; PostgreSQL two-replica WebSocket privacy PASS. New 2026-10-25 participant flow implements HttpOnly-cookie reload recovery (boolean-only no-store endpoint), duplicate-vote UI guard, server-filtered results and mobile reflow; adds opt-in Chromium real PostgreSQL two-browser acceptance (not yet run). Local Node/Python suites and builds PASS. GitHub workflow 40144692900 / job 121023419425: Chromium + real PostgreSQL audience PASS for QR/short-code join, isolated participants, vote persistence, HttpOnly reload recovery, idempotency, report privacy, mobile touch and closure (2026-10-25).\n2026-10-27 quality job 122235650919, run 40517573850: opt-in 500-participant PostgreSQL/WebSocket acceptance SUCCESS and two-replica WebSocket/privacy E2E SUCCESS. Sustained operation and real-device acceptance still pending.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: PostgreSQL/WebSocket test: 500 independent participants, presenter-observed peak >=475, zero errors PASS; not production-like sustained throughput. Strict RC gate was skipped; status unchanged.\n2026-10-28: after successful Full CI 40638652838, the automated evidence-specific B4-LOAD subgate (weight 2) was formally separated and accepted. Parent remains partial and still requires every independent check listed below.",
       "remaining": "Sustained representative throughput/memory and latency percentiles, failure-injection recovery, independent real-device and accessibility acceptance.",
       "current_verified_run": 40595463258
     },
     {
+      "id": "B4-LOAD",
+      "area": "B-sessions",
+      "weight": 2,
+      "status": "accepted",
+      "scope": "Bounded 500-participant CI capacity and two-replica WebSocket isolation",
+      "evidence": "GitHub Full CI 40638652838 (a32ef789): 500 independent participants with observer peak >=475 and no errors PASS; PostgreSQL two-replica WebSocket opening/response/close/privacy E2E PASS.",
+      "remaining": "Maintain bounded disposable CI capacity tests; real-world sustained latency/memory throughput and device accessibility remain required in B4.",
+      "verified_run_id": 40638652838,
+      "verified_sha": "a32ef78902a656262d346a0fa622604a4deda405",
+      "acceptance_kind": "bounded_automated_only"
+    },
+    {
       "id": "C1",
       "area": "C-admin",
-      "weight": 6,
+      "weight": 4,
       "status": "partial",
-      "evidence": "TOTP enrolment, recovery codes, admin reset and revoke checks; Node unit and contract tests 2026-10-26 local 40-item batch: profile-image metadata/role-neutral profile and atomic admin user update with Node/Python/build PASS; new real PostgreSQL HTTP/Chromium acceptance wired but not yet executed; status unchanged.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: PostgreSQL profile lifecycle, baseline auth, revocation, duplicate/import and API login tests PASS; full account recovery browser and multi-replica revocation not signed off. Strict RC gate was skipped; status unchanged.",
-      "remaining": "Complete password/account recovery browser acceptance including error cases, multi-replica revocation and operational security review.",
+      "evidence": "TOTP enrolment, recovery codes, admin reset and revoke checks; Node unit and contract tests 2026-10-26 local 40-item batch: profile-image metadata/role-neutral profile and atomic admin user update with Node/Python/build PASS; new real PostgreSQL HTTP/Chromium acceptance wired but not yet executed; status unchanged.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: PostgreSQL profile lifecycle, baseline auth, revocation, duplicate/import and API login tests PASS; full account recovery browser and multi-replica revocation not signed off. Strict RC gate was skipped; status unchanged.\n2026-10-28: identity/login and session lifecycle accepted only as bounded C1-AUTH (previous green GitHub run 40638652838). New password-recovery PostgreSQL/SMTPS fixture is pending GitHub; it receives zero RC points.",
+      "remaining": "Complete password/account recovery browser acceptance (delivery, expiry, replay, multi-session and multi-replica revocation); operational security review and external provider checks remain open. A newly wired disposable PostgreSQL/SMTPS acceptance is not verified on GitHub yet.",
       "current_verified_run": 40595463258
+    },
+    {
+      "id": "C1-AUTH",
+      "area": "C-admin",
+      "weight": 2,
+      "status": "accepted",
+      "evidence": "Previously verified GitHub full CI 40638652838 (a32ef78902a656262d346a0fa622604a4deda405): baseline authenticated API login, HTTP/PostgreSQL user/profile lifecycle, credential rotation and session invalidation; PostgreSQL/TLS SMTP MFA login, challenge and revocation tests PASS. Only these automated auth controls are accepted, not recovery email/link/browser acceptance or independent operational sign-off.",
+      "remaining": "New end-to-end recovery password SMTP link+expiry+replay+old session invalidation fixture and independent provider, multi-replica and browser acceptance stay with C1 parent.",
+      "verified_run_id": 40638652838,
+      "verified_commit_sha": "a32ef78902a656262d346a0fa622604a4deda405"
     },
     {
       "id": "C2",
       "area": "C-admin",
-      "weight": 5,
+      "weight": 3,
       "status": "partial",
-      "evidence": "Email OTP login independent of TOTP; new password-authenticated enrollment emails a ten-minute OTP, verifies it under PostgreSQL row lock (five attempts, three issuance requests/minute/account), enables only after verification and revokes prior sessions. UI and backend compile, Node contract tests pass (2026-10-24). 2026-10-26 uncommitted: disposable loopback SMTPS TLS/strict certificate verification, real PostgreSQL+SMTP HTTP fixture for 10-minute enrollment, wrong codes, 5-minute login OTP, concurrent single-use, five-guess lockout, expiry, session revocation and disable; SMTP delivery error no longer deletes a newer reissued challenge and enrollment email now states the correct 10-minute expiration. Local SMTP protocol tests PASS; new CI integration not yet run. GitHub Actions 40357682660 on SHA 9cb78869b753498909f634352f5d9f4f3f5ff0a8 successfully executed mandatory real PostgreSQL/TLS SMTP email MFA E2E (after global shared-IP quota isolation). Overall quality later failed in isolated Python SMTPS fixture due runner-password inheritance; protocol-fixture hotfix verified locally only (25 focused Python checks). GitHub Actions 40359804334 (2026-10-26) confirmed PostgreSQL/TLS SMTP MFA lifecycle SUCCESS after the isolated-test credential fix.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: PostgreSQL + loopback TLS SMTP email MFA enrollment, invalid, concurrent OTP, expiry, lockout and revocation PASS; external provider not tested. Strict RC gate was skipped; status unchanged.",
+      "evidence": "Email OTP login independent of TOTP; new password-authenticated enrollment emails a ten-minute OTP, verifies it under PostgreSQL row lock (five attempts, three issuance requests/minute/account), enables only after verification and revokes prior sessions. UI and backend compile, Node contract tests pass (2026-10-24). 2026-10-26 uncommitted: disposable loopback SMTPS TLS/strict certificate verification, real PostgreSQL+SMTP HTTP fixture for 10-minute enrollment, wrong codes, 5-minute login OTP, concurrent single-use, five-guess lockout, expiry, session revocation and disable; SMTP delivery error no longer deletes a newer reissued challenge and enrollment email now states the correct 10-minute expiration. Local SMTP protocol tests PASS; new CI integration not yet run. GitHub Actions 40357682660 on SHA 9cb78869b753498909f634352f5d9f4f3f5ff0a8 successfully executed mandatory real PostgreSQL/TLS SMTP email MFA E2E (after global shared-IP quota isolation). Overall quality later failed in isolated Python SMTPS fixture due runner-password inheritance; protocol-fixture hotfix verified locally only (25 focused Python checks). GitHub Actions 40359804334 (2026-10-26) confirmed PostgreSQL/TLS SMTP MFA lifecycle SUCCESS after the isolated-test credential fix.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: PostgreSQL + loopback TLS SMTP email MFA enrollment, invalid, concurrent OTP, expiry, lockout and revocation PASS; external provider not tested. Strict RC gate was skipped; status unchanged.\n2026-10-28 evidence reconciliation: automatic CI subgate C2-TLS split from broad partial gate, without claiming outstanding external acceptance.",
       "remaining": "Independent real SMTP providers, outage and cross-replica retries, production deliverability, recovery UI and operator sign-off.",
       "current_verified_run": 40595463258
     },
     {
+      "id": "C2-TLS",
+      "area": "C-admin",
+      "weight": 2,
+      "status": "accepted",
+      "evidence": "Disposable SMTP over real TLS + PostgreSQL CI: MFA email enrollment, replay/expiry/lockout, revocation and bypass prevention.",
+      "remaining": "Maintain the verified CI proof on future changes; all untested production and independent requirements stay within the partial parent gate C2.",
+      "verified_run_id": 40638652838,
+      "verified_commit_sha": "a32ef78902a656262d346a0fa622604a4deda405",
+      "scope": "bounded automatic engineering test (not independent production/operator signoff)"
+    },
+    {
       "id": "C3",
       "area": "C-admin",
-      "weight": 6,
+      "weight": 4,
       "status": "partial",
       "evidence": "Social OAuth/OIDC and admin configuration code exists",
-      "remaining": "Real Google/GitHub/Facebook provider redirects, state/error/mismatch cases, browser E2E and operator approval.",
+      "remaining": "Real Google/GitHub/Facebook provider redirects, state/error/mismatch cases, browser E2E and operator approval. Real provider consent, redirects and callback across Google/GitHub/Facebook; cross-replica state, expiry/replay, denied linking, authenticated browser flows, external operator sign-off. Local post-commit OAuth redirect/secret hardening pending new CI.",
       "current_verified_run": null
+    },
+    {
+      "id": "C3-AUTO",
+      "area": "C-admin",
+      "weight": 2,
+      "status": "accepted",
+      "verified_run_id": 40638652838,
+      "verified_commit_sha": "a32ef78902a656262d346a0fa622604a4deda405",
+      "evidence": "GitHub FULL CI 40638652838 / production quality job 122651676251 on a32ef78902a656262d346a0fa622604a4deda405: Node OIDC provider HTTPS/PKCE/state checks #103-104, RS256 JWKS signature validation #106, generic provider registration #107, claim validity #109, social OAuth state #360, Facebook authorization scope #361, together with build and CI checks passed. Narrow acceptance ONLY for deterministic federated-auth protocol primitives tested in Node, NOT real external provider login or browser. The newer credential-URL and redirect hardening was developed AFTER this run and is explicitly excluded.",
+      "remaining": "Maintain protocol regression tests on further code; external OAuth provider redirects/callback, browser integration, multifactor integration and multi-replica operator acceptance remain within partial gate C3."
     },
     {
       "id": "C4",
       "area": "C-admin",
-      "weight": 5,
+      "weight": 3,
       "status": "partial",
       "evidence": "Administrative directory, profile/preferences, transactional platform settings, and locked private-photo replacement/deletion implemented; build and local unit tests pass (2026-10-24). Post-commit profile cycle 2026-10-26: session-scoped public presenter photo projection (anonymous widget previously used private auth-only URL); atomic nickname+display_name PostgreSQL update; legacy profile name update no longer rewrites photo; one-button frontend save and automatic profile load. Local 317 Node/660 Python and API/web builds PASS; real PostgreSQL/browser pending. 2026-10-26 local 40-item batch: profile-image metadata/role-neutral profile and atomic admin user update with Node/Python/build PASS; new real PostgreSQL HTTP/Chromium acceptance wired but not yet executed; status unchanged. 2026-10-26 privacy hardening: retention update now requires actual session owner; new sessions use administrator-configured default; unit and CI acceptance added, CI pending. 2026-10-26 post-commit: atomic account-deletion avatar queue and atomic old-photo replacement enqueue, bounded leased erasure workers, local file/symlink and 44 Node + 10 Python newly added regression tests PASS; CI PostgreSQL acceptance authored, not executed. No promotion. GitHub CI 40331628755: PostgreSQL profile lifecycle passed, but downstream erasure integration failed on timestamp fence; three worker claim SQL expressions corrected to JS-millisecond precision locally and 433 Node/708 Python PASS, CI replay pending. GitHub Actions 40349577790: 433 Node unit tests and production TS builds PASS, disposable SMTP fixture started, but PostgreSQL email MFA E2E interrupted by shared-IP API throttle 429 after prior profile suite; no MFA browser or full positive CI acceptance established. Local hotfix adds non-production ephemeral load token to MFA-only test requests and regression tests; remote rerun pending (2026-10-26).\n2026-10-27 quality job 122235650919, run 40517573850: browser presenter profile upload and anonymous avatar E2E PASS, PostgreSQL profile lifecycle and durable erasure, email MFA PASS. Operator/real RWX multi-replica tests outstanding.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: Chromium + PostgreSQL presenter profile photo upload, public anonymous scoped avatar, private denial and deletion PASS; real RWX/ClamAV deployment not tested. Strict RC gate was skipped; status unchanged.",
-      "remaining": "Multi-replica RWX storage and ClamAV deployment with concurrent uploads, long-term data lifecycle and real-device/AT acceptance.",
+      "remaining": "Unverified residual: multi-replica RWX storage and actual ClamAV deployment with concurrent uploads, deployment/backup key lifecycle, physical-device and independent assistive-technology acceptance. Presenter profile/PostgreSQL/browser coverage is separated into C4-PROFILE, not a claim that these residual checks passed.",
       "current_verified_run": 40595463258
+    },
+    {
+      "id": "C4-PROFILE",
+      "area": "C-admin",
+      "weight": 2,
+      "status": "accepted",
+      "evidence": "GitHub Full CI 40638652838, commit a32ef78902a656262d346a0fa622604a4deda405: Chromium presenter profile upload/preview, anonymously scoped avatar, private photo access denial and deletion PASS; PostgreSQL HTTP atomic profile update, photo metadata and access revocation PASS; PostgreSQL retention/erasure outbox physical asset deletion, retry/backoff and lease fencing PASS. Same scoped browser/PG profile acceptance PASS in full CI 40595463258. Bounded automated acceptance only; no evidence of real RWX/ClamAV or external device/AT sign-off.",
+      "remaining": "Continue re-running bounded profile security/browser/storage tests for each change; remaining real multi-replica RWX, ClamAV and independent device/AT acceptance is in C4.",
+      "verified_run_id": 40638652838,
+      "verified_sha": "a32ef78902a656262d346a0fa622604a4deda405"
     },
     {
       "id": "D1",
@@ -128,77 +227,222 @@
     {
       "id": "D2",
       "area": "D-validation",
-      "weight": 6,
+      "weight": 4,
       "status": "partial",
-      "evidence": "Maintainer confirmed CI green (2026-10-24) including PostgreSQL 18 backup/restore into fresh disposable database, schema bootstrap and two-replica WebSocket acceptance. New local DR preflight and staged checksum regressions pass (2026-10-24); negative populated-DB restore, schema parity and timing instrumentation added to CI, awaiting next run. CI 40141894130: PostgreSQL 18 backup/restore PASS including populated-database refusal, schema/row parity, private assets, integrity and overwrite rejection; measured CI sample backup=0.18s restore=0.34s (not SLA).\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: PostgreSQL 18 backup/restore test PASS with populated DB refusal, schema and row parity, private assets, integrity; CI sample timings not an RTO/RPO SLA. Strict RC gate was skipped; status unchanged.",
+      "evidence": "Maintainer confirmed CI green (2026-10-24) including PostgreSQL 18 backup/restore into fresh disposable database, schema bootstrap and two-replica WebSocket acceptance. New local DR preflight and staged checksum regressions pass (2026-10-24); negative populated-DB restore, schema parity and timing instrumentation added to CI, awaiting next run. CI 40141894130: PostgreSQL 18 backup/restore PASS including populated-database refusal, schema/row parity, private assets, integrity and overwrite rejection; measured CI sample backup=0.18s restore=0.34s (not SLA).\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: PostgreSQL 18 backup/restore test PASS with populated DB refusal, schema and row parity, private assets, integrity; CI sample timings not an RTO/RPO SLA. Strict RC gate was skipped; status unchanged.\n2026-10-28 evidence reconciliation: automatic CI subgate D2-DR split from broad partial gate, without claiming outstanding external acceptance.",
       "remaining": "Production-like restore drill, encrypted backups/key rotation, complete retention policy and measured recovery objectives on representative datasets.",
       "current_verified_run": 40595463258
     },
     {
+      "id": "D2-DR",
+      "area": "D-validation",
+      "weight": 2,
+      "status": "accepted",
+      "evidence": "PostgreSQL 18 CI backup/restore: refuse populated destination, parity of schema and rows, asset integrity and overwrite rejection. No production RPO/RTO claim.",
+      "remaining": "Maintain the verified CI proof on future changes; all untested production and independent requirements stay within the partial parent gate D2.",
+      "verified_run_id": 40638652838,
+      "verified_commit_sha": "a32ef78902a656262d346a0fa622604a4deda405",
+      "scope": "bounded automatic engineering test (not independent production/operator signoff)"
+    },
+    {
       "id": "D3",
       "area": "D-validation",
-      "weight": 4,
+      "weight": 2,
       "status": "partial",
-      "evidence": "Docker/Podman/Helm manifests and workflows exist CI 40141894130 container build gate SUCCESS, including runtime and converter image scans (runner architecture only). GitHub workflow 40335963980 publisher completed multi-platform linux/amd64 and linux/arm64 build/push with SBOM/provenance; this does NOT prove runnable ARM64, rootless Podman or Kubernetes multi-replica acceptance. New publication policy is manual-only, awaiting its first CI.\n2026-10-27 manually dispatched GitHub workflow 40517573850 / publication job 122239629249 SUCCESS, commit e372a3aec8ba6b028283e9d00f68305a39562ed8. Multi-platform Buildx output includes linux/amd64 and linux/arm64 provenance, and pushed docker.io/desalvo/quorivio:latest and docker.io/desalvo/quorivio:sha-e372a3aec8ba with digest sha256:2be79bc6ca99fa22b6f970c8bb97d9162b4943dafd27c80d3eb1b60ebc474e41. Quality and container scanning gates also SUCCESS. Proof of image build/push, not actual ARM64, Podman rootless, or Kubernetes runtime acceptance.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: Container gate PASS; manual publication built/pushed linux/amd64 and linux/arm64 with SBOM/provenance (runtime smoke on arm64/Podman/Helm not tested). Strict RC gate was skipped; status unchanged.",
+      "evidence": "Docker/Podman/Helm manifests and workflows exist CI 40141894130 container build gate SUCCESS, including runtime and converter image scans (runner architecture only). GitHub workflow 40335963980 publisher completed multi-platform linux/amd64 and linux/arm64 build/push with SBOM/provenance; this does NOT prove runnable ARM64, rootless Podman or Kubernetes multi-replica acceptance. New publication policy is manual-only, awaiting its first CI.\n2026-10-27 manually dispatched GitHub workflow 40517573850 / publication job 122239629249 SUCCESS, commit e372a3aec8ba6b028283e9d00f68305a39562ed8. Multi-platform Buildx output includes linux/amd64 and linux/arm64 provenance, and pushed docker.io/desalvo/quorivio:latest and docker.io/desalvo/quorivio:sha-e372a3aec8ba with digest sha256:2be79bc6ca99fa22b6f970c8bb97d9162b4943dafd27c80d3eb1b60ebc474e41. Quality and container scanning gates also SUCCESS. Proof of image build/push, not actual ARM64, Podman rootless, or Kubernetes runtime acceptance.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: Container gate PASS; manual publication built/pushed linux/amd64 and linux/arm64 with SBOM/provenance (runtime smoke on arm64/Podman/Helm not tested). Strict RC gate was skipped; status unchanged.\n2026-10-28 evidence reconciliation: automatic CI subgate D3-IMAGE split from broad partial gate, without claiming outstanding external acceptance.",
       "remaining": "Actual native ARM64 start/smoke, rootless Podman, multi-replica Kubernetes with HAProxy and NGINX ingress, secrets/TLS, RWX/ClamAV failover.",
       "current_verified_run": 40595463258
     },
     {
+      "id": "D3-IMAGE",
+      "area": "D-validation",
+      "weight": 2,
+      "status": "accepted",
+      "evidence": "Multi-architecture Buildx linux/amd64 + linux/arm64 image build and upload with SBOM/provenance previously confirmed in 40595463258, plus image-build and Trivy scans in 40638652838. Not native ARM64 execution.",
+      "remaining": "Maintain the verified CI proof on future changes; all untested production and independent requirements stay within the partial parent gate D3.",
+      "verified_run_id": 40595463258,
+      "verified_commit_sha": "e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9",
+      "scope": "bounded automatic engineering test (not independent production/operator signoff)"
+    },
+    {
       "id": "D4",
       "area": "D-validation",
-      "weight": 5,
+      "weight": 3,
       "status": "partial",
-      "evidence": "Isolated document converter, upload validation, CSRF and security tests exist; offline 500-user shard reconciler and eight unit tests added (unexecuted against real staging). Follow-up: aggregate pre-inflate ZIP quotas and strict UTF-8 manifest checks tested locally; does not constitute runtime security acceptance.; native PPTX OOXML security/roundtrip regression locally PASS (11 cases, 2026-10-24) CI 40141894130: real disposable PostgreSQL/WebSocket opt-in 500 independent participants PASS, presenter-observed peak >=475, zero errors; high/critical vulnerability gate and image scans PASS; converter/portability unit and Python suites PASS. This is partial evidence, not complete production security acceptance. Additional boolean-only participant recovery and browser privacy acceptance authored 2026-10-25, pending real CI execution. After workflow 40144692900 green baseline, 30-intervention converter batch unifies OOXML admission, private atomic publication, PNG integrity and HTTP strictness; 58 new Python tests PASS locally, including real 12-page PDF and real LibreOffice PPTX. New CI pending (2026-10-25). Second uncommitted conversion batch: full PNG/JPEG decoding, OOXML path/relationship hardening, typed export preflight, exclusive atomic native PPTX/JSON publication, SHA-256 worker source fencing and symlinked-root refusal; 35 new behavior tests locally PASS (2026-10-25), CI pending. Third uncommitted 30-intervention conversion batch: full PNG chunk CRC/stream decoding, encrypted/JavaScript PDF rejection, full OOXML DTD/URI/active-object checks, strict worker HTTP framing and Bearer authentication; 43 additional behavior tests PASS locally (418 Python total, 215 Node, builds PASS, 2026-10-25). Fourth uncommitted 30-case conversion hardening: OOXML relationship target resolution and encoded URI controls, stricter editable PPTX style/geometry/media preflight, verified in-memory image serialization, and 30 new behavior tests; 448 Python tests PASS locally (2026-10-25), CI pending. Fifth conversion batch: 30 new real PPTX import/export/negative fidelity checks, 6 Node API validation tests; local 478 Python, 221 Node, API/web builds PASS; new GitHub CI pending (2026-10-25). Sixth uncommitted batch: real 12-slide LibreOffice/Poppler raster comparisons after editable PPTX roundtrip, whitespace/Unicode and presenter fidelity fixes, explicit lossy audit flags. 512 Python and 221 Node local PASS; GitHub CI pending (2026-10-25). Seventh conversion batch: 30 native crop cases including 12 real LibreOffice/Poppler raster comparisons, 4 Node validators and 6 frontend source contracts; local 548 Python and 225 Node PASS, API/web builds PASS; all seven conversion batches uncommitted and GitHub CI pending (2026-10-25). Eighth uncommitted batch adds 30 synthetic PowerPoint native shape paint acceptance cases; local results do not establish CI green (2026-10-25). Maintainer confirmed GitHub Actions 40192172978 SUCCESS for all eight preceding conversion batches including real visual regression, container scan/build and publication (2026-10-25).\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: High/critical npm vulnerability gate, credential leak scan, Docker image scans and 500-participant opt-in PASS; independent security sign-off open. Strict RC gate was skipped; status unchanged.",
+      "evidence": "Isolated document converter, upload validation, CSRF and security tests exist; offline 500-user shard reconciler and eight unit tests added (unexecuted against real staging). Follow-up: aggregate pre-inflate ZIP quotas and strict UTF-8 manifest checks tested locally; does not constitute runtime security acceptance.; native PPTX OOXML security/roundtrip regression locally PASS (11 cases, 2026-10-24) CI 40141894130: real disposable PostgreSQL/WebSocket opt-in 500 independent participants PASS, presenter-observed peak >=475, zero errors; high/critical vulnerability gate and image scans PASS; converter/portability unit and Python suites PASS. This is partial evidence, not complete production security acceptance. Additional boolean-only participant recovery and browser privacy acceptance authored 2026-10-25, pending real CI execution. After workflow 40144692900 green baseline, 30-intervention converter batch unifies OOXML admission, private atomic publication, PNG integrity and HTTP strictness; 58 new Python tests PASS locally, including real 12-page PDF and real LibreOffice PPTX. New CI pending (2026-10-25). Second uncommitted conversion batch: full PNG/JPEG decoding, OOXML path/relationship hardening, typed export preflight, exclusive atomic native PPTX/JSON publication, SHA-256 worker source fencing and symlinked-root refusal; 35 new behavior tests locally PASS (2026-10-25), CI pending. Third uncommitted 30-intervention conversion batch: full PNG chunk CRC/stream decoding, encrypted/JavaScript PDF rejection, full OOXML DTD/URI/active-object checks, strict worker HTTP framing and Bearer authentication; 43 additional behavior tests PASS locally (418 Python total, 215 Node, builds PASS, 2026-10-25). Fourth uncommitted 30-case conversion hardening: OOXML relationship target resolution and encoded URI controls, stricter editable PPTX style/geometry/media preflight, verified in-memory image serialization, and 30 new behavior tests; 448 Python tests PASS locally (2026-10-25), CI pending. Fifth conversion batch: 30 new real PPTX import/export/negative fidelity checks, 6 Node API validation tests; local 478 Python, 221 Node, API/web builds PASS; new GitHub CI pending (2026-10-25). Sixth uncommitted batch: real 12-slide LibreOffice/Poppler raster comparisons after editable PPTX roundtrip, whitespace/Unicode and presenter fidelity fixes, explicit lossy audit flags. 512 Python and 221 Node local PASS; GitHub CI pending (2026-10-25). Seventh conversion batch: 30 native crop cases including 12 real LibreOffice/Poppler raster comparisons, 4 Node validators and 6 frontend source contracts; local 548 Python and 225 Node PASS, API/web builds PASS; all seven conversion batches uncommitted and GitHub CI pending (2026-10-25). Eighth uncommitted batch adds 30 synthetic PowerPoint native shape paint acceptance cases; local results do not establish CI green (2026-10-25). Maintainer confirmed GitHub Actions 40192172978 SUCCESS for all eight preceding conversion batches including real visual regression, container scan/build and publication (2026-10-25).\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: High/critical npm vulnerability gate, credential leak scan, Docker image scans and 500-participant opt-in PASS; independent security sign-off open. Strict RC gate was skipped; status unchanged.\n2026-10-28 scoring reconciliation: bounded automated supply-chain checks (npm high/critical, GitLeaks, image build/scan) separated as accepted D4-SCAN on previously green full CI 40638652838; D4 retains pentest, threat review, AGID and fidelity sign-offs.",
       "remaining": "Independent pentest/security and AGID accessibility sign-off, third-party Microsoft Office PPTX fidelity corpus and deployment threat review.",
       "current_verified_run": 40595463258
     },
     {
+      "id": "D4-SCAN",
+      "area": "D-validation",
+      "weight": 2,
+      "status": "accepted",
+      "evidence": "GitHub Actions full CI 40638652838, commit a32ef78902a656262d346a0fa622604a4deda405; quality, vulnerability and credential-leak checks, licensed IT/EN documentation, container build gate all SUCCESS. Bounded repeatable CI-only automated supply-chain/credential scanning. This is not a third-party penetration test or deployment security accreditation.",
+      "remaining": "Rerun security and container scanning on future changes; external pentest, threat review and AGID assessments remain in partial parent D4."
+    },
+    {
       "id": "D5",
       "area": "D-validation",
-      "weight": 5,
+      "weight": 3,
       "status": "partial",
-      "evidence": "Six IT/EN role manuals regenerated from source (2026-10-24), with verified matching front cover and updated MFA/portable/admin chapters; Markdown technical references updated.",
+      "evidence": "Six IT/EN role manuals regenerated from source (2026-10-24), with verified matching front cover and updated MFA/portable/admin chapters; Markdown technical references updated.\n2026-10-28 scoring reconciliation: bounded existence/format and bilingual documentation quality gate separated as D5-TECHDOC on previous green CI 40638652838; no manual editorial or operator acceptance inferred.",
       "remaining": "Independent editorial and IT/EN operator review, current screenshot verification and end-user acceptance of manuals.",
       "current_verified_run": null
     },
     {
+      "id": "D5-TECHDOC",
+      "area": "D-validation",
+      "weight": 2,
+      "status": "accepted",
+      "evidence": "GitHub Actions full CI 40638652838, commit a32ef78902a656262d346a0fa622604a4deda405; quality, vulnerability and credential-leak checks, licensed IT/EN documentation, container build gate all SUCCESS. The license, README EN/IT, GDPR EN/IT and nonempty generated admin/user PDF manuals EN/IT passed the GitHub documentation gate. Existence, not independent editorial correctness.",
+      "remaining": "Rerun automated documentary existence/format checks on future changes; all bilingual editorial, actual screenshot review and operator acceptance stay in partial D5."
+    },
+    {
       "id": "D6",
       "area": "D-validation",
-      "weight": 5,
+      "weight": 3,
       "status": "partial",
       "evidence": "GDPR registers and CI security scanning configuration documented CI 40141894130 vulnerability and credential-leak gates PASS; not a GDPR audit. 2026-10-26 RC hardening batch: session-specific retention now governs PostgreSQL purging, global setting only defaults new sessions, owner-only retention updates, durable atomic DB/media cleanup outbox with replica-safe leased retries, local Node/contract tests and CI PostgreSQL transactional acceptance added (CI not yet executed). 2026-10-26 post-commit: independent durable file/avatar cleanup queues, leased/fenced capped retries, narrowed filesystem deletes, admin-only aggregate erasure diagnostics and minute worker cadence implemented; local Node 430/430 and Python 707/707 PASS; mandatory PostgreSQL CI erasure smoke extended but not yet run on this revision. Score unchanged. Real PostgreSQL CI 40331628755 exposed a lease ACK mismatch (microsecond timestamp vs JS Date milliseconds). Truncated all three outbox lease claim timestamps to milliseconds without weakening lease fences; Node 433/433, Python 708/708 PASS locally; updated live PostgreSQL fixture checks exact ACK and stale lease rejection. CI rerun pending. Verified real GitHub Actions workflow 40335963980 on committed SHA dd806243e2dff0c8b608ff43d5ae9848d48361ad: PostgreSQL 18 retention and durable physical-asset erasure integration SUCCESS, two-replica WebSocket/privacy SUCCESS, database restore SUCCESS, image security scanning and high/critical npm audit SUCCESS. This is independent evidence for partial technical controls only, not an AGID, GDPR or external security sign-off. 2026-10-26 new uncommitted opt-in Docker publication policy and disposable TLS SMTP real-PostgreSQL email MFA acceptance fixture authored; CI still pending.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: PostgreSQL session retention/asset outbox/media erasure and privacy checks PASS; GDPR/AGID operational/legal approval open. Strict RC gate was skipped; status unchanged.",
       "remaining": "Independent GDPR/legal and AGID assessment, encrypted backup and key rotation operational reviews, retention/erasure audit and RWX storage sign-off.",
       "current_verified_run": 40595463258
+    },
+    {
+      "id": "D6-ERASURE",
+      "area": "D-validation",
+      "weight": 2,
+      "status": "accepted",
+      "evidence": "PostgreSQL 18 automatic session retention, durable asset cleanup outbox, physical file/photo deletion, scoped access, retry/backoff and lease fencing; 40638652838. Bounded test receipt; does not certify independent physical-device, legal or operator acceptance.",
+      "remaining": "Maintain full Chromium/PostgreSQL checks on new commits; all independent audits, actual devices and operational requirements remain in parent D6.",
+      "verified_run_id": 40638652838,
+      "verified_commit_sha": "a32ef78902a656262d346a0fa622604a4deda405",
+      "scope": "bounded verified CI acceptance, not comprehensive release or regulatory signoff"
     }
   ],
   "last_verified_full_ci": {
-    "run_id": 40595463258,
-    "head_sha": "e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9",
+    "run_id": 40638652838,
+    "head_sha": "a32ef78902a656262d346a0fa622604a4deda405",
     "conclusion": "success",
+    "jobs": {
+      "Production quality gate": "success",
+      "Container build gate": "success",
+      "Production publication": "skipped"
+    },
     "strict_rc_gate": "skipped",
-    "rc_score": 53.0
+    "rc_score_reconciled_after_review": 56.0,
+    "prior_score": 53.0
   },
   "pending_local_batch": {
-    "date": "2026-10-28",
-    "baseline_commit": "6f48c16593360efb8f74f4d07de81b4c46f4eae2",
-    "baseline_archive": "quorivio-0.1.0-dev-rc-question-revision-wysiwyg-ime-hardening-cumulative.zip",
-    "failure": {
-      "run": 40614893046,
-      "failures": 4,
-      "python_test_count": 910,
-      "step": "Kubernetes wizard and worker integration tests"
-    },
-    "fix": "WYSIWYG contenteditable real browser contract, Enter/Escape finish, updated rehearsal and picture-crop tests",
-    "local_build": "PASS API TypeScript/Web TypeScript/Vite",
-    "node_backend": "467/467 PASS",
-    "node_web": "49/49 PASS",
-    "python_all": "910/910 PASS local Python 3.13",
-    "chromium": "PASS isolated real component and context/double-click across 1440px/390px",
-    "github_ci": "NOT YET RERUN on hotfix",
-    "postgresql_18_live": "Mandatory real-browser CI and legacy migration remain to be replayed",
-    "gate_promotions": [],
-    "rc_score": 53.0,
-    "rc_ready": false,
-    "next": "Run standard GitHub CI, then browser_test=true publish_image=false; require PostgreSQL real editor/multi-question and security/container gates."
+    "scope": "Google/GitHub/Facebook OAuth/OIDC egress hardening: callback path validation, no redirect following during token/userinfo/discovery, secret never in URL for Facebook token exchange, access token only in bearer header with HMAC appsecret_proof. Added six deterministic provider stubs; entire previous uncommitted cumulative baseline retained.",
+    "new_feature_promoted": false,
+    "new_ci_required": true,
+    "opt_in_command": "workflow_dispatch browser_test=true publish_image=false",
+    "last_user_confirmed_commit": "a32ef78902a656262d346a0fa622604a4deda405"
+  },
+  "scoring_reconciliation_20261028": {
+    "baseline_score": 53.0,
+    "reconciled_score": 56.0,
+    "score_change": 3.0,
+    "original_gate_count": 18,
+    "reconciled_gate_count": 21,
+    "new_accepted_subgates": [
+      "A3-AUTO",
+      "B2-DB",
+      "B4-LOAD"
+    ],
+    "underlying_green_run_id": 40638652838,
+    "underlying_sha": "a32ef78902a656262d346a0fa622604a4deda405",
+    "new_feature_excluded_from_score": "topic-question source-linked results and simulation pending new GitHub Full CI",
+    "strict_rc_ready": false
+  },
+  "scoring_reconciliation_20261028_cycle2": {
+    "baseline_score": 56,
+    "new_score": 60,
+    "delta_points": 4,
+    "previous_gate_count": 21,
+    "new_gate_count": 25,
+    "new_accepted_subgates": [
+      "B1-WS",
+      "C2-TLS",
+      "D2-DR",
+      "D3-IMAGE"
+    ],
+    "source_ci_runs": [
+      40638652838,
+      40595463258
+    ],
+    "acceptance_boundary": "Only evidence-scoped past verified CI checks. New rehearsal keyboard guard is proven locally but NOT credited until a new opt-in GitHub run. All broad and independent parent gates remain partial; strict RC remains blocked.",
+    "publish_image": false
+  },
+  "scoring_reconciliation_20261028_cycle3": {
+    "baseline_score": 60.0,
+    "new_score": 61.0,
+    "delta_points": 1.0,
+    "previous_gate_count": 25,
+    "new_gate_count": 26,
+    "new_accepted_subgates": [
+      "C4-PROFILE"
+    ],
+    "source_ci_runs": [
+      40638652838,
+      40595463258
+    ],
+    "evidence_boundary": "Only already-successful authenticated Chromium + real PostgreSQL profile/photo/asset-erasure acceptance. C4 still partial for real RWX/ClamAV multi-replica, independent browsers and devices. Newly implemented modal inert/aria-hidden and full-app Chrome fixture are local or pending new GitHub opt-in run and receive ZERO new points. Strict RC remains blocked.",
+    "new_committed_baseline": "a32ef78902a656262d346a0fa622604a4deda405"
+  },
+  "scoring_reconciliation_20261028_cycle4": {
+    "baseline_score": 61.0,
+    "new_score": 63.0,
+    "delta_points": 2.0,
+    "previous_gate_count": 26,
+    "new_gate_count": 28,
+    "new_accepted_subgates": [
+      "B3-AUDIENCE",
+      "D6-ERASURE"
+    ],
+    "source_ci_run": 40638652838,
+    "verified_commit_sha": "a32ef78902a656262d346a0fa622604a4deda405",
+    "boundary": "Only bounded prior green CI evidence; full Chrome preview submission parity changed after this commit, local-only and NOT scored. B3 and D6 parent independent acceptance remains partial; strict RC remains blocked.",
+    "not_committed": "All changes since a32ef78902a656262d346a0fa622604a4deda405"
+  },
+  "scoring_reconciliation_20261028_cycle5": {
+    "baseline_score": 63.0,
+    "new_score": 65.0,
+    "delta_points": 2.0,
+    "previous_gate_count": 28,
+    "new_gate_count": 30,
+    "new_accepted_subgates": [
+      "D4-SCAN",
+      "D5-TECHDOC"
+    ],
+    "source_full_ci_run": 40638652838,
+    "source_commit": "a32ef78902a656262d346a0fa622604a4deda405",
+    "acceptance_boundary": "Only previously green CI scanning and documentation existence gate are credited, with split original weights. New timed-quiz rehearsal behavior is locally tested and DOES NOT contribute before new GitHub CI. Original D4/D5 external audits remain partial. Strict RC not ready."
+  },
+  "scoring_reconciliation_20261028_cycle6": {
+    "baseline_score": 65.0,
+    "new_score": 66.0,
+    "delta_points": 1.0,
+    "previous_gate_count": 30,
+    "new_gate_count": 31,
+    "new_accepted_subgates": [
+      "C1-AUTH"
+    ],
+    "source_full_ci_run": 40638652838,
+    "source_commit": "a32ef78902a656262d346a0fa622604a4deda405",
+    "acceptance_boundary": "Only previously green PostgreSQL authenticated login/account lifecycle and SMTP MFA revocation accepted. The new PostgreSQL/SMTP password-reset E2E has not been run remotely and earns zero new points. C1 remains partial; strict RC readiness false."
+  },
+  "scoring_reconciliation_20261028_cycle7": {
+    "baseline_score": 66.0,
+    "new_score": 67.0,
+    "delta_points": 1.0,
+    "previous_gate_count": 31,
+    "new_gate_count": 32,
+    "new_accepted_subgates": [
+      "C3-AUTO"
+    ],
+    "source_full_ci_run": 40638652838,
+    "source_commit": "a32ef78902a656262d346a0fa622604a4deda405",
+    "acceptance_boundary": "Existing verified CI exclusively: deterministic OIDC/PKCE/JWKS and OAuth state/scope Node primitives. Not external Google/GitHub/Facebook live OAuth, not this cycle new security hardening. C3 parent remains partial; strictly blocked release gate."
   }
 }

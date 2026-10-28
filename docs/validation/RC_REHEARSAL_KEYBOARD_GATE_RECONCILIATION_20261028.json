@@ -1,0 +1,61 @@
+{
+  "date": "2026-10-28",
+  "version": "0.1.0-dev",
+  "last_user_confirmed_commit": "a32ef78902a656262d346a0fa622604a4deda405",
+  "source_archive": "quorivio-0.1.0-dev-rc-topic-statistics-verified-gates-cumulative.zip",
+  "previous_score": 56.0,
+  "new_score": 60.0,
+  "weight_sum": 100,
+  "gate_count": 25,
+  "accepted_gate_count": 8,
+  "partial_gate_count": 17,
+  "rc_ready": false,
+  "new_subgates": [
+    {
+      "id": "B1-WS",
+      "source_ci": 40638652838,
+      "scope": "two-replica PostgreSQL WebSocket"
+    },
+    {
+      "id": "C2-TLS",
+      "source_ci": 40638652838,
+      "scope": "disposable TLS SMTP + PostgreSQL MFA"
+    },
+    {
+      "id": "D2-DR",
+      "source_ci": 40638652838,
+      "scope": "disposable PostgreSQL 18 backup and restore"
+    },
+    {
+      "id": "D3-IMAGE",
+      "source_ci": 40595463258,
+      "scope": "multiarch build/push proof; native arm64 smoke not proven"
+    }
+  ],
+  "implemented_uncommitted": [
+    "scoped topic-question results in previous ZIP",
+    "rehearsal keyboard focus trap and focus restoration",
+    "background scroll lock with cleanup",
+    "IME-safe Escape",
+    "new opt-in Chromium desktop/mobile keyboard guard in CI"
+  ],
+  "local_validation": {
+    "api_tsc_web_tsc_vite": "PASS",
+    "node_api": "468/468",
+    "node_web": "50/50",
+    "python_tests": "921/921",
+    "chromium_keyboard_1440_390": "PASS",
+    "chromium_dual_viewport_reactions": "PASS",
+    "chromium_geometry_tooltips": "PASS",
+    "chromium_real_wysiwyg_component": "PASS"
+  },
+  "not_verified": [
+    "New GitHub CI on uncommitted batch",
+    "Authenticated browser modal keyboard test",
+    "Firefox/WebKit and physical hardware",
+    "Screen reader independent acceptance",
+    "Production DR RPO/RTO, external SMTP, native ARM64, rootless Podman, HA Kubernetes, GDPR/AGID"
+  ],
+  "known_local_blocker": "Chromium navigation to localhost for authenticated Vite browser is blocked by policy; offline real-component tests used, no false E2E claim.",
+  "publication": "No assistant commit, push, tag, release or Docker publication; next CI should use browser_test=true and publish_image=false"
+}

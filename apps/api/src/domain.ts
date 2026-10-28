@@ -94,7 +94,7 @@ export function validPageDesign(x:unknown):x is PageDesign {
  if(Array.isArray(d.widgets))for(const widget of d.widgets){
   if(widget.kind!=='results-button'||widget.targetWidgetId===undefined)continue;
   const target=d.widgets.find((source:any)=>source.id===widget.targetWidgetId);
-  if(!target||!['question','timed-quiz','rating','reactions'].includes(target.kind))return false;
+  if(!target||!['question','timed-quiz','rating','reactions','topic-question'].includes(target.kind))return false;
   if(widget.targetQuestionId!==undefined&&(!['question','timed-quiz'].includes(target.kind)||!target.questions?.some((q:any)=>q.id===widget.targetQuestionId)))return false;
  }
  return true;

@@ -55,6 +55,7 @@ def run():
         {'id':'timed1','kind':'timed-quiz','label':'Five-second test','answerMode':'single',
          'options':[{'id':'yes','label':'Correct'},{'id':'no','label':'Wrong'}], 'correctOptionId':'yes', 'durationSeconds':15},
         {'id':'topic1','kind':'topic-question','label':'Ask about this page','showNames':False},
+        {'id':'topic-stats','kind':'results-button','label':'Question count','targetWidgetId':'topic1','resultsView':'table'},
     ]}
     patch=request(admin,'PATCH',f'/api/sessions/{sid}/activities/{aid}/design',
         {'page_design':design,'result_design':{},'expected_design_revision':1})
@@ -86,6 +87,10 @@ def run():
     assert outcomes.count(201)==10 and outcomes.count(429)==2,outcomes
     page=request(admin,'GET',f'/api/sessions/{sid}/activities/{aid}/topic-widgets/topic1/questions?page=1')
     assert page['total']==10 and len(page['items'])==10
+    stats=f'/api/sessions/{sid}/activities/{aid}/topic-widgets/topic1/stats'
+    assert request(admin,'GET',stats)=={'total':10}
+    request(same,'GET',stats,expected=401)
+    request(admin,'GET',f'/api/sessions/{sid}/activities/{aid}/topic-widgets/no-such-widget/stats',expected=404)
     assert all(x['participant_name'] is None for x in page['items'])
     ranking=request(admin,'GET',f'/api/sessions/{sid}/activities/{aid}/widgets/timed1/timed-leaderboard')
     assert ranking['answers']==1 and ranking['correct']==1 and len(ranking['ranking'])==1, ranking
