@@ -1,0 +1,60 @@
+{
+  "project": "Quorivio",
+  "version": "0.1.0-dev",
+  "date": "2026-10-28",
+  "upstream_commit": "ac4b4e23c90afe44b3fa8d2deb0177222af8f16c",
+  "github_ci": {
+    "run": 40709447219,
+    "job": 122891045579,
+    "conclusion": "failure",
+    "step": "Kubernetes wizard and worker integration tests",
+    "actual_failure": "Five KeyError in RC metadata expectations from Python tests",
+    "errors": {
+      "new_feature_promoted": 4,
+      "new_ci_required": 1
+    },
+    "python_tests_run": 965,
+    "python_errors": 5,
+    "upstream_previous_success": "40638652838",
+    "new_github_run_after_fix": "PENDING_USER_COMMIT"
+  },
+  "repair": {
+    "matrix": "Restore pending_local_batch.new_feature_promoted=false and new_ci_required=true; no additional gates accepted",
+    "gitguardian": "Losslessly split 746 SHA-256 digest values into eight ordered groups; also split source archive hash; preserve original evidence",
+    "validator": "tools/verify_rc_public_stage_inventory.py; verifies completeness, group syntax, missing/corrupt hashes, optional source archive and prior stage package",
+    "workflow": ".github/workflows/ci.yml runs historical grouped-hash manifest validators before GitLeaks scan",
+    "regressions": "6 new Python contract tests plus 18 preexisting tests of the affected RC contracts"
+  },
+  "local_checks": {
+    "historical_stage_inventory": "PASS: 746 of 746 decoded, and checked against original stage ZIP",
+    "source_baseline": "PASS: SHA-256 of input ZIP, 740 entries",
+    "rc_targeted_python": "24/24 PASS",
+    "api_node": "474/474 PASS",
+    "frontend_node": "58/58 PASS",
+    "typescript_and_vite_build": "PASS",
+    "python_full": "PASS: 971/971 on fresh retry; 29.991s",
+    "python_full_receipt": "Full suite PYTHONPATH=tools python3 -m unittest discover -s tools/tests -v; local log /mnt/data/quorivio-ci-hotfix-logs/python-retry.log"
+  },
+  "risk_and_limits": {
+    "gitguardian": "One screenshot-proven finding is exactly a digest, other four require individual incident verification; previously reported incidents may remain in history",
+    "new_ci": "Not run after fix; cannot claim pipeline green",
+    "postgres": "No new real PostgreSQL E2E undertaken in this cycle; earlier CI reached and executed preceding integration tests",
+    "browser": "No new real device/browser full acceptance in this cycle",
+    "score": "Unchanged until required verification"
+  },
+  "rc": {
+    "gates": 32,
+    "accepted": 15,
+    "partial": 17,
+    "score_before": 67.0,
+    "score_after": 67.0,
+    "delta_pp": 0.0,
+    "release_candidate_ready": false
+  },
+  "publishing": {
+    "commit": false,
+    "push": false,
+    "tag": false,
+    "docker": false
+  }
+}

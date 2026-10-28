@@ -398,6 +398,10 @@ jobs:
           test -s LICENSE && test -s README.md && test -s README.it.md
           test -s docs/GDPR.en.md && test -s docs/GDPR.it.md
           for name in admin-guide user-guide; do for lang in en it; do test -s "docs/manuals/${name}.${lang}.pdf"; done; done
+      - name: Verify grouped SHA-256 evidence inventory
+        run: |
+          python3 tools/verify_rc_checksum_manifest.py
+          python3 tools/verify_rc_public_stage_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

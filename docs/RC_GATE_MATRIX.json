@@ -338,22 +338,23 @@
   },
   "pending_local_batch": {
     "date": "2026-10-28",
-    "description": "Public participant stage parity, actual media crop and WYSIWYG marks, accessible reading/scroll, dynamic rehearsal portal inert/focus, independent Chromium and actual built React rehearsals",
-    "last_maintainer_confirmed_commit": "1a0bea5918098af52fdf9958b8e8e664d09c11d5",
-    "observed_main_sha": "8899c24155473ab8ff88cfa1ba767aa949be1ded",
-    "last_failed_run": 40689633215,
-    "last_failed_step": "Chromium editor UI acceptance",
+    "description": "Public participant stage parity, actual media crop and WYSIWYG marks, accessible reading/scroll, dynamic rehearsal portal inert/focus, independent Chromium and actual built React rehearsals; post-commit ledger schema compatibility and SHA256 inventory security-scanner formatting hotfix",
+    "last_maintainer_confirmed_commit": "ac4b4e23c90afe44b3fa8d2deb0177222af8f16c",
+    "observed_main_sha": "ac4b4e23c90afe44b3fa8d2deb0177222af8f16c",
+    "last_failed_run": 40709447219,
+    "last_failed_step": "Kubernetes wizard and worker integration tests: 5 Python unittest errors (missing compatibility keys in pending_local_batch)",
     "local_evidence": {
       "npm_build": "PASS backend tsc, frontend tsc and Vite",
       "backend_node": "474/474",
       "frontend_node": "58/58",
-      "python_all": "965/965",
+      "python_all": "971/971 PASS on updated hotfix batch (fresh local full suite)",
       "chromium_builtin_react_preview": "PASS desktop 1440 and mobile 390",
       "chromium_public_stage_css": "PASS 1440 and 390",
-      "chromium_real_rehearsal_typescript_dynamic_portals": "PASS 1440 and 390"
+      "chromium_real_rehearsal_typescript_dynamic_portals": "PASS 1440 and 390",
+      "github_40709447219": "Observed 5 Python RC ledger KeyError, compilation and PostgreSQL tests preceding the Python gate passed; no new green full CI"
     },
     "blocked": {
-      "git_hub_new_full_ci": "not triggered or verified (no commit/push)",
+      "git_hub_new_full_ci": "Run 40709447219 FAILED: 5 KeyError in Python RC gate contract tests; correction made locally, new GitHub CI not yet executed",
       "authenticated_postgres_18_public_participant_e2e": "not run locally",
       "firefox_webkit_real_device_screen_reader": "not run / independent acceptance outstanding"
     },
@@ -366,7 +367,9 @@
     "gate_partial": 17,
     "strict_rc_ready": false,
     "suggested_workflow": "workflow_dispatch browser_test=true publish_image=false",
-    "source_log": "docs/validation/RC_PUBLIC_STAGE_REHEARSAL_PORTALS_LOCAL_20261028.json"
+    "source_log": "docs/validation/RC_CI_40709447219_AND_GITGUARDIAN_HOTFIX_20261028.json",
+    "new_feature_promoted": false,
+    "new_ci_required": true
   },
   "scoring_reconciliation_20261028": {
     "baseline_score": 53.0,
@@ -493,5 +496,18 @@
     "verified_local_only": true,
     "requires_new_github_full_ci": true,
     "not_independent_rc_acceptance": true
+  },
+  "ci_hotfix_40709447219_20261028": {
+    "commit": "ac4b4e23c90afe44b3fa8d2deb0177222af8f16c",
+    "failed_run": 40709447219,
+    "failed_job": 122891045579,
+    "failed_step": "Kubernetes wizard and worker integration tests",
+    "cause": "5 RC documentation contract tests indexed removed keys new_feature_promoted and new_ci_required; KeyError in 965-test suite",
+    "repair": "Restore both backward-compatible fields in pending_local_batch, retain evidence and zero newly promoted gates",
+    "github_after_repair": "pending commit and fresh workflow run",
+    "score_before": 67.0,
+    "score_after": 67.0,
+    "strict_rc_ready": false,
+    "local_python_validation": "971/971 PASS (local), GitHub validation after fix pending"
   }
 }
