@@ -48,7 +48,8 @@ async def run():
     await editor.evaluate("el=>el.dispatchEvent(new CompositionEvent('compositionend',{bubbles:true,data:'あ'}))")
     await expect(page.locator('[data-test=json]')).to_contain_text('Alpha beta!あ')
     await expect(page.locator('[data-test=projection]')).to_contain_text('Alpha beta!あ')
-    await page.locator('[data-test=finish]').click()
+    # Pressing Enter commits and exits the real production WYSIWYG edit state.
+    await editor.press('Enter')
     await expect(page.get_by_role('textbox',name='Titolo widget')).to_have_count(0)
     await expect(page.locator('[data-test=projection]')).to_contain_text('Alpha beta!あ')
     await page.close()

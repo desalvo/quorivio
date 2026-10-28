@@ -1,3 +1,19 @@
+# Quorivio 0.1.0-dev — Correzione CI 40614893046 e WYSIWYG (28 ottobre 2026)
+
+**Ultima Full CI verificata:** GitHub run 40595463258 (success), precedente agli sviluppi WYSIWYG/domande indipendenti.
+
+**Baseline committata:** `6f48c16593360efb8f74f4d07de81b4c46f4eae2`. Archivio sorgente cumulativo precedente conservato integralmente (693 file). Nessuna nuova CI GitHub ha ancora verificato questo hotfix.
+
+**Errore:** la run GitHub 40614893046 si è fermata nel gate di qualità, nella suite Python: 910 test eseguiti e 4 falliti. I test cercavano ancora il titolo `input readonly`, il vecchio JSX dell'anteprima, il vecchio punto di rendering e il nome di una variabile ormai cambiato nel ripristino del cursore. Anche il test browser PostgreSQL usava l'input non più presente.
+
+**Interventi:** terminazione esplicita dell'editing WYSIWYG con Invio/Escape, collegata a titolo, contenuti, opzioni e domande indipendenti. I clic sulla palette non terminano automaticamente l'editing; si preserva quindi il caso d'uso della selezione parziale. Aggiornato il vero test Chromium/PostgreSQL per esercitare le transizioni `contentEditable=false → true → false`, il salvataggio automatico e la riconciliazione concorrente. Nuova prova Chromium isolata di menu contestuale/doppio clic su desktop e mobile. Ripristinato il titolo nella pagina vuota dell'anteprima, mantenendo il canvas 16:9 condiviso. I contratti Python ora verificano il comportamento vigente invece di stringhe del vecchio codice.
+
+**Verifiche LOCALI:** build API/Web TypeScript e Vite PASS; 467/467 test Node backend, 49/49 test Node frontend; suite Python completa 910/910 PASS in locale (Python 3.13; CI Python 3.12); preflight Chromium desktop/mobile WYSIWYG, IME e chiusura con Invio PASS. **Non ancora verificati:** nuova CI GitHub, E2E PostgreSQL 18 autenticato col nuovo helper, migrazione dati storici in CI, dispositivi reali, Firefox/WebKit e accessibilità assistiva.
+
+**Completamento RC: 53,0%** — 1 gate accettato, 17 parziali. Nessuna promozione per sola evidenza locale. Prossimi passi: commit dell'utente, CI standard e Full CI `browser_test=true`, `publish_image=false`, senza pubblicazione Docker non autorizzata. Nessun commit, push, tag o Docker push effettuato dall'assistente.
+
+---
+
 # Quorivio 0.1.0-dev — ciclo isolamento revisioni e WYSIWYG (28 ottobre 2026)
 
 **Baseline:** cumulativo `quorivio-0.1.0-dev-rc-wysiwyg-independent-questions-cumulative.zip`; ultimo commit confermato `e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9`. Sviluppo locale non ancora verificato da nuova CI GitHub. Versione e licenza invariate.

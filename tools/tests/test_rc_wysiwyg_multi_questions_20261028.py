@@ -19,7 +19,7 @@ class RichMultiQuestionRegression(unittest.TestCase):
 
     def test_editing_selection_and_caret_restore_after_formatting(self):
         self.assertIn('domTextRange(root.current)', RICH)
-        self.assertIn('restoreDomTextRange(el,remembered.current)', RICH)
+        self.assertIn('restoreDomTextRange(el,selection)', RICH)
         self.assertIn('onBeforeInput=', RICH)
         self.assertIn('onInput=', RICH)
 

@@ -180,34 +180,25 @@
   },
   "pending_local_batch": {
     "date": "2026-10-28",
-    "baseline_archive": "quorivio-0.1.0-dev-rc-wysiwyg-independent-questions-cumulative.zip",
-    "last_user_confirmed_sha": "e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9",
-    "description": "Scoped historical answer revisions, PostgreSQL legacy migration acceptance and composition-safe WYSIWYG DOM",
-    "local_build": "PASS TypeScript API and Web plus Vite",
-    "node_backend": {
-      "passed": 467,
-      "total": 467
+    "baseline_commit": "6f48c16593360efb8f74f4d07de81b4c46f4eae2",
+    "baseline_archive": "quorivio-0.1.0-dev-rc-question-revision-wysiwyg-ime-hardening-cumulative.zip",
+    "failure": {
+      "run": 40614893046,
+      "failures": 4,
+      "python_test_count": 910,
+      "step": "Kubernetes wizard and worker integration tests"
     },
-    "node_web": {
-      "passed": 49,
-      "total": 49
-    },
-    "python_migration_contract": {
-      "passed": 6,
-      "total": 6
-    },
-    "python_widget_contract": {
-      "passed": 36,
-      "total": 36
-    },
-    "chromium_offline": "PASS at desktop 1440 and mobile 390 for real RichWidgetText, selections, Unicode composition, projection",
-    "python_global": "local timeout (not considered passed)",
-    "postgresql_18_live": "CI acceptance authored (migration shadow temp table and question revision E2E); awaiting GitHub run",
-    "github_ci": "NOT RUN for this uncommitted code",
-    "security": "no raw HTML saved; independent revision/idempotence, DB test uses temporary transaction ROLLBACK; publish_image=false required",
+    "fix": "WYSIWYG contenteditable real browser contract, Enter/Escape finish, updated rehearsal and picture-crop tests",
+    "local_build": "PASS API TypeScript/Web TypeScript/Vite",
+    "node_backend": "467/467 PASS",
+    "node_web": "49/49 PASS",
+    "python_all": "910/910 PASS local Python 3.13",
+    "chromium": "PASS isolated real component and context/double-click across 1440px/390px",
+    "github_ci": "NOT YET RERUN on hotfix",
+    "postgresql_18_live": "Mandatory real-browser CI and legacy migration remain to be replayed",
     "gate_promotions": [],
     "rc_score": 53.0,
     "rc_ready": false,
-    "next": "Commit only after review, run Full CI browser_test=true publish_image=false; independent Firefox/WebKit, screen-reader, real touch and visual parity remain open"
+    "next": "Run standard GitHub CI, then browser_test=true publish_image=false; require PostgreSQL real editor/multi-question and security/container gates."
   }
 }

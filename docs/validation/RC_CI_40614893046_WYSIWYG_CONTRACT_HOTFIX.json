@@ -1,0 +1,61 @@
+{
+  "project": "Quorivio",
+  "version": "0.1.0-dev",
+  "date": "2026-10-28",
+  "baseline_archive": "quorivio-0.1.0-dev-rc-question-revision-wysiwyg-ime-hardening-cumulative.zip",
+  "baseline_commit": "6f48c16593360efb8f74f4d07de81b4c46f4eae2",
+  "failed_github_run": 40614893046,
+  "failed_job": "Production quality gate",
+  "failed_step": "Kubernetes wizard and worker integration tests",
+  "github_observation": {
+    "python_total": 910,
+    "failed": 4,
+    "reason": "Static tests and PostgreSQL Chromium helper still targeted obsolete readonly input and renamed rehearsal/media/range internals",
+    "failed_contracts": [
+      "test_ci_browser_editor_readonly_title",
+      "test_page_rename_preview_contract_20261027",
+      "test_pptx_picture_crop_ui",
+      "test_rc_wysiwyg_multi_questions_20261028"
+    ]
+  },
+  "fixes": [
+    "Update obsolete static tests to assert current contentEditable semantics, explicit editing controls and shared projection renderer",
+    "Correct real PostgreSQL Chromium edit_canvas_widget_title to edit RichWidgetText, require contentEditable transition and assert persisted concurrent conflict resolution",
+    "Support Enter/Escape commit for real RichWidgetText via optional onFinish callback, wired for all title, description and multi-question fields",
+    "Keep palette formatting usable by not exiting edit mode merely because focus moves outside the text field",
+    "Restore readable blank-page rehearsal heading while preserving shared 16:9 page geometry",
+    "Replace obsolete readonly pointer preflight with desktop/mobile Chromium WYSIWYG context menu and widget double-click semantics",
+    "Extend Chromium production component test to commit editing by pressing Enter and verify edit mode closes"
+  ],
+  "local_verifications": {
+    "node_api_tests": {
+      "passed": 467,
+      "total": 467,
+      "result": "PASS"
+    },
+    "node_web_tests": {
+      "passed": 49,
+      "total": 49,
+      "result": "PASS"
+    },
+    "python_full_suite": {
+      "passed": 910,
+      "total": 910,
+      "result": "PASS with Python 3.13 on local host (CI Python 3.12)"
+    },
+    "build": "PASS API TypeScript, Web TypeScript and Vite (Node 22)",
+    "chromium": "PASS local desktop 1440 and mobile 390: contentEditable contextual menu and dblclick; production RichWidgetText formatting/Unicode IME/Enter"
+  },
+  "not_verified": [
+    "GitHub rerun of production quality gate, container build and secret scan after this hotfix",
+    "Authenticated PostgreSQL 18 Chromium editor E2E with revised contentEditable helper",
+    "Full opt-in browser acceptance for independent widget questions and historical PostgreSQL migration",
+    "Independent Firefox/WebKit and assistive technology/physical device acceptance"
+  ],
+  "git_policy": "No commit/push/tag/release/Docker publication performed by assistant",
+  "rc": {
+    "score": 53.0,
+    "gate_promotions": [],
+    "ready": false
+  }
+}

@@ -57,26 +57,25 @@ async def open_editor(page,title):
  await expect(page.get_by_role('group',name='Canvas grafico widget')).to_be_visible()
 
 async def edit_canvas_widget_title(canvas, title):
-  """Edit through the visible, accessible widget menu (real pointer actions).
+  """Use the real contextual action and WYSIWYG title editor, never forced clicks.
 
-  The canvas title input is intentionally read-only and has pointer-events:none
-  until edit mode. Clicking/double-clicking that input directly is intercepted
-  by its draggable parent in Chromium. The production menu has a supported
-  "Modifica titolo" action which enables the input without bypassing the UI.
+  The inactive title is rendered as a text div (not the legacy readonly input).
+  Enter commits through RichWidgetText.onFinish so autosave can persist the
+  edit and Chromium verifies that editing actually exits.
   """
   item=canvas.first
-  field=item.get_by_role('textbox',name='Titolo text')
-  await expect(field).not_to_be_editable()
+  field=item.locator('.widget-rich-inline').first
+  await expect(field).to_have_attribute('contenteditable','false')
   await item.click(button='right',position={'x':12,'y':12})
   menu=item.get_by_role('group',name='Azioni widget text')
   await expect(menu).to_be_visible()
   await menu.get_by_role('button',name='Modifica titolo').click()
   await expect(menu).to_have_count(0)
-  await expect(field).to_be_editable()
+  await expect(field).to_have_attribute('contenteditable','true')
   await field.fill(title)
   await field.press('Enter')
-  await expect(field).to_have_value(title)
-  await expect(field).not_to_be_editable()
+  await expect(field).to_have_text(title)
+  await expect(field).to_have_attribute('contenteditable','false')
 
 async def await_revision(context,sid,aid,minimum,attempts=55):
  """Wait for confirmed server-side persistence; do not assume a success toast."""

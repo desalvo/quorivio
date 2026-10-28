@@ -25,7 +25,7 @@ export function restoreDomTextRange(root:HTMLElement,selection:TextRange):void{
  };
  try{const range=document.createRange();const [a,ao]=point(selection.start),[b,bo]=point(selection.end);range.setStart(a,ao);range.setEnd(b,bo);const selectionApi=window.getSelection();selectionApi?.removeAllRanges();selectionApi?.addRange(range)}catch{/* detaching a widget during autosave may invalidate a range */}
 }
-export function RichWidgetText({value,marks,field,active,onChange,onSelection,ariaLabel,maxLength=240}:{value:string;marks?:TextMark[];field:string;active:boolean;onChange:(next:string)=>void;onSelection:(range:TextRange)=>void;ariaLabel:string;maxLength?:number}){
+export function RichWidgetText({value,marks,field,active,onChange,onSelection,onFinish,ariaLabel,maxLength=240}:{value:string;marks?:TextMark[];field:string;active:boolean;onChange:(next:string)=>void;onSelection:(range:TextRange)=>void;onFinish?:()=>void;ariaLabel:string;maxLength?:number}){
  const root=useRef<HTMLDivElement>(null);
  const remembered=useRef<TextRange|null>(null);
  const lock=useRef(false);
@@ -57,6 +57,6 @@ export function RichWidgetText({value,marks,field,active,onChange,onSelection,ar
   onCompositionStart={()=>{composing.current=true}}
   onCompositionEnd={e=>{composing.current=false;const el=e.currentTarget;const next=(el.textContent||'').replace(/[\r\n]/g,' ');capture();if(next.length>maxLength){lock.current=true;el.textContent=value;lock.current=false;return}onChange(next)}}
   onInput={e=>{if(lock.current||composing.current)return;const el=e.currentTarget;const next=(el.textContent||'').replace(/[\r\n]/g,' ');capture();if(next.length>maxLength){lock.current=true;el.textContent=value;lock.current=false;return}onChange(next)}}
-  onKeyDown={e=>{e.stopPropagation();if(!composing.current&&(e.key==='Enter'||e.key==='Escape')){e.preventDefault();e.currentTarget.blur()}}}>
+  onKeyDown={e=>{e.stopPropagation();if(!composing.current&&(e.key==='Enter'||e.key==='Escape')){e.preventDefault();onFinish?.();e.currentTarget.blur()}}}>
  </div>;
 }

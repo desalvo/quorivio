@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Isolated Chromium hit-target regression (no backend/network needed).
+"""Isolated Chromium hit-target and WYSIWYG contextual editing regression.
 
-Reproduces the production readonly input pointer policy and accessible widget
-context-menu action. This is NOT a substitute for the real PostgreSQL E2E gate.
+Fixture uses the current contentEditable contract, not the removed readonly
+input. The full authenticated browser/PostgreSQL test remains independent.
 """
 import asyncio
 import os
@@ -11,22 +11,27 @@ from playwright.async_api import async_playwright, expect, TimeoutError as Playw
 HTML = '''<!doctype html><html lang="it"><meta charset="utf-8">
 <style>
 .widget-canvas-item { position:relative; width:340px; height:140px; padding:9px 23px 9px 9px; background:white; border:1px solid #877cbb; }
-.widget-canvas-item input { box-sizing:border-box; height:100%; width:100%; background:transparent; border:0; }
-.widget-canvas-item input[readonly] { pointer-events:none; cursor:move; }
-/* Contextual actions open with right-click or the keyboard Menu key. */
-.canvas-context-menu { position:absolute;left:10px;top:28px;z-index:30;display:flex;flex-direction:column;background:white; }
+.widget-rich-inline { width:100%; padding:8px; white-space:pre-wrap; }
+.widget-rich-inline[contenteditable="false"] { pointer-events:none; user-select:none; }
+.widget-rich-inline[contenteditable="true"] { pointer-events:auto; user-select:text; outline:1px dotted #3470be; }
+.canvas-context-menu { position:absolute;left:10px;top:45px;z-index:30;display:flex;flex-direction:column;background:white; }
+.canvas-context-menu[hidden] { display:none; }
 </style>
-<div class="widget-canvas-item" role="group" aria-label="Widget text; frecce spostano">
-<input aria-label="Titolo text" readonly value="Remote collaborator">
+<div class="widget-canvas-item" role="group" tabindex="0" aria-label="Widget text; frecce spostano">
+<div class="widget-rich-inline" aria-label="Titolo text" contenteditable="false">Remote collaborator</div>
 <div class="canvas-context-menu" role="group" aria-label="Azioni widget text" hidden>
 <button type="button">Modifica titolo</button></div></div>
 <script>
-const item=document.querySelector('.widget-canvas-item'), input=item.querySelector('input');
+const item=document.querySelector('.widget-canvas-item');
+const field=item.querySelector('.widget-rich-inline');
 const menu=item.querySelector('.canvas-context-menu');
-item.addEventListener('contextmenu',event=>{event.preventDefault();menu.hidden=false});
-item.addEventListener('keydown',event=>{if(event.key==='ContextMenu'||(event.shiftKey&&event.key==='F10')){event.preventDefault();menu.hidden=false}});
-menu.querySelector('button').addEventListener('click',()=>{input.readOnly=false;menu.hidden=true});
-input.addEventListener('keydown',e=>{if(e.key==='Enter'){input.readOnly=true;input.blur()}});
+const activate=()=>{field.contentEditable='true';menu.hidden=true;field.focus()};
+const finish=()=>{field.contentEditable='false';field.blur()};
+item.addEventListener('contextmenu',e=>{e.preventDefault();menu.hidden=false});
+item.addEventListener('dblclick',e=>{if(!e.target.closest('button'))activate()});
+item.addEventListener('keydown',e=>{if(e.key==='ContextMenu'||(e.shiftKey&&e.key==='F10')){e.preventDefault();menu.hidden=false}});
+menu.querySelector('button').addEventListener('click',activate);
+field.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key==='Escape'){e.preventDefault();finish()}});
 </script></html>'''
 
 async def main():
@@ -34,28 +39,37 @@ async def main():
   opts={'executable_path':os.environ['QUORIVIO_CHROMIUM_PATH']} if os.environ.get('QUORIVIO_CHROMIUM_PATH') else {}
   browser=await pw.chromium.launch(**opts,headless=True,args=['--no-sandbox'])
   try:
-   page=await browser.new_page()
-   await page.set_content(HTML)
-   item=page.get_by_role('group',name='Widget text; frecce spostano')
-   field=item.get_by_role('textbox',name='Titolo text')
-   await expect(field).not_to_be_editable()
-   # The regression: a Playwright double-click on the readonly input is not
-   # actionable because the parent is the actual pointer hit target.
-   try:
-    await field.dblclick(timeout=750)
-    raise AssertionError('Expected readonly title double-click to be intercepted')
-   except PlaywrightTimeout:
-    pass
-   await item.click(button='right',position={'x':12,'y':12})
-   menu=item.get_by_role('group',name='Azioni widget text')
-   await expect(menu).to_be_visible()
-   await menu.get_by_role('button',name='Modifica titolo').click()
-   await expect(field).to_be_editable()
-   await field.fill('Local second edit')
-   await field.press('Enter')
-   await expect(field).to_have_value('Local second edit')
-   await expect(field).not_to_be_editable()
-   print('PASS isolated Chromium: readonly pointer intercept reproduced; accessible menu edit/Enter succeeds')
+   for width in (1440,390):
+    page=await browser.new_page(viewport={'width':width,'height':820})
+    await page.set_content(HTML)
+    item=page.get_by_role('group',name='Widget text; frecce spostano')
+    field=item.locator('.widget-rich-inline')
+    await expect(field).to_have_attribute('contenteditable','false')
+    # The inactive title cannot be edited accidentally during dragging.
+    try:
+     await field.dblclick(timeout=600)
+     raise AssertionError('Expected inactive text layer pointer interception')
+    except PlaywrightTimeout:
+     pass
+    await item.click(button='right',position={'x':12,'y':12})
+    menu=item.get_by_role('group',name='Azioni widget text')
+    await expect(menu).to_be_visible()
+    await menu.get_by_role('button',name='Modifica titolo').click()
+    await expect(menu).not_to_be_visible()
+    await expect(field).to_have_attribute('contenteditable','true')
+    await field.fill('Local second edit')
+    await field.press('Enter')
+    await expect(field).to_have_text('Local second edit')
+    await expect(field).to_have_attribute('contenteditable','false')
+    # Double-clicking the widget itself is the second user-supported path.
+    await item.dblclick(position={'x':12,'y':12})
+    await expect(field).to_have_attribute('contenteditable','true')
+    await field.fill('Double click edit')
+    await field.press('Enter')
+    await expect(field).to_have_text('Double click edit')
+    await expect(field).to_have_attribute('contenteditable','false')
+    await page.close()
+   print('PASS isolated Chromium: WYSIWYG context menu and widget double-click, Enter commits, desktop/mobile')
   finally:
    await browser.close()
 

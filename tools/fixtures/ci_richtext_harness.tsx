@@ -20,7 +20,7 @@ function Demo(){
   if(end>start)setMarks(m=>formatTextRange(m,'label',start,end,style));
   else pending.current={...pending.current,...style};
  };
- return <><RichWidgetText value={value} marks={marks} field="label" active={active} onChange={update} onSelection={r=>range.current=r} ariaLabel="Titolo widget"/>
+ return <><RichWidgetText value={value} marks={marks} field="label" active={active} onChange={update} onSelection={r=>range.current=r} onFinish={()=>setActive(false)} ariaLabel="Titolo widget"/>
  <button type="button" data-test="bold" onClick={()=>apply({bold:true})}>B</button>
  <button type="button" data-test="italic" onClick={()=>apply({italic:true})}>I</button>
  <button type="button" data-test="finish" onClick={()=>setActive(false)}>Done</button>

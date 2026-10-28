@@ -1,3 +1,19 @@
+# Quorivio 0.1.0-dev — CI 40614893046 WYSIWYG acceptance hotfix (2026-10-28)
+
+**Previous verified Full CI:** GitHub run 40595463258 (success), predates the present WYSIWYG/multi-question changes.
+
+**Committed baseline:** `6f48c16593360efb8f74f4d07de81b4c46f4eae2` from GitHub push CI. The submitted ZIP baseline is the complete previous 693-file cumulative package; it is preserved. No new GitHub CI has run on this hotfix.
+
+**Failure:** GitHub run 40614893046 failed the production quality gate in the Python unittest discovery step (910 tests, 4 failures), before final documentation/secret leak checks and container build. All four failures were legacy static assertions against the old read-only title input, rehearsal JSX, projection call shape, and a local variable name in the WYSIWYG caret-restore code. The old PostgreSQL Chromium title helper also targeted the now-removed input and needed a behavioral update.
+
+**Implemented:** WYSIWYG `onFinish` on Enter/Escape wired for title/description/option and independent-question fields; palette clicks do not automatically abandon text edit mode. Updated the actual PostgreSQL-backed Chromium title editing helper to require the `contentEditable=false → true → false` lifecycle, confirm text and retain full concurrent autosave/merge expectations. Replaced the outdated pointer fixture with a desktop/mobile contextual-menu plus double-click regression. Blank rehearsal slides display their page title within the same shared 16:9 stage. Static tests now assert current observable contracts instead of obsolete source spelling.
+
+**Locally verified:** API/Web TypeScript/Vite build PASS; Node backend 467/467 PASS; Node web 49/49 PASS; full Python suite 910/910 PASS (Python 3.13 here, CI uses 3.12); isolated Chromium 1440/390 PASS for real RichWidgetText formatting, IME and Enter commit, and pointer fixture. **Not verified:** fresh GitHub CI, actual PostgreSQL authenticated Chromium E2E on this code, real historical migration in the CI, Firefox/WebKit, real assistive technology and devices.
+
+**RC score: 53.0%** per unchanged weighted gates: 1 accepted, 17 partial. No promotion based on only local tests. Next: user commit; standard CI, then Full CI `browser_test=true`, `publish_image=false`; preserve Docker publication opt-in. No commit, push, tag or image publication was performed by the assistant.
+
+---
+
 # Quorivio 0.1.0-dev — Question-scoped revisions and WYSIWYG hardening (28 October 2026)
 
 Baseline archive: `quorivio-0.1.0-dev-rc-wysiwyg-independent-questions-cumulative.zip`; last user-confirmed commit `e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9`. These are **uncommitted local changes**, not yet confirmed by GitHub Actions.
