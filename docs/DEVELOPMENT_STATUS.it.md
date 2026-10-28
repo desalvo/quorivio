@@ -1,3 +1,13 @@
+# Quorivio 0.1.0-dev — Hotfix anteprima duplicata e barra mobile (28 ottobre 2026)
+
+**Run GitHub:** CI estesa [40689633215](https://github.com/desalvo/quorivio/actions/runs/40689633215), commit `8899c24155473ab8ff88cfa1ba767aa949be1ded`. Il quality gate è fallito in `tools/ci_browser_editor.py`: Playwright ha trovato **due finestre di anteprima**, entrambe `inert` e `aria-hidden`. Build container e integrazione PostgreSQL sono state saltate; ultima Full CI interamente verde: 40638652838.
+
+**Nuovo hotfix cumulativo non committato:** quando l'editor è aperto, la dashboard non monta una seconda `SessionRehearsal`: l'editor è l'unico proprietario dell'anteprima della bozza corrente. Conservato il portal al `body`. Il test Chromium verifica l'esistenza di una sola finestra con ruolo accessibile e controlla lo sfondo `inert` tramite DOM, poiché gli elementi inerti non devono essere visibili ai selettori per ruolo. Risolta anche la sovrapposizione dei pulsanti dell'anteprima a 390 px provocata dall'altezza fissa dell'header. Aggiunto alla CI opzionale un preflight Chromium del vero bundle React, con API simulate e apertura da dashboard/editor, modalità affiancata, chiusura e ripristino del focus su desktop/mobile.
+
+**Verifiche locali:** build TypeScript/Vite PASS; 474 test Node backend e 58 frontend PASS; 5 test Python nuovi e 3 di regressione portal PASS; Chromium sul bundle React completo PASS a 1440 e 390 px. Suite Python integrale in timeout locale; browser autenticato/PostgreSQL da confermare sulla nuova Full CI. **RC: 67,0%, 32 gate: 15 accettati, 17 parziali; non pronta.** Evidenze in `docs/validation/RC_REHEARSAL_SINGLETON_CI_40689633215.json`. Nessun commit/push/tag/Docker push effettuato.
+
+---
+
 # Quorivio 0.1.0-dev — Hotfix accessibilità anteprima, CI 40652684000 (28 ottobre 2026)
 
 **Ultimo commit confermato dall’utente:** `1a0bea5918098af52fdf9958b8e8e664d09c11d5` (cumulativo precedente al 67%). La CI estesa è fallita nello step Chromium editor UI: l’anteprima affiancata era visibile nello screenshot, ma Playwright non trovava il suo ruolo accessibile `dialog`. I job successivi PostgreSQL e container sono stati saltati; non considerarli verdi nella nuova run.
@@ -1454,3 +1464,18 @@ Report: `docs/RC_LINKED_RESULTS_DUAL_PREVIEW_20261028.it.md`.
 **Evidenze locali:** build backend/frontend TypeScript e Vite **PASS**; **461/461 Node backend, 46/46 Node frontend, 33/33 Python mirati PASS**; Chromium del vero componente React su viewport 1440 e 390 px **PASS**, inclusi grassetto sulla selezione e corsivo durante l'inserimento. Suite Python generale **timeout**, non validata. Browser autenticato bloccato localmente da `ERR_BLOCKED_BY_ADMINISTRATOR`; PostgreSQL 18 non disponibile localmente: la nuova prova DB è **da eseguire in GitHub**. Il codice nuovo NON ha una Full CI verificata.
 
 **Blocchi e prossimi controlli:** eseguire Full CI GitHub con `browser_test=true`, `publish_image=false`; migrazione su database storico di staging; confronto layout e interazioni in sessione reale; Firefox/WebKit, telefoni e tablet fisici, screen reader e verifiche indipendenti WCAG/AGID/GDPR. Non dichiarare pronta la RC. Nessun commit, push, tag, release o publish Docker dell'assistente.
+
+
+## Ciclo RC — 28/10/2026: fedeltà della sessione reale e robustezza delle anteprime
+
+**Baseline:** ZIP cumulativo con 740 file (hotfix istanza unica/mobile Chromium). **Versione:** `0.1.0-dev`, licenza EUPL-1.2 invariata. **GitHub main verificato:** `8899c24155473ab8ff88cfa1ba767aa949be1ded`; ultimo commit esplicitamente confermato dall’utente: `1a0bea5918098af52fdf9958b8e8e664d09c11d5`. Ultima run `40689633215`: FALLITA nello step Chromium editor UI acceptance prima dei test PostgreSQL; il nuovo hotfix singleton è ancora da convalidare in GitHub.
+
+**Sviluppo effettivo:** sessione pubblica su stage 16:9 con coordinate, dimensioni e rotazione persistite; sfondo autorizzato e ritaglio delle immagini importate; marcature testuali inline nei widget testo/nota. Aggiunta modalità alternativa «Lettura accessibile», predefinita su smartphone, e scorrimento orizzontale quando viene selezionata la fedeltà geometrica. L'anteprima protegge anche dai portali dello sfondo aggiunti dopo l'apertura: `inert`/`aria-hidden` temporanei e ripristino dello stato precedente, focus e Tab migliorati. Due nuovi controlli Chromium eseguiti in locale e inseriti nella CI opt-in.
+
+**Verifiche locali:** `npm run build` PASS (TypeScript backend/frontend e Vite). Test Node 474/474 backend e 58/58 frontend PASS. Suite Python completa 965/965 PASS, suite RC mirata 383/383 PASS. Chromium sul React compilato: istanza unica da dashboard/editor 1440/390 PASS; gestore TypeScript reale con portali dinamici 1440/390 PASS; CSS pubblico con fedeltà percentuale/rotazione e target touch 44px 1440/390 PASS. Un tentativo precedente della suite Python era stato interrotto; la ripetizione integrale è poi passata.
+
+**RC globale:** 32 gate pesati (15 accettati, 17 parziali), **67,0% → 67,0% (+0,0 punti percentuali)**. Nessun gate promosso sulla sola evidenza locale. Release candidate ancora NON pronta.
+
+**Da eseguire:** nuova Full CI GitHub dopo commit con `browser_test=true` e `publish_image=false`; test React partecipante/editor su PostgreSQL 18 reale, confronto visivo indipendente tra le quattro superfici, Firefox/WebKit, telefoni fisici Android/iOS, lettori di schermo e verifica WCAG/AGID; prove infrastrutturali reali Kubernetes/Helm, replica e failover. Nessun commit/push/tag/pubblicazione Docker eseguito.
+
+**Report:** `docs/validation/RC_PUBLIC_STAGE_REHEARSAL_PORTALS_LOCAL_20261028.json`, con gate non modificati per assenza di Full CI nuova.

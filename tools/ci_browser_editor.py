@@ -95,13 +95,17 @@ async def main():
    # to role-based locators when nested under the inert editor/dashboard tree.
    # Verify actual body-portal ownership before checking aria-modal semantics.
    backdrop=page.locator('.rehearsal-backdrop')
+   # Editor and session dashboard coexist in the DOM. Exactly one dialog may
+   # mount: otherwise separate focus traps inert/aria-hide each other.
+   await expect(backdrop).to_have_count(1)
    await expect(backdrop).to_be_visible()
    assert await backdrop.evaluate('(node)=>node.parentElement===document.body'), 'Rehearsal must use a body-level portal'
    assert await backdrop.evaluate('(node)=>!node.closest("[inert],[aria-hidden=true]")'), 'Rehearsal portal was hidden from assistive technology'
    rehearsal=page.get_by_role('dialog',name='Anteprima interattiva della sessione')
    await expect(rehearsal).to_be_visible()
    await expect(rehearsal.locator('.rehearsal-pane')).to_have_count(2)
-   assert await editor.locator('.editor-exit').evaluate('(node)=>!!node.closest("[inert]")'), 'Editor background must be inert during rehearsal'
+   # Role-based queries correctly hide the inert editor; inspect its DOM node instead.
+   assert await page.locator('.powerpoint-editor.editor-ux-v2 .editor-exit').evaluate('(node)=>!!node.closest("[inert]")'), 'Editor background must be inert during rehearsal'
    assert not await rehearsal.evaluate('(node)=>node.inert'), 'Rehearsal must remain interactive'
    await expect(rehearsal.get_by_role('button',name='Chiudi anteprima')).to_be_focused()
    layout=await page.evaluate('''() => {

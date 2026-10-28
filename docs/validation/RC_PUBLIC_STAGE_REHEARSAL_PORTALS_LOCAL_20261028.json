@@ -1,0 +1,83 @@
+{
+  "project": "Quorivio",
+  "version": "0.1.0-dev",
+  "date": "2026-10-28",
+  "baseline_file_count": 740,
+  "baseline_package": "quorivio-0.1.0-dev-rc-rehearsal-singleton-mobile-chromium-hotfix-cumulative(4).zip",
+  "git": {
+    "last_user_confirmed_commit": "1a0bea5918098af52fdf9958b8e8e664d09c11d5",
+    "main_observed_sha": "8899c24155473ab8ff88cfa1ba767aa949be1ded",
+    "observed_last_run": 40689633215,
+    "run_state": "failure",
+    "production_quality_gate": "failure",
+    "failed_step": "Chromium editor UI acceptance",
+    "reason": "Two rehearsals were mounted and mutually made inert; the last ZIP includes singleton/portal hotfix; no later GitHub CI green yet",
+    "new_commit_or_push": false
+  },
+  "work": [
+    "Reused original 740-file cumulative ZIP as baseline and preserved existing backend, API, Helm and CI features",
+    "Live public stage now keeps 16:9 canvas and persisted percent geometry, including rotation, rather than fixed 560px height; explicitly selectable accessible linear reading mode defaults on small screens",
+    "Live public slide uses authorized participant media route for page background, imported picture cropping and inline WYSIWYG text marks",
+    "Rehearsal focus management isolates background nodes added after mount via MutationObserver, retains previous inert/aria-hidden state and filters hidden/disabled focus controls",
+    "Added offline public CSS fidelity and live TypeScript dynamic-portal Chromium tests; wired both into opt-in editor Chromium CI",
+    "Updated static acceptance contracts for new semantics and gate state documentation"
+  ],
+  "tests": {
+    "npm_build": {
+      "status": "PASS",
+      "description": "API tsc; web tsc --noEmit; Vite production build"
+    },
+    "backend_node": {
+      "passed": 474,
+      "failed": 0
+    },
+    "frontend_node": {
+      "passed": 58,
+      "failed": 0
+    },
+    "python_all": {
+      "passed": 965,
+      "failed": 0
+    },
+    "python_rc": {
+      "passed": 383,
+      "failed": 0
+    },
+    "chromium": {
+      "built_react_singleton_desktop_1440": "PASS",
+      "built_react_singleton_mobile_390": "PASS",
+      "public_css_fidelity_1440": "PASS",
+      "public_css_fidelity_390": "PASS",
+      "actual_ts_dynamic_focus_1440": "PASS",
+      "actual_ts_dynamic_focus_390": "PASS"
+    }
+  },
+  "limitations": [
+    "Public route compiled-React plus PostgreSQL 18 E2E and full GitHub opt-in Chromium runs are NOT verified for this package",
+    "No Firefox, WebKit, physical-device, NVDA/VoiceOver/TalkBack or AGID independent sign-off",
+    "Full CI on 8899c24 failed before PostgreSQL steps; cannot credit skipped steps to this hotfix",
+    "Local tests include isolated DOM/real React fixtures; these are not a substitute for externally deployed live sessions"
+  ],
+  "formal_rc_score_before": 67.0,
+  "formal_rc_score_after": 67.0,
+  "gate_count": 32,
+  "accepted": 15,
+  "partial": 17,
+  "score_promotions": [],
+  "files_changed": [
+    "apps/web/src/main.tsx",
+    "apps/web/src/style.css",
+    "apps/web/src/rehearsal-dialog.ts",
+    ".github/workflows/ci.yml",
+    "tools/tests/test_rehearsal_keyboard_focus_20261028.py"
+  ],
+  "new_files": [
+    "tools/ci_rc_public_stage_chromium.py",
+    "tools/ci_rc_rehearsal_dynamic_portals_chromium.py",
+    "tools/tests/test_rc_public_stage_and_dynamic_portals_20261028.py",
+    "docs/RC_PUBLIC_STAGE_AND_REHEARSAL_MODAL_20261028.en.md",
+    "docs/RC_PUBLIC_STAGE_AND_REHEARSAL_MODAL_20261028.it.md",
+    "docs/validation/RC_PUBLIC_STAGE_REHEARSAL_PORTALS_LOCAL_20261028.json"
+  ],
+  "commit_or_docker_publication": false
+}

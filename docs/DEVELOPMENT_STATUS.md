@@ -1,3 +1,13 @@
+# Quorivio 0.1.0-dev — Duplicate rehearsal modal and mobile toolbar hotfix (2026-10-28)
+
+**GitHub source:** Extended CI [40689633215](https://github.com/desalvo/quorivio/actions/runs/40689633215), commit `8899c24155473ab8ff88cfa1ba767aa949be1ded`. Quality gate failed at `tools/ci_browser_editor.py`: strict mode found **two body-level rehearsal dialogs**, both `inert` and `aria-hidden`. Docker build and PostgreSQL integration were skipped; the last verified full-green CI remains 40638652838.
+
+**New cumulative uncommitted fix:** Session dashboard no longer instantiates the rehearsal when the nested editor is active; the editor remains the only owner for unsaved draft previews. Preserve the body-level portal. Chromium acceptance rejects duplicate dialogs and checks the hidden background using a DOM locator, not a role query (inert correctly removes background nodes from accessibility queries). Fix toolbar height/stacking on mobile so wrapped mode buttons remain clickable. Add production-bundle offline Chromium regression (1440/390 px) for dashboard and editor launch, exactly one accessible dialog, side-by-side mode changes, close, focus restoration; opt-in CI now runs it before the full fixture.
+
+**Local verification:** API/Web TypeScript/Vite build PASS; 474 backend Node and 58 frontend Node PASS; 5 new and 3 existing portal Python tests PASS; Chromium executes built React against isolated fixture on desktop/mobile PASS. Full Python converter suite timed out and authenticated app/PostgreSQL Full CI are pending. **RC score remains 67.0%, 32 gates: 15 accepted, 17 partial; NOT RC ready.** See `docs/validation/RC_REHEARSAL_SINGLETON_CI_40689633215.json`. No assistant commit/push/tag/image publication.
+
+---
+
 # Quorivio 0.1.0-dev — Rehearsal accessibility CI hotfix 40652684000 (2026-10-28)
 
 **Latest user-confirmed commit:** `1a0bea5918098af52fdf9958b8e8e664d09c11d5` (previous 67% cumulative baseline). Opt-in extended CI failed at Chromium editor UI: the two-pane rehearsal was visible in its saved screenshot but the browser could not locate its accessible `dialog` role. Downstream PostgreSQL and container jobs were skipped in this run.
@@ -1630,3 +1640,18 @@ Detailed notes: `docs/RC_LINKED_RESULTS_DUAL_PREVIEW_20261028.en.md` and `.it.md
 **Local evidence:** `npm run build` PASS (backend TypeScript, frontend TypeScript and Vite), **461/461 Node API** and **46/46 Node frontend** PASS; **33/33 focused Python** PASS (component, projection, database clock, timing, canvas and new RC contracts); actual Chromium headless component PASS at 1440px and 390px, including selected-run bold and italic insertion visible in projection. The full Python suite did not finish within the local execution limit; do not treat it as PASS. Authenticated browser requests to localhost are blocked by the local browser environment. PostgreSQL service/container tools are unavailable locally, so the **new database E2E has NOT passed locally and GitHub Full CI has not run for this batch**.
 
 **Open:** GitHub opt-in Full CI browser+PostgreSQL, real presenter/participant interaction and page fidelity, Firefox/WebKit, physical devices and assistive technology, historical revision migration on a populated staging database, independent accessibility and AGID/GDPR acceptance. This batch does not establish release-candidate readiness. No assistant commit/push/tag/release or Docker publication.
+
+
+## RC cycle — 28 Oct 2026: live participant slide parity and modal resilience
+
+**Baseline:** 740-file cumulative ZIP (singleton/mobile Chromium hotfix). **Version:** `0.1.0-dev`, EUPL-1.2 unchanged. **Observed GitHub main:** `8899c24155473ab8ff88cfa1ba767aa949be1ded`; last user-confirmed commit: `1a0bea5918098af52fdf9958b8e8e664d09c11d5`. Last GitHub full run `40689633215`: FAILED at Chromium editor UI acceptance before PostgreSQL steps; this ZIP's singleton hotfix is still unverified on GitHub.
+
+**Implemented:** real participant 16:9 slide and persisted x/y/width/height/rotation parity; authorized slide background and picture crop; inline text marks in the live text/post-it widgets; a selectable linear reading mode defaulting on phone-size screens, with slide horizontal scroll when fidelity mode is manually selected. Rehearsal modal now isolates dynamically inserted sibling portals from assistive technology and restores their previous `inert`/`aria-hidden` state, with improved Tab navigation. Added Chromium regression runners and wired them before real editor acceptance in opt-in CI.
+
+**Local verification:** `npm run build` PASS (API TypeScript, frontend TypeScript, Vite). `node --test`: 474/474 API PASS, 58/58 frontend PASS. Full Python suite: 965/965 PASS; RC-focused Python suite 383/383 PASS. Chromium: built React dashboard/editor singleton PASS at 1440 and 390px; actual rehearsal TS focus/dynamic portals PASS both; public participant CSS fixture 16:9/saved rotation/reading-mode 44px target PASS both. The failed full-Python first attempt was rerun successfully; results are not inferred from previous cycles.
+
+**RC:** 32 weighted gates (15 accepted, 17 partial), score **67.0% → 67.0% (+0.0 percentage points)**. Local evidence did NOT promote a gate. Strict release candidate remains blocked.
+
+**Still required:** a fresh maintainer-triggered full GitHub run `browser_test=true`, `publish_image=false` after commit; authenticated React participant and editor against PostgreSQL 18, independent side-by-side visual and screenshot comparisons of real sessions, Firefox/WebKit, physical Android/iOS touch, screen readers and AGID/WCAG independent sign-off; Kubernetes/Helm multi-replica/failover operational tests. No commit, push, tag or Docker publication was performed.
+
+**Evidence/report:** `docs/validation/RC_PUBLIC_STAGE_REHEARSAL_PORTALS_LOCAL_20261028.json`; the RC gate matrix documents pending work without changing accepted gate statuses.

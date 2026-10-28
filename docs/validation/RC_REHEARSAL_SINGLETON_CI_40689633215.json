@@ -1,0 +1,40 @@
+{
+  "product": "Quorivio",
+  "version": "0.1.0-dev",
+  "date": "2026-10-28",
+  "github_run": 40689633215,
+  "github_job": 122821316597,
+  "head_sha": "8899c24155473ab8ff88cfa1ba767aa949be1ded",
+  "observed_failure": {
+    "step": "Chromium editor UI acceptance (opt-in)",
+    "test_file": "tools/ci_browser_editor.py",
+    "locator": ".rehearsal-backdrop",
+    "condition": "strict mode violation: 2 dialogs, both inert and aria-hidden",
+    "downstream_jobs": "skipped"
+  },
+  "root_cause": "Both dashboard and nested editor render SessionRehearsal when rehearsalOpen and designActivity are true, producing mutually inert body-level portals.",
+  "fixes": [
+    "Dashboard preview conditional on rehearsalOpen and !designActivity; nested editor remains owner when designActivity is active",
+    "Chromium fixture explicitly asserts exactly one dialog before accessibility checks",
+    "Inspect inert editor background by DOM selector rather than role locator intentionally hidden by inert",
+    "Prevent global header fixed height clipping mode controls on narrow viewport",
+    "Introduce genuine production React bundle Chromium offline preflight at 1440px and 390px, dashboard and editor, mode changes, single accessible portal, restoration",
+    "Run same browser preflight before the full app fixture in opt-in CI"
+  ],
+  "verification": {
+    "api_build": "PASS",
+    "web_build": "PASS",
+    "node_backend_tests": "474 PASS",
+    "node_frontend_tests": "58 PASS",
+    "react_bundle_chromium_offline": "PASS at desktop/mobile",
+    "python_new_unique_mount": "5 PASS",
+    "python_existing_portal": "3 PASS",
+    "full_python_suite": "timed out locally",
+    "full_authenticated_chromium_postgres": "pending GitHub CI"
+  },
+  "rc_score": 67.0,
+  "accepted_gates": 15,
+  "partial_gates": 17,
+  "release_candidate_ready": false,
+  "caveat": "Offline browser executes the real compiled React UI with simulated API, not authenticated PostgreSQL. GitHub run 40689633215 failed, so its downstream steps are unverified."
+}

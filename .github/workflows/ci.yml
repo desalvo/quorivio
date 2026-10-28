@@ -117,6 +117,13 @@ jobs:
           python3 tools/ci_rehearsal_timer_chromium.py
           # Real production React WYSIWYG component, caret/selection and live styles.
           python3 tools/ci_browser_rich_text_offline.py
+          # Real bundled React without HTTP: exactly one accessible rehearsal
+          # from both dashboard and editor (regression for CI 40689633215).
+          # Public participant 16:9 stage and an accessible linear-reading alternative.
+          python3 tools/ci_rc_public_stage_chromium.py
+          # The real TS rehearsal handler also isolates portals created after opening.
+          python3 tools/ci_rc_rehearsal_dynamic_portals_chromium.py
+          python3 tools/ci_rehearsal_singleton_offline_chromium.py
           python3 tools/ci_browser_editor.py
       - name: Upload Chromium failure diagnostics
         if: failure() && github.event_name == 'workflow_dispatch' && inputs.browser_test

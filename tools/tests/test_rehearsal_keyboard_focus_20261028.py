@@ -23,7 +23,7 @@ class RehearsalKeyboardFocus(unittest.TestCase):
     def test_modal_background_is_inert_without_inerting_the_dialog(self):
         # External screen readers ignore Tab-based focus trapping alone.
         # Isolate siblings along the ancestor chain, not the app root.
-        for clause in ('const modal = root.closest', 'const background:', 'sibling.inert = true', "sibling.setAttribute('aria-hidden', 'true')",
+        for clause in ('const modal = root.closest', 'const background = new Map', 'sibling.inert = true', "sibling.setAttribute('aria-hidden', 'true')",
                        'node.inert = previous', 'child = parent'):
             self.assertIn(clause, DOM)
         self.assertIn("'Background button leaked into accessible modal view'", BROWSER)

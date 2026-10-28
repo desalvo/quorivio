@@ -891,3 +891,32 @@
 .widget-subquestion-choices{display:grid;gap:4px}
 .widget-subquestion-choices label{display:flex;gap:5px;align-items:center}
 .widget-subquestion-choices label input[type="text"]{min-width:0;flex:1}
+
+/* Rehearsal modal: global header height must not clip wrapped mode buttons on
+   narrow screens. Keep the controls above the slide hit targets. */
+header.rehearsal-toolbar{height:auto;min-height:0;flex:0 0 auto;position:relative;z-index:2}
+.rehearsal-shell>.rehearsal-stage{position:relative;z-index:1}
+
+/* RC cycle: the public participant slide uses the same normalized 16:9 stage
+   and saved widget percentages as the editor and both rehearsal panes. A
+   separate explicitly selected reading view retains usable touch targets and
+   linear screen-reader flow rather than silently changing the slide geometry. */
+.audience-layout-controls{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.audience-layout-controls button{min-height:44px;padding:8px 12px;border:1px solid #748aaa;border-radius:7px;background:#fff;color:#152b4e}
+.audience-layout-controls button[aria-pressed="true"]{background:#144e6d;color:#fff}
+.audience-layout-controls button:focus-visible,.audience-stage-scroll:focus-visible{outline:3px solid #195dbe;outline-offset:3px}
+.audience-stage-scroll{width:100%;max-width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-gutter:stable}
+.audience-widget-layout.stage-fidelity{position:relative;box-sizing:border-box;display:block!important;width:100%;max-width:none!important;height:auto!important;min-height:0!important;aspect-ratio:16/9;overflow:hidden;background-color:#fff;container-type:inline-size;border:1px solid #b9c7d8}
+.audience-widget-layout.stage-fidelity>.page-widget{position:absolute!important;max-width:none!important;min-width:0!important;min-height:0!important;margin:0!important;overflow:auto;box-sizing:border-box;font-size:1.25cqw!important;line-height:1.2;transform:rotate(var(--stage-rotation,0deg))!important;transform-origin:center center}
+.audience-widget-layout.stage-fidelity>.page-widget[style*="--stage-x"]{left:var(--stage-x)!important;top:var(--stage-y)!important;width:var(--stage-width)!important;height:var(--stage-height)!important}
+.audience-widget-layout.stage-legacy,.audience-widget-layout.stage-reading{position:relative!important;display:grid!important;grid-template-columns:minmax(0,1fr);gap:12px;aspect-ratio:auto!important;width:100%!important;min-height:0!important;height:auto!important;padding:12px;container-type:normal;overflow:visible}
+.audience-widget-layout.stage-legacy>.page-widget,.audience-widget-layout.stage-reading>.page-widget,.audience-widget-layout.stage-reading>.page-widget[style*="--stage-x"]{position:relative!important;inset:auto!important;left:auto!important;top:auto!important;width:auto!important;height:auto!important;min-height:64px!important;max-width:100%!important;max-height:none!important;transform:none!important;margin:0!important;font-size:1rem!important;line-height:1.5!important;overflow:visible!important}
+.audience-widget-layout.stage-reading .projection-text-widget{white-space:pre-wrap}
+.audience-widget-layout.stage-reading button,.audience-widget-layout.stage-reading input,.audience-widget-layout.stage-reading select,.audience-widget-layout.stage-reading textarea{min-height:44px;max-width:100%;font-size:16px}
+.audience-widget-layout.stage-reading .widget-question{max-width:100%}
+@media(max-width:700px){
+ .audience-widget-layout.stage-fidelity{width:max(100%,700px);min-width:700px!important}
+ .audience-stage-scroll{max-width:100%;-webkit-overflow-scrolling:touch}
+ .audience-widget-layout.stage-reading,.audience-widget-layout.stage-legacy{width:100%!important;min-width:0!important}
+}
+@media(prefers-reduced-motion:reduce){.audience-widget-layout .page-widget{animation:none!important;transition:none!important}}
