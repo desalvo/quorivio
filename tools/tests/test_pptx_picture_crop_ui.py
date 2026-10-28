@@ -10,8 +10,9 @@ class PictureCropUIContracts(unittest.TestCase):
         self.assertIn('<CroppedImage className="projection-media"', MAIN)
         self.assertIn('crop={widget.crop}', MAIN)
     def test_preview_uses_same_crop_aware_media(self):
-        self.assertIn('className="rehearsal-cropped-media"', MAIN)
-        self.assertIn('crop={w.crop}', MAIN)
+        self.assertIn('<ProjectionWidgetContent sessionId={snapshot.session.id} widget={w} activity={a}/>',MAIN)
+        self.assertIn('<CroppedImage className="projection-media"',MAIN)
+        self.assertIn('crop={widget.crop}',MAIN)
     def test_editor_has_four_sided_crop_controls(self):
         self.assertIn("(['left','right','top','bottom'] as const)", MAIN)
         self.assertIn('Ritaglio immagine PowerPoint', MAIN)

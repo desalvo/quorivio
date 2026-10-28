@@ -186,7 +186,10 @@ CREATE TABLE IF NOT EXISTS widget_revisions (
 );
 ALTER TABLE widget_answers ADD COLUMN IF NOT EXISTS revision integer NOT NULL DEFAULT 1;
 ALTER TABLE widget_answers DROP CONSTRAINT IF EXISTS widget_answers_activity_id_participant_id_widget_id_key;
-CREATE UNIQUE INDEX IF NOT EXISTS widget_answers_one_per_revision ON widget_answers(activity_id,participant_id,widget_id,revision);
+-- Multiple independent questions share the same visual widget yet cannot overwrite one another.
+ALTER TABLE widget_answers ADD COLUMN IF NOT EXISTS question_id text NOT NULL DEFAULT '';
+DROP INDEX IF EXISTS widget_answers_one_per_revision;
+CREATE UNIQUE INDEX IF NOT EXISTS widget_answers_one_per_question_revision ON widget_answers(activity_id,participant_id,widget_id,question_id,revision);
 CREATE INDEX IF NOT EXISTS widget_answers_revision_stats ON widget_answers(session_id,activity_id,widget_id,revision);
 -- Timed widget results are independent per widget and definition revision.
 ALTER TABLE widget_answers ADD COLUMN IF NOT EXISTS correct boolean;

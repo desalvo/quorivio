@@ -1,0 +1,40 @@
+{
+  "version": "0.1.0-dev",
+  "date": "2026-10-28",
+  "baseline": "quorivio-0.1.0-dev-rc-linked-results-dual-live-preview-cumulative.zip",
+  "features": {
+    "wysiwyg_live": true,
+    "independent_subquestions_max_additional": 5,
+    "legacy_question_id": "",
+    "per_question_answer_isolation": true,
+    "per_question_presenter_results": true,
+    "timed_leaderboard_question_scoped": true,
+    "public_quiz_answer_key_redaction": true
+  },
+  "local_checks": {
+    "node_api": "461/461 PASS",
+    "node_web": "46/46 PASS",
+    "typescript_backend_frontend": "PASS",
+    "vite_build": "PASS",
+    "python_focused": "33/33 PASS",
+    "chromium_real_component_offline": "PASS desktop/mobile 1440/390",
+    "python_full": "timed out",
+    "authenticated_browser": "blocked locally",
+    "postgresql_18": "not available locally",
+    "github_full_ci": "not yet run"
+  },
+  "github_previous_verified": {
+    "run": 40595463258,
+    "sha": "e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9",
+    "scope": "previous baseline, not current changes"
+  },
+  "remaining": [
+    "New Full CI with browser_test true and publish_image false",
+    "Real PostgreSQL 18 migration and live E2E",
+    "Visual editor/rehearsal/audience consistency",
+    "Firefox WebKit physical touch and screen readers",
+    "Independent WCAG/AGID and GDPR approval"
+  ],
+  "global_rc_percent": 53.0,
+  "gate_promotions": []
+}

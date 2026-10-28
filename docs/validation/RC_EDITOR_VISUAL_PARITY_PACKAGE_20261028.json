@@ -1,0 +1,37 @@
+{
+  "baseline_archive": "quorivio-0.1.0-dev-rc-full-ci-green-evidence-consolidated.zip",
+  "baseline_files": 662,
+  "final_files": 671,
+  "added": [
+    "apps/api/test/widget-inline-marks.test.ts",
+    "apps/web/src/widget-text-marks.ts",
+    "apps/web/test/widget-text-marks.test.ts",
+    "docs/RC_EDITOR_VISUAL_PARITY_20261028.en.md",
+    "docs/RC_EDITOR_VISUAL_PARITY_20261028.it.md",
+    "docs/validation/RC_EDITOR_VISUAL_PARITY_20261028.json",
+    "docs/validation/RC_EDITOR_VISUAL_PARITY_PACKAGE_20261028.json",
+    "docs/validation/RC_EDITOR_VISUAL_PARITY_PACKAGE_20261028.json",
+    "tools/ci_widget_visual_geometry_20261028.py",
+    "tools/tests/test_visual_parity_rehearsal_20261028.py"
+  ],
+  "modified": [
+    ".github/workflows/ci.yml",
+    "apps/api/src/domain.ts",
+    "apps/web/src/main.tsx",
+    "apps/web/src/style.css",
+    "apps/web/src/widget-appearance.ts",
+    "docs/DEVELOPMENT_STATUS.it.md",
+    "docs/DEVELOPMENT_STATUS.md",
+    "docs/RC_GATE_MATRIX.json",
+    "tools/tests/test_ci_browser_editor_readonly_title.py",
+    "tools/tests/test_pptx_picture_crop_ui.py",
+    "tools/tests/test_pptx_projection_text_fidelity.py"
+  ],
+  "removed": [],
+  "version": "0.1.0-dev",
+  "current_verified_github_full_ci": 40595463258,
+  "previous_full_ci_commit": "e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9",
+  "new_code_github_ci": "pending",
+  "git_commit_or_push_performed": false,
+  "docker_publish_performed": false
+}

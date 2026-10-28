@@ -1,0 +1,81 @@
+{
+  "project": "Quorivio",
+  "version": "0.1.0-dev",
+  "recorded_on": "2026-10-27",
+  "workflow_url": "https://github.com/desalvo/quorivio/actions/runs/40595463258",
+  "run_id": 40595463258,
+  "run_conclusion": "success",
+  "head_sha": "e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9",
+  "trigger": "workflow_dispatch",
+  "observed_jobs": {
+    "Production quality gate": "success",
+    "Container build gate": "success",
+    "Production publication": "success"
+  },
+  "quality_evidence": {
+    "compile_frontend_backend": "pass",
+    "chromium_editor_opt_in": "pass: mock editor geometry/drag/group duplication, delete confirmation, network recovery, autosave",
+    "postgresql_editor_browser_opt_in": "pass: PATCH/readback/reload, CAS revision conflict, three-way merge and JSON export",
+    "postgresql_participant_browser_opt_in": "pass: QR join, independent votes, privacy, mobile touch, Q&A moderation",
+    "postgresql_presenter_avatar_browser_opt_in": "pass: upload/preview, anonymous scoped avatar, access denial, deletion",
+    "postgresql_live_concurrency": "pass: 24 independent participants",
+    "postgresql_timed_widgets": "pass: 12-way concurrency/idempotency and topic quota",
+    "postgresql_two_replica_websocket": "pass: cross-replica open/response/close and privacy",
+    "postgresql_capacity_500_opt_in": "pass: 500 independent participants, observed peak >= 475, no errors",
+    "postgresql_18_backup_restore": "pass: schema/row/asset parity, overwritten/refused invalid cases; test-only timings backup 0.18s / restore 0.34s",
+    "email_mfa_real_loopback_tls_smtp": "pass: enrollment, expiry, invalid/reused OTP, lockout, revocation",
+    "dependency_and_image_scans": "pass: vulnerability high/critical gate, runtime and converter image scans",
+    "credential_leak_scan": "pass",
+    "python_contract_tests": "pass: 877 tests, according to GitHub Actions log"
+  },
+  "strict_rc_gate": "skipped (manual opt-in not selected)",
+  "image_publication": {
+    "job": "success",
+    "triggered_by": "workflow_dispatch (GitHub Actions, not ChatGPT)",
+    "repository": "desalvo/quorivio",
+    "tags": [
+      "sha-e2dc3a97bd15",
+      "latest"
+    ],
+    "platforms_requested": [
+      "linux/amd64",
+      "linux/arm64"
+    ],
+    "digest": "sha256:3d08b4262c178b1701120e47f4aae1b145242686f8a9d91d363f015c4e88080a",
+    "proof": "Docker Buildx pushed both tags successfully, not proof of native ARM64, Podman or Kubernetes runtime acceptance"
+  },
+  "gate_evidence": {
+    "A1": "Chromium mock editor PASS (multi-widget duplicate/undo/delete, pointer, contextual menus, autosave loss/retry, reload); PostgreSQL editor CAS and Chromium actual autosave PATCH/readback, concurrent merge/conflict/JSON export PASS",
+    "A2": "Chromium editor thumb/menu/pointer and responsive editor preflights PASS; physical pixel fidelity and cross-engine drag/drop unverified",
+    "A3": "Chromium mock editor widget UI and real PostgreSQL widget semantics/timed concurrency PASS; full visual fidelity and representative PPTX corpus still outstanding",
+    "A4": "Chromium desktop plus touch-size viewport editor/participant and actual browser profile tested PASS; external screen readers and physical hardware outstanding",
+    "B1": "PostgreSQL live 24 concurrent participants, independent audience Chromium and two API replicas WebSocket PASS",
+    "B2": "Real PostgreSQL timed-widget 12-way idempotency/concurrency/fairness and topic quotas PASS; variable latency, multi-replica load environment not signed off",
+    "B3": "Chromium + PostgreSQL audience QR join, Q&A moderation/revocation, vote persistence and mobile touch PASS",
+    "B4": "PostgreSQL/WebSocket test: 500 independent participants, presenter-observed peak >=475, zero errors PASS; not production-like sustained throughput",
+    "C1": "PostgreSQL profile lifecycle, baseline auth, revocation, duplicate/import and API login tests PASS; full account recovery browser and multi-replica revocation not signed off",
+    "C2": "PostgreSQL + loopback TLS SMTP email MFA enrollment, invalid, concurrent OTP, expiry, lockout and revocation PASS; external provider not tested",
+    "C4": "Chromium + PostgreSQL presenter profile photo upload, public anonymous scoped avatar, private denial and deletion PASS; real RWX/ClamAV deployment not tested",
+    "D1": "All mandatory quality, Chromium opt-in, PostgreSQL acceptance, container build/scan and leak check PASS; strict opt-in RC gate SKIPPED",
+    "D2": "PostgreSQL 18 backup/restore test PASS with populated DB refusal, schema and row parity, private assets, integrity; CI sample timings not an RTO/RPO SLA",
+    "D3": "Container gate PASS; manual publication built/pushed linux/amd64 and linux/arm64 with SBOM/provenance (runtime smoke on arm64/Podman/Helm not tested)",
+    "D4": "High/critical npm vulnerability gate, credential leak scan, Docker image scans and 500-participant opt-in PASS; independent security sign-off open",
+    "D6": "PostgreSQL session retention/asset outbox/media erasure and privacy checks PASS; GDPR/AGID operational/legal approval open"
+  },
+  "rc_gate_state": {
+    "accepted": 1,
+    "partial": 17,
+    "other": 0,
+    "score": 53.0,
+    "ready": false
+  },
+  "not_proven": [
+    "Real physical device and screen reader accessibility",
+    "Firefox/WebKit cross-browser acceptance",
+    "Production-like DR restore/SLA/secret rotation",
+    "Production two-replica Kubernetes/HAProxy/NGINX/Podman/ClamAV",
+    "Independent real provider SSO/MFA and GDPR legal review",
+    "Independent full PPTX/visual fidelity/operational signoff"
+  ],
+  "provenance": "Recorded from GitHub Actions run and job logs. No local build or browser E2E has been run for this documentation-only package."
+}

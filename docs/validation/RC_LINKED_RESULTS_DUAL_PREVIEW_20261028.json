@@ -1,0 +1,27 @@
+{
+  "project": "Quorivio",
+  "version": "0.1.0-dev",
+  "baseline_archive": "quorivio-0.1.0-dev-rc-editor-preview-visual-parity-rich-text-cumulative.zip",
+  "last_user_committed_sha": "e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9",
+  "github_full_ci_baseline": 40595463258,
+  "new_github_full_ci": "pending",
+  "score": 53.0,
+  "node_backend": 455,
+  "node_frontend": 44,
+  "python_focused": 58,
+  "python_full": "timeout",
+  "chromium_offline": "PASS 1440x900 and 390x844; geometry and pointer",
+  "authenticated_browser": "blocked",
+  "files": [
+    "apps/api/src/domain.ts",
+    "apps/web/src/main.tsx",
+    "apps/web/src/widget-results.ts",
+    "apps/web/src/widget-group.ts",
+    "apps/web/src/style.css",
+    "apps/web/test/widget-results.test.ts",
+    "apps/web/test/widget-results-copy.test.ts",
+    "apps/api/test/widget-result-links.test.ts",
+    ".github/workflows/ci.yml",
+    "tools/ci_preview_layout_offline.py"
+  ]
+}

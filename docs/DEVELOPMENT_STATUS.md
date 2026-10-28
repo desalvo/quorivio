@@ -1,3 +1,37 @@
+# Quorivio 0.1.0-dev — Question-scoped revisions and WYSIWYG hardening (28 October 2026)
+
+Baseline archive: `quorivio-0.1.0-dev-rc-wysiwyg-independent-questions-cumulative.zip`; last user-confirmed commit `e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9`. These are **uncommitted local changes**, not yet confirmed by GitHub Actions.
+
+Implemented: question-specific revision selection from immutable existing PostgreSQL widget revision snapshots. Editing one independent question no longer reopens unrelated participants' answers or resets unrelated timed leaderboards. Added a PostgreSQL 18 transactional legacy-schema migration CI smoke test (TEMP table, historical default question ID, new uniqueness, rollback), and expanded real PostgreSQL HTTP acceptance (still pending CI). Fixed React `contentEditable` duplicate characters by giving the inline WYSIWYG editor ownership of its text DOM and deferring IME updates until `compositionend`; preserve selected styles and cursor without saving unsafe HTML.
+
+Local evidence: TypeScript API/Web and Vite build PASS, backend Node **467/467**, frontend Node **49/49**, Python focused contract **6/6**, widget-focused Python **36/36**, real offline Chromium component acceptance **PASS on 1440px desktop and 390px mobile**, including Unicode composition and live styled projection. Complete Python suite timed out locally; neither new PostgreSQL acceptance nor the full authenticated GitHub CI has run. No commits, pushes, tags, releases or Docker publications.
+
+RC accounting remains **53.0%** (1 accepted / 17 partial). Independent full browser/PostgreSQL proof, Firefox/WebKit, screen readers, physical devices and visual operator acceptance are still mandatory. Do not confuse completed implementation with release acceptance. Next run: `browser_test=true`, `publish_image=false`.
+
+---
+
+# Quorivio 0.1.0-dev — Editor, rehearsal and audience visual parity (2026-10-28)
+
+**Baseline:** user commit `e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9`, earlier successful Full CI `40595463258`. Changes in this cumulative archive have **not** been committed or verified by a new GitHub run.
+
+Implemented shared projection-backed widget sample bodies in the editor; editable title/options on double-click; contextual add-choice; font face, size, text color and alignment in the palette; bounded API-validated character-range `textMarks` (plain text, no arbitrary HTML); unsaved-draft participant rehearsal launched from the editor with native fullscreen; 16:9 saved coordinates across preview and final audience on desktop/mobile; rectangular tooltips for both widget palettes; and opt-in network-free real Chromium CSS geometry regression.
+
+**Local validation:** TypeScript API/web compilation + Vite build PASS; backend 454/454 Node PASS; frontend 38/38 Node PASS; focused Python 26/26 PASS; Chromium visual geometry 1440px and 390px PASS. Full Python suite locally timed out and is **not** certified.
+
+**Still open:** post-commit Full CI (Chromium with real PostgreSQL), Firefox/WebKit and real hardware, independent pixel-level widget parity checks, screen readers, phone usability, fully visual rich-text WYSIWYG inside the currently plain edit input, and distinct multi-question blocks inside one widget. No RC gate promoted on this evidence alone. Global RC remains **53.0%** (1 accepted, 17 partial); release candidate not ready. No assistant commit/push/tag/image publication.
+
+---
+
+## 2026-10-27 — FULL CI green, GitHub evidence reconciled (documentation-only batch)
+
+**Committed baseline:** `e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9` — [full opt-in workflow 40595463258](https://github.com/desalvo/quorivio/actions/runs/40595463258) **SUCCESS**. Production quality gate, container build gate and production publication are all green. Standard CI previously passed at `0bb8fb7856727699384dfe51aea6ee6d961ea022`. This is the first successfully completed opt-in full Chromium/PostgreSQL acceptance on the current multi-widget duplication hotfix.
+
+**Verified by GitHub Actions (not by fresh local execution):** desktop/mobile Chromium editor mock flows including group duplicate and destructive confirmation; network-loss/retry and autosave/reload; actual PostgreSQL Chromium editor PATCH/readback, stale CAS conflict, three-way merge and JSON export; audience QR join, votes, moderator, privacy and mobile touch; presenter avatar upload/anonymous audience display and private denial; real PostgreSQL auth and data erasure, SMTP TLS MFA, timed-widget concurrency, two-replica WS, database restore, vulnerability/leak checks and scanned container builds. The 500-user opt-in load passed with 500 independent participants and observer peak >=475, zero errors. The GitHub test log reports **877 Python tests** passed.
+
+**Publication warning:** the workflow manually dispatched on this commit really pushed Docker Hub tags `desalvo/quorivio:sha-e2dc3a97bd15` and `desalvo/quorivio:latest` (digest `sha256:3d08b4262c178b1701120e47f4aae1b145242686f8a9d91d363f015c4e88080a`; multi-platform builds requested). No push was made by ChatGPT. Future package review must not assume opt-in publishing is disabled unless `publish_image=false` is selected in the workflow.
+
+**RC gate decision:** 18 weighted gates (100 points), **1 accepted / 17 partial = 53.0%**, unchanged. The strict RC acceptance step was **skipped**; full automated tests do not certify independent visual, physical-device/assistive-technology, Firefox/WebKit, production-style DR, arm64/Podman/Kubernetes/ClamAV, GDPR or security operator signoff. Updated each gate's current outstanding criterion; no unsupported gate promotion or release claim. New machine-readable receipt: `docs/validation/RC_FULL_CI_GREEN_40595463258.json`. Run any next code changes through standard and opt-in CI; do not automatically republish images.
+
 ## 2026-10-27 — Full Chromium multi-widget duplication hotfix (uncommitted)
 
 Baseline is user-committed SHA `f4d0a768b468a64654cc72a261eec22e7ae0c4ee`. Extended GitHub Actions run [40592859476](https://github.com/desalvo/quorivio/actions/runs/40592859476) FAILED at the opt-in Chromium editor acceptance. The prior header-hit-target fix **PASSED** desktop/touch browser smoke in GitHub. The next browser check in `tools/ci_browser_editor.py` expected five widgets after duplicating two of three, but observed three. Root cause: `duplicateWidgetSelection` always offset the group by 5%, overlapping existing widgets; `rejectWidgetCollisions` legitimately rejected the result even where another translation would fit. Fixed at the geometry layer: `insertWidgetGroupInFreeSpace` searches collision-free whole-group offsets, preserving sizes, rotations and relative positions, and refuses insertions only where no suitable free layout exists. Clipboard multi-paste now uses the same placement guarantee. Chromium fixture now explicitly observes rejected duplication alerts and explicitly accepts the required user confirmation for destructive group deletion. No force clicks or disabled collision checks.
@@ -1454,3 +1488,37 @@ New responsive three-column shell with local Quorivio branding, distinct widget 
 ## RC batch 2026-10-27 — resilient autosave & visual parity
 
 Formal weighted score **53.0%** (unchanged until new CI + independent acceptance). Baseline `67a7be939a5930e2f9a49ce3932a4b7f29a682ac`; changed recovery after ambiguous PATCH responses, bounded retries, common CSS geometry, and mandatory frontend Node test step. Local Python 842/842, backend Node 447/447, frontend Node 12/12 PASS. New Full GitHub CI pending. Detailed report: `docs/RC_AUTOSAVE_RECOVERY_VISUAL_PARITY_20261027.en.md`. No automatic commit/push/release.
+
+
+## RC batch 2026-10-28 — linked presenter results, dual interactive rehearsal and formatting toolbar
+
+**Version:** 0.1.0-dev (unchanged). **Last verified complete GitHub CI:** run 40595463258 on e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9 (earlier baseline, not this batch). **This batch:** local checks only; new GitHub Full CI pending. Overall conservative RC readiness remains **53.0%**; A1–A4 remain partial.
+
+Delivered:
+- Each Results widget is now an on-canvas presenter-only chart, independently bound via `targetWidgetId` to an eligible statistical widget already on the same page (question, timed quiz, rating or reactions). Source selection is available in the editor property drawer, new results default to the first eligible source, invalid/deleted sources are unlinked, and API validation rejects self-reference, invalid or non-statistical targets and foreign-page references. Older unlinked widgets remain loadable and show a configuration prompt.
+- Live presenter results poll source-specific private endpoints (answer revisions, timed leaderboard, rating aggregates and page reactions) without publishing statistics in the participant widget tree. Topic-question visual statistics are still deferred until a dedicated backed aggregation is implemented; no fabricated live counts are claimed.
+- Dashboard and editor expose presenter, participant and side-by-side rehearsal. They use one 16:9 draft page geometry per pane, synchronized local responses/reactions, sample statistics seeded afresh per rehearsal, and native full screen; no rehearsal write APIs are called. Participant rehearsal does not render presenter-only results.
+- Participant reaction controls already submitted in real sessions; rehearsal controls now work locally and update simulated presenter results; the redundant page-level reaction bar is suppressed when a reactions widget is present.
+- Copying a Results widget with its source rewires the duplicate to the duplicate source; copying only Results keeps its existing source. Editor quick palette retains font family, font size, color, and inline range styles, with improved focus handling and rounded rectangle container.
+
+Evidence: local backend TypeScript build PASS; frontend `tsc --noEmit` and Vite build PASS; **455/455 API Node tests, 44/44 frontend Node tests, 58/58 focused Python tests PASS**; existing geometry Chromium offline PASS at 1440px and 390px, new dual-preview CSS and actual reaction pointer Chromium offline PASS at the same widths. **Local authenticated browser test blocked** by `net::ERR_BLOCKED_BY_ADMINISTRATOR` on localhost. Global Python suite TIMED OUT; it is not marked as passed. PostgreSQL 18, multi-user real browser and GitHub CI for this specific batch remain UNVERIFIED. The opt-in workflow now invokes `tools/ci_preview_layout_offline.py` before full editor Chromium acceptance.
+
+Outstanding: end-to-end browser and PostgreSQL user/presenter synchronization, real visual compare of all widgets, independent accessibility on physical devices/assistive tech and Firefox/WebKit, true WYSIWYG during typing, multiple separately editable questions per widget, topic-question linked live statistics. No auto commit/push/tag/release or Docker publication.
+
+Detailed notes: `docs/RC_LINKED_RESULTS_DUAL_PREVIEW_20261028.en.md` and `.it.md`.
+
+
+## RC development batch — 28 Oct 2026: live WYSIWYG and independent questions
+
+**Baseline:** previous cumulative linked-results/dual-preview package. **Version:** `0.1.0-dev` unchanged. **Formal global RC score:** 53.0% (unchanged). The 18-gate weighted matrix retains 1 accepted and 17 partial gates. This is a conservative release-readiness score, not a metric of lines coded. Do not promote A1–A4 without the new full GitHub/real PostgreSQL/browser and independent device/visual/accessibility acceptance.
+
+**Implemented in code:**
+- Actual inline rich-text `contentEditable` on the canvas: double-click to edit, immediate visible styled spans, character-range formatting from the contextual palette, per-caret insertion formatting, selection restoration across React re-renders, bounded plain-text paste without arbitrary HTML, and rendering parity with presenter and audience. Whole-widget style remains available when no text range is being edited.
+- Up to five additional separately editable/answerable questions in each `question` or `timed-quiz` widget, as well as its legacy primary question. Each subquestion has a stable ID, independent title, description, answer mode, choices, correct choices (quiz), requiredness and rich-text ranges. Inspector and canvas context support add/remove/edit; preview, projection and audience show all parts.
+- PostgreSQL migration adds `question_id` to `widget_answers` with `''` default for historical answers and a unique `(activity_id, participant_id, widget_id, question_id, revision)` constraint; duplicate submissions remain idempotent per independent question and answer revision. Backend enforces the selected subquestion's answer mode, options, scoring, deadlines and file-attachment ownership. Question definition edits bump the parent widget revision to preserve historical interpretation.
+- Results widgets can choose a specific subquestion, with per-question statistics and demo previews. The presenter answer summary and timed leaderboard are also question-scoped. Participant-facing activity serialization strips answer keys from nested timed quiz questions.
+- Full CI opt-in adds actual-production-component offline Chromium desktop/mobile rich editing and a disposable PostgreSQL 18 multi-question API lifecycle test. Security checks remain enabled; no deployment or publication has been performed.
+
+**Local evidence:** `npm run build` PASS (backend TypeScript, frontend TypeScript and Vite), **461/461 Node API** and **46/46 Node frontend** PASS; **33/33 focused Python** PASS (component, projection, database clock, timing, canvas and new RC contracts); actual Chromium headless component PASS at 1440px and 390px, including selected-run bold and italic insertion visible in projection. The full Python suite did not finish within the local execution limit; do not treat it as PASS. Authenticated browser requests to localhost are blocked by the local browser environment. PostgreSQL service/container tools are unavailable locally, so the **new database E2E has NOT passed locally and GitHub Full CI has not run for this batch**.
+
+**Open:** GitHub opt-in Full CI browser+PostgreSQL, real presenter/participant interaction and page fidelity, Firefox/WebKit, physical devices and assistive technology, historical revision migration on a populated staging database, independent accessibility and AGID/GDPR acceptance. This batch does not establish release-candidate readiness. No assistant commit/push/tag/release or Docker publication.

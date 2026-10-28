@@ -36,3 +36,19 @@ export function widgetAppearanceStyle(style:WidgetAppearance|undefined,imageUrl?
  if(shape==='circle')result.aspectRatio='1';
  return result;
 }
+
+/** Font and paragraph values belong to the stage coordinate system (1280px wide),
+ * not to each viewport. Using cqw ensures identical scaling in editor, preview
+ * and presenter projection without per-surface magic font sizes. */
+export function widgetTypographyStyle(style:WidgetTextStyle|undefined):Record<string,string|undefined>{
+ const size=style?.fontSize??16;
+ return {
+  fontFamily:style?.fontFamily||undefined,
+  fontSize:`${(size/1280*100).toFixed(5)}cqw`,
+  color:style?.color||undefined,
+  fontWeight:style?.bold?'bold':undefined,
+  fontStyle:style?.italic?'italic':undefined,
+  textAlign:style?.textAlign||undefined,
+  textDecoration:[style?.underline?'underline':'',style?.strikethrough?'line-through':''].filter(Boolean).join(' ')||undefined
+ };
+}

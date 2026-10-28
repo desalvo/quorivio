@@ -8,11 +8,12 @@ class SessionRehearsalContracts(unittest.TestCase):
   self.assertNotIn('request<',block)
   self.assertNotIn('fetch(',block)
   self.assertIn('Ricomincia prova',block)
-  self.assertIn('Simulazione locale',block)
+  self.assertIn('Nessuna risposta di prova viene salvata',block)
  def test_launch_from_dashboard(self):
   web=(ROOT/'apps/web/src/main.tsx').read_text()
-  self.assertIn('onClick={()=>setRehearsalOpen(true)}',web)
-  self.assertIn('<SessionRehearsal snapshot={snap}',web)
+  self.assertIn('setRehearsalMode(m);setRehearsalOpen(true)',web)
+  self.assertIn('initialMode={rehearsalMode} snapshot={snap}',web)
+  self.assertIn('Anteprime affiancate',web)
  def test_postit_validated_both_sides(self):
   web=(ROOT/'apps/web/src/main.tsx').read_text()
   domain=(ROOT/'apps/api/src/domain.ts').read_text()

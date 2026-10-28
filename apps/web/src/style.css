@@ -779,3 +779,115 @@
   top:max(204px,calc(200px + env(safe-area-inset-top,0px)))!important;
   max-height:min(31dvh,calc(100dvh - 225px))!important;
 }
+
+/* RC visual parity: the editing canvas, participant rehearsal and projection
+   all place widgets on a fixed 16:9 coordinate plane, including touch widths. */
+.rehearsal-shell{width:min(96vw,calc((92dvh - 128px)*16/9 + 20px));height:min(94dvh,960px)}
+.rehearsal-shell:fullscreen{width:100vw;height:100dvh;max-width:none;max-height:none;border-radius:0}
+.rehearsal-stage{flex:1;display:flex!important;align-items:center;justify-content:center;min-height:0;overflow:auto;padding:8px!important;background:#e8edf4}
+.rehearsal-stage>.rehearsal-slide{box-sizing:border-box;display:block;flex:none;position:relative;width:min(100%,calc((94dvh - 165px)*16/9));aspect-ratio:16/9;height:auto!important;min-height:0!important;padding:0!important;overflow:hidden!important;background-color:#fff;box-shadow:0 5px 25px #0002}
+.rehearsal-slide>.rehearsal-widgets{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-height:0!important;max-width:none!important;display:block!important;overflow:visible}
+.rehearsal-widgets>.rehearsal-widget{position:absolute!important;box-sizing:border-box;min-width:0!important;min-height:0!important;max-width:none;max-height:none;margin:0!important;overflow:hidden;display:block;transform-origin:center center;padding:0.7em!important;font-size:clamp(9px,1.1vw,18px);line-height:1.2;overflow-wrap:anywhere;}
+.rehearsal-widget>*{max-width:100%;box-sizing:border-box}
+.rehearsal-widget p{margin:.25em 0}
+.rehearsal-widget .projection-text-widget{width:100%;height:100%}
+.rehearsal-widget .projection-media{width:100%;height:100%;object-fit:contain}
+.rehearsal-widget .projection-sample-qr img{display:block;max-width:80%;max-height:75%;object-fit:contain}
+.rehearsal-shell:fullscreen .rehearsal-stage>.rehearsal-slide{width:min(100%,calc((100dvh - 140px)*16/9))}
+.editor-ux-v2 .widget-canvas-item>.canvas-widget-body-preview{height:calc(100% - 1.6em);min-height:0;max-width:100%;overflow:hidden;pointer-events:none;line-height:1.2;white-space:normal}
+.editor-ux-v2 .widget-canvas-item>.canvas-widget-body-preview :is(p,div){margin:.2em 0}
+.editor-ux-v2 .widget-canvas-item>.canvas-widget-body-preview img{max-width:100%;max-height:100%;object-fit:contain}
+.editor-ux-v2 .widget-canvas-item>input[aria-label^="Titolo"]{height:1.5em!important;min-height:1.3em;flex:none;font-size:inherit!important;font-weight:700;text-align:inherit;}
+.editor-ux-v2 .widget-canvas-item .canvas-widget-answer-preview input{width:100%;height:1.5em;font-size:inherit;padding:0;border:1px solid #5c86ac;pointer-events:auto}
+.editor-ux-v2 .canvas-widget-answer-preview{pointer-events:auto;max-height:calc(100% - 2em)}
+.editor-ux-v2 .widget-canvas-item{overflow:hidden;line-height:1.2}
+.editor-ux-v2 .widget-canvas-item:focus-within{overflow:visible}
+.editor-ux-v2 .editor-preview-open{flex:none;min-height:38px;padding:6px 12px;border:1px solid #76cee0;border-radius:8px;background:#124d63;color:#fff;white-space:nowrap}
+/* Both palette columns use the identical horizontally sized, rectangular tooltip. */
+.editor-floating-tooltip{width:max-content;min-width:0;max-width:min(340px,calc(100vw - 28px));white-space:nowrap;overflow-wrap:normal;border-radius:8px;}
+@media(max-width:760px){.editor-ux-v2 .editor-preview-open{font-size:11px;min-height:36px;padding:6px}.rehearsal-toolbar{gap:5px;padding:8px}.rehearsal-stage>.rehearsal-slide{width:100%}.rehearsal-widgets>.rehearsal-widget{font-size:clamp(8px,1.6vw,13px)}}
+/* Typography is relative to the same 1280-unit slide, not to the outer browser. */
+.editor-ux-v2 .widget-canvas,.rehearsal-widgets,.projection-page-content{container-type:inline-size}
+.editor-ux-v2 .widget-canvas-item,.rehearsal-widgets>.rehearsal-widget,.projection-page-content>.projection-widget{font-size:1.25cqw;line-height:1.2;}
+.editor-ux-v2 .widget-canvas-item>input[readonly]{color:inherit}
+.editor-ux-v2 .widget-canvas-item .canvas-widget-time-preview{padding-top:.3em;white-space:nowrap}
+/* The real audience stage must not switch into a stacked list on narrow screens.
+   Its hit targets stay inside the same 16:9 slide coordinate system as the editor. */
+.audience-widget-layout{position:relative!important;width:100%;height:auto;aspect-ratio:16/9;min-height:0!important;max-width:100%;display:block!important;container-type:inline-size;overflow:hidden;background:#fff}
+.audience-widget-layout>.page-widget{position:absolute!important;min-width:0!important;min-height:0!important;max-width:none!important;max-height:none!important;margin:0!important;padding:.7em!important;box-sizing:border-box;overflow:auto;transform-origin:center center;font-size:inherit!important}
+.rehearsal-widgets>.rehearsal-widget{border-radius:2px;}
+.projection-page-content{aspect-ratio:16/9;min-height:0!important;overflow:hidden}
+@media(max-width:700px){.audience-widget-layout{display:block!important;flex:none!important;min-height:0!important}.audience-widget-layout>.page-widget{position:absolute!important;min-height:0!important;max-height:none!important;height:var(--saved-height,auto);font-size:inherit!important;}}
+/* Legacy mobile !important rules formerly moved preview widgets into a list.
+   Explicit saved coordinates beat those rules at every viewport size. */
+.rehearsal-widgets>.rehearsal-widget{left:var(--stage-x)!important;top:var(--stage-y)!important;width:var(--stage-width)!important;height:var(--stage-height)!important;}
+.audience-widget-layout>.page-widget[style*="--stage-x"]{left:var(--stage-x)!important;top:var(--stage-y)!important;width:var(--stage-width)!important;height:var(--stage-height)!important;}
+/* When not typing, show the persisted styled spans instead of an unstyled
+   read-only text field. Keep the actual input for accessible editing shortcuts. */
+.editor-ux-v2 .widget-canvas-item>.canvas-title-readonly{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px!important;clip-path:inset(50%)}
+.editor-ux-v2 .widget-canvas-rich-label{font-weight:700;white-space:pre-wrap;overflow:hidden;text-overflow:ellipsis;max-height:2.4em;line-height:1.2;pointer-events:none;min-width:0}
+.editor-ux-v2 .widget-canvas-item>.canvas-widget-body-preview{height:calc(100% - 1.6em)}
+/* A shared visual body owns the title of these widgets; do not display the
+   editor-only title overlay a second time. Double-click still edits the input. */
+.editor-ux-v2 .widget-canvas-item:is([data-widget-kind="timer"],[data-widget-kind="rating"],[data-widget-kind="reactions"],[data-widget-kind="qr"],[data-widget-kind="profile"],[data-widget-kind="participant-count"],[data-widget-kind="results-button"])>.canvas-widget-rich-label{display:none}
+
+/* Multi-view rehearsal uses one 16:9 coordinate plane per pane, identical to
+   the editing canvas. On narrow screens dual panes scroll horizontally rather
+   than reflowing absolute widget positions. */
+.rehearsal-shell.rehearsal-mode-both{width:min(98vw,1740px);max-width:none}
+.rehearsal-stage{min-height:0;overflow:auto!important;display:block!important;padding:14px!important;background:#e8edf4}
+.rehearsal-panes{width:100%;min-height:100%;display:flex;justify-content:center;align-items:flex-start;gap:16px}
+.rehearsal-pane{flex:1 1 0;min-width:0;max-width:100%;display:flex;flex-direction:column;align-items:stretch;gap:8px}
+.rehearsal-pane-heading{font-size:13px;color:#233451;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rehearsal-pane>.rehearsal-slide{width:100%;height:auto!important;aspect-ratio:16/9;min-height:0!important;position:relative;flex:none;overflow:hidden!important;box-sizing:border-box;border:1px solid #cad2e1;padding:0!important;background-color:#fff;box-shadow:0 5px 25px #0002}
+.rehearsal-pane>.rehearsal-slide>.rehearsal-widgets{position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;min-height:0!important;max-width:none!important;container-type:inline-size;overflow:hidden}
+.rehearsal-pane .rehearsal-widget{position:absolute!important;left:var(--stage-x)!important;top:var(--stage-y)!important;width:var(--stage-width)!important;height:var(--stage-height)!important;margin:0!important;padding:.7em!important;box-sizing:border-box;min-height:0!important;max-height:none!important;max-width:none!important;overflow:hidden;font-size:1.25cqw!important;line-height:1.2;transform-origin:center center;}
+.rehearsal-mode-switch{display:flex;gap:3px;flex-wrap:wrap;align-items:center}
+.rehearsal-mode-switch button{border:1px solid #7b91af;border-radius:7px;background:#f0f4fa;color:#263a59;padding:6px 9px;min-height:34px}
+.rehearsal-mode-switch button[aria-pressed=true]{background:#144e6d;color:#fff}
+.rehearsal-shell:fullscreen{height:100dvh!important;width:100vw!important}
+.rehearsal-mode-both:fullscreen .rehearsal-panes{max-width:none}
+@media(max-width:720px){.rehearsal-panes:has(>.rehearsal-pane:nth-child(2)){justify-content:flex-start;min-width:680px}.rehearsal-panes:has(>.rehearsal-pane:nth-child(2)) .rehearsal-pane{min-width:320px}.rehearsal-pane .rehearsal-widget{font-size:1.25cqw!important}}
+.rehearsal-widget .projection-sample-reactions>div{display:flex;flex-wrap:wrap;gap:.2em}
+.rehearsal-widget .projection-sample-reactions button,.rehearsal-widget .projection-sample-rating button{font:inherit;padding:.12em .25em;border:1px solid #9baec5;border-radius:6px;background:#fff;color:#172038;cursor:pointer;min-width:1.6em}
+.rehearsal-widget button[aria-pressed=true]{background:#155c80;color:white;border-color:#155c80}
+.rehearsal-widget button:disabled{cursor:default;opacity:.75}
+.linked-results{display:flex;flex-direction:column;gap:.3em;overflow:hidden;width:100%;height:100%;font:inherit;color:inherit}
+.linked-results>small{font-size:.75em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.linked-results-items{display:flex;flex-direction:column;gap:.25em;overflow:auto;flex:1;min-height:0}
+.linked-results-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.15em .4em;align-items:center;font-size:.9em}
+.linked-results-row span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.linked-results-track{grid-column:1/-1;height:.3em;min-height:2px;background:#d0dced;border-radius:9px;overflow:hidden}
+.linked-results-track>div{height:100%;background:#2784c4}
+.linked-results-pie{width:min(30%,5.8em);aspect-ratio:1;border-radius:50%;align-self:center;flex:none}
+.result-view-cloud .linked-results-items{display:block}
+.result-view-cloud .linked-results-row{display:inline-flex;gap:.4em;margin-right:.6em}
+.result-view-table .linked-results-row{border-bottom:1px solid #a9b3c77d}
+.rehearsal-launch-actions{display:flex;flex-wrap:wrap;gap:8px}
+.editor-ux-v2 .editor-preview-open.preview-presenter{background:#5b327e;border-color:#d0a5ee;color:#fff}
+.editor-ux-v2 .editor-preview-open.preview-participant{background:#124d63;border-color:#76cee0;color:#fff}
+.editor-ux-v2 .editor-preview-open.preview-both{background:#5f4d15;border-color:#e6ce78;color:#fff}
+.widget-selection-palette{border-radius:14px;outline:1px solid #648198;box-shadow:0 8px 21px #0003}
+
+/* Rich-text editing uses the actual rendered spans while typing. No unstyled
+   textbox overlay: the user's caret shares the projection's font metrics. */
+.editor-ux-v2 .widget-canvas-item>.widget-rich-inline{font-weight:700;line-height:1.2;min-width:0;white-space:pre-wrap;overflow-wrap:anywhere;max-width:100%;flex:none;min-height:1.25em;outline:0}
+.editor-ux-v2 .widget-canvas-item>.widget-rich-editing{background:#fff6;outline:1px dotted #3470be;border-radius:3px;cursor:text;user-select:text;pointer-events:auto}
+.editor-ux-v2 .widget-rich-inline[contenteditable="true"]{user-select:text;touch-action:manipulation}
+.editor-ux-v2 .widget-canvas-item .canvas-widget-answer-preview .widget-rich-inline{display:inline;min-width:0;flex:1}
+.editor-ux-v2 .widget-canvas-item .canvas-widget-answer-preview .widget-rich-editing{display:inline-block}
+.editor-ux-v2 .widget-canvas-item .canvas-widget-body-preview{min-height:0;overflow:auto}
+.editor-ux-v2 .widget-canvas-item:has(>.widget-rich-inline):not([data-widget-kind="text"]):not([data-widget-kind="postit"]){overflow:auto}
+.editor-ux-v2 .widget-canvas-item .canvas-subquestion{display:flex;flex-direction:column;gap:.28em;border-top:1px solid #6665;padding-top:.3em;margin-top:.3em}
+.editor-ux-v2 .canvas-subquestion .widget-rich-inline:first-child{font-weight:700}
+.editor-ux-v2 .canvas-subquestion-option{display:flex;gap:.3em;align-items:flex-start}
+.editor-ux-v2 .canvas-subquestion-option .widget-rich-inline{flex:1;min-width:0}
+.projection-question-group{display:flex;flex-direction:column;gap:.5em;height:100%;overflow:auto}
+.projection-question-group>.projection-interactive-widget{min-height:0;flex:none;border-bottom:1px solid #bac5d355;padding-bottom:.35em}
+.widget-question-group{display:flex;flex-direction:column;gap:.7em;overflow:auto;max-height:100%}
+.widget-question-group>.widget-question{flex:none;min-height:0}
+.widget-subquestion-editor{margin-block:8px;border:1px solid #607b95;border-radius:12px;padding:10px}
+.widget-subquestion-editor-row{border:1px solid #758ca3;border-radius:8px;padding:8px;margin-bottom:8px;display:grid;gap:5px}
+.widget-subquestion-choices{display:grid;gap:4px}
+.widget-subquestion-choices label{display:flex;gap:5px;align-items:center}
+.widget-subquestion-choices label input[type="text"]{min-width:0;flex:1}

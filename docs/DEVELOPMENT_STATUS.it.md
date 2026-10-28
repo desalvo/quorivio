@@ -1,3 +1,75 @@
+# Quorivio 0.1.0-dev — ciclo isolamento revisioni e WYSIWYG (28 ottobre 2026)
+
+**Baseline:** cumulativo `quorivio-0.1.0-dev-rc-wysiwyg-independent-questions-cumulative.zip`; ultimo commit confermato `e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9`. Sviluppo locale non ancora verificato da nuova CI GitHub. Versione e licenza invariate.
+
+## Modifiche realmente implementate
+
+- **Risposte di domande indipendenti:** l'API ricostruisce la revisione effettiva della singola domanda dagli snapshot immutabili `widget_revisions`. La modifica della domanda 2 non rende nuovamente votabile la domanda 1 e non cambia il denominatore dei suoi risultati; anche la classifica a tempo usa la revisione della domanda selezionata. Nessuna riscrittura delle vecchie risposte o dei loro ID.
+- **Migrazione PostgreSQL storica:** aggiunta prova CI transazionale su PostgreSQL 18 con tabella legacy temporanea, esecuzione delle istruzioni reali di migrazione, conservazione delle risposte esistenti, vincolo di unicità per domanda e `ROLLBACK` finale. Esteso test API PostgreSQL sullo stesso scenario; il database non era disponibile in locale, perciò queste verifiche sono **ancora da eseguire in GitHub**.
+- **WYSIWYG inline:** risolto un difetto riproducibile di caratteri duplicati causato dalla riconciliazione React di nodi dentro `contentEditable`. Il DOM viene ricostruito da testo semplice e marcature consentite, mantenendo il cursore; l'IME non conferma caratteri parziali prima di `compositionend`. Test reale offline Chromium desktop/mobile con grassetto sulla selezione, corsivo all'inserimento, carattere Unicode e proiezione aggiornata.
+- Aggiunte regressioni TypeScript/Node e Python, senza `any`, `@ts-ignore`, disattivazioni dei controlli di sicurezza o pubblicazioni.
+
+## Evidenze del ciclo
+
+| Verifica | Risultato |
+|---|---|
+| Compilazione TypeScript API/Web e Vite | PASS locale |
+| Suite Node backend | 467/467 PASS locale |
+| Suite Node frontend | 49/49 PASS locale |
+| Python regressioni migrazione/revisioni | 6/6 PASS locale |
+| Python contratti widget mirati | 36/36 PASS locale |
+| Chromium WYSIWYG offline desktop/mobile | PASS locale (non end-to-end autenticato) |
+| Suite Python completa | Timeout locale: NON certificata |
+| Migrazione PostgreSQL 18 e E2E multi-domanda | CI aggiunta, non eseguita |
+| Nuova Full CI GitHub | Non eseguita |
+
+**Gate e percentuale:** 18 gate, 1 accettato e 17 parziali; **indice RC verificato 53,0%**. La correzione del codice e i test locali non soddisfano da soli i requisiti di accettazione indipendente dei gate A3/B2. Nessuna promozione fittizia; release candidate non pronta.
+
+**Prossimi passi:** Full CI `browser_test=true`, `publish_image=false`; verificare risposte storiche e classifiche PostgreSQL, riprodurre flusso WYSIWYG autenticato, controllare Firefox/WebKit, accessibilità assistiva, dispositivi reali e fedeltà visuale editor/presentatore/partecipante.
+
+---
+
+# Quorivio 0.1.0-dev — Allineamento editor, anteprima e partecipante (28 ottobre 2026)
+
+**Baseline:** commit utente `e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9`; Full CI precedente `40595463258` verde. **Nuove modifiche ancora non committate e non confermate in GitHub CI.** Nessuna pubblicazione Docker eseguita in questo ciclo.
+
+## Consegnato nel cumulativo
+
+- Il canvas editor mostra i contenuti di prova dei widget usando la logica di proiezione, non solo il titolo: Timer, gradimento, reazioni, QR, immagini/media, partecipanti, risultati, profilo, testo e opzioni.
+- Anteprima partecipante nel medesimo editor senza uscire né salvare forzatamente: riceve la bozza corrente. Pulsante nativo «Tutto schermo» e navigazione locale che non invia risposte.
+- Editor, anteprima, proiezione e vista partecipante usano posizionamenti percentuali su un piano 16:9. Rimossi i reflow impliciti che alteravano le coordinate su mobile; le vecchie regole `!important` sono superate dai dati posizionali salvati.
+- Font, colore, dimensioni, allineamento e stili del widget vengono applicati in modo scalabile rispetto alla larghezza della pagina.
+- Doppio clic: modifica titolo e opzioni direttamente nel widget. Menu contestuale per aggiungere opzioni (max 12). La palette offre font, grandezza, colore e allineamenti.
+- Aggiunta formattazione persistente per intervalli selezionati di titolo/opzioni tramite `textMarks`, validata dall'API su testo semplice (non HTML né CSS arbitrario). I tooltip delle palette hanno entrambi forma rettangolare.
+- Nuovo preflight Chromium della geometria reale su desktop 1440px e mobile 390px, incluso nel job browser opt-in.
+
+## Verifiche eseguite localmente
+
+- `npm run build`: TypeScript backend/frontend e build Vite **PASS**.
+- `npm run test`: **454/454 PASS**.
+- Test Node frontend: **38/38 PASS**.
+- Test Python di contratto mirati: **26/26 PASS**.
+- `python tools/ci_widget_visual_geometry_20261028.py`: **PASS** a 1440 e 390 px con Chromium reale, senza network.
+- Suite Python integrale: timeout nell'ambiente locale, **non certificata**.
+
+## Attività residue reali
+
+La conferma finale del rendering pagina per pagina, su Firefox/WebKit, touch fisico, screen reader, proiezione e backend PostgreSQL resta aperta. L'editing di testo con formattazione a intervalli è memorizzato/renderizzato, ma il campo nativo in fase di digitazione non disegna ancora gli stili dei singoli caratteri: occorre un vero editor WYSIWYG inline. L'aggiunta di opzioni è implementata, non ancora la gestione di più domande distinte nello stesso widget. L'uso in scala 16:9 sui telefoni deve essere valutato per accessibilità e interazione.
+
+**Score RC = 53,0%** (1 gate accepted, 17 partial). A1–A4 non promossi: evidenze locali non equivalgono a Full CI e approvazione indipendente. La release candidate **non è pronta**.
+
+---
+
+## 2026-10-27 — Full CI verde, riconciliazione evidenze GitHub (solo documentazione)
+
+**Baseline committata:** `e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9` — [workflow completo 40595463258](https://github.com/desalvo/quorivio/actions/runs/40595463258) **SUCCESS**. Verdi Production quality gate, Container build gate e Production publication. La CI standard era già passata al commit `0bb8fb7856727699384dfe51aea6ee6d961ea022`. Questa run conferma in GitHub il primo completamento della Full CI Chromium/PostgreSQL sul fix della duplicazione di gruppi.
+
+**Verificato in GitHub Actions (non rieseguito localmente in questo batch):** Chromium desktop/mobile del mock editor con duplicazione e conferma cancellazione; recupero connessione, autosalvataggio e riapertura; browser PostgreSQL reale per PATCH/rilettura, CAS, conflitti e merge a tre vie; audience QR/voti/moderazione/privacy/touch; upload avatar e proiezione anonima; PostgreSQL retention/erasure, MFA SMTP TLS, concorrenza widget temporizzati, WebSocket a due repliche, ripristino DB, vulnerability/leak scan e build container. La prova opzionale 500 partecipanti è **PASS** (500 partecipanti indipendenti, picco osservato >=475, zero errori). Nei log GitHub risultano **877 test Python** superati.
+
+**Attenzione pubblicazione:** GitHub Actions ha pubblicato realmente su Docker Hub `desalvo/quorivio:sha-e2dc3a97bd15` e `desalvo/quorivio:latest`, digest `sha256:3d08b4262c178b1701120e47f4aae1b145242686f8a9d91d363f015c4e88080a`, tramite workflow avviato manualmente. ChatGPT non ha effettuato alcun push. Per le prossime run utilizzare esplicitamente `publish_image=false` se non si vuole pubblicare.
+
+**Decisione RC:** 18 gate ponderati (100 punti), **1 accettato / 17 parziali = 53,0%**; valore invariato. Lo step rigoroso RC era **saltato**: la CI automatica verde non sostituisce accettazione visuale, dispositivi reali/accessibilità assistiva, Firefox/WebKit, DR operativo, ARM64/Podman/Kubernetes/ClamAV, audit GDPR/sicurezza e collaudo umano. Aggiornati i requisiti residui per ogni gate senza promozioni non giustificate. Ricevuta: `docs/validation/RC_FULL_CI_GREEN_40595463258.json`.
+
 ## 2026-10-27 — Hotfix duplicazione multipla nella Full CI Chromium (non committato)
 
 La baseline è il commit utente `f4d0a768b468a64654cc72a261eec22e7ae0c4ee`. La CI estesa [40592859476](https://github.com/desalvo/quorivio/actions/runs/40592859476) è **FALLITA** nel test Chromium editor opzionale. Il precedente fix dell'header è stato **CONFERMATO** dalla nuova run desktop/touch. Il test successivo attendeva cinque widget dopo averne duplicati due su tre, ma ne rilevava soltanto tre. Causa: lo spostamento fisso del 5% per duplicare un gruppo causa sovrapposizioni; il controllo anticollisione annulla legittimamente l'operazione senza tentare posizioni alternative. Correzione nello strato geometrico: `insertWidgetGroupInFreeSpace` ricerca una traslazione libera dell'intero gruppo, conserva geometria relativa/dimensioni/rotazioni e rifiuta l'inserimento solo se non esiste spazio. Anche l'incolla di gruppi utilizza la stessa garanzia. Il test browser intercetta gli alert di duplicazione respinta e accetta esplicitamente la conferma obbligatoria per la cancellazione multipla. Non sono stati disabilitati controlli collisione o usati clic forzati.
@@ -1241,3 +1313,36 @@ Nuova cornice responsive a tre colonne, logo, menu contestuali desktop/touch, ic
 ## Batch RC 27/10/2026 — autosalvataggio resiliente e geometria condivisa
 
 Formal weighted score **53.0%** (unchanged until new CI + independent acceptance). Baseline `67a7be939a5930e2f9a49ce3932a4b7f29a682ac`; changed recovery after ambiguous PATCH responses, bounded retries, common CSS geometry, and mandatory frontend Node test step. Local Python 842/842, backend Node 447/447, frontend Node 12/12 PASS. New Full GitHub CI pending. Detailed report: `docs/RC_AUTOSAVE_RECOVERY_VISUAL_PARITY_20261027.it.md`. No automatic commit/push/release.
+
+
+## Batch RC 28/10/2026 — risultati collegati, anteprime interattive affiancate e palette
+
+**Versione:** 0.1.0-dev invariata. Ultima Full CI GitHub verificata: 40595463258 sul commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9 (precedente al presente ciclo). **Questo ciclo: solo test locali, nuova Full CI da eseguire. Completamento globale RC 53,0% invariato, gate A1–A4 ancora parziali.**
+
+Implementato:
+- Ogni widget Risultati viene mostrato soltanto al presentatore ed è collegabile dal pannello proprietà a un widget statistico della stessa pagina (domanda, quiz a tempo, gradimento, reazioni) mediante `targetWidgetId`. Il backend rifiuta target inesistenti, autoreferenze, widget non statistici e riferimenti esterni alla pagina. I widget legacy privi di collegamento restano caricabili ma richiedono configurazione.
+- Nella proiezione reale del presentatore i grafici interrogano gli endpoint autenticati e specifici della sorgente; nel preview si usano dati fittizi generati all'avvio, mai scritti nel database. Le statistiche delle domande sul tema non sono ancora collegate a un aggregato reale e rimangono aperte.
+- Anteprime presentatore, partecipante e simultanee affiancate accessibili sia dalla dashboard sia dall'editor, con canvas 16:9, contenuto della bozza corrente (anche non salvata), schermo intero e stato di prova condiviso. I risultati sono assenti dalla vista partecipante; le reazioni funzionano nella prova, senza richieste di scrittura.
+- Duplicando insieme domanda e risultati, i duplicati mantengono un collegamento tra loro; i collegamenti verso widget rimossi sono svuotati. Palette rettangolare ad angoli arrotondati con font face, font size, colore e formattazione del testo selezionato; corretto il focus quando si passa dall'editing alla palette.
+
+**Test locali:** build TypeScript backend e frontend/Vite PASS; **455/455 Node backend, 44/44 Node frontend e 58/58 Python mirati PASS**; Chromium offline geometria 16:9 e puntatore delle reazioni su 1440 e 390 px PASS. Il browser con app autenticata su localhost è bloccato da `net::ERR_BLOCKED_BY_ADMINISTRATOR`; NON è un test end-to-end superato. Suite Python generale interrotta per timeout; NON superata. CI GitHub e PostgreSQL 18 sul nuovo batch NON ancora verificati. Inserita la nuova prova offline nella Full CI opt-in.
+
+**Da chiudere:** prove browser end-to-end PostgreSQL su sessioni reali, confronto visivo di tutti i widget, Firefox/WebKit e dispositivi fisici, accessibilità assistiva, WYSIWYG durante digitazione, più domande indipendenti in un widget, risultati live per domande sul tema. Nessun commit/push/tag/release o pubblicazione Docker automatica.
+
+Report: `docs/RC_LINKED_RESULTS_DUAL_PREVIEW_20261028.it.md`.
+
+
+## Batch RC 28/10/2026 — WYSIWYG in tempo reale e domande indipendenti
+
+**Baseline:** ultimo cumulativo risultati collegati / doppia anteprima. **Versione:** `0.1.0-dev` invariata. **Avanzamento globale RC ufficiale:** 53,0% (invariato). La matrice ponderata conserva 1 gate accettato e 17 parziali: non è una misura del numero di righe sviluppate. A1–A4 non saranno promossi prima della nuova Full CI e del collaudo indipendente visivo, accessibilità e dispositivi.
+
+**Funzionalità implementate:**
+- Editor `contentEditable` direttamente sul canvas, attivato dal doppio clic, con caratteri formattati visibili durante la digitazione, marcature per intervalli di testo, mantenimento del cursore durante i rerender React e formattazione delle nuove lettere al punto di inserimento. La palette modifica tutto il widget se non si è in editing; modifica solo la porzione selezionata quando si lavora nel testo. Incolla soltanto testo normale, senza HTML arbitrario.
+- Fino a cinque ulteriori domande indipendenti, oltre alla domanda principale compatibile con i dati storici, per widget domanda o quiz a tempo. Ogni sottodomanda dispone di ID permanente, titolo, descrizione, modalità di risposta, opzioni, risposte corrette (quiz), obbligatorietà e stili individuali. Aggiunta/rimozione e configurazione dall'editor, anteprime e pagina partecipanti.
+- Migrazione PostgreSQL: `widget_answers.question_id` con default `''` per il vecchio schema e unicità per partecipante/widget/domanda/revisione; invii duplicati idempotenti, scadenze, convalida opzioni, allegati e punteggi isolati per domanda. Le modifiche alla definizione incrementano la revisione del widget e non reinterpretano risposte già raccolte.
+- Il widget Risultati può selezionare una specifica sottodomanda; sia riepiloghi sia classifiche dei quiz a tempo filtrano per `question_id`. Chiavi di risposta corrette rimosse dalla proiezione pubblica del quiz, anche per le domande annidate.
+- Aggiunti alla CI estesa Chromium desktop/mobile sul vero componente WYSIWYG e test end-to-end PostgreSQL 18 di risposte indipendenti. Nessuna pubblicazione Docker eseguita.
+
+**Evidenze locali:** build backend/frontend TypeScript e Vite **PASS**; **461/461 Node backend, 46/46 Node frontend, 33/33 Python mirati PASS**; Chromium del vero componente React su viewport 1440 e 390 px **PASS**, inclusi grassetto sulla selezione e corsivo durante l'inserimento. Suite Python generale **timeout**, non validata. Browser autenticato bloccato localmente da `ERR_BLOCKED_BY_ADMINISTRATOR`; PostgreSQL 18 non disponibile localmente: la nuova prova DB è **da eseguire in GitHub**. Il codice nuovo NON ha una Full CI verificata.
+
+**Blocchi e prossimi controlli:** eseguire Full CI GitHub con `browser_test=true`, `publish_image=false`; migrazione su database storico di staging; confronto layout e interazioni in sessione reale; Firefox/WebKit, telefoni e tablet fisici, screen reader e verifiche indipendenti WCAG/AGID/GDPR. Non dichiarare pronta la RC. Nessun commit, push, tag, release o publish Docker dell'assistente.

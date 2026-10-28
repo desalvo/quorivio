@@ -6,7 +6,7 @@ WEB = (Path(__file__).resolve().parents[2] / 'apps/web/src/main.tsx').read_text(
 
 class ProjectionTextFidelity(unittest.TestCase):
     def test_full_imported_description_not_rendered_twice(self):
-        self.assertIn("widget.description.startsWith(widget.label||'')?widget.description", WEB)
+        self.assertIn("widget.description?.startsWith(widget.label||'')", WEB)
         self.assertIn("whiteSpace:'pre-wrap'", WEB)
 
     def test_pptx_text_style_is_applied_on_presenter_projection(self):
@@ -18,7 +18,7 @@ class ProjectionTextFidelity(unittest.TestCase):
         self.assertIn("w.kind==='postit'?<div className=\"rehearsal-postit\" style=", WEB)
 
     def test_rehearsal_uses_imported_typography_and_full_text(self):
-        self.assertIn("fontFamily:w.style?.fontFamily||undefined", WEB)
-        self.assertIn("['text','postit'].includes(w.kind)?<span style={{whiteSpace:'pre-wrap'}}>", WEB)
+        self.assertIn("...widgetTypographyStyle(w.style)", WEB)
+        self.assertIn('<ProjectionWidgetContent sessionId={snapshot.session.id} widget={w} activity={activity}/>', WEB)
 
 if __name__ == '__main__': unittest.main()

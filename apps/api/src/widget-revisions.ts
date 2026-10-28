@@ -4,7 +4,7 @@ export function widgetAnswerShapeChanged(old:any,next:any):boolean {
   const timed=w.kind==='timed-quiz';
   const mode=timed?(w.answerMode==='multiple'?'multiple':'single'):(w.answerMode||'text');
   const options=w.options||[];
-  const base:any={answerMode:mode,required:w.required!==false,options};
+  const base:any={answerMode:mode,required:w.required!==false,options,questions:w.questions??null};
   if(timed){
    base.durationSeconds=w.durationSeconds??30;
    // Match the scorer's precedence: the legacy single-answer key wins over
@@ -55,4 +55,41 @@ export function liveTimedWidgetMutation(previous:any[],next:any[]):boolean {
  }
  const newWidgets=new Map(next.filter(w=>w.kind==='timed-quiz').map(w=>[w.id,w]));
  return previous.some(old=>old.kind==='timed-quiz'&&(!newWidgets.has(old.id)||widgetAnswerShapeChanged(old,newWidgets.get(old.id))));
+}
+
+/** Return the answer revision of one independent question, not the whole widget.
+ *
+ * widget_revisions stores immutable full snapshots with global monotonic numbers.
+ * Reuse the number at the last semantic change of THIS question. This keeps
+ * old answer rows and their original revision numbers readable; editing q2
+ * cannot make q1 answerable a second time or reset q1's leaderboard.
+ * An empty history is the legacy, default revision one.
+ */
+export function questionRevisionAtHistory(
+ history:ReadonlyArray<{revision:number;definition:any}>, questionId:string
+):number {
+ let previous:string|undefined;
+ let activeRevision=1;
+ const ordered=[...history].sort((a,b)=>a.revision-b.revision);
+ for(const item of ordered){
+  if(!Number.isSafeInteger(item.revision)||item.revision<1)continue;
+  const widget=item.definition;
+  const part=questionId?widget?.questions?.find((q:any)=>q.id===questionId):widget;
+  if(!part) {previous=undefined;continue}
+  const timed=widget?.kind==='timed-quiz';
+  const comparable={kind:widget.kind,
+   answerMode:timed?(part.answerMode==='multiple'?'multiple':'single'):(part.answerMode||'text'),
+   required:part.required!==false,options:part.options||[],
+   // The timer is shared by the visual widget: a duration change affects every question.
+   ...(timed?{durationSeconds:widget.durationSeconds??30,
+    correctIds:part.answerMode==='multiple'?(part.correctOptionIds||[]):
+      typeof part.correctOptionId==='string'&&part.correctOptionId
+      ?[part.correctOptionId]:Array.isArray(part.correctOptionIds)&&part.correctOptionIds.length===1
+      ?part.correctOptionIds:[]}:{}),
+  };
+  const signature=JSON.stringify(comparable);
+  if(previous!==signature)activeRevision=item.revision;
+  previous=signature;
+ }
+ return activeRevision;
 }

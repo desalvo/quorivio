@@ -1,0 +1,54 @@
+{
+  "project": "Quorivio",
+  "version": "0.1.0-dev",
+  "date": "2026-10-28",
+  "baseline_user_committed_sha": "e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9",
+  "baseline_full_ci": {
+    "run": 40595463258,
+    "conclusion": "success",
+    "verified_in_prior_turn": true
+  },
+  "task": "Editor/rehearsal/presenter/audience layout and content parity from user screenshots, plus inline style and tooltips",
+  "implemented": [
+    "Editor widget preview displays actual projection-backed content for timer, rating, reactions, QR, participant count, results, profile, media, PDF, text/postit and existing question options",
+    "Real 16:9 coordinate space is used in rehearsal and final participant page, including mobile: legacy !important mobile auto-stacking neutralized by persisted CSS custom properties",
+    "Preview from the editor opens without closing editing, uses current unsaved page draft and supports native fullscreen",
+    "Both widget rail tooltips use rectangular width-to-content treatment",
+    "Inline title and choice editing after double-click, plus contextual add-choice; style palette exposes family/size/color/alignment",
+    "Widget-inline text marks stored as plain text and validated against server schema with bounded span ranges, no arbitrary HTML/CSS",
+    "Canvas-relative typography (cqw) used to scale widget text with the slide across contexts",
+    "Shared projection rendering replaces duplicated rehearsal media/text code",
+    "Opt-in CI adds network-free desktop/mobile Chromium geometry and tooltip preflight"
+  ],
+  "local_checks": {
+    "frontend_typescript_tsc_noemit": "PASS",
+    "backend_typescript_tsc": "PASS",
+    "vite_production_build": "PASS",
+    "backend_node_tests": "454/454 PASS",
+    "frontend_node_tests": "38/38 PASS",
+    "python_focused_contracts": "26/26 PASS",
+    "chromium_network_free_desktop_mobile": "PASS 1440px and 390px percent geometry and tooltip width",
+    "full_python_suite": "not certified (local timeout)"
+  },
+  "not_yet_verified": [
+    "Actual full GitHub CI opt-in browser/PostgreSQL on this new implementation (previous success belongs to earlier commit)",
+    "Physical-device user testing, independent screenshot/pixel comparisons for each widget, Firefox/WebKit and screen readers",
+    "Full rich text WYSIWYG inside the active input: persisted selected ranges render after editing; the native input itself is plain text while typing",
+    "Multiple independent questions inside a single widget: current direct edit supports title and multiple options, not multiple question blocks",
+    "Touch accessibility/usability of controls when the final participant slide preserves scaled geometry on narrow phones",
+    "Automatic equivalence of all kinds and external PPTX round-trip is not yet proved"
+  ],
+  "rc": {
+    "total_gates": 18,
+    "accepted": 1,
+    "partial": 17,
+    "completion_percent": 53.0,
+    "strict_release_gate": "not passed",
+    "promotions": []
+  },
+  "security": {
+    "no_commits_or_pushes": true,
+    "no_docker_publication": true,
+    "unchanged_version": true
+  }
+}

@@ -10,13 +10,14 @@ CSS = (ROOT / 'apps/web/src/style.css').read_text()
 class PresenterResultsTests(unittest.TestCase):
     def test_results_are_in_canvas_at_saved_geometry(self):
         component = UI.split('function PresenterPageResults(')[1].split('\nfunction AudienceExtensions(')[0]
-        self.assertIn('projection-results-control', component)
-        for coord in ('layout.x', 'layout.y', 'layout.width', 'layout.height', 'layout.rotation'):
-            self.assertIn(coord, component)
+        # Each result is a genuine canvas widget, not a floating button.
+        self.assertIn('widgets.map((w:any)', component)
+        self.assertIn('widgetGeometryStyle(w.position)', component)
+        self.assertIn("w.kind==='results-button'?<PresenterLinkedResult", component)
         self.assertIn('aria-expanded={visible}', component)
         self.assertIn('aria-controls="presenter-page-results"', component)
-        self.assertIn('!control&&', component)
-        self.assertIn('.projection-results-control{position:absolute', CSS)
+        self.assertIn('linked-results', UI)
+        self.assertIn('.linked-results{', CSS)
 
     def test_topic_questions_live_in_results_panel(self):
         component = UI.split('function PresenterPageResults(')[1].split('\nfunction AudienceExtensions(')[0]

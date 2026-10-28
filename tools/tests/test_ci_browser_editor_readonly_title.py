@@ -10,7 +10,8 @@ class ChromiumReadOnlyWidgetTitle(unittest.TestCase):
  def test_real_canvas_requires_explicit_title_editing(self):
   self.assertIn('readOnly={editing!==w.id}',UI)
   self.assertIn('setEditing(w.id);requestAnimationFrame',UI)
-  self.assertIn('onInspectWidget?.(w.id);return',UI)
+  self.assertIn('onInspectWidget?.(w.id)}setEditing(w.id);requestAnimationFrame',UI)
+  self.assertIn('Modifica opzione ',UI)
   self.assertIn('input[readonly]{pointer-events:none', (ROOT/'apps/web/src/style.css').read_text())
   self.assertIn('>Modifica titolo</button>',UI)
   self.assertIn("if(e.key==='Enter'){e.currentTarget.blur();setEditing(null)}",UI)

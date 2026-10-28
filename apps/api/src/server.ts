@@ -17,7 +17,7 @@ import {generateTotpSecret,makeTotp,verifyTotp,sealTotp,openTotp,totpAuthUrl,val
 import {smtpConfigFromEnv,sendTestEmail,sendPasswordResetEmail,sendEmailOtp} from './smtp.js';
 import {createEmailOtp,emailOtpDigest,matchesEmailOtp,validEmailOtp} from './email-otp.js';
 import {sealSmtpConfig,openSmtpConfig,validateSmtpInput,publicSmtpConfig} from './smtp-store.js';
-import {widgetAnswerShapeChanged,aggregateWidgetAnswerRevisions,liveTimedWidgetMutation} from './widget-revisions.js';
+import {widgetAnswerShapeChanged,aggregateWidgetAnswerRevisions,liveTimedWidgetMutation,questionRevisionAtHistory} from './widget-revisions.js';
 import {normalizeWord,validateQuestion,moderationStatus,safeFrequency,parseModerationQueueQuery,parseModerationBulk} from './audience-tools.js';
 import {validPageOrder} from './page-sequence.js';
 import express from 'express';import helmet from 'helmet';import pg from 'pg';import bcrypt from 'bcryptjs';import QRCode from 'qrcode';import {WebSocketServer,WebSocket} from 'ws';import {liveSessionActive,livePresenterAuthorized,liveParticipantAuthorized} from './live-socket-policy.js';import {createLiveSnapshotQueue} from './live-snapshot-queue.js';import {shouldDropSlowSocket} from './live-delivery-policy.js';import {createServer} from 'node:http';import {randomUUID,randomBytes,createHash,createHmac,timingSafeEqual} from 'node:crypto';import {readFileSync,existsSync} from 'node:fs';import {mkdir,writeFile,readFile,unlink,rm} from 'node:fs/promises';import {validAsset} from './asset-policy.js';import {receiveAssetStream} from './stream-upload.js';import {scanUploadedFile} from './malware-scan.js';import {readdir,stat} from 'node:fs/promises';import path from 'node:path';import {fileURLToPath} from 'node:url';import {validTransition,validateOptions,checkAnswer,publicActivity,escapeCsvCell,validRetentionDays,validPageDesign,validPseudonym,validAnswerMode,validateSubmittedAnswer,validReaction,type Activity,type SessionStatus} from './domain.js';
@@ -768,8 +768,11 @@ app.post('/api/join/:code/activities/:aid/widgets/:wid/upload',async(req,res)=>{
  const who=await audienceIdentity(req,req.params.code,req.params.aid);
  if(!who){res.status(403).json({error:'join_or_open_activity_required'});return}
  const activity=await db.query('SELECT page_design FROM activities WHERE id=$1 AND session_id=$2',[req.params.aid,who.sessionId]);
- const widget=(activity.rows[0]?.page_design?.widgets||[]).find((w:any)=>w.id===req.params.wid&&w.kind==='question'&&w.answerMode==='file');
- if(!widget){res.status(404).json({error:'file_widget_not_found'});return}
+ const widget=(activity.rows[0]?.page_design?.widgets||[]).find((w:any)=>w.id===req.params.wid&&w.kind==='question');
+ const questionId=String(req.query.question_id||'');
+ if(questionId&&!/^[a-zA-Z0-9_-]{1,40}$/.test(questionId)){res.status(400).json({error:'invalid_question_id'});return}
+ const question=questionId?widget?.questions?.find((q:any)=>q.id===questionId):widget;
+ if(!question||question.answerMode!=='file'){res.status(404).json({error:'file_widget_not_found'});return}
  const cap=await allowedUploadBytes();const length=Number(req.headers['content-length']);
  if(!Number.isSafeInteger(length)||length<1||length>cap){res.status(413).json({error:'invalid_upload_size'});return}
  const declared=String(req.headers['content-type']||'').split(';')[0].trim().toLowerCase();
@@ -1341,26 +1344,32 @@ app.post('/api/join/:code/activities/:aid/widgets/:wid/respond',async(req,res)=>
  if(!a.rowCount){await cx.query('ROLLBACK');res.status(409).json({error:'activity_not_open'});return}
  const widget=(a.rows[0]?.page_design?.widgets||[]).find((w:any)=>['question','timed-quiz'].includes(w.kind)&&w.id===req.params.wid);
  if(!widget){await cx.query('ROLLBACK');res.status(404).json({error:'widget_not_found'});return}
+ const questionId=req.body?.question_id===undefined?'':req.body.question_id;
+ if(typeof questionId!=='string'||(questionId!==''&&!/^[a-zA-Z0-9_-]{1,40}$/.test(questionId))){await cx.query('ROLLBACK');res.status(400).json({error:'invalid_question_id'});return}
+ const questions=Array.isArray(widget.questions)?widget.questions:[];
+ if(questions.length===0&&questionId){await cx.query('ROLLBACK');res.status(400).json({error:'question_not_found'});return}
+ const part=questionId?questions.find((q:any)=>q.id===questionId):widget;
+ if(!part){await cx.query('ROLLBACK');res.status(404).json({error:'question_not_found'});return}
  const timed=widget.kind==='timed-quiz';
- const mode=timed?(widget.answerMode==='multiple'?'multiple':'single'):(validAnswerMode(widget.answerMode)?widget.answerMode:'text');
- const options=Array.isArray(widget.options)?widget.options:[];
+ const mode=timed?(part.answerMode==='multiple'?'multiple':'single'):(validAnswerMode(part.answerMode)?part.answerMode:'text');
+ const options=Array.isArray(part.options)?part.options:[];
  const value=mode==='single'?req.body?.option_id:mode==='multiple'?req.body?.option_ids:mode==='text'?req.body?.text:req.body?.asset_id;
- const answer=validateSubmittedAnswer(mode,widget.required!==false,value,options);
+ const answer=validateSubmittedAnswer(mode,part.required!==false,value,options);
  if(!answer){await cx.query('ROLLBACK');res.status(400).json({error:'invalid_widget_answer'});return}
  if(timed){
   const duration=Number(widget.durationSeconds||30);
   if(!Number.isInteger(duration)||duration<5||duration>600||!a.rows[0].opened_at){await cx.query('ROLLBACK');res.status(409).json({error:'timed_widget_not_started'});return}
-  const correctIds=widgetCorrectOptionIds(widget);
+  const correctIds=widgetCorrectOptionIds(part);
   if(!correctIds.length||new Set(correctIds).size!==correctIds.length||!correctIds.every((id:string)=>options.some((o:any)=>o.id===id))){await cx.query('ROLLBACK');res.status(409).json({error:'timed_widget_not_configured'});return}
  }
  if(answer.assetId){const owned=await cx.query('SELECT id FROM session_assets WHERE id=$1 AND session_id=$2 AND (participant_id IS NULL OR participant_id=$3)',[answer.assetId,who.sessionId,who.participantId]);if(!owned.rowCount){await cx.query('ROLLBACK');res.status(400).json({error:'attachment_not_in_session'});return}}
- const rev=await cx.query('SELECT coalesce(max(revision),1)::int AS revision FROM widget_revisions WHERE activity_id=$1 AND widget_id=$2',[req.params.aid,req.params.wid]);
- const revision=Number(rev.rows[0].revision);
+ const rev=await cx.query('SELECT revision,definition FROM widget_revisions WHERE activity_id=$1 AND widget_id=$2 ORDER BY revision',[req.params.aid,req.params.wid]);
+ const revision=questionRevisionAtHistory(rev.rows,questionId);
  // A retry of a committed answer remains idempotent even when the timer has
  // subsequently expired. Never overwrite the first answer or change its score.
- const existing=await cx.query('SELECT id FROM widget_answers WHERE activity_id=$1 AND participant_id=$2 AND widget_id=$3 AND revision=$4',[req.params.aid,who.participantId,req.params.wid,revision]);
- if(existing.rowCount){await cx.query('COMMIT');res.json({ok:true,already_submitted:true,revision});return}
- const correctIds=timed?widgetCorrectOptionIds(widget):[];
+ const existing=await cx.query('SELECT id FROM widget_answers WHERE activity_id=$1 AND participant_id=$2 AND widget_id=$3 AND question_id=$4 AND revision=$5',[req.params.aid,who.participantId,req.params.wid,questionId,revision]);
+ if(existing.rowCount){await cx.query('COMMIT');res.json({ok:true,already_submitted:true,question_id:questionId,revision});return}
+ const correctIds=timed?widgetCorrectOptionIds(part):[];
  const correct=timed&&answer.optionIds.length===correctIds.length&&answer.optionIds.every((id:string)=>correctIds.includes(id));
  // Read PostgreSQL's wall clock immediately before the write, not at the start of
  // the transaction: validation and attachment lookups can take time. All replicas
@@ -1372,21 +1381,21 @@ app.post('/api/join/:code/activities/:aid/widgets/:wid/respond',async(req,res)=>
   elapsed=timing.elapsedMs;
   if(!timing.valid){await cx.query('ROLLBACK');res.status(409).json({error:'timer_elapsed'});return}
  }
- const r=await cx.query('INSERT INTO widget_answers(id,session_id,activity_id,participant_id,widget_id,answer_mode,answer_payload,revision,correct,elapsed_ms) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) ON CONFLICT(activity_id,participant_id,widget_id,revision) DO NOTHING RETURNING id',[randomUUID(),who.sessionId,req.params.aid,who.participantId,req.params.wid,mode,JSON.stringify(answer),revision,timed?correct:null,elapsed]);
- await cx.query('COMMIT');cx.release();cx=undefined;if(r.rowCount)await notifyAudience(who.sessionId);res.json({ok:true,already_submitted:!r.rowCount,revision});
+ const r=await cx.query('INSERT INTO widget_answers(id,session_id,activity_id,participant_id,widget_id,question_id,answer_mode,answer_payload,revision,correct,elapsed_ms) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) ON CONFLICT(activity_id,participant_id,widget_id,question_id,revision) DO NOTHING RETURNING id',[randomUUID(),who.sessionId,req.params.aid,who.participantId,req.params.wid,questionId,mode,JSON.stringify(answer),revision,timed?correct:null,elapsed]);
+ await cx.query('COMMIT');cx.release();cx=undefined;if(r.rowCount)await notifyAudience(who.sessionId);res.json({ok:true,already_submitted:!r.rowCount,question_id:questionId,revision});
  }catch(e){if(cx)try{await cx.query('ROLLBACK')}catch{}sendError(res,e)}finally{cx?.release()}});
 app.get('/api/sessions/:id/widget-answers',requireAuth,async(req,res)=>{try{
  const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}
- const r=await db.query('SELECT activity_id,widget_id,revision,answer_mode,count(*)::int AS responses FROM widget_answers WHERE session_id=$1 GROUP BY activity_id,widget_id,revision,answer_mode ORDER BY activity_id,widget_id,revision',[s.id]);
+ const r=await db.query('SELECT activity_id,widget_id,question_id,revision,answer_mode,count(*)::int AS responses FROM widget_answers WHERE session_id=$1 GROUP BY activity_id,widget_id,question_id,revision,answer_mode ORDER BY activity_id,widget_id,question_id,revision',[s.id]);
  res.json(r.rows);
  }catch(e){sendError(res,e)}});
 app.get('/api/sessions/:id/widget-answers/detail',requireAuth,async(req,res)=>{try{
  const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}
- const activity=String(req.query.activity_id||''), widget=String(req.query.widget_id||'');
- if(!/^[0-9a-f-]{36}$/i.test(activity)||!/^[a-zA-Z0-9_-]{1,48}$/.test(widget)){res.status(400).json({error:'invalid_filter'});return}
- const r=await db.query('SELECT revision,answer_mode,answer_payload FROM widget_answers WHERE session_id=$1 AND activity_id=$2 AND widget_id=$3 ORDER BY submitted_at',[s.id,activity,widget]);
+ const activity=String(req.query.activity_id||''), widget=String(req.query.widget_id||''), questionId=String(req.query.question_id||'');
+ if(!/^[0-9a-f-]{36}$/i.test(activity)||!/^[a-zA-Z0-9_-]{1,48}$/.test(widget)||(questionId!==''&&!/^[a-zA-Z0-9_-]{1,40}$/.test(questionId))){res.status(400).json({error:'invalid_filter'});return}
+ const r=await db.query('SELECT revision,answer_mode,answer_payload FROM widget_answers WHERE session_id=$1 AND activity_id=$2 AND widget_id=$3 AND question_id=$4 ORDER BY submitted_at',[s.id,activity,widget,questionId]);
  const revisions=aggregateWidgetAnswerRevisions(r.rows);
- res.json({activity_id:activity,widget_id:widget,revisions});
+ res.json({activity_id:activity,widget_id:widget,question_id:questionId,revisions});
  }catch(e){sendError(res,e)}});
 // Independent, presenter-only timed rankings scoped to the exact widget and revision.
 app.get('/api/sessions/:id/activities/:aid/widgets/:wid/timed-leaderboard',requireAuth,async(req,res)=>{try{
@@ -1394,15 +1403,17 @@ app.get('/api/sessions/:id/activities/:aid/widgets/:wid/timed-leaderboard',requi
  const a=await db.query('SELECT page_design,opened_at FROM activities WHERE id=$1 AND session_id=$2',[req.params.aid,s.id]);
  const w=(a.rows[0]?.page_design?.widgets||[]).find((w:any)=>w.id===req.params.wid&&w.kind==='timed-quiz');
  if(!w){res.status(404).json({error:'timed_widget_not_found'});return}
- const rev=await db.query('SELECT coalesce(max(revision),1)::int AS revision FROM widget_revisions WHERE activity_id=$1 AND widget_id=$2',[req.params.aid,req.params.wid]);
- const revision=Number(rev.rows[0].revision),page=parseLeaderboardPage(req.query.page);if(page===null){res.status(400).json({error:'invalid_pagination'});return}const size=20;
- const stats=await db.query('SELECT count(*)::int AS answers,count(*) FILTER (WHERE correct IS TRUE)::int AS correct FROM widget_answers WHERE activity_id=$1 AND widget_id=$2 AND revision=$3',[req.params.aid,req.params.wid,revision]);
+ const questionId=String(req.query.question_id||'');
+ if(questionId&&(!/^[a-zA-Z0-9_-]{1,40}$/.test(questionId)||!w.questions?.some((q:any)=>q.id===questionId))){res.status(400).json({error:'invalid_question_id'});return}
+ const rev=await db.query('SELECT revision,definition FROM widget_revisions WHERE activity_id=$1 AND widget_id=$2 ORDER BY revision',[req.params.aid,req.params.wid]);
+ const revision=questionRevisionAtHistory(rev.rows,questionId),page=parseLeaderboardPage(req.query.page);if(page===null){res.status(400).json({error:'invalid_pagination'});return}const size=20;
+ const stats=await db.query('SELECT count(*)::int AS answers,count(*) FILTER (WHERE correct IS TRUE)::int AS correct FROM widget_answers WHERE activity_id=$1 AND widget_id=$2 AND revision=$3 AND question_id=$4',[req.params.aid,req.params.wid,revision,questionId]);
  const ranked=await db.query(`SELECT p.pseudonym AS participant_name,w.elapsed_ms AS duration_ms,w.submitted_at,
  rank() OVER (ORDER BY w.elapsed_ms)::int AS rank
  FROM widget_answers w JOIN participants p ON p.id=w.participant_id
- WHERE w.activity_id=$1 AND w.widget_id=$2 AND w.revision=$3 AND w.correct IS TRUE AND w.elapsed_ms IS NOT NULL
- ORDER BY w.elapsed_ms,w.submitted_at,w.id LIMIT $4 OFFSET $5`,[req.params.aid,req.params.wid,revision,size,(page-1)*size]);
- res.json({widget_id:req.params.wid,revision,opened_at:a.rows[0].opened_at,...stats.rows[0],page,page_size:size,total_pages:Math.max(1,Math.ceil(stats.rows[0].correct/size)),ranking:ranked.rows});
+ WHERE w.activity_id=$1 AND w.widget_id=$2 AND w.revision=$3 AND w.question_id=$4 AND w.correct IS TRUE AND w.elapsed_ms IS NOT NULL
+ ORDER BY w.elapsed_ms,w.submitted_at,w.id LIMIT $5 OFFSET $6`,[req.params.aid,req.params.wid,revision,questionId,size,(page-1)*size]);
+ res.json({widget_id:req.params.wid,question_id:questionId,revision,opened_at:a.rows[0].opened_at,...stats.rows[0],page,page_size:size,total_pages:Math.max(1,Math.ceil(stats.rows[0].correct/size)),ranking:ranked.rows});
  }catch(e){sendError(res,e)}});
 // Only authorized presenters can read identities and rankings; the start is the server's page-open timestamp.
 app.get('/api/sessions/:id/activities/:aid/timed-leaderboard',requireAuth,async(req,res)=>{try{

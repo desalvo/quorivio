@@ -28,5 +28,10 @@ export function pasteWidgetGroup<T extends Widget>(source:readonly T[],newIds:re
  const originals=source.map(widgetRect);
  const deltaX=clamp(offset,-Math.min(...originals.map(p=>p.x)),Math.min(...originals.map(p=>100-p.x-p.width)));
  const deltaY=clamp(offset,-Math.min(...originals.map(p=>p.y)),Math.min(...originals.map(p=>100-p.y-p.height)));
- return source.map((w,i)=>({...structuredClone(w),id:newIds[i],position:{...w.position,x:round(originals[i].x+deltaX),y:round(originals[i].y+deltaY),width:originals[i].width,height:originals[i].height}}));
+ const clonedId=new Map(source.map((w,i)=>[w.id,newIds[i]]));
+ return source.map((w,i)=>({
+  ...structuredClone(w),
+  ...(typeof (w as T&{targetWidgetId?:string}).targetWidgetId==='string'&&clonedId.has((w as T&{targetWidgetId:string}).targetWidgetId)?{targetWidgetId:clonedId.get((w as T&{targetWidgetId:string}).targetWidgetId)}:{}),
+  id:newIds[i],position:{...w.position,x:round(originals[i].x+deltaX),y:round(originals[i].y+deltaY),width:originals[i].width,height:originals[i].height}
+ } as T));
 }

@@ -1,0 +1,35 @@
+{
+  "date": "2026-10-28",
+  "version": "0.1.0-dev",
+  "baseline": "quorivio-0.1.0-dev-rc-wysiwyg-independent-questions-cumulative.zip",
+  "source_changes": [
+    "apps/api/src/server.ts",
+    "apps/api/src/widget-revisions.ts",
+    "apps/api/test/widget-question-revision-isolation.test.ts",
+    "apps/web/src/widget-rich-editor.tsx",
+    "apps/web/test/widget-rich-editor-ime.test.ts",
+    "tools/ci_independent_widget_questions_postgres.py",
+    "tools/ci_question_schema_migration_postgres.py",
+    "tools/ci_browser_rich_text_offline.py",
+    "tools/tests/test_rc_question_revision_migration_20261028.py",
+    ".github/workflows/ci.yml"
+  ],
+  "local_results": {
+    "build": "pass",
+    "backend_node": "467/467 pass",
+    "frontend_node": "49/49 pass",
+    "python_contract": "6/6 pass",
+    "python_widget": "36/36 pass",
+    "offline_chromium": "pass 1440px and 390px",
+    "python_global": "timeout"
+  },
+  "unverified": [
+    "real postgresql 18 migration and API E2E",
+    "GitHub standard and opt-in full CI for modified code",
+    "Firefox/WebKit physical-device assisted-technology and visual operator acceptance"
+  ],
+  "gate_promotions": [],
+  "rc_score_before": 53.0,
+  "rc_score_after": 53.0,
+  "rc_ready": false
+}
