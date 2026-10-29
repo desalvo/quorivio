@@ -415,7 +415,7 @@ jobs:
           python3 tools/verify_rc_cycle11_inventory.py --historical
           # Historical SHA-256 receipts remain immutable; only the newest
           # inventory must match the actual committed tree in this CI run.
-          python3 tools/verify_rc_cycle13_inventory.py
+          python3 tools/verify_rc_cycle14_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:
@@ -444,6 +444,9 @@ jobs:
       - name: Native browser keyboard, modal, public slide and reading acceptance
         timeout-minutes: 5
         run: python3 tools/ci_cross_browser_rc.py --engines firefox webkit
+      - name: Native browser built React dashboard/editor singleton and portal acceptance
+        timeout-minutes: 5
+        run: python3 tools/ci_rehearsal_singleton_offline_chromium.py --engines firefox webkit
       - name: Upload cross-browser failure evidence
         if: failure()
         uses: actions/upload-artifact@v4

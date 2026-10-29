@@ -1,3 +1,16 @@
+# Quorivio 0.1.0-dev — RC cycle 14: 75.0% (+1.0 pp), October 29, 2026
+
+**Last confirmed commit:** `cf49c3e1d3e58d4ec4d65862a92b742348a11435`. Standard `40846201940` and Full `40847463104` **SUCCESS**. Full native Firefox/WebKit job `123360950163` verified real TS modal and CSS stage desktop/mobile. Narrow accepted A3-NATIVE-STAGE and A4-NATIVE-MODAL, 1 point each moved from partially accepted parent gates (net +1.0 pp). 42 gates, 25 accepted, 17 partial. Physical device, screen-reader, pixel-fidelity and independent approvals remain unverified; strict RC not ready.
+
+**New local development (not credited):** native CI job now exercises actual built React dashboard/editor preview on Firefox/WebKit in addition to TS/CSS tests. Local Chromium build regression PASS; native execution pending new commit/CI. Historical inventories unchanged; cycle-14 SHA-256 package inventory and bilingual receipt added. No commit/push/tag/publish by assistant.
+
+**Next:** maintainer commits one cumulative ZIP; full CI with browser and cross-browser enabled, capacity enabled, Docker publication disabled. Inspect browser errors and repair before any further score promotion. See `docs/RC_CYCLE14_NATIVE_BROWSERS_VERIFIED.en.md`.
+
+**Local verification:** TypeScript/Vite PASS; API Node 474/474, Web Node 65/65, Python 1008/1008, Chromium actual React 1440/390 and focus/stage 1440/390 PASS; new native React Firefox/WebKit CI pending.
+
+
+---
+
 # Quorivio 0.1.0-dev — RC cycle 12: 74.0% (unchanged), October 29, 2026
 
 **Baseline:** cycle-11 RC 74 cumulative archive (782 files). Fixed version 0.1.0-dev, EUPL-1.2. No automatic commit, push, tag, Docker publication or release.

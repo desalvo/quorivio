@@ -50,13 +50,26 @@
     {
       "id": "A3",
       "area": "A-editor",
-      "weight": 2,
+      "weight": 1,
       "status": "partial",
       "evidence": "Widget palette, page layouts, media, quiz and topic widgets present in source; editable PPTX import/export security and fidelity regression suite (11 tests) locally PASS, 2026-10-24; editable widget copy/cut/paste with new IDs and slide-bounded geometry, Node regression PASS (2026-10-24) Fifth uncommitted conversion batch: editable solid RGB slide backgrounds, uniform horizontal paragraph alignment and vertical text anchors; API validation, editor/presenter/rehearsal UI, truthful gradient/mixed-alignment loss reporting; 30 real python-pptx behavioral regressions + 6 Node tests locally PASS (2026-10-25). Seventh uncommitted conversion batch: native PPTX picture cropping preserved as editable fractional metadata across import/export, crop-aware projection/rehearsal, editor numeric controls and strict validation; 12 synthetic raster comparisons and local suites PASS (2026-10-25). Eighth uncommitted conversion batch: editable native PowerPoint shape no-fill/no-outline, RGB outline widths 0.25–12pt and solid/dash/dot line styles; 12 synthetic real raster comparisons and 30 behavior/validation scenarios PASS, Node 232 PASS, builds PASS (2026-10-25). 2026-10-26 post-baseline: both leaderboard widgets show explicit server-calculated ranks including ties without duplicate React keys; widget answer form adds double-click protection, submission state, disabled empty answers and accessible live status. Local Node 447/447; production frontend build and Chromium regression on this patch are PENDING.\n2026-10-27 opt-in Chromium production frontend/editor and presenter profile PASS, timed-widget PostgreSQL concurrency/fairness PASS in 40517573850. Cross-browser accessibility and independent visual review still pending.\n2026-10-27: Green maintainer Full CI 40553571012 on 67a7be939a5930e2f9a49ce3932a4b7f29a682ac confirmed real Chromium/PostgreSQL editor behavior. Subsequent local resilience batch: bounded retry with authority readback after ambiguous network failures, 12 frontend Node tests plus 842 Python and 447 backend Node pass; shared editor/presenter/audience geometry helper. New Chromium network-loss fixture and mandatory frontend Node CI step require a NEW GitHub run. No acceptance promotion.\n2026-10-27 local (pending new GitHub CI): rich per-widget shape and fill schema, shared appearance, image asset remapping, ratings/reactions/timer/QR preview and 0-connected count; verification and device fidelity still required.\n2026-10-27 post-6395b0b: server PageDesign union now matches validator for participant count; resultsView rejects unknown modes; local 450 API/23 web Node tests, TypeScript/Vite builds PASS. PostgreSQL + Chromium end-to-end still required. No status promotion.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: Chromium mock editor widget UI and real PostgreSQL widget semantics/timed concurrency PASS; full visual fidelity and representative PPTX corpus still outstanding. Strict RC gate was skipped; status unchanged.\n2026-10-28 local visual parity batch: editor projection-backed widget contents; 16:9 desktop/mobile geometry and rectangular tooltips Chromium preflight PASS; draft participant rehearsal/fullscreen; inline options and persistent bounded typography spans; backend/frontend builds, Node 454+36 PASS. New Full CI and visual operator/physical assistive technology sign-off PENDING. 2026-10-28 local uncommitted: per-widget source-linked results, independent presenter-only rendering, side-by-side simulated presenter/audience and responsive 16:9 CSS; Node backend 455/455, web 44/44, Python focused 58/58, Chromium offline CSS pointer+geometry 1440/390 PASS. New full GitHub Chromium+PostgreSQL pending; this is NOT acceptance evidence.\n2026-10-28 pending local batch (after last committed e2dc3a97): production WYSIWYG contentEditable DOM ownership fixes duplicated characters and buffers IME composition; desktop/mobile real Chromium offline acceptance PASS including Unicode input. Question-scoped answer revisions derived from existing immutable widget history prevent a change to q2 from reopening q1 responses or resetting its statistics/rankings; 6 API Node tests PASS, full backend 467/467 PASS, web 49/49 PASS. Actual PostgreSQL legacy migration and independent-answer transactional acceptance are added to manual CI but have NOT yet executed on GitHub. No independent sign-off or gate promotion.\n2026-10-28: after successful Full CI 40638652838, the automated evidence-specific A3-AUTO subgate (weight 2) was formally separated and accepted. Parent remains partial and still requires every independent check listed below.",
-      "remaining": "Independent editor/presenter/participant visual pixel-accuracy on a representative corpus, Firefox/WebKit, real touchscreen/keyboard and screen-reader evaluation, correct full PPTX roundtrip corpus, operator acceptance. Topic-question linked statistics added locally post-CI and require new authenticated CI acceptance. The narrower A3-GEOMETRY automated subgate is separately verified in 40717525524; operator, external/browser and production requirements remain explicitly in this partial parent.",
+      "remaining": "Independent pixel-accurate representative editor/presenter/audience/thumbnail comparison; physical touchscreen, full Office roundtrip corpus, human keyboard and screen-reader review, and iOS Safari device acceptance. Native Firefox/WebKit automated CSS stage/reading assertions are separately credited in A3-NATIVE-STAGE, NOT pixel-accurate visual certification.",
       "current_verified_run": 40595463258,
       "pending_local_evidence_20261028": "WYSIWYG and independent-question implementation passes local TypeScript/Vite, 461 Node API, 46 frontend, 33 focused Python, Chromium component desktop/mobile. Unverified by GitHub and real PostgreSQL; prior accepted gates unchanged.",
       "pending_local_evidence_20261028_public_stage": "2026-10-28: local verified public participant stage uses the same saved widget percentage geometry, rotation and 16:9 slide as editor/rehearsal; the real participant UI adds accessible reading mode (default under 700px) and bounded horizontal slide scroll, public slide background, saved image crop and inline text marks. The modal additionally inerts dynamically inserted background portals and restores their original accessibility state. Full local API+web TypeScript and Vite builds PASS; 474 backend Node, 58 frontend Node and 965 Python tests PASS; built React Chromium rehearsal singleton and isolated public stage/focus regressions PASS on 1440/390px. The actual public participant React+PostgreSQL E2E, Firefox/WebKit, independent accessibility/device acceptance and new opt-in GitHub Full CI have NOT passed. ZERO new RC points."
+    },
+    {
+      "id": "A3-NATIVE-STAGE",
+      "area": "A-editor",
+      "weight": 1,
+      "status": "accepted",
+      "acceptance_kind": "bounded_automated_native_browser_css",
+      "scope": "Playwright Firefox 157 + WebKit 27.2 on Linux at 1440 and 390 px: stage 16:9, 16/23/37/26% widget geometry, rotation, accessible reading mode with >=44px control; actual module CSS not pixel-accuracy certification.",
+      "evidence": "GitHub Actions full opt-in run 40847463104 (commit cf49c3e1d3e58d4ec4d65862a92b742348a11435), native Firefox/WebKit job 123360950163 SUCCESS: PASS firefox 1440px, firefox 390px, webkit 1440px, webkit 390px for stage/reading tests in tools/ci_cross_browser_rc.py. Prior Chromium geometry proof separately credited as A3-GEOMETRY; this gate is native engines only.",
+      "verified_run_id": 40847463104,
+      "verified_commit_sha": "cf49c3e1d3e58d4ec4d65862a92b742348a11435",
+      "verified_job_id": 123360950163,
+      "remaining": "Keep native engine regression on future changes. Actual physical Safari/iOS/Android, independent representative pixel comparison and screen-reader approval remain in A3."
     },
     {
       "id": "A3-GEOMETRY",
@@ -86,13 +99,26 @@
     {
       "id": "A4",
       "area": "A-editor",
-      "weight": 4,
+      "weight": 3,
       "status": "partial",
       "evidence": "Responsive styles exist; no device test report in package New 2026-10-25 audience UI local implementation: narrow-screen absolute widget reflow, >=44px touch targets, keyboard skip link, accessible choice state and forced-colors CSS; local build PASS. Not yet validated in device lab or new Chromium CI. GitHub workflow 40144692900: real PostgreSQL Chromium mobile touch audience acceptance PASS; independent device lab and screen-reader acceptance still outstanding. 2026-10-27 mobile Chromium 390px mock-editor identified and locally corrected contextual-overlay interception of accessible widget disclosure; standalone real Chromium/touch overlap fixture PASS, new CI pending.\n2026-10-27 verified maintainer manual workflow 40517573850 (commit e372a3aec8ba6b028283e9d00f68305a39562ed8): all Chromium desktop/mobile touch editor checks, keyboard-group editing, accessible disclosure and pointer-hit preflights, participant browser/PG and presenter profile browser PASS in quality job 122235650919. This proves an implemented accessible/touch baseline, NOT screen-reader or physical-device certification. Following committed baseline, new keyboard thumbnail reorder Alt+ArrowUp/Down, context Esc focus return and aria-live saved/failed messages were added, with Python contracts locally PASS; new UI changes have NOT yet passed GitHub CI.\n2026-10-27 post-6395b0b: 7 isolated real Chromium preflights PASS on desktop/mobile dimensions; accessibility screen-reader and real devices remain unverified. No status promotion. Full Chromium 40592859476: fixed-header real-pointer preflight desktop/mobile PASS, but later mock editor multi-widget duplicate failed (5 expected, 3); geometry hotfix locally tested, CI rerun pending.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: Chromium desktop plus touch-size viewport editor/participant and actual browser profile tested PASS; external screen readers and physical hardware outstanding. Strict RC gate was skipped; status unchanged.\n2026-10-28 local visual parity batch: editor projection-backed widget contents; 16:9 desktop/mobile geometry and rectangular tooltips Chromium preflight PASS; draft participant rehearsal/fullscreen; inline options and persistent bounded typography spans; backend/frontend builds, Node 454+36 PASS. New Full CI and visual operator/physical assistive technology sign-off PENDING. 2026-10-28 local uncommitted: per-widget source-linked results, independent presenter-only rendering, side-by-side simulated presenter/audience and responsive 16:9 CSS; Node backend 455/455, web 44/44, Python focused 58/58, Chromium offline CSS pointer+geometry 1440/390 PASS. New full GitHub Chromium+PostgreSQL pending; this is NOT acceptance evidence.\n2026-10-28: verified remote evidence in GitHub Actions 40717525524 separated as narrow A4-FOCUS subgate; parent stays partial and independent acceptance remains required.",
-      "remaining": "Independent screen-reader NVDA/VoiceOver/TalkBack testing, keyboard-only human audit, physical iOS/Android touch and Firefox/WebKit/WCAG/AGID approval remain required. Automated Chromium focus contract separated into A4-FOCUS.",
+      "remaining": "Independent NVDA/VoiceOver/TalkBack screen-reader testing, human keyboard-only operator audit, real iOS/Android touch and WCAG/AGID sign-off. Native Firefox/WebKit automated modal Tab/contenteditable/inert/focus contracts are separately credited in A4-NATIVE-MODAL, NOT an assistive-technology certification.",
       "current_verified_run": 40717525524,
       "pending_local_evidence_20261028": "WYSIWYG and independent-question implementation passes local TypeScript/Vite, 461 Node API, 46 frontend, 33 focused Python, Chromium component desktop/mobile. Unverified by GitHub and real PostgreSQL; prior accepted gates unchanged.",
       "pending_local_evidence_20261028_public_stage": "2026-10-28: local verified public participant stage uses the same saved widget percentage geometry, rotation and 16:9 slide as editor/rehearsal; the real participant UI adds accessible reading mode (default under 700px) and bounded horizontal slide scroll, public slide background, saved image crop and inline text marks. The modal additionally inerts dynamically inserted background portals and restores their original accessibility state. Full local API+web TypeScript and Vite builds PASS; 474 backend Node, 58 frontend Node and 965 Python tests PASS; built React Chromium rehearsal singleton and isolated public stage/focus regressions PASS on 1440/390px. The actual public participant React+PostgreSQL E2E, Firefox/WebKit, independent accessibility/device acceptance and new opt-in GitHub Full CI have NOT passed. ZERO new RC points."
+    },
+    {
+      "id": "A4-NATIVE-MODAL",
+      "area": "A-editor",
+      "weight": 1,
+      "status": "accepted",
+      "acceptance_kind": "bounded_automated_native_keyboard_focus",
+      "scope": "Playwright Firefox 157 + WebKit 27.2 on Linux at 1440 and 390 px: modal Tab/Shift+Tab, contenteditable and tabindex=-1, inert/aria-hidden of dynamically reparented portals, fallback focus and Escape close restoration.",
+      "evidence": "GitHub Actions full opt-in run 40847463104 (commit cf49c3e1d3e58d4ec4d65862a92b742348a11435), native Firefox/WebKit job 123360950163 SUCCESS, four PASS records. Actual rehearsal-dialog.ts focus logic exercised by tools/ci_cross_browser_rc.py; earlier Chromium-only A4-FOCUS is not counted twice.",
+      "verified_run_id": 40847463104,
+      "verified_commit_sha": "cf49c3e1d3e58d4ec4d65862a92b742348a11435",
+      "verified_job_id": 123360950163,
+      "remaining": "Maintain passing native browser engine tests. NVDA/VoiceOver/TalkBack, human keyboard operator and physical-device WCAG/AGID sign-off remain in A4."
     },
     {
       "id": "A4-FOCUS",
@@ -424,73 +450,62 @@
     }
   ],
   "last_verified_full_ci": {
-    "run_id": 40717525524,
-    "head_sha": "f6738592c648bc620e01b92d2bbaa6b90b459287",
-    "attempt": 2,
+    "run_id": 40847463104,
+    "head_sha": "cf49c3e1d3e58d4ec4d65862a92b742348a11435",
+    "attempt": 1,
     "conclusion": "success",
     "jobs": {
       "Production quality gate": "success",
       "Container build gate": "success",
-      "Production publication": "success"
+      "Native Firefox and WebKit acceptance (opt-in)": "success",
+      "Production publication": "skipped"
     },
     "strict_rc_gate": "skipped",
-    "accepted_scope": "Full opt-in Chromium, real PostgreSQL 18/SMTPS, two-replica privacy, optional 500-person capacity, images and Gitleaks/Trivy scans; all SUCCESS. Publication was manually opted in. New uncommitted code unverified.",
-    "rc_score_at_run": 67.0,
-    "rc_score_after_evidence_review": 68.0
+    "accepted_scope": "PostgreSQL 18/SMTP/Chromium/capacity and native Firefox/WebKit actual TS focus + CSS stage checks, on committed cf49c3e1. Production external and real device tests pending.",
+    "rc_score_at_run": 74.0,
+    "rc_score_after_evidence_review": 75.0,
+    "standard_run_id": 40846201940
   },
   "pending_local_batch": {
     "date": "2026-10-29",
-    "description": "Cycle 13 CI hotfix after user-confirmed commit ee8f77b: restore tracked acceptance log in Git, version current SHA-256 inventory and stabilize real React recovery cookie dialog acceptance; no gate promotion without new GitHub CI",
-    "last_maintainer_confirmed_commit": "ee8f77b640b0d8bafcf3f2f291488557cddcd011",
-    "observed_main_sha": "ee8f77b640b0d8bafcf3f2f291488557cddcd011",
-    "last_failed_run": 40797106013,
-    "last_failed_step": "Chromium editor UI acceptance: recovery mismatch assertion hidden behind pending cookie dialog",
-    "local_evidence": {
-      "build": "PASS backend TypeScript and frontend TypeScript/Vite on local source",
-      "recovery_unit": "4/4 PASS",
-      "recovery_browser": "PASS real built React Chromium desktop 1440/mobile 390 (offline fixture; no live PostgreSQL or mail)",
-      "source_full_ci": "40717525524 attempt 2 success on f6738592 (prior committed source)",
-      "new_changes_github": "PENDING",
-      "recovery_confirmation": "LOCAL ONLY: confirm field, mismatch rejection, duplicate-submit guard, real built React Chromium 1440px/390px. Pending new GitHub Full CI.",
-      "cycle10": "Pending local build/Chromium/Python/Node report; NOT new GitHub proof.",
-      "cycle11_build": "PASS backend tsc, frontend tsc and Vite",
-      "cycle11_backend_node": "474/474 PASS",
-      "cycle11_frontend_node": "65/65 PASS",
-      "cycle11_python_all": "993/993 PASS",
-      "cycle11_chromium_reset": "4/4 desktop/mobile + legacy/fragment, real built React, PASS",
-      "cycle11_chromium_modal": "4/4 focus + dynamic portal desktop/mobile, PASS",
-      "cycle11_postgres_smtps_new": "PENDING: real PostgreSQL 18 + SMTP loopback CI must validate new fragment-only links",
-      "cycle11_latest_verified_full_ci": "40717525524 attempt 2, commit f6738592 (historical source only)",
-      "rc_cycle12_chromium": "PASS locally 1440/390: native Chromium modal/geometry/reading checks and built React singleton; Firefox/WebKit still NOT installed or tested",
-      "cycle13_hotfix": "LOCAL PASS: build, backend 474, frontend 65, full Python 1005, Chromium recovery 12/12, Git index/manifest 795 files. New standard and full extended CI still pending."
-    },
-    "blocked": {
-      "github_full_ci_new_source": "Both user-committed CI runs 40796695726 and 40797106013 FAILED; fixes pending new commit and CI.",
-      "independent_recovery_browser_provider": "Not yet verified by live providers/physical device",
-      "external_acceptance": "Firefox/WebKit, AGID, GDPR, operator, multi-replica production",
-      "github_new_full_ci": "The revised recovery form and new gate contracts are not yet tested by a fresh GitHub run. Run 40717525524 is historical proof only.",
-      "cycle11_github_new_full_ci": "PENDING new commit and full GitHub Actions; do not promote gate score",
-      "cycle11_external_acceptance": "Firefox/WebKit, physical devices and screen reader, ingress+ClamAV/RWX, independent GDPR/security/operator reviews unverified"
-    },
-    "gates_promoted": [],
-    "formal_rc_score_before": 74.0,
-    "formal_rc_score_after": 74.0,
-    "global_rc_delta_pp": 0.0,
-    "gate_count": 40,
-    "gate_accepted": 23,
-    "gate_partial": 17,
-    "strict_rc_ready": false,
-    "suggested_workflow": "workflow_dispatch browser_test=true capacity_test=true publish_image=false publish_latest=false",
-    "source_log": "docs/validation/RC_CYCLE11_SECURITY_AND_FOCUS_LOCAL_20261029.json",
+    "description": "Cycle 14: evidence reconciliation for already-green native Firefox/WebKit run, plus new full React-native-engine coverage and append-only acceptance artifacts; no unverified code credits",
+    "last_maintainer_confirmed_commit": "cf49c3e1d3e58d4ec4d65862a92b742348a11435",
+    "observed_main_sha": "cf49c3e1d3e58d4ec4d65862a92b742348a11435",
+    "last_verified_full_ci_run": 40847463104,
+    "last_verified_standard_ci_run": 40846201940,
     "new_feature_promoted": false,
     "new_ci_required": true,
-    "last_successful_full_run": 40717525524,
-    "newly_accepted_historical_subgates": [
-      "A1-EDITOR-INTERACTION",
-      "A3-GEOMETRY",
-      "D3-K8S-GENERATOR",
-      "D4-CONVERTER-BOUNDARY"
-    ]
+    "strict_rc_ready": false,
+    "local_evidence": {
+      "build": "PASS backend tsc, frontend tsc and Vite locally",
+      "backend_node": "474/474 PASS",
+      "frontend_node": "65/65 PASS",
+      "python_all": "1008/1008 PASS",
+      "chromium_actual_react": "2/2 PASS (1440px and 390px)",
+      "chromium_actual_ts_stage": "2/2 PASS (1440px and 390px)",
+      "native_firefox_webkit_new_react_job": "PENDING NEW GITHUB CI (not installed locally)",
+      "local_integrity": "SOURCE 800 SHA-256 groups verified, Git index matches source inventory (before package)"
+    },
+    "blocked": {
+      "new_github_ci": "Post-cycle14 workflow change requires fresh GitHub Actions; no claim of pass.",
+      "screen_reader": "No NVDA/VoiceOver/TalkBack independent signoff",
+      "real_touch": "No physical iOS/Android device check",
+      "external_audits": "No independent GDPR/AGID/pentest review, hardware ARM64/rootless Podman/ingress-RWX+ClamAV drills"
+    },
+    "gates_promoted": [
+      "A3-NATIVE-STAGE",
+      "A4-NATIVE-MODAL"
+    ],
+    "formal_rc_score_before": 74.0,
+    "formal_rc_score_after": 75.0,
+    "global_rc_delta_pp": 1.0,
+    "gate_count": 42,
+    "gate_accepted": 25,
+    "gate_partial": 17,
+    "last_failed_run": 40797106013,
+    "last_failed_step": "Historical: Chromium recovery cookie modal (fixed in 40847463104)",
+    "last_successful_run": 40847463104,
+    "historical_failure_only": true
   },
   "scoring_reconciliation_20261028": {
     "baseline_score": 53.0,
@@ -805,5 +820,27 @@
     "github_full_ci_green_on_hotfix": false,
     "pending": "New standard and extended GitHub CI; native Firefox/WebKit and independent acceptance outstanding",
     "source_report": "docs/validation/RC_CI_40796695726_40797106013_HOTFIX_20261029.json"
+  },
+  "scoring_reconciliation_20261029_cycle14": {
+    "baseline_score": 74.0,
+    "reconciled_score": 75.0,
+    "delta_pp": 1.0,
+    "baseline_gate_count": 40,
+    "new_gate_count": 42,
+    "baseline_accepted": 23,
+    "new_accepted": 25,
+    "partial_gates_still_open": 17,
+    "new_accepted_gates": [
+      "A3-NATIVE-STAGE",
+      "A4-NATIVE-MODAL"
+    ],
+    "credited_scope": "only NEW native Firefox/WebKit engine assertions in verified GitHub run; prior Chromium coverage is not credited again",
+    "verified_run_id": 40847463104,
+    "verified_job_id": 123360950163,
+    "verified_commit_sha": "cf49c3e1d3e58d4ec4d65862a92b742348a11435",
+    "independent_testing_complete": false,
+    "new_react_browser_job_pending_new_ci": true,
+    "rc_ready": false,
+    "score_formula": "accepted=weight; partial=weight/2; open=0; total weight=100"
   }
 }

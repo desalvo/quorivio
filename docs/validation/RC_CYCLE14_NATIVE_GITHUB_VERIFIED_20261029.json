@@ -1,0 +1,131 @@
+{
+  "project": "Quorivio",
+  "version": "0.1.0-dev",
+  "date": "2026-10-29",
+  "baseline_archive": "quorivio-0.1.0-dev-rc-standard-extended-ci-hotfix-cycle13-cumulative.zip",
+  "baseline_rc_score": 74.0,
+  "reconciled_rc_score": 75.0,
+  "delta_pp": 1.0,
+  "source_commit_verified": "cf49c3e1d3e58d4ec4d65862a92b742348a11435",
+  "github_runs": [
+    {
+      "run_id": 40846201940,
+      "event": "push",
+      "conclusion": "success",
+      "head_sha": "cf49c3e1d3e58d4ec4d65862a92b742348a11435",
+      "quality_job": 123354201326,
+      "container_job": 123355343608,
+      "native_browser_job": "skipped"
+    },
+    {
+      "run_id": 40847463104,
+      "event": "workflow_dispatch",
+      "conclusion": "success",
+      "head_sha": "cf49c3e1d3e58d4ec4d65862a92b742348a11435",
+      "quality_job": 123358374122,
+      "container_job": 123360950096,
+      "native_browser_job": 123360950163,
+      "publication": "skipped"
+    }
+  ],
+  "native_engine_evidence": {
+    "runner": "GitHub Actions Ubuntu 24.04 x86_64",
+    "tool": "Playwright native browser launch, compiled actual TypeScript rehearsal-dialog.ts and public stage CSS",
+    "engines": [
+      "Firefox 157.0 (Playwright v1555)",
+      "WebKit 27.2 (Playwright v2370)"
+    ],
+    "verified_records": [
+      {
+        "engine": "firefox",
+        "viewport": 1440,
+        "run_id": 40847463104,
+        "job_id": 123360950163,
+        "result": "PASS",
+        "assertions": [
+          "Tab/Shift+Tab focus containment, editable controls, negative tabindex exclusion",
+          "inert and aria-hidden with dynamic portals and reparenting",
+          "Escape close and invoker focus restoration",
+          "stage 16:9 geometry and widget percentage/rotation",
+          "accessible linear-reading mode and >=44px target"
+        ]
+      },
+      {
+        "engine": "firefox",
+        "viewport": 390,
+        "run_id": 40847463104,
+        "job_id": 123360950163,
+        "result": "PASS",
+        "assertions": [
+          "Tab/Shift+Tab focus containment, editable controls, negative tabindex exclusion",
+          "inert and aria-hidden with dynamic portals and reparenting",
+          "Escape close and invoker focus restoration",
+          "stage 16:9 geometry and widget percentage/rotation",
+          "accessible linear-reading mode and >=44px target"
+        ]
+      },
+      {
+        "engine": "webkit",
+        "viewport": 1440,
+        "run_id": 40847463104,
+        "job_id": 123360950163,
+        "result": "PASS",
+        "assertions": [
+          "Tab/Shift+Tab focus containment, editable controls, negative tabindex exclusion",
+          "inert and aria-hidden with dynamic portals and reparenting",
+          "Escape close and invoker focus restoration",
+          "stage 16:9 geometry and widget percentage/rotation",
+          "accessible linear-reading mode and >=44px target"
+        ]
+      },
+      {
+        "engine": "webkit",
+        "viewport": 390,
+        "run_id": 40847463104,
+        "job_id": 123360950163,
+        "result": "PASS",
+        "assertions": [
+          "Tab/Shift+Tab focus containment, editable controls, negative tabindex exclusion",
+          "inert and aria-hidden with dynamic portals and reparenting",
+          "Escape close and invoker focus restoration",
+          "stage 16:9 geometry and widget percentage/rotation",
+          "accessible linear-reading mode and >=44px target"
+        ]
+      }
+    ],
+    "non_evidence": [
+      "No physical iOS Safari or Android device",
+      "No NVDA/VoiceOver/TalkBack",
+      "No pixel-difference independent review",
+      "No real Office PPTX corpus",
+      "No human operator AGID/WCAG/legal sign-off"
+    ]
+  },
+  "newly_credited_gates": [
+    "A3-NATIVE-STAGE",
+    "A4-NATIVE-MODAL"
+  ],
+  "gate_counts": {
+    "total": 42,
+    "accepted": 25,
+    "partial": 17,
+    "open": 0
+  },
+  "total_gate_weight": 100,
+  "new_code_pending_github": [
+    "Native Firefox/WebKit job now additionally runs real bundled React dashboard/editor singleton preview on two viewports",
+    "Updated matrix, inventories and source regression contracts"
+  ],
+  "strict_rc_ready": false,
+  "ci_commit_policy": "No automatic commit, push, tag, release or Docker publication; wait for maintainer commit and new opt-in CI",
+  "cycle14_local_verification": {
+    "build": "PASS backend/frontend TypeScript + Vite",
+    "backend_node": "474/474 PASS",
+    "frontend_node": "65/65 PASS",
+    "python": "1008/1008 PASS",
+    "chromium_actual_react": "PASS 1440/390",
+    "chromium_focus_stage": "PASS 1440/390",
+    "native_firefox_webkit_react": "NOT RUN LOCALLY; pending new opt-in GitHub CI",
+    "new_source_git_integrity": "800 file checksums validated before package; actual ZIP to be validated at packaging"
+  }
+}

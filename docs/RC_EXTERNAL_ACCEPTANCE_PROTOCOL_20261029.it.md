@@ -8,7 +8,7 @@ Per ogni prova annotare ID gate, versione/commit e hash dell'immagine effettivam
 
 ## Percorso browser multi-engine
 
-La CI possiede un'opzione **`cross_browser_test=true`** indipendente da `browser_test=true`. Su GitHub installa Firefox e WebKit nativi, compila TypeScript e testa sia il modulo reale di focus, sia il CSS pubblico 16:9, sia il bundle React reale in due viewport (1440 e 390 pixel). Una run verde costituisce evidenza tecnica **limitata**, non certificazione di pixel-parity, screen reader o dispositivi fisici. Il job opzionale richiede connettività per l'installazione dei browser e non è coperto dalla precedente run 40717525524.
+La CI possiede un'opzione **`cross_browser_test=true`** indipendente da `browser_test=true`. Su GitHub installa Firefox e WebKit nativi, compila TypeScript e testa sia il modulo reale di focus, sia il CSS pubblico 16:9, sia il bundle React reale in due viewport (1440 e 390 pixel). Una run verde costituisce evidenza tecnica **limitata**, non certificazione di pixel-parity, screen reader o dispositivi fisici. Il job opzionale ha superato su GitHub la run [40847463104](https://github.com/desalvo/quorivio/actions/runs/40847463104), commit cf49c3e1, job 123360950163, con Firefox e WebKit a 1440/390px sul modulo TypeScript e CSS 16:9. La **nuova estensione al bundle React completo** richiede ancora una CI dopo il ciclo 14. Resta necessaria la verifica indipendente su dispositivi fisici, screen reader, fedeltà visiva e infrastruttura.
 
 Esecuzione locale (solo quando gli eseguibili Playwright sono già disponibili):
 

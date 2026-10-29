@@ -19,7 +19,7 @@ class RCCi40709447219Hotfix(unittest.TestCase):
         pending=matrix['pending_local_batch']
         self.assertIs(pending['new_feature_promoted'],False)
         self.assertIs(pending['new_ci_required'],True)
-        self.assertFalse(pending['gates_promoted'])
+        self.assertEqual(pending['gates_promoted'],matrix['scoring_reconciliation_20261029_cycle14']['new_accepted_gates'])  # remote proof, not fresh code
         self.assertFalse(pending['strict_rc_ready'])
         # Historical failure is an immutable receipt, not the newest run forever.
         self.assertEqual(matrix['ci_hotfix_40709447219_20261028']['failed_run'],40709447219)

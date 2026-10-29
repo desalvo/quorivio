@@ -1,3 +1,16 @@
+# Quorivio 0.1.0-dev — ciclo RC 14: 75,0% (+1,0 punto), 29 ottobre 2026
+
+**Ultimo commit confermato:** `cf49c3e1d3e58d4ec4d65862a92b742348a11435`. CI standard `40846201940` e estesa `40847463104` **SUCCESS**. Il job Firefox/WebKit `123360950163` ha verificato sui due motori reali il dialogo TypeScript e la geometria CSS desktop/mobile. Accettati i sotto-gate A3-NATIVE-STAGE e A4-NATIVE-MODAL, conservando i requisiti indipendenti nei gate principali. 42 gate, 25 accettati e 17 parziali. RC rigorosa ancora bloccata.
+
+**Nuovo codice locale (non accreditato):** il job nativo ora eseguirà anche il bundle React vero da dashboard/editor su Firefox/WebKit. Verificato localmente solo in Chromium; nuova CI GitHub necessaria. Inventari precedenti intatti; nuovo inventario e report bilingue. Nessun commit/push/tag/pubblicazione eseguito.
+
+**Prossimo:** commit del manutentore, poi CI estesa browser, cross-browser e capacità, senza pubblicazione Docker; raccogliere prove reali su dispositivi, screen reader, ingress/storage e valutazioni indipendenti. Dettagli in `docs/RC_CYCLE14_NATIVE_BROWSERS_VERIFIED.it.md`.
+
+**Verifiche locali:** TypeScript/Vite PASS; Node backend 474/474, frontend 65/65, Python 1008/1008, Chromium React reale 1440/390 e focus/geometria 1440/390 PASS; nuovo test React Firefox/WebKit in attesa della CI.
+
+
+---
+
 # Quorivio 0.1.0-dev — ciclo RC 12: 74,0% (invariato), 29 ottobre 2026
 
 **Baseline:** archivio cumulativo RC 74 ciclo 11 (782 file). Nessun commit/push/tag/pubblicazione Docker automatica. Versione fissa `0.1.0-dev`, licenza `EUPL-1.2`.

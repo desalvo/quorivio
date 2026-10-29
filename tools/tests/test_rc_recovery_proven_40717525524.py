@@ -31,7 +31,7 @@ class ProvenRecoveryGate(unittest.TestCase):
   doc=json.loads((ROOT/'docs/RC_GATE_MATRIX.json').read_text())
   self.assertTrue(doc['pending_local_batch']['new_ci_required'])
   self.assertFalse(doc['pending_local_batch']['new_feature_promoted'])
-  self.assertEqual(doc['pending_local_batch']['gates_promoted'],[])
+  self.assertEqual(doc['pending_local_batch']['gates_promoted'],doc['scoring_reconciliation_20261029_cycle14']['new_accepted_gates'])  # no recovery UI promotion
   code=(ROOT/'apps/web/src/password-recovery-url.ts').read_text()
   self.assertIn('history.replaceState',code)
   self.assertNotIn('localStorage',code)

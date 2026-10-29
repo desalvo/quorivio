@@ -6,7 +6,7 @@ For each gate, record the exact revision, deployed image digest, UTC time, indep
 
 ## Native browser engines
 
-The explicit GitHub Actions input **`cross_browser_test=true`** installs native Firefox and WebKit in a separate optional job. Tests cover the compiled production modal TypeScript module, public 16:9 stage/reading controls and real built React presenter/editor preview at desktop 1440px and mobile-sized 390px viewports. Test screenshots and diagnostics are uploaded on failures. These are engine-level automated checks, **not** genuine physical-device testing, pixel accuracy certification, an accessibility screen-reader audit or legal sign-off. Native browser tests have **not** yet passed remotely on this revision.
+The explicit GitHub Actions input **`cross_browser_test=true`** installs native Firefox and WebKit in a separate optional job. Tests cover the compiled production modal TypeScript module, public 16:9 stage/reading controls and real built React presenter/editor preview at desktop 1440px and mobile-sized 390px viewports. Test screenshots and diagnostics are uploaded on failures. These are engine-level automated checks, **not** genuine physical-device testing, pixel accuracy certification, an accessibility screen-reader audit or legal sign-off. Native-engine modal/geometry tests **passed** on GitHub [40847463104](https://github.com/desalvo/quorivio/actions/runs/40847463104) (commit cf49c3e1, job 123360950163) on Firefox and WebKit at 1440/390px. The *newly expanded built-React multi-engine check* still needs a fresh post-cycle-14 CI. The independent visual, device, screen-reader and operational reviews remain open.
 
 When Playwright browsers are installed locally:
 
