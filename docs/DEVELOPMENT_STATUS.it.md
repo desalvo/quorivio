@@ -1,3 +1,15 @@
+## Quorivio 0.1.0-dev — ciclo RC 25 — 30 ottobre 2026: correzione test SIGTERM/WebSocket
+
+**Nuova baseline committata dall'utente:** `30f7ab98403611ee1a4846e4aa8797e03bac0e6b`. La CI standard `40972614731`, job `123792791695`, fallisce nel test di terminazione controllata delle repliche: il test interpreta il primo frame dopo SIGTERM come chiusura. Il log non mostra il tipo del frame ricevuto; uno snapshot in volo è una spiegazione plausibile, non confermata.
+
+**Correzione:** il test attende la chiusura WebSocket con **codice 1012**, tollerando solo snapshot validi già in coda, con tempo e numero massimo limitati. Un errore di trasporto, un altro codice, un messaggio inatteso o il mancato arresto continuano a far fallire la CI. Test dedicati e diagnostica CI senza segreti. Inventario del ciclo 24 conservato come evidenza storica e nuovo inventario SHA-256 del ciclo 25.
+
+**Verifiche locali:** build npm superata, 474/474 test backend e 65/65 frontend, 10 test di regressione SIGTERM/WebSocket superati. Suite Python completa **1.150/1.150 PASS**. Verifica finale SHA-256 e Git/ZIP durante la creazione del package. Il collaudo integrato PostgreSQL 18 richiede GitHub.
+
+**Completamento RC: 79,0% invariato**, 47 gate (30 accettati, 17 parziali). Non dichiarare verde la CI nuova prima della verifica GitHub; nessun commit/push/tag/pubblicazione eseguito dall'assistente.
+
+---
+
 ## Quorivio 0.1.0-dev — ciclo RC 24 — 29 ottobre 2026: avvio reale KIND temporaneo e protezione dei percorsi
 
 **Verifiche locali completate:** build TypeScript/Vite PASS; Node backend 474/474, frontend 65/65; suite Python completa 1.140/1.140 PASS, inclusi 14 nuovi test e 4 contratti RC. YAML CI valido. Il nuovo job KIND necessita ancora di una CI GitHub verde. Inventario del ciclo 24 pronto per verificare sorgenti, indice Git e ZIP.

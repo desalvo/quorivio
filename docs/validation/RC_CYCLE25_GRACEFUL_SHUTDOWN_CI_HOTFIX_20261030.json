@@ -1,0 +1,18 @@
+{
+  "version": "0.1.0-dev",
+  "cycle": 25,
+  "failed_run": 40972614731,
+  "failed_job": 123792791695,
+  "commit": "30f7ab98403611ee1a4846e4aa8797e03bac0e6b",
+  "failure": "First received post-SIGTERM WebSocket frame was not CLOSE/CLOSING; original log did not reveal its type",
+  "changed_files": [
+    "tools/ci_graceful_shutdown.py",
+    "tools/tests/test_ci_graceful_shutdown_ws_20261030.py",
+    ".github/workflows/ci.yml"
+  ],
+  "safety": "Require actual WS close 1012, bounded time/snapshot count, reject unexpected frames/errors",
+  "local_test_status": "PASS npm build, Node backend 474/474, Node frontend 65/65, Python full 1150/1150, SIGTERM focused 10/10, source/Git/ZIP checksum validation pending",
+  "remote_hotfix_verified": false,
+  "score": 79.0,
+  "commit_status": "uncommitted hotfix; new GitHub CI required"
+}

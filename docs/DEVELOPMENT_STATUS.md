@@ -1,3 +1,15 @@
+## Quorivio 0.1.0-dev — RC cycle 25 — 30 October 2026: rolling SIGTERM CI acceptance hotfix
+
+**Maintainer-confirmed baseline:** `30f7ab98403611ee1a4846e4aa8797e03bac0e6b`; push CI `40972614731`, quality job `123792791695`, FAILED at `tools/ci_graceful_shutdown.py:51`. Earlier CI steps, including builds, Node tests and two-replica WebSocket acceptance, passed. Do not assume later steps passed on this run.
+
+**Change:** the drain smoke now consumes a bounded number of *valid snapshot* messages that were already queued across `SIGTERM`, and requires a terminal WebSocket close with **code 1012** within a deadline. Invalid frames, wrong close codes, missing closes, and transport errors still fail closed. Dedicated deterministic tests cover all those paths; the workflow prints only non-sensitive lifecycle markers on failure. Previous cycle-24 source hashes are treated as immutable historical evidence, with fresh cycle-25 SHA-256 inventory. **The reason for the first non-close frame was not printed in the original log; the queued snapshot explanation remains a hypothesis pending fresh remote evidence.**
+
+**Local verification:** npm build PASS; backend 474/474, frontend 65/65; 10 targeted SIGTERM-frame regression cases PASS. Python complete suite **1,150/1,150 PASS**. Final source/Git/ZIP SHA-256 validation performed during packaging. The full PostgreSQL 18 rolling SIGTERM integration remains remote-only.
+
+**Formal RC score: 79.0% unchanged**, 47 gates (30 accepted, 17 partial). No remote validation of this hotfix yet; no automatic commit/push/tag/publication.
+
+---
+
 ## Quorivio 0.1.0-dev — RC cycle 24 — 29 October 2026: live disposable KIND runtime and path hardening
 
 **Local verification completed:** TypeScript/Vite build PASS; Node backend 474/474, web 65/65; Python full 1,140/1,140 PASS, including 14 targeted runtime/path-hardening cases and 4 new RC evidence contracts. CI workflow parsed. The new full KIND job still needs a remotely successful run. Current source, staged Git index and ZIP hashes verified by cycle-24 receipt.

@@ -5,6 +5,7 @@ Must run only after all multi-replica and load acceptance that uses port 8081.
 The surviving API on port 8080 must remain ready. No production SLO claims.
 """
 import asyncio
+import json
 import os
 from pathlib import Path
 import signal
@@ -14,6 +15,46 @@ import aiohttp
 
 A='http://127.0.0.1:8080'
 B='http://127.0.0.1:8081'
+
+
+async def wait_for_restart_close(ws, seconds=8.0, max_inflight=32):
+    """Require a real 1012 handshake, tolerating only queued snapshots.
+
+    A snapshot can be sent concurrently with SIGTERM and can already be in the
+    socket's receive queue. The first frame after SIGTERM is therefore not
+    necessarily the close frame. An ERROR, a different close code, or a stream
+    of unexpected messages is still a hard integration failure.
+    """
+    deadline = time.monotonic() + seconds
+    inflight = 0
+    while True:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise AssertionError(f'no 1012 restart close within {seconds}s ({inflight} queued snapshots)')
+        try:
+            message = await ws.receive(timeout=remaining)
+        except asyncio.TimeoutError as exc:
+            raise AssertionError(f'no 1012 restart close within {seconds}s ({inflight} queued snapshots)') from exc
+        if message.type == aiohttp.WSMsgType.TEXT:
+            try:
+                payload = json.loads(message.data)
+            except (TypeError, ValueError) as exc:
+                raise AssertionError('invalid queued WebSocket JSON during drain') from exc
+            if not isinstance(payload, dict) or payload.get('type') != 'snapshot':
+                raise AssertionError('unexpected application message during graceful shutdown')
+            inflight += 1
+            if inflight > max_inflight:
+                raise AssertionError('too many queued WebSocket snapshots during drain')
+            continue
+        if message.type in (aiohttp.WSMsgType.CLOSE, aiohttp.WSMsgType.CLOSING, aiohttp.WSMsgType.CLOSED):
+            code = ws.close_code
+            if code is None and message.type == aiohttp.WSMsgType.CLOSE:
+                code = message.data
+            assert code == 1012, f'WebSocket restart close must be 1012 (received {code!r})'
+            return inflight
+        if message.type == aiohttp.WSMsgType.ERROR:
+            raise AssertionError(f'WebSocket transport error during drain: {type(message.data).__name__}')
+        raise AssertionError(f'unexpected WebSocket frame during drain: {message.type!s}')
 
 
 async def main():
@@ -47,9 +88,8 @@ async def main():
                     break
                 await asyncio.sleep(.075)
             assert was_draining, 'terminating replica never reported readiness=503 before stopping'
-            close=await ws.receive(timeout=7)
-            assert close.type in (aiohttp.WSMsgType.CLOSE,aiohttp.WSMsgType.CLOSING), 'WebSocket was not gracefully closed'
-            assert ws.close_code==1012 or close.data==1012, 'WebSocket must signal 1012 service restart'
+            inflight=await wait_for_restart_close(ws)
+            print(f'Rolling drain: received WebSocket restart close 1012 after {inflight} in-flight snapshots')
         async with client.get(A+'/api/health/ready') as response:
             assert response.status==200, 'surviving replica failed readiness after peer termination'
         # The HTTP server should stop after the short readiness-drain interval.

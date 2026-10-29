@@ -92,7 +92,7 @@ def verify_zip(archive: Path, inventory: Path = ROOT / MANIFEST) -> int:
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--package', type=Path, help='optional historical cycle-24 ZIP')
-    parser.add_argument('--historical', action='store_true', help='validate immutable cycle-23 checksums without comparing later source edits')
+    parser.add_argument('--historical', action='store_true', help='validate immutable cycle-24 checksum catalog without comparing later source edits')
     args = parser.parse_args()
     if args.historical:
         print('Cycle 24 historical checksum catalog VALID:', len(load_inventory()), 'digests')

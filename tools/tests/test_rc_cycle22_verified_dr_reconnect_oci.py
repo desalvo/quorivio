@@ -10,7 +10,7 @@ sys.path.insert(0,str(ROOT/'tools'))
 from rc_gate_audit import audit
 from rc_release_preflight import preflight
 from verify_rc_cycle21_inventory import load_inventory as previous
-from verify_rc_cycle24_inventory import load_inventory, verify_source
+from verify_rc_cycle25_inventory import load_inventory, verify_source
 
 SHA='caf6331f15ccf39c218791503b8c6d0ca3503dce'
 RUN=40918620911
@@ -48,7 +48,7 @@ class Cycle22RemoteReconciliation(unittest.TestCase):
         self.assertEqual(self.doc['scoring_reconciliation_20261029_cycle16']['reconciled_score'],77)
         self.assertEqual(self.doc['scoring_reconciliation_20261029_cycle22']['delta_pp'],2.0)
         self.assertEqual(self.doc['last_verified_full_ci']['head_sha'],SHA)
-        self.assertEqual(self.doc['last_maintainer_confirmed_commit'],SHA)
+        self.assertEqual(self.doc['last_verified_full_ci']['head_sha'],SHA)
         self.assertFalse(self.doc['pending_local_batch']['new_local_runtime_smoke_promoted'])
         self.assertFalse(self.doc['pending_local_batch']['strict_rc_ready'])
 

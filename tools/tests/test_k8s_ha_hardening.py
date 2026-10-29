@@ -129,7 +129,7 @@ class KubernetesHA(unittest.TestCase):
         self.assertLess(workflow.index('python3 tools/ci_capacity_500.py'),workflow.index('python3 tools/ci_graceful_shutdown.py'))
         self.assertLess(workflow.index('python3 tools/ci_graceful_shutdown.py'),workflow.index('python3 tools/ci_backup_restore.py'))
         script=(ROOT/'tools/ci_graceful_shutdown.py').read_text()
-        for needle in ("signal.SIGTERM",'ws.close_code==1012','status==503','response.status==200'):
+        for needle in ("signal.SIGTERM",'await wait_for_restart_close(ws)','status==503','response.status==200'):
             self.assertIn(needle,script)
 
     def test_kind_job_is_opt_in_and_does_not_publish(self):

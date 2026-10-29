@@ -10,7 +10,7 @@ from verify_rc_cycle14_inventory import load_inventory as load_cycle14
 from verify_rc_cycle16_inventory import load_inventory as load_cycle16
 from verify_rc_cycle18_inventory import load_inventory as load_cycle18
 from verify_rc_cycle19_inventory import load_inventory as load_cycle19
-from verify_rc_cycle24_inventory import verify_source as verify_current_source, load_inventory as load_current
+from verify_rc_cycle25_inventory import verify_source as verify_current_source, load_inventory as load_current
 
 ROOT = Path(__file__).resolve().parents[2]
 

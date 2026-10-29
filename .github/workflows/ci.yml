@@ -386,6 +386,14 @@ jobs:
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
           QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
         run: python3 tools/ci_graceful_shutdown.py
+      - name: Diagnose graceful SIGTERM failure without private session data
+        if: failure()
+        run: |
+          # Only known lifecycle markers; never print complete API logs,
+          # which can include session IDs or other private data.
+          if [ -f /tmp/quorivio-ci-replica.log ]; then
+            grep -E '^(Quorivio API ready|Graceful shutdown requested|Server close failed|Graceful shutdown exceeded)' /tmp/quorivio-ci-replica.log || true
+          fi
       - name: PostgreSQL 18 disaster recovery backup and restore acceptance
         # Fail closed rather than silently skipping the authenticated encryption
         # and key-rotation portion of the disposable restore test.
@@ -455,7 +463,8 @@ jobs:
           python3 tools/verify_rc_cycle21_inventory.py --historical
           python3 tools/verify_rc_cycle22_inventory.py --historical
           python3 tools/verify_rc_cycle23_inventory.py --historical
-          python3 tools/verify_rc_cycle24_inventory.py
+          python3 tools/verify_rc_cycle24_inventory.py --historical
+          python3 tools/verify_rc_cycle25_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

@@ -536,8 +536,8 @@
   },
   "pending_local_batch": {
     "date": "2026-10-29",
-    "description": "RC cycle 24 disposable KIND single-node real runtime: PostgreSQL18, two API pods, shared CI hostPath assets and pod replacement; output-directory symlink hardening; pending remote CI",
-    "baseline_commit": "caf6331f15ccf39c218791503b8c6d0ca3503dce",
+    "description": "RC cycle 25 after failed standard CI 40972614731: bounded wait for WS restart 1012 after queued snapshots; in-flight frames are not a close. New regression suite and explicit lifecycle-only CI diagnostics. KIND/OCI/manual gates still unverified.",
+    "baseline_commit": "30f7ab98403611ee1a4846e4aa8797e03bac0e6b",
     "source_full_ci_run": 40918620911,
     "current_score": 79.0,
     "new_ci_required": true,
@@ -550,9 +550,9 @@
     "kubernetes_kind_runtime_verified": false,
     "graceful_shutdown_postgres_e2e_verified": false,
     "not_claimed": [
-      "no native multi-node RWX",
-      "no ingress/TLS/ClamAV verification",
-      "no verified GitHub run for cycle24"
+      "rolling SIGTERM E2E not yet green on new commit",
+      "KIND and multiarch smoke unverified",
+      "no real Kubernetes HA, RWX, rootless Podman, RPO/RTO or external acceptance"
     ]
   },
   "scoring_reconciliation_20261028": {
@@ -1038,7 +1038,7 @@
       "GDPR/legal key custody review"
     ]
   },
-  "last_maintainer_confirmed_commit": "caf6331f15ccf39c218791503b8c6d0ca3503dce",
+  "last_maintainer_confirmed_commit": "30f7ab98403611ee1a4846e4aa8797e03bac0e6b",
   "scoring_reconciliation_20261029_cycle22": {
     "date": "2026-10-29",
     "prior_score": 77.0,
@@ -1158,6 +1158,18 @@
     ],
     "new_ci_input": "kubernetes_runtime_test",
     "single_node_hostpath_only": true,
+    "strict_rc_ready": false
+  },
+  "rc_cycle25_graceful_drain_ci_hotfix_20261030": {
+    "source_failed_run": 40972614731,
+    "source_failed_job": 123792791695,
+    "source_commit": "30f7ab98403611ee1a4846e4aa8797e03bac0e6b",
+    "failed_step": "PostgreSQL two-replica graceful rolling SIGTERM acceptance",
+    "observed_error": "AssertionError: WebSocket was not gracefully closed in tools/ci_graceful_shutdown.py:51",
+    "evidence_limit": "Log did not include received frame type; an in-flight snapshot is a plausible cause, not yet directly observed. New test enforces 1012 after bounded queued snapshots.",
+    "score_before": 79.0,
+    "score_after": 79.0,
+    "verified_remote_hotfix": false,
     "strict_rc_ready": false
   }
 }
