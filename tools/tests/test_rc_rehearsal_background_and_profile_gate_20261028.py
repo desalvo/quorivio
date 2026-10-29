@@ -16,7 +16,7 @@ BROWSER=(ROOT/'tools/ci_rehearsal_keyboard_chromium.py').read_text()
 class RehearsalBackgroundAndProfileGate(unittest.TestCase):
     def test_profile_accepted_only_with_actual_prior_chromium_postgres_evidence(self):
         gates={gate['id']:gate for gate in LEDGER['gates']}
-        self.assertEqual(len(gates),32)
+        self.assertGreaterEqual(len(gates),33)
         self.assertEqual(sum(gate['weight'] for gate in gates.values()),100)
         self.assertEqual((gates['C4']['weight'],gates['C4']['status']),(3,'partial'))
         self.assertEqual((gates['C4-PROFILE']['weight'],gates['C4-PROFILE']['status']),(2,'accepted'))

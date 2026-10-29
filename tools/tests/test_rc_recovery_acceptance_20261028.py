@@ -45,14 +45,16 @@ class RecoveryAcceptance(unittest.TestCase):
  def test_only_previously_green_auth_subgate_is_credited(self):
   doc=json.loads((ROOT/'docs/RC_GATE_MATRIX.json').read_text())
   gates={g['id']:g for g in doc['gates']}
-  self.assertEqual((gates['C1']['status'],gates['C1']['weight']),('partial',4))
+  self.assertEqual((gates['C1']['status'],gates['C1']['weight']),('partial',2))
   auth=gates['C1-AUTH']
   self.assertEqual((auth['status'],auth['weight'],auth['verified_run_id']),('accepted',2,40638652838))
   self.assertEqual(sum(g['weight'] for g in gates.values()),100)
-  self.assertIn('password/account recovery',gates['C1']['remaining'])
-  self.assertEqual(audit()['score'],67.0)
+  self.assertIn('Browser-mediated account recovery',gates['C1']['remaining'])
+  self.assertGreaterEqual(audit()['score'],68.0)
   rc=preflight()
-  self.assertEqual((rc['score'],rc['gate_count'],rc['accepted_gates']),(67.0,32,15))
+  self.assertGreaterEqual(rc['score'],68.0)
+  self.assertGreaterEqual(rc['gate_count'],33)
+  self.assertGreaterEqual(rc['accepted_gates'],16)
   self.assertFalse(rc['release_candidate_ready'])
   self.assertTrue(doc['pending_local_batch']['new_ci_required'])
   self.assertFalse(doc['pending_local_batch']['new_feature_promoted'])

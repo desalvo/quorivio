@@ -6,6 +6,7 @@ checks dashboard/editor coexistence, one and only one accessible rehearsal,
 unsaved editor geometry and background restoration. The authenticated network,
 PostgreSQL and physical screen reader gates remain independent.
 """
+import argparse
 import asyncio
 import json
 import os
@@ -16,6 +17,9 @@ from ci_browser_editor import SESSION, ACTIVITY, ACT, SES, SNAP
 ROOT = Path(__file__).resolve().parents[1]
 
 async def main():
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--engines', nargs='+', choices=('chromium','firefox','webkit'),default=['chromium'])
+    args=parser.parse_args()
     assets = ROOT / 'apps/web/dist/assets'
     js = next(assets.glob('index-*.js'), None)
     css = next(assets.glob('index-*.css'), None)
@@ -45,7 +49,12 @@ async def main():
       };
     }'''.replace('__SNAP__',json.dumps(fixture)).replace('__SESSION__',json.dumps(SES))
     async with async_playwright() as p:
-        browser=await p.chromium.launch(executable_path=os.environ.get('QUORIVIO_CHROMIUM_PATH','/usr/bin/chromium'),headless=True,args=['--no-sandbox'])
+      for engine in args.engines:
+        options={'headless':True}
+        if engine=='chromium':
+            options.update(executable_path=os.environ.get('QUORIVIO_CHROMIUM_PATH','/usr/bin/chromium'),args=['--no-sandbox'])
+        # Each requested engine launches natively; never silently fall back.
+        browser=await getattr(p,engine).launch(**options)
         try:
             for width,height in [(1440,940),(390,844)]:
                 page=await browser.new_page(viewport={'width':width,'height':height})
@@ -95,7 +104,7 @@ async def main():
                 assert await invoker.evaluate('(node)=>document.activeElement===node'), 'Focus not returned to invoker'
                 assert not await editor.locator('.editor-exit').evaluate('(node)=>!!node.closest("[inert]")')
                 assert not errors, errors
-                print(f'PASS offline built React Chromium {width}px: one accessible dual preview, inert background and restored focus')
+                print(f'PASS offline built React {engine} {width}px: one accessible dual preview, inert background and restored focus')
                 await page.close()
         finally:
             await browser.close()

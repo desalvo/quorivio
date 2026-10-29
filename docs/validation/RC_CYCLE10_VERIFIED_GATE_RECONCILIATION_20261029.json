@@ -1,0 +1,98 @@
+{
+  "project": "Quorivio",
+  "version": "0.1.0-dev",
+  "date": "2026-10-29",
+  "baseline_zip": "quorivio-0.1.0-dev-rc-gate71-accessibility-stats-recovery-confirmation-cumulative.zip",
+  "baseline_gate_count": 36,
+  "baseline_accepted": 19,
+  "baseline_partial": 17,
+  "baseline_score_percent": 71.0,
+  "reconciled_gate_count": 40,
+  "reconciled_accepted": 23,
+  "reconciled_partial": 17,
+  "reconciled_score_percent": 74.0,
+  "delta_pp": 3.0,
+  "weight_total": 100,
+  "github_verified_proof": {
+    "run_id": 40717525524,
+    "attempt": 2,
+    "commit": "f6738592c648bc620e01b92d2bbaa6b90b459287",
+    "quality_job_id": 123073117101,
+    "conclusion": "success",
+    "evidence": "UI interaction/geometry Chromium 1440/390, real PostgreSQL tests, Kubernetes generation/worker, OOXML and converter boundary regressions: verified prior full CI. Not a new full CI."
+  },
+  "historical_scope_reconciliation": {
+    "date": "2026-10-29",
+    "baseline_score": 71.0,
+    "reconciled_score": 74.0,
+    "delta_pp": 3.0,
+    "source": "GitHub Actions 40717525524 attempt 2 quality gate job 123073117101; already-green prior committed SHA f6738592c648bc620e01b92d2bbaa6b90b459287",
+    "source_gate_states": "Four distinct automated bounded scopes formerly within four partial parent gates: A1 6=>4+2, A3 4=>2+2, D3 2=>1+1, D4 3=>2+1. New net score 3.0, 100 weight maintained and independent parent requirements still partial.",
+    "accepted_subgates": [
+      "A1-EDITOR-INTERACTION",
+      "A3-GEOMETRY",
+      "D3-K8S-GENERATOR",
+      "D4-CONVERTER-BOUNDARY"
+    ],
+    "non_duplicate_scope": [
+      "A1 editor canvas interaction, pointer/keyboard/selection is NOT A2 slide thumbnails, A3-AUTO autosave/CAS/WYSIWYG, or A3-GEOMETRY projection",
+      "A3 geometry is not A3-AUTO data integrity, A4 focus lifecycle or independent pixel-accuracy",
+      "D3 Kubernetes wizard/credential generation is not D3-IMAGE image build and scan",
+      "D4 converter input/boundary regressions are distinct from D4-SCAN generic credential and vulnerability gate"
+    ],
+    "local_only_changes_without_scoring": [
+      "Recovery password Enter-to-submit form accessibility on built React",
+      "Rehearsal dynamic background portal reparent inert/aria-hidden restoration",
+      "Expanded local Chromium fixture for both changes"
+    ],
+    "accepted_before": 19,
+    "accepted_after": 23,
+    "partial_before": 17,
+    "partial_after": 17,
+    "gate_count_before": 36,
+    "gate_count_after": 40,
+    "strict_rc_ready": false,
+    "new_code_github_pending": true,
+    "verified_run_id": 40717525524,
+    "verified_job_id": 123073117101,
+    "verified_sha": "f6738592c648bc620e01b92d2bbaa6b90b459287"
+  },
+  "local_new_code": {
+    "password_reset": "Native HTML form submit on Enter, matching confirmation, in-flight single-submit guard already present, post-failure retry preserved.",
+    "dialog": "Restore original aria-hidden and inert when background portals are reparented inside the active dialog or detached; isolate again when moved outside.",
+    "source_files": [
+      "apps/web/src/main.tsx",
+      "apps/web/src/rehearsal-dialog.ts",
+      "tools/ci_recovery_url_chromium.py",
+      "tools/ci_rc_rehearsal_dynamic_portals_chromium.py"
+    ]
+  },
+  "local_tests": {
+    "typescript_backend_frontend_vite": "PASS",
+    "backend_node": "474/474",
+    "frontend_node": "62/62",
+    "python_full": "984/984",
+    "chromium_built_react_recovery_1440_390": "PASS",
+    "chromium_rehearsal_portal_1440_390": "PASS",
+    "chromium_rehearsal_keyboard_1440_390": "PASS",
+    "new_regression_7": "PASS"
+  },
+  "external_not_run": [
+    "new GitHub Full CI on uncommitted code",
+    "Firefox and WebKit automated browser acceptance",
+    "NVDA/VoiceOver/TalkBack and independent screen reader audit",
+    "physical iOS/Android touch, operator reviews",
+    "real multi-replica Kubernetes HAProxy/NGINX and RWX/ClamAV failover",
+    "independent GDPR/AGID/pentest and production recovery drills"
+  ],
+  "strict_rc_ready": false,
+  "new_source_ci_pending": true,
+  "maintainer_commit_required": true,
+  "workflow_inputs_recommended": {
+    "browser_test": true,
+    "capacity_test": true,
+    "publish_image": false,
+    "publish_latest": false,
+    "rc_strict": false
+  }
+}

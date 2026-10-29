@@ -19,7 +19,7 @@ from email import policy
 from email.parser import Parser
 from pathlib import Path
 from urllib.error import HTTPError
-from urllib.parse import urlsplit
+from urllib.parse import urlsplit, parse_qs
 from urllib.request import HTTPCookieProcessor, Request, build_opener
 
 BASE = os.environ.get('QUORIVIO_CI_BASE_URL', 'http://127.0.0.1:8080')
@@ -60,6 +60,25 @@ def mail_count():
     return len([x for x in CAPTURE.read_text(encoding='utf-8').splitlines() if x.strip()])
 
 
+def extract_recovery_token(content: str) -> str:
+    """Validate the actual SMTP link without disclosing a bearer in test output.
+
+    A fragment never reaches the HTTP request path, access logs or Referer.
+    Legacy query links can still be consumed by the web client, but newly
+    issued links must use the private fragment-only representation.
+    """
+    match = re.search(r'https?://[^\s<>]+', content)
+    assert match, 'SMTPS message lacks a valid recovery URL'
+    link = urlsplit(match.group(0))
+    assert link.scheme == 'https' or (link.scheme == 'http' and link.hostname in ('127.0.0.1', 'localhost')), 'recovery email must use HTTPS (HTTP only for loopback CI)'
+    assert link.path == '/' and not link.query, 'recovery URL leaked bearer into request URL'
+    params = parse_qs(link.fragment, strict_parsing=True)
+    tokens = params.get('reset_token', [])
+    assert len(tokens) == 1 and re.fullmatch(r'[A-Za-z0-9_-]{43}', tokens[0]), 'invalid recovery bearer in fragment'
+    assert len(params) == 1, 'unexpected recovery URL fragment fields'
+    return tokens[0]
+
+
 def receive_link(offset, recipient):
     for _ in range(50):
         rows = [json.loads(x) for x in CAPTURE.read_text(encoding='utf-8').splitlines() if x.strip()]
@@ -69,10 +88,9 @@ def receive_link(offset, recipient):
             msg = Parser(policy=policy.default).parsestr(rows[-1]['message'])
             plain = msg.get_body(preferencelist=('plain',))
             content = plain.get_content() if plain else msg.get_content()
-            match = re.search(r'https?://[^\s<>]+reset_token=([A-Za-z0-9_-]{43})', content)
-            assert match, 'SMTPS message lacks a valid recovery link'
+            token = extract_recovery_token(content)
             assert '20 minutes' in content, 'incorrect token expiry in SMTP message'
-            return match.group(1)
+            return token
         time.sleep(0.15)
     raise AssertionError('password recovery SMTP delivery did not arrive')
 

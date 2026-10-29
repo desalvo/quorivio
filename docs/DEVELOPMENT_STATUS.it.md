@@ -1,3 +1,108 @@
+# Quorivio 0.1.0-dev — ciclo RC 12: 74,0% (invariato), 29 ottobre 2026
+
+**Baseline:** archivio cumulativo RC 74 ciclo 11 (782 file). Nessun commit/push/tag/pubblicazione Docker automatica. Versione fissa `0.1.0-dev`, licenza `EUPL-1.2`.
+
+## Nuove implementazioni sostanziali
+
+1. **Focus accessibile in editor/anteprima:** il gestore reale TypeScript considera i campi `contenteditable` e i `<summary>` tra i target da tastiera, esclude controlli con `tabindex` negativo e gestisce la finestra temporaneamente priva di azioni con un punto di focus ripristinabile. Preservati `inert`/`aria-hidden`, Escape e ritorno al pulsante che aveva aperto la finestra.
+2. **Firefox/WebKit nativi in GitHub Actions:** nuovo input manuale `cross_browser_test=true`, job opzionale con installazione delle dipendenze e dei veri motori Playwright. Test desktop 1440px/mobile 390px sia del modulo reale TypeScript e del CSS della diapositiva 16:9, sia del bundle React reale da dashboard/editor. In caso di errore viene conservata la diagnostica per motore; nessun fallback silenzioso su Chromium.
+3. **Percorso di approvazione indipendente:** protocollo IT/EN e checklist JSON degli esatti 17 gate parziali, con requisiti di prove, device, SLO, screen reader, provider esterni e infrastrutture. Nessun gate viene accettato soltanto per aver creato la checklist.
+4. **Inventari storici e correnti:** il verificatore del ciclo 11 valida lo snapshot immutabile, mentre il ciclo 12 verifica gli SHA-256 di sorgenti e ZIP corrente, preservando il formato esadecimale a gruppi contro falsi positivi GitGuardian/GitLeaks.
+
+## Verifiche e limiti
+
+Locali: build TypeScript backend/frontend+Vite PASS, 474/474 backend Node, 65/65 frontend Node, 1000/1000 Python, Chromium nativo 1440/390 per geometria, tastiera, dialogo e React bundle PASS. Firefox/WebKit non sono installati localmente e **non sono stati eseguiti**; l'input GitHub è nuovo e richiede una run dopo il commit. Niente nuove prove con PostgreSQL 18, dispositivi fisici o screen reader su questa revisione. L'ultima Full CI GitHub 40717525524 resta riferita al commit precedente `f6738592`.
+
+**Punteggio:** 74,0% prima/dopo (40 gate, 23 accettati, 17 parziali). Nessun credito anticipato per la CI opzionale o prove esterne non eseguite. RC rigorosa ancora non pronta.
+
+**Nuovo avvio consigliato:** GitHub workflow manuale `browser_test=true`, `cross_browser_test=true`, `capacity_test=true`, `publish_image=false`, `publish_latest=false`, `rc_strict=false`. Per completare i gate residui seguire `docs/RC_EXTERNAL_ACCEPTANCE_PROTOCOL_20261029.it.md`.
+
+---
+
+# Quorivio 0.1.0-dev — ciclo RC 11: 74,0% (invariato), 29 ottobre 2026
+
+**Baseline:** ZIP cumulativo RC 74 del ciclo 10 (775 file); nessun nuovo commit dichiarato dall'utente. **Versione:** 0.1.0-dev; **licenza:** EUPL-1.2. Nessun commit, push, tag o pubblicazione Docker eseguito dall'assistente.
+
+## Batch tecnico completo
+
+1. **Sicurezza dei link di recupero password:** le nuove email contengono `#reset_token=...` nel frammento dell'URL, non nella richiesta HTTP. Questo limita l'esposizione nei log del reverse proxy e negli header Referer. I vecchi link con `?reset_token=...` restano validi e vengono ripuliti immediatamente dalla cronologia; i token non sono persistiti nel browser. Rimangono invariati scadenza di 20 minuti, consumo singolo e digest SHA-256 sul server.
+2. **Integrazione PostgreSQL 18/SMTP TLS:** lo script E2E reale già presente impone ora per le nuove email il formato con frammento, rifiutando token nella query. Per il solo ambiente CI isolato è permesso HTTP loopback; altrove è richiesto HTTPS nel test. Prove con provider SMTP e client di posta reali ancora aperte.
+3. **Focus accessibile delle anteprime:** oltre a Tab/Maiusc+Tab ed Esc, un listener `focusin` cattura spostamenti di focus fuori dalla finestra effettuati via script o tecnologie assistive e riporta il focus nel dialogo, con cleanup completo. Regressioni Chromium a 1440 e 390 px superate. Non rappresenta una certificazione con NVDA/VoiceOver/TalkBack.
+4. **Integrità dei package:** preservati gli SHA-256 dell'archivio storico ciclo 10, ora verificati come snapshot e non confrontati erroneamente con i file modificati nei cicli successivi. Il nuovo verificatore ciclo 11 controlla i checksum di ciascun file corrente e dello ZIP completo, con otto gruppi esadecimali per evitare falsi positivi di secret scanning.
+
+## Verifiche e avanzamento
+
+Locali: build TypeScript API/Web e Vite **PASS**; **474/474** test Node backend, **65/65** frontend, **993/993** Python, inclusi i test del nuovo inventario; test Chromium reali sul bundle React per link nuovi/legacy **4/4** a 1440/390 e focus/portali **4/4**. Report e inventario aggiornati e verificati integralmente prima del packaging.
+
+La Full CI GitHub [40717525524](https://github.com/desalvo/quorivio/actions/runs/40717525524), tentativo 2, commit `f6738592c648bc620e01b92d2bbaa6b90b459287`, era verde sul **codice precedente**, non su queste modifiche ancora senza commit. Mancano accettazione PostgreSQL/SMTP TLS con il nuovo link, altri browser, screen reader, dispositivi reali, test operativi e revisione indipendente.
+
+**Punteggio RC ufficiale: 74,0%, +0,0 punti (40 gate, 23 accettati, 17 parziali; RC non pronta).** Le modifiche locali non sono state usate per gonfiare la percentuale. Per aumentarla occorre chiudere realmente i 17 gate residui, non dividerli ulteriormente senza nuove prove.
+
+**Prossima CI:** avviare manualmente `browser_test=true`, `capacity_test=true`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag/Docker push automatico.
+
+**Evidenze:** `docs/RC_GATE_MATRIX.json`, `docs/validation/RC_CYCLE11_SECURITY_AND_FOCUS_LOCAL_20261029.json`, `docs/validation/RC_CYCLE11_PACKAGE_INVENTORY_20261029.json`.
+
+---
+
+# Quorivio 0.1.0-dev — ciclo RC 10: 74,0% (+3,0 punti), 29 ottobre 2026
+
+**Baseline:** archivio cumulativo ciclo 9, RC 71,0%; conservati i 768 file originali. Nessun commit, tag, push o pubblicazione Docker eseguiti dall'assistente.
+
+## Riconciliazione delle evidenze verificate
+
+La Full CI GitHub [40717525524](https://github.com/desalvo/quorivio/actions/runs/40717525524), tentativo 2, commit `f6738592c648bc620e01b92d2bbaa6b90b459287`, job qualità `123073117101` aveva già superato quattro verifiche automatizzate indipendenti ancora incluse in gate parziali:
+
+- **A1-EDITOR-INTERACTION** (peso 2): controlli dell'editor Chromium, canvas, pointer e tastiera. A1 resta parziale (4): approvazione indipendente, più browser e dispositivi. Non duplica A3-AUTO (WYSIWYG/persistenza) né A2-ORDER (miniature).
+- **A3-GEOMETRY** (peso 2): geometria 16:9 coerente tra editor, anteprima e pubblico a 1440/390 px, lettura accessibile. A3 resta parziale (2): fedeltà pixel con corpus, Office, Firefox/WebKit, dispositivi. Non duplica i contratti di autosave o focus.
+- **D3-K8S-GENERATOR** (peso 1): wizard/worker Kubernetes e generazione persistente di segreti distinti in CI. D3 resta parziale (1): ARM64 nativo, Podman rootless, Ingress/ClamAV/RWX reali. Distinto dalla compilazione immagini D3-IMAGE.
+- **D4-CONVERTER-BOUNDARY** (peso 1): regressioni reali di conversione, input malevoli e pubblicazione atomica. D4 resta parziale (2): pentest indipendente e revisione delle minacce. Distinto dagli scanner generici di D4-SCAN.
+
+Peso complessivo invariato: 100. **71,0 → 74,0%**, gate **36 → 40**, accettati **19 → 23**, parziali **17** invariati. Le verifiche automatiche non sono accettazioni esterne o operative; la RC rigorosa è ancora bloccata.
+
+## Nuove correzioni funzionali, soltanto locali
+
+Il recupero password dispone di un vero form HTML accessibile con invio anche mediante **Invio** da tastiera; restano conferma password, deduplicazione POST e ritentativo. Nell'anteprima, quando un portale viene spostato dentro il dialogo, `inert` e `aria-hidden` tornano allo stato precedente; se torna all'esterno viene nuovamente isolato. Test Chromium desktop 1440 e mobile 390 per entrambi i flussi.
+
+**Test locali:** build TypeScript backend/frontend e Vite PASS; 474/474 Node backend, 62/62 Node frontend, 984/984 Python; Chromium form recupero, focus e portali a 1440/390 PASS. Nuova CI GitHub **non eseguita** sul codice non committato; SMTP/PostgreSQL reali, Firefox/WebKit, tecnologie assistive, dispositivi fisici, infrastruttura reale e verifiche indipendenti restano in sospeso.
+
+**Prossimo passo:** commit dell'utente e CI estesa manuale con `browser_test=true`, `capacity_test=true`, `publish_image=false`, `publish_latest=false`. Nessuna RC pronta finché rimangono gate parziali.
+
+**Evidenze:** `docs/RC_GATE_MATRIX.json`, `docs/validation/RC_CYCLE10_VERIFIED_GATE_RECONCILIATION_20261029.json`, inventario SHA-256 raggruppato.
+
+---
+
+# Quorivio 0.1.0-dev — ciclo RC 9: 71,0% (+3,0 punti), 28 ottobre 2026
+
+**Baseline:** ZIP cumulativo ciclo 8 (RC 68,0%), tutte le implementazioni precedenti conservate. Versione `0.1.0-dev`, licenza EUPL-1.2.
+
+## Riconciliazione gate con prove verificate su GitHub
+
+La run GitHub Actions [40717525524](https://github.com/desalvo/quorivio/actions/runs/40717525524), tentativo 2, commit `f6738592c648bc620e01b92d2bbaa6b90b459287`, job qualità `123073117101` è **interamente verde**. I seguenti sotto-gate tecnici distinti erano già dimostrati ma compresi nei gate parziali. Per ciascuno sono trasferiti esattamente 2 punti di peso dal padre parziale al sotto-gate accettato, senza doppia attribuzione:
+
+- **A2-ORDER** (2): miniature/editor e controlli di interazione Chromium desktop/mobile, contratti di riordino da tastiera. A2 residuo parziale (4): fedeltà pixel, DnD Firefox/WebKit, dispositivi reali.
+- **A4-FOCUS** (2): focus trap reale TypeScript/React Chromium 1440/390, isolamento `inert`/ARIA dinamico e ripristino del focus. A4 residuo parziale (4): NVDA/VoiceOver/TalkBack, touch e tastiera fisici, approvazione WCAG/AGID.
+- **B3-QUESTION-STATS** (2): PostgreSQL 18 reale, tre domande indipendenti, statistiche riservate al presentatore, revisioni e idempotenza per due partecipanti. B3 residuo parziale (2): verifica indipendente browser/dispositivi e tecnologie assistive.
+
+Queste prove non riutilizzano il perimetro già accettato di A3-AUTO (persistenza editor) o B3-AUDIENCE (ingresso QR, votazioni e moderazione). Peso complessivo 100; 33 → 36 gate, 16 → 19 accettati, 17 parziali invariati. **68,0 → 71,0%, +3,0 punti percentuali**. RC rigorosa ancora bloccata.
+
+## Nuovo sviluppo locale (nessun punto assegnato)
+
+Il recupero password richiede nuova password e conferma identiche, almeno 12 caratteri; un blocco sulla richiesta in corso impedisce l'invio doppio. In caso di errore resta possibile ritentare senza ripubblicare il token nell'URL. Il test Chromium sul bundle React compilato, 1440 e 390 px, verifica password difformi, doppio clic (un solo POST), errore/ritentativo, successo e assenza del token nello storage/URL. **La nuova Full CI GitHub è ancora necessaria**.
+
+**Test locali:** build TypeScript backend/frontend e Vite PASS; 474/474 Node backend; 62/62 Node frontend; 979/979 Python; Chromium desktop/mobile PASS. PostgreSQL locale, Firefox/WebKit, dispositivi fisici e verifica indipendente non eseguiti in questo batch.
+
+**Prossimi passi:** commit effettuato dall'utente, CI estesa `browser_test=true`, `capacity_test=true`, `publish_image=false`, `publish_latest=false`, verifiche indipendenti multi-browser, dispositivi, screen reader, distribuzione reale Kubernetes/RWX/ClamAV e GDPR/AGID. Nessun commit, push, tag o pubblicazione automatica.
+
+**Evidenze:** `docs/validation/RC_CYCLE9_VERIFIED_GATE_HARDENING_20261028.json`, `docs/RC_GATE_MATRIX.json`.
+
+---
+
+# Quorivio 0.1.0-dev — ciclo 8, RC verificata 68,0% (+1,0 punto), 28/10/2026
+
+**Evidenza:** [CI GitHub 40717525524](https://github.com/desalvo/quorivio/actions/runs/40717525524), tentativo 2, commit `f6738592c648bc620e01b92d2bbaa6b90b459287`: qualità, build container e pubblicazione richiesta manualmente tutte verdi. Superato il test reale di recupero password PostgreSQL 18 + SMTP TLS; accettato soltanto il sotto-gate autonomo e circoscritto `C1-RECOVERY` (peso 2, sottratto al residuo C1). **68,0%, 33 gate (16 accettati, 17 parziali); RC non pronta.** Il nuovo codice elimina immediatamente dall’URL e dalla cronologia il token di recupero e impedisce l’invio del referrer; aggiunti test Node, Chromium 1440/390 e integrazione nella CI opzionale. Build locale e 474 test Node backend, 62 frontend, 975 Python e Chromium PASS. **Nuova CI GitHub ancora necessaria per il codice modificato.** Dettagli: `docs/RC_RECOVERY_CYCLE8_20261028.it.md` e `docs/validation/RC_RECOVERY_CYCLE8_20261028.json`. Nessun commit/push/tag/pubblicazione automatica.
+
+---
+
 # Quorivio 0.1.0-dev — Hotfix anteprima duplicata e barra mobile (28 ottobre 2026)
 
 **Run GitHub:** CI estesa [40689633215](https://github.com/desalvo/quorivio/actions/runs/40689633215), commit `8899c24155473ab8ff88cfa1ba767aa949be1ded`. Il quality gate è fallito in `tools/ci_browser_editor.py`: Playwright ha trovato **due finestre di anteprima**, entrambe `inert` e `aria-hidden`. Build container e integrazione PostgreSQL sono state saltate; ultima Full CI interamente verde: 40638652838.

@@ -5,33 +5,71 @@
     {
       "id": "A1",
       "area": "A-editor",
-      "weight": 6,
+      "weight": 4,
       "status": "partial",
       "evidence": "Canvas 16:9, free placement, resizing, rotation, rulers, keyboard code and local build documented; page-scoped bounded widget undo/redo, drag grouping, and keyboard shortcuts implemented; local 163 Node tests and web build PASS (2026-10-24); multi-widget selection (shift-click, accessible checkbox, Ctrl/Cmd+A), 10 alignment/equal-size/distribution commands with bounded geometry and one-step undo/redo, 8 Node regressions PASS (2026-10-25); group move/copy/cut/paste with bounded geometry and eight additional Node tests locally PASS (2026-10-25); Chromium workflow 40141207000 reached multi-selection, alignment, undo/redo and group paste, but failed on test-only disabled deselect click (2026-10-25). CI 40141894130 / job 121015403855: opt-in Chromium PASS (multi-selection, alignment, undo/redo, group paste, accessible selection, clear selection, zero JS page errors). Following 20-intervention batch adds stable layer groups, gap distribution, canvas centering, multi-delete/duplicate, bounded keyboard/group nudge, and new opt-in browser persistence/mobile smoke (not yet executed). GitHub workflow 40143475939 / quality job 121019855513: expanded Chromium editor PASS including group editing, layer order, keyboard interactions, simulated PATCH persistence/reload and 390px mobile viewport; 205 Node and 277 Python PASS; container build job 121020208222 SUCCESS (maintainer confirmed, verified 2026-10-25). Maintainer confirmed commit and GitHub CI 40192172978 SUCCESS for the preceding 240-case conversion baseline (2026-10-25). Next 30-intervention batch adds separate PostgreSQL design revision, atomic compare-and-swap, explicit UI conflict recovery, and real PostgreSQL + Chromium acceptance; local Node and build PASS, new CI not yet executed. Tenth uncommitted 30-item batch adds conservative three-way rebase of independent edits, explicit field/deletion/order conflict choices, local draft JSON export, server freshness check before apply, and expanded opt-in real PostgreSQL Chromium test; 40 Node merge behavior tests PASS locally. Ninth and tenth batches remain uncommitted; new CI pending. Eleventh editor batch: explicit versioned JSON backup/import, same-revision local restore, stale v2 three-way merge and stale v1 refusal; 30 documented implementation/acceptance items, 314 Node + 621 Python tests PASS locally. Maintainer committed the ninth–eleventh editor batches; GitHub run 40209267607 quality gate failed at frontend TS17001 duplicate disabled attribute after 314/314 Node PASS; container and publication SKIPPED. Follow-up hotfix merges disabled guards and adds regression; GitHub rerun and Chromium/PostgreSQL acceptance pending. GitHub CI standard 40213703957 quality/container/publication PASS; full CI 40215782964 Chromium blocked by cookie dialog hit-test (`.welcome` intercepts despite body portal). Native HTML dialog showModal top-layer fix, local 314 Node + 630 Python and API/web builds PASS, isolated Chromium hit-test PASS; full app Chromium rerun pending. GitHub full run 40218596128 fails on mobile Chromium cookie dialog hit-testing due to layout 1243px vs visual 844px viewport. Narrow CSS top-anchor + real visual-viewport assertions added; local standalone Chromium desktop/mobile regression PASS, 314 Node/633 Python tests and API/web builds PASS. Full CI rerun pending (2026-10-25). GitHub full CI 40220288310 advanced past Chromium mock editor, PostgreSQL CAS HTTP and real PostgreSQL Chromium participant acceptance; real PostgreSQL editor browser test failed on an accidentally conflicting remote fixture (server x=10 vs local x=12, prior x=11). Fixed the test to clone the latest persisted design and edit only the collaborator label; eleven new pure Python regressions, with real Chromium/PostgreSQL rerun pending (2026-10-25). Maintainer-confirmed GitHub full CI run 40304413948: production quality gate 121510438909 SUCCESS (including opt-in Chromium+PostgreSQL editor/participant journeys); container build gate 121512122765 SUCCESS; publication SKIPPED (2026-10-26). Committed baseline. 2026-10-26 uncommitted editor UX redesign: canvas-first dark-glass photo-backed app chrome, contextual properties, keyboard/thumb drag reorder, responsive icon-only widget palette, touch tooltips; local 135 focused Python contracts and TSX parsing pass, new Chromium fixture pending CI. CI 40381561104 quality/container SUCCESS after BIGINT correction. Full Chromium 40382686414 failed due to first-thumbnail popup covering ⋮ toggle. Hotfix adjusts popup placement and hit-target assertions; new Chromium run pending. 2026-10-27 CI 40510491774 passed real Chromium nested CSS and exact Save preflights, but mobile mock-editor timed out at accessibility disclosure because the alignment overlay intercepted the pointer. Scoped stacking + onToggle menu-dismissal fixed locally; focused Python 182 and Node 447 PASS, desktop/touch Chromium overlap regression PASS; new full CI pending. 2026-10-27 Full CI 40513571247: simulated Chromium editor CSS, Save, mobile/touch and complete UI acceptance PASS; real PostgreSQL participant Chromium PASS; real PostgreSQL editor acceptance FAILED at first Save due to expanded accessible controls overflowing onto the Save area. CSS nonshrinking stage/canvas/workflow fix verified with real Chromium desktop/touch and prior-CSS negative reproduction LOCALLY ONLY.\nFull opt-in Chromium run 40517573850 quality gate SUCCESS on e372a3ae, including simulated and PostgreSQL-backed editor/persistence/conflict tests after editor overflow fix. Physical device, accessibility, Firefox/WebKit remain unverified.\n2026-10-27 browser run 40549836288 (commit b6736aa) PASSED new isolated Chromium mock-fidelity/autosave/Exit preflights but failed full editor mock on fixed canvas corner context click covered by branded header after scroll. Shared real hit-target helper and independent desktop/touch reproduction now PASS locally; new complete GitHub acceptance PENDING.\n2026-10-27: Green maintainer Full CI 40553571012 on 67a7be939a5930e2f9a49ce3932a4b7f29a682ac confirmed real Chromium/PostgreSQL editor behavior. Subsequent local resilience batch: bounded retry with authority readback after ambiguous network failures, 12 frontend Node tests plus 842 Python and 447 backend Node pass; shared editor/presenter/audience geometry helper. New Chromium network-loss fixture and mandatory frontend Node CI step require a NEW GitHub run. No acceptance promotion.\n2026-10-27 local (pending new GitHub CI): contextual quick palette and drag/resize/keyboard conservative no-overlap + 1.5%-edge magnetic snap with regression tests.\n2026-10-27 post-6395b0b: backend and frontend TypeScript production builds PASS locally after sharing WidgetTextStyle with editor; Chromium seven isolated preflights PASS. Full PostgreSQL editor + lost-network collaborative autosave acceptance and new GitHub CI still required. No status promotion.\n2026-10-27: GitHub default push CI 40583756455 passed TypeScript frontend/backend and editor, API, and PostgreSQL tests; failed solely Gitleaks checksum-manifest false positives. SHA-256 evidence encoding fixed locally, GitHub rerun pending. Opt-in Chromium omitted. NO gate promotion.\n2026-10-27 standard push CI 40588408394 on 0bb8fb7856727699384dfe51aea6ee6d961ea022 SUCCESS for quality gate and container build (Docker publication skipped). Opt-in Full CI 40589103128 reached 6 real Chromium preflights PASS but FAILED in tools/ci_browser_editor.py:106 when fixed .editor-mock-header blocked background contextual selection-entry pointer, before real PostgreSQL Chromium acceptance. A viewport-anchored CSS fix for both contextual menu and arrangement panels plus a real desktop/touch Chromium regression was validated LOCALLY only; older CSS gives a genuine header hit-target failure, updated CSS PASS. No gate promotion pending a fresh successful full CI and independent visual/AT review. 2026-10-27: full Chromium 40592859476 confirmed header pointer fix but stopped on multi-duplicate 5 expected vs 3 actual; collision-free translation of whole group and clipboard paste implemented, Node 28 frontend + 450 backend PASS, Python 32 targeted PASS. Not yet CI-confirmed. \n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: Chromium mock editor PASS (multi-widget duplicate/undo/delete, pointer, contextual menus, autosave loss/retry, reload); PostgreSQL editor CAS and Chromium actual autosave PATCH/readback, concurrent merge/conflict/JSON export PASS. Strict RC gate was skipped; status unchanged.\n2026-10-28 local visual parity batch: editor projection-backed widget contents; 16:9 desktop/mobile geometry and rectangular tooltips Chromium preflight PASS; draft participant rehearsal/fullscreen; inline options and persistent bounded typography spans; backend/frontend builds, Node 454+36 PASS. New Full CI and visual operator/physical assistive technology sign-off PENDING. 2026-10-28 local uncommitted: per-widget source-linked results, independent presenter-only rendering, side-by-side simulated presenter/audience and responsive 16:9 CSS; Node backend 455/455, web 44/44, Python focused 58/58, Chromium offline CSS pointer+geometry 1440/390 PASS. New full GitHub Chromium+PostgreSQL pending; this is NOT acceptance evidence.",
-      "remaining": "Independent visual operator acceptance, Firefox/WebKit and physical-device canvas interactions, realistic latency and multi-editor workload sign-off. 2026-10-28 new batch pending GitHub opt-in acceptance and independent browser/device sign-off. Re-run full GitHub CI on linked results / dual rehearsal and independently confirm actual browser source-specific stats, accurate pixel-level editor/presenter/participant parity, real reaction workflow and format-selection interactions.",
+      "remaining": "Independent visual operator acceptance, Firefox/WebKit and physical-device canvas interactions, realistic latency and multi-editor workload sign-off. 2026-10-28 new batch pending GitHub opt-in acceptance and independent browser/device sign-off. Re-run full GitHub CI on linked results / dual rehearsal and independently confirm actual browser source-specific stats, accurate pixel-level editor/presenter/participant parity, real reaction workflow and format-selection interactions. The narrower A1-EDITOR-INTERACTION automated subgate is separately verified in 40717525524; operator, external/browser and production requirements remain explicitly in this partial parent.",
       "current_verified_run": 40595463258,
       "pending_local_evidence_20261028": "WYSIWYG and independent-question implementation passes local TypeScript/Vite, 461 Node API, 46 frontend, 33 focused Python, Chromium component desktop/mobile. Unverified by GitHub and real PostgreSQL; prior accepted gates unchanged."
+    },
+    {
+      "id": "A1-EDITOR-INTERACTION",
+      "area": "A-editor",
+      "weight": 2,
+      "status": "accepted",
+      "scope": "Automated interactive editor canvas pointer/keyboard, selection and contextual hit-target controls; excludes persistence/CAS, WYSIWYG and slide filmstrip acceptance",
+      "evidence": "GitHub Actions 40717525524 attempt 2 quality job 123073117101: PASS real Chromium canvas corner hit-target, overlapping toolbar/contextual menus, group pointer/keyboard interactions, and desktop/mobile editor UI acceptance. Distinct from A2-ORDER slide filmstrip and A3-AUTO persistence/WYSIWYG/question integrity, and A3-GEOMETRY visual projection. Independent visual/editor operator acceptance remains in A1.",
+      "remaining": "Maintain corresponding bounded automated proof in fresh CI. External, production and independent review remains open in A1.",
+      "verified_run_id": 40717525524,
+      "verified_commit_sha": "f6738592c648bc620e01b92d2bbaa6b90b459287",
+      "verified_job_id": 123073117101,
+      "acceptance_kind": "bounded_prior_github_automated"
     },
     {
       "id": "A2",
       "area": "A-editor",
-      "weight": 6,
+      "weight": 4,
       "status": "partial",
-      "evidence": "Slide thumbnails, order and duplication implemented with keyboard alternative; strict UUID/permutation validation and 8 focused tests (2026-10-24) 2026-10-26 uncommitted: full 16:9 page thumbnails with position-aware preview, menu-based insert before/after, duplication beside source and deletion; drag/drop and keyboard fallback, saved position via /pages/order. Requires real browser verification. Full Chromium 40382686414 exposed menu-on-trigger pointer interception in a one-page session; CSS and actual pointer hit-test fixture corrected locally, CI pending.\nFull opt-in Chromium editor completed in 40517573850, including thumbnail menu and mobile hit testing. Newly added Alt+ArrowUp/Down, keyboard focus return and aria-live order feedback are LOCAL TESTED ONLY, pending next GitHub build/browser. Pixel-accurate thumbnails and cross-engine DnD not independently verified.\n2026-10-27 post-6395b0b: shared style type parity, transparent image fill and widget inspector delete confirmation fixed; local tests PASS. Actual widget-by-widget PostgreSQL persistence, projection parity and cross-browser visual acceptance outstanding. No status promotion.\n2026-10-27 standard push CI 40588408394 on 0bb8fb7856727699384dfe51aea6ee6d961ea022 SUCCESS for quality gate and container build (Docker publication skipped). Opt-in Full CI 40589103128 reached 6 real Chromium preflights PASS but FAILED in tools/ci_browser_editor.py:106 when fixed .editor-mock-header blocked background contextual selection-entry pointer, before real PostgreSQL Chromium acceptance. A viewport-anchored CSS fix for both contextual menu and arrangement panels plus a real desktop/touch Chromium regression was validated LOCALLY only; older CSS gives a genuine header hit-target failure, updated CSS PASS. No gate promotion pending a fresh successful full CI and independent visual/AT review.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: Chromium editor thumb/menu/pointer and responsive editor preflights PASS; physical pixel fidelity and cross-engine drag/drop unverified. Strict RC gate was skipped; status unchanged.\n2026-10-28 local visual parity batch: editor projection-backed widget contents; 16:9 desktop/mobile geometry and rectangular tooltips Chromium preflight PASS; draft participant rehearsal/fullscreen; inline options and persistent bounded typography spans; backend/frontend builds, Node 454+36 PASS. New Full CI and visual operator/physical assistive technology sign-off PENDING. 2026-10-28 local uncommitted: per-widget source-linked results, independent presenter-only rendering, side-by-side simulated presenter/audience and responsive 16:9 CSS; Node backend 455/455, web 44/44, Python focused 58/58, Chromium offline CSS pointer+geometry 1440/390 PASS. New full GitHub Chromium+PostgreSQL pending; this is NOT acceptance evidence.",
-      "remaining": "Independent pixel-accurate page/thumbnail comparisons and Firefox/WebKit drag-and-drop plus real touch/keyboard field validation. 2026-10-28 new batch pending GitHub opt-in acceptance and independent browser/device sign-off. Re-run full GitHub CI on linked results / dual rehearsal and independently confirm actual browser source-specific stats, accurate pixel-level editor/presenter/participant parity, real reaction workflow and format-selection interactions.",
-      "current_verified_run": 40595463258,
+      "evidence": "Slide thumbnails, order and duplication implemented with keyboard alternative; strict UUID/permutation validation and 8 focused tests (2026-10-24) 2026-10-26 uncommitted: full 16:9 page thumbnails with position-aware preview, menu-based insert before/after, duplication beside source and deletion; drag/drop and keyboard fallback, saved position via /pages/order. Requires real browser verification. Full Chromium 40382686414 exposed menu-on-trigger pointer interception in a one-page session; CSS and actual pointer hit-test fixture corrected locally, CI pending.\nFull opt-in Chromium editor completed in 40517573850, including thumbnail menu and mobile hit testing. Newly added Alt+ArrowUp/Down, keyboard focus return and aria-live order feedback are LOCAL TESTED ONLY, pending next GitHub build/browser. Pixel-accurate thumbnails and cross-engine DnD not independently verified.\n2026-10-27 post-6395b0b: shared style type parity, transparent image fill and widget inspector delete confirmation fixed; local tests PASS. Actual widget-by-widget PostgreSQL persistence, projection parity and cross-browser visual acceptance outstanding. No status promotion.\n2026-10-27 standard push CI 40588408394 on 0bb8fb7856727699384dfe51aea6ee6d961ea022 SUCCESS for quality gate and container build (Docker publication skipped). Opt-in Full CI 40589103128 reached 6 real Chromium preflights PASS but FAILED in tools/ci_browser_editor.py:106 when fixed .editor-mock-header blocked background contextual selection-entry pointer, before real PostgreSQL Chromium acceptance. A viewport-anchored CSS fix for both contextual menu and arrangement panels plus a real desktop/touch Chromium regression was validated LOCALLY only; older CSS gives a genuine header hit-target failure, updated CSS PASS. No gate promotion pending a fresh successful full CI and independent visual/AT review.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: Chromium editor thumb/menu/pointer and responsive editor preflights PASS; physical pixel fidelity and cross-engine drag/drop unverified. Strict RC gate was skipped; status unchanged.\n2026-10-28 local visual parity batch: editor projection-backed widget contents; 16:9 desktop/mobile geometry and rectangular tooltips Chromium preflight PASS; draft participant rehearsal/fullscreen; inline options and persistent bounded typography spans; backend/frontend builds, Node 454+36 PASS. New Full CI and visual operator/physical assistive technology sign-off PENDING. 2026-10-28 local uncommitted: per-widget source-linked results, independent presenter-only rendering, side-by-side simulated presenter/audience and responsive 16:9 CSS; Node backend 455/455, web 44/44, Python focused 58/58, Chromium offline CSS pointer+geometry 1440/390 PASS. New full GitHub Chromium+PostgreSQL pending; this is NOT acceptance evidence.\n2026-10-28: verified remote evidence in GitHub Actions 40717525524 separated as narrow A2-ORDER subgate; parent stays partial and independent acceptance remains required.",
+      "remaining": "Independent pixel-accurate thumbnail/page comparisons, Firefox/WebKit drag and drop and real touchscreen/keyboard operator acceptance remain required. Automated filmstrip baseline separated into A2-ORDER.",
+      "current_verified_run": 40717525524,
       "pending_local_evidence_20261028": "WYSIWYG and independent-question implementation passes local TypeScript/Vite, 461 Node API, 46 frontend, 33 focused Python, Chromium component desktop/mobile. Unverified by GitHub and real PostgreSQL; prior accepted gates unchanged."
+    },
+    {
+      "id": "A2-ORDER",
+      "area": "A-editor",
+      "weight": 2,
+      "status": "accepted",
+      "evidence": "GitHub Full CI run 40717525524 attempt 2, commit f6738592c648bc620e01b92d2bbaa6b90b459287, quality job 123073117101 SUCCESS: real Chromium 1440/390 editor mock-fidelity with left thumbnails, nested contextual controls, real pointer hit-testing and responsive 16:9 stage PASS; Node and Python slide-thumbnail source/keyboard contracts PASS. This is a bounded filmstrip/keyboard baseline, NOT pixel accuracy, native drag-drop or physical device approval.",
+      "remaining": "Maintain in future CI; residual external acceptance remains in A2.",
+      "verified_run_id": 40717525524,
+      "verified_commit_sha": "f6738592c648bc620e01b92d2bbaa6b90b459287",
+      "verified_job_id": 123073117101,
+      "scope": "Automated slide filmstrip layout, action hit-testing and keyboard reordering contracts"
     },
     {
       "id": "A3",
       "area": "A-editor",
-      "weight": 4,
+      "weight": 2,
       "status": "partial",
       "evidence": "Widget palette, page layouts, media, quiz and topic widgets present in source; editable PPTX import/export security and fidelity regression suite (11 tests) locally PASS, 2026-10-24; editable widget copy/cut/paste with new IDs and slide-bounded geometry, Node regression PASS (2026-10-24) Fifth uncommitted conversion batch: editable solid RGB slide backgrounds, uniform horizontal paragraph alignment and vertical text anchors; API validation, editor/presenter/rehearsal UI, truthful gradient/mixed-alignment loss reporting; 30 real python-pptx behavioral regressions + 6 Node tests locally PASS (2026-10-25). Seventh uncommitted conversion batch: native PPTX picture cropping preserved as editable fractional metadata across import/export, crop-aware projection/rehearsal, editor numeric controls and strict validation; 12 synthetic raster comparisons and local suites PASS (2026-10-25). Eighth uncommitted conversion batch: editable native PowerPoint shape no-fill/no-outline, RGB outline widths 0.25–12pt and solid/dash/dot line styles; 12 synthetic real raster comparisons and 30 behavior/validation scenarios PASS, Node 232 PASS, builds PASS (2026-10-25). 2026-10-26 post-baseline: both leaderboard widgets show explicit server-calculated ranks including ties without duplicate React keys; widget answer form adds double-click protection, submission state, disabled empty answers and accessible live status. Local Node 447/447; production frontend build and Chromium regression on this patch are PENDING.\n2026-10-27 opt-in Chromium production frontend/editor and presenter profile PASS, timed-widget PostgreSQL concurrency/fairness PASS in 40517573850. Cross-browser accessibility and independent visual review still pending.\n2026-10-27: Green maintainer Full CI 40553571012 on 67a7be939a5930e2f9a49ce3932a4b7f29a682ac confirmed real Chromium/PostgreSQL editor behavior. Subsequent local resilience batch: bounded retry with authority readback after ambiguous network failures, 12 frontend Node tests plus 842 Python and 447 backend Node pass; shared editor/presenter/audience geometry helper. New Chromium network-loss fixture and mandatory frontend Node CI step require a NEW GitHub run. No acceptance promotion.\n2026-10-27 local (pending new GitHub CI): rich per-widget shape and fill schema, shared appearance, image asset remapping, ratings/reactions/timer/QR preview and 0-connected count; verification and device fidelity still required.\n2026-10-27 post-6395b0b: server PageDesign union now matches validator for participant count; resultsView rejects unknown modes; local 450 API/23 web Node tests, TypeScript/Vite builds PASS. PostgreSQL + Chromium end-to-end still required. No status promotion.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: Chromium mock editor widget UI and real PostgreSQL widget semantics/timed concurrency PASS; full visual fidelity and representative PPTX corpus still outstanding. Strict RC gate was skipped; status unchanged.\n2026-10-28 local visual parity batch: editor projection-backed widget contents; 16:9 desktop/mobile geometry and rectangular tooltips Chromium preflight PASS; draft participant rehearsal/fullscreen; inline options and persistent bounded typography spans; backend/frontend builds, Node 454+36 PASS. New Full CI and visual operator/physical assistive technology sign-off PENDING. 2026-10-28 local uncommitted: per-widget source-linked results, independent presenter-only rendering, side-by-side simulated presenter/audience and responsive 16:9 CSS; Node backend 455/455, web 44/44, Python focused 58/58, Chromium offline CSS pointer+geometry 1440/390 PASS. New full GitHub Chromium+PostgreSQL pending; this is NOT acceptance evidence.\n2026-10-28 pending local batch (after last committed e2dc3a97): production WYSIWYG contentEditable DOM ownership fixes duplicated characters and buffers IME composition; desktop/mobile real Chromium offline acceptance PASS including Unicode input. Question-scoped answer revisions derived from existing immutable widget history prevent a change to q2 from reopening q1 responses or resetting its statistics/rankings; 6 API Node tests PASS, full backend 467/467 PASS, web 49/49 PASS. Actual PostgreSQL legacy migration and independent-answer transactional acceptance are added to manual CI but have NOT yet executed on GitHub. No independent sign-off or gate promotion.\n2026-10-28: after successful Full CI 40638652838, the automated evidence-specific A3-AUTO subgate (weight 2) was formally separated and accepted. Parent remains partial and still requires every independent check listed below.",
-      "remaining": "Independent editor/presenter/participant visual pixel-accuracy on a representative corpus, Firefox/WebKit, real touchscreen/keyboard and screen-reader evaluation, correct full PPTX roundtrip corpus, operator acceptance. Topic-question linked statistics added locally post-CI and require new authenticated CI acceptance.",
+      "remaining": "Independent editor/presenter/participant visual pixel-accuracy on a representative corpus, Firefox/WebKit, real touchscreen/keyboard and screen-reader evaluation, correct full PPTX roundtrip corpus, operator acceptance. Topic-question linked statistics added locally post-CI and require new authenticated CI acceptance. The narrower A3-GEOMETRY automated subgate is separately verified in 40717525524; operator, external/browser and production requirements remain explicitly in this partial parent.",
       "current_verified_run": 40595463258,
       "pending_local_evidence_20261028": "WYSIWYG and independent-question implementation passes local TypeScript/Vite, 461 Node API, 46 frontend, 33 focused Python, Chromium component desktop/mobile. Unverified by GitHub and real PostgreSQL; prior accepted gates unchanged.",
       "pending_local_evidence_20261028_public_stage": "2026-10-28: local verified public participant stage uses the same saved widget percentage geometry, rotation and 16:9 slide as editor/rehearsal; the real participant UI adds accessible reading mode (default under 700px) and bounded horizontal slide scroll, public slide background, saved image crop and inline text marks. The modal additionally inerts dynamically inserted background portals and restores their original accessibility state. Full local API+web TypeScript and Vite builds PASS; 474 backend Node, 58 frontend Node and 965 Python tests PASS; built React Chromium rehearsal singleton and isolated public stage/focus regressions PASS on 1440/390px. The actual public participant React+PostgreSQL E2E, Firefox/WebKit, independent accessibility/device acceptance and new opt-in GitHub Full CI have NOT passed. ZERO new RC points."
+    },
+    {
+      "id": "A3-GEOMETRY",
+      "area": "A-editor",
+      "weight": 2,
+      "status": "accepted",
+      "scope": "Automated 16:9 widget geometry and responsive public-stage projection across editor, rehearsal and audience, not independent pixel-perfect comparison",
+      "evidence": "GitHub Actions 40717525524 attempt 2 quality job 123073117101: PASS Chromium 1440px/390px editor/preview/audience 16:9 geometry and rectangular tooltip; public CSS stage saved geometry, scroll and 44px reading mode; real built React one accessible dual preview. Distinct from A3-AUTO WYSIWYG/multi-question data integrity, A2-ORDER filmstrip, and A4-FOCUS keyboard trap. Pixel accurate visual/Firefox/WebKit/physical device acceptance remains in A3.",
+      "remaining": "Maintain corresponding bounded automated proof in fresh CI. External, production and independent review remains open in A3.",
+      "verified_run_id": 40717525524,
+      "verified_commit_sha": "f6738592c648bc620e01b92d2bbaa6b90b459287",
+      "verified_job_id": 123073117101,
+      "acceptance_kind": "bounded_prior_github_automated"
     },
     {
       "id": "A3-AUTO",
@@ -48,13 +86,25 @@
     {
       "id": "A4",
       "area": "A-editor",
-      "weight": 6,
+      "weight": 4,
       "status": "partial",
-      "evidence": "Responsive styles exist; no device test report in package New 2026-10-25 audience UI local implementation: narrow-screen absolute widget reflow, >=44px touch targets, keyboard skip link, accessible choice state and forced-colors CSS; local build PASS. Not yet validated in device lab or new Chromium CI. GitHub workflow 40144692900: real PostgreSQL Chromium mobile touch audience acceptance PASS; independent device lab and screen-reader acceptance still outstanding. 2026-10-27 mobile Chromium 390px mock-editor identified and locally corrected contextual-overlay interception of accessible widget disclosure; standalone real Chromium/touch overlap fixture PASS, new CI pending.\n2026-10-27 verified maintainer manual workflow 40517573850 (commit e372a3aec8ba6b028283e9d00f68305a39562ed8): all Chromium desktop/mobile touch editor checks, keyboard-group editing, accessible disclosure and pointer-hit preflights, participant browser/PG and presenter profile browser PASS in quality job 122235650919. This proves an implemented accessible/touch baseline, NOT screen-reader or physical-device certification. Following committed baseline, new keyboard thumbnail reorder Alt+ArrowUp/Down, context Esc focus return and aria-live saved/failed messages were added, with Python contracts locally PASS; new UI changes have NOT yet passed GitHub CI.\n2026-10-27 post-6395b0b: 7 isolated real Chromium preflights PASS on desktop/mobile dimensions; accessibility screen-reader and real devices remain unverified. No status promotion. Full Chromium 40592859476: fixed-header real-pointer preflight desktop/mobile PASS, but later mock editor multi-widget duplicate failed (5 expected, 3); geometry hotfix locally tested, CI rerun pending.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: Chromium desktop plus touch-size viewport editor/participant and actual browser profile tested PASS; external screen readers and physical hardware outstanding. Strict RC gate was skipped; status unchanged.\n2026-10-28 local visual parity batch: editor projection-backed widget contents; 16:9 desktop/mobile geometry and rectangular tooltips Chromium preflight PASS; draft participant rehearsal/fullscreen; inline options and persistent bounded typography spans; backend/frontend builds, Node 454+36 PASS. New Full CI and visual operator/physical assistive technology sign-off PENDING. 2026-10-28 local uncommitted: per-widget source-linked results, independent presenter-only rendering, side-by-side simulated presenter/audience and responsive 16:9 CSS; Node backend 455/455, web 44/44, Python focused 58/58, Chromium offline CSS pointer+geometry 1440/390 PASS. New full GitHub Chromium+PostgreSQL pending; this is NOT acceptance evidence.",
-      "remaining": "Independent NVDA/VoiceOver/TalkBack screen-reader testing, keyboard-only operator review, real Android/iOS touch, Firefox/WebKit and WCAG/AGID sign-off. 2026-10-28 new batch pending GitHub opt-in acceptance and independent browser/device sign-off. Re-run full GitHub CI on linked results / dual rehearsal and independently confirm actual browser source-specific stats, accurate pixel-level editor/presenter/participant parity, real reaction workflow and format-selection interactions.",
-      "current_verified_run": 40595463258,
+      "evidence": "Responsive styles exist; no device test report in package New 2026-10-25 audience UI local implementation: narrow-screen absolute widget reflow, >=44px touch targets, keyboard skip link, accessible choice state and forced-colors CSS; local build PASS. Not yet validated in device lab or new Chromium CI. GitHub workflow 40144692900: real PostgreSQL Chromium mobile touch audience acceptance PASS; independent device lab and screen-reader acceptance still outstanding. 2026-10-27 mobile Chromium 390px mock-editor identified and locally corrected contextual-overlay interception of accessible widget disclosure; standalone real Chromium/touch overlap fixture PASS, new CI pending.\n2026-10-27 verified maintainer manual workflow 40517573850 (commit e372a3aec8ba6b028283e9d00f68305a39562ed8): all Chromium desktop/mobile touch editor checks, keyboard-group editing, accessible disclosure and pointer-hit preflights, participant browser/PG and presenter profile browser PASS in quality job 122235650919. This proves an implemented accessible/touch baseline, NOT screen-reader or physical-device certification. Following committed baseline, new keyboard thumbnail reorder Alt+ArrowUp/Down, context Esc focus return and aria-live saved/failed messages were added, with Python contracts locally PASS; new UI changes have NOT yet passed GitHub CI.\n2026-10-27 post-6395b0b: 7 isolated real Chromium preflights PASS on desktop/mobile dimensions; accessibility screen-reader and real devices remain unverified. No status promotion. Full Chromium 40592859476: fixed-header real-pointer preflight desktop/mobile PASS, but later mock editor multi-widget duplicate failed (5 expected, 3); geometry hotfix locally tested, CI rerun pending.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: Chromium desktop plus touch-size viewport editor/participant and actual browser profile tested PASS; external screen readers and physical hardware outstanding. Strict RC gate was skipped; status unchanged.\n2026-10-28 local visual parity batch: editor projection-backed widget contents; 16:9 desktop/mobile geometry and rectangular tooltips Chromium preflight PASS; draft participant rehearsal/fullscreen; inline options and persistent bounded typography spans; backend/frontend builds, Node 454+36 PASS. New Full CI and visual operator/physical assistive technology sign-off PENDING. 2026-10-28 local uncommitted: per-widget source-linked results, independent presenter-only rendering, side-by-side simulated presenter/audience and responsive 16:9 CSS; Node backend 455/455, web 44/44, Python focused 58/58, Chromium offline CSS pointer+geometry 1440/390 PASS. New full GitHub Chromium+PostgreSQL pending; this is NOT acceptance evidence.\n2026-10-28: verified remote evidence in GitHub Actions 40717525524 separated as narrow A4-FOCUS subgate; parent stays partial and independent acceptance remains required.",
+      "remaining": "Independent screen-reader NVDA/VoiceOver/TalkBack testing, keyboard-only human audit, physical iOS/Android touch and Firefox/WebKit/WCAG/AGID approval remain required. Automated Chromium focus contract separated into A4-FOCUS.",
+      "current_verified_run": 40717525524,
       "pending_local_evidence_20261028": "WYSIWYG and independent-question implementation passes local TypeScript/Vite, 461 Node API, 46 frontend, 33 focused Python, Chromium component desktop/mobile. Unverified by GitHub and real PostgreSQL; prior accepted gates unchanged.",
       "pending_local_evidence_20261028_public_stage": "2026-10-28: local verified public participant stage uses the same saved widget percentage geometry, rotation and 16:9 slide as editor/rehearsal; the real participant UI adds accessible reading mode (default under 700px) and bounded horizontal slide scroll, public slide background, saved image crop and inline text marks. The modal additionally inerts dynamically inserted background portals and restores their original accessibility state. Full local API+web TypeScript and Vite builds PASS; 474 backend Node, 58 frontend Node and 965 Python tests PASS; built React Chromium rehearsal singleton and isolated public stage/focus regressions PASS on 1440/390px. The actual public participant React+PostgreSQL E2E, Firefox/WebKit, independent accessibility/device acceptance and new opt-in GitHub Full CI have NOT passed. ZERO new RC points."
+    },
+    {
+      "id": "A4-FOCUS",
+      "area": "A-editor",
+      "weight": 2,
+      "status": "accepted",
+      "evidence": "GitHub Full CI run 40717525524 attempt 2, commit f6738592c648bc620e01b92d2bbaa6b90b459287, quality job 123073117101 SUCCESS: Chromium 1440px and 390px real TS rehearsal module checks initial focus, cyclic Tab, outside-focus recovery, Escape and invoker restoration; dynamic portal inert/aria-hidden restored; built React singleton preview and responsive controls PASS. No NVDA/VoiceOver/TalkBack or physical keyboard/device claim.",
+      "remaining": "Maintain in future CI; residual external acceptance remains in A4.",
+      "verified_run_id": 40717525524,
+      "verified_commit_sha": "f6738592c648bc620e01b92d2bbaa6b90b459287",
+      "verified_job_id": 123073117101,
+      "scope": "Automated focus trapping, keyboard restoration and mobile-size modal accessibility"
     },
     {
       "id": "B1",
@@ -102,12 +152,24 @@
     {
       "id": "B3",
       "area": "B-sessions",
-      "weight": 4,
+      "weight": 2,
       "status": "partial",
-      "evidence": "Presenter-only Results, chart selection, paginated leaderboards and topic questions exist; word-cloud result projection filters malformed historical labels (2026-10-24); disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24) 2026-10-26 new post-commit delivery (local verification only): PostgreSQL transaction-scoped 3-question quota, page/session locks, vote/moderation fencing, post-commit notification reliability, filtered/paged private moderator queue with counts, 20-item atomic bulk review, reversible decisions, presenter and participant UX, 442 Node tests, targeted 52 Python tests; real PostgreSQL concurrency and Chromium acceptance added to CI, NOT yet executed for this batch. CI 40366108461 (commit 1d4f0e957da2a568c188279e8d8e4fa76cb6dd33) failed: 12-thread same-participant Q&A timed out from PostgreSQL pool starvation (client checked out before nested identity queries); post-failure local fix defers all three audience writes and frees clients before broadcasts, 442 Node/51 focused Python PASS, GitHub real database rerun pending. Verified GitHub CI 40368807527 (mandatory PostgreSQL Q&A 12 clients, quotas, bulk moderation) and full Chromium/PostgreSQL opt-in CI 40369919680 SUCCESS (moderation/revocation and voting, editor, profile, participant). 2026-10-26 post-baseline topic-widget cap corrected with participant FOR UPDATE transaction, session/page fencing, no stale-page write and post-commit notify; local 447 Node and focused Python tests pass, mandatory CI replay PENDING.\n2026-10-27 quality job 122235650919, run 40517573850: PostgreSQL audience Q&A and atomic topic quota, moderation, privacy and Chromium participant acceptance SUCCESS. Screen-reader/cross-browser/physical-device review still pending.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: Chromium + PostgreSQL audience QR join, Q&A moderation/revocation, vote persistence and mobile touch PASS. Strict RC gate was skipped; status unchanged.",
-      "remaining": "Cross-browser Firefox/WebKit, physical-device input and independent screen-reader/keyboard accessibility acceptance.",
-      "current_verified_run": 40595463258,
+      "evidence": "Presenter-only Results, chart selection, paginated leaderboards and topic questions exist; word-cloud result projection filters malformed historical labels (2026-10-24); disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24) 2026-10-26 new post-commit delivery (local verification only): PostgreSQL transaction-scoped 3-question quota, page/session locks, vote/moderation fencing, post-commit notification reliability, filtered/paged private moderator queue with counts, 20-item atomic bulk review, reversible decisions, presenter and participant UX, 442 Node tests, targeted 52 Python tests; real PostgreSQL concurrency and Chromium acceptance added to CI, NOT yet executed for this batch. CI 40366108461 (commit 1d4f0e957da2a568c188279e8d8e4fa76cb6dd33) failed: 12-thread same-participant Q&A timed out from PostgreSQL pool starvation (client checked out before nested identity queries); post-failure local fix defers all three audience writes and frees clients before broadcasts, 442 Node/51 focused Python PASS, GitHub real database rerun pending. Verified GitHub CI 40368807527 (mandatory PostgreSQL Q&A 12 clients, quotas, bulk moderation) and full Chromium/PostgreSQL opt-in CI 40369919680 SUCCESS (moderation/revocation and voting, editor, profile, participant). 2026-10-26 post-baseline topic-widget cap corrected with participant FOR UPDATE transaction, session/page fencing, no stale-page write and post-commit notify; local 447 Node and focused Python tests pass, mandatory CI replay PENDING.\n2026-10-27 quality job 122235650919, run 40517573850: PostgreSQL audience Q&A and atomic topic quota, moderation, privacy and Chromium participant acceptance SUCCESS. Screen-reader/cross-browser/physical-device review still pending.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: Chromium + PostgreSQL audience QR join, Q&A moderation/revocation, vote persistence and mobile touch PASS. Strict RC gate was skipped; status unchanged.\n2026-10-28: verified remote evidence in GitHub Actions 40717525524 separated as narrow B3-QUESTION-STATS subgate; parent stays partial and independent acceptance remains required.",
+      "remaining": "Independent Firefox/WebKit statistics visualization, physically deployed presenter/participant devices and independent screen-reader/keyboard accessibility approval remain open. Per-question PostgreSQL statistics isolated in B3-QUESTION-STATS.",
+      "current_verified_run": 40717525524,
       "pending_local_evidence_20261028_public_stage": "2026-10-28: local verified public participant stage uses the same saved widget percentage geometry, rotation and 16:9 slide as editor/rehearsal; the real participant UI adds accessible reading mode (default under 700px) and bounded horizontal slide scroll, public slide background, saved image crop and inline text marks. The modal additionally inerts dynamically inserted background portals and restores their original accessibility state. Full local API+web TypeScript and Vite builds PASS; 474 backend Node, 58 frontend Node and 965 Python tests PASS; built React Chromium rehearsal singleton and isolated public stage/focus regressions PASS on 1440/390px. The actual public participant React+PostgreSQL E2E, Firefox/WebKit, independent accessibility/device acceptance and new opt-in GitHub Full CI have NOT passed. ZERO new RC points."
+    },
+    {
+      "id": "B3-QUESTION-STATS",
+      "area": "B-sessions",
+      "weight": 2,
+      "status": "accepted",
+      "evidence": "GitHub Full CI run 40717525524 attempt 2, commit f6738592c648bc620e01b92d2bbaa6b90b459287, quality job 123073117101 SUCCESS: PostgreSQL 18 E2E verifies three independent question IDs, two participants, per-question idempotency, presenter-only scoped statistics, legacy results and revision isolation; timed widgets presenter-only rankings and Chromium participant Q&A acceptance PASS. DISTINCT from B3-AUDIENCE basic QR/voting/moderation flow. No external presentation visual or real browser engine parity claim.",
+      "remaining": "Maintain in future CI; residual external acceptance remains in B3.",
+      "verified_run_id": 40717525524,
+      "verified_commit_sha": "f6738592c648bc620e01b92d2bbaa6b90b459287",
+      "verified_job_id": 123073117101,
+      "scope": "Independent per-question presenter statistics and protected response data"
     },
     {
       "id": "B3-AUDIENCE",
@@ -144,10 +206,10 @@
     {
       "id": "C1",
       "area": "C-admin",
-      "weight": 4,
+      "weight": 2,
       "status": "partial",
       "evidence": "TOTP enrolment, recovery codes, admin reset and revoke checks; Node unit and contract tests 2026-10-26 local 40-item batch: profile-image metadata/role-neutral profile and atomic admin user update with Node/Python/build PASS; new real PostgreSQL HTTP/Chromium acceptance wired but not yet executed; status unchanged.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: PostgreSQL profile lifecycle, baseline auth, revocation, duplicate/import and API login tests PASS; full account recovery browser and multi-replica revocation not signed off. Strict RC gate was skipped; status unchanged.\n2026-10-28: identity/login and session lifecycle accepted only as bounded C1-AUTH (previous green GitHub run 40638652838). New password-recovery PostgreSQL/SMTPS fixture is pending GitHub; it receives zero RC points.",
-      "remaining": "Complete password/account recovery browser acceptance (delivery, expiry, replay, multi-session and multi-replica revocation); operational security review and external provider checks remain open. A newly wired disposable PostgreSQL/SMTPS acceptance is not verified on GitHub yet.",
+      "remaining": "Browser-mediated account recovery and recovery UI on actual PostgreSQL (new local Chromium URL hygiene pending new GitHub CI), real provider deliverability, cross-replica recovery with network impairment, security/operator approval and independent production sign-off. Previously verified SMTP/PostgreSQL API recovery is isolated in C1-RECOVERY; established authentication remains in C1-AUTH.",
       "current_verified_run": 40595463258
     },
     {
@@ -159,6 +221,18 @@
       "remaining": "New end-to-end recovery password SMTP link+expiry+replay+old session invalidation fixture and independent provider, multi-replica and browser acceptance stay with C1 parent.",
       "verified_run_id": 40638652838,
       "verified_commit_sha": "a32ef78902a656262d346a0fa622604a4deda405"
+    },
+    {
+      "id": "C1-RECOVERY",
+      "area": "C-security",
+      "weight": 2,
+      "status": "accepted",
+      "evidence": "Bounded PostgreSQL 18 + disposable real TLS SMTP recovery lifecycle verified in GitHub Actions run 40717525524 attempt 2, quality job 123073117101, commit f6738592c648bc620e01b92d2bbaa6b90b459287, SUCCESS. CI step \"PostgreSQL TLS SMTP password recovery and session revocation acceptance\" succeeded: private reset delivery, enumeration resistance, per-account throttle, hashed bearer storage, atomic racing single-use, expiry, weak-password rejection, concurrent sessions invalidated, pending MFA challenges/enrollments cleared, old password rejected, new login succeeds. Verified script tools/ci_password_recovery_postgres.py in workflow; the broader C1 parent retains actual browser, cross-replica/provider and independent operational acceptance. This is new reviewed GitHub evidence from a completed CI (NOT a claim that new uncommitted changes passed CI).",
+      "remaining": "Maintain regression on new commits; recovery browser/real provider/operational acceptance intentionally stays within partial C1.",
+      "verified_run_id": 40717525524,
+      "verified_commit_sha": "f6738592c648bc620e01b92d2bbaa6b90b459287",
+      "verified_job_id": 123073117101,
+      "acceptance_scope": "Disposable PostgreSQL 18 and TLS SMTP account recovery API end-to-end, not physical browser/provider or independent security audit"
     },
     {
       "id": "C2",
@@ -251,11 +325,24 @@
     {
       "id": "D3",
       "area": "D-validation",
-      "weight": 2,
+      "weight": 1,
       "status": "partial",
       "evidence": "Docker/Podman/Helm manifests and workflows exist CI 40141894130 container build gate SUCCESS, including runtime and converter image scans (runner architecture only). GitHub workflow 40335963980 publisher completed multi-platform linux/amd64 and linux/arm64 build/push with SBOM/provenance; this does NOT prove runnable ARM64, rootless Podman or Kubernetes multi-replica acceptance. New publication policy is manual-only, awaiting its first CI.\n2026-10-27 manually dispatched GitHub workflow 40517573850 / publication job 122239629249 SUCCESS, commit e372a3aec8ba6b028283e9d00f68305a39562ed8. Multi-platform Buildx output includes linux/amd64 and linux/arm64 provenance, and pushed docker.io/desalvo/quorivio:latest and docker.io/desalvo/quorivio:sha-e372a3aec8ba with digest sha256:2be79bc6ca99fa22b6f970c8bb97d9162b4943dafd27c80d3eb1b60ebc474e41. Quality and container scanning gates also SUCCESS. Proof of image build/push, not actual ARM64, Podman rootless, or Kubernetes runtime acceptance.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: Container gate PASS; manual publication built/pushed linux/amd64 and linux/arm64 with SBOM/provenance (runtime smoke on arm64/Podman/Helm not tested). Strict RC gate was skipped; status unchanged.\n2026-10-28 evidence reconciliation: automatic CI subgate D3-IMAGE split from broad partial gate, without claiming outstanding external acceptance.",
-      "remaining": "Actual native ARM64 start/smoke, rootless Podman, multi-replica Kubernetes with HAProxy and NGINX ingress, secrets/TLS, RWX/ClamAV failover.",
+      "remaining": "Actual native ARM64 start/smoke, rootless Podman, multi-replica Kubernetes with HAProxy and NGINX ingress, secrets/TLS, RWX/ClamAV failover. The narrower D3-K8S-GENERATOR automated subgate is separately verified in 40717525524; operator, external/browser and production requirements remain explicitly in this partial parent.",
       "current_verified_run": 40595463258
+    },
+    {
+      "id": "D3-K8S-GENERATOR",
+      "area": "D-validation",
+      "weight": 1,
+      "status": "accepted",
+      "scope": "Disposable CI Kubernetes wizard manifests/worker integration, repeatable credential persistence and unique generated secrets",
+      "evidence": "GitHub Actions 40717525524 attempt 2 quality job 123073117101: Kubernetes wizard and worker integration tests PASS and Verify Kubernetes credential persistence and unique fresh installations PASS (stable repeat generation, unique credentials, no leak). Independent production Kubernetes/Helm HAProxy or NGINX and rootless Podman/ARM64 runtime remain in D3. Distinct from D3-IMAGE multi-arch Buildx and image scans.",
+      "remaining": "Maintain corresponding bounded automated proof in fresh CI. External, production and independent review remains open in D3.",
+      "verified_run_id": 40717525524,
+      "verified_commit_sha": "f6738592c648bc620e01b92d2bbaa6b90b459287",
+      "verified_job_id": 123073117101,
+      "acceptance_kind": "bounded_prior_github_automated"
     },
     {
       "id": "D3-IMAGE",
@@ -271,11 +358,24 @@
     {
       "id": "D4",
       "area": "D-validation",
-      "weight": 3,
+      "weight": 2,
       "status": "partial",
       "evidence": "Isolated document converter, upload validation, CSRF and security tests exist; offline 500-user shard reconciler and eight unit tests added (unexecuted against real staging). Follow-up: aggregate pre-inflate ZIP quotas and strict UTF-8 manifest checks tested locally; does not constitute runtime security acceptance.; native PPTX OOXML security/roundtrip regression locally PASS (11 cases, 2026-10-24) CI 40141894130: real disposable PostgreSQL/WebSocket opt-in 500 independent participants PASS, presenter-observed peak >=475, zero errors; high/critical vulnerability gate and image scans PASS; converter/portability unit and Python suites PASS. This is partial evidence, not complete production security acceptance. Additional boolean-only participant recovery and browser privacy acceptance authored 2026-10-25, pending real CI execution. After workflow 40144692900 green baseline, 30-intervention converter batch unifies OOXML admission, private atomic publication, PNG integrity and HTTP strictness; 58 new Python tests PASS locally, including real 12-page PDF and real LibreOffice PPTX. New CI pending (2026-10-25). Second uncommitted conversion batch: full PNG/JPEG decoding, OOXML path/relationship hardening, typed export preflight, exclusive atomic native PPTX/JSON publication, SHA-256 worker source fencing and symlinked-root refusal; 35 new behavior tests locally PASS (2026-10-25), CI pending. Third uncommitted 30-intervention conversion batch: full PNG chunk CRC/stream decoding, encrypted/JavaScript PDF rejection, full OOXML DTD/URI/active-object checks, strict worker HTTP framing and Bearer authentication; 43 additional behavior tests PASS locally (418 Python total, 215 Node, builds PASS, 2026-10-25). Fourth uncommitted 30-case conversion hardening: OOXML relationship target resolution and encoded URI controls, stricter editable PPTX style/geometry/media preflight, verified in-memory image serialization, and 30 new behavior tests; 448 Python tests PASS locally (2026-10-25), CI pending. Fifth conversion batch: 30 new real PPTX import/export/negative fidelity checks, 6 Node API validation tests; local 478 Python, 221 Node, API/web builds PASS; new GitHub CI pending (2026-10-25). Sixth uncommitted batch: real 12-slide LibreOffice/Poppler raster comparisons after editable PPTX roundtrip, whitespace/Unicode and presenter fidelity fixes, explicit lossy audit flags. 512 Python and 221 Node local PASS; GitHub CI pending (2026-10-25). Seventh conversion batch: 30 native crop cases including 12 real LibreOffice/Poppler raster comparisons, 4 Node validators and 6 frontend source contracts; local 548 Python and 225 Node PASS, API/web builds PASS; all seven conversion batches uncommitted and GitHub CI pending (2026-10-25). Eighth uncommitted batch adds 30 synthetic PowerPoint native shape paint acceptance cases; local results do not establish CI green (2026-10-25). Maintainer confirmed GitHub Actions 40192172978 SUCCESS for all eight preceding conversion batches including real visual regression, container scan/build and publication (2026-10-25).\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: High/critical npm vulnerability gate, credential leak scan, Docker image scans and 500-participant opt-in PASS; independent security sign-off open. Strict RC gate was skipped; status unchanged.\n2026-10-28 scoring reconciliation: bounded automated supply-chain checks (npm high/critical, GitLeaks, image build/scan) separated as accepted D4-SCAN on previously green full CI 40638652838; D4 retains pentest, threat review, AGID and fidelity sign-offs.",
-      "remaining": "Independent pentest/security and AGID accessibility sign-off, third-party Microsoft Office PPTX fidelity corpus and deployment threat review.",
+      "remaining": "Independent pentest/security and AGID accessibility sign-off, third-party Microsoft Office PPTX fidelity corpus and deployment threat review. The narrower D4-CONVERTER-BOUNDARY automated subgate is separately verified in 40717525524; operator, external/browser and production requirements remain explicitly in this partial parent.",
       "current_verified_run": 40595463258
+    },
+    {
+      "id": "D4-CONVERTER-BOUNDARY",
+      "area": "D-validation",
+      "weight": 1,
+      "status": "accepted",
+      "scope": "Automated isolated conversion and hostile-input security boundary regressions for editable PPTX/PDF/assets",
+      "evidence": "GitHub Actions 40717525524 attempt 2 quality job 123073117101: all 971 Python regressions including 30-case OOXML/PNG/JPEG/PDF conversion and worker atomic publication suites PASS; build dedicated document converter image and image scans PASS. Distinct from D4-SCAN credential/vulnerability supply-chain scanning; no independent penetration test, Office corpus or security accreditation.",
+      "remaining": "Maintain corresponding bounded automated proof in fresh CI. External, production and independent review remains open in D4.",
+      "verified_run_id": 40717525524,
+      "verified_commit_sha": "f6738592c648bc620e01b92d2bbaa6b90b459287",
+      "verified_job_id": 123073117101,
+      "acceptance_kind": "bounded_prior_github_automated"
     },
     {
       "id": "D4-SCAN",
@@ -324,52 +424,72 @@
     }
   ],
   "last_verified_full_ci": {
-    "run_id": 40638652838,
-    "head_sha": "a32ef78902a656262d346a0fa622604a4deda405",
+    "run_id": 40717525524,
+    "head_sha": "f6738592c648bc620e01b92d2bbaa6b90b459287",
+    "attempt": 2,
     "conclusion": "success",
     "jobs": {
       "Production quality gate": "success",
       "Container build gate": "success",
-      "Production publication": "skipped"
+      "Production publication": "success"
     },
     "strict_rc_gate": "skipped",
-    "rc_score_reconciled_after_review": 56.0,
-    "prior_score": 53.0
+    "accepted_scope": "Full opt-in Chromium, real PostgreSQL 18/SMTPS, two-replica privacy, optional 500-person capacity, images and Gitleaks/Trivy scans; all SUCCESS. Publication was manually opted in. New uncommitted code unverified.",
+    "rc_score_at_run": 67.0,
+    "rc_score_after_evidence_review": 68.0
   },
   "pending_local_batch": {
-    "date": "2026-10-28",
-    "description": "Public participant stage parity, actual media crop and WYSIWYG marks, accessible reading/scroll, dynamic rehearsal portal inert/focus, independent Chromium and actual built React rehearsals; post-commit ledger schema compatibility and SHA256 inventory security-scanner formatting hotfix",
+    "date": "2026-10-29",
+    "description": "Cycle 11: one-time password reset links moved to URL fragments (legacy query links still consumable), real PostgreSQL/SMTPS fixture validates fragment-only delivery, modal programmatic focus containment, immutable previous snapshot checksum validation; no new GitHub CI on uncommitted source.; native Firefox/WebKit opt-in acceptance harness, keyboard-rich-text and empty-dialog focus hardening (new CI pending)",
     "last_maintainer_confirmed_commit": "ac4b4e23c90afe44b3fa8d2deb0177222af8f16c",
-    "observed_main_sha": "ac4b4e23c90afe44b3fa8d2deb0177222af8f16c",
+    "observed_main_sha": "f6738592c648bc620e01b92d2bbaa6b90b459287",
     "last_failed_run": 40709447219,
     "last_failed_step": "Kubernetes wizard and worker integration tests: 5 Python unittest errors (missing compatibility keys in pending_local_batch)",
     "local_evidence": {
-      "npm_build": "PASS backend tsc, frontend tsc and Vite",
-      "backend_node": "474/474",
-      "frontend_node": "58/58",
-      "python_all": "971/971 PASS on updated hotfix batch (fresh local full suite)",
-      "chromium_builtin_react_preview": "PASS desktop 1440 and mobile 390",
-      "chromium_public_stage_css": "PASS 1440 and 390",
-      "chromium_real_rehearsal_typescript_dynamic_portals": "PASS 1440 and 390",
-      "github_40709447219": "Observed 5 Python RC ledger KeyError, compilation and PostgreSQL tests preceding the Python gate passed; no new green full CI"
+      "build": "PASS backend TypeScript and frontend TypeScript/Vite on local source",
+      "recovery_unit": "4/4 PASS",
+      "recovery_browser": "PASS real built React Chromium desktop 1440/mobile 390 (offline fixture; no live PostgreSQL or mail)",
+      "source_full_ci": "40717525524 attempt 2 success on f6738592 (prior committed source)",
+      "new_changes_github": "PENDING",
+      "recovery_confirmation": "LOCAL ONLY: confirm field, mismatch rejection, duplicate-submit guard, real built React Chromium 1440px/390px. Pending new GitHub Full CI.",
+      "cycle10": "Pending local build/Chromium/Python/Node report; NOT new GitHub proof.",
+      "cycle11_build": "PASS backend tsc, frontend tsc and Vite",
+      "cycle11_backend_node": "474/474 PASS",
+      "cycle11_frontend_node": "65/65 PASS",
+      "cycle11_python_all": "993/993 PASS",
+      "cycle11_chromium_reset": "4/4 desktop/mobile + legacy/fragment, real built React, PASS",
+      "cycle11_chromium_modal": "4/4 focus + dynamic portal desktop/mobile, PASS",
+      "cycle11_postgres_smtps_new": "PENDING: real PostgreSQL 18 + SMTP loopback CI must validate new fragment-only links",
+      "cycle11_latest_verified_full_ci": "40717525524 attempt 2, commit f6738592 (historical source only)",
+      "rc_cycle12_chromium": "PASS locally 1440/390: native Chromium modal/geometry/reading checks and built React singleton; Firefox/WebKit still NOT installed or tested"
     },
     "blocked": {
-      "git_hub_new_full_ci": "Run 40709447219 FAILED: 5 KeyError in Python RC gate contract tests; correction made locally, new GitHub CI not yet executed",
-      "authenticated_postgres_18_public_participant_e2e": "not run locally",
-      "firefox_webkit_real_device_screen_reader": "not run / independent acceptance outstanding"
+      "github_full_ci_new_source": "Not committed; latest already-green GitHub run 40717525524 proves ONLY bounded historical subgates. New UI changes require independent new Full CI.",
+      "independent_recovery_browser_provider": "Not yet verified by live providers/physical device",
+      "external_acceptance": "Firefox/WebKit, AGID, GDPR, operator, multi-replica production",
+      "github_new_full_ci": "The revised recovery form and new gate contracts are not yet tested by a fresh GitHub run. Run 40717525524 is historical proof only.",
+      "cycle11_github_new_full_ci": "PENDING new commit and full GitHub Actions; do not promote gate score",
+      "cycle11_external_acceptance": "Firefox/WebKit, physical devices and screen reader, ingress+ClamAV/RWX, independent GDPR/security/operator reviews unverified"
     },
     "gates_promoted": [],
-    "formal_rc_score_before": 67.0,
-    "formal_rc_score_after": 67.0,
+    "formal_rc_score_before": 74.0,
+    "formal_rc_score_after": 74.0,
     "global_rc_delta_pp": 0.0,
-    "gate_count": 32,
-    "gate_accepted": 15,
+    "gate_count": 40,
+    "gate_accepted": 23,
     "gate_partial": 17,
     "strict_rc_ready": false,
-    "suggested_workflow": "workflow_dispatch browser_test=true publish_image=false",
-    "source_log": "docs/validation/RC_CI_40709447219_AND_GITGUARDIAN_HOTFIX_20261028.json",
+    "suggested_workflow": "workflow_dispatch browser_test=true capacity_test=true publish_image=false publish_latest=false",
+    "source_log": "docs/validation/RC_CYCLE11_SECURITY_AND_FOCUS_LOCAL_20261029.json",
     "new_feature_promoted": false,
-    "new_ci_required": true
+    "new_ci_required": true,
+    "last_successful_full_run": 40717525524,
+    "newly_accepted_historical_subgates": [
+      "A1-EDITOR-INTERACTION",
+      "A3-GEOMETRY",
+      "D3-K8S-GENERATOR",
+      "D4-CONVERTER-BOUNDARY"
+    ]
   },
   "scoring_reconciliation_20261028": {
     "baseline_score": 53.0,
@@ -509,5 +629,161 @@
     "score_after": 67.0,
     "strict_rc_ready": false,
     "local_python_validation": "971/971 PASS (local), GitHub validation after fix pending"
+  },
+  "scoring_reconciliation_20261028_cycle8": {
+    "date": "2026-10-28",
+    "verified_run_id": 40717525524,
+    "verified_commit_sha": "f6738592c648bc620e01b92d2bbaa6b90b459287",
+    "source_job_id": 123073117101,
+    "baseline_score": 67.0,
+    "new_score": 68.0,
+    "delta_pp": 1.0,
+    "scope": "C1 accepted bounded recovery API E2E in real PostgreSQL 18 / TLS SMTP; C1-AUTH baseline remains independent. C1 residual narrowed from 4 to 2 weight, new C1-RECOVERY accepted 2. No external review or browser evidence claimed.",
+    "weights_before": {
+      "C1": 4,
+      "C1-AUTH": 2
+    },
+    "weights_after": {
+      "C1": 2,
+      "C1-AUTH": 2,
+      "C1-RECOVERY": 2
+    },
+    "gate_count_before": 32,
+    "gate_count_after": 33,
+    "accepted_before": 15,
+    "accepted_after": 16,
+    "partial_before": 17,
+    "partial_after": 17,
+    "gates_promoted": [
+      "C1-RECOVERY"
+    ],
+    "limitations": "Actual browser recovery UI test newly added but not yet in full GitHub CI, physical screen reader/Firefox/WebKit/provider and production acceptance remain pending. Strict RC gate still blocked."
+  },
+  "rc_recovery_url_hygiene_local_cycle_20261028": {
+    "scope": "Remove one-time bearer from browser address/history as soon as React mounts, before user interaction; browser referrer meta no-referrer; mock Chromium desktop/mobile regression. New code not GitHub-verified.",
+    "source_code": [
+      "apps/web/src/password-recovery-url.ts",
+      "apps/web/src/main.tsx",
+      "apps/web/index.html"
+    ],
+    "tests": [
+      "apps/web/test/password-recovery-url.test.ts",
+      "tools/ci_recovery_url_chromium.py"
+    ],
+    "ci_wired": ".github/workflows/ci.yml",
+    "new_remote_ci_required": true,
+    "technical_gate_accepted_for_this_local_code": false
+  },
+  "scoring_reconciliation_20261028_cycle9": {
+    "date": "2026-10-28",
+    "baseline_score": 68.0,
+    "reconciled_score": 71.0,
+    "delta_pp": 3.0,
+    "source": "GitHub Actions 40717525524 attempt 2, quality job 123073117101, f6738592c648bc620e01b92d2bbaa6b90b459287",
+    "source_gate_states": "Three parent partial technical gates with weight 6/6/4 became residual partial weight 4/4/2 plus distinct accepted 2/2/2 automated subgates. Net +3 weighted points; 100 total maintained.",
+    "accepted_subgates": [
+      "A2-ORDER",
+      "A4-FOCUS",
+      "B3-QUESTION-STATS"
+    ],
+    "non_duplicate_scope": [
+      "filmstrip/keyboard order distinct from A3-AUTO editor autosave/CAS",
+      "focus/ARIA modal distinct from A3-AUTO editor persistence",
+      "per-question statistics distinct from B3-AUDIENCE join/moderation"
+    ],
+    "unchanged": "Parent A2/A4/B3 still partial; independent pixel fidelity, physical keyboard/screen-reader/mobile, Firefox/WebKit and production operator acceptance NOT passed. New recovery UI code has only local tests and has not been credited.",
+    "gate_count_before": 33,
+    "gate_count_after": 36,
+    "accepted_before": 16,
+    "accepted_after": 19,
+    "partial_before": 17,
+    "partial_after": 17,
+    "strict_rc_ready": false,
+    "verified_run_id": 40717525524,
+    "verified_sha": "f6738592c648bc620e01b92d2bbaa6b90b459287",
+    "verified_job_id": 123073117101
+  },
+  "scoring_reconciliation_20261029_cycle10": {
+    "date": "2026-10-29",
+    "baseline_score": 71.0,
+    "reconciled_score": 74.0,
+    "delta_pp": 3.0,
+    "source": "GitHub Actions 40717525524 attempt 2 quality gate job 123073117101; already-green prior committed SHA f6738592c648bc620e01b92d2bbaa6b90b459287",
+    "source_gate_states": "Four distinct automated bounded scopes formerly within four partial parent gates: A1 6=>4+2, A3 4=>2+2, D3 2=>1+1, D4 3=>2+1. New net score 3.0, 100 weight maintained and independent parent requirements still partial.",
+    "accepted_subgates": [
+      "A1-EDITOR-INTERACTION",
+      "A3-GEOMETRY",
+      "D3-K8S-GENERATOR",
+      "D4-CONVERTER-BOUNDARY"
+    ],
+    "non_duplicate_scope": [
+      "A1 editor canvas interaction, pointer/keyboard/selection is NOT A2 slide thumbnails, A3-AUTO autosave/CAS/WYSIWYG, or A3-GEOMETRY projection",
+      "A3 geometry is not A3-AUTO data integrity, A4 focus lifecycle or independent pixel-accuracy",
+      "D3 Kubernetes wizard/credential generation is not D3-IMAGE image build and scan",
+      "D4 converter input/boundary regressions are distinct from D4-SCAN generic credential and vulnerability gate"
+    ],
+    "local_only_changes_without_scoring": [
+      "Recovery password Enter-to-submit form accessibility on built React",
+      "Rehearsal dynamic background portal reparent inert/aria-hidden restoration",
+      "Expanded local Chromium fixture for both changes"
+    ],
+    "accepted_before": 19,
+    "accepted_after": 23,
+    "partial_before": 17,
+    "partial_after": 17,
+    "gate_count_before": 36,
+    "gate_count_after": 40,
+    "strict_rc_ready": false,
+    "new_code_github_pending": true,
+    "verified_run_id": 40717525524,
+    "verified_job_id": 123073117101,
+    "verified_sha": "f6738592c648bc620e01b92d2bbaa6b90b459287"
+  },
+  "rc_cycle11_security_and_focus_local_20261029": {
+    "baseline_score": 74.0,
+    "formal_rc_score": 74.0,
+    "delta_pp": 0.0,
+    "gates": 40,
+    "accepted": 23,
+    "partial": 17,
+    "scope": [
+      "fragment-only newly-issued password recovery links, query-format backward compatibility",
+      "SMTP/PostgreSQL fragment link CI validation on next run",
+      "programmatic/assistive focus escape recovery in modal",
+      "snapshot-specific SHA256 manifest handling with fresh cycle 11 inventory"
+    ],
+    "local_validation": [
+      "Node backend 474/474",
+      "Node frontend 65/65",
+      "Python 993/993 complete",
+      "TS backend/frontend/Vite PASS",
+      "Chromium 1440/390 legacy and fragment reset UI PASS",
+      "Chromium 1440/390 keyboard and dynamic focus/portal PASS",
+      "cycle11 source + cumulative ZIP SHA256/CRC VALID"
+    ],
+    "last_verified_full_ci": {
+      "run_id": 40717525524,
+      "attempt": 2,
+      "sha": "f6738592c648bc620e01b92d2bbaa6b90b459287"
+    },
+    "new_source_github_run": "PENDING",
+    "new_gate_promotions": [],
+    "strict_rc_ready": false,
+    "remaining": "17 independent/operational partial gates; new code requires GitHub CI, real provider and device testing."
+  },
+  "rc_cycle12_native_browser_and_accessibility_20261029": {
+    "date": "2026-10-29",
+    "baseline_score": 74.0,
+    "current_score": 74.0,
+    "delta_pp": 0.0,
+    "gate_count": 40,
+    "accepted_gates": 23,
+    "partial_gates": 17,
+    "weight_sum": 100,
+    "remote_verified_run_for_existing_automated_gates": 40717525524,
+    "native_firefox_webkit_status": "PENDING: engines unavailable locally; optional CI added but unrun",
+    "local_chromium_status": "PASS native Chromium 1440/390 modal, public stage and real built React preview",
+    "remaining": "All 17 partial gates require bounded test evidence and independent sign-offs; no promotion in this local uncommitted cycle",
+    "rc_ready": false
   }
 }

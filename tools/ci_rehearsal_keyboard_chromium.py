@@ -59,6 +59,11 @@ async def main():
                 await page.locator('#outside').focus()
                 await page.keyboard.press('Tab')
                 assert await page.evaluate('document.activeElement?.id') == 'presenter','Tab must recover escaped focus'
+                # Simulate programmatic/AT focusin outside the modal even when
+                # inert background controls would normally refuse .focus().
+                await page.evaluate('''() => document.querySelector('#outside').dispatchEvent(
+                    new FocusEvent('focusin',{bubbles:true}))''')
+                assert await page.evaluate('document.activeElement?.id') == 'presenter', 'Programmatic outside focus must be contained immediately'
                 await page.locator('#response').fill('Risposta privata di prova')
                 # IME Escape cancels a composed character, not the entire modal.
                 await page.locator('#response').evaluate("node=>node.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',isComposing:true,bubbles:true}))")

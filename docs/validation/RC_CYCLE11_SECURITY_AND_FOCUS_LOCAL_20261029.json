@@ -1,0 +1,67 @@
+{
+  "project": "Quorivio",
+  "version": "0.1.0-dev",
+  "cycle": 11,
+  "date": "2026-10-29",
+  "source_zip": "quorivio-0.1.0-dev-rc-editor-geometry-k8s-converter-gate74-cumulative.zip",
+  "baseline_file_count": 775,
+  "last_prior_green_full_ci": {
+    "run_id": 40717525524,
+    "attempt": 2,
+    "sha": "f6738592c648bc620e01b92d2bbaa6b90b459287",
+    "applies_to_new_changes": false
+  },
+  "changes": [
+    {
+      "component": "password_reset_link",
+      "detail": "fragment-only new issuance, query-format legacy consumption",
+      "evidence": "API 3 baseline cases + new browser/frontend coverage; live PG-SMTPS pending GitHub"
+    },
+    {
+      "component": "ci_password_recovery_postgres",
+      "detail": "email link fragment-only validation, legacy query disallowed for new sends",
+      "evidence": "5 Python parser tests local, live disposable PG/SMTP pending GitHub"
+    },
+    {
+      "component": "rehearsal_modal",
+      "detail": "programmatic and accessibility focusin escaped-focus containment",
+      "evidence": "real Chromium keyboard/focus/portals desktop/mobile PASS"
+    },
+    {
+      "component": "historical_sha256_manifest",
+      "detail": "preserve historical checksum receipt, no invalid comparison against future source changes; fresh strict cycle11 source+ZIP manifest",
+      "evidence": "previous snapshot decoder and new full-source integrity regression"
+    }
+  ],
+  "local_tests": {
+    "backend_typescript": "PASS",
+    "web_typescript_vite": "PASS",
+    "backend_node": "474/474 PASS",
+    "frontend_node": "65/65 PASS",
+    "python_full_before_new_inventory_test": "989/989 PASS",
+    "chromium_built_react_recovery": "4/4 PASS, fragment and query legacy × desktop and mobile",
+    "chromium_modal_focus_and_portals": "4/4 PASS, desktop and mobile",
+    "old_manifest_decoder": "PASS",
+    "python_full_final": "993/993 PASS",
+    "cycle11_manifest_source": "781/781 current-source digests verified",
+    "cycle11_zip": "782/782 files CRC + SHA-256 verified"
+  },
+  "blocked": [
+    "No current-source GitHub full CI: uncommitted source",
+    "No actual PostgreSQL+TLS SMTP run with new fragment links in this local environment",
+    "No independent Firefox/WebKit or physical touchscreen/screen-reader acceptance",
+    "No representative production Kubernetes ingress, backup/ClamAV/RWX/DR/long-load operator acceptance"
+  ],
+  "scoring": {
+    "before": 74.0,
+    "after": 74.0,
+    "delta_pp": 0.0,
+    "gate_count": 40,
+    "accepted": 23,
+    "partial": 17,
+    "strict_rc_ready": false,
+    "no_new_gate_promotions": true
+  },
+  "no_commit_or_publication": true,
+  "manifest": "docs/validation/RC_CYCLE11_PACKAGE_INVENTORY_20261029.json"
+}

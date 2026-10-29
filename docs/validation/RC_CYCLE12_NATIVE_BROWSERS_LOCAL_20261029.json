@@ -1,0 +1,80 @@
+{
+  "project": "Quorivio",
+  "version": "0.1.0-dev",
+  "date": "2026-10-29",
+  "cycle": 12,
+  "baseline_archive": "quorivio-0.1.0-dev-rc-recovery-fragment-focus-ci-gate74-cumulative.zip",
+  "baseline_files": 782,
+  "baseline_sha256_hex_groups": [
+    "6274c6b7",
+    "0ee02233",
+    "b1b874eb",
+    "ac503f74",
+    "a573d774",
+    "e5189fc4",
+    "63c0bdd9",
+    "e351fb0f"
+  ],
+  "workstreams": [
+    {
+      "name": "Modal WYSIWYG keyboard and empty-state focus",
+      "outcome": "PASS local Chromium 1440/390; TS production source",
+      "files": [
+        "apps/web/src/rehearsal-dialog.ts",
+        "tools/ci_cross_browser_rc.py"
+      ]
+    },
+    {
+      "name": "Native browser CI acceptance",
+      "outcome": "Wired but unrun remotely; Firefox/WebKit unavailable locally; requires workflow_dispatch cross_browser_test=true",
+      "files": [
+        ".github/workflows/ci.yml",
+        "tools/ci_cross_browser_rc.py",
+        "tools/ci_rehearsal_singleton_offline_chromium.py"
+      ]
+    },
+    {
+      "name": "Operator acceptance plan for 17 incomplete gates",
+      "outcome": "Checklist generated; none approved automatically",
+      "files": [
+        "docs/RC_EXTERNAL_ACCEPTANCE_PROTOCOL_20261029.it.md",
+        "docs/RC_EXTERNAL_ACCEPTANCE_PROTOCOL_20261029.en.md",
+        "docs/validation/RC_CYCLE12_EXTERNAL_ACCEPTANCE_TEMPLATE_20261029.json"
+      ]
+    },
+    {
+      "name": "Historical SHA-256 evidence retention",
+      "outcome": "Cycle-11 catalog preserved; latest inventory checks current source and archive independently",
+      "files": [
+        "tools/verify_rc_cycle11_inventory.py",
+        "tools/verify_rc_cycle12_inventory.py"
+      ]
+    }
+  ],
+  "local_validation": {
+    "backend_node": "474/474 PASS",
+    "frontend_node": "65/65 PASS",
+    "python_unittest": "1000/1000 PASS (including three new inventory tests, rerun pending)",
+    "typescript_vite": "PASS",
+    "chromium_module_and_stage_1440_390": "PASS",
+    "chromium_real_react_1440_390": "PASS",
+    "firefox_native": "NOT RUN - browser not installed locally",
+    "webkit_native": "NOT RUN - browser not installed locally",
+    "postgres18_new_revision": "NOT RUN locally",
+    "new_github_ci": "NOT RUN"
+  },
+  "rc": {
+    "before": 74.0,
+    "after": 74.0,
+    "delta": 0.0,
+    "total_gates": 40,
+    "accepted_gates": 23,
+    "partial_gates": 17,
+    "ready": false
+  },
+  "limitations": [
+    "No independent browser/physical-device/screen-reader acceptance",
+    "No new remote full CI on uncommitted code",
+    "No external infrastructure sign-off"
+  ]
+}

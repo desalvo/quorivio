@@ -32,8 +32,26 @@ async def main():
                 await page.wait_for_function("document.querySelector('#late-portal')?.inert===true")
                 assert await page.locator('#late-portal').get_attribute('aria-hidden')=='true'
                 assert await page.get_by_role('button',name='New background button').count()==0
+                # Move an existing isolated portal INSIDE the active dialog.
+                # It must not remain inert merely because it was a background
+                # element at the moment of the first observer callback.
+                await page.evaluate("document.querySelector('#shell').appendChild(document.querySelector('#late-portal'))")
+                await page.wait_for_function("document.querySelector('#late-portal')?.inert===false")
+                assert await page.locator('#late-portal').get_attribute('aria-hidden')=='false'
+                assert await page.get_by_role('button',name='New background button').count()==1
+                # Moving it back out must reapply background isolation.
+                await page.evaluate("document.body.appendChild(document.querySelector('#late-portal'))")
+                await page.wait_for_function("document.querySelector('#late-portal')?.inert===true")
+                assert await page.get_by_role('button',name='New background button').count()==0
                 await page.keyboard.press('Tab')
                 assert await page.evaluate('document.activeElement?.id')=='one','Tab should skip aria-hidden button'
+                await page.keyboard.press('Shift+Tab')
+                assert await page.evaluate('document.activeElement?.id')=='close'
+                # A script, browser extension or accessibility technology may
+                # attempt an outside focus target without a Tab keypress.
+                await page.evaluate('''() => document.querySelector('#launch').dispatchEvent(
+                    new FocusEvent('focusin',{bubbles:true}))''')
+                assert await page.evaluate('document.activeElement?.id')=='one','outside programmatic focus must return to dialog'
                 await page.keyboard.press('Shift+Tab')
                 assert await page.evaluate('document.activeElement?.id')=='close'
                 await page.keyboard.press('Escape')

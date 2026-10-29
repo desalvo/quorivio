@@ -1,3 +1,102 @@
+# Quorivio 0.1.0-dev — RC cycle 12: 74.0% (unchanged), October 29, 2026
+
+**Baseline:** cycle-11 RC 74 cumulative archive (782 files). Fixed version 0.1.0-dev, EUPL-1.2. No automatic commit, push, tag, Docker publication or release.
+
+1. **Modal/editor accessibility:** the production TypeScript focus manager now includes contenteditable and summary controls in the keyboard cycle, skips negative tabindex, and provides a reversible empty-dialog fallback focus anchor; existing inert/ARIA, Escape and focus restoration behavior stays intact.
+2. **Real browser-engine CI:** opt-in `cross_browser_test=true` adds native Playwright Firefox/WebKit acceptance at 1440px and 390px of actual TS focus logic, public 16:9 CSS, and built React dashboard/editor rehearsals. Failure diagnostics are captured. Native Firefox/WebKit not available/tested locally; no Chromium fallback.
+3. **Independent acceptance:** bilingual operator protocol and JSON template record each of the 17 partial gate residuals, required environment, reviewer and proof. A generated checklist is not proof or approval.
+4. **Historical integrity:** cycle-11 hash manifest remains an immutable snapshot while cycle-12 validates the currently packaged sources and ZIP with grouped SHA-256 values, without weakening secret scanning.
+
+**Local verification:** backend TypeScript, frontend/Vite PASS, 474 API Node tests, 65 web Node tests, 1000 Python tests and native Chromium + actual built React at desktop/mobile PASS. Firefox/WebKit, physical devices, assistive technologies, live PostgreSQL on this revision and fresh GitHub CI remain pending. Previously green run 40717525524 applies only to prior commit f6738592.
+
+**RC matrix:** 74.0% unchanged; 40 gates, 23 accepted, 17 partial; release-candidate strict gate remains blocked. Next manual workflow: `browser_test=true`, `cross_browser_test=true`, `capacity_test=true`, `publish_image=false`, `publish_latest=false`, `rc_strict=false`. See `docs/RC_EXTERNAL_ACCEPTANCE_PROTOCOL_20261029.en.md`.
+
+---
+
+# Quorivio 0.1.0-dev — RC cycle 11: 74.0% (unchanged), 29 October 2026
+
+**Source:** complete RC cycle-10 ZIP (775 files), with no user commit after the last referenced GitHub full run. **Version:** 0.1.0-dev; **license:** EUPL-1.2. No code was pushed or images published by the assistant.
+
+## Complete technical hardening batch
+
+1. **Password-reset bearer delivery:** new SMTP recovery messages link to a `#reset_token=...` URL fragment rather than placing the secret into the HTTP path or query. A fragment is not transmitted with the document request, reducing exposure in reverse-proxy access logs and HTTP Referer. The React client still accepts legacy `?reset_token=...` links previously delivered; both variants are consumed immediately and sanitized from history. Neither bearer is stored in local/session storage. The 20-minute single-use token expiration and server-side SHA-256 storage are unchanged.
+2. **Real PostgreSQL/SMTPS acceptance upgraded:** the existing disposable, real-PostgreSQL and SMTPS integration test now asserts that newly generated recovery links use a fragment-only bearer and rejects a query-string token. Loopback HTTP remains permitted *only* for the protected disposable CI fixture; public HTTPS is enforced by this fixture. Actual provider link rewriting, email deliverability and native mobile mail clients are not yet independently tested.
+3. **Modal focus containment:** in addition to Tab/Shift+Tab and Escape, a `focusin` capture handler immediately restores focus if a script or assistive navigation attempts to leave the open rehearsal modal. The handler is removed on cleanup. Chromium tests confirm interaction, focus return and portal reparenting at 1440/390 px. Screen-reader certification is **not** claimed.
+4. **Immutable historical integrity proofs:** cycle-10's SHA-256 inventory remains a historical snapshot and is no longer erroneously checked against the evolving cycle-11 source tree. Current source and new ZIP are instead verified exhaustively by `verify_rc_cycle11_inventory.py`, reassembling eight-by-eight hash groups. Older receipts are preserved and checked for format/integrity, not rewritten. This avoids misleading CI failures on legitimate source edits.
+
+## Local and remote evidence boundaries
+
+Local: backend API TypeScript/frontend TypeScript/Vite build **PASS**; Node API **474/474**, web **65/65**, Python **989/989 before final new inventory regression**, real React Chromium recovery **4/4** (legacy and fragment variants at 1440/390), rehearsal keyboard and dynamic portal Chromium **4/4**. The new report/inventory tests are run separately before packaging and the full suite is rerun after adding them.
+
+Latest prior green GitHub Full CI: [40717525524](https://github.com/desalvo/quorivio/actions/runs/40717525524), attempt 2 on commit `f6738592c648bc620e01b92d2bbaa6b90b459287`. It confirms the previously credited automated areas but **does not validate this uncommitted batch**. A new full GitHub run, real SMTPS/PostgreSQL recovery link acceptance, external Firefox/WebKit and accessibility/physical-device/operator tests remain required.
+
+**Formal RC score: 74.0%, +0.0 pp (40 gates, 23 accepted, 17 partial; strict RC blocked).** These new fixes cannot be credited prior to GitHub verification and remaining external acceptance. To increase completion, prioritize closing or independently accepting the 17 partial gates, not repeatedly subdividing them.
+
+**Next CI:** `workflow_dispatch` with `browser_test=true`, `capacity_test=true`, `publish_image=false`, `publish_latest=false`; inspect all browser, PostgreSQL/SMTPS, security, image, manifest and Kubernetes steps. Review the GitHub result, then reconcile only newly proven gate scopes. No automated commit/push/tag/release/image publication.
+
+**Evidence:** `docs/RC_GATE_MATRIX.json`, `docs/validation/RC_CYCLE11_SECURITY_AND_FOCUS_LOCAL_20261029.json`, `docs/validation/RC_CYCLE11_PACKAGE_INVENTORY_20261029.json`.
+
+---
+
+# Quorivio 0.1.0-dev — RC cycle 10: 74.0% (+3.0 pp), 29 October 2026
+
+**Baseline:** cumulative cycle-9 RC 71.0% archive; original 768 packaged files preserved. No automatic commit, tag, push or Docker publication.
+
+## Verified evidence reconciliation
+
+Previously-green GitHub Actions run [40717525524](https://github.com/desalvo/quorivio/actions/runs/40717525524), attempt 2, commit `f6738592c648bc620e01b92d2bbaa6b90b459287`, quality job `123073117101` supplies distinct bounded automated proofs which were still aggregated in broad partial gates:
+
+- **A1-EDITOR-INTERACTION** (2): Chromium canvas interactions, pointer/keyboard context controls and group editing. The parent **A1** remains partial (4) for independent visual/operator and multi-engine/mobile/device sign-off. Not the autosave/CAS proof already credited under A3-AUTO, or the thumbnail contract under A2-ORDER.
+- **A3-GEOMETRY** (2): Chromium editor, rehearsal and public slide 16:9 coordinate fidelity at desktop/mobile, accessible reading mode; parent **A3** remains partial (2) for representative pixel comparison, Office corpus, browser engines and physical device review. Not text persistence/WYSIWYG (A3-AUTO) or modal focus (A4-FOCUS).
+- **D3-K8S-GENERATOR** (1): repeatable Kubernetes wizard/worker manifest and fresh-secret generation checks; **D3** residual 1 partial for ARM64 execution, rootless Podman and deployed ingress/storage/ClamAV acceptance. Not D3-IMAGE's image build/scan.
+- **D4-CONVERTER-BOUNDARY** (1): executable conversion/hostile-input and file-publication regressions, distinct from D4-SCAN supply-chain credential/vulnerability checks; **D4** residual 2 partial for independent pentest and deployment threat review.
+
+All 100 weight points remain conserved. **71.0 → 74.0%**, gates **36 → 40**, accepted **19 → 23**, partial unchanged **17**. A bounded technical pass is *not* external or production acceptance; strict RC remains blocked.
+
+## Functional changes — local-only, no RC points
+
+The password-reset confirmation page is now a real accessible HTML form with a labelled heading and native Enter-to-submit; mismatch validation, single in-flight POST and retry behavior remain intact. When a late React portal is moved from the background into an open preview, its previous `inert` / `aria-hidden` state is restored immediately, and moving it outside isolates it again. This prevents reparented UI from becoming unusable. Chromium checks exercise both cases on desktop 1440px and mobile 390px.
+
+**Local verification:** backend/frontend TypeScript and Vite build PASS; 474/474 backend Node tests, 62/62 frontend Node tests, 984/984 Python tests, Chromium recovery, modal portal and focus tests 1440/390 PASS. Real SMTP/PostgreSQL on this uncommitted code and a new GitHub full run **not performed**. Firefox/WebKit, independent AT, actual mobile devices, production deployment and external reviews remain open.
+
+**Next:** maintainer commit; manually run opt-in `browser_test=true`, `capacity_test=true`, `publish_image=false`, `publish_latest=false`. Only then credit new-source GitHub evidence. No release candidate sign-off yet.
+
+**Receipts:** `docs/RC_GATE_MATRIX.json`, `docs/validation/RC_CYCLE10_VERIFIED_GATE_RECONCILIATION_20261029.json`, grouped SHA-256 package inventory.
+
+---
+
+# Quorivio 0.1.0-dev — RC cycle 9: 71.0% (+3.0 pp), 28 October 2026
+
+**Baseline:** cumulative cycle-8 ZIP (RC 68.0%); all previous implementation preserved. **Version:** `0.1.0-dev`, license EUPL-1.2.
+
+## Verified gate reconciliation (not speculative)
+
+The complete GitHub Actions [run 40717525524](https://github.com/desalvo/quorivio/actions/runs/40717525524), attempt 2, commit `f6738592c648bc620e01b92d2bbaa6b90b459287`, production quality job `123073117101`, has already passed. The original matrix still bundled these independently exercised **bounded technical** areas into broad partial gates. Each parent retains independent/hardware acceptance obligations, and exactly 2 weight points are moved from it to one accepted subgate:
+
+- **A2-ORDER** (2): desktop/mobile Chromium editor thumbnail filmstrip, pointer controls and keyboard reorder contracts. Parent A2 remains partial (4): pixel fidelity, cross-browser native DnD and real device review outstanding.
+- **A4-FOCUS** (2): real TypeScript/React Chromium modal accessible focus trap at 1440/390, dynamic portal `inert`/ARIA isolation and focus restore. Parent A4 remains partial (4): NVDA/VoiceOver/TalkBack, actual touch/keyboard and WCAG/AGID review outstanding.
+- **B3-QUESTION-STATS** (2): real PostgreSQL 18 three independent questions, scoped presenter-only statistics, revisions and two-participant idempotency. Parent B3 remains partial (2): independent browser/device and assistive-technology acceptance outstanding.
+
+This evidence is **separate** from the earlier A3-AUTO editor persistence, B3-AUDIENCE QR/ballot/moderation and other accepted subgates. All weights still sum to 100. 33 → 36 gates, 16 → 19 accepted, 17 partial unchanged. **68.0 → 71.0 (+3.0 percentage points)**. The strict RC readiness gate remains false.
+
+## Implemented in this uncommitted batch — no scoring credit yet
+
+Password reset now requires matching password and confirmation fields, enforces at least 12 characters, prevents a second submit during the first in-flight POST and preserves retry after a failed/expired token without restoring the bearer to the URL. The existing browser no-referrer and history sanitation remain. The real compiled React Chromium fixture at 1440/390 validates mismatch rejection, synchronously duplicated clicks (one request), error/retry, success, and non-persistence of the token. It is wired to the opt-in CI but **not yet verified by a new GitHub run**.
+
+**Local tests:** backend/frontend TypeScript + Vite build PASS; 474/474 backend Node; 62/62 frontend Node; 979/979 Python; Chromium at 1440/390 PASS. No local PostgreSQL server, physical device tests or Firefox/WebKit checks were claimed.
+
+**Next:** maintainer commit, full GitHub opt-in `browser_test=true`, `capacity_test=true`, `publish_image=false`, `publish_latest=false`; then operator-independent cross-browser/device/AT, production Kubernetes/RWX/ClamAV and legal/GDPR reviews. No automated commit/push/tag/image publication.
+
+**Evidence:** `docs/validation/RC_CYCLE9_VERIFIED_GATE_HARDENING_20261028.json`, `docs/RC_GATE_MATRIX.json`.
+
+---
+
+# Quorivio 0.1.0-dev — cycle 8, verified RC 68.0% (+1.0 pp), 2026-10-28
+
+**Evidence:** GitHub run [40717525524](https://github.com/desalvo/quorivio/actions/runs/40717525524), attempt 2, commit `f6738592c648bc620e01b92d2bbaa6b90b459287`: quality, container build and manually requested publication all SUCCESS. The existing PostgreSQL 18 + TLS SMTP recovery step passed. Reviewed and accepted bounded `C1-RECOVERY` (2 points) by taking 2 points of weight from residual C1; strict RC remains blocked. **68.0%, 33 gates (16 accepted, 17 partial)**; no new local-only controls accepted. New development consumes one-time reset tokens from the URL into React state, removes the token from browser history and blocks referer exposure; unit/Chromium tests and opt-in CI wiring added. Local build/API Node 474/Web Node 62/Python 975 and Chromium 1440/390 PASS. **The new code requires fresh GitHub verification.** See `docs/RC_RECOVERY_CYCLE8_20261028.en.md` and `docs/validation/RC_RECOVERY_CYCLE8_20261028.json`. No commit/push/tag/publish by assistant.
+
+---
+
 # Quorivio 0.1.0-dev — Duplicate rehearsal modal and mobile toolbar hotfix (2026-10-28)
 
 **GitHub source:** Extended CI [40689633215](https://github.com/desalvo/quorivio/actions/runs/40689633215), commit `8899c24155473ab8ff88cfa1ba767aa949be1ded`. Quality gate failed at `tools/ci_browser_editor.py`: strict mode found **two body-level rehearsal dialogs**, both `inert` and `aria-hidden`. Docker build and PostgreSQL integration were skipped; the last verified full-green CI remains 40638652838.

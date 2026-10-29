@@ -1,0 +1,68 @@
+{
+  "project": "Quorivio",
+  "version": "0.1.0-dev",
+  "date": "2026-10-28",
+  "source_baseline": "quorivio-0.1.0-dev-rc-recovery-url-verified-gate-68-cumulative.zip",
+  "score": {
+    "previous": 68.0,
+    "current": 71.0,
+    "delta_pp": 3.0,
+    "total_weight": 100,
+    "gates": 36,
+    "accepted": 19,
+    "partial": 17,
+    "strict_rc_ready": false
+  },
+  "verified_github": {
+    "run_id": 40717525524,
+    "attempt": 2,
+    "commit_sha": "f6738592c648bc620e01b92d2bbaa6b90b459287",
+    "quality_job_id": 123073117101,
+    "conclusion": "success",
+    "evidence": [
+      {
+        "gate": "A2-ORDER",
+        "checks": [
+          "Responsive editor thumbnail filmstrip and menus Chromium desktop/mobile",
+          "Keyboard reorder regression contract"
+        ]
+      },
+      {
+        "gate": "A4-FOCUS",
+        "checks": [
+          "Chromium 1440/390 real TS modal focus trap, outside-focus restoration and inert isolation",
+          "Built React singleton preview focus regression"
+        ]
+      },
+      {
+        "gate": "B3-QUESTION-STATS",
+        "checks": [
+          "PostgreSQL 18 independent widget question IDs/answer revisions and presenter-only statistics",
+          "PostgreSQL concurrent topic quota, presenter-only timed leaderboard and participant Chromium moderation"
+        ]
+      }
+    ],
+    "historical_verified_run": true
+  },
+  "local_only_new_changes": [
+    "Reset form now asks for password and confirmation with match validation",
+    "In-flight lock and disabled button prevent duplicate password reset POSTs",
+    "Chromium 1440 and 390 real built React smoke tests mismatch, double click, expired token retry, success, URL/referrer hygiene"
+  ],
+  "local_tests": {
+    "typescript_and_vite": "PASS",
+    "node_api": "474/474",
+    "node_web": "62/62",
+    "python": "979/979",
+    "chromium_recovery_1440": "PASS",
+    "chromium_recovery_390": "PASS"
+  },
+  "unverified": {
+    "new_full_ci": "Pending on the cumulative package after maintainer commit",
+    "browser_engines": "Firefox, WebKit not executed",
+    "physical_devices": "Real iOS/Android touch not executed",
+    "accessibility": "Independent screen-reader and AGID/WCAG acceptance not executed",
+    "production": "Rootless Podman, native ARM64, multi-replica K8s/ClamAV and operator sign-off not completed"
+  },
+  "policy": "No new local-only change was counted as accepted; new accepted technical subgates are narrow, sourced exclusively from already-green GitHub run 40717525524. Residual parent gate requirements remain partial."
+}

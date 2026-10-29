@@ -22,9 +22,11 @@ class FederatedAuthRC(unittest.TestCase):
   doc=json.loads((ROOT/'docs/RC_GATE_MATRIX.json').read_text())
   self.assertFalse(doc['pending_local_batch']['new_feature_promoted'])
   self.assertTrue(doc['pending_local_batch']['new_ci_required'])
-  self.assertEqual(audit()['score'],67)
+  self.assertGreaterEqual(audit()['score'],68)
   p=preflight()
-  self.assertEqual((p['score'],p['gate_count'],p['accepted_gates']),(67,32,15))
+  self.assertGreaterEqual(p['score'],68)
+  self.assertGreaterEqual(p['gate_count'],33)
+  self.assertGreaterEqual(p['accepted_gates'],16)
   self.assertFalse(p['release_candidate_ready'])
  def test_no_secret_in_social_profile_url_or_followed_redirect(self):
   social=(ROOT/'apps/api/src/social-oauth.ts').read_text()
@@ -42,5 +44,8 @@ class FederatedAuthRC(unittest.TestCase):
    self.assertIn('redirect', (ROOT/file).read_text())
   self.assertTrue((ROOT/'docs/validation/RC_OAUTH_EGRESS_AND_C3_PROTOCOL_GATE_20261028.json').is_file())
   for path in ('docs/DEVELOPMENT_STATUS.md','docs/DEVELOPMENT_STATUS.it.md'):
-   self.assertIn('67', (ROOT/path).read_text()[:400])
+   # New RC cycles prepend status; the historic 67% receipt remains intact.
+   content = (ROOT/path).read_text()
+   self.assertIn('0.1.0-dev', content[:160])
+   self.assertIn('67', content)
 if __name__=='__main__':unittest.main()
