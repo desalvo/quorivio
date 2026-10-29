@@ -1,0 +1,43 @@
+{
+  "project": "Quorivio",
+  "version": "0.1.0-dev",
+  "cycle": 17,
+  "date": "2026-10-29",
+  "baseline_confirmed_commit": "244945b1c79c5a7b20e8f743bd5646e041bade00",
+  "last_verified_full_ci_run": 40855898307,
+  "formal_rc_percentage_before": 77.0,
+  "formal_rc_percentage_after": 77.0,
+  "delta_percentage_points": 0.0,
+  "gate_count": 45,
+  "accepted_gates": 28,
+  "partial_gates": 17,
+  "new_implementation": [
+    "AES-256-GCM streaming authenticated encryption for Quorivio backup archives",
+    "Owner-only generated 32-byte random key files with atomic no-overwrite output",
+    "Wrong key, truncated ciphertext, tampering and symlinks fail closed",
+    "Explicit key rotation requiring old-key authentication and a distinct new destination",
+    "Real disposable PostgreSQL 18 CI backup, encrypt, rotate, decrypt and restore validation",
+    "Preserved immutable cycle16 manifest and new Git-index/source/ZIP cycle17 integrity receipt"
+  ],
+  "local_checks": {
+    "backup_and_envelope_unit": "23/23 PASS",
+    "rc_and_backup_focused": "30/30 PASS",
+    "full_python": "1031/1031 PASS on 2026-10-29",
+    "workflow_yaml": "PASS (4 jobs)",
+    "node_build": "NOT RUN on new package, TypeScript application sources unchanged",
+    "real_postgres_encrypted_restore": "PENDING new GitHub Full CI",
+    "inventory_source_and_git": "PASS 814 SHA-256 source hashes and Git index parity, 815 package members",
+    "zip": "PASS all 815 members and CRC/SHA-256 after packaging"
+  },
+  "security_notes": [
+    "Backups created by existing instance_backup.py are unencrypted until the separate encrypt command is run",
+    "Key material is never passed as a command-line argument or included in the archive",
+    "Rotate uses a private temporary plaintext file; use encrypted private temporary storage; secure deletion cannot be guaranteed"
+  ],
+  "remaining": [
+    "Production-like independent restore drill and representative RPO/RTO measurements",
+    "External key-management, rotation, retention, disaster recovery and GDPR operator approval",
+    "17 partial gates; RC strict gate must remain closed",
+    "Full GitHub CI on new encrypted DR code"
+  ]
+}

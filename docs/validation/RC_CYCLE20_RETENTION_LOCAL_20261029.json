@@ -1,0 +1,42 @@
+{
+  "project": "Quorivio",
+  "version": "0.1.0-dev",
+  "date": "2026-10-29",
+  "cycle": 20,
+  "status": "Local Python 1081/1081 PASS; new full GitHub CI/operational acceptance pending",
+  "baseline_archive": "quorivio-0.1.0-dev-rc-operational-dr-rehearsal-retention-cycle19-cumulative.zip",
+  "baseline_file_count": 833,
+  "last_verified_github_full_ci": 40855898307,
+  "last_verified_commit": "244945b1c79c5a7b20e8f743bd5646e041bade00",
+  "changes": [
+    "Authenticated all sealed archives and inner manifests before deleting any",
+    "Explicit owner-only legal hold registry required for destructive apply",
+    "Keep legal-hold archives in addition to minimum normal snapshots",
+    "Key generations after rotation supported with repeated --key-file",
+    "Identity and hold registry rechecks before deletion",
+    "PostgreSQL 18 DR CI retention acceptance added using real encrypted archives",
+    "Operator guidance in IT/EN; no automatic prune"
+  ],
+  "security_invariants": [
+    "No deletion without explicit confirmation, owner-only holds and valid keys/workspace",
+    "A malformed newer snapshot cannot justify removing an older authenticated snapshot",
+    "Held snapshots never deleted",
+    "No plain archival data published in backup retention",
+    "No production RPO/RTO or GDPR legal sign-off claimed"
+  ],
+  "tests": {
+    "retention_unit": "16/16 PASS, authenticated AES-256-GCM and inner manifest checked",
+    "cycle19_compatibility": "4/4 PASS; immutable inventory verified independently",
+    "cycle20_contracts": "4/4 PASS",
+    "python_full": "1081/1081 PASS (single complete unittest discovery, 29.392s)",
+    "postgres18": "Wired into extended PostgreSQL 18 test; new GitHub run required",
+    "typescript_build": "Not run; TypeScript application sources unchanged",
+    "sha256_source_git_zip": "PASS, 836 source hash checks + exact 837-file Git-index/ZIP parity (final packaging)"
+  },
+  "formal_rc_percentage": 77.0,
+  "formal_delta_points": 0,
+  "gate_count": 45,
+  "gate_accepted": 28,
+  "gate_partial": 17,
+  "production_dr_verified": false
+}

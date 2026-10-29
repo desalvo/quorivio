@@ -1,3 +1,86 @@
+# Quorivio 0.1.0-dev — RC cycle 21: mounted encrypted DR mirror (29 October 2026)
+
+**Formal completion remains 77.0%.** 45 gates (28 accepted, 17 partial). Previous GitHub Full CI 40855898307 on commit `244945b1`; new cycle 21 code is not yet committed or remotely verified. User manages commit/push/tag and Docker publication.
+
+**Implemented:** `tools/backup_mirror.py` fail-closed `push`/`verify` of already-encrypted `.qenc` archives to an explicit pre-mounted filesystem (never local fallback after unmount), with owner-only source, destination and receipt, AES-GCM and inner-manifest verification before publication, SHA-256 parity and no overwrite. No keys copied, no plaintext on mirror; verification staging MUST use a separate encrypted 0700 workspace supplied by the operator. 12 real cryptographic/negative tests and 5 RC contract tests. GitHub PostgreSQL 18 backup/restore acceptance now copies a rotated archive to a separate `/dev/shm` tmpfs, restores to a fourth isolated database and checks schema, row counts and private assets. Documentation IT/EN added (`docs/DR_MOUNTED_ENCRYPTED_MIRROR.*`). Existing operator commands and archives remain compatible.
+
+**Pending:** new GitHub Full CI, physical offsite independence, representative network/outage and restore exercises, separate key custody, actual RPO/RTO measured and independent operational/legal approval. **Do not count mounted tmpfs as production offsite.** No new formal RC acceptance granted until new evidence. Cycle 20 SHA-256 receipt remains historical and immutable; cycle 21 uses a new inventory.
+
+**Local validation:** TypeScript/Vite build PASS, Node API 474/474, Node web 65/65; Python 1,099 tests PASS in four disjoint chunks (360+170+170+399), and 14/14 mirror tests retested after the final mirror-volume key/workspace guard. The monolithic suite timed out in this container; isolated partitions passed. Source/Git-index/ZIP verification is recorded in the cycle-21 inventory.
+
+
+---
+
+# Quorivio 0.1.0-dev — RC cycle 20: authenticated backup retention and legal holds (29 Oct 2026)
+
+**Formal RC score: 77.0% unchanged.** 45 gates, 28 accepted, 17 partial. This cycle closes a *code-level security gap*, but does not claim production DR recovery, GDPR legal approval or a new externally verified RC gate. Last GitHub Full CI 40855898307 / commit `244945b1c79c5a7b20e8f743bd5646e041bade00`. User will commit later; no commit/push/tag/image publication by the assistant.
+
+**Implemented:** retention dry-run remains the default. Destructive `--apply` now REQUIRES an owner-only legal-hold registry, one or more private encryption keys (including rotated generations), a 0700 workspace on encrypted storage and explicit confirmation. The command first authenticates **every** sealed AES-256-GCM archive and its inner backup manifest, including older deletion candidates; it refuses any missing key, corrupted newer backup, unsafe hold registry or modified archive set before any deletion. Holds are always preserved and *not counted* toward `min_keep` ordinary recoverable snapshots. The PostgreSQL 18 DR CI test now exercises retention against real sealed backups from old and rotated keys, including an explicit hold and a later guarded prune. Updated Italian/English operator procedures. No automatic pruning enabled.
+
+**Local validation: Python unittest discovery 1,081/1,081 PASS, including conversion HTTP, encrypted-backup retention and historical receipts; current manifest/Git-index/ZIP parity verified during packaging.** Real PostgreSQL 18 exercise and build/integration require the next GitHub Full CI; independent D2/D6 operational, offsite, compliance, legal review and RPO/RTO testing remain open. See `docs/DR_REHEARSAL_AND_RETENTION.en.md` and `.it.md`.
+
+---
+
+# Quorivio 0.1.0-dev — RC cycle 19: DR rehearsal + guarded retention (29 Oct 2026)
+
+**Formal RC remains 77.0%:** 45 gates, 28 accepted, 17 partial. Last independently verified GitHub Full CI: [40855898307](https://github.com/desalvo/quorivio/actions/runs/40855898307), commit `244945b1c79c5a7b20e8f743bd5646e041bade00`. Current development is local and **does not change RC gate credit** until a fresh Full CI and required independent acceptance. No automatic commit/push/tag/release.
+
+**This cycle implements:** `secure_instance_backup.py drill` authenticates and validates the encrypted archive, checks backup age against an optional pre-restore threshold, performs a guarded restore into an empty database/assets target, and atomically writes an owner-only, credential-free JSON receipt with elapsed *command* duration and threshold results. A missed time threshold is reported after the restore (it does not roll data back). `backup_retention.py` provides owner-only `.qenc` archive policy with default dry-run, minimum preserved copies and explicit confirmation required for deletion; never deletes key files. CI adds a *third disposable PostgreSQL 18 database* restored from an authenticated key-rotated envelope, compares schema/rows/assets, and publishes sanitized technical evidence (7-day retention). New documentation: `docs/DR_REHEARSAL_AND_RETENTION.en.md` and `.it.md`.
+
+**Security boundary:** restore can temporarily hold plaintext only in the explicitly operator-provided 0700 encrypted staging volume; its cleanup is not SSD secure erase. Retention is never automatically enabled. Technical backup age is not actual data loss (RPO); isolated restore command timing is not end-to-end RTO. Key escrow, independent offsite copies, failure injection, deploy/cutover timing, legal retention and actual production sign-off remain outstanding (D2/D6).
+
+**Validation:** full Python unittest discovery **1069/1069 PASS**; CI YAML parsed; source/Git-index SHA-256 verification PASS. Detailed report in `docs/validation/RC_CYCLE19_DR_REHEARSAL_LOCAL_20261029.json`. No new GitHub Full CI verification has yet been performed on this code. No TypeScript application changes.
+
+---
+
+# Quorivio 0.1.0-dev — RC cycle 18: integrated encrypted disaster recovery (29 Oct 2026)
+
+**RC score remains 77.0%** (45 gates: 28 accepted, 17 partial; strict RC blocked). Baseline confirmed commit `244945b1c79c5a7b20e8f743bd5646e041bade00`; latest prior verified Full CI [40855898307](https://github.com/desalvo/quorivio/actions/runs/40855898307). New code is local-only until the maintainer commits and runs a fresh Full CI.
+
+**Implemented:** `tools/secure_instance_backup.py` integrates encrypted `backup`, `verify`, `rotate`, `restore` with fail-closed owner-only work directory validation and no persistent published raw backup. `backup_envelope.rotate` has been redesigned to re-encrypt verified AES-256-GCM streaming chunks without staging a plaintext archive on disk; wrong old key/tampering/same key leaves no published ciphertext. The PostgreSQL 18 CI DR acceptance now creates and restores a second disposable database using the new integrated operator workflow, checking schema, rows, assets, key refusal and workspace cleanup. Docs: `docs/DR_SECURE_WORKFLOW.en.md` / `.it.md`. Existing legacy tar.gz backup/restore remains supported.
+
+**Validation:** workflow YAML parsed, focused encrypted backup tests passed; 1,048 Python tests PASS across 3 separately executed groups (944 + 3 + 101); a monolithic local run timed out in the converter HTTP group. Current SHA-256 manifest and Git-index/ZIP parity are checked before package release. No new TypeScript application files modified. The local build attempt is not credited because the offline npm dependency set lacks type definitions. Local database/Podman/production restore tests cannot substitute for GitHub Full CI or an independently reviewed DR exercise.
+
+**Still required for D2/D6:** fresh GitHub Full CI with PostgreSQL 18, independent representative restore drill and measured RPO/RTO, externally managed key custody/rotation, operational retention, legal/compliance acceptance. No feature promoted or percentage increment without valid evidence.
+
+---
+
+# Quorivio 0.1.0-dev — RC cycle 17: 77.0%, October 29, 2026
+
+**Completed locally (no new release points):** streaming AES-256-GCM authenticated envelope for existing PostgreSQL/asset archives, owner-only random key files and private no-overwrite atomic output; explicit wrong-key/tampering refusal, key rotation, bilingual operational procedure, and full disposable PostgreSQL restore CI integration. Historical cycle-16 checksum receipt remains immutable, current cycle-17 integrity inventory and Git-index gate added. Production backup/restore and key custody/rotation remain external obligations (D2/D6); strict RC NOT READY.
+
+**Baseline:** latest maintainer-confirmed commit `244945b1c79c5a7b20e8f743bd5646e041bade00`, verified Full CI 40855898307. Changes in this cycle are not yet in a verified GitHub run. Formal score **77.0%, no increase** (45 gates, 28 accepted, 17 partial). See `docs/DR_ENCRYPTED_BACKUPS.en.md` and `docs/validation/RC_CYCLE17_ENCRYPTED_DR_LOCAL_20261029.json`.
+
+**Final local verification:** Python 1031/1031 PASS, cryptography backup/rotation and existing backup safety contracts PASS, workflow YAML PASS; latest current-source/Git/ZIP inventory to be verified at packaging. No fresh PostgreSQL encrypted restore or Node build on new package; GitHub CI pending.
+
+**Integrity delivery:** 814 source hashes plus current manifest, exact Git-index parity and all 815 cumulative ZIP members PASS.
+
+---
+
+# Quorivio 0.1.0-dev — RC cycle 16: 77.0% (+2.0 pp), October 29, 2026
+
+**Verified baseline:** `244945b1c79c5a7b20e8f743bd5646e041bade00`, GitHub Full CI [40855898307](https://github.com/desalvo/quorivio/actions/runs/40855898307) SUCCESS, quality `123386671138`, native Firefox/WebKit `123389289779`, container `123389289637`. Docker publication skipped. No assistant commit/push/tag.
+
+## Previously green, newly reconciled bounded proofs
+
+- **A1-NATIVE-REACT-ENTRY (2 weight):** full built React dashboard/editor singleton preview open and view switching under native Firefox/WebKit at 1440/390px, distinct from Chromium canvas interaction and CSS geometry.
+- **A4-NATIVE-REACT-FOCUS (1):** built React dialog background inert and invoker focus restored on native browser engines, distinct from standalone TypeScript modal and Chromium-only focus.
+- **C1-RECOVERY-UI (1):** built React Chromium recovery URLs (fragment and legacy), no token persistence, confirmation, validation and retries, distinct from real PostgreSQL/SMTP API recovery; mocked UI transport does not certify providers.
+
+These **4 weight points** moved from parent partial gates to the three scoped accepted gates. With the unchanged 100-weight model this yields **75.0% → 77.0%, +2.0 pp**, 45 gates, 28 accepted and 17 partial. Strict RC NOT READY; independent criteria remain outstanding.
+
+## New code, no points before fresh CI
+
+1. **Real two-replica PostgreSQL/WebSocket reconnect:** after committed vote, disconnect participant on A and reconnect on B; assert immediate current view, private result and presence isolation, idempotent vote and propagation of later activity/session closure.
+2. **Full React focus probe:** external programmatic focus attempt while modal is open; focus must stay inside and inert must restore on close across native browsers.
+3. **CI integrity:** retain the immutable cycle-14 SHA-256 manifest and introduce an exact Git-index/source/ZIP cycle-16 inventory; do not disable secret scanners.
+
+**Pending independent acceptance:** NVDA/VoiceOver/TalkBack and physical devices, Office/PPTX and pixel-parity corpus, actual SMTP/OAuth providers, native ARM64/Podman rootless/Kubernetes/RWX/ClamAV installations, GDPR/AGID/security review and production DR operations.
+
+**Local verification:** full Python unittest discovery **1016/1016 PASS**, Python syntax, Git-index integrity, YAML syntax and full ZIP SHA-256 checks PASS. The offline container cannot install Node workspace dependencies or run PostgreSQL replicas/Firefox/WebKit, so the new source changes are NOT validated by a fresh TypeScript/Node build or native/DB acceptance here. Re-run GitHub Full CI with `browser_test=true`, `cross_browser_test=true`, `capacity_test=true`, `publish_image=false`, `publish_latest=false`, `rc_strict=false`. Fixed version `0.1.0-dev`, EUPL-1.2. See `docs/validation/RC_CYCLE16_GITHUB_VERIFIED_RECONCILIATION_20261029.json`.
+
+---
+
 # Quorivio 0.1.0-dev — RC cycle 14: 75.0% (+1.0 pp), October 29, 2026
 
 **Last confirmed commit:** `cf49c3e1d3e58d4ec4d65862a92b742348a11435`. Standard `40846201940` and Full `40847463104` **SUCCESS**. Full native Firefox/WebKit job `123360950163` verified real TS modal and CSS stage desktop/mobile. Narrow accepted A3-NATIVE-STAGE and A4-NATIVE-MODAL, 1 point each moved from partially accepted parent gates (net +1.0 pp). 42 gates, 25 accepted, 17 partial. Physical device, screen-reader, pixel-fidelity and independent approvals remain unverified; strict RC not ready.

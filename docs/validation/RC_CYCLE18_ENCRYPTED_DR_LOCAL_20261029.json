@@ -1,0 +1,42 @@
+{
+  "project": "Quorivio",
+  "version": "0.1.0-dev",
+  "cycle": 18,
+  "date": "2026-10-29",
+  "baseline_commit": "244945b1c79c5a7b20e8f743bd5646e041bade00",
+  "prior_verified_full_ci_run": 40855898307,
+  "formal_score_before": 77.0,
+  "formal_score_after": 77.0,
+  "delta_pp": 0.0,
+  "gate_count": 45,
+  "gate_accepted": 28,
+  "gate_partial": 17,
+  "implementation": [
+    "first-class encrypted backup/verify/rotate/restore CLI",
+    "explicit private 0700 work root with temporary plaintext lifecycle cleanup",
+    "one-pass authenticated AES-GCM rekey with no plaintext file",
+    "second disposable PostgreSQL 18 encrypted operator restore CI acceptance",
+    "bilingual operations documentation and tests"
+  ],
+  "local_verification": {
+    "unit": "8 new workflow + 8 original envelope tests PASS; RC contract tests PASS",
+    "python_full": "1048/1048 PASS split: 944 main, 3 converter HTTP, 101 conversion tests; single monolithic run timed out in HTTP tests",
+    "git_index_inventory": "PASS 823 source hashes before final report updates; final ZIP verified after packaging",
+    "real_postgres": "PENDING new Full GitHub CI",
+    "node": "Build attempted but local npm @types incomplete; application TypeScript sources unchanged"
+  },
+  "limitations": [
+    "no actual PostgreSQL instance available locally",
+    "operator supplies protected encrypted work filesystem; temporary plaintext can exist there for backup or restore",
+    "stream rekey plaintext exists in process memory only",
+    "not RPO/RTO, long-term keys, live K8s or production restore sign-off"
+  ],
+  "full_ci_on_new_code": false,
+  "new_gates_accepted": [],
+  "security_notes": [
+    "AES-256-GCM one-pass key rotation does not persist plaintext to disk",
+    "Integrated backup and restore temporarily write raw archives only within operator-provided private work directory; encrypted underlying filesystem required",
+    "No destructive restore into existing PostgreSQL schemas or nonempty asset directories",
+    "Full GitHub integration and independent production DR sign-off required"
+  ]
+}

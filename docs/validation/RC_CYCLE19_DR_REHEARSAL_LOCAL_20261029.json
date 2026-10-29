@@ -1,0 +1,35 @@
+{
+  "project": "Quorivio",
+  "version": "0.1.0-dev",
+  "cycle": 19,
+  "date": "2026-10-29",
+  "last_committed_sha": "244945b1c79c5a7b20e8f743bd5646e041bade00",
+  "last_verified_full_ci_run": 40855898307,
+  "formal_rc_score_before": 77,
+  "formal_rc_score_after": 77,
+  "global_delta_pp": 0,
+  "gates_total": 45,
+  "gates_accepted": 28,
+  "gates_partial": 17,
+  "strict_rc_ready": false,
+  "added_features": [
+    "authenticated protected DR rehearsal receipt and backup-age cutoff",
+    "guarded no-clobber atomic receipt with timed restore and post-restore threshold outcomes",
+    "conservative encrypted retention dry-run and explicit opt-in prune",
+    "disposable third PostgreSQL 18 CI recovery rehearsal and sanitized artifact"
+  ],
+  "source_verification": "832 grouped SHA-256 source files matched, Git index tracks exactly 833 including current manifest; final package SHA-256 check pending archive generation",
+  "test_results": {
+    "python": "1069/1069 PASS in full unittest discovery; observed local 47.519s",
+    "workflow_yaml": "PASS parsed via PyYAML",
+    "node_build": "not rerun; no TypeScript application changes and offline dependencies incomplete",
+    "postgres18_drill": "CI instrumented, requires fresh GitHub Full CI (not locally exercised)",
+    "new_dr_retention": "16 core tests passed (8 rehearsal + 8 retention) plus remaining RC tests in full suite",
+    "historical_manifest_regression": "corrected to distinguish immutable cycle18 receipt from current cycle19 source manifest"
+  },
+  "remaining": [
+    "No measured full production RPO/RTO",
+    "Independent restore/key custody/offsite/retention legal review",
+    "Fresh GitHub Full CI needed for new PostgreSQL scenario"
+  ]
+}

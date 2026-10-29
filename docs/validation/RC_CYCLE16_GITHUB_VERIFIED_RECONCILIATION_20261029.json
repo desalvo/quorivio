@@ -1,0 +1,88 @@
+{
+  "project": "Quorivio",
+  "version": "0.1.0-dev",
+  "date": "2026-10-29",
+  "baseline_package": "quorivio-0.1.0-dev-rc-native-browser-evidence-gate75-cumulative.zip",
+  "baseline_verified_commit": "244945b1c79c5a7b20e8f743bd5646e041bade00",
+  "github_full_ci": {
+    "run": 40855898307,
+    "result": "success",
+    "quality_job": 123386671138,
+    "native_browser_job": 123389289779,
+    "container_job": 123389289637,
+    "publisher": "skipped"
+  },
+  "verified_evidence": [
+    {
+      "gate": "A1-NATIVE-REACT-ENTRY",
+      "weight_from_parent": 2,
+      "run": 40855898307,
+      "job": 123389289779,
+      "details": "Firefox/WebKit full compiled React dashboard+editor preview opener, one modal, view toggle and close at 1440/390px; not editor canvas or pixel parity"
+    },
+    {
+      "gate": "A4-NATIVE-REACT-FOCUS",
+      "weight_from_parent": 1,
+      "run": 40855898307,
+      "job": 123389289779,
+      "details": "Firefox/WebKit full built React modal background inert/accessible and invoker focus restore, separate from isolated TypeScript modal and Chromium"
+    },
+    {
+      "gate": "C1-RECOVERY-UI",
+      "weight_from_parent": 1,
+      "run": 40855898307,
+      "job": 123386671138,
+      "details": "Compiled React Chromium 1440/390 fragment/legacy token hygiene, confirmation, retry and no storage; stubbed backend, not external SMTP approval"
+    }
+  ],
+  "score": {
+    "before": 75.0,
+    "after": 77.0,
+    "delta_pp": 2.0,
+    "total_weight": 100,
+    "gate_count": 45,
+    "accepted": 28,
+    "partial": 17,
+    "strict_rc_ready": false
+  },
+  "new_code_pending_ci": [
+    "PostgreSQL two-process WebSocket: detach participant socket and reconnect on opposite replica after committed vote; preserve privacy, idempotency, live page and closed state",
+    "Actual built React Firefox/WebKit: programmatic out-of-dialog focus probe and restoration of external portal inert after close",
+    "Immutable cycle-14 inventory and new cycle-16 current source inventory; no Git index vs package mismatch"
+  ],
+  "no_duplicate_credit": [
+    "B4-LOAD existing 500-participant load is not credited to B1",
+    "A3-NATIVE-STAGE CSS is not credited to A1",
+    "A4-NATIVE-MODAL TypeScript is not credited to A4-NATIVE-REACT-FOCUS",
+    "C1-RECOVERY API backend is not credited to C1-RECOVERY-UI"
+  ],
+  "limitations": [
+    "No installed npm modules in current offline container, so new TypeScript/Vite builds and full Node suites cannot be rerun here",
+    "No native Firefox/WebKit binaries locally; new full React focus probe needs next GitHub native CI",
+    "No disposable running PostgreSQL 18 and 2 API replicas locally; reconnect branch needs full GitHub CI",
+    "No physical iOS/Android devices or independent screen-reader / AGID / GDPR / pentest signoff"
+  ],
+  "release": "NOT READY; 17 partial gates remain pending real external/operational evidence",
+  "recommended_workflow_inputs": {
+    "browser_test": true,
+    "cross_browser_test": true,
+    "capacity_test": true,
+    "publish_image": false,
+    "publish_latest": false,
+    "rc_strict": false
+  },
+  "no_automatic_commit_push_tag_or_publish": true,
+  "local_verification": {
+    "python_all": "1016/1016 PASS, full local unittest discovery",
+    "python_targeted": "19 focused regression tests PASS (before final inventory)",
+    "workflow": "PyYAML parsed",
+    "sha256": "805 source hashes checked against actual source and staged Git index",
+    "zip": "806 members checked by current manifest",
+    "source_runtime": "Changed Python scripts compile via py_compile",
+    "limitations": [
+      "Workspace Node build and Node unit suites not rerun locally (npm offline dependency cache incomplete)",
+      "New React native focus probe and two-replica reconnect require GitHub execution",
+      "No independent screen-reader/physical device/operator approval"
+    ]
+  }
+}

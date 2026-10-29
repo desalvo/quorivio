@@ -2,9 +2,15 @@
 import json
 import unittest
 from pathlib import Path
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from verify_rc_cycle12_inventory import load_inventory as load_historical
 from verify_rc_cycle13_inventory import MANIFEST, load_inventory
-from verify_rc_cycle14_inventory import verify_source as verify_current_source, load_inventory as load_current
+from verify_rc_cycle14_inventory import load_inventory as load_cycle14
+from verify_rc_cycle16_inventory import load_inventory as load_cycle16
+from verify_rc_cycle18_inventory import load_inventory as load_cycle18
+from verify_rc_cycle19_inventory import load_inventory as load_cycle19
+from verify_rc_cycle21_inventory import verify_source as verify_current_source, load_inventory as load_current
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -16,6 +22,10 @@ class Ci4079Hotfix(unittest.TestCase):
         current = load_inventory()
         self.assertGreaterEqual(len(current), len(legacy))
         self.assertGreaterEqual(len(current),790)  # archived snapshot is intentionally immutable
+        self.assertEqual(len(load_cycle14()),800)  # immutable prior receipt
+        self.assertEqual(len(load_cycle16()),805)
+        self.assertEqual(len(load_cycle18()),823)  # immutable historical snapshot
+        self.assertEqual(len(load_cycle19()), 832)  # immutable cycle-19 evidence
         self.assertEqual(verify_current_source(),len(load_current()))
         doc = json.loads((ROOT / MANIFEST).read_text(encoding='utf-8'))
         self.assertEqual(doc['version'], '0.1.0-dev')

@@ -1,3 +1,88 @@
+# Quorivio 0.1.0-dev — ciclo RC 21: replica cifrata su volume montato (29 ottobre 2026)
+
+**Completamento formale RC: 77,0% invariato.** 45 gate (28 accettati, 17 parziali). Ultima Full CI GitHub verde 40855898307 sul commit `244945b1`; il nuovo sviluppo è locale e richiede un nuovo commit e CI. Il commit/push/tag e le immagini Docker restano a carico dell'utente.
+
+**Sviluppato:** nuovo comando `tools/backup_mirror.py push|verify` per replicare esclusivamente file `.qenc` cifrati su filesystem esplicitamente montato. Verifica dell'esistenza del mount (evita copie locali accidentali), permessi 0600/0700, autenticazione AES-256-GCM e manifest interno prima della pubblicazione, checksum SHA-256, ricevuta JSON privata e blocco delle sovrascritture. Nessuna chiave né archivio decifrato viene scritto sul mirror: la verifica usa soltanto lo spool cifrato 0700 indicato dall'operatore. Aggiunti test reali e nuova prova CI su PostgreSQL 18 con tmpfs montato e **quarto database** di ripristino indipendente per schema, righe e asset. Guida IT/EN `docs/DR_MOUNTED_ENCRYPTED_MIRROR.*`.
+
+**Non ancora chiuso:** nuova Full CI, prova su copia realmente offsite e indipendente, custodia delle chiavi, misurazione effettiva di RPO/RTO, collaudo dell'interruzione della connettività, approvazione operativa e legale. Un tmpfs locale di CI NON equivale a backup offsite. Nessun credito RC nuovo senza evidenze valide. Inventario ciclo 20 conservato come storico; nuovo inventario per il codice corrente.
+
+**Verifiche locali:** build TypeScript/Vite PASS; Node backend 474/474, frontend 65/65; 1.099 test Python PASS in quattro gruppi disgiunti (360+170+170+399), quindi 14/14 test mirror ripetuti dopo l'ultima protezione dei percorsi di chiavi/spool. La suite monolitica ha raggiunto il timeout locale, ma i gruppi separati sono verdi. Inventario Git/ZIP verificato per il ciclo 21.
+
+
+---
+
+# Quorivio 0.1.0-dev — ciclo RC 20: conservazione autenticata e blocchi legali (29 ottobre 2026)
+
+**RC formale: 77,0% invariato.** 45 gate, 28 accettati, 17 parziali. È stata chiusa una lacuna di sicurezza nel codice della retention, non un requisito operativo GDPR o un nuovo gate verificato esternamente. Ultima Full CI 40855898307, commit `244945b1c79c5a7b20e8f743bd5646e041bade00`. Il commit verrà fatto dall'utente; nessun push/tag/pubblicazione dell'assistente.
+
+**Implementato:** simulazione come comportamento predefinito. La cancellazione `--apply` ora RICHIEDE registro dei vincoli 0600, chiavi delle diverse generazioni, directory di lavoro protetta 0700 e conferma esplicita. **Tutti** gli archivi AES-256-GCM vengono autenticati insieme al manifest interno prima della prima cancellazione: copie recenti corrotte, chiavi mancanti, vincoli non validi e modifiche concorrenti bloccano l'operazione. Le copie sottoposte a vincolo non si contano nel minimo `min_keep` delle altre copie. Il test PostgreSQL 18 CI controlla ora archivi autentici con chiavi ruotate, vincoli e successiva cancellazione sorvegliata. Documentazione bilingue aggiornata. Nessuna cancellazione automatica attivata.
+
+**Verifiche locali: 1.081/1.081 test Python PASS, compresi convertitore HTTP, conservazione cifrata e inventari storici; corrispondenza SHA-256/Git/ZIP verificata durante il confezionamento.** Il collaudo con PostgreSQL 18 richiede una nuova Full CI. Restano i requisiti di approvazione D2/D6, i test operativi rappresentativi, RPO/RTO, copie offsite, custodia delle chiavi e controllo legale indipendente.
+
+---
+
+# Quorivio 0.1.0-dev — ciclo RC 19: collaudo DR e conservazione protetta (29 ottobre 2026)
+
+**RC formale invariata al 77,0%:** 45 gate, 28 accettati e 17 parziali. Ultima Full CI GitHub verde [40855898307](https://github.com/desalvo/quorivio/actions/runs/40855898307), commit `244945b1c79c5a7b20e8f743bd5646e041bade00`. Il nuovo codice locale non riceve punti RC fino alla prossima CI e alle approvazioni indipendenti. Nessun commit/push/tag/release automatico.
+
+**Sviluppi del ciclo:** il comando `secure_instance_backup.py drill` autentica l'archivio, verifica l'età rispetto alla soglia opzionale prima del ripristino, ripristina in DB/asset vuoti e pubblica in forma atomica una ricevuta JSON privata, senza credenziali, con durata tecnica ed esito delle soglie. Un eventuale superamento della soglia temporale non annulla i dati già ripristinati. `backup_retention.py` offre conservazione dei soli backup `.qenc`: simulazione predefinita, numero minimo di copie, consenso esplicito per la cancellazione, nessuna modifica alle chiavi. Nella CI verrà provato un **terzo DB PostgreSQL 18 temporaneo** con backup ruotato, parità dati/schema/asset e pubblicazione di ricevuta tecnica sanificata (7 giorni). Documenti bilingui: `docs/DR_REHEARSAL_AND_RETENTION.*.md`.
+
+**Limiti:** durante il restore i file temporanei in chiaro esistono solo nella directory privata cifrata specificata dall'operatore; la cancellazione non garantisce la cancellazione fisica degli SSD. Il comando di conservazione non è attivato automaticamente. Anzianità del backup ≠ RPO reale; durata del comando ≠ RTO completo. Restano aperti custodia chiavi, copie offsite, ripristino rappresentativo con cutover, vincoli legali di retention e approvazione operativa dei gate D2/D6.
+
+**Verifiche:** test mirati e sintassi della CI in locale; stato della suite completa e dell'inventario nel report `docs/validation/RC_CYCLE19_DR_REHEARSAL_LOCAL_20261029.json`. Nessuna nuova Full CI GitHub eseguita sul codice corrente. Nessuna modifica TypeScript applicativa.
+
+---
+
+# Quorivio 0.1.0-dev — Ciclo RC 18: disaster recovery cifrato integrato (29 ottobre 2026)
+
+**Avanzamento formale RC: 77,0%** (45 gate: 28 accettati, 17 parziali; controllo RC rigoroso ancora bloccato). Baseline committata `244945b1c79c5a7b20e8f743bd5646e041bade00`; ultima Full CI già verificata [40855898307](https://github.com/desalvo/quorivio/actions/runs/40855898307). Il nuovo codice è verificato localmente e richiederà una nuova Full CI dopo il commit dell'utente.
+
+**Completato:** il nuovo `tools/secure_instance_backup.py` unifica i comandi `backup`, `verify`, `rotate`, `restore` con directory temporanea privata obbligatoria e nessuna pubblicazione di archivi in chiaro. La rotazione AES-256-GCM funziona in streaming, senza scrivere temporaneamente il backup decifrato sul disco: con chiave sbagliata, alterazioni o mancata distinzione tra chiavi non viene pubblicato un nuovo archivio. La CI PostgreSQL 18 eseguirà anche un secondo ripristino su DB temporaneo indipendente, verificando schema, righe, file, fallimento con chiave sbagliata e pulizia dei file temporanei. Documentazione: `docs/DR_SECURE_WORKFLOW.it.md` e `.en.md`.
+
+**Verifiche:** test dedicati eseguiti; 1.048 test Python superati in tre gruppi separati (944 + 3 + 101); una esecuzione monolitica è andata in timeout nei test HTTP di conversione. Il manifest attuale e il confronto Git/ZIP sono verificati prima della consegna. Nessun file TypeScript applicativo modificato. La build locale non viene accreditata perché la copia offline delle dipendenze npm manca di alcune definizioni di tipo. Una CI verde e un collaudo DR operativo reale sono ancora richiesti per l'accettazione D2/D6.
+
+**Residuo:** Full CI PostgreSQL 18 sul nuovo codice, ripristino rappresentativo indipendente, RPO/RTO misurati, custodia esterna e rotazione chiavi, conservazione e conformità. Non vengono attribuiti punti RC sulla base dei soli test locali.
+
+---
+
+# Quorivio 0.1.0-dev — ciclo RC 17: 77,0%, 29 ottobre 2026
+
+**Completato localmente (nessun punto anticipato):** cifratura autenticata streaming AES-256-GCM degli archivi PostgreSQL/asset già esistenti, chiavi casuali private, pubblicazione atomica senza sovrascritture, rifiuto di chiavi errate e backup manomessi, rotazione delle chiavi e procedura operativa bilingue. La CI integra ora una prova di backup cifrato, rotazione e ripristino su PostgreSQL 18 effimero. Lo snapshot SHA-256 del ciclo 16 rimane immutabile; nuovo inventario del ciclo 17 da verificare. RPO/RTO reali, approvazione dell'operatore, gestione delle chiavi e revisioni GDPR (D2/D6) ancora aperti: **RC NON PRONTA**.
+
+**Baseline:** ultimo commit confermato `244945b1c79c5a7b20e8f743bd5646e041bade00`, Full CI 40855898307 verde. Il codice nuovo attende un'altra CI. Punteggio formale **77,0%, invariato** (45 gate, 28 accettati, 17 parziali). Vedi `docs/DR_ENCRYPTED_BACKUPS.it.md` e `docs/validation/RC_CYCLE17_ENCRYPTED_DR_LOCAL_20261029.json`.
+
+**Verifiche locali finali:** Python 1.031/1.031 PASS, contratti di sicurezza backup/cifratura/rotazione superati, YAML del workflow valido; la verifica dell’inventario Git/ZIP corrente avverrà dopo il confezionamento. Ripristino cifrato su PostgreSQL e nuova build Node da verificare nella successiva CI GitHub.
+
+**Integrità consegna:** PASS su 814 checksum sorgente, corrispondenza esatta dell’indice Git e 815 file del cumulativo.
+
+---
+
+# Quorivio 0.1.0-dev — RC ciclo 16: 77,0% (+2,0 punti), 29 ottobre 2026
+
+**Baseline confermata:** commit `244945b1c79c5a7b20e8f743bd5646e041bade00`, Full CI [40855898307](https://github.com/desalvo/quorivio/actions/runs/40855898307) tutta verde, con qualità `123386671138`, Firefox/WebKit `123389289779` e build container `123389289637`. Pubblicazione Docker saltata. Nessun commit/tag/push effettuato in questo ciclo.
+
+## Gate completati con prove già disponibili
+
+- **A1-NATIVE-REACT-ENTRY, peso 2:** il bundle React reale apre una sola anteprima da dashboard/editor e cambia modalità presentatore/partecipante su Firefox e WebKit (1440/390). Non duplica il test Chromium del canvas né la geometria CSS.
+- **A4-NATIVE-REACT-FOCUS, peso 1:** lo stesso bundle nei browser nativi verifica separatamente isolamento `inert` e restituzione del focus al comando che apre l'anteprima. Non duplica il modulo TypeScript isolato né Chromium.
+- **C1-RECOVERY-UI, peso 1:** Chromium sul React compilato verifica pulizia token negli URL legacy/frammento, conferma password, ritentativi e assenza di persistenza nel browser. Il backend simulato *non* è il test PostgreSQL/SMTP, già accettato separatamente.
+
+Sono stati trasferiti **4 punti di peso** dai rispettivi genitori ancora parziali ai tre sotto-gate accettati; la formula `accepted = peso`, `partial = peso/2` produce **75,0 → 77,0%**. Peso totale 100; **45 gate, 28 accettati, 17 parziali**. Non è una dichiarazione di RC pronta: l'approvazione indipendente rimane obbligatoria.
+
+## Nuovo codice (in attesa di una nuova CI)
+
+1. **Resilienza WebSocket PostgreSQL a due repliche:** dopo una risposta confermata, lo script E2E chiude volontariamente la connessione partecipante A e si riconnette su B; verifica stato attuale, nessuna statistica o presenza privata, idempotenza del voto, propagazione della chiusura attività e sessione sulla connessione ristabilita. Nessun punto RC anticipato.
+2. **Focus del React reale:** prova programmatica di focus fuori dal dialogo e ripristino completo degli elementi esterni, in Firefox/WebKit/Chromium. Richiede nuova CI native.
+3. **Inventari:** inventario ciclo 14 conservato storico, nuovo inventario SHA-256 ciclo 16 che verifica sorgenti e pacchetto, collegato alla CI e compatibile con GitLeaks/GitGuardian.
+
+**Bloccanti reali:** screen reader NVDA/VoiceOver/TalkBack, browser su dispositivi fisici, Fedeltà Office/PPTX e confronto visuale indipendente, SMTP/OAuth con provider reali, Podman rootless/ARM64/Kubernetes/RWX/ClamAV su infrastruttura reale, accettazioni GDPR/AGID/pentest e disaster recovery operativa. Non assegnare punti a questi requisiti senza prove.
+
+**Verifiche locali:** suite Python completa **1016/1016 PASS**, sintassi Python/YAML, corrispondenza Git/index e integrità ZIP/SHA-256 PASS. Il container offline non ha tutte le dipendenze npm, né PostgreSQL a due repliche o Firefox/WebKit; i nuovi script richiedono la successiva Full CI per essere validati in integrazione. Gli esiti locali saranno registrati nell'inventario/report; non vanno confusi con le prove GitHub già verdi.
+
+**Prossima CI consigliata:** `browser_test=true`, `cross_browser_test=true`, `capacity_test=true`, `publish_image=false`, `publish_latest=false`, `rc_strict=false`. Versione fissa `0.1.0-dev`; licenza EUPL-1.2. Documentazione dettagliata `docs/validation/RC_CYCLE16_GITHUB_VERIFIED_RECONCILIATION_20261029.json`.
+
+---
+
 # Quorivio 0.1.0-dev — ciclo RC 14: 75,0% (+1,0 punto), 29 ottobre 2026
 
 **Ultimo commit confermato:** `cf49c3e1d3e58d4ec4d65862a92b742348a11435`. CI standard `40846201940` e estesa `40847463104` **SUCCESS**. Il job Firefox/WebKit `123360950163` ha verificato sui due motori reali il dialogo TypeScript e la geometria CSS desktop/mobile. Accettati i sotto-gate A3-NATIVE-STAGE e A4-NATIVE-MODAL, conservando i requisiti indipendenti nei gate principali. 42 gate, 25 accettati e 17 parziali. RC rigorosa ancora bloccata.

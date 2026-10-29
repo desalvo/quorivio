@@ -19,11 +19,13 @@ class RCCi40709447219Hotfix(unittest.TestCase):
         pending=matrix['pending_local_batch']
         self.assertIs(pending['new_feature_promoted'],False)
         self.assertIs(pending['new_ci_required'],True)
-        self.assertEqual(pending['gates_promoted'],matrix['scoring_reconciliation_20261029_cycle14']['new_accepted_gates'])  # remote proof, not fresh code
+        self.assertEqual(matrix['scoring_reconciliation_20261029_cycle14']['new_accepted_gates'], ['A3-NATIVE-STAGE','A4-NATIVE-MODAL'])  # historical proof immutable
+        self.assertEqual(matrix['scoring_reconciliation_20261029_cycle16']['new_accepted_gates'], ['A1-NATIVE-REACT-ENTRY', 'A4-NATIVE-REACT-FOCUS', 'C1-RECOVERY-UI'])
+        self.assertEqual(pending['gates_promoted'], [])  # new cycle is not remotely verified
         self.assertFalse(pending['strict_rc_ready'])
         # Historical failure is an immutable receipt, not the newest run forever.
         self.assertEqual(matrix['ci_hotfix_40709447219_20261028']['failed_run'],40709447219)
-        self.assertIsInstance(pending['last_failed_run'],int)
+        self.assertIsInstance(matrix['previous_pending_local_batch_cycle17_20261029']['last_failed_run'], int)
 
     def test_zero_rc_credits_without_new_green_full_ci(self):
         matrix=json.loads((ROOT/'docs/RC_GATE_MATRIX.json').read_text())

@@ -26,3 +26,6 @@ Unavailable engines must fail closed, never silently fall back to Chromium. Afte
 - **D2/D3/D4/D5/D6:** real DR exercise and measured recovery objectives, encryption/key rotation, ARM64, rootless Podman, NGINX/HAProxy Kubernetes deployments, RWX/ClamAV failure recovery, external pentest, third-party Office conversion fidelity, bilingual editorial/manual acceptance, GDPR/AGID and legal/operator sign-off.
 
 Gate evidence must be linked and reviewed before editing statuses. Recompute `python3 tools/rc_gate_audit.py` and require `python3 tools/rc_release_preflight.py --strict` to pass before calling the RC ready.
+
+## Cycle 16 update — October 29, 2026
+GitHub run [40855898307](https://github.com/desalvo/quorivio/actions/runs/40855898307) also passes the **real built React bundle under Firefox/WebKit** (four engine/viewport cases), in addition to CSS/TypeScript. Bounded A1-NATIVE-REACT-ENTRY and A4-NATIVE-REACT-FOCUS subgates are accepted, while parent gates remain partial pending physical-device and independent review. Real Chromium React password-reset UI is independently bounded under C1-RECOVERY-UI; external SMTP and multi-replica recovery remain open. Newly added disconnect/reconnect WebSocket and external focus probes await fresh CI. No implicit independent signoff.

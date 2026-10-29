@@ -1,0 +1,13 @@
+# Quorivio disaster recovery — backup cifrati (procedura operativa)
+
+**Versione 0.1.0-dev; ciclo RC 17.** `tools/instance_backup.py` continua a creare e ripristinare archivi `tar.gz` verificati, ma **non esegue la cifratura automaticamente**. Prima di inviare il backup fuori dall'host, cifrarlo con `tools/backup_envelope.py`, che usa AES-256-GCM autenticato e una chiave casuale di 32 byte conservata in un file privato. Installare `cryptography>=43,<47` in un ambiente affidabile.
+
+Arrestare i processi che scrivono sul database e sugli asset. Impostare `umask 077`, creare una chiave con `python3 tools/backup_envelope.py keygen --key-file /secure/keys/chiave.key`, creare il backup con `python3 tools/instance_backup.py backup --assets /srv/quorivio/assets --output /private/backup.tar.gz`, quindi cifrare con `python3 tools/backup_envelope.py encrypt --key-file /secure/keys/chiave.key --input /private/backup.tar.gz --output /safe-offsite/backup.qenc`. Per ripristinare, eseguire `decrypt --key-file ... --input ... --output /private/ripristino.tar.gz`, verificare con `instance_backup.py verify --input ...` e usare `instance_backup.py restore` **solo** su database e directory asset vuoti, dopo conferma esplicita.
+
+Per la **rotazione**, creare una nuova chiave e utilizzare `python3 tools/backup_envelope.py rotate --old-key-file /secure/keys/chiave.key --new-key-file /secure/keys/chiave-nuova.key --input /safe-offsite/backup.qenc --output /safe-offsite/backup-ruotato.qenc`. L'archivio originale rimane disponibile: non viene sovrascritto. Conservare le chiavi separatamente dagli archivi, in un sistema di gestione dei segreti; prevedere una copia di recupero controllata. Se la chiave viene persa, il backup non è decifrabile. Evitare argomenti CLI contenenti chiavi e non conservare plaintext in cartelle condivise. La cancellazione sicura su SSD/COW non è garantita; usare uno storage temporaneo cifrato.
+
+**Limiti:** la prova CI usa PostgreSQL 18 effettivo su database effimero, ma non certifica RPO/RTO reali, ripristino su infrastruttura indipendente, custodia delle chiavi o audit di backup/GDPR. Questi requisiti restano parziali nei gate D2 e D6.
+
+## Procedura integrata per operatori (ciclo 18)
+
+Il nuovo [`secure_instance_backup.py`](../tools/secure_instance_backup.py) integra `backup`, `verify`, `rotate` e `restore`: consultare la [procedura operativa](DR_SECURE_WORKFLOW.it.md). La rotazione streaming non crea più archivi temporanei in chiaro. Il precedente backup in due fasi resta valido e intenzionalmente non cifrato fino al passaggio esplicito. Nessun collaudo DR di produzione è dichiarato concluso.

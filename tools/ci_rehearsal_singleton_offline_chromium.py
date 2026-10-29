@@ -94,7 +94,22 @@ async def main():
                 dlg=page.get_by_role('dialog',name='Anteprima interattiva della sessione')
                 await expect(dlg).to_be_visible()
                 await expect(dlg.locator('.rehearsal-pane')).to_have_count(2)
+                assert await dlg.get_attribute('aria-modal') == 'true'
                 assert await page.locator('.powerpoint-editor.editor-ux-v2 .editor-exit').evaluate('(node)=>!!node.closest("[inert]")')
+                # Test the full React portal (not just the standalone TS modal):
+                # an external script or assistive navigation cannot steal focus
+                # while the rehearsal is modal. Check the return path, too.
+                focused=await page.evaluate('''() => {
+                    const e=document.createElement('button');e.id='ci-external-focus';
+                    e.textContent='Outside focus probe';document.body.appendChild(e);
+                    e.focus();
+                    return document.activeElement?.id;
+                }''')
+                await page.wait_for_function('''() => {
+                    const dlg=document.querySelector('[role="dialog"][aria-modal="true"]');
+                    return dlg?.contains(document.activeElement);
+                }''')
+                assert focused != 'ci-external-focus', 'external programmatic focus escaped the React modal'
                 await dlg.get_by_role('button',name='Partecipante',exact=True).click()
                 await expect(dlg.locator('.rehearsal-pane')).to_have_count(1)
                 await dlg.get_by_role('button',name='Affiancate').click()
@@ -103,6 +118,8 @@ async def main():
                 await expect(overlay).to_have_count(0)
                 assert await invoker.evaluate('(node)=>document.activeElement===node'), 'Focus not returned to invoker'
                 assert not await editor.locator('.editor-exit').evaluate('(node)=>!!node.closest("[inert]")')
+                assert not await page.locator('#ci-external-focus').evaluate('node=>node.inert'), 'external portal remained inert on close'
+                await page.locator('#ci-external-focus').evaluate('node=>node.remove()')
                 assert not errors, errors
                 print(f'PASS offline built React {engine} {width}px: one accessible dual preview, inert background and restored focus')
                 await page.close()

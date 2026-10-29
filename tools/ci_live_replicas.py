@@ -106,17 +106,37 @@ async def main():
                                                'participant receives NEW post-vote snapshot')
             assert not audience.get('results') and not audience.get('totals'), 'unpublished results leaked after vote'
             assert 'connected_participants' not in audience and 'participants' not in audience, 'private presence leaked'
-            # Closing from B must propagate to the participant socket on A.
-            await api(admin, B, 'POST', f'/api/sessions/{sid}/activities/{aid}/close', {})
-            participant = await snapshot_matching(participant_ws,
-                                                  lambda d: d.get('session', {}).get('current_activity_id') is None,
-                                                  'B -> A activity close')
-            assert not participant.get('results') and not participant.get('totals'), participant
-            await api(admin, A, 'POST', f'/api/sessions/{sid}/status', {'status': 'closed'})
-            await snapshot_matching(presenter_ws,
-                                    lambda d: d.get('session', {}).get('status') == 'closed',
-                                    'cross-replica session close')
-    print('PASS PostgreSQL two-replica WebSocket: A->B opening, B->A response, privacy, closing')
+            # Simulate a real network drop after a committed response. The same
+            # cookie-bound participant must reconnect on the OTHER replica,
+            # receive the current page state immediately and never receive
+            # presenter-only totals. Reconnect must not create a second vote.
+            await participant_ws.close()
+            assert participant_ws.closed, 'initial participant socket did not close'
+            async with visitor.ws_connect(ws_url(B, sid), headers={**HEADERS, 'Origin': A}) as recovered_ws:
+                recovered = await snapshot_matching(recovered_ws,
+                    lambda d: d.get('session', {}).get('current_activity_id') == aid,
+                    'disconnected A -> reconnected B participant snapshot')
+                assert not recovered.get('results') and not recovered.get('totals'), 'reconnect leaked presenter results'
+                assert 'participants' not in recovered and 'connected_participants' not in recovered, 'reconnect leaked presence'
+                repeated_after_reconnect = await api(visitor, B, 'POST', f'/api/join/{code}/respond',
+                    {'activity_id': aid, 'option_id': 'yes'})
+                assert repeated_after_reconnect == {'ok': True, 'already_submitted': True}, repeated_after_reconnect
+                # Closing from B must propagate across replicas, including to
+                # a fresh socket that was opened only AFTER the committed vote.
+                await drain_pending_snapshots(recovered_ws)
+                await drain_pending_snapshots(presenter_ws)
+                await api(admin, A, 'POST', f'/api/sessions/{sid}/activities/{aid}/close', {})
+                participant = await snapshot_matching(recovered_ws,
+                    lambda d: d.get('session', {}).get('current_activity_id') is None,
+                    'A -> B activity close after reconnect')
+                assert not participant.get('results') and not participant.get('totals'), participant
+                await api(admin, A, 'POST', f'/api/sessions/{sid}/status', {'status': 'closed'})
+                await snapshot_matching(presenter_ws,
+                    lambda d: d.get('session', {}).get('status') == 'closed', 'cross-replica session close')
+                final = await snapshot_matching(recovered_ws,
+                    lambda d: d.get('session', {}).get('status') == 'closed', 'session close after reconnect')
+                assert not final.get('results') and not final.get('totals'), 'closed session leaked private results'
+    print('PASS PostgreSQL two-replica WebSocket: A->B opening, B->A response, reconnect on B, private state and closing')
 
 
 if __name__ == '__main__':

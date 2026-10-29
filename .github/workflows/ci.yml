@@ -369,10 +369,22 @@ jobs:
           QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
         run: python3 tools/ci_capacity_500.py
       - name: PostgreSQL 18 disaster recovery backup and restore acceptance
+        # Fail closed rather than silently skipping the authenticated encryption
+        # and key-rotation portion of the disposable restore test.
         env:
           DATABASE_URL: postgres://quorivio:ci-only-secret@127.0.0.1:5432/quorivio
           QUORIVIO_ASSET_DIR: /tmp/quorivio-ci-assets
-        run: python3 tools/ci_backup_restore.py
+        run: |
+          python3 -m pip install --disable-pip-version-check --break-system-packages 'cryptography>=43,<47'
+          python3 tools/ci_backup_restore.py
+      - name: Upload sanitized disposable DR rehearsal metrics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dr-rehearsal-ci-only
+          path: /tmp/quorivio-dr-rehearsal.json
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Stop disposable SMTP and remove captured OTPs
         if: always()
         run: |
@@ -415,7 +427,13 @@ jobs:
           python3 tools/verify_rc_cycle11_inventory.py --historical
           # Historical SHA-256 receipts remain immutable; only the newest
           # inventory must match the actual committed tree in this CI run.
-          python3 tools/verify_rc_cycle14_inventory.py
+          python3 tools/verify_rc_cycle14_inventory.py --historical
+          python3 tools/verify_rc_cycle16_inventory.py --historical
+          python3 tools/verify_rc_cycle17_inventory.py --historical
+          python3 tools/verify_rc_cycle18_inventory.py --historical
+          python3 tools/verify_rc_cycle19_inventory.py --historical
+          python3 tools/verify_rc_cycle20_inventory.py --historical
+          python3 tools/verify_rc_cycle21_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

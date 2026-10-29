@@ -30,3 +30,6 @@ In mancanza di uno dei browser il test **deve fallire**, mai ripiegare su Chromi
 ## Criterio di uscita
 
 Le nuove evidenze devono essere registrate nella matrice e nei report di validazione, con hash e URI della run o del documento di approvazione. Solo allora si ricalcola il punteggio con `python3 tools/rc_gate_audit.py`; il controllo `python3 tools/rc_release_preflight.py --strict` deve passare. Fino a quel momento la RC **non è pronta**.
+
+## Aggiornamento ciclo 16 — 29 ottobre 2026
+La run GitHub [40855898307](https://github.com/desalvo/quorivio/actions/runs/40855898307) passa anche sul **bundle React reale Firefox/WebKit** (quattro combinazioni motore/viewport), oltre al controllo CSS/TypeScript. I limitati sotto-gate A1-NATIVE-REACT-ENTRY e A4-NATIVE-REACT-FOCUS sono accettati, mentre il parent resta parziale per dispositivi e revisione indipendente. Il recupero password Chromium React ottiene un sotto-gate distinto C1-RECOVERY-UI; SMTP esterno e multi-replica restano aperti. Nuovo scenario WebSocket di disconnessione/riconnessione e probe fuori dialogo richiedono ancora CI. Nessuna approvazione manuale implicita.

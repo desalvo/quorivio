@@ -66,7 +66,7 @@ Caricamento, elenco, apertura autenticata ed eliminazione degli allegati e repor
 
 ### Manutenzione offline dell'istanza
 
-Per backup/verifica/ripristino PostgreSQL + asset utilizzare `tools/instance_backup.py` seguendo `docs/INSTANCE_BACKUP.it.md`. Il wizard Kubernetes permette di configurare il PVC degli asset con `asset_storage_size`, `asset_storage_class` e `asset_access_mode`. Non è ancora disponibile un workflow da interfaccia admin né una procedura di disaster recovery validata in produzione.
+Per backup/verifica/ripristino PostgreSQL + asset utilizzare `tools/instance_backup.py` seguendo `docs/INSTANCE_BACKUP.it.md`. Prima di esportare gli archivi, proteggerli con cifratura autenticata AES-256-GCM e rotazione delle chiavi secondo `docs/DR_ENCRYPTED_BACKUPS.it.md`; il `tar.gz` originale non è cifrato automaticamente. Il wizard Kubernetes permette di configurare il PVC degli asset con `asset_storage_size`, `asset_storage_class` e `asset_access_mode`. Non è ancora disponibile un workflow da interfaccia admin né una procedura di disaster recovery validata in produzione.
 
 Quiz e reazioni: [guida italiana](docs/QUIZ_REACTIONS.it.md).
 

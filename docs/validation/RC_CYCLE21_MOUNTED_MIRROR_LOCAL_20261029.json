@@ -1,0 +1,26 @@
+{
+  "project": "Quorivio 0.1.0-dev",
+  "cycle": 21,
+  "date": "2026-10-29",
+  "formal_rc_score_before": 77.0,
+  "formal_rc_score_after": 77.0,
+  "github_last_verified_full_ci_run": 40855898307,
+  "github_last_verified_commit": "244945b1c79c5a7b20e8f743bd5646e041bade00",
+  "new_github_ci_on_changes": "pending after maintainer commit",
+  "feature": "Mounted encrypted backup mirror with AES-GCM/manifest authenticated publication, mount loss rejection, private technical receipt and four-database CI DR integration",
+  "local_verification": {
+    "backup_mirror_unit": "14/14 PASS after final mount/key/workspace boundary change",
+    "node_backend": "474/474 PASS",
+    "node_frontend": "65/65 PASS",
+    "typescript_vite_build": "PASS (1601 frontend modules transformed)",
+    "python_full": "1099/1099 PASS in 4 disjoint chunks before final key/workspace boundary guard; affected mirror tests rerun 14/14 PASS",
+    "python_chunk_breakdown": "360 + 170 + 170 + 399 PASS",
+    "workflow_syntax": "PASS YAML parsed as four jobs",
+    "source_manifest_git_zip": "PASS: final cycle-21 844 SHA-256 source/Git tracked entries and 845-member ZIP; code and receipt sealed before packaging"
+  },
+  "limitations": [
+    "A local mounted tmpfs in CI is not an independent remote/offsite failure domain",
+    "New CI acceptance and independent production DR restore are not verified yet",
+    "No production RPO, RTO, legal sign-off or key custody acceptance claimed"
+  ]
+}

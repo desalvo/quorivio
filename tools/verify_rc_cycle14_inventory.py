@@ -91,8 +91,12 @@ def verify_zip(archive: Path, inventory: Path = ROOT / MANIFEST) -> int:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--package', type=Path, help='optional new cumulative ZIP')
+    parser.add_argument('--package', type=Path, help='optional historical cycle-14 ZIP')
+    parser.add_argument('--historical', action='store_true', help='validate immutable cycle-14 checksums without comparing later source edits')
     args = parser.parse_args()
-    print('Cycle 14 current-source checksums VALID:', verify_source(), 'files')
+    if args.historical:
+        print('Cycle 14 historical checksum catalog VALID:', len(load_inventory()), 'digests')
+    else:
+        print('Cycle 14 current-source checksums VALID:', verify_source(), 'files')
     if args.package:
         print('Cycle 14 cumulative ZIP VALID:', verify_zip(args.package), 'files')

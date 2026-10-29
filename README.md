@@ -103,7 +103,7 @@ Presenter-side upload, inventory, authenticated opening and removal plus aggrega
 
 ### Offline instance maintenance
 
-For PostgreSQL + private-asset backup/verify/restore use `tools/instance_backup.py`, following `docs/INSTANCE_BACKUP.en.md`. A Kubernetes asset PVC can be configured through `asset_storage_size`, `asset_storage_class`, and `asset_access_mode` in the standalone wizard. This is **not** yet an administrator UI workflow or production-validated disaster recovery process.
+For PostgreSQL + private-asset backup/verify/restore use `tools/instance_backup.py`, following `docs/INSTANCE_BACKUP.en.md`. Protect offsite copies using the authenticated AES-256-GCM envelope and key rotation described in `docs/DR_ENCRYPTED_BACKUPS.en.md`; the legacy `tar.gz` is not automatically encrypted. A Kubernetes asset PVC can be configured through `asset_storage_size`, `asset_storage_class`, and `asset_access_mode` in the standalone wizard. This is **not** yet an administrator UI workflow or production-validated disaster recovery process.
 
 Quiz and reactions: [English guide](docs/QUIZ_REACTIONS.en.md).
 
