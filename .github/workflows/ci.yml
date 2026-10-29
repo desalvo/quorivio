@@ -503,7 +503,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: {persist-credentials: false}
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
       - name: Build without publishing
         uses: docker/build-push-action@v6
         with:
@@ -585,7 +585,7 @@ jobs:
       - uses: actions/checkout@v4
         with: {persist-credentials: false}
       - uses: docker/setup-qemu-action@v3
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
       - name: Build AMD64 without publication
         uses: docker/build-push-action@v6
         with:
@@ -621,7 +621,7 @@ jobs:
         shell: bash
         run: test "$GITHUB_REPOSITORY" = 'desalvo/quorivio'
       - uses: docker/setup-qemu-action@v3
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
       - name: Resolve and validate manual publication labels
         id: label
         shell: bash
