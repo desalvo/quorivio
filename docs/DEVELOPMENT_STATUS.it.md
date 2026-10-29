@@ -1597,3 +1597,14 @@ Report: `docs/RC_LINKED_RESULTS_DUAL_PREVIEW_20261028.it.md`.
 **Verifiche:** checksum dei 740 file originali e dei 746 hash del vecchio package convalidati, compilazione TypeScript/Vite PASS, Node backend 474/474 PASS, Node frontend 58/58 PASS, Python RC mirati 24/24 PASS. Nuova suite Python completa **971/971 PASS**; il tentativo locale interrotto in precedenza non è conteggiato. Nessuna nuova Full CI remota né certificazione esterna Chromium/PostgreSQL multi-browser dopo questo hotfix.
 
 **RC:** 32 gate, 15 accettati, 17 parziali, **67,0% → 67,0% (+0,0 punti)**. RC non pronta. Report `docs/validation/RC_CI_40709447219_AND_GITGUARDIAN_HOTFIX_20261028.json`. Dopo commit dell'utente rilanciare workflow con `browser_test=true`, `publish_image=false`. Versione `0.1.0-dev` invariata, nessun push/tag/pubblicazione da parte dell'assistente.
+
+
+## 29/10/2026 — Correzione CI dopo il commit ee8f77b (standard ed estesa)
+
+**Verifica GitHub:** commit `ee8f77b640b0d8bafcf3f2f291488557cddcd011`, ultima baseline dichiarata dall'utente. Run standard `40796695726`, job `123194777341`: il passo denominato integrazione Kubernetes falliva in realtà per un solo test Python che cercava il log `docs/validation/RC_WIDGET_STYLE_LOCAL_BUILD_TESTS_20261027.log`, incluso nello ZIP ma ignorato dal Git per la regola `*.log`. Run estesa `40797106013`, job `123196122032`: test Chromium a 390 px del recupero password tramite frammento URL; il dialogo cookie appariva dopo il controllo di presenza e rendeva inaccessibile il messaggio di errore del modulo.
+
+**Correzioni:** eccezione esplicita in `.gitignore` per includere il log storico nel prossimo commit; inventario ciclo 12 conservato come snapshot immutabile e nuovo manifest ciclo 13 per la verifica dei file correnti e del relativo ZIP, con controllo dei file tracciati dal Git. Il test Chromium attende l'apertura reale del dialogo cookie, lo chiude e attende la sua rimozione prima dell'interazione con il form. Nessun bypass della sicurezza o del consenso cookie in produzione. Aggiunte regressioni automatiche.
+
+**RC:** **74,0% invariato**, 40 gate, 23 accettati e 17 parziali. I test locali non promuovono gate. Dopo il nuovo commit eseguire entrambe le CI; con `git add -A` assicurarsi che il log non precedentemente tracciato venga inserito. Restano da verificare Firefox/WebKit, i dispositivi reali, le tecnologie assistive e il gate RC rigoroso.
+
+**Evidenze locali finali:** compilazione TypeScript/Vite PASS; Node backend 474/474, frontend 65/65 PASS; Python completo 1005/1005 PASS; Chromium recupero password sul vero React 12/12 (tre ripetizioni, desktop/mobile e URL legacy/frammento); corrispondenza dell’indice Git e dell’inventario SHA-256 PASS. La nuova Full CI GitHub resta da verificare.

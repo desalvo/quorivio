@@ -413,8 +413,9 @@ jobs:
           python3 tools/verify_rc_cycle8_inventory.py
           python3 tools/verify_rc_cycle10_inventory.py
           python3 tools/verify_rc_cycle11_inventory.py --historical
-          # Cycle 11 remains a historical immutable snapshot; cycle 12 verifies current files.
-          python3 tools/verify_rc_cycle12_inventory.py
+          # Historical SHA-256 receipts remain immutable; only the newest
+          # inventory must match the actual committed tree in this CI run.
+          python3 tools/verify_rc_cycle13_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

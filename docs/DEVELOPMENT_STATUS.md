@@ -1767,3 +1767,14 @@ Detailed notes: `docs/RC_LINKED_RESULTS_DUAL_PREVIEW_20261028.en.md` and `.it.md
 **Verification:** real source ZIP (740 files) and original public-stage ZIP (746 recorded files) independently rechecked against the grouped checksums. TypeScript backend/frontend/Vite build PASS, Node backend 474/474 PASS, Node frontend 58/58 PASS, targeted RC Python 24/24 PASS. Fresh full Python suite **971/971 PASS**; prior interrupted local attempt is not counted. No fresh GitHub full CI or external security/browser acceptance occurred after this code correction.
 
 **RC readiness:** 32 gates, 15 accepted, 17 partial, **67.0% → 67.0% (+0.0 pp)**. Strict RC release remains blocked. Report: `docs/validation/RC_CI_40709447219_AND_GITGUARDIAN_HOTFIX_20261028.json`. User must commit and rerun GitHub Actions with `browser_test=true`, `publish_image=false` when ready. Do not publish Docker or change the version `0.1.0-dev`.
+
+
+## 2026-10-29 — CI hotfix after commit ee8f77b (standard and extended)
+
+**Verified upstream:** commit `ee8f77b640b0d8bafcf3f2f291488557cddcd011` is the latest maintainer-confirmed baseline. Standard run `40796695726`, job `123194777341`, failed in the step named Kubernetes wizard and worker integration tests, *actually* due to one Python check for `docs/validation/RC_WIDGET_STYLE_LOCAL_BUILD_TESTS_20261027.log`, which Git ignored (`*.log`) despite its presence in the earlier ZIP and checksum manifest. Extended run `40797106013`, job `123196122032`, failed in Chromium editor UI acceptance on the 390px fragment-link recovery test: an asynchronous cookie dialog remained open while the test asserted a hidden password-mismatch status.
+
+**Fixes:** `.gitignore` now explicitly permits the immutable validation log to be staged and committed; the cycle-12 inventory is preserved as historical evidence, and a cycle-13 manifest verifies the current tree/ZIP (and Git index when present). The real-React recovery browser test explicitly waits for the cookie modal to appear, dismisses it, and checks its removal before interacting with the reset form; no security guard, credential test, or production cookie consent was bypassed. Six new/incremental CI contracts cover packaging, history preservation, and browser synchronization.
+
+**RC:** remains **74.0%**, 40 gates, 23 accepted and 17 partial. No promotion from local-only evidence. Run both standard and extended CI after the next maintainer commit; include the previously omitted `.log` in `git add -A`. Firefox/WebKit, physical-device/assistive-tech acceptance, and strict RC gate remain pending.
+
+**Final local evidence:** TypeScript/Vite build PASS; Node backend 474/474, frontend 65/65 PASS; Python entire suite 1005/1005 PASS; real React Chromium recovery 12/12 (three full passes, both viewports and URL styles); current Git index and grouped SHA-256 inventory parity PASS. Next GitHub full CI remains unverified.

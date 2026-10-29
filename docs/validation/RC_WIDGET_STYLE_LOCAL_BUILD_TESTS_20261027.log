@@ -1,0 +1,74 @@
+### Production TypeScript/Vite build
+
+> quorivio@0.1.0-dev build
+> npm run build -w @quorivio/api && npm run build -w @quorivio/web
+
+
+> @quorivio/api@0.1.0-dev build
+> tsc -p tsconfig.json
+
+
+> @quorivio/web@0.1.0-dev build
+> tsc --noEmit && vite build
+
+vite v6.4.5 building for production...
+transforming...
+✓ 1594 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.41 kB │ gzip:   0.29 kB
+dist/assets/index-BocX17Z9.css   74.55 kB │ gzip:  15.27 kB
+dist/assets/index-BUFEhAuJ.js   454.22 kB │ gzip: 133.24 kB
+✓ built in 14.46s
+
+
+### Backend Node suite
+  type: 'test'
+  ...
+1..450
+# tests 450
+# suites 0
+# pass 450
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 7207.238341
+
+### Web Node suite
+  type: 'test'
+  ...
+1..23
+# tests 23
+# suites 0
+# pass 23
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 677.928689
+
+### Chromium isolated smoke
+
+
+ci_nested_context_css_chromium.py
+PASS nested canvas context CSS: desktop+mobile real pointer, open/click/close
+
+ci_accessible_disclosure_chromium.py
+PASS real Chromium: overlapping mobile/desktop contextual toolbar, accessible disclosure opens, closes popup and remains interactive
+
+ci_editor_save_locator_chromium.py
+PASS Chromium autosave-only editor: no redundant Save buttons, labelled sync state and contextual manual save desktop+touch fixture
+
+ci_editor_save_flow_chromium.py
+PASS Chromium autosave and editor Exit: responsive header, expanded accessible controls, desktop+mobile real clicks
+
+ci_editor_mock_layout_chromium.py
+PASS mock-fidelity editor: branded header, left thumbnails, responsive 16:9 canvas, right widget rail, Exit only; desktop and mobile Chromium
+
+ci_canvas_context_hit_target_chromium.py
+PASS Chromium fixed-header obscured canvas corner: actual background hit-target, right-click, contextual tools, close/reopen, desktop+touch viewport
+
+ci_widget_inspector_tooltip_chromium.py
+PASS editor floating tooltip and left-of-answer markers: {'width': 1440, 'height': 900}
+PASS editor floating tooltip and left-of-answer markers: {'width': 390, 'height': 844}

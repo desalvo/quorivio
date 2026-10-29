@@ -1,0 +1,49 @@
+"""CI failure regression contracts for 2026-10-29 (standard + extended)."""
+import json
+import unittest
+from pathlib import Path
+from verify_rc_cycle12_inventory import load_inventory as load_historical
+from verify_rc_cycle13_inventory import MANIFEST, load_inventory, verify_source
+
+ROOT = Path(__file__).resolve().parents[2]
+
+class Ci4079Hotfix(unittest.TestCase):
+    def test_historical_manifest_remains_immutable_and_current_is_new(self):
+        legacy = load_historical()
+        self.assertEqual(len(legacy), 790)
+        self.assertIn('docs/validation/RC_WIDGET_STYLE_LOCAL_BUILD_TESTS_20261027.log', legacy)
+        current = load_inventory()
+        self.assertGreaterEqual(len(current), len(legacy))
+        self.assertEqual(verify_source(), len(current))
+        doc = json.loads((ROOT / MANIFEST).read_text(encoding='utf-8'))
+        self.assertEqual(doc['version'], '0.1.0-dev')
+
+    def test_log_receipt_is_not_ignored_by_git(self):
+        ignore = (ROOT / '.gitignore').read_text(encoding='utf-8')
+        self.assertIn('*.log',ignore)
+        self.assertIn('!docs/validation/RC_WIDGET_STYLE_LOCAL_BUILD_TESTS_20261027.log',ignore)
+        self.assertTrue((ROOT/'docs/validation/RC_WIDGET_STYLE_LOCAL_BUILD_TESTS_20261027.log').is_file())
+
+    def test_cookie_modal_is_awaited_not_counted_before_reset_form(self):
+        fixture = (ROOT/'tools/ci_recovery_url_chromium.py').read_text(encoding='utf-8')
+        self.assertIn('await expect(cookie).to_be_visible(timeout=10000)',fixture)
+        self.assertIn('await expect(cookie).to_have_count(0)',fixture)
+        self.assertNotIn('if await cookie.count():',fixture)
+        self.assertLess(fixture.index('await expect(cookie).to_have_count(0)'),fixture.index("await page.get_by_label('Nuova password"))
+
+    def test_workflow_checks_new_manifest_and_keeps_security_gate(self):
+        workflow=(ROOT/'.github/workflows/ci.yml').read_text(encoding='utf-8')
+        self.assertIn('python3 tools/verify_rc_cycle13_inventory.py',workflow)
+        self.assertIn('gitleaks/gitleaks-action@v2',workflow)
+        self.assertIn('python3 tools/ci_recovery_url_chromium.py',workflow)
+        self.assertLess(workflow.index('Verify grouped SHA-256 evidence inventory'),workflow.index('Detect credential leaks'))
+
+    def test_no_unverified_promotion(self):
+        matrix=json.loads((ROOT/'docs/RC_GATE_MATRIX.json').read_text(encoding='utf-8'))
+        self.assertEqual(len(matrix['gates']),40)
+        self.assertEqual(sum(g['weight'] for g in matrix['gates']),100)
+        self.assertEqual(sum(g['weight']*(1 if g['status']=='accepted' else .5 if g['status']=='partial' else 0) for g in matrix['gates']),74)
+        self.assertEqual(matrix['ci_failure_hotfix_20261029']['rc_delta_pp'],0)
+        self.assertFalse(matrix['ci_failure_hotfix_20261029']['github_full_ci_green_on_hotfix'])
+
+if __name__ == '__main__': unittest.main()

@@ -3,6 +3,8 @@ dist/
 .env
 coverage/
 *.log
+# This immutable RC acceptance receipt is packaged and verified in the committed manifest.
+!docs/validation/RC_WIDGET_STYLE_LOCAL_BUILD_TESTS_20261027.log
 .DS_Store
 
 # Python generated caches and local tooling artifacts

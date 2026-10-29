@@ -440,11 +440,11 @@
   },
   "pending_local_batch": {
     "date": "2026-10-29",
-    "description": "Cycle 11: one-time password reset links moved to URL fragments (legacy query links still consumable), real PostgreSQL/SMTPS fixture validates fragment-only delivery, modal programmatic focus containment, immutable previous snapshot checksum validation; no new GitHub CI on uncommitted source.; native Firefox/WebKit opt-in acceptance harness, keyboard-rich-text and empty-dialog focus hardening (new CI pending)",
-    "last_maintainer_confirmed_commit": "ac4b4e23c90afe44b3fa8d2deb0177222af8f16c",
-    "observed_main_sha": "f6738592c648bc620e01b92d2bbaa6b90b459287",
-    "last_failed_run": 40709447219,
-    "last_failed_step": "Kubernetes wizard and worker integration tests: 5 Python unittest errors (missing compatibility keys in pending_local_batch)",
+    "description": "Cycle 13 CI hotfix after user-confirmed commit ee8f77b: restore tracked acceptance log in Git, version current SHA-256 inventory and stabilize real React recovery cookie dialog acceptance; no gate promotion without new GitHub CI",
+    "last_maintainer_confirmed_commit": "ee8f77b640b0d8bafcf3f2f291488557cddcd011",
+    "observed_main_sha": "ee8f77b640b0d8bafcf3f2f291488557cddcd011",
+    "last_failed_run": 40797106013,
+    "last_failed_step": "Chromium editor UI acceptance: recovery mismatch assertion hidden behind pending cookie dialog",
     "local_evidence": {
       "build": "PASS backend TypeScript and frontend TypeScript/Vite on local source",
       "recovery_unit": "4/4 PASS",
@@ -461,10 +461,11 @@
       "cycle11_chromium_modal": "4/4 focus + dynamic portal desktop/mobile, PASS",
       "cycle11_postgres_smtps_new": "PENDING: real PostgreSQL 18 + SMTP loopback CI must validate new fragment-only links",
       "cycle11_latest_verified_full_ci": "40717525524 attempt 2, commit f6738592 (historical source only)",
-      "rc_cycle12_chromium": "PASS locally 1440/390: native Chromium modal/geometry/reading checks and built React singleton; Firefox/WebKit still NOT installed or tested"
+      "rc_cycle12_chromium": "PASS locally 1440/390: native Chromium modal/geometry/reading checks and built React singleton; Firefox/WebKit still NOT installed or tested",
+      "cycle13_hotfix": "LOCAL PASS: build, backend 474, frontend 65, full Python 1005, Chromium recovery 12/12, Git index/manifest 795 files. New standard and full extended CI still pending."
     },
     "blocked": {
-      "github_full_ci_new_source": "Not committed; latest already-green GitHub run 40717525524 proves ONLY bounded historical subgates. New UI changes require independent new Full CI.",
+      "github_full_ci_new_source": "Both user-committed CI runs 40796695726 and 40797106013 FAILED; fixes pending new commit and CI.",
       "independent_recovery_browser_provider": "Not yet verified by live providers/physical device",
       "external_acceptance": "Firefox/WebKit, AGID, GDPR, operator, multi-replica production",
       "github_new_full_ci": "The revised recovery form and new gate contracts are not yet tested by a fresh GitHub run. Run 40717525524 is historical proof only.",
@@ -785,5 +786,24 @@
     "local_chromium_status": "PASS native Chromium 1440/390 modal, public stage and real built React preview",
     "remaining": "All 17 partial gates require bounded test evidence and independent sign-offs; no promotion in this local uncommitted cycle",
     "rc_ready": false
+  },
+  "ci_failure_hotfix_20261029": {
+    "baseline_commit": "ee8f77b640b0d8bafcf3f2f291488557cddcd011",
+    "failed_standard_run": 40796695726,
+    "failed_extended_run": 40797106013,
+    "root_causes": [
+      "Ignored .log file referenced by previous current-source inventory",
+      "Race in Chromium recovery fixture: cookie modal mounted after early count() check"
+    ],
+    "fixes": [
+      "Track immutable .log explicitly and introduce cycle13 current-tree manifest",
+      "Wait for cookie dialog opening and closing before reset form access"
+    ],
+    "rc_before": 74,
+    "rc_after": 74,
+    "rc_delta_pp": 0,
+    "github_full_ci_green_on_hotfix": false,
+    "pending": "New standard and extended GitHub CI; native Firefox/WebKit and independent acceptance outstanding",
+    "source_report": "docs/validation/RC_CI_40796695726_40797106013_HOTFIX_20261029.json"
   }
 }

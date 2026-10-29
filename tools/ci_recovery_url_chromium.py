@@ -58,9 +58,15 @@ async def run_browser(js,css):
                     await page.evaluate(API)
                     await page.add_style_tag(content=css.read_text(encoding='utf8'))
                     await page.add_script_tag(content=js.read_text(encoding='utf8'),type='module')
+                    # React mounts the cookie dialog asynchronously. count() here
+                    # races with the mount: on slow/mobile runners the dialog
+                    # appears *after* the form is filled, leaving the form inert
+                    # and its aria-live mismatch status inaccessible. Await the
+                    # real modal and dismiss it before any form interaction.
                     cookie=page.get_by_role('dialog',name='Informativa cookie funzionali')
-                    if await cookie.count():
-                        await cookie.get_by_role('button',name='Ho capito').click()
+                    await expect(cookie).to_be_visible(timeout=10000)
+                    await cookie.get_by_role('button',name='Ho capito').click()
+                    await expect(cookie).to_have_count(0)
                     # Real React consumes token on mount, removing it from address.
                     await expect(page.get_by_role('heading',name='Recupero password / Password reset')).to_be_visible()
                     assert await page.evaluate('location.search')=='?lang=it'
@@ -72,7 +78,7 @@ async def run_browser(js,css):
                     confirm=page.get_by_role('button',name='Conferma / Confirm')
                     await expect(confirm).to_be_disabled()
                     await page.get_by_label('Conferma nuova password / Confirm new password').fill('fixture-only-wrong-password-999')
-                    await expect(page.get_by_role('status',name='')).to_contain_text('Password')
+                    await expect(page.locator('form[aria-labelledby="reset-password-title"] [role="status"]')).to_contain_text('Password')
                     await expect(confirm).to_be_disabled()
                     assert not await page.evaluate('window.confirmCalls.length'),'mismatch must never submit'
                     await page.get_by_label('Conferma nuova password / Confirm new password').fill('fixture-only-new-password-123')

@@ -21,7 +21,9 @@ class RCCi40709447219Hotfix(unittest.TestCase):
         self.assertIs(pending['new_ci_required'],True)
         self.assertFalse(pending['gates_promoted'])
         self.assertFalse(pending['strict_rc_ready'])
-        self.assertEqual(pending['last_failed_run'],40709447219)
+        # Historical failure is an immutable receipt, not the newest run forever.
+        self.assertEqual(matrix['ci_hotfix_40709447219_20261028']['failed_run'],40709447219)
+        self.assertIsInstance(pending['last_failed_run'],int)
 
     def test_zero_rc_credits_without_new_green_full_ci(self):
         matrix=json.loads((ROOT/'docs/RC_GATE_MATRIX.json').read_text())
