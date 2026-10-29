@@ -505,14 +505,14 @@ jobs:
         with: {persist-credentials: false}
       - uses: docker/setup-buildx-action@v3
       - name: Build without publishing
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           push: false
           load: true
           tags: quorivio:gate
       - name: Build dedicated document converter image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: Dockerfile.converter
@@ -587,7 +587,7 @@ jobs:
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
       - name: Build AMD64 without publication
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           platforms: linux/amd64
@@ -597,7 +597,7 @@ jobs:
       - name: Execute AMD64 non-root runtime against PostgreSQL 18
         run: bash tools/ci_oci_runtime_smoke.sh quorivio:ci-oci-amd64 amd64
       - name: Build ARM64 under QEMU without publication
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           platforms: linux/arm64
@@ -636,7 +636,7 @@ jobs:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Publish approved image to Docker Hub
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           platforms: linux/amd64,linux/arm64
