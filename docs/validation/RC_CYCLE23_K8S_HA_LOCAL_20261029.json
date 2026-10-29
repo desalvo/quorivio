@@ -1,0 +1,50 @@
+{
+  "date": "2026-10-29",
+  "cycle": 23,
+  "version": "0.1.0-dev",
+  "last_confirmed_commit": "caf6331f15ccf39c218791503b8c6d0ca3503dce",
+  "score_before": 79,
+  "score_after": 79,
+  "gate_count": 47,
+  "accepted": 30,
+  "partial": 17,
+  "implemented": [
+    "Kubernetes rollingUpdate maxUnavailable 0 and maxSurge 1; PDB minAvailable=N-1 for N>=2; nonblocking hostname topology spread",
+    "Automatic removal of stale PDB when scaling to one pod",
+    "Credential overrides and Kubernetes secrets written using atomic rename, 0600 permissions, and symlink rejection",
+    "Numerically typed --set CLI overrides for replicas, upload limit and ports",
+    "API readiness=503 while draining; service-restart WebSocket 1012 on SIGTERM/SIGINT; bounded server shutdown",
+    "New PostgreSQL-backed disposable replica SIGTERM integration test added to standard/extended quality gate",
+    "New manual-only KIND API-server schema acceptance for four ingress/TLS/database/replica variations"
+  ],
+  "local_evidence": {
+    "build": "PASS",
+    "node_backend": 474,
+    "node_frontend": 65,
+    "kubernetes_ha_unit_cases": 13,
+    "python_full": "1122 cases PASS in 4 isolated groups after documentation header correction (retest scheduled)",
+    "yaml_parser": "PASS",
+    "sha256_git_parity": "860 files before report finalization; final inventory regenerated after edits",
+    "kind_api_server": "NOT RUN; kubectl/KIND unavailable locally",
+    "postgres_sigterm_integration": "NOT RUN locally; GitHub CI pending"
+  },
+  "not_verified": [
+    "real KIND API test",
+    "real PostgreSQL rolling SIGTERM",
+    "physical Kubernetes RWX/ingress/ClamAV",
+    "production load/SLO",
+    "rootless Podman and native ARM64"
+  ],
+  "promotion_delta": 0,
+  "strict_rc_ready": false,
+  "new_ci_parameters": {
+    "kubernetes_manifest_test": true,
+    "runtime_arch_test": true,
+    "browser_test": true,
+    "cross_browser_test": true,
+    "capacity_test": true,
+    "publish_image": false,
+    "publish_latest": false,
+    "rc_strict": false
+  }
+}

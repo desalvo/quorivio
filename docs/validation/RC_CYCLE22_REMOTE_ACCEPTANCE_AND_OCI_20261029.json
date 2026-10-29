@@ -1,0 +1,54 @@
+{
+  "version": "0.1.0-dev",
+  "cycle": 22,
+  "date": "2026-10-29",
+  "verified_remote_commit": "caf6331f15ccf39c218791503b8c6d0ca3503dce",
+  "standard_ci": {
+    "run_id": 40917736867,
+    "quality_job_id": 123602360060,
+    "container_job_id": 123603870557,
+    "result": "success"
+  },
+  "extended_ci": {
+    "run_id": 40918620911,
+    "quality_job_id": 123605484902,
+    "browser_job_id": 123608606057,
+    "container_job_id": 123608606172,
+    "result": "success",
+    "publication": "skipped"
+  },
+  "remote_scopes": {
+    "B1-RECONNECT": "True participant reconnect A to B under PostgreSQL 18 with privacy & closure",
+    "D2-ENCRYPTED-DR": "AES-256-GCM, rotated keys, guarded recovery, authenticated mirror with restore, legal holds on disposable PostgreSQL 18"
+  },
+  "score_before": 77.0,
+  "score_after": 79.0,
+  "new_accepted_gates": [
+    "B1-RECONNECT",
+    "D2-ENCRYPTED-DR"
+  ],
+  "gate_count": 47,
+  "accepted_gate_count": 30,
+  "partially_accepted_gates": 17,
+  "new_local_unverified_capability": "Opt-in AMD64 and emulated ARM64 OCI runtime startup with disposable PostgreSQL 18",
+  "not_verified": [
+    "Physical offsite backup / production RPO and RTO",
+    "Host rootless Podman, native ARM64 hardware, multi-node Kubernetes HA",
+    "external legal, accessibility and security signoffs"
+  ],
+  "local_validation": {
+    "typescript_vite_build": "pass",
+    "backend_node": 474,
+    "frontend_node": 65,
+    "python_test_ranges": [
+      330,
+      350,
+      250,
+      175
+    ],
+    "python_total_passed": 1105,
+    "yaml": "parsed",
+    "new_oci_runtime_test": "not executed; no local Docker engine",
+    "source_git_zip": "must match cycle22 manifest"
+  }
+}

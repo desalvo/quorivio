@@ -1,0 +1,9 @@
+# OCI runtime acceptance — optional AMD64/ARM64 smoke
+
+Cycle 22, Quorivio 0.1.0-dev. `workflow_dispatch` input **`runtime_arch_test=true`** triggers an independent CI job. It builds the runtime container image twice with Docker Buildx, **without publishing**, for `linux/amd64` and `linux/arm64`. QEMU runs the ARM64 image on an x86_64 GitHub runner; this is *not* native ARM64 hardware acceptance.
+
+For each architecture, `tools/ci_oci_runtime_smoke.sh` runs the built image (not just inspects the manifest), asserts `process.arch`, a non-root UID and the presence of compiled API and web assets, confirms npm is absent from the production image, then starts a separate disposable PostgreSQL 18 container on an internal Docker network. The Quorivio API must boot, remain alive and respond on `/api/health/ready`, `/api/health/live` and `/` with real HTML. Requests are made from inside the application container, without publishing an external port. PostgreSQL and the app are removed on success and failure. Credentials are CI-only and never printed by this script.
+
+This **must run successfully on GitHub** before any architecture-specific RC credit can be considered. It does not test rootless Podman, native ARM64 devices, Kubernetes scheduling, NGINX/HAProxy ingress, actual RWX storage, ClamAV failover, network partition or an operator deployment. All of these remain open under D3. The CI job uses nonroot user *inside Docker*; this is different from *rootless Podman on the host*.
+
+After committing, manually dispatch CI with `runtime_arch_test=true`, `browser_test=true`, `cross_browser_test=true`, `capacity_test=true` and all publication inputs false. Attach the successful job URL and its SHA to the external acceptance ledger. The normal push CI is unchanged: this job is opt-in and cannot publish an image.

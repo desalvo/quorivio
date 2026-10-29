@@ -1,3 +1,35 @@
+## Quorivio 0.1.0-dev — ciclo RC 24 — 29 ottobre 2026: avvio reale KIND temporaneo e protezione dei percorsi
+
+**Verifiche locali completate:** build TypeScript/Vite PASS; Node backend 474/474, frontend 65/65; suite Python completa 1.140/1.140 PASS, inclusi 14 nuovi test e 4 contratti RC. YAML CI valido. Il nuovo job KIND necessita ancora di una CI GitHub verde. Inventario del ciclo 24 pronto per verificare sorgenti, indice Git e ZIP.
+
+**Baseline GitHub:** `caf6331f15ccf39c218791503b8c6d0ca3503dce` (Full CI `40918620911` verde). **RC formale: 79,0% invariato**, 47 gate (30 accettati, 17 parziali). RC rigorosa non pronta. Nessun commit/push/tag/pubblicazione automatica.
+
+**Realizzato:** il wizard Kubernetes ora rifiuta directory di output simboliche, antenati simbolici e percorsi non-directory. Nuovo job opzionale `kubernetes_runtime_test` per avviare l'immagine reale su un KIND mono-nodo con PostgreSQL 18, due pod API e volume `hostPath` RWX **esclusivamente CI**. Verifica endpoint HTTP ClusterIP, condivisione asset, sopravvivenza del pod rimasto e ripristino delle due repliche dopo cancellazione di un pod. Job distinto dalla verifica degli schemi Kubernetes e dal runtime Docker/QEMU. L'hostPath mono-nodo non è RWX CSI multi-nodo e non certifica ingress, TLS, Podman o HA di produzione.
+
+**In attesa:** il nuovo job runtime non è ancora stato eseguito su GitHub; nell'ambiente locale non sono presenti Docker/KIND. Pertanto non si accreditano punti ai gate B1 e D3. Riferimenti: manuali KIND IT/EN, report del ciclo 24 e nuovo inventario di integrità. Eseguire successivamente la Full CI con i job opzionali abilitati e pubblicazione disattivata.
+
+---
+
+## Quorivio 0.1.0-dev — Ciclo RC 23 — 29 ottobre 2026: sicurezza wizard e disponibilità Kubernetes
+
+**Baseline GitHub:** `caf6331f15ccf39c218791503b8c6d0ca3503dce`, Full CI verde `40918620911`. **Punteggio RC:** 79,0% invariato; 47 gate, 30 accettati e 17 parziali; strict RC non pronta. Nessun nuovo credito da test locali.
+
+**Interventi:** scrittura atomica con protezione symlink dei file segreti e permessi `0600`; `--set` numerici corretti; Deployment con maxUnavailable 0/maxSurge 1, PDB per repliche multiple, distribuzione preferenziale dei pod; arresto SIGTERM con readiness 503 e WebSocket 1012; nuovo test PostgreSQL reale della terminazione di una replica; job opzionale KIND per validare i manifest su API Kubernetes senza applicazione in produzione.
+
+**Verifiche:** build TypeScript/Vite PASS, backend Node 474/474 e frontend Node 65/65 PASS; 13 test mirati K8s PASS. Suite Python 1122/1122 PASS in quattro gruppi separati; nessuna nuova CI GitHub ancora verificata. Il test KIND e quello PostgreSQL del nuovo ciclo richiedono GitHub CI.
+
+**Rimanenti:** ARM64 nativo, Podman rootless, Kubernetes/ingress/RWX/ClamAV su ambiente reale, failover e SLO con collaudo indipendente, provider esterni, lettori schermo e revisione GDPR/AGID.
+
+# Quorivio 0.1.0-dev — ciclo RC 22: 79% verificato e test runtime multiarchitettura opzionale (29 ottobre 2026)
+
+**RC formale 79,0% (+2,0 punti), 47 gate (30 accettati / 17 parziali).** Commit confermato `caf6331f15ccf39c218791503b8c6d0ca3503dce`; CI standard 40917736867 verde, Full CI 40918620911 verde (qualità, container, Firefox/WebKit, nessuna pubblicazione). I nuovi ambiti B1-RECONNECT e D2-ENCRYPTED-DR derivano da prove tecniche distinte e già superate nel job 123605484902; non chiudono B1/D2 che richiedono collaudi di produzione e approvazione indipendente.
+
+**Nuovo codice non committato:** job opzionale che costruisce ed esegue immagini Docker AMD64 e ARM64 emulate con QEMU, PostgreSQL 18 e endpoint HTTP. Questo percorso **non è stato verificato su GitHub** e non comporta punti RC; non certifica hardware ARM64, Podman rootless né Kubernetes. Consultare `docs/OCI_MULTIARCH_RUNTIME_ACCEPTANCE.it.md`. RC rigorosa non pronta. Nessun commit/push/tag o immagine pubblicata dall'assistente.
+
+**Validazione locale:** build TypeScript/Vite PASS, Node backend 474/474 e frontend 65/65 PASS; tutti i 1.105 test Python superati in quattro gruppi distinti (330 + 350 + 250 + 175). Gli hash dei sorgenti, l’indice Git e lo ZIP cumulativo sono verificati. Docker non è disponibile localmente: il nuovo test OCI non è ancora stato eseguito.
+
+---
+
 # Quorivio 0.1.0-dev — ciclo RC 21: replica cifrata su volume montato (29 ottobre 2026)
 
 **Completamento formale RC: 77,0% invariato.** 45 gate (28 accettati, 17 parziali). Ultima Full CI GitHub verde 40855898307 sul commit `244945b1`; il nuovo sviluppo è locale e richiede un nuovo commit e CI. Il commit/push/tag e le immagini Docker restano a carico dell'utente.

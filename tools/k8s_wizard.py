@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Standalone, deterministic, idempotent Quorivio Kubernetes Kustomize generator (stdlib)."""
-import argparse, json, re, sys, os, secrets, base64, urllib.parse
+import argparse, json, re, sys, os, secrets, base64, urllib.parse, tempfile
 from pathlib import Path
 
 DEFAULTS = {'namespace':'quorivio','name':'quorivio','image':'desalvo/quorivio:latest','host':'quorivio.example.org','replicas':1,'max_upload_mb':100,'container_port':8080,'postgres_mode':'internal','postgres_image':'postgres:18.6-alpine','postgres_host':'postgresql','postgres_port':5432,'postgres_sslmode':'require','ingress_controller':'nginx','haproxy_variant':'community','ingress_class':'','postgres_host':'postgresql','postgres_database':'quorivio','postgres_user':'quorivio','secret_name':'quorivio-app-secrets','tls_secret':'','tls_termination':True,'app_node_selector':'','postgres_node_selector':'','admin_email':'admin@example.org','admin_password':'','auth_secret':'','postgres_password':'','storage_class':'','asset_storage_class':'','asset_storage_size':'10Gi','asset_access_mode':'ReadWriteOnce','cpu_request':'100m','memory_request':'256Mi','cpu_limit':'1000m','memory_limit':'1Gi'}
@@ -24,11 +24,14 @@ def validate(cfg):
     if cfg['haproxy_variant'] not in ('community','haproxytech'):raise ValueError('Invalid haproxy_variant')
     if cfg['postgres_sslmode'] not in ('require','verify-full','verify-ca','disable'):raise ValueError('Invalid sslmode')
     if cfg['postgres_mode']=='external' and (cfg['postgres_host']=='postgresql' or cfg['postgres_sslmode']=='disable'):raise ValueError('External PostgreSQL requires dedicated host and TLS')
-    if not 1<=int(cfg['postgres_port'])<=65535:raise ValueError('Invalid postgres_port')
-    if not isinstance(cfg['max_upload_mb'],int) or not 1<=cfg['max_upload_mb']<=1024:raise ValueError('max_upload_mb must be 1..1024')
-    if int(cfg['replicas']) > 1 and cfg['asset_access_mode'] != 'ReadWriteMany':raise ValueError('Multiple API replicas require ReadWriteMany asset storage')
-    if int(cfg['replicas'])<1 or int(cfg['replicas'])>20:raise ValueError('replicas must be 1-20')
-    if not 1<=int(cfg['container_port'])<=65535:raise ValueError('Invalid port')
+    if type(cfg['postgres_port']) is not int or not 1<=cfg['postgres_port']<=65535:raise ValueError('Invalid postgres_port')
+    if type(cfg['max_upload_mb']) is not int or not 1<=cfg['max_upload_mb']<=1024:raise ValueError('max_upload_mb must be 1..1024')
+    if type(cfg['replicas']) is not int or not 1 <= cfg['replicas'] <= 20: raise ValueError('replicas must be 1-20')
+    if type(cfg['container_port']) is not int or not 1 <= cfg['container_port'] <= 65535: raise ValueError('Invalid port')
+    if type(cfg['postgres_port']) is not int or not 1 <= cfg['postgres_port'] <= 65535: raise ValueError('Invalid postgres_port')
+    if cfg['replicas'] > 1 and cfg['asset_access_mode'] != 'ReadWriteMany':raise ValueError('Multiple API replicas require ReadWriteMany asset storage')
+
+
     if not isinstance(cfg['tls_termination'],bool): raise ValueError('tls_termination must be true or false')
     for key in ('app_node_selector','postgres_node_selector'):
         parse_node_selector(cfg[key])
@@ -64,18 +67,38 @@ def selector_yaml(value,indent=6):
     pad=' '*indent
     return pad+'nodeSelector:\n'+''.join(pad+'  '+quote(k)+': '+quote(v)+'\n' for k,v in labels.items())
 
-def secure_write(path, content):
-    fd=os.open(str(path),os.O_WRONLY|os.O_CREAT|os.O_TRUNC,0o600)
+def checked_file(path):
+    """Never read a symlinked credential receipt or a nonregular file."""
+    import stat
+    if path.is_symlink(): raise ValueError('Refusing symlink in generated output')
+    if path.exists() and not stat.S_ISREG(path.lstat().st_mode):
+        raise ValueError('Refusing non-file generated output')
+
+
+def secure_write(path, content, private=True):
+    """Atomically replace a manifest without following existing symlinks.
+
+    Never truncate an existing secret: a crash leaves the previous complete
+    credentials or the new complete credentials, not a partial YAML/JSON.
+    """
+    checked_file(path)
+    mode = 0o600 if private else 0o644
+    descriptor, temporary = tempfile.mkstemp(prefix='.quorivio-atomic-', dir=str(path.parent))
     try:
-        os.fchmod(fd,0o600)
-        with os.fdopen(fd,'w',encoding='utf-8') as f: f.write(content)
-    except:
-        os.close(fd)
-        raise
+        os.fchmod(descriptor, mode)
+        with os.fdopen(descriptor, 'w', encoding='utf-8') as file:
+            file.write(content)
+            file.flush()
+            os.fsync(file.fileno())
+        checked_file(path)
+        os.replace(temporary, path)
+    finally:
+        if os.path.lexists(temporary): os.unlink(temporary)
 
 def resolve_credentials(cfg,out):
     cfg=dict(cfg)
     saved=out/'quorivio-overrides.json'
+    checked_file(saved)
     if saved.exists():
         previous=json.loads(saved.read_text())
         for key in ('admin_password','auth_secret','postgres_password'):
@@ -89,8 +112,26 @@ def resolve_credentials(cfg,out):
     validate(cfg)
     return cfg
 
+def guarded_output_directory(out):
+    """Refuse output redirected through any pre-existing directory symlink.
+
+    Manifest generation writes credentials and must never silently follow a
+    symlink planted at the output path or in its directory chain. This is not
+    a substitute for exclusive ownership of the workspace on a shared host.
+    """
+    out=Path(out).absolute()
+    for part in (out,*out.parents):
+        if part.is_symlink():
+            raise ValueError('Refusing symlink in Kubernetes output directory')
+    if out.exists() and not out.is_dir():
+        raise ValueError('Kubernetes output path must be a directory')
+    out.mkdir(parents=True,exist_ok=True,mode=0o700)
+    if not out.is_dir() or out.is_symlink():
+        raise ValueError('Unsafe Kubernetes output directory')
+    return out
+
 def generate(cfg,out):
-    out.mkdir(parents=True,exist_ok=True)
+    out=guarded_output_directory(out)
     cfg=resolve_credentials(cfg,out)
     name=cfg['name'];ns=cfg['namespace'];port=int(cfg['container_port'])
     klass=cfg['ingress_class'] or cfg['ingress_controller']
@@ -129,6 +170,9 @@ spec:
   replicas: {cfg['replicas']}
   strategy:
     type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
   selector:
     matchLabels:
       app: {name}
@@ -137,7 +181,8 @@ spec:
       labels:
         app: {name}
     spec:
-{selector_yaml(cfg['app_node_selector'])}      automountServiceAccountToken: false
+{selector_yaml(cfg['app_node_selector'])}{('      topologySpreadConstraints:' + chr(10) + '        - maxSkew: 1' + chr(10) + '          topologyKey: kubernetes.io/hostname' + chr(10) + '          whenUnsatisfiable: ScheduleAnyway' + chr(10) + '          labelSelector:' + chr(10) + '            matchLabels:' + chr(10) + '              app: ' + name + chr(10)) if cfg['replicas'] > 1 else ''}      terminationGracePeriodSeconds: 45
+      automountServiceAccountToken: false
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
@@ -251,6 +296,21 @@ resources:
   - 40-ingress.yaml
 '''
     }
+    if cfg['replicas'] > 1:
+        files['25-disruption-budget.yaml']=f"""apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {name}-availability
+  namespace: {ns}
+spec:
+  minAvailable: {cfg['replicas']-1}
+  selector:
+    matchLabels:
+      app: {name}
+"""
+        files['kustomization.yaml']=files['kustomization.yaml'].replace('  - 30-service.yaml\n','  - 25-disruption-budget.yaml\n  - 30-service.yaml\n')
+    else:
+        (out/'25-disruption-budget.yaml').unlink(missing_ok=True)
     files['05-app-secret.yaml']='apiVersion: v1\nkind: Secret\nmetadata:\n  name: '+cfg['secret_name']+'\n  namespace: '+ns+'\ntype: Opaque\ndata:\n'+''.join('  '+k+': '+base64.b64encode(v.encode()).decode()+'\n' for k,v in sorted(secret_data.items()))
     files['kustomization.yaml']=files['kustomization.yaml'].replace('  - 10-configmap.yaml\n','  - 05-app-secret.yaml\n  - 10-configmap.yaml\n')
     if cfg['postgres_mode']=='internal':
@@ -260,8 +320,7 @@ resources:
     for old in ('11-postgres-service.yaml','12-postgres-statefulset.yaml'):
         if old not in files: (out/old).unlink(missing_ok=True)
     for filename,body in files.items():
-        if filename=='05-app-secret.yaml': secure_write(out/filename,body)
-        else: (out/filename).write_text(body,encoding='utf-8')
+        secure_write(out/filename,body,private=filename=='05-app-secret.yaml')
     # Store ONLY changed custom values. No passwords/tokens are collected by the wizard.
     overrides={k:cfg[k] for k in FIELDS if cfg[k]!=DEFAULTS[k]}
     secure_write(out/'quorivio-overrides.json',json.dumps(overrides,indent=2,ensure_ascii=False,sort_keys=True)+'\n')
@@ -359,7 +418,10 @@ def main(argv=None):
     a.add_argument('--set',action='append',default=[],metavar='KEY=VALUE')
     args=a.parse_args(argv)
     cfg=dict(DEFAULTS);out=Path(args.output)
+    try: guarded_output_directory(out)
+    except ValueError as e: a.error(str(e))
     saved=out/'quorivio-overrides.json'
+    checked_file(saved)
     if saved.is_file(): cfg.update(json.loads(saved.read_text()))
     if args.values:cfg.update(json.loads(Path(args.values).read_text()))
     print('Quorivio Kubernetes defaults + existing overrides:')
@@ -375,6 +437,9 @@ def main(argv=None):
         if k=='tls_termination':
             if v.lower() not in ('true','false'):a.error('tls_termination requires true/false')
             cfg[k]=v.lower()=='true'
+        elif k in ('replicas','max_upload_mb','container_port','postgres_port'):
+            try: cfg[k]=int(v)
+            except ValueError: a.error(f'{k} must be an integer')
         else: cfg[k]=v
     try:validate(cfg)
     except ValueError as e:a.error(str(e))

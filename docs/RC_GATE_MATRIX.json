@@ -159,11 +159,11 @@
     {
       "id": "B1",
       "area": "B-sessions",
-      "weight": 4,
+      "weight": 2,
       "status": "partial",
-      "evidence": "Presenter dashboard, synced server-driven navigation and participant preview in source; live WebSocket authorization re-audits sessions, presenter memberships/roles and participants every 10s (local policy tests PASS, 2026-10-24); per-session coalesced snapshot delivery and 2 MiB slow-consumer protection, local tests PASS (2026-10-24); LISTEN startup/resync failure now forces reconnection, with local regression tests (2026-10-24); retired listener notification fencing and rejected handler reconnect regression tests PASS (2026-10-24); coalesced snapshot callers now await the final read and failed DB snapshots propagate to listener recovery (152 Node and 252 Python tests PASS, builds PASS, 2026-10-24); disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24); added mandatory CI PostgreSQL two-process WebSocket notification acceptance (not yet run on CI, 2026-10-24); replica smoke now drains pre-mutation notifications to require a fresh post-vote participant snapshot (2026-10-24). Maintainer confirmed green CI including two-replica PostgreSQL 18 WebSocket test (2026-10-24). CI 40141894130: PostgreSQL 18 two-replica WebSocket opening, response propagation, privacy and close PASS; 24 concurrent HTTP clients PASS.\n2026-10-27 local (pending real PG CI): closed-session owner/collaborator duplication exposed in session directory; portable definition-only copy creates fresh draft/credentials and independently remapped media, with no participant/responses/statistics.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: PostgreSQL live 24 concurrent participants, independent audience Chromium and two API replicas WebSocket PASS. Strict RC gate was skipped; status unchanged.\n2026-10-28 evidence reconciliation: automatic CI subgate B1-WS split from broad partial gate, without claiming outstanding external acceptance.",
+      "evidence": "Presenter dashboard, synced server-driven navigation and participant preview in source; live WebSocket authorization re-audits sessions, presenter memberships/roles and participants every 10s (local policy tests PASS, 2026-10-24); per-session coalesced snapshot delivery and 2 MiB slow-consumer protection, local tests PASS (2026-10-24); LISTEN startup/resync failure now forces reconnection, with local regression tests (2026-10-24); retired listener notification fencing and rejected handler reconnect regression tests PASS (2026-10-24); coalesced snapshot callers now await the final read and failed DB snapshots propagate to listener recovery (152 Node and 252 Python tests PASS, builds PASS, 2026-10-24); disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24); added mandatory CI PostgreSQL two-process WebSocket notification acceptance (not yet run on CI, 2026-10-24); replica smoke now drains pre-mutation notifications to require a fresh post-vote participant snapshot (2026-10-24). Maintainer confirmed green CI including two-replica PostgreSQL 18 WebSocket test (2026-10-24). CI 40141894130: PostgreSQL 18 two-replica WebSocket opening, response propagation, privacy and close PASS; 24 concurrent HTTP clients PASS.\n2026-10-27 local (pending real PG CI): closed-session owner/collaborator duplication exposed in session directory; portable definition-only copy creates fresh draft/credentials and independently remapped media, with no participant/responses/statistics.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: PostgreSQL live 24 concurrent participants, independent audience Chromium and two API replicas WebSocket PASS. Strict RC gate was skipped; status unchanged.\n2026-10-28 evidence reconciliation: automatic CI subgate B1-WS split from broad partial gate, without claiming outstanding external acceptance.\n2026-10-29: GitHub Full CI 40918620911 on caf6331f15cc PASS confirms a bounded automated capability carved out below. Independent production-facing requirements remain within this partial parent; no external SLO, physical offsite or RPO/RTO sign-off inferred.",
       "remaining": "Production-like long-running multi-replica load, network impairment/reconnection latency, recovery and operational SLO acceptance.",
-      "current_verified_run": 40595463258,
+      "current_verified_run": 40918620911,
       "pending_local_evidence_20261028": "WYSIWYG and independent-question implementation passes local TypeScript/Vite, 461 Node API, 46 frontend, 33 focused Python, Chromium component desktop/mobile. Unverified by GitHub and real PostgreSQL; prior accepted gates unchanged."
     },
     {
@@ -367,11 +367,11 @@
     {
       "id": "D2",
       "area": "D-validation",
-      "weight": 4,
+      "weight": 2,
       "status": "partial",
-      "evidence": "Maintainer confirmed CI green (2026-10-24) including PostgreSQL 18 backup/restore into fresh disposable database, schema bootstrap and two-replica WebSocket acceptance. New local DR preflight and staged checksum regressions pass (2026-10-24); negative populated-DB restore, schema parity and timing instrumentation added to CI, awaiting next run. CI 40141894130: PostgreSQL 18 backup/restore PASS including populated-database refusal, schema/row parity, private assets, integrity and overwrite rejection; measured CI sample backup=0.18s restore=0.34s (not SLA).\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: PostgreSQL 18 backup/restore test PASS with populated DB refusal, schema and row parity, private assets, integrity; CI sample timings not an RTO/RPO SLA. Strict RC gate was skipped; status unchanged.\n2026-10-28 evidence reconciliation: automatic CI subgate D2-DR split from broad partial gate, without claiming outstanding external acceptance.\n2026-10-29 local cycle 19: code for technical DR rehearsal receipt and conservative retention implemented, pending fresh GitHub CI, not accepted as operational RPO/RTO evidence.",
+      "evidence": "Maintainer confirmed CI green (2026-10-24) including PostgreSQL 18 backup/restore into fresh disposable database, schema bootstrap and two-replica WebSocket acceptance. New local DR preflight and staged checksum regressions pass (2026-10-24); negative populated-DB restore, schema parity and timing instrumentation added to CI, awaiting next run. CI 40141894130: PostgreSQL 18 backup/restore PASS including populated-database refusal, schema/row parity, private assets, integrity and overwrite rejection; measured CI sample backup=0.18s restore=0.34s (not SLA).\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: PostgreSQL 18 backup/restore test PASS with populated DB refusal, schema and row parity, private assets, integrity; CI sample timings not an RTO/RPO SLA. Strict RC gate was skipped; status unchanged.\n2026-10-28 evidence reconciliation: automatic CI subgate D2-DR split from broad partial gate, without claiming outstanding external acceptance.\n2026-10-29 local cycle 19: code for technical DR rehearsal receipt and conservative retention implemented, pending fresh GitHub CI, not accepted as operational RPO/RTO evidence.\n2026-10-29: GitHub Full CI 40918620911 on caf6331f15cc PASS confirms a bounded automated capability carved out below. Independent production-facing requirements remain within this partial parent; no external SLO, physical offsite or RPO/RTO sign-off inferred.",
       "remaining": "Independent representative restore drill with actual RTO and RPO measurements (including cutover and lost writes), validated offsite/key custody and retention legal holds, production operator approval. Local technical rehearsal and storage mtime are not sufficient.",
-      "current_verified_run": 40595463258
+      "current_verified_run": 40918620911
     },
     {
       "id": "D2-DR",
@@ -483,11 +483,35 @@
       "verified_run_id": 40638652838,
       "verified_commit_sha": "a32ef78902a656262d346a0fa622604a4deda405",
       "scope": "bounded verified CI acceptance, not comprehensive release or regulatory signoff"
+    },
+    {
+      "id": "B1-RECONNECT",
+      "area": "B-live",
+      "weight": 2,
+      "status": "accepted",
+      "evidence": "GitHub Full CI 40918620911, quality job 123605484902, commit caf6331f15ccf39c218791503b8c6d0ca3503dce: PASS PostgreSQL two-replica WebSocket: A->B opening, B->A response, reconnect on B, private state and closing. Confirms real authenticated participant reconnection against the second PostgreSQL-backed API replica, previously separately unverified after cycle 16. Does not cover network partition, sustained multi-node scale or production SLO.",
+      "scope": "Disposable PostgreSQL 18 two-replica WebSocket reconnect state and privacy, distinct from preexisting B1-WS open/send proof",
+      "remaining": "Retain this already CI-proven bounded contract after future changes. Production network disruption, HA failover and SLO remain in parent B1.",
+      "verified_run_id": 40918620911,
+      "verified_job_id": 123605484902,
+      "verified_commit_sha": "caf6331f15ccf39c218791503b8c6d0ca3503dce"
+    },
+    {
+      "id": "D2-ENCRYPTED-DR",
+      "area": "D-validation",
+      "weight": 2,
+      "status": "accepted",
+      "evidence": "GitHub Full CI 40918620911, quality job 123605484902, commit caf6331f15ccf39c218791503b8c6d0ca3503dce: disposable PostgreSQL 18 backup/restore with AES-256-GCM, key rotation, wrong-key/populated-target refusal, schema/row/asset parity; independent empty-database restore from an authenticated archive copied to a separate mounted tmpfs; legal holds and authenticated retention; technical restore-drill receipt. Separate from preexisting D2-DR plain database/asset backup acceptance. This is not offsite, independent key custody, production cutover or an RPO/RTO SLA.",
+      "scope": "Encrypted, authenticated and key-rotated PostgreSQL 18 DR plus mounted-volume mirror and guarded retention under disposable GitHub CI",
+      "remaining": "Retain automated CI coverage; operator evidence for real offsite, hardware/key custody, actual lost writes and time-to-service and production approval remains parent D2.",
+      "verified_run_id": 40918620911,
+      "verified_job_id": 123605484902,
+      "verified_commit_sha": "caf6331f15ccf39c218791503b8c6d0ca3503dce"
     }
   ],
   "last_verified_full_ci": {
-    "run_id": 40855898307,
-    "head_sha": "244945b1c79c5a7b20e8f743bd5646e041bade00",
+    "run_id": 40918620911,
+    "head_sha": "caf6331f15ccf39c218791503b8c6d0ca3503dce",
     "attempt": 1,
     "conclusion": "success",
     "jobs": {
@@ -496,40 +520,40 @@
       "Native Firefox and WebKit acceptance (opt-in)": "success",
       "Production publication": "skipped"
     },
-    "strict_rc_gate": "skipped",
-    "accepted_scope": "Production quality, PostgreSQL 18, Chromium, capacity 500 and real built React native Firefox/WebKit (1440/390) all SUCCESS, run 40855898307. This is bounded automated engineering proof, not physical device, external-provider or independent signoff.",
-    "rc_score_at_run": 75.0,
-    "rc_score_after_evidence_review": 77.0,
-    "standard_run_id": 40846201940,
-    "commit_sha": "244945b1c79c5a7b20e8f743bd5646e041bade00",
-    "standard_run_sha": "cf49c3e1d3e58d4ec4d65862a92b742348a11435"
+    "evidence": {
+      "two_replica_ws_reconnect": "PASS PostgreSQL two-replica WebSocket: A->B opening, B->A response, reconnect on B, private state and closing",
+      "encrypted_dr": "PASS PostgreSQL 18 encrypted instance DR: AES-256-GCM, key rotation, wrong-key refusal, populated-DB refusal, schema and row parity, private assets, integrity, overwrite rejection",
+      "mounted_mirror": "PASS PostgreSQL 18 mounted-volume encrypted mirror: authentic copy, private receipt, independent empty database restore, schema/data/assets parity; CI-only, NOT offsite or RTO/RPO",
+      "retention": "PASS PostgreSQL 18 authenticated DR retention: key generations, legal hold, checksum and age policy, no plaintext residue",
+      "drill": "PASS PostgreSQL 18 DR rehearsal: rotated authenticated backup, distinct empty database, private assets and metadata-only receipt; NOT production RPO/RTO"
+    },
+    "quality_job_id": 123605484902,
+    "standard_run_id": 40917736867,
+    "standard_quality_job_id": 123602360060,
+    "standard_image_job_id": 123603870557,
+    "extended_image_job_id": 123608606172,
+    "native_browser_job_id": 123608606057
   },
   "pending_local_batch": {
     "date": "2026-10-29",
-    "description": "RC cycle 21: mounted-volume encrypted backup mirror, authenticated copy/receipt, mounted-store negative guard and fourth disposable PostgreSQL 18 mirror restore CI test",
-    "last_maintainer_confirmed_commit": "244945b1c79c5a7b20e8f743bd5646e041bade00",
-    "observed_main_sha": "244945b1c79c5a7b20e8f743bd5646e041bade00",
-    "last_verified_full_ci_run": 40855898307,
-    "new_feature_promoted": false,
+    "description": "RC cycle 24 disposable KIND single-node real runtime: PostgreSQL18, two API pods, shared CI hostPath assets and pod replacement; output-directory symlink hardening; pending remote CI",
+    "baseline_commit": "caf6331f15ccf39c218791503b8c6d0ca3503dce",
+    "source_full_ci_run": 40918620911,
+    "current_score": 79.0,
     "new_ci_required": true,
+    "new_feature_promoted": false,
+    "new_local_runtime_smoke_promoted": false,
     "strict_rc_ready": false,
-    "formal_rc_score_before": 77,
-    "formal_rc_score_after": 77,
-    "global_rc_delta_pp": 0,
-    "gate_count": 45,
-    "gate_accepted": 28,
-    "gate_partial": 17,
     "gates_promoted": [],
-    "local_evidence": {
-      "mounted_encrypted_replication": "real AES-GCM and inner-manifest tests with mount-guard and corruption injection; PostgreSQL integration queued for next GitHub CI",
-      "python_tests": "1099/1099 PASS across four disjoint groups; final mirror custody guard retested 14/14 PASS",
-      "node_build_and_tests": "TypeScript/Vite build PASS; Node API 474/474; Node frontend 65/65",
-      "mount_recovery_limits": "CI uses mounted tmpfs; production offsite operator validation and RPO/RTO unverified"
-    },
-    "blocked": {
-      "D2_D6": "Independent offsite physical storage, key custody, production failover/RPO/RTO and legal compliance acceptance are still required",
-      "full_ci": "Current cumulative code has not been committed or run on GitHub"
-    }
+    "newly_accepted_verified": [],
+    "kubernetes_kind_api_smoke_verified": false,
+    "kubernetes_kind_runtime_verified": false,
+    "graceful_shutdown_postgres_e2e_verified": false,
+    "not_claimed": [
+      "no native multi-node RWX",
+      "no ingress/TLS/ClamAV verification",
+      "no verified GitHub run for cycle24"
+    ]
   },
   "scoring_reconciliation_20261028": {
     "baseline_score": 53.0,
@@ -1013,5 +1037,127 @@
       "operator recovery sign-off",
       "GDPR/legal key custody review"
     ]
+  },
+  "last_maintainer_confirmed_commit": "caf6331f15ccf39c218791503b8c6d0ca3503dce",
+  "scoring_reconciliation_20261029_cycle22": {
+    "date": "2026-10-29",
+    "prior_score": 77.0,
+    "verified_score": 79.0,
+    "delta_pp": 2.0,
+    "prior_gate_count": 45,
+    "current_gate_count": 47,
+    "previous_accepted": 28,
+    "current_accepted": 30,
+    "partial_remaining": 17,
+    "source_standard_run": 40917736867,
+    "source_extended_run": 40918620911,
+    "verified_commit_sha": "caf6331f15ccf39c218791503b8c6d0ca3503dce",
+    "source_quality_job": 123605484902,
+    "new_independent_scopes": [
+      "B1-RECONNECT",
+      "D2-ENCRYPTED-DR"
+    ],
+    "credit_boundary": "Only new separately executed CI capabilities not covered by preexisting B1-WS opening and D2-DR basic backup. No production or independent approval was awarded.",
+    "not_verified": [
+      "production network partition and SLO",
+      "actual offsite storage independence",
+      "external key custody",
+      "real RPO/RTO and failover/cutover",
+      "independent security/AGID/GDPR assessment",
+      "ARM64 and rootless runtime acceptance"
+    ]
+  },
+  "previous_pending_local_batch_cycle22_20261029": {
+    "date": "2026-10-29",
+    "description": "Cycle 22: source reconciliation of GitHub proven reconnect and encrypted DR; optional ARM64 OCI runtime smoke acceptance on QEMU (new code uncommitted; not RC approved)",
+    "baseline_commit": "caf6331f15ccf39c218791503b8c6d0ca3503dce",
+    "source_full_ci_run": 40918620911,
+    "current_score": 79.0,
+    "new_ci_required": true,
+    "new_feature_promoted": false,
+    "newly_accepted_verified": [
+      "B1-RECONNECT",
+      "D2-ENCRYPTED-DR"
+    ],
+    "new_local_runtime_smoke_promoted": false,
+    "strict_rc_ready": false,
+    "gates_promoted": [],
+    "newly_verified_previous_commit_scopes": [
+      "B1-RECONNECT",
+      "D2-ENCRYPTED-DR"
+    ]
+  },
+  "rc_cycle23_k8s_ha_local_20261029": {
+    "date": "2026-10-29",
+    "baseline_commit": "caf6331f15ccf39c218791503b8c6d0ca3503dce",
+    "source_ci_reference": 40918620911,
+    "baseline_score": 79.0,
+    "new_score": 79.0,
+    "score_delta_pp": 0.0,
+    "new_evidence_only_local": [
+      "Kubernetes wizard: atomic no-symlink credential output, numeric CLI values, HA safe rolling strategy, PDB and topology spread",
+      "API: SIGTERM disables readiness before planned closure and signals WS 1012 for clients to reconnect to healthy replica",
+      "GitHub extended quality: new mandatory PostgreSQL-backed two-replica rolling SIGTERM scenario (not executed yet)",
+      "Opt-in disposable Kubernetes KIND real API server-side dry-run for four generator variants (not executed yet)"
+    ],
+    "limitations": [
+      "No real KIND cluster available for local tests",
+      "No fresh GitHub CI on this code",
+      "No validated production HA, physical ARM64, rootless Podman, real RWX, ingress controller or independent acceptance"
+    ],
+    "partial_parent_gates_still_open": [
+      "B1",
+      "C4",
+      "D3"
+    ],
+    "new_accepted_gates": [],
+    "strict_rc_ready": false,
+    "local_tests": {
+      "typescript_vite_build": "PASS",
+      "node_api": "474 PASS",
+      "node_web": "65 PASS",
+      "k8s_ha_tests": "13 PASS",
+      "python_full": "1122/1122 PASS in four groups"
+    },
+    "report": "docs/validation/RC_CYCLE23_K8S_HA_LOCAL_20261029.json"
+  },
+  "previous_pending_local_batch_cycle23_20261029": {
+    "date": "2026-10-29",
+    "description": "Cycle 23 Kubernetes HA/operator hardening, SIGTERM real replica drain and optional API-server manifest acceptance; all new work local-only, pending GitHub CI",
+    "baseline_commit": "caf6331f15ccf39c218791503b8c6d0ca3503dce",
+    "source_full_ci_run": 40918620911,
+    "current_score": 79.0,
+    "new_ci_required": true,
+    "new_feature_promoted": false,
+    "new_local_runtime_smoke_promoted": false,
+    "strict_rc_ready": false,
+    "gates_promoted": [],
+    "newly_accepted_verified": [],
+    "newly_verified_previous_commit_scopes": [
+      "B1-RECONNECT",
+      "D2-ENCRYPTED-DR"
+    ],
+    "kubernetes_kind_api_smoke_verified": false,
+    "graceful_shutdown_postgres_e2e_verified": false
+  },
+  "rc_cycle24_kind_runtime_local_20261029": {
+    "score_before": 79.0,
+    "score_after": 79.0,
+    "score_delta_pp": 0.0,
+    "gate_count": 47,
+    "accepted_gates": 30,
+    "partial_gates": 17,
+    "verified_local": [
+      "Kubernetes path symlink guards",
+      "real KIND CI script contracts (not cluster execution)"
+    ],
+    "new_remote_evidence_required": [
+      "kubernetes_runtime_test GitHub success",
+      "KIND API schema job",
+      "representative multi-node and ingress independent acceptance"
+    ],
+    "new_ci_input": "kubernetes_runtime_test",
+    "single_node_hostpath_only": true,
+    "strict_rc_ready": false
   }
 }

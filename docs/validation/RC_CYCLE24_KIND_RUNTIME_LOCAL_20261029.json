@@ -1,0 +1,53 @@
+{
+  "date": "2026-10-29",
+  "cycle": 24,
+  "version": "0.1.0-dev",
+  "baseline_commit": "caf6331f15ccf39c218791503b8c6d0ca3503dce",
+  "last_verified_full_ci": 40918620911,
+  "score_before": 79,
+  "score_after": 79,
+  "score_delta_pp": 0,
+  "gate_count": 47,
+  "accepted": 30,
+  "partial": 17,
+  "strict_rc_ready": false,
+  "implemented": [
+    "Guarded Kubernetes wizard output rejects symlink directories and parents and non-directories before secret generation",
+    "Manual-only KIND single-node actual runtime boot of PostgreSQL 18 and 2 API replicas from locally built image",
+    "Real ClusterIP HTTP readiness/liveness/landing page, bidirectional shared asset mount smoke and replica pod replacement",
+    "CI-only single-node hostPath RWX no publication, limited failure diagnostics and no credential logs",
+    "Bilingual deployment limitations and next steps, updated historical/current inventory",
+    "Disposable static no-provisioner StorageClass for hostPath CI RWX volume, avoiding reliance on default provisioners"
+  ],
+  "local_evidence": {
+    "node_backend_tests_passed": 474,
+    "node_frontend_tests_passed": 65,
+    "typescript_vite_build": "PASS",
+    "new_k8s_unit_tests_passed": 14,
+    "python_full": "1140/1140 PASS in single unittest discovery",
+    "inventory_sha256": "868 source SHA-256 digests; 869 ZIP members, Git-index parity verified at packaging",
+    "github_kind_runtime": "NOT RUN: docker/kind absent",
+    "workflow_yaml": "PASS",
+    "git_index_parity": "PASS on local temporary Git index"
+  },
+  "kubernetes_runtime_verified": false,
+  "kubernetes_apiserver_manifest_verified": false,
+  "runtime_arch_verified": false,
+  "remote_ci_new_commit": false,
+  "unsupported": [
+    "Real KIND runtime unavailable locally; requires manual GitHub workflow_dispatch",
+    "No multi-node RWX CSI validation or ingress controller routing",
+    "No production HA, RPO/RTO, ClamAV, Podman rootless, native ARM64"
+  ],
+  "recommended_ci_inputs": {
+    "browser_test": true,
+    "cross_browser_test": true,
+    "capacity_test": true,
+    "kubernetes_manifest_test": true,
+    "kubernetes_runtime_test": true,
+    "runtime_arch_test": true,
+    "publish_image": false,
+    "publish_latest": false,
+    "rc_strict": false
+  }
+}

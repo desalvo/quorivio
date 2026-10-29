@@ -34,6 +34,18 @@ on:
         description: 'Run 500-participant disposable PostgreSQL acceptance (manual only)'
         type: boolean
         default: false
+      kubernetes_manifest_test:
+        description: 'API-server dry-run on disposable KIND: NGINX/HAProxy, TLS, RWX, PDB, external/internal database (no runtime/HA certification)'
+        type: boolean
+        default: false
+      kubernetes_runtime_test:
+        description: 'Boot two API pods + PostgreSQL 18 on single-node KIND with disposable hostPath RWX; not real multi-node HA/ingress (manual opt-in)'
+        type: boolean
+        default: false
+      runtime_arch_test:
+        description: 'Boot amd64 and arm64 images under Docker/QEMU with disposable PostgreSQL 18; not native ARM64, rootless Podman or Kubernetes (manual opt-in)'
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -368,6 +380,12 @@ jobs:
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
           QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
         run: python3 tools/ci_capacity_500.py
+      - name: PostgreSQL two-replica graceful rolling SIGTERM acceptance
+        env:
+          QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
+          QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
+          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
+        run: python3 tools/ci_graceful_shutdown.py
       - name: PostgreSQL 18 disaster recovery backup and restore acceptance
         # Fail closed rather than silently skipping the authenticated encryption
         # and key-rotation portion of the disposable restore test.
@@ -413,6 +431,7 @@ jobs:
       - name: Verify Kubernetes credential persistence and unique fresh installations
         run: |
           python3 tools/check_k8s_generation.py
+          python3 -m unittest tools.tests.test_k8s_ha_hardening -v
       - name: Verify license and documentation
         run: |
           test -s LICENSE && test -s README.md && test -s README.it.md
@@ -433,7 +452,10 @@ jobs:
           python3 tools/verify_rc_cycle18_inventory.py --historical
           python3 tools/verify_rc_cycle19_inventory.py --historical
           python3 tools/verify_rc_cycle20_inventory.py --historical
-          python3 tools/verify_rc_cycle21_inventory.py
+          python3 tools/verify_rc_cycle21_inventory.py --historical
+          python3 tools/verify_rc_cycle22_inventory.py --historical
+          python3 tools/verify_rc_cycle23_inventory.py --historical
+          python3 tools/verify_rc_cycle24_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:
@@ -511,6 +533,80 @@ jobs:
           severity: CRITICAL,HIGH
           exit-code: '1'
           ignore-unfixed: true
+  kubernetes-api-manifests:
+    name: Kubernetes real API manifest schema (opt-in)
+    if: github.event_name == 'workflow_dispatch' && inputs.kubernetes_manifest_test
+    needs: validate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    permissions: {contents: read}
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: helm/kind-action@v1.12.0
+        with:
+          cluster_name: quorivio-schema
+          version: v0.26.0
+      - name: Kubernetes server-side schema and admission checks
+        run: python3 tools/ci_k8s_apiserver_smoke.py
+  kubernetes-runtime:
+    name: Kubernetes live single-node runtime and pod replacement (opt-in)
+    if: github.event_name == 'workflow_dispatch' && inputs.kubernetes_runtime_test
+    needs: validate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 22
+    permissions: {contents: read}
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: helm/kind-action@v1.12.0
+        with:
+          cluster_name: quorivio-runtime
+          version: v0.26.0
+      - name: Build runtime image for disposable KIND (never publish)
+        run: docker build -t quorivio:kind-runtime .
+      - name: Load locally built image into KIND
+        run: kind load docker-image quorivio:kind-runtime --name quorivio-runtime
+      - name: Boot PostgreSQL 18 and two API replicas; exercise service and pod replacement
+        run: python3 tools/ci_k8s_runtime_smoke.py
+      - name: Diagnostics of failed disposable runtime (no manifest/Secret export)
+        if: failure()
+        run: |
+          kubectl -n quorivio-runtime get pods,deploy,sts,pvc -o wide || true
+          kubectl -n quorivio-runtime get events --sort-by=.lastTimestamp | tail -40 || true
+  runtime-architecture:
+    name: OCI amd64/arm64 actual runtime acceptance (opt-in)
+    if: github.event_name == 'workflow_dispatch' && inputs.runtime_arch_test
+    needs: validate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions: {contents: read}
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - name: Build AMD64 without publication
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          load: true
+          push: false
+          tags: quorivio:ci-oci-amd64
+      - name: Execute AMD64 non-root runtime against PostgreSQL 18
+        run: bash tools/ci_oci_runtime_smoke.sh quorivio:ci-oci-amd64 amd64
+      - name: Build ARM64 under QEMU without publication
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/arm64
+          load: true
+          push: false
+          tags: quorivio:ci-oci-arm64
+      - name: Execute ARM64 non-root runtime against PostgreSQL 18
+        timeout-minutes: 12
+        run: bash tools/ci_oci_runtime_smoke.sh quorivio:ci-oci-arm64 arm64
   publish:
     name: Production publication
     if: github.event_name == 'workflow_dispatch' && inputs.publish_image == true && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))

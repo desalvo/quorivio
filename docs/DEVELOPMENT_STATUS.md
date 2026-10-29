@@ -1,3 +1,35 @@
+## Quorivio 0.1.0-dev — RC cycle 24 — 29 October 2026: live disposable KIND runtime and path hardening
+
+**Local verification completed:** TypeScript/Vite build PASS; Node backend 474/474, web 65/65; Python full 1,140/1,140 PASS, including 14 targeted runtime/path-hardening cases and 4 new RC evidence contracts. CI workflow parsed. The new full KIND job still needs a remotely successful run. Current source, staged Git index and ZIP hashes verified by cycle-24 receipt.
+
+**GitHub baseline:** `caf6331f15ccf39c218791503b8c6d0ca3503dce` (Full CI `40918620911` green). **Formal RC: 79.0% unchanged**, 47 gates (30 accepted, 17 partial), strict RC not ready. No new remote CI or independent production acceptance; no auto commit/push/tag/image publication.
+
+**Implemented this cycle:** guarded Kubernetes wizard output directory refuses symlinked directories/ancestors and non-directory destinations, preserving private secret writes. New manual-only `kubernetes_runtime_test` job starts an actual disposable single-node KIND cluster, builds and locally loads the real image, installs PostgreSQL 18 and two non-root API replicas with hostPath-backed CI-only RWX assets, verifies HTTP service/volume sharing, deletes one pod and asserts the survivor and eventual second replica recover. Tests explicitly distinguish single-node KIND from true multi-node CSI RWX, ingress NGINX/HAProxy routing, rootless Podman, production resilience and RPO/RTO. CI schema-only KIND and Docker/QEMU jobs remain separate.
+
+**Pending evidence:** new runtime script has not been executed on GitHub; Docker/KIND not installed in this local sandbox. No D3/B1 points can be credited yet. See bilingual docs `docs/K8S_KIND_SINGLE_NODE_RUNTIME.en.md` and `.it.md`, new validation report and cycle-24 integrity receipt. The next Full CI must run the optional KIND jobs manually with publishing disabled.
+
+---
+
+## Quorivio 0.1.0-dev — RC cycle 23 — 29 October 2026: secure Kubernetes wizard and deployment availability
+
+**GitHub baseline:** `caf6331f15ccf39c218791503b8c6d0ca3503dce`; green Full CI `40918620911`. **RC score:** unchanged at 79.0%, 47 gates, 30 accepted and 17 partial; strict RC not ready. No local-only gate promotion.
+
+**Implemented:** symlink-safe atomic credential persistence at `0600`; correctly typed numeric `--set` values; application rolling rollout maxUnavailable 0/maxSurge 1, multi-replica PDB and preferred pod spreading; readiness-503 + WS 1012 on SIGTERM; mandatory real PostgreSQL replica drain CI and optional KIND API-server dry-run over four Kubernetes configurations.
+
+**Evidence:** TypeScript/Vite build PASS, backend 474/474 and web 65/65 Node tests PASS; 13 Kubernetes focused tests PASS. Python 1122/1122 PASS in four independent test groups; no GitHub CI evidence on current changes. No new remote CI, KIND or production HA acceptance yet.
+
+**Open:** physical ARM64 and rootless Podman, actual Kubernetes RWX/ingress/ClamAV/multi-node failover, independent operational SLO, external providers, assistive technologies and GDPR/AGID reviews.
+
+# Quorivio 0.1.0-dev — RC cycle 22: verified 79% and optional multi-architecture runtime acceptance (29 October 2026)
+
+**Formal RC score 79.0% (+2.0 pp), 47 gates (30 accepted / 17 partial).** Maintainer confirmed commit `caf6331f15ccf39c218791503b8c6d0ca3503dce`; standard CI 40917736867 PASS, full CI 40918620911 PASS (quality, Docker build, Firefox/WebKit; no publication). The verified technical scopes independently closing B1-RECONNECT and D2-ENCRYPTED-DR are traced to quality job 123605484902 and distinct from earlier B1-WS and D2-DR scopes. They **do not close** the parent production/operator gates B1/D2. Full trace: `docs/validation/RC_CYCLE22_REMOTE_ACCEPTANCE_AND_OCI_20261029.json`.
+
+**New uncommitted runtime acceptance:** optional multi-architecture OCI image build and execution with emulated ARM64, PostgreSQL 18 and HTTP readiness under Docker. It has *not been run on GitHub*, not credited to RC, and is not native ARM64/rootless Podman/Kubernetes acceptance. See `docs/OCI_MULTIARCH_RUNTIME_ACCEPTANCE.en.md`. Strict RC is not ready. CI must run with `runtime_arch_test=true` only after maintainer commit; no image is published. The user controls commit/push/tag.
+
+**Local validation:** API/web TypeScript and Vite builds PASS, 474/474 backend and 65/65 frontend Node tests PASS; all 1,105 Python tests PASS across four disjoint verified test ranges (330 + 350 + 250 + 175); current source, staged Git index and cumulative ZIP checksum verification PASS. No Docker engine is available locally, so the new OCI runtime smoke is not claimed as executed.
+
+---
+
 # Quorivio 0.1.0-dev — RC cycle 21: mounted encrypted DR mirror (29 October 2026)
 
 **Formal completion remains 77.0%.** 45 gates (28 accepted, 17 partial). Previous GitHub Full CI 40855898307 on commit `244945b1`; new cycle 21 code is not yet committed or remotely verified. User manages commit/push/tag and Docker publication.
