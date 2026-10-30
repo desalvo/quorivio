@@ -1,3 +1,13 @@
+# Quorivio 0.1.0-dev — RC cycle 33 — extended CI repair (30 October 2026)
+
+**Formal RC completion: 79.25% (31 accepted, 17 partial, 48 total), unchanged pending independent acceptance.** Maintainer committed through cycle 32, SHA `fc316ce290652e74292c75216859176b0d4fdad8`. Extended GitHub Actions [41044420650](https://github.com/desalvo/quorivio/actions/runs/41044420650) passed the production quality and container build gates but failed both opt-in real ClamAV and two-worker KIND ingress acceptance; other optional jobs skipped.
+
+**Cycle 33 (not yet committed):** The real ClamAV CI probe now waits for the official clamd PING/PONG protocol rather than TCP connection alone, and reports only preapproved stage codes without raw scanner output or user data. The root cause of the original ClamAV test failure is *not yet proven*; retest required. KIND ingress test now uses Node core `http.request()` because Node's `fetch()` silently overrides the explicit virtual-host `Host` header; this cause was reproduced locally. Additional safe resource-only diagnostics and unit regressions cover readiness, clean/EICAR logic in mock, actual Host header and wrong-host rejection.
+
+**Limits:** no real clamd or KIND cluster locally, pending full GitHub re-run; do not promote score. Real NFS/CSI RWX, HAProxy, production TLS and independent GDPR/AGID review remain open. No commit, push, tag or image publication by assistant.
+
+---
+
 # Quorivio 0.1.0-dev — RC cycle 32 — 30 October 2026 — production antivirus/Kubernetes parity
 
 **RC formal 79.25%** (48 gates: 31 accepted, 17 partial). Last maintainer-confirmed Git commit `016beea25d5e2d2fab21b0730aa15baf0b573e12` (cycle 28); cycles 29–32 remain cumulative and uncommitted. No independent GitHub CI is yet available for these changes, therefore no score increment is justified.

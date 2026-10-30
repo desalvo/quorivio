@@ -1,3 +1,13 @@
+# Quorivio 0.1.0-dev — RC ciclo 33 — correzione CI estesa (30 ottobre 2026)
+
+**Completamento formale: 79,25% (31 gate accettati, 17 parziali, 48 totali); nessun incremento artificiale.** L'utente ha effettuato commit del cumulativo fino al ciclo 32, SHA `fc316ce290652e74292c75216859176b0d4fdad8`. La CI estesa [41044420650](https://github.com/desalvo/quorivio/actions/runs/41044420650) ha superato qualità e build container, ma fallisce i due test opt-in ClamAV ed Ingress KIND multi-nodo; gli altri test facoltativi sono stati saltati.
+
+**Ciclo 33 (non committato):** test ClamAV reale attende un `PING/PONG` effettivo del daemon, non soltanto una connessione TCP, e registra solo codici diagnostici predefiniti, senza mostrare file o risposte clamd. La causa effettiva della precedente scansione resta da certificare con una nuova CI. La sonda Ingress KIND sostituisce Node `fetch()` (che ignora/sovrascrive l'header `Host` personalizzato) con `http.request()` e verifica un host virtuale reale; aggiunge diagnostica di risorse non segrete. Test locali verificano PING/PONG, timeout, campione EICAR in mock, header `Host` e rifiuto di host errati.
+
+**Limiti:** nessun nuovo test con ClamAV reale o KIND è stato eseguito in locale; lo score non aumenta fino a prove indipendenti. NFS/CSI RWX, HAProxy reale, TLS e audit GDPR/AGID restano aperti. Nessun commit/push/tag/pubblicazione dall'assistente.
+
+---
+
 # Quorivio 0.1.0-dev — RC ciclo 32 — 30 ottobre 2026 — antivirus produzione e Kubernetes
 
 **RC ufficiale: 79,25% (48 gate: 31 accettati, 17 parziali)**. Ultimo commit confermato dall'utente: `016beea25d5e2d2fab21b0730aa15baf0b573e12` (ciclo 28); cicli 29–32 cumulativi e ancora senza commit. Nessun nuovo risultato GitHub indipendente su queste modifiche: punteggio non aumentato artificiosamente.

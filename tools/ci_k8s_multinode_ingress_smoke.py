@@ -71,18 +71,36 @@ def node_script(source: str, script: str, *arguments: str) -> None:
     run('kubectl', '-n', NS, 'exec', source, '--', 'node', '-e', script, *arguments, timeout=35)
 
 
+def ingress_http_source() -> str:
+    """Node core HTTP request preserves the virtual-host Host header.
+
+    Node's global fetch()/undici silently replaces the provided Host header
+    with the upstream Service DNS name, causing genuine NGINX name-based
+    routing checks to fail although the controller and backends are healthy.
+    No response bodies or headers are written into CI logs.
+    """
+    return ("const http=require('node:http');"
+            "const target=new URL(process.argv[1]);"
+            "if(target.protocol!=='http:')process.exit(31);"
+            "const expected=Number(process.argv[3]);"
+            "const req=http.request(target,{method:'GET',headers:{Host:process.argv[2]},timeout:8000},res=>{"
+            "if(res.statusCode!==expected){res.resume();process.exitCode=21;return}"
+            "let bytes=0;res.on('data',part=>{bytes+=part.length;"
+            "if(bytes>65536){req.destroy();process.exitCode=22}});"
+            "res.on('end',()=>{if(expected===200&&bytes===0)process.exitCode=23});"
+            "});"
+            "req.on('timeout',()=>req.destroy());"
+            "req.on('error',()=>{process.exitCode=24});req.end();")
+
+
 def ingress_probe(source: str, path: str = '/api/health/ready', bad_host: bool = False) -> None:
     if path not in ('/', '/api/health/live', '/api/health/ready'):
         raise ValueError('Unexpected HTTP probe path')
-    # All HTTP requests travel through the REAL ingress-nginx controller Service
-    # with a Host header; the backend Service is not addressed directly.
-    script = ("(async()=>{let r=await fetch(process.argv[1],"
-              "{headers:{Host:process.argv[2]},signal:AbortSignal.timeout(8000)});"
-              "if(r.status!==Number(process.argv[3]))process.exit(21);"
-              "if(r.ok && !(await r.text()).trim())process.exit(22);"
-              "})().catch(()=>process.exit(23))")
+    # Reach the real ingress-nginx Service using the HTTP core client and an
+    # explicit Host header; avoid fetch(), which rewrites it to Service DNS.
     target = f'http://{INGRESS}{path}'
-    node_script(source, script, target, 'unknown.example.invalid' if bad_host else HOST,
+    node_script(source, ingress_http_source(), target,
+                'unknown.example.invalid' if bad_host else HOST,
                 '404' if bad_host else '200')
 
 

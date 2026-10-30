@@ -70,8 +70,8 @@ class AntivirusKubernetesCycle32(unittest.TestCase):
     def test_latest_integrity_gate_is_before_gitleaks(self):
         wf=(ROOT/'.github/workflows/ci.yml').read_text()
         self.assertLess(wf.index('verify_rc_cycle31_inventory.py --historical'),
-                        wf.index('verify_rc_cycle32_inventory.py'))
-        self.assertLess(wf.index('verify_rc_cycle32_inventory.py'),wf.index('Detect credential leaks'))
+                        wf.index('verify_rc_cycle33_inventory.py'))
+        self.assertLess(wf.index('verify_rc_cycle33_inventory.py'),wf.index('Detect credential leaks'))
 
     def test_actual_clamd_acceptance_is_opt_in_and_no_registry_publish(self):
         wf=yaml.safe_load((ROOT/'.github/workflows/ci.yml').read_text())
@@ -81,9 +81,9 @@ class AntivirusKubernetesCycle32(unittest.TestCase):
         self.assertNotIn('docker push',str(job))
         self.assertIn('127.0.0.1:23310:3310',str(job))
         source=(ROOT/'tools/ci_clamav_real.mjs').read_text()
-        self.assertIn('actual_antivirus_signature_not_detected',source)
+        self.assertIn('eicar_not_detected',source)
         self.assertIn('malware_detected',source)
-        self.assertIn('scanUploadedFile(clean,env)',source)
+        self.assertIn('await scan(clean,env)',source)
 
     def test_production_no_missing_scanner_bypass_contract(self):
         src=(ROOT/'apps/api/src/malware-scan.ts').read_text()

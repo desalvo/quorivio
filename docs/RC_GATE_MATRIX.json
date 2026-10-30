@@ -1311,5 +1311,17 @@
     "formal_rc_before": 79.25,
     "formal_rc_after": 79.25,
     "reason": "New implementation and local unit tests need independent PostgreSQL 18 run before any acceptance promotion; no production HA claim."
+  },
+  "rc_cycle33_extended_ci_repair_20261030": {
+    "source_run": 41044420650,
+    "commit": "fc316ce290652e74292c75216859176b0d4fdad8",
+    "quality_gate": "passed",
+    "container_build": "passed",
+    "clamav_real": "failed; readiness replaced with PING/PONG, pending next remote run",
+    "kubernetes_two_worker": "passed dual node/PG18/RWX-like runner bind; failed ingress due Node fetch Host override (locally reproduced)",
+    "score_before": 79.25,
+    "score_after": 79.25,
+    "strict_rc_ready": false,
+    "reason": "Only after follow-up CI can new ClamAV and actual ingress host-routing be credited; original two failures remain open."
   }
 }

@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT/'tools'))
-from verify_rc_cycle32_inventory import verify_source,load_inventory
+from verify_rc_cycle33_inventory import verify_source,load_inventory
 from verify_rc_cycle31_inventory import load_inventory as historical
 from rc_release_preflight import preflight
 
@@ -20,7 +20,7 @@ class Cycle31Inventory(unittest.TestCase):
     def test_workflow_order(self):
         wf=(ROOT/'.github/workflows/ci.yml').read_text()
         a=wf.index('python3 tools/verify_rc_cycle31_inventory.py --historical')
-        b=wf.index('python3 tools/verify_rc_cycle32_inventory.py')
+        b=wf.index('python3 tools/verify_rc_cycle33_inventory.py')
         c=wf.index('Detect credential leaks')
         self.assertLess(a,b)
         self.assertLess(b,c)

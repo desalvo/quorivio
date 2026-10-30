@@ -485,7 +485,8 @@ jobs:
           python3 tools/verify_rc_cycle28_inventory.py --historical
           python3 tools/verify_rc_cycle30_inventory.py --historical
           python3 tools/verify_rc_cycle31_inventory.py --historical
-          python3 tools/verify_rc_cycle32_inventory.py
+          python3 tools/verify_rc_cycle32_inventory.py --historical
+          python3 tools/verify_rc_cycle33_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:
@@ -636,6 +637,8 @@ jobs:
         run: |
           kubectl -n quorivio-multinode get pods,deploy,sts,pvc -o wide || true
           kubectl -n ingress-nginx get pods,deploy,service || true
+          kubectl -n quorivio-multinode get ingress,service,endpointslices -o wide || true
+          kubectl get ingressclass || true
       - name: Remove ephemeral runner-mounted assets
         if: always()
         run: sudo rm -rf /tmp/quorivio-kind-multinode-shared
@@ -707,14 +710,9 @@ jobs:
           docker run -d --name quorivio-ci-clamav --memory=4g \
             --security-opt no-new-privileges:true -p 127.0.0.1:23310:3310 \
             clamav/clamav:stable
-          for i in $(seq 1 180); do
-            if bash -c 'echo >/dev/tcp/127.0.0.1/23310' 2>/dev/null; then break; fi
-            if test "$(docker inspect --format '{{.State.Running}}' quorivio-ci-clamav)" != true; then
-              echo 'ClamAV image stopped before readiness (diagnostics redacted)'; exit 1
-            fi
-            sleep 2
-          done
-          bash -c 'echo >/dev/tcp/127.0.0.1/23310'
+      - name: Wait for clamd PING/PONG and loaded signature database
+        timeout-minutes: 7
+        run: node --experimental-strip-types tools/ci_clamav_real.mjs --wait-ready
       - name: Verify clean upload and EICAR detection through real ClamAV INSTREAM
         timeout-minutes: 3
         run: node --experimental-strip-types tools/ci_clamav_real.mjs

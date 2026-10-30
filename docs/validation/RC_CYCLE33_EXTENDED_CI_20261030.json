@@ -1,0 +1,47 @@
+{
+  "cycle": 33,
+  "date": "2026-10-30",
+  "version": "0.1.0-dev",
+  "commit_after_cycle32": "fc316ce290652e74292c75216859176b0d4fdad8",
+  "github_full_ci_run": 41044420650,
+  "github_jobs": {
+    "production_quality_gate": {
+      "id": 124024877812,
+      "result": "success"
+    },
+    "container_build": {
+      "id": 124025948120,
+      "result": "success"
+    },
+    "clamav_runtime": {
+      "id": 124024877479,
+      "result": "failure",
+      "observed": "Failed immediately in INSTREAM clean/EICAR check; stage redacted so precise failure unknown",
+      "implemented_mitigation": "true clamd PING/PONG with bounded wait and enumerated secret-free diagnostic"
+    },
+    "kubernetes_multinode_ingress": {
+      "id": 124025948155,
+      "result": "failure",
+      "observed": "Two-worker spread, PG18 and shared assets passed; ingress host routing rejected",
+      "root_cause_reproduced_locally": "Node fetch overwrites custom Host with upstream host; Node http.request honors Host override"
+    },
+    "other_optional_jobs": "skipped"
+  },
+  "local_verification": {
+    "new_node_tests_passed": 5,
+    "new_python_tests_passed": 3,
+    "full_node_suite": "pending",
+    "full_python_suite": "pending",
+    "real_clamav": "not executable locally",
+    "kind_real_nginx": "not executable locally"
+  },
+  "score": 79.25,
+  "gate_counts": {
+    "accepted": 31,
+    "partial": 17,
+    "total": 48
+  },
+  "score_unchanged_reason": "No new successful independent acceptance; CI red until corrected commit is tested",
+  "publication_or_commit": false,
+  "security": "Do not print scanner raw replies, file paths, tokens or response bodies; no production images published."
+}

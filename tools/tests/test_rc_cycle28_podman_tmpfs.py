@@ -7,7 +7,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tools'))
 from verify_rc_cycle27_inventory import load_inventory as prior_inventory
-from verify_rc_cycle32_inventory import load_inventory, verify_source
+from verify_rc_cycle33_inventory import load_inventory, verify_source
 from rc_release_preflight import preflight
 
 
@@ -20,7 +20,7 @@ class Cycle28(unittest.TestCase):
     def test_workflow_runs_historical_before_current_before_leak_detection(self):
         workflow = (ROOT / '.github/workflows/ci.yml').read_text()
         historic = 'python3 tools/verify_rc_cycle27_inventory.py --historical'
-        latest = 'python3 tools/verify_rc_cycle32_inventory.py'
+        latest = 'python3 tools/verify_rc_cycle33_inventory.py'
         leak = 'Detect credential leaks'
         self.assertIn(historic, workflow)
         self.assertIn(latest, workflow)

@@ -1,0 +1,35 @@
+{
+  "version": "0.1.0-dev",
+  "cycle": 33,
+  "date": "2026-10-30",
+  "source_commit": "fc316ce290652e74292c75216859176b0d4fdad8",
+  "extended_ci_run": 41044420650,
+  "local_tests": {
+    "node_backend": {
+      "run": 490,
+      "passed": 490
+    },
+    "node_frontend": {
+      "run": 65,
+      "passed": 65
+    },
+    "python_focused_new": {
+      "run": 3,
+      "passed": 3
+    },
+    "full_python": {
+      "run": 1239,
+      "passed": 1238,
+      "skipped": 1,
+      "failed": 0,
+      "method": "non-overlapping Python unittest groups: 230 + 211 + 209 + (297 + 34 + 42 + 64) + 152"
+    }
+  },
+  "actual_clamav_runtime_verified_on_new_code": false,
+  "actual_kind_ingress_runtime_verified_on_new_code": false,
+  "formal_rc_score": 79.25,
+  "gate_accepted": 31,
+  "gate_partial": 17,
+  "statement": "First failure cause is not proven; bounded PING/PONG readiness and secret-free stage codes added. Second failure root cause reproduced locally: Node fetch overrides Host. No external acceptance on new code.",
+  "no_commit_push_tag_publish": true
+}
