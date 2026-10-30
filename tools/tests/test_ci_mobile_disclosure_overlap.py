@@ -28,7 +28,8 @@ class MobileDisclosureOverlapRegression(unittest.TestCase):
         self.assertNotIn('force=True',self.editor)
 
     def test_postgresql_browser_closes_popup_before_accessible_alternative(self):
-        self.assertIn('await edit_canvas_widget_title(widgets,',self.real)
+        self.assertIn('await edit_canvas_widget_title(page,widgets,',self.real)
+        self.assertIn("menu=page.get_by_role('group',name='Azioni widget text',exact=True)",self.real)
         self.assertIn("await expect(editor.get_by_text('Conflitto di revisione'))",self.real)
         self.assertNotIn('force=True',self.real)
 

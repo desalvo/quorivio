@@ -10,7 +10,7 @@ from rc_gate_audit import audit
 from rc_release_preflight import preflight
 from verify_rc_cycle22_inventory import load_inventory as previous
 from verify_rc_cycle23_inventory import load_inventory
-from verify_rc_cycle45_inventory import load_inventory as current_inventory, verify_source
+from verify_rc_cycle47_inventory import load_inventory as current_inventory, verify_source
 
 class Cycle23RC(unittest.TestCase):
     def test_frozen_historical_catalog_and_current_tree(self):

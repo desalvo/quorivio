@@ -32,7 +32,8 @@ class ChromiumWidgetTitleEditing(unittest.TestCase):
   self.assertIn("await field.press('Enter')",BROWSER)
   self.assertIn('await expect(field).to_have_text(title)',BROWSER)
  def test_real_browser_verifies_concurrent_autosave_and_merge(self):
-  self.assertIn("await edit_canvas_widget_title(widgets,'Local second edit')",BROWSER)
+  self.assertIn("await edit_canvas_widget_title(page,widgets,'Local second edit')",BROWSER)
+  self.assertIn("menu=page.get_by_role('group',name='Azioni widget text',exact=True)",BROWSER)
   self.assertIn("assert resolved['page_design']['widgets'][0]['label']=='Local second edit'",BROWSER)
   self.assertIn("await expect(editor.get_by_text('Conflitto di revisione'))",BROWSER)
   self.assertNotIn('force=True',BROWSER)

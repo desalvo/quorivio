@@ -3,7 +3,7 @@ import sys,unittest
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT/'tools'))
-from verify_rc_cycle45_inventory import verify_source,load_inventory
+from verify_rc_cycle47_inventory import verify_source,load_inventory
 from verify_rc_cycle29_inventory import load_inventory as historical
 class Cycle30Integrity(unittest.TestCase):
  def test_current_tree_matches_new_manifest(self):

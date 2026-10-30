@@ -77,6 +77,11 @@ class Cycle35VerifiedBootstrap(unittest.TestCase):
         for fn in ('DEVELOPMENT_STATUS.md','DEVELOPMENT_STATUS.it.md','COMPLETION_HANDOFF.md','COMPLETION_HANDOFF.it.md'):
             body=(ROOT/'docs'/fn).read_text()[:4000]
             self.assertIn('80,75' if fn.endswith('.it.md') else '80.75',body)
-            self.assertIn('f5ccf9a7545e7c17b4323d067db66aff5eca9b41',body)
+            # The immutable 2026-10-30 cycle-35 receipt above proves its original
+            # commit. Current status headers must instead report the latest CI
+            # failure, its unaccepted gates and remaining validation constraints.
+            self.assertIn('41114355433',body)
+            self.assertIn('5163e5a5b4685348810ef24067538967a1bbb536',body)
+            self.assertIn('rc_strict=false',body)
 
 if __name__=='__main__':unittest.main()

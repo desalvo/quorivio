@@ -61,7 +61,7 @@ async def open_editor(page,title):
  await page.get_by_role('button',name='✎ Modifica le pagine').first.click()
  await expect(page.get_by_role('group',name='Canvas grafico widget')).to_be_visible()
 
-async def edit_canvas_widget_title(canvas, title):
+async def edit_canvas_widget_title(page, canvas, title):
   """Use the real contextual action and WYSIWYG title editor, never forced clicks.
 
   The inactive title is rendered as a text div (not the legacy readonly input).
@@ -72,7 +72,10 @@ async def edit_canvas_widget_title(canvas, title):
   field=item.locator('.widget-rich-inline').first
   await expect(field).to_have_attribute('contenteditable','false')
   await item.click(button='right',position={'x':12,'y':12})
-  menu=item.get_by_role('group',name='Azioni widget text')
+  # This menu is portaled to document.body; searching below the canvas item
+  # cannot find it. Keep the menu outside overflow-hidden transformed widgets.
+  menu=page.get_by_role('group',name='Azioni widget text',exact=True)
+  await expect(menu).to_have_count(1)
   await expect(menu).to_be_visible()
   await menu.get_by_role('button',name='Modifica titolo').click()
   await expect(menu).to_have_count(0)
@@ -152,7 +155,7 @@ async def main():
    remote_design=json.loads(json.dumps(merged['page_design']));remote_design['widgets'][0]['label']='Remote second edit'
    remote_result=json.loads(json.dumps(merged['result_design']));remote_result['header']='Remote results heading'
    await call(context,'PATCH',design_path,{'page_design':remote_design,'result_design':remote_result,'expected_design_revision':5})
-   await edit_canvas_widget_title(widgets,'Local second edit')
+   await edit_canvas_widget_title(page,widgets,'Local second edit')
    await expect(editor.get_by_text('Conflitto di revisione')).to_be_visible(timeout=12000)
    await page.get_by_role('button',name='Confronta e riconcilia le modifiche').click()
    choice=page.get_by_role('combobox',name='Risolvi Widget pg-first · label')

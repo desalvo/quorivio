@@ -1,3 +1,25 @@
+# Quorivio 0.1.0-dev — RC ciclo 47 — hotfix collaudo editor PostgreSQL e portal (30 ottobre 2026)
+
+**Baseline committata:** `5163e5a5b4685348810ef24067538967a1bbb536`. I cicli **46 e 47 non sono committati** e devono essere distribuiti insieme. **RC formale: 80,75%**, 35 gate accettati, 17 parziali, `rc_strict=false`; nessun punto aggiunto.
+
+**CI estesa precedente:** run `41115332748`, job `124267958170`, eseguita sul commit precedente al ciclo 46. Supera PostgreSQL background library e ownership collaboratori, test editor CAS, test browser partecipanti e test contestuale isolato. Fallisce solo la prova editor PostgreSQL quando `tools/ci_browser_editor_postgres.py` cerca il menu `Azioni widget text` sotto `.widget-canvas-item`: la vera applicazione utilizza React `createPortal` verso `document.body`.
+
+**Modifica:** il test apre il menu con clic destro sul widget ma lo localizza nell'intero documento, impone una sola istanza, ne verifica la visibilità, la modifica del titolo, la chiusura e il ripristino del `contenteditable=false`. Lasciati immutati i controlli PostgreSQL reali per autosave, revisione, merge, conflitto dello stesso campo ed export. Aggiunti contratti Python contro future regressioni del selettore. Il codice applicativo non viene cambiato.
+
+**Non ancora certificato:** il test PostgreSQL/Chromium end-to-end con il nuovo selettore deve passare in una nuova CI. La precedente run non verifica gli hotfix non committati 46–47. Resta da superare il gate Container, saltato per dipendenza. Nessun commit, push, tag o pubblicazione dell'assistente.
+
+---
+
+# Quorivio 0.1.0-dev — RC ciclo 46 — ripristino gate qualità Python (30 ottobre 2026)
+
+**Completamento RC invariato: 80,75% (52 gate: 35 accettati, 17 parziali).** Ultimo commit osservato su GitHub: `5163e5a5b4685348810ef24067538967a1bbb536` (ciclo 45). Il workflow `41114355433`, job qualità `124264578469`, ha eseguito 1.278 test Python, con **due regressioni obsolete** in `test_canvas_context_menu.py` e `test_rc_cycle35_verified_bootstrap.py`. Gli altri 1.276 test hanno superato il gate, ma il job è fallito e non ha ancora raggiunto le prove Chromium sul frontend compilato, né il container gate.
+
+**Hotfix non ancora verificato nella CI:** il test del menu contestuale controlla ora le proprietà effettivamente passate a `WidgetCanvas` (`assets`, libreria sfondi collaboratori, sessione, callback upload, busy) anche quando sono su più righe; conferma inoltre che il selettore sfondi conserva i callback di libreria. Il test di documentazione utilizza la ricevuta immutabile del ciclo 35 per verificare il commit storico, mentre i documenti correnti devono dichiarare la run recente, la baseline, le limitazioni e `rc_strict=false`. Il vecchio riferimento storico non è più richiesto nei primi 4.000 caratteri dell'handoff.
+
+**Limiti e rischio residuo:** l'hotfix riguarda test e documentazione, non modifica il comportamento dell'app. La suite Python completa, la CI standard, la prova Chromium reale sul build di produzione e l'immagine container sul nuovo pacchetto restano da confermare dopo il commit. I 17 gate parziali, incluso storage RWX reale, HAProxy, TLS, dispositivi/accessibilità e verifiche GDPR/AGID indipendenti, rimangono aperti. **Non pubblicare immagini; `publish_image=false`, `rc_strict=false`.** Nessun commit, push, tag o pubblicazione eseguiti dall'assistente.
+
+---
+
 # Quorivio 0.1.0-dev — RC ciclo 45 — collaudo Chromium sugli asset compilati (30 ottobre 2026)
 
 **RC verificata invariata: 80,75% (52 gate: 35 accettati e 17 parziali).** La run GitHub `41110214420`, job `124250386166`, sul commit `383c273deb53d368d6b8a1d57ab5c623591bcc7a` ha compilato correttamente TypeScript/Vite e superato 500 test Node backend, 84 frontend e il test ClamAV reale, ma il collaudo Chromium completo ha fallito con `root_children=0, page_error_count=0`. Il test non ha ottenuto alcun DOM React nell'app, prima della navigazione autenticata. Il container gate è stato saltato a causa del quality gate fallito.

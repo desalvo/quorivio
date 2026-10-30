@@ -1,0 +1,23 @@
+{
+  "cycle": 47,
+  "date": "2026-10-30",
+  "source_run": 41115332748,
+  "source_job": 124267958170,
+  "source_commit": "5163e5a5b4685348810ef24067538967a1bbb536",
+  "source_conclusion": "failure",
+  "failed_step": "Chromium editor PostgreSQL persistence and conflict acceptance (opt-in)",
+  "error": "expect menu to_be_visible: portal menu absent within locator(.widget-canvas-item).first",
+  "root_cause": "React createPortal mounts contextual widget menu in document.body while the legacy test scoped the locator under canvas item",
+  "fix": "ci_browser_editor_postgres.py searches page for the exact accessible group and verifies single menu, title action, dismissal and field edit; existing PG18 autosave/CAS/merge assertions unchanged",
+  "postgres_and_browser_ci_completed_before_failure": [
+    "CI PostgreSQL 18 presenter-owned background library and independent collaborator copy passed",
+    "CI PostgreSQL editor CAS and concurrency passed",
+    "CI Chromium audience participation and persistence passed",
+    "CI isolated widget title context menu passed"
+  ],
+  "cycle46_included_uncommitted": true,
+  "new_changes_github_verified": false,
+  "formal_score": 80.75,
+  "remaining_partial_gates": 17,
+  "note": "Run predates local cycle 46, and this cycle 47 fix cannot be certified until a new GitHub CI run."
+}

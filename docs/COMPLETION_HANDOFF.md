@@ -1,3 +1,25 @@
+# Quorivio 0.1.0-dev — RC cycle 47 — PostgreSQL editor portal selector hotfix (30 October 2026)
+
+**Last maintainer commit:** `5163e5a5b4685348810ef24067538967a1bbb536`. Cycles **46 and 47 are still uncommitted** and must be delivered cumulatively. **Formal RC remains 80.75%**: 35 accepted gates and 17 partial; `rc_strict=false`. No credit for local code.
+
+**Extended CI evidence:** run `41115332748`, quality job `124267958170`, ran on the previous committed source, not the pending cycle 46. It passed real PostgreSQL background-library collaborator ownership, editor CAS, audience Chromium and isolated title-menu checks. It failed in `tools/ci_browser_editor_postgres.py` because the test searched beneath `.widget-canvas-item` for a context menu which production React deliberately portals to `document.body` to avoid widget clipping.
+
+**Change:** right-click the widget as before, then locate the exact accessible menu at page scope. Assert exactly one menu, visible actions, successful title edit, menu dismissal, and transition out of editing. Preserve all existing real PostgreSQL autosave, CAS, three-way merge, explicit same-field resolution and layout export assertions. New Python contracts prevent reintroducing the wrong nested locator; no production UI behavior was altered.
+
+**Not yet GitHub-certified:** real PostgreSQL/Chromium full editor acceptance on the patched script; subsequent container gate was skipped. This run does not certify cycles 46–47. No assistant commit, push, tag or publication.
+
+---
+
+# Quorivio 0.1.0-dev — RC cycle 46 — Python quality-gate regression fix (30 October 2026)
+
+**Verified RC unchanged: 80.75% (52 gates: 35 accepted, 17 partial).** Latest GitHub commit observed: `5163e5a5b4685348810ef24067538967a1bbb536` (cycle 45). Run `41114355433`, quality job `124264578469`, executed 1,278 Python tests with **two outdated contract checks** failing in `test_canvas_context_menu.py` and `test_rc_cycle35_verified_bootstrap.py`. The other 1,276 tests passed, but the job failed before the compiled-frontend Chromium acceptance and container gate could run.
+
+**New, not yet CI-certified:** the canvas test now checks current `WidgetCanvas` media and collaborator-background props even when JSX is wrapped across lines, and verifies the background-library callbacks remain wired. The immutable cycle-35 GitHub evidence receipt continues proving the original commit. Current status documents instead must expose the latest CI run, committed baseline, known unaccepted gates and `rc_strict=false`; a historic commit hash no longer needs to appear in the first 4,000 characters of every current handoff.
+
+**Remaining risks and limitations:** this hotfix changes tests and documentation, not application runtime behavior. Full Python regression, standard CI, real compiled-frontend Chromium startup and the container gate for the new package are still pending maintainer CI. The 17 partial gates remain open (including production RWX, HAProxy, public TLS, device/accessibility and independent GDPR/AGID/security reviews). **No image publication; `publish_image=false`, `rc_strict=false`.** No assistant commit/push/tag/release.
+
+---
+
 # Quorivio 0.1.0-dev — RC cycle 45 — Chromium on compiled frontend assets (30 October 2026)
 
 **Verified RC remains 80.75% (52 gates: 35 accepted, 17 partial).** GitHub run `41110214420`, job `124250386166`, on commit `383c273deb53d368d6b8a1d57ab5c623591bcc7a` completed TypeScript/Vite builds, 500 backend and 84 frontend Node tests and the real ClamAV runtime test. The full Chromium editor acceptance failed with `root_children=0, page_error_count=0` before authenticated navigation, meaning React never mounted. The dependent container build was skipped.

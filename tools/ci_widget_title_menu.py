@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Isolated Chromium hit-target and WYSIWYG contextual editing regression.
 
-Fixture uses the current contentEditable contract, not the removed readonly
-input. The full authenticated browser/PostgreSQL test remains independent.
+Fixture mirrors both the production document.body menu portal and the current
+contentEditable contract. The full authenticated test remains independent.
 """
 import asyncio
 import os
@@ -14,17 +14,17 @@ HTML = '''<!doctype html><html lang="it"><meta charset="utf-8">
 .widget-rich-inline { width:100%; padding:8px; white-space:pre-wrap; }
 .widget-rich-inline[contenteditable="false"] { pointer-events:none; user-select:none; }
 .widget-rich-inline[contenteditable="true"] { pointer-events:auto; user-select:text; outline:1px dotted #3470be; }
-.canvas-context-menu { position:absolute;left:10px;top:45px;z-index:30;display:flex;flex-direction:column;background:white; }
+.canvas-context-menu { position:fixed;left:28px;top:205px;z-index:10020;display:flex;flex-direction:column;background:white; }
 .canvas-context-menu[hidden] { display:none; }
 </style>
 <div class="widget-canvas-item" role="group" tabindex="0" aria-label="Widget text; frecce spostano">
 <div class="widget-rich-inline" aria-label="Titolo text" contenteditable="false">Remote collaborator</div>
-<div class="canvas-context-menu" role="group" aria-label="Azioni widget text" hidden>
-<button type="button">Modifica titolo</button></div></div>
+</div><div class="canvas-context-menu" role="group" aria-label="Azioni widget text" hidden>
+<button type="button">Modifica titolo</button></div>
 <script>
 const item=document.querySelector('.widget-canvas-item');
 const field=item.querySelector('.widget-rich-inline');
-const menu=item.querySelector('.canvas-context-menu');
+const menu=document.querySelector('.canvas-context-menu');
 const activate=()=>{field.contentEditable='true';menu.hidden=true;field.focus()};
 const finish=()=>{field.contentEditable='false';field.blur()};
 item.addEventListener('contextmenu',e=>{e.preventDefault();menu.hidden=false});
@@ -52,7 +52,8 @@ async def main():
     except PlaywrightTimeout:
      pass
     await item.click(button='right',position={'x':12,'y':12})
-    menu=item.get_by_role('group',name='Azioni widget text')
+    menu=page.get_by_role('group',name='Azioni widget text',exact=True)
+    await expect(menu).to_have_count(1)
     await expect(menu).to_be_visible()
     await menu.get_by_role('button',name='Modifica titolo').click()
     await expect(menu).not_to_be_visible()

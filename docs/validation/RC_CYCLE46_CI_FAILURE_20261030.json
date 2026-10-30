@@ -1,0 +1,27 @@
+{
+  "cycle": 46,
+  "date": "2026-10-30",
+  "source_run": 41114355433,
+  "source_job": 124264578469,
+  "source_commit": "5163e5a5b4685348810ef24067538967a1bbb536",
+  "source_conclusion": "failure",
+  "python_tests_executed": 1278,
+  "python_failures": [
+    {
+      "name": "test_canvas_context_menu.ContextMediaContract.test_context_picker_reuses_session_library",
+      "reason": "exact single-line JSX prop assertion obsolete after background library integration",
+      "fix": "regex verifies current asset/background props and background-library callbacks"
+    },
+    {
+      "name": "test_rc_cycle35_verified_bootstrap.Cycle35VerifiedBootstrap.test_documentation_records_remaining_risks",
+      "reason": "expects original cycle-35 committed SHA within first 4000 characters of every latest handoff",
+      "fix": "keep immutable GitHub receipt proof and assert current run, commit, non-ready RC status"
+    }
+  ],
+  "browser_compiled_frontend_evaluated_in_source_run": false,
+  "container_gate_evaluated_in_source_run": false,
+  "new_changes_github_verified": false,
+  "formal_score": 80.75,
+  "remaining_partial_gates": 17,
+  "notes": "The latest CI run stopped before compiled Chromium startup. No new CI claims or RC scoring are derived from the local test repairs."
+}

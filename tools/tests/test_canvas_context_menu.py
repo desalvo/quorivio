@@ -18,7 +18,11 @@ class ContextMenuContract(unittest.TestCase):
 class ContextMediaContract(unittest.TestCase):
     def test_context_picker_reuses_session_library(self):
         src = (ROOT / 'apps/web/src/main.tsx').read_text()
-        self.assertIn('assets={assets} sessionId={selected} onUpload={uploadWidgetMedia} assetBusy={assetBusy}', src)
+        # The canvas now receives both session media and collaborator background
+        # libraries. JSX may wrap these independent props across several lines.
+        self.assertRegex(src, r'<WidgetCanvas\b[\s\S]*?assets=\{assets\}\s+backgrounds=\{backgrounds\}\s+sessionId=\{selected\}\s+onUpload=\{uploadWidgetMedia\}\s+assetBusy=\{assetBusy\}')
+        self.assertIn('onBackgroundSelect=', src)
+        self.assertIn('onBackgroundUpload=', src)
         self.assertIn('Sostituisci file', src)
         self.assertIn("patch(w.id,{assetId:e.target.value})", src)
         self.assertIn("onUpload(w.id,e.target.files?.[0],w.kind)", src)
