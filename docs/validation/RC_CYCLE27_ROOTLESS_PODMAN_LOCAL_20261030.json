@@ -1,0 +1,54 @@
+{
+  "version": "0.1.0-dev",
+  "cycle": 27,
+  "source_package": "quorivio-0.1.0-dev-rc-oci-amd64-x64-hotfix-cycle26-gate79-cumulative(2).zip",
+  "maintainer_committed_baseline": "540fca20a8fe90a6a3aad4e571c0f95ed13ecfe1",
+  "github_run_id": 40975979003,
+  "full_ci_passed": false,
+  "failed_job_id": 123806382783,
+  "new_rootless_podman_job_executed": false,
+  "oci_arch_hotfix_executed_remotely": false,
+  "local_podman_available": false,
+  "local_docker_available": false,
+  "new_manual_ci_input": "rootless_podman_test",
+  "publishing_enabled": false,
+  "score_before": 79.0,
+  "score_after": 79.0,
+  "accepted_gates": 30,
+  "partial_gates": 17,
+  "pending_real_acceptance": [
+    "Podman rootless production image and PostgreSQL 18 E2E on GitHub runner",
+    "OCI amd64 and QEMU arm64 runtime rerun",
+    "native ARM64 and physical operator device acceptance",
+    "multi-node RWX CSI and production ingress acceptance",
+    "independent accessibility/AGID/GDPR and operational sign-off"
+  ],
+  "local_test_evidence": {
+    "python_full_suite": {
+      "ran": 1172,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 1,
+      "result": "PASS"
+    },
+    "backend_node": {
+      "ran": 474,
+      "failed": 0,
+      "result": "PASS"
+    },
+    "frontend_node": {
+      "ran": 65,
+      "failed": 0,
+      "result": "PASS"
+    },
+    "focused_podman_contract": {
+      "ran": 7,
+      "failed": 0,
+      "skipped": 1
+    },
+    "workflow_yaml": "parsed; eight jobs including opt-in rootless Podman",
+    "package_integrity": "cycle-27 SHA-256 catalog must be verified against final ZIP",
+    "production_typescript_vite_build": "NOT RUN: npm dependencies incomplete; npm ci --offline not cached; subsequent npm ci unable to complete in runtime",
+    "podman_postgres_runtime": "NOT RUN: no Podman/docker or PostgreSQL engine locally"
+  }
+}

@@ -1,3 +1,27 @@
+## Quorivio 0.1.0-dev — RC cycle 27 — 30 October 2026 — new rootless Podman acceptance path (local only)
+
+**Last maintainer-confirmed commit:** `540fca20a8fe90a6a3aad4e571c0f95ed13ecfe1`, run `40975979003` failed only on OCI amd64/arm64 job `123806382783`. Cycle-26 OCI `amd64` → Node `x64` hotfix remains unconfirmed on GitHub.
+
+**New development:** a separate opt-in `rootless_podman_test` pipeline job installs the unprivileged Podman engine on a disposable Ubuntu runner, builds the real production image locally, then launches it as a non-root process against real PostgreSQL 18 on an isolated internal Podman network. The smoke rejects rootful/remote engines, checks compiled API/web, absence of npm, readiness/live/HTML routes and deterministic container cleanup. No registry credentials, public host ports, privileged containers or auto publication.
+
+**Verification status:** full Python **1,172/1,172 PASS (one skipped)**, backend Node **474/474 PASS**, frontend Node **65/65 PASS**, syntax and rootless Podman negative contracts PASS; real Podman, Docker/QEMU, PostgreSQL and CI runner acceptance are **pending**. TypeScript/Vite production build **NOT verified** this cycle: the local npm installation has incomplete dependencies and offline cache misses; do not infer successful compilation from prior cycle evidence. See `docs/ROOTLESS_PODMAN_RUNTIME_ACCEPTANCE.{en,it}.md` and `docs/validation/RC_CYCLE27_ROOTLESS_PODMAN_LOCAL_20261030.json`. Current source has a new cycle-27 SHA-256 receipt; cycle-26 checksums remain immutable historical evidence. CI must validate historical receipts and current source prior to the secret-scan gate.
+
+**Global weighted RC completion: 79.0% unchanged** (47 gates, 30 accepted, 17 partial; no independent gate promoted). Strict RC blocked by remaining operator/deployment/physical-device/legal acceptance. Do not run with `rc_strict=true` until all gates are accepted. No assistant commit, tag, push, production deployment or image publishing.
+
+---
+
+## Quorivio 0.1.0-dev — RC cycle 26 — 30 October 2026 — OCI architecture smoke hotfix (pending GitHub rerun)
+
+**Maintainer-committed baseline:** `540fca20a8fe90a6a3aad4e571c0f95ed13ecfe1`. Workflow-dispatch `40975979003` overall FAIL, but quality job `123804398587`, Kubernetes API schema `123806382731`, container build `123806382735`, real single-node KIND replacement `123806382760` and native Firefox/WebKit `123806382775` PASS. KIND uses single-node hostPath, NOT representative multi-node HA or CSI RWX. OCI job `123806382783` FAIL before ARM64 at first AMD64 runtime check, exit 42.
+
+**Cause and fix:** Docker/OCI `amd64` corresponds to Node.js `process.arch === "x64"`, while `arm64` maps to `"arm64"`. Preserve mandatory non-root, compiled API/UI and removal of npm checks; add separate exit codes and safe error messages and eight executable regression tests. No production image or API changes; Docker/QEMU not available locally. The overall CI remains FAILED until rerun.
+
+**Final local validation:** TypeScript/Vite build PASS; backend Node 474/474 PASS; web Node 65/65 PASS; full Python suite 1,161/1,161 PASS. No Docker/QEMU verification in local environment.
+
+**RC score unchanged: 79.0%** (47 gates: 30 accepted, 17 partial). The GitHub KIND result is useful but not independent operational sign-off. Update the new cycle-26 manifest and full source/ZIP hash check; retain cycle-25 as immutable history. Commit/push/tag/publication remain with maintainer.
+
+---
+
 ## Quorivio 0.1.0-dev — RC cycle 25 — 30 October 2026: rolling SIGTERM CI acceptance hotfix
 
 **Maintainer-confirmed baseline:** `30f7ab98403611ee1a4846e4aa8797e03bac0e6b`; push CI `40972614731`, quality job `123792791695`, FAILED at `tools/ci_graceful_shutdown.py:51`. Earlier CI steps, including builds, Node tests and two-replica WebSocket acceptance, passed. Do not assume later steps passed on this run.

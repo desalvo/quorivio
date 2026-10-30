@@ -1,0 +1,37 @@
+{
+  "version": "0.1.0-dev",
+  "cycle": 26,
+  "github_run_id": 40975979003,
+  "commit_sha": "540fca20a8fe90a6a3aad4e571c0f95ed13ecfe1",
+  "github_run_conclusion": "failure",
+  "passed_job_ids": [
+    123804398587,
+    123806382731,
+    123806382735,
+    123806382760,
+    123806382775
+  ],
+  "failed_job_id": 123806382783,
+  "failed_step": "Execute AMD64 non-root runtime against PostgreSQL 18",
+  "observed": "The OCI smoke run terminated with exit code 42 directly after postgres:18-alpine started; no ARM64 runtime steps were executed.",
+  "diagnosis": "The inline Node.js check compared process.arch (x64) to Docker platform target (amd64) instead of mapping equivalent architecture names.",
+  "fix": "Use OCI-to-Node architecture map and distinct 42=arch mismatch, 45=root, 43=missing assets, 44=npm retained. New Python tests run actual inline probe through Node in controlled mocks.",
+  "local_tests": "1161/1161 Python PASS (including eight new architecture/security probe tests); backend Node 474/474, frontend Node 65/65; npm run build TypeScript/Vite PASS; bash -n PASS. Actual Docker/QEMU runtime still unverified.",
+  "score_before": 79.0,
+  "score_after": 79.0,
+  "accepted_gates": 30,
+  "partial_gates": 17,
+  "pending_ci_flags": {
+    "runtime_arch_test": true,
+    "publish_image": false,
+    "publish_latest": false
+  },
+  "not_yet_proven": [
+    "amd64 live Docker runtime",
+    "arm64 QEMU Docker runtime",
+    "native ARM64 hardware",
+    "Podman rootless",
+    "multi-node RWX CSI + real ingress",
+    "human accessibility and GDPR acceptance"
+  ]
+}

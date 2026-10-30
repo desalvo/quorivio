@@ -10,7 +10,7 @@ sys.path.insert(0,str(ROOT/'tools'))
 from rc_gate_audit import audit
 from rc_release_preflight import preflight
 from verify_rc_cycle21_inventory import load_inventory as previous
-from verify_rc_cycle25_inventory import load_inventory, verify_source
+from verify_rc_cycle27_inventory import load_inventory, verify_source
 
 SHA='caf6331f15ccf39c218791503b8c6d0ca3503dce'
 RUN=40918620911

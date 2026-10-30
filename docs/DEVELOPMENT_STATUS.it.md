@@ -1,3 +1,15 @@
+## Quorivio 0.1.0-dev — Ciclo RC 26 — 30 ottobre 2026 — correzione test OCI multiarchitettura (nuova CI da verificare)
+
+**Baseline committata dall'utente:** `540fca20a8fe90a6a3aad4e571c0f95ed13ecfe1`. Workflow `40975979003` complessivamente FALLITO, ma sono verdi qualità `123804398587`, schemi Kubernetes `123806382731`, build container `123806382735`, avvio e sostituzione pod KIND mono-nodo `123806382760`, Firefox/WebKit `123806382775`. KIND utilizza hostPath sullo stesso nodo: NON certifica HA multi-nodo o CSI RWX. Il job OCI `123806382783` fallisce prima dell'ARM64 nel controllo AMD64 con exit code 42.
+
+**Causa e correzione:** `amd64` in Docker/OCI corrisponde a `process.arch === "x64"` in Node; `arm64` rimane `arm64`. Rimangono obbligatori i controlli di utente non-root, asset API/UI compilati e assenza di npm. Codici di errore distinti, diagnostica sicura e otto test di regressione eseguibili. Nessun cambiamento all'API produttiva; Docker/QEMU non disponibili localmente. La Full CI NON è confermata verde sul nuovo hotfix.
+
+**Validazione locale finale:** build TypeScript/Vite PASS; Node backend 474/474 PASS, frontend 65/65 PASS, suite Python completa 1.161/1.161 PASS. Docker/QEMU non verificati localmente.
+
+**Punteggio RC invariato: 79,0%**, 47 gate (30 accettati, 17 parziali). Il test KIND verificato è una nuova prova tecnica, non un'accettazione operativa indipendente. Nuovo manifest SHA-256 del ciclo 26; quello del ciclo 25 rimane storico. Nessun commit/push/tag/pubblicazione automatica.
+
+---
+
 ## Quorivio 0.1.0-dev — ciclo RC 25 — 30 ottobre 2026: correzione test SIGTERM/WebSocket
 
 **Nuova baseline committata dall'utente:** `30f7ab98403611ee1a4846e4aa8797e03bac0e6b`. La CI standard `40972614731`, job `123792791695`, fallisce nel test di terminazione controllata delle repliche: il test interpreta il primo frame dopo SIGTERM come chiusura. Il log non mostra il tipo del frame ricevuto; uno snapshot in volo è una spiegazione plausibile, non confermata.

@@ -51,9 +51,21 @@ done
 # both its compiled API and UI assets.
 docker run --rm --platform "linux/$target" --entrypoint node "$image" -e '
 const fs=require("fs");
-if(process.arch!==process.argv[1]||process.getuid()===0)process.exit(42);
-for(const p of ["/app/apps/api/dist/server.js","/app/apps/web/dist/index.html"]){if(!fs.statSync(p).isFile())process.exit(43)}
-if(fs.existsSync("/usr/local/bin/npm"))process.exit(44);
+// Node reports x64 for the OCI linux/amd64 architecture, but arm64 for linux/arm64.
+// Compare equivalent architectures; never bypass the non-root or asset gates.
+const ociArch=process.argv[1];
+const expectedNodeArch=({amd64:"x64",arm64:"arm64"})[ociArch];
+if(process.arch!==expectedNodeArch){
+  console.error(`OCI architecture mismatch: requested=${ociArch}, node=${process.arch}`);
+  process.exit(42);
+}
+if(process.getuid()===0){console.error("OCI runtime unexpectedly runs as root");process.exit(45)}
+for(const p of ["/app/apps/api/dist/server.js","/app/apps/web/dist/index.html"]){
+  if(!fs.existsSync(p)||!fs.statSync(p).isFile()){
+    console.error(`OCI runtime missing compiled artifact: ${p}`);process.exit(43);
+  }
+}
+if(fs.existsSync("/usr/local/bin/npm")){console.error("OCI production image includes npm");process.exit(44)}
 ' "$target"
 
 # Production server must boot against a separate real PostgreSQL 18 container,

@@ -10,7 +10,7 @@ from rc_gate_audit import audit
 from rc_release_preflight import preflight
 from verify_rc_cycle22_inventory import load_inventory as previous
 from verify_rc_cycle23_inventory import load_inventory
-from verify_rc_cycle25_inventory import load_inventory as current_inventory, verify_source
+from verify_rc_cycle27_inventory import load_inventory as current_inventory, verify_source
 
 class Cycle23RC(unittest.TestCase):
     def test_frozen_historical_catalog_and_current_tree(self):
@@ -37,7 +37,7 @@ class Cycle23RC(unittest.TestCase):
     def test_current_and_historical_inventories_before_secret_scan(self):
         text=(ROOT/'.github/workflows/ci.yml').read_text()
         before='python3 tools/verify_rc_cycle22_inventory.py --historical'
-        after='python3 tools/verify_rc_cycle25_inventory.py'
+        after='python3 tools/verify_rc_cycle27_inventory.py'
         self.assertIn(before,text)
         self.assertIn(after,text)
         self.assertLess(text.index(before),text.index(after))

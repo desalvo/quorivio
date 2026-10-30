@@ -42,6 +42,10 @@ on:
         description: 'Boot two API pods + PostgreSQL 18 on single-node KIND with disposable hostPath RWX; not real multi-node HA/ingress (manual opt-in)'
         type: boolean
         default: false
+      rootless_podman_test:
+        description: 'Build and run the real application with rootless Podman and disposable PostgreSQL 18 (manual opt-in; no publishing)'
+        type: boolean
+        default: false
       runtime_arch_test:
         description: 'Boot amd64 and arm64 images under Docker/QEMU with disposable PostgreSQL 18; not native ARM64, rootless Podman or Kubernetes (manual opt-in)'
         type: boolean
@@ -464,7 +468,9 @@ jobs:
           python3 tools/verify_rc_cycle22_inventory.py --historical
           python3 tools/verify_rc_cycle23_inventory.py --historical
           python3 tools/verify_rc_cycle24_inventory.py --historical
-          python3 tools/verify_rc_cycle25_inventory.py
+          python3 tools/verify_rc_cycle25_inventory.py --historical
+          python3 tools/verify_rc_cycle26_inventory.py --historical
+          python3 tools/verify_rc_cycle27_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:
@@ -616,6 +622,26 @@ jobs:
       - name: Execute ARM64 non-root runtime against PostgreSQL 18
         timeout-minutes: 12
         run: bash tools/ci_oci_runtime_smoke.sh quorivio:ci-oci-arm64 arm64
+  runtime-podman-rootless:
+    name: Rootless Podman PostgreSQL runtime acceptance (opt-in)
+    if: github.event_name == 'workflow_dispatch' && inputs.rootless_podman_test
+    needs: validate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    permissions: {contents: read}
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - name: Install rootless container engine
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq podman uidmap slirp4netns fuse-overlayfs
+          test "$(id -u)" -ne 0
+          test "$(podman info --format '{{.Host.Security.Rootless}}')" = true
+      - name: Build locally as rootless user (no publication)
+        run: podman build --format docker --pull=always -t quorivio:ci-rootless .
+      - name: Execute rootless Podman and PostgreSQL 18 application acceptance
+        run: bash tools/ci_rootless_podman_smoke.sh quorivio:ci-rootless
   publish:
     name: Production publication
     if: github.event_name == 'workflow_dispatch' && inputs.publish_image == true && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))

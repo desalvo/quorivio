@@ -6,7 +6,7 @@ import unittest
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 from verify_rc_cycle20_inventory import load_inventory as previous
 from verify_rc_cycle21_inventory import load_inventory
-from verify_rc_cycle25_inventory import verify_source, load_inventory as latest_inventory
+from verify_rc_cycle27_inventory import verify_source, load_inventory as latest_inventory
 from rc_gate_audit import audit
 from rc_release_preflight import preflight
 ROOT=pathlib.Path(__file__).resolve().parents[2]

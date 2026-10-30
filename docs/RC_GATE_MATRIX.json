@@ -1171,5 +1171,45 @@
     "score_after": 79.0,
     "verified_remote_hotfix": false,
     "strict_rc_ready": false
+  },
+  "rc_cycle26_ci_hotfix_20261030": {
+    "origin_run_id": 40975979003,
+    "commit_sha": "540fca20a8fe90a6a3aad4e571c0f95ed13ecfe1",
+    "run_result": "failure",
+    "passed_jobs": {
+      "production_quality": 123804398587,
+      "kubernetes_api_schema": 123806382731,
+      "container_build": 123806382735,
+      "kubernetes_single_node_runtime": 123806382760,
+      "native_firefox_webkit": 123806382775
+    },
+    "failed_job": 123806382783,
+    "failed_step": "Execute AMD64 non-root runtime against PostgreSQL 18",
+    "root_cause": "Node process.arch uses x64 whereas OCI names the same architecture amd64; script compared them verbatim and exited 42.",
+    "change": "Compare amd64 against x64 and arm64 against arm64, retaining independent root UID, compiled asset and npm removal checks.",
+    "new_full_ci_verified": false,
+    "oci_runtime_amd64_verified": false,
+    "oci_runtime_arm64_verified": false,
+    "score_before": 79.0,
+    "score_after": 79.0,
+    "strict_rc_ready": false,
+    "limits": "KIND was single-node hostPath only; native ARM hardware, rootless Podman, ingress runtime, independent accessibility and real RWX CSI remain unverified."
+  },
+  "rc_cycle27_rootless_podman_local_20261030": {
+    "base_cycle": 26,
+    "last_user_confirmed_commit": "540fca20a8fe90a6a3aad4e571c0f95ed13ecfe1",
+    "last_full_ci_run": 40975979003,
+    "last_full_ci_conclusion": "failure",
+    "oci_hotfix_verified_remotely": false,
+    "rootless_podman_verified_remotely": false,
+    "podman_runtime_opt_in": "rootless_podman_test=true",
+    "oci_runtime_opt_in": "runtime_arch_test=true",
+    "score_before": 79.0,
+    "score_after": 79.0,
+    "score_delta_pp": 0.0,
+    "accepted_gates": 30,
+    "partial_gates": 17,
+    "strict_rc_ready": false,
+    "comment": "New independent opt-in rootless Podman acceptance is source-only until a real GitHub runner validates the image and PostgreSQL. No gate promotion or production claims."
   }
 }
