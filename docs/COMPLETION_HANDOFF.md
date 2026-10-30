@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC cycle 45 — Chromium on compiled frontend assets (30 October 2026)
+
+**Verified RC remains 80.75% (52 gates: 35 accepted, 17 partial).** GitHub run `41110214420`, job `124250386166`, on commit `383c273deb53d368d6b8a1d57ab5c623591bcc7a` completed TypeScript/Vite builds, 500 backend and 84 frontend Node tests and the real ClamAV runtime test. The full Chromium editor acceptance failed with `root_children=0, page_error_count=0` before authenticated navigation, meaning React never mounted. The dependent container build was skipped.
+
+**New change (not yet GitHub certified):** the full editor CI now serves the immutable compiled distribution through `vite preview` rather than Vite's development optimizer and HMR server. `tools/ci_built_frontend_asset_probe.py` verifies the built HTML, fingerprinted JavaScript response and React mount before the existing editor suite. Logs expose only safe asset-type/status counts, not private cookies, requests, tokens or stack traces. The editor still verifies reload-based autosave restoration but no longer reloads to disguise an optimizer startup failure.
+
+**Verification and limits:** local Node suites, focused Python tests, Python and YAML parsing were exercised. Local Chromium is explicitly blocked from loopback HTTP by this environment (`ERR_BLOCKED_BY_ADMINISTRATOR`), preventing an actual browser end-to-end run here. The exact reason for the previous blank DOM has not been definitively proven; switching to prebuilt assets removes one plausible source of variability and makes the next run more diagnostic. No score credit or assistant commit/push/tag/publish.
+
+**After committing:** standard CI with `browser_test=true`, `publish_image=false`, `rc_strict=false`; require `PASS Chromium built frontend` and `PASS Chromium editor mock fidelity`. Extended tests can follow after the standard gate turns green.
+
+---
+
 # Quorivio 0.1.0-dev — RC cycle 44 — Chromium initial mount and cookie top-layer CI hotfix (30 October 2026)
 
 **Last maintainer commit:** `1857ebb22560d0ddcc1fec439dfe865eb0183e98` (cycle 43). Standard workflow `41103165554` passed 500 API and 84 web Node tests, TypeScript/Vite production build, and the independent real ClamAV job. The quality gate failed in `tools/ci_browser_editor.py` waiting for the `Apri sessione` button; the attached failure screenshot is fully white, so the frontend had not visibly mounted when the test timed out. The exact underlying JavaScript or cold Vite startup fault was not recorded in this run and must not be guessed.

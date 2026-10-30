@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC ciclo 45 — collaudo Chromium sugli asset compilati (30 ottobre 2026)
+
+**RC verificata invariata: 80,75% (52 gate: 35 accettati e 17 parziali).** La run GitHub `41110214420`, job `124250386166`, sul commit `383c273deb53d368d6b8a1d57ab5c623591bcc7a` ha compilato correttamente TypeScript/Vite e superato 500 test Node backend, 84 frontend e il test ClamAV reale, ma il collaudo Chromium completo ha fallito con `root_children=0, page_error_count=0`. Il test non ha ottenuto alcun DOM React nell'app, prima della navigazione autenticata. Il container gate è stato saltato a causa del quality gate fallito.
+
+**Intervento nuovo (non ancora certificato da CI):** per evitare la dipendenza del collaudo editor dall'ottimizzatore di dipendenze e dall'HMR del server Vite in modalità sviluppo, il workflow avvia `vite preview` dal `dist` già prodotto da `npm run build`. La nuova prova `tools/ci_built_frontend_asset_probe.py` verifica che la pagina provenga dal build, che il JS fingerprinted sia scaricato con HTTP 200 e che React monti `#root .app` prima dei test editor. I log non espongono URL con token, cookie, payload o stacktrace contenenti dati. Il test editor mantiene la prova di ricaricamento per l'autosave ma non ripete più il bootstrap per tentare di compensare l'optimizer.
+
+**Verifiche e limiti:** contratti Python, sintassi Python/YAML e suite Node locali eseguiti; il browser di questo ambiente blocca esplicitamente il loopback HTTP (`ERR_BLOCKED_BY_ADMINISTRATOR`) e non permette una verifica end-to-end dell'avvio React. La causa tecnica esatta del mancato montaggio nella run precedente non è stata dimostrata; l'intervento rimuove una sorgente plausibile di instabilità e rende la successiva run molto più diagnostica. La nuova CI deve passare prima di definire risolto il guasto. Non vi sono punti RC nuovi né commit/push/tag/publish automatici.
+
+**Dopo il commit:** workflow standard con `browser_test=true`, `publish_image=false`, `rc_strict=false`; verificare `PASS Chromium built frontend` e `PASS Chromium editor mock fidelity`. Solo dopo eseguire eventuali workflow estesi.
+
+---
+
 # Quorivio 0.1.0-dev — RC ciclo 44 — avvio Chromium e informativa cookie (30 ottobre 2026)
 
 **Ultimo commit confermato:** `1857ebb22560d0ddcc1fec439dfe865eb0183e98` (ciclo 43). La CI standard `41103165554` ha superato 500 test Node backend, 84 frontend, build TypeScript/Vite e la prova separata ClamAV reale. Il quality gate si è fermato in `tools/ci_browser_editor.py` attendendo «Apri sessione». Lo screenshot allegato è interamente bianco: quando si è verificato il timeout il frontend non era visibilmente montato. La vera causa sottostante (JavaScript o caricamento freddo Vite) non era riportata nei log e non può essere dichiarata identificata.

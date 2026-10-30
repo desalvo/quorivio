@@ -1,0 +1,28 @@
+{
+  "cycle": 45,
+  "date": "2026-10-30",
+  "base_package": "quorivio-0.1.0-dev-rc-chromium-startup-cookie-hotfix-cycle44-gate80.75-cumulative.zip",
+  "github_run_id": 41110214420,
+  "github_job_id": 124250386166,
+  "github_head_sha": "383c273deb53d368d6b8a1d57ab5c623591bcc7a",
+  "evidence": {
+    "node_backend_tests": 500,
+    "node_backend_pass": 500,
+    "node_frontend_tests": 84,
+    "node_frontend_pass": 84,
+    "previous_run_ts_vite_build": "pass",
+    "previous_run_clamav_instream": "pass",
+    "previous_run_chromium_full_editor": "failed",
+    "failure_signature": "root_children=0; page_error_count=0; Chromium frontend not mounted under Vite development server",
+    "new_code_gitHub_ci": "not executed",
+    "new_code_full_chromium_local": "blocked by local browser ERR_BLOCKED_BY_ADMINISTRATOR for loopback HTTP",
+    "scope": "Switch CI full-editor route fixture to immutable Vite production preview; add built asset + React mount probe and safe diagnostics. No product feature/API behavior modified."
+  },
+  "rc_gate_score": 80.75,
+  "rc_gate_counts": {
+    "accepted": 35,
+    "partial": 17
+  },
+  "release_ready": false,
+  "commit_performed_by_assistant": false
+}

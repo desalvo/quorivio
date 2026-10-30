@@ -117,14 +117,21 @@ jobs:
           # Smoke and export the exact browser used by every subsequent UI test.
           python3 tools/ci_browser_bootstrap.py --smoke --github-env "$GITHUB_ENV"
           export QUORIVIO_CHROMIUM_PATH="$(sed -n 's/^QUORIVIO_CHROMIUM_PATH=//p' "$GITHUB_ENV" | tail -1)"
-          npm run dev:web > /tmp/quorivio-ci-vite.log 2>&1 &
-          echo $! > /tmp/quorivio-ci-vite.pid
-          trap 'kill $(cat /tmp/quorivio-ci-vite.pid) || true; tail -80 /tmp/quorivio-ci-vite.log' EXIT
+          # Exercise exactly the compiled distribution from the preceding build.
+          # Vite's dev optimizer intermittently reloads its first ESM imports,
+          # leaving a completely empty #root with no JavaScript exception.
+          # Preview serves immutable /assets/* with no HMR/optimizer races.
+          npm run preview -w @quorivio/web > /tmp/quorivio-ci-preview.log 2>&1 &
+          preview_pid=$!
+          trap 'kill "$preview_pid" || true; tail -50 /tmp/quorivio-ci-preview.log' EXIT
           for i in $(seq 1 45); do
             if curl --fail --silent http://127.0.0.1:5173/ >/dev/null; then break; fi
             sleep 1
           done
-          curl --fail --show-error http://127.0.0.1:5173/
+          curl --fail --show-error http://127.0.0.1:5173/ > /dev/null
+          # Verify production HTML advertises fingerprinted JS and CSS, not
+          # a dev-only /src/main.tsx module or /@vite/client HMR bootstrap.
+          python3 tools/ci_built_frontend_asset_probe.py
           # Real browser CSS preflight: catch hidden nested actions before UI acceptance.
           python3 tools/ci_nested_context_css_chromium.py
           python3 tools/ci_accessible_disclosure_chromium.py
@@ -507,7 +514,8 @@ jobs:
           python3 tools/verify_rc_cycle41_inventory.py --historical
           python3 tools/verify_rc_cycle42_inventory.py --historical
           python3 tools/verify_rc_cycle43_inventory.py --historical
-          python3 tools/verify_rc_cycle44_inventory.py
+          python3 tools/verify_rc_cycle44_inventory.py --historical
+          python3 tools/verify_rc_cycle45_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

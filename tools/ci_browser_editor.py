@@ -37,26 +37,23 @@ async def acknowledge_functional_cookie_notice(page):
     await expect(notice).to_have_count(0)
 
 async def await_frontend_mount(page, errors=None):
-    """Wait for actual React mount, not merely a 200 HTML or Vite cold start.
+    """Check the compiled React bundle, not a Vite optimizer/HMR race.
 
-    A white screenshot cannot be diagnosed from a missing navigation button;
-    distinguish initial optimizer reloads from genuine frontend startup crashes.
+    Asset status and failure *counts* are safe in public GitHub logs; URLs,
+    cookies, session IDs, request bodies and contents are never printed.
     """
-    for attempt in range(2):
-        try:
-            await page.locator('#root .app').wait_for(state='visible', timeout=18000)
-            return
-        except Exception:
-            if attempt == 0:
-                # Vite can reload on its first dependency optimization pass.
-                await page.reload(wait_until='domcontentloaded')
-                continue
-            # Never dump user content, cookies or session IDs to public CI logs.
-            root_children = await page.locator('#root > *').count()
-            print(f'FAIL Chromium frontend startup: root_children={root_children}, '
-                  f'page_error_count={len(errors or [])}; '
-                  'inspect page errors and Vite startup; no authenticated navigation was rendered.', flush=True)
-            raise
+    try:
+        await page.locator('#root .app').wait_for(state='visible', timeout=25000)
+    except Exception:
+        root_children = await page.locator('#root > *').count()
+        asset_http = await page.evaluate("""() => performance.getEntriesByType('resource')
+            .filter(e=>new URL(e.name).pathname.startsWith('/assets/'))
+            .map(e=>({kind:new URL(e.name).pathname.endsWith('.js')?'JS':'other',
+                       responseStatus:e.responseStatus||0}))""")
+        print(f'FAIL Chromium compiled frontend startup: root_children={root_children}, '
+              f'asset_http={asset_http}, page_error_count={len(errors or [])}; '
+              'React did not mount. Inspect the built asset probe before editor actions.', flush=True)
+        raise
 
 async def main():
  async with async_playwright() as pw:

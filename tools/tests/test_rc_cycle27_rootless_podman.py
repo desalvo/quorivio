@@ -9,7 +9,7 @@ sys.path.insert(0, str(ROOT / 'tools'))
 from rc_gate_audit import audit
 from rc_release_preflight import preflight
 from verify_rc_cycle26_inventory import load_inventory as historical
-from verify_rc_cycle44_inventory import load_inventory, verify_source
+from verify_rc_cycle45_inventory import load_inventory, verify_source
 
 
 class Cycle27(unittest.TestCase):

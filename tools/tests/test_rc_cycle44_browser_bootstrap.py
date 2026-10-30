@@ -9,7 +9,10 @@ class ChromiumBrowserBootstrapRegression(unittest.TestCase):
   src=(ROOT/'tools/ci_browser_editor.py').read_text()
   ast.parse(src)
   self.assertIn("await page.locator('#root .app').wait_for(state='visible'",src)
-  self.assertIn("await page.reload(wait_until='domcontentloaded')",src)
+  # Cycle 45 serves immutable compiled assets, so the old HMR workaround
+  # must no longer conceal a missing React mount.
+  self.assertNotIn("await page.reload(wait_until='domcontentloaded')",src.split('async def await_frontend_mount',1)[1].split('async def main',1)[0])
+  self.assertIn('FAIL Chromium compiled frontend startup:',src)
   for name in ('page','mobile'):
    ready='await await_frontend_mount('+name
    modal='await acknowledge_functional_cookie_notice('+name+')'

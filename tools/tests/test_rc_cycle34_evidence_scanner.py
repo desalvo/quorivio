@@ -6,7 +6,7 @@ ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT/'tools'))
 from rc_gate_audit import audit
 from rc_release_preflight import preflight
-from verify_rc_cycle44_inventory import verify_source,load_inventory
+from verify_rc_cycle45_inventory import verify_source,load_inventory
 
 class Cycle34Evidence(unittest.TestCase):
  def test_new_credit_is_bounded_and_does_not_duplicate_old_gates(self):
