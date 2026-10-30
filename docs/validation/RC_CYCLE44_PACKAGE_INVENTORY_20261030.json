@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
-  "cycle": 43,
-  "file_count_excluding_manifest": 987,
+  "cycle": 44,
+  "file_count_excluding_manifest": 992,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -44,14 +44,14 @@
       "e377db62"
     ],
     ".github/workflows/ci.yml": [
-      "eb45adbf",
-      "5e8beb63",
-      "25bf9fe8",
-      "9ad18e11",
-      "0dcc4ca9",
-      "99c0571f",
-      "8b533f51",
-      "03932a92"
+      "e278f8f8",
+      "d570561a",
+      "dbcd589e",
+      "844d52b0",
+      "5d84713c",
+      "f777c86b",
+      "4b3e525a",
+      "b6496fe2"
     ],
     ".gitignore": [
       "ed25541d",
@@ -2154,24 +2154,24 @@
       "949f2c92"
     ],
     "docs/COMPLETION_HANDOFF.it.md": [
-      "913c85ee",
-      "669156aa",
-      "bb2ad677",
-      "29a705ac",
-      "08f16531",
-      "7d9053a9",
-      "ef6b97cc",
-      "eccb2542"
+      "9cec4526",
+      "66a7cd8a",
+      "3d3c94dc",
+      "ff871ddc",
+      "e60ca29f",
+      "8d32beae",
+      "257085a3",
+      "482778c2"
     ],
     "docs/COMPLETION_HANDOFF.md": [
-      "3e34f20e",
-      "af5201a5",
-      "88810ecb",
-      "cfd17803",
-      "55d49f16",
-      "cba83ccc",
-      "e2439761",
-      "f6ca58fb"
+      "af479fa3",
+      "48d9be16",
+      "68b80323",
+      "98127a01",
+      "76031147",
+      "cbbfb4e4",
+      "68431174",
+      "50f398ca"
     ],
     "docs/CONVERSION_ATOMIC_PUBLISH.en.md": [
       "20d0f241",
@@ -2234,24 +2234,24 @@
       "1ac5fb62"
     ],
     "docs/DEVELOPMENT_STATUS.it.md": [
-      "7983fe6c",
-      "7424a2c3",
-      "f51e889a",
-      "d445dd03",
-      "af33b44e",
-      "98d76274",
-      "0586f6d1",
-      "74550e4e"
+      "da8e8715",
+      "8d92cf23",
+      "754e41f2",
+      "051bdef7",
+      "e5b5794a",
+      "2d70b50d",
+      "3be688cc",
+      "9f060ea5"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "20b916e4",
-      "1722c2fa",
-      "dc02725f",
-      "f7fa2068",
-      "b8e8fac4",
-      "8faff434",
-      "c48e6954",
-      "5ac7c423"
+      "70fbcc19",
+      "a804218b",
+      "4bb83cd4",
+      "64ba427d",
+      "e95eb12f",
+      "d86462ce",
+      "f4e9766a",
+      "b4978262"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",
@@ -4232,6 +4232,26 @@
       "fcc7686a",
       "675bdfe7",
       "9fde389b"
+    ],
+    "docs/RC_CYCLE44_CHROMIUM_STARTUP_COOKIE_HOTFIX.en.md": [
+      "a095ffe0",
+      "800bfd48",
+      "165ff2da",
+      "cae4da3a",
+      "878c7958",
+      "19341b18",
+      "bfa4e1ae",
+      "a27f2568"
+    ],
+    "docs/RC_CYCLE44_CHROMIUM_STARTUP_COOKIE_HOTFIX.it.md": [
+      "903064d3",
+      "4dec09e5",
+      "ff40752f",
+      "4ae6647f",
+      "30e8da45",
+      "6e73a401",
+      "336f3007",
+      "faf4def6"
     ],
     "docs/RC_CYCLE9_VERIFIED_GATE_HARDENING_20261028.en.md": [
       "920e2f93",
@@ -6904,24 +6924,24 @@
       "52ca3ef4"
     ],
     "tools/ci_browser_editor.py": [
-      "30d89dba",
-      "493ee1a3",
-      "4ee56110",
-      "7951e2ca",
-      "12afeb53",
-      "b1223067",
-      "4020469b",
-      "b827e0e2"
+      "c7adba3f",
+      "b2c4f898",
+      "73a07c03",
+      "17b76229",
+      "f62300f3",
+      "55abc9b8",
+      "24f0ab91",
+      "2b6479ce"
     ],
     "tools/ci_browser_editor_postgres.py": [
-      "13bc9650",
-      "2c8cdf0f",
-      "906445d6",
-      "7ab9380e",
-      "15ecc007",
-      "98d64dc1",
-      "3f036078",
-      "b2f5a91d"
+      "10e5fa9b",
+      "e197bac9",
+      "a742dc63",
+      "321b6e9c",
+      "72713088",
+      "644f7711",
+      "ca0a59f0",
+      "8750489b"
     ],
     "tools/ci_browser_participant.py": [
       "e05de1e0",
@@ -6992,6 +7012,16 @@
       "d0231529",
       "43babf23",
       "da86105d"
+    ],
+    "tools/ci_cookie_modal_order_chromium.py": [
+      "429d95f9",
+      "4b61592d",
+      "f41e118f",
+      "1b6e785e",
+      "01516d4a",
+      "a916210e",
+      "ebee3034",
+      "3e23bb8f"
     ],
     "tools/ci_cookie_viewport.py": [
       "7e66f757",
@@ -7764,14 +7794,14 @@
       "4af460f5"
     ],
     "tools/tests/test_chromium_cookie_notice_acceptance.py": [
-      "4bf95722",
-      "deca4b07",
-      "48c91959",
-      "1f04407f",
-      "194c9143",
-      "1f842df4",
-      "ce2ab66a",
-      "90387d6a"
+      "81881640",
+      "45a00fe9",
+      "746347f8",
+      "4c5a3e0f",
+      "6d64746d",
+      "0badf718",
+      "7892a922",
+      "acd295a4"
     ],
     "tools/tests/test_chromium_cookie_portal_layer.py": [
       "696a5f26",
@@ -8734,14 +8764,14 @@
       "e36920f0"
     ],
     "tools/tests/test_rc_ci_40796695726_40797106013_20261029.py": [
-      "a6f71835",
-      "369de452",
-      "b8fb4d2f",
-      "eab5be3d",
-      "41b8cc39",
-      "444dd5c4",
-      "21856eee",
-      "e2eb55c1"
+      "61ebec27",
+      "ec12c88b",
+      "c34f19cb",
+      "e48b3902",
+      "2de4d680",
+      "54d7a157",
+      "8afc4843",
+      "e2cca93b"
     ],
     "tools/tests/test_rc_conversion_30_cycle.py": [
       "d98445fc",
@@ -8954,84 +8984,84 @@
       "44272ce6"
     ],
     "tools/tests/test_rc_cycle20_authenticated_retention.py": [
-      "2c608a2d",
-      "d239634f",
-      "9f6b8e3c",
-      "b9998703",
-      "fe1a851e",
-      "4fa97bc5",
-      "1aadd4d8",
-      "9ec68d5d"
+      "d2b5ddf1",
+      "4ddedbdf",
+      "7e751b6c",
+      "d3e34fb7",
+      "d130ae24",
+      "92c05e72",
+      "a2c0a186",
+      "4787e8e4"
     ],
     "tools/tests/test_rc_cycle21_mounted_mirror.py": [
-      "533e8ae0",
-      "8aad902d",
-      "88b230f1",
-      "881bcc53",
-      "a31e84ea",
-      "99811615",
-      "d63a41af",
-      "39ace689"
+      "ae241265",
+      "4767ad4f",
+      "c95f3dae",
+      "b58ad25a",
+      "2c7e7a03",
+      "d59cde98",
+      "708e55f4",
+      "9a80aacd"
     ],
     "tools/tests/test_rc_cycle22_verified_dr_reconnect_oci.py": [
-      "55d046f8",
-      "bb0d12b2",
-      "a01b2269",
-      "846f144b",
-      "18dc2c2d",
-      "1c8df0f2",
-      "f5d211dd",
-      "b2c92447"
+      "4a1e475e",
+      "9f0206df",
+      "ecb4fc4a",
+      "0b489188",
+      "d0d3841a",
+      "af56b02c",
+      "1c470b89",
+      "60df2c75"
     ],
     "tools/tests/test_rc_cycle23_k8s_ha.py": [
-      "a1b9dfd5",
-      "5b50536c",
-      "b11c5b5b",
-      "9c91271f",
-      "95ab1dd3",
-      "190a4d8e",
-      "1a3c14a8",
-      "f8007647"
+      "4b5b301b",
+      "cf6d1b2c",
+      "01cda7dc",
+      "b66911e9",
+      "bc8501bf",
+      "0b911117",
+      "5b1bfc38",
+      "f2bf1148"
     ],
     "tools/tests/test_rc_cycle24_kind_runtime.py": [
-      "6ac724f0",
-      "e217ce1e",
-      "0deb9a1f",
-      "52fd8c2d",
-      "550f1f42",
-      "44fae20e",
-      "a306faab",
-      "28b7008b"
+      "37f5775f",
+      "9e4223ab",
+      "1cafd590",
+      "1c0d5909",
+      "f47cb800",
+      "e8ce554a",
+      "7463f562",
+      "bdada2f6"
     ],
     "tools/tests/test_rc_cycle26_oci_hotfix.py": [
-      "de13e9b3",
-      "4bbfd590",
-      "afd0fb81",
-      "3be9bdf5",
-      "83b98760",
-      "189aeb21",
-      "fb5eca93",
-      "7f8b9a3b"
+      "862e234a",
+      "98a205af",
+      "94865eae",
+      "6cc1c298",
+      "6a0c6b3b",
+      "ff10691e",
+      "99a87c38",
+      "f77f4a2c"
     ],
     "tools/tests/test_rc_cycle27_rootless_podman.py": [
-      "9e89b9a0",
-      "6c871324",
-      "70ada965",
-      "abf88d7c",
-      "d7e25b2e",
-      "6ae38cf1",
-      "fec0ac10",
-      "17a755a9"
+      "f1b72dd0",
+      "4ed14eee",
+      "95347610",
+      "f4bdac53",
+      "18ec1ab5",
+      "700b1b12",
+      "229eacc0",
+      "6b3f007f"
     ],
     "tools/tests/test_rc_cycle28_podman_tmpfs.py": [
-      "873f3b46",
-      "f78cdce0",
-      "0432c512",
-      "2d02a0f9",
-      "2f5849a2",
-      "1e2253f6",
-      "ae4cd33e",
-      "c9623afd"
+      "994dc4cd",
+      "f0d1a984",
+      "ff527fa3",
+      "4b0ed926",
+      "e54fd525",
+      "faca0a20",
+      "74a23278",
+      "f5762710"
     ],
     "tools/tests/test_rc_cycle29_multinode_ingress.py": [
       "29f704a7",
@@ -9044,14 +9074,14 @@
       "0d14aa27"
     ],
     "tools/tests/test_rc_cycle30_inventory.py": [
-      "e2bee63b",
-      "7e3a4a1e",
-      "810662f9",
-      "80fba9f8",
-      "8057e429",
-      "c71fed27",
-      "f2582469",
-      "86b181ed"
+      "dfae6bb5",
+      "50f22f75",
+      "b3521da6",
+      "f7b52f49",
+      "c66dde35",
+      "29557ec9",
+      "3d60948b",
+      "2936276a"
     ],
     "tools/tests/test_rc_cycle30_operational_ha.py": [
       "f325990f",
@@ -9064,14 +9094,14 @@
       "0603f0f1"
     ],
     "tools/tests/test_rc_cycle31_inventory.py": [
-      "3273ccc3",
-      "4dafc465",
-      "3ee01ae3",
-      "acc97339",
-      "bc93c3e9",
-      "1312655e",
-      "bc90fc4b",
-      "08b793d9"
+      "b777c348",
+      "4923c2f4",
+      "a1e64ec6",
+      "6ba7793c",
+      "b067b36b",
+      "d4ddc4cc",
+      "3624b830",
+      "cda64a12"
     ],
     "tools/tests/test_rc_cycle32_antivirus_k8s.py": [
       "88886c81",
@@ -9094,14 +9124,14 @@
       "1538df71"
     ],
     "tools/tests/test_rc_cycle34_evidence_scanner.py": [
-      "e257ecd6",
-      "c6ea9cca",
-      "a344872f",
-      "e0b3fecf",
-      "a376efb8",
-      "456d7989",
-      "491be1f9",
-      "569c93b5"
+      "9aae5d07",
+      "9e79f5ee",
+      "f77920c1",
+      "8e5316a6",
+      "6e6ba769",
+      "ac17f5cf",
+      "026796ef",
+      "832ac8a7"
     ],
     "tools/tests/test_rc_cycle35_verified_bootstrap.py": [
       "35c131e6",
@@ -9142,6 +9172,16 @@
       "e59f67e7",
       "40d7c615",
       "89dfc198"
+    ],
+    "tools/tests/test_rc_cycle44_browser_bootstrap.py": [
+      "69cbc7d6",
+      "59512912",
+      "b0cd7e1c",
+      "d4b23acf",
+      "29c9f718",
+      "0c5eb2b0",
+      "ea378192",
+      "20d5a496"
     ],
     "tools/tests/test_rc_cycle4_submission_audit_20261028.py": [
       "92f9fe02",
@@ -9852,6 +9892,16 @@
       "ebe3564c",
       "da6a5650",
       "d5d801a0"
+    ],
+    "tools/verify_rc_cycle44_inventory.py": [
+      "d480eb76",
+      "beb8753c",
+      "b90de9a3",
+      "ae5b4373",
+      "b276b82c",
+      "9c3e53e0",
+      "542decbf",
+      "783a3ebb"
     ],
     "tools/verify_rc_cycle8_inventory.py": [
       "ca6179f9",

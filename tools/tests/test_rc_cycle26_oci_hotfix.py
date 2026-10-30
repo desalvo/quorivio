@@ -9,7 +9,7 @@ from rc_gate_audit import audit
 from rc_release_preflight import preflight
 from verify_rc_cycle25_inventory import load_inventory as historical
 from verify_rc_cycle26_inventory import load_inventory as historical_26
-from verify_rc_cycle43_inventory import load_inventory,verify_source
+from verify_rc_cycle44_inventory import load_inventory,verify_source
 
 class Cycle26RC(unittest.TestCase):
     def test_historical_archive_unmodified_and_current_git_hashes(self):

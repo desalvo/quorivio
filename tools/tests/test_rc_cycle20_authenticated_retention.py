@@ -10,7 +10,7 @@ from rc_release_preflight import preflight
 from verify_rc_cycle19_inventory import load_inventory as historical_19
 from verify_rc_cycle20_inventory import load_inventory as historical_20
 from verify_rc_cycle21_inventory import load_inventory as current_21
-from verify_rc_cycle43_inventory import verify_source
+from verify_rc_cycle44_inventory import verify_source
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 
@@ -20,7 +20,7 @@ class Cycle20SafeRetention(unittest.TestCase):
         self.assertEqual(len(historical_20()), 836)
         manifest = current_21()
         self.assertGreater(len(manifest), len(historical_19()))
-        self.assertEqual(verify_source(), len(__import__("verify_rc_cycle43_inventory").load_inventory()))
+        self.assertEqual(verify_source(), len(__import__("verify_rc_cycle44_inventory").load_inventory()))
         self.assertIn('tools/tests/test_rc_cycle20_authenticated_retention.py', manifest)
 
     def test_real_postgres_acceptance_checks_authenticated_retention_and_legal_holds(self):

@@ -1,0 +1,8 @@
+# Quorivio 0.1.0-dev — RC cycle 44 — Chromium initial mount and cookie top-layer CI hotfix (30 October 2026)
+
+**Last maintainer commit:** `1857ebb22560d0ddcc1fec439dfe865eb0183e98` (cycle 43). Standard workflow `41103165554` passed 500 API and 84 web Node tests, TypeScript/Vite production build, and the independent real ClamAV job. The quality gate failed in `tools/ci_browser_editor.py` waiting for the `Apri sessione` button; the attached failure screenshot is fully white, so the frontend had not visibly mounted when the test timed out. The exact underlying JavaScript or cold Vite startup fault was not recorded in this run and must not be guessed.
+
+**Cycle 44 changes (not yet CI-verified):** mock Chromium editor now explicitly waits for React `#root .app` and retries once after a full navigation to absorb a Vite cold dependency-optimizer reload, otherwise failing with a precise frontend-mount diagnostic. The native modal cookie notice is acknowledged *before* querying navigation controls on desktop and mobile. The real PostgreSQL editor acceptance similarly handles the modal before querying the page, with a cookie-aware readiness check. Added contract tests and a self-contained real-Chromium regression proving modal pointer interception and manual acknowledgement; no production cookie bypass or force-click was introduced. Do not claim that the full browser editor acceptance passes until the next GitHub run.
+
+**RC score unchanged: 80.75%** (52 gates, 35 accepted, 17 partial). `rc_strict=false`, `publish_image=false`. Commit only after review; no assistant commit, push, tag or publication.
+

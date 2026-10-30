@@ -36,6 +36,28 @@ async def acknowledge_functional_cookie_notice(page):
     await button.click()
     await expect(notice).to_have_count(0)
 
+async def await_frontend_mount(page, errors=None):
+    """Wait for actual React mount, not merely a 200 HTML or Vite cold start.
+
+    A white screenshot cannot be diagnosed from a missing navigation button;
+    distinguish initial optimizer reloads from genuine frontend startup crashes.
+    """
+    for attempt in range(2):
+        try:
+            await page.locator('#root .app').wait_for(state='visible', timeout=18000)
+            return
+        except Exception:
+            if attempt == 0:
+                # Vite can reload on its first dependency optimization pass.
+                await page.reload(wait_until='domcontentloaded')
+                continue
+            # Never dump user content, cookies or session IDs to public CI logs.
+            root_children = await page.locator('#root > *').count()
+            print(f'FAIL Chromium frontend startup: root_children={root_children}, '
+                  f'page_error_count={len(errors or [])}; '
+                  'inspect page errors and Vite startup; no authenticated navigation was rendered.', flush=True)
+            raise
+
 async def main():
  async with async_playwright() as pw:
   launch={'executable_path':os.environ['QUORIVIO_CHROMIUM_PATH']} if os.environ.get('QUORIVIO_CHROMIUM_PATH') else {}
@@ -72,8 +94,11 @@ async def main():
   await page.route('**/api/**',mock)
   try:
    await page.goto(os.environ.get('QUORIVIO_WEB_URL','http://127.0.0.1:5173/'),wait_until='domcontentloaded')
-   await page.get_by_role('button',name='Apri sessione').first.wait_for()
+   await await_frontend_mount(page,errors)
+   # The native showModal() cookie dialog makes underlying UI inaccessible to
+   # get_by_role() until the presenter acknowledges it. Always dismiss first.
    await acknowledge_functional_cookie_notice(page)
+   await page.get_by_role('button',name='Apri sessione').first.wait_for()
    await page.get_by_role('button',name='Apri sessione').first.click()
    card=page.locator('details').filter(has=page.get_by_text('Browser acceptance',exact=True))
    await card.locator('summary').click();await card.get_by_role('button',name='Apri sessione').click()
@@ -245,8 +270,9 @@ async def main():
    mobile=await touch_context.new_page()
    await mobile.route('**/api/**',mock)
    await mobile.goto(os.environ.get('QUORIVIO_WEB_URL','http://127.0.0.1:5173/'),wait_until='domcontentloaded')
-   await mobile.get_by_role('button',name='Apri sessione').first.wait_for()
+   await await_frontend_mount(mobile)
    await acknowledge_functional_cookie_notice(mobile)
+   await mobile.get_by_role('button',name='Apri sessione').first.wait_for()
    await mobile.get_by_role('button',name='Apri sessione').first.click()
    card=mobile.locator('details').filter(has=mobile.get_by_text('Browser acceptance',exact=True))
    await card.locator('summary').click();await card.get_by_role('button',name='Apri sessione').click()

@@ -33,8 +33,12 @@ async def call(context,method,path,body=None,status=200):
 
 async def open_editor(page,title):
  await page.goto(BASE+'/',wait_until='domcontentloaded')
- await page.get_by_role('button',name='Apri sessione').first.wait_for()
+ # The cookie notice is a native modal and therefore hides the underlying
+ # navigation from accessibility locators until the user closes it.
  notice=page.get_by_role('dialog',name='Informativa cookie funzionali')
+ cookies=await page.context.cookies()
+ if not any(cookie['name']=='q_cookie_notice' for cookie in cookies):
+  await expect(notice).to_be_visible()
  if await notice.is_visible():
   assert await notice.evaluate("element => element.matches(':modal')"), 'Functional cookie notice must be in the browser top layer'
   button=notice.get_by_role('button',name='Ho capito')
@@ -49,6 +53,7 @@ async def open_editor(page,title):
   assert visible_hit, 'Cookie acknowledgement button must be inside the visual viewport before a real click'
   await button.click()
   await expect(notice).to_have_count(0)
+ await page.get_by_role('button',name='Apri sessione').first.wait_for()
  await page.get_by_role('button',name='Apri sessione').first.click()
  card=page.locator('details').filter(has=page.get_by_text(title,exact=True))
  await card.locator('summary').click()

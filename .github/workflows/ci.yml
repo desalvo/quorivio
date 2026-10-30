@@ -160,6 +160,8 @@ jobs:
           python3 tools/ci_rehearsal_singleton_offline_chromium.py
           # Real built React: one-time account recovery bearer never lingers in URL/history.
           python3 tools/ci_recovery_url_chromium.py
+          # Native modal must be acknowledged before querying page controls.
+          python3 tools/ci_cookie_modal_order_chromium.py
           python3 tools/ci_browser_editor.py
       - name: Upload Chromium failure diagnostics
         if: failure() && github.event_name == 'workflow_dispatch' && inputs.browser_test
@@ -504,7 +506,8 @@ jobs:
           python3 tools/verify_rc_cycle39_inventory.py --historical
           python3 tools/verify_rc_cycle41_inventory.py --historical
           python3 tools/verify_rc_cycle42_inventory.py --historical
-          python3 tools/verify_rc_cycle43_inventory.py
+          python3 tools/verify_rc_cycle43_inventory.py --historical
+          python3 tools/verify_rc_cycle44_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:
