@@ -7,7 +7,7 @@ SOURCE=(ROOT/'apps/web/src/main.tsx').read_text()
 class WidgetQuestionEditorRegression(unittest.TestCase):
     def test_integrated_editor_has_one_inspector_only(self):
         self.assertIn('contextWidget&&!onInspectWidget&&<div className="canvas-context-properties">', SOURCE)
-        self.assertIn('contextWidget===w.id&&<div className="canvas-context-menu"', SOURCE)
+        self.assertIn('contextWidget===w.id&&createPortal(<div className="canvas-context-menu"', SOURCE)
         self.assertIn('editor-widget-drawer',SOURCE)
         self.assertIn('aria-label="Chiudi proprietà widget"',SOURCE)
     def test_question_modes(self):

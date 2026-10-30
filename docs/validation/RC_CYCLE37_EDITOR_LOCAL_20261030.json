@@ -1,0 +1,24 @@
+{
+  "version": "0.1.0-dev",
+  "cycle": 37,
+  "formal_score": 80.75,
+  "base_commit": "f5ccf9a7545e7c17b4323d067db66aff5eca9b41",
+  "uncommitted_since": 34,
+  "issues": [
+    "pale canvas text default",
+    "context menu clipped inside widget",
+    "rehearsal modal inaccessible/unclosable",
+    "multiple poll options invalid page design"
+  ],
+  "local_node_focused_pass": 5,
+  "local_python_editor_contract_pass": 180,
+  "local_python_rehearsal_contract_pass": 20,
+  "tsx_syntax_parse": "pass",
+  "real_chromium_ci": "pending_after_maintainer_commit",
+  "full_typescript_vite_build": "not_run_missing_local_npm_dependencies",
+  "real_postgres_api": "pending_github_ci",
+  "rc_gate_promotions": 0,
+  "source_integrity": "current source + package SHA-256 inventory generated and verified",
+  "assistant_committed": false,
+  "assistant_published": false
+}

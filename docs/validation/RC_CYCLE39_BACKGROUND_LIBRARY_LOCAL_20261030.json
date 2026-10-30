@@ -1,0 +1,30 @@
+{
+  "cycle": 39,
+  "version": "0.1.0-dev",
+  "formal_rc_score": 80.75,
+  "baseline_commit_confirmed": "f5ccf9a7545e7c17b4323d067db66aff5eca9b41",
+  "functional_scope": [
+    "user-owned persistent background library",
+    "authorized collaborator listing with independent copy-on-use",
+    "scoped session asset copy and protected deletion",
+    "canvas, preview and active participant background rendering",
+    "source-widget controlled linked result views and animated accessible cloud"
+  ],
+  "local_validation": {
+    "backend_node_tests_passed": 500,
+    "background_python_tests_passed": 14,
+    "inventory_python_tests_passed": 27,
+    "rc_cycle3_python_tests_passed": 59,
+    "results_python_tests_passed": 6,
+    "typescript_tsx_syntax_errors": 0,
+    "workflow_yaml_parse": "PASS"
+  },
+  "pending": [
+    "PostgreSQL 18 integration of library and collaboration",
+    "Chromium upload/preview/public background E2E",
+    "Full TypeScript Vite build",
+    "Independent GDPR security review",
+    "New PostgreSQL 18 collaborator copy-on-use CI job has not run"
+  ],
+  "score_note": "No RC gate promoted on local-only acceptance"
+}

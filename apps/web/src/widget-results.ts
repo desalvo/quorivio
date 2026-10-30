@@ -8,6 +8,12 @@ export function eligibleStatisticSources(widgets:StatisticalWidget[],excluding?:
 export function linkedStatisticSource(widget:StatisticalWidget,widgets:StatisticalWidget[]):StatisticalWidget|undefined{
  return eligibleStatisticSources(widgets,widget.id).find(w=>w.id===widget.targetWidgetId);
 }
+export type ResultView='bars'|'pie'|'table'|'cloud';
+/** The source question/quiz/poll controls the appearance; result widgets cannot override it. */
+export function effectiveResultView(resultWidget:StatisticalWidget,widgets:StatisticalWidget[]):ResultView{
+ const view=linkedStatisticSource(resultWidget,widgets)?.resultsView;
+ return view==='pie'||view==='table'||view==='cloud'?view:'bars';
+}
 export const REHEARSAL_EMOJIS=['👍','❤️','😂','😮','👏','🎉','🤔','😕'] as const;
 /** The same safe, count-only projection is used by live PostgreSQL and by rehearsal.
  * The presenter may see counts; participants never receive result-widget data. */

@@ -120,7 +120,7 @@ class MultiNodeScriptContracts(unittest.TestCase):
         matrix=json.loads((ROOT/'docs/RC_GATE_MATRIX.json').read_text())
         by_id={g['id']:g for g in matrix['gates']}
         self.assertEqual((audit()['score'],preflight()['accepted_gates'],len(matrix['gates'])),
-                         (79.25,31,48))
+                         (80.75,35,52))
         self.assertEqual(len(preflight()['unaccepted_gates']),17)
         self.assertEqual((by_id['D3']['weight'],by_id['D3']['status']),(0.5,'partial'))
         proof=by_id['D3-OCI-ROOTLESS-RUNTIME']

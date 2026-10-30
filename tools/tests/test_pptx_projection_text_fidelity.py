@@ -19,6 +19,6 @@ class ProjectionTextFidelity(unittest.TestCase):
 
     def test_rehearsal_uses_imported_typography_and_full_text(self):
         self.assertIn("...widgetTypographyStyle(w.style)", WEB)
-        self.assertIn('<ProjectionWidgetContent sessionId={snapshot.session.id} widget={w} activity={activity}/>', WEB)
+        self.assertIn('<ProjectionWidgetContent sessionId={snapshot.session.id} widget={w} activity={activity} joinCode={snapshot.session.join_code} usePrivateProfile={true}/>', WEB)
 
 if __name__ == '__main__': unittest.main()

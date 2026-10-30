@@ -21,7 +21,7 @@ import {sealSmtpConfig,openSmtpConfig,validateSmtpInput,publicSmtpConfig} from '
 import {widgetAnswerShapeChanged,aggregateWidgetAnswerRevisions,liveTimedWidgetMutation,questionRevisionAtHistory} from './widget-revisions.js';
 import {normalizeWord,validateQuestion,moderationStatus,safeFrequency,parseModerationQueueQuery,parseModerationBulk} from './audience-tools.js';
 import {validPageOrder} from './page-sequence.js';
-import express from 'express';import helmet from 'helmet';import pg from 'pg';import bcrypt from 'bcryptjs';import QRCode from 'qrcode';import {WebSocketServer,WebSocket} from 'ws';import {liveSessionActive,livePresenterAuthorized,liveParticipantAuthorized} from './live-socket-policy.js';import {createLiveSnapshotQueue} from './live-snapshot-queue.js';import {shouldDropSlowSocket} from './live-delivery-policy.js';import {createServer} from 'node:http';import {randomUUID,randomBytes,createHash,createHmac,timingSafeEqual} from 'node:crypto';import {readFileSync,existsSync} from 'node:fs';import {mkdir,writeFile,readFile,unlink,rm} from 'node:fs/promises';import {validAsset} from './asset-policy.js';import {receiveAssetStream} from './stream-upload.js';import {scanUploadedFile} from './malware-scan.js';import {readdir,stat} from 'node:fs/promises';import path from 'node:path';import {fileURLToPath} from 'node:url';import {validTransition,validateOptions,checkAnswer,publicActivity,escapeCsvCell,validRetentionDays,validPageDesign,validPseudonym,validAnswerMode,validateSubmittedAnswer,validReaction,type Activity,type SessionStatus} from './domain.js';
+import express from 'express';import helmet from 'helmet';import pg from 'pg';import bcrypt from 'bcryptjs';import QRCode from 'qrcode';import {WebSocketServer,WebSocket} from 'ws';import {liveSessionActive,livePresenterAuthorized,liveParticipantAuthorized} from './live-socket-policy.js';import {createLiveSnapshotQueue} from './live-snapshot-queue.js';import {shouldDropSlowSocket} from './live-delivery-policy.js';import {createServer} from 'node:http';import {randomUUID,randomBytes,createHash,createHmac,timingSafeEqual} from 'node:crypto';import {readFileSync,existsSync} from 'node:fs';import {mkdir,writeFile,readFile,unlink,rm,copyFile} from 'node:fs/promises';import {validAsset} from './asset-policy.js';import {receiveAssetStream} from './stream-upload.js';import {scanUploadedFile} from './malware-scan.js';import {readdir,stat} from 'node:fs/promises';import path from 'node:path';import {fileURLToPath} from 'node:url';import {validTransition,validateOptions,checkAnswer,publicActivity,escapeCsvCell,validRetentionDays,validPageDesign,validPseudonym,validAnswerMode,validateSubmittedAnswer,validReaction,type Activity,type SessionStatus} from './domain.js';
 const db=new pg.Pool({connectionString:process.env.DATABASE_URL});const secret=process.env.AUTH_SECRET||'';if(secret.length<32)throw new Error('AUTH_SECRET must have >= 32 characters');
 const base=process.env.PUBLIC_BASE_URL||'http://localhost:8080';let publicBase=base;const app=express();app.disable('x-powered-by');app.use(helmet({contentSecurityPolicy:false}));app.use(express.json({limit:'32kb'}));const server=createServer(app);const wss=new WebSocketServer({noServer:true});
 const hash=(v:string)=>createHash('sha256').update(v).digest('hex');const sign=(s:string)=>createHmac('sha256',secret).update(s).digest('base64url');const cookies=(s:string='')=>Object.fromEntries(s.split(';').map(x=>x.trim().split('=')).filter(x=>x.length===2));
@@ -702,7 +702,15 @@ app.get('/api/join/:code/presenters/:presenterId/photo',async(req,res)=>{try{
  inspectProfileImage(data,mime);
  res.setHeader('Content-Type',mime);res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Cache-Control','no-store');res.send(data);
  }catch(e){if((e as NodeJS.ErrnoException).code==='ENOENT'||(e as Error).message==='invalid_profile_image'){res.status(404).end();return}sendError(res,e)}});
-app.get('/api/join/:code/presenter-profiles',async(req,res)=>{try{const session=await publicSession(req.params.code);if(!session||session.status==='closed'){res.status(404).end();return}const profiles=await db.query("SELECT u.id,coalesce(nullif(u.display_name,''),'Presentatore') AS name,u.profile_photo_url FROM users u WHERE u.id=$1 OR u.id IN (SELECT user_id FROM session_presenters WHERE session_id=$2)",[session.owner_id,session.id]);res.setHeader('Cache-Control','no-store');res.json(publicPresenterProfiles(profiles.rows,req.params.code))}catch(e){sendError(res,e)}});
+app.get('/api/join/:code/presenter-profiles',async(req,res)=>{try{const session=await publicSession(req.params.code);if(!session||session.status==='closed'){res.status(404).end();return}const profiles=await db.query("SELECT u.id,u.email,coalesce(nullif(u.display_name,''),'Presentatore') AS name,u.profile_photo_url FROM users u WHERE u.id=$1 OR u.id IN (SELECT user_id FROM session_presenters WHERE session_id=$2)",[session.owner_id,session.id]);
+ // Public e-mail requires explicit opt-in on a visible profile widget. Never publish
+ // every collaborator's account address from the mere existence of a session.
+ const visiblePages=await db.query('SELECT page_design FROM activities WHERE session_id=$1 AND id=$2',[session.id,session.current_activity_id]);
+ const publicEmailIds=new Set<string>();
+ for(const page of visiblePages.rows)for(const w of page.page_design?.widgets||[]){
+  if(w.kind==='profile'&&w.showEmail===true)publicEmailIds.add(w.presenterId||session.owner_id);
+ }
+ res.setHeader('Cache-Control','no-store');res.json(publicPresenterProfiles(profiles.rows,req.params.code,publicEmailIds))}catch(e){sendError(res,e)}});
 // A session may have no scheduled dates, or any explicitly selected set of dates.
 app.get('/api/sessions/:id/schedule',requireAuth,async(req,res)=>{try{
  const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}
@@ -730,7 +738,7 @@ app.put('/api/sessions/:id/appointments',requireAuth,async(req,res)=>{const cx=a
  for(const a of appointments)await cx.query('INSERT INTO session_appointments(id,session_id,scheduled_date,start_time,duration_minutes,time_zone) VALUES($1,$2,$3,$4,$5,$6)',[randomUUID(),session.id,a.date,a.start_time,a.duration_minutes,a.time_zone]);
  await cx.query('COMMIT');res.json({ok:true});
  }catch(e){await cx.query('ROLLBACK');sendError(res,e)}finally{cx.release()}});
-app.get('/api/sessions/:id/presenter-profiles',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}const users=await db.query("SELECT u.id,coalesce(nullif(u.display_name,''),'Presentatore') AS name,u.profile_photo_url,(u.id=$1) AS is_owner FROM users u WHERE u.id=$1 OR u.id IN (SELECT user_id FROM session_presenters WHERE session_id=$2)",[s.owner_id,s.id]);res.json(users.rows)}catch(e){sendError(res,e)}});
+app.get('/api/sessions/:id/presenter-profiles',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}const users=await db.query("SELECT u.id,u.email,coalesce(nullif(u.display_name,''),'Presentatore') AS name,u.profile_photo_url,(u.id=$1) AS is_owner FROM users u WHERE u.id=$1 OR u.id IN (SELECT user_id FROM session_presenters WHERE session_id=$2)",[s.owner_id,s.id]);res.json(users.rows)}catch(e){sendError(res,e)}});
 app.get('/api/sessions',requireAuth,requirePresenter,async(req,res)=>{try{
  const page=Number(req.query.page||1),pageSize=Number(req.query.page_size||(req.query.page===undefined?100:10)),search=String(req.query.search||'').trim().slice(0,160),role=String(req.query.role||'all');
  if(!Number.isSafeInteger(page)||page<1||!Number.isSafeInteger(pageSize)||pageSize<1||pageSize>100||!['all','owner','collaborator'].includes(role)){res.status(400).json({error:'invalid_pagination'});return}
@@ -781,6 +789,83 @@ async function createFromPortable(data:any,uid:string,importMediaDir?:string,bun
 const assetRoot=path.resolve(process.env.QUORIVIO_ASSET_DIR||'/app/assets');
 async function cleanupSessionFiles(sessionId:string){if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(sessionId))throw Error('invalid session id');await rm(path.join(assetRoot,sessionId),{recursive:true,force:true})}
 async function allowedUploadBytes(){const r=await db.query("SELECT value FROM platform_settings WHERE key='max_upload_mb'");return Math.max(1,Math.min(1024,Number(r.rows[0]?.value||100)))*1024*1024}
+// Backgrounds belong permanently to their uploading presenter, not to a session.
+// Collaborators can choose each other's backgrounds only inside a shared session.
+const backgroundRoot=path.join(assetRoot,'background-library');
+const backgroundTypes=new Set(['image/png','image/jpeg','image/gif','image/webp']);
+const backgroundPath=(uid:string,id:string)=>path.join(backgroundRoot,uid,id);
+const backgroundUuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
+async function accessibleBackground(s:any,uid:string,id:string){
+ if(!backgroundUuid.test(id))return undefined;
+ const result=await db.query(`SELECT b.id,b.owner_id,b.mime_type,b.byte_size,b.sha256
+ FROM presenter_backgrounds b WHERE b.id=$1 AND (b.owner_id=$2 OR EXISTS(
+  SELECT 1 FROM sessions shared WHERE
+  (shared.owner_id=$2 OR EXISTS(SELECT 1 FROM session_presenters me WHERE me.session_id=shared.id AND me.user_id=$2))
+  AND (shared.owner_id=b.owner_id OR EXISTS(SELECT 1 FROM session_presenters other WHERE other.session_id=shared.id AND other.user_id=b.owner_id))
+ ))`,[id,uid]);
+ return result.rows[0];
+}
+async function useBackground(s:any,uid:string,b:any){
+ // Copy-on-use creates *both* an independently owned library entry (when borrowed)
+ // and a session-scoped asset. Removing any other collaborator cannot break it.
+ const borrowed=b.owner_id!==uid;const libraryId=borrowed?randomUUID():b.id;
+ const assetId=randomUUID();const source=backgroundPath(b.owner_id,b.id);
+ const libraryTarget=backgroundPath(uid,libraryId);const sessionTarget=path.join(assetRoot,s.id,assetId);
+ await mkdir(path.dirname(sessionTarget),{recursive:true});
+ if(borrowed)await mkdir(path.dirname(libraryTarget),{recursive:true});
+ try{
+  if(borrowed)await copyFile(source,libraryTarget);
+  await copyFile(source,sessionTarget);
+  const cx=await db.connect();
+  try{await cx.query('BEGIN');
+   if(borrowed)await cx.query('INSERT INTO presenter_backgrounds(id,owner_id,mime_type,byte_size,sha256) VALUES($1,$2,$3,$4,$5)',[libraryId,uid,b.mime_type,b.byte_size,b.sha256]);
+   await cx.query('INSERT INTO session_assets(id,session_id,uploaded_by,mime_type,byte_size,sha256) VALUES($1,$2,$3,$4,$5,$6)',[assetId,s.id,uid,b.mime_type,b.byte_size,b.sha256]);
+   await cx.query('COMMIT');
+  }catch(e){await cx.query('ROLLBACK');throw e}finally{cx.release()}
+ }catch(e){await unlink(sessionTarget).catch(()=>{});if(borrowed)await unlink(libraryTarget).catch(()=>{});throw e}
+ return {id:assetId,background_id:libraryId,url:`/api/sessions/${s.id}/assets/${assetId}`};
+}
+app.get('/api/sessions/:id/backgrounds',requireAuth,async(req,res)=>{try{
+ const uid=auth(req)!;const s=await owner(req.params.id,uid);if(!s){res.status(404).end();return}
+ const r=await db.query(`SELECT b.id,b.owner_id,b.mime_type,b.byte_size,b.created_at,
+ CASE WHEN b.owner_id=$1 THEN true ELSE false END AS mine
+ FROM presenter_backgrounds b WHERE b.owner_id=$1 OR EXISTS(
+  SELECT 1 FROM sessions shared WHERE
+  (shared.owner_id=$1 OR EXISTS(SELECT 1 FROM session_presenters me WHERE me.session_id=shared.id AND me.user_id=$1))
+  AND (shared.owner_id=b.owner_id OR EXISTS(SELECT 1 FROM session_presenters other WHERE other.session_id=shared.id AND other.user_id=b.owner_id))
+ )
+ ORDER BY mine DESC,b.created_at DESC LIMIT 500`,[uid]);
+ res.setHeader('Cache-Control','private, no-store');res.json(r.rows.map(b=>({...b,url:`/api/sessions/${s.id}/backgrounds/${b.id}/image`})));
+ }catch(e){sendError(res,e)}});
+app.get('/api/sessions/:id/backgrounds/:bid/image',requireAuth,async(req,res)=>{try{
+ const uid=auth(req)!;const s=await owner(req.params.id,uid);if(!s){res.status(404).end();return}
+ const b=await accessibleBackground(s,uid,req.params.bid);if(!b){res.status(404).end();return}
+ res.setHeader('Cache-Control','private, no-store');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Content-Security-Policy',"default-src 'none'; sandbox");res.type(b.mime_type);
+ res.sendFile(backgroundPath(b.owner_id,b.id));
+ }catch(e){sendError(res,e)}});
+app.post('/api/sessions/:id/backgrounds',requireAuth,async(req,res)=>{try{
+ const uid=auth(req)!;const s=await owner(req.params.id,uid);if(!s){res.status(404).end();return}
+ if(s.status==='closed'){res.status(409).json({error:'session_closed'});return}
+ const cap=await allowedUploadBytes();const length=Number(req.headers['content-length']);
+ if(!Number.isSafeInteger(length)||length<1||length>cap){res.status(413).json({error:'invalid_upload_size'});return}
+ const mime=String(req.headers['content-type']||'').split(';')[0].trim().toLowerCase();
+ if(!backgroundTypes.has(mime)){res.status(415).json({error:'unsupported_background_media'});return}
+ const id=randomUUID();const folder=path.join(backgroundRoot,uid);
+ const received=await receiveAssetStream(req,folder,id,mime,cap,length);
+ try{
+  await scanUploadedFile(received.destination);
+  await db.query('INSERT INTO presenter_backgrounds(id,owner_id,mime_type,byte_size,sha256) VALUES($1,$2,$3,$4,$5)',[id,uid,mime,received.size,received.sha256]);
+ }catch(e){await unlink(received.destination).catch(()=>{});throw e}
+ try{const applied=await useBackground(s,uid,{id,owner_id:uid,mime_type:mime,byte_size:received.size,sha256:received.sha256});res.status(201).json(applied)}
+ catch(e){sendError(res,e)}
+ }catch(e){sendError(res,e)}});
+app.post('/api/sessions/:id/backgrounds/:bid/use',requireAuth,async(req,res)=>{try{
+ const uid=auth(req)!;const s=await owner(req.params.id,uid);if(!s){res.status(404).end();return}
+ if(s.status==='closed'){res.status(409).json({error:'session_closed'});return}
+ const b=await accessibleBackground(s,uid,req.params.bid);if(!b){res.status(404).end();return}
+ res.status(201).json(await useBackground(s,uid,b));
+ }catch(e){sendError(res,e)}});
+
 // Participant file submissions are scoped to the currently open page and to an actual file widget.
 // The server never trusts a client-supplied session id, participant id, or asset owner.
 app.post('/api/join/:code/activities/:aid/widgets/:wid/upload',async(req,res)=>{try{
@@ -825,6 +910,8 @@ app.get('/api/sessions/:id/assets',requireAuth,async(req,res)=>{try{
 app.delete('/api/sessions/:id/assets/:assetId',requireAuth,async(req,res)=>{try{
  const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}
  if(s.status==='closed'){res.status(409).json({error:'session_closed'});return}
+ const backgroundLink=await db.query("SELECT 1 FROM activities WHERE session_id=$1 AND (page_design->>'backgroundAssetId'=$2 OR result_design->>'backgroundAssetId'=$2) LIMIT 1",[s.id,req.params.assetId]);
+ if(backgroundLink.rowCount){res.status(409).json({error:'asset_in_use_by_background'});return}
  const widgetLink=await db.query("SELECT 1 FROM activities WHERE session_id=$1 AND page_design->'widgets' @> $2::jsonb LIMIT 1",[s.id,JSON.stringify([{assetId:req.params.assetId}])]);
  if(widgetLink.rowCount){res.status(409).json({error:'asset_in_use_by_widget'});return}
  const linked=await db.query('SELECT 1 FROM presentation_slide_assets WHERE asset_id=$1 LIMIT 1',[req.params.assetId]);
@@ -1276,8 +1363,11 @@ app.post('/api/join/:code/reactions',async(req,res)=>{try{
  const activityId=req.body?.activity_id,emoji=req.body?.emoji;
  if(!validReaction(emoji)){res.status(400).json({error:'invalid_reaction'});return}
  const a=await db.query('SELECT id FROM activities WHERE id=$1 AND session_id=$2',[activityId,s.id]);if(!a.rowCount||s.current_activity_id!==activityId){res.status(409).json({error:'page_not_current'});return}
- const r=await db.query('INSERT INTO page_reactions(session_id,activity_id,participant_id,emoji) VALUES($1,$2,$3,$4) ON CONFLICT(activity_id,participant_id) DO NOTHING RETURNING emoji',[s.id,activityId,p.rows[0].id,emoji]);
- if(r.rowCount)await broadcast(s.id);res.json({ok:true,already_reacted:!r.rowCount});
+ const r=await db.query(`INSERT INTO page_reactions(session_id,activity_id,participant_id,emoji) VALUES($1,$2,$3,$4)
+   ON CONFLICT(activity_id,participant_id) DO UPDATE SET emoji=EXCLUDED.emoji
+   WHERE page_reactions.emoji IS DISTINCT FROM EXCLUDED.emoji RETURNING emoji`,[s.id,activityId,p.rows[0].id,emoji]);
+ if(r.rowCount)await broadcast(s.id);
+ res.json({ok:true,already_reacted:!r.rowCount,changed:!!r.rowCount});
  }catch(e){sendError(res,e)}});
 app.post('/api/join/:code/ratings',async(req,res)=>{try{
  const s=await publicSession(req.params.code);if(!s){res.status(404).json({error:'session_unavailable'});return}
@@ -1396,8 +1486,8 @@ app.post('/api/join/:code/activities/:aid/widgets/:wid/respond',async(req,res)=>
  const revision=questionRevisionAtHistory(rev.rows,questionId);
  // A retry of a committed answer remains idempotent even when the timer has
  // subsequently expired. Never overwrite the first answer or change its score.
- const existing=await cx.query('SELECT id FROM widget_answers WHERE activity_id=$1 AND participant_id=$2 AND widget_id=$3 AND question_id=$4 AND revision=$5',[req.params.aid,who.participantId,req.params.wid,questionId,revision]);
- if(existing.rowCount){await cx.query('COMMIT');res.json({ok:true,already_submitted:true,question_id:questionId,revision});return}
+ const existing=await cx.query('SELECT id FROM widget_answers WHERE activity_id=$1 AND participant_id=$2 AND widget_id=$3 AND question_id=$4 AND revision=$5 FOR UPDATE',[req.params.aid,who.participantId,req.params.wid,questionId,revision]);
+ if(existing.rowCount&&part.allowAnswerChange!==true){await cx.query('COMMIT');res.json({ok:true,already_submitted:true,question_id:questionId,revision});return}
  const correctIds=timed?widgetCorrectOptionIds(part):[];
  const correct=timed&&answer.optionIds.length===correctIds.length&&answer.optionIds.every((id:string)=>correctIds.includes(id));
  // Read PostgreSQL's wall clock immediately before the write, not at the start of
@@ -1409,6 +1499,12 @@ app.post('/api/join/:code/activities/:aid/widgets/:wid/respond',async(req,res)=>
   const timing=timedDeadline(a.rows[0].opened_at,Number(widget.durationSeconds||30),clock.rows[0].database_now);
   elapsed=timing.elapsedMs;
   if(!timing.valid){await cx.query('ROLLBACK');res.status(409).json({error:'timer_elapsed'});return}
+ }
+ if(existing.rowCount){
+  await cx.query('UPDATE widget_answers SET answer_mode=$2,answer_payload=$3,correct=$4,elapsed_ms=$5 WHERE id=$1',
+    [existing.rows[0].id,mode,JSON.stringify(answer),timed?correct:null,elapsed]);
+  await cx.query('COMMIT');cx.release();cx=undefined;
+  await notifyAudience(who.sessionId);res.json({ok:true,changed:true,already_submitted:false,question_id:questionId,revision});return;
  }
  const r=await cx.query('INSERT INTO widget_answers(id,session_id,activity_id,participant_id,widget_id,question_id,answer_mode,answer_payload,revision,correct,elapsed_ms) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) ON CONFLICT(activity_id,participant_id,widget_id,question_id,revision) DO NOTHING RETURNING id',[randomUUID(),who.sessionId,req.params.aid,who.participantId,req.params.wid,questionId,mode,JSON.stringify(answer),revision,timed?correct:null,elapsed]);
  await cx.query('COMMIT');cx.release();cx=undefined;if(r.rowCount)await notifyAudience(who.sessionId);res.json({ok:true,already_submitted:!r.rowCount,question_id:questionId,revision});

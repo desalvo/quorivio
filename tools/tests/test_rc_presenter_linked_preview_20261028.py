@@ -20,7 +20,8 @@ class PresenterLinkedPreview(unittest.TestCase):
   self.assertIn('rehearsal-mode-both',CSS)
  def test_preview_reaction_local_state(self):
   self.assertIn("onClick={()=>submitDemoDirect(w.id,'reactions',emoji)}",SRC)
-  self.assertIn("submittedAnswers[REHEARSAL_REACTION_PREFIX+activity.id]",SRC)
+  self.assertIn("const pageKey=REHEARSAL_REACTION_PREFIX+activity.id",SRC)
+  self.assertIn('changeRehearsalReaction(previous,pageKey,widgetId,value)',SRC)
   self.assertIn('Nessuna risposta di prova viene salvata',SRC)
  def test_one_full_widget_and_one_selected_text_style_path(self):
   self.assertIn('formatTextRange(w.textMarks||[]',SRC)

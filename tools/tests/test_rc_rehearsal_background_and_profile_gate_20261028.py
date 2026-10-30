@@ -18,7 +18,7 @@ class RehearsalBackgroundAndProfileGate(unittest.TestCase):
         gates={gate['id']:gate for gate in LEDGER['gates']}
         self.assertGreaterEqual(len(gates),33)
         self.assertEqual(sum(gate['weight'] for gate in gates.values()),100)
-        self.assertEqual((gates['C4']['weight'],gates['C4']['status']),(3,'partial'))
+        self.assertEqual((gates['C4']['weight'],gates['C4']['status']),(2,'partial'))
         self.assertEqual((gates['C4-PROFILE']['weight'],gates['C4-PROFILE']['status']),(2,'accepted'))
         evidence=gates['C4-PROFILE']['evidence']
         for token in ('40638652838','Chromium','PostgreSQL','private','deletion'):

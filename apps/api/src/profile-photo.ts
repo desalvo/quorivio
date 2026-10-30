@@ -8,10 +8,11 @@ export function profilePhotoId(url:unknown):string|null{
 
 /** Public session profile projection: expose only session-scoped photo URLs,
  * never the private authenticated photo endpoint or extra user columns. */
-export function publicPresenterProfiles(rows:ReadonlyArray<{id:string;name:string;profile_photo_url:unknown}>,code:string){
+export function publicPresenterProfiles(rows:ReadonlyArray<{id:string;name:string;email?:string;profile_photo_url:unknown}>,code:string,publicEmailIds:ReadonlySet<string>=new Set()){
  return rows.map(row=>({
   id:row.id,
   name:row.name,
+  ...(publicEmailIds.has(row.id)&&typeof row.email==='string'?{email:row.email}:{}),
   photo_url:profilePhotoId(row.profile_photo_url)
    ?`/api/join/${encodeURIComponent(code)}/presenters/${encodeURIComponent(row.id)}/photo`
    :null

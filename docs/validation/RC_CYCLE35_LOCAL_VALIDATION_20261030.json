@@ -1,0 +1,25 @@
+{
+  "version": "0.1.0-dev",
+  "cycle": 35,
+  "formal_score": 80.75,
+  "credited_new_accepted_subgates": [
+    "B1-BOOTSTRAP-PG18",
+    "B1-GRACEFUL-DRAIN"
+  ],
+  "independent_ci_run": 41048187760,
+  "independent_ci_job": 124037870206,
+  "local_python_test_groups": 18,
+  "local_python_tests_executed": 1251,
+  "local_python_failed_groups": 0,
+  "local_node_bootstrap_lock_tests": 8,
+  "local_node_bootstrap_lock_failed": 0,
+  "local_backend_complete_test_suite": "not_run_missing_npm_dependencies",
+  "local_frontend_complete_test_suite": "not_run_missing_npm_dependencies",
+  "local_typescript_build": "not_run_missing_npm_dependencies",
+  "actual_postgres_18_on_cycle35": "not_run; followup GitHub CI required",
+  "sha256_manifest_current_source": "verified_before_packaging",
+  "strict_rc_ready": false,
+  "production_verified": false,
+  "no_commit_push_tag_or_publish": true,
+  "source_files_excluding_inventory": 942
+}

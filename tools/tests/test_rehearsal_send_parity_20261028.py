@@ -16,8 +16,9 @@ class RehearsalSendParity(unittest.TestCase):
   self.assertNotIn('seed,responses,w.targetQuestionId',UI)
  def test_no_double_reaction_across_widgets(self):
   self.assertIn('REHEARSAL_REACTION_PREFIX+activity.id', UI)
-  self.assertIn('if(previous[pageKey]!==undefined)return previous', UI)
-  self.assertIn('disabled={viewer===\'presenter\'||submittedAnswers[REHEARSAL_REACTION_PREFIX+activity.id]!==undefined}',UI)
+  self.assertIn('changeRehearsalReaction(previous,pageKey,widgetId,value)', UI)
+  self.assertIn("kind==='reactions'&&viewer==='presenter'?<ProjectionWidgetContent",UI)
+  self.assertIn('aria-pressed={submittedAnswers[w.id]===emoji}',UI)
  def test_own_draft_and_sent_state_and_restart(self):
   self.assertIn('const [responses,setResponses]=useState',UI)
   self.assertIn('const [submittedAnswers,setSubmittedAnswers]=useState',UI)

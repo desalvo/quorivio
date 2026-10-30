@@ -9,7 +9,9 @@ test('question widget offers persisted frequency cloud with explicit numeric cou
  assert.match(src,/Grafico risultati del widget<select/);
  assert.match(src,/<option value="cloud">Nuvola<\/option>/);
 });
-test('aggregate results control does not offer unsupported cloud mode',()=>{
- const field=src.split('Visualizzazione risultati<select')[1].split('</select>')[0];
- assert.doesNotMatch(field,/value="cloud"/);
+test('the question controls animated cloud mode; linked results have no independent picker',()=>{
+ assert.match(src,/aria-label="Visualizzazione risultati della domanda"/);
+ assert.match(src,/value="cloud">Nuvola animata/);
+ assert.match(src,/effectiveResultView\(control,widgets\)/);
+ assert.doesNotMatch(src,/aria-label="Visualizzazione autonoma del widget Risultati"/);
 });

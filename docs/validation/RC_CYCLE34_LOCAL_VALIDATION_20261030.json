@@ -1,0 +1,55 @@
+{
+  "cycle": 34,
+  "version": "0.1.0-dev",
+  "based_on_commit": "f5ccf9a7545e7c17b4323d067db66aff5eca9b41",
+  "verified_remote_run": 41048187760,
+  "score": 80.25,
+  "previous_score": 79.25,
+  "local_test_runs": {
+    "scanner_unit": {
+      "executed": 12,
+      "passed": 12,
+      "failed": 0
+    },
+    "node_backend": {
+      "executed": 492,
+      "passed": 492,
+      "failed": 0
+    },
+    "node_frontend": {
+      "executed": 65,
+      "passed": 65,
+      "failed": 0
+    },
+    "python_unit_partitioned": {
+      "executed": 1243,
+      "passed": 1242,
+      "skipped": 1,
+      "failed": 0,
+      "groups": [
+        231,
+        269,
+        195,
+        222,
+        117,
+        58,
+        51,
+        100
+      ],
+      "method": "Eight disjoint unittest module groups, 193 modules; each group passed, one skip. One subsequent monolithic rerun timed out without a final result and is not counted."
+    },
+    "python_bounded_new": {
+      "executed": 4,
+      "passed": 4,
+      "failed": 0
+    }
+  },
+  "new_inode_scanner_verified_by_github": false,
+  "real_container_runtime_on_modified_source": "not available locally",
+  "new_git_commit_or_push": false,
+  "source_compilation": {
+    "typescript_full_build": "not verified locally; node_modules unavailable",
+    "github_cycle33_build_passed": true,
+    "cycle34_build": "not yet executed on GitHub"
+  }
+}

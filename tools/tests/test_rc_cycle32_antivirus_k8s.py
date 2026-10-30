@@ -70,8 +70,8 @@ class AntivirusKubernetesCycle32(unittest.TestCase):
     def test_latest_integrity_gate_is_before_gitleaks(self):
         wf=(ROOT/'.github/workflows/ci.yml').read_text()
         self.assertLess(wf.index('verify_rc_cycle31_inventory.py --historical'),
-                        wf.index('verify_rc_cycle33_inventory.py'))
-        self.assertLess(wf.index('verify_rc_cycle33_inventory.py'),wf.index('Detect credential leaks'))
+                        wf.index('verify_rc_cycle41_inventory.py'))
+        self.assertLess(wf.index('verify_rc_cycle41_inventory.py'),wf.index('Detect credential leaks'))
 
     def test_actual_clamd_acceptance_is_opt_in_and_no_registry_publish(self):
         wf=yaml.safe_load((ROOT/'.github/workflows/ci.yml').read_text())

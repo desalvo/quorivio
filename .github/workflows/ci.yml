@@ -46,6 +46,10 @@ on:
         description: 'Real 2-worker KIND, strict replica placement, ephemeral cross-worker bind, NGINX HTTP ingress and pod recovery (NOT production CSI/HA)' 
         type: boolean
         default: false
+      kubernetes_haproxy_test:
+        description: 'Real HAProxy Technologies controller on disposable 2-worker KIND with host routing and failover (NOT external CSI/TLS/HA)'
+        type: boolean
+        default: false
       clamav_runtime_test:
         description: 'Real private ClamAV INSTREAM acceptance with clean + harmless EICAR signature (manual opt-in, no publication)'
         type: boolean
@@ -251,6 +255,11 @@ jobs:
           QUORIVIO_CI_ADMIN_PASSWORD: ci-only-administrator-password-123
           QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
         run: python3 tools/ci_portable_http.py
+      - name: PostgreSQL-backed private presenter background library and collaborator copy-on-use
+        env:
+          QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
+          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
+        run: python3 tools/ci_background_library_postgres.py
       - name: PostgreSQL and real TLS SMTP email MFA lifecycle acceptance
         env:
           # This shared, disposable test IP exceeds 100 requests/min across suites.
@@ -486,7 +495,15 @@ jobs:
           python3 tools/verify_rc_cycle30_inventory.py --historical
           python3 tools/verify_rc_cycle31_inventory.py --historical
           python3 tools/verify_rc_cycle32_inventory.py --historical
-          python3 tools/verify_rc_cycle33_inventory.py
+          python3 tools/verify_rc_cycle33_inventory.py --historical
+          python3 tools/verify_rc_cycle34_inventory.py --historical
+          python3 tools/verify_rc_cycle35_inventory.py --historical
+          python3 tools/verify_rc_cycle36_inventory.py --historical
+          python3 tools/verify_rc_cycle37_inventory.py --historical
+          python3 tools/verify_rc_cycle38_inventory.py --historical
+          python3 tools/verify_rc_cycle39_inventory.py --historical
+          python3 tools/verify_rc_cycle41_inventory.py --historical
+          python3 tools/verify_rc_cycle42_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:
@@ -642,6 +659,46 @@ jobs:
       - name: Remove ephemeral runner-mounted assets
         if: always()
         run: sudo rm -rf /tmp/quorivio-kind-multinode-shared
+  kubernetes-haproxy-ingress:
+    name: Kubernetes live HAProxy Technologies two-worker ingress and failover (opt-in)
+    if: github.event_name == 'workflow_dispatch' && inputs.kubernetes_haproxy_test
+    needs: validate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    permissions: {contents: read}
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - name: Prepare ephemeral KIND-only runner shared volume
+        run: |
+          test "$(id -u)" -ne 0
+          sudo install -d -m 0777 /tmp/quorivio-kind-multinode-shared
+      - uses: helm/kind-action@v1.12.0
+        with:
+          cluster_name: quorivio-multinode
+          version: v0.26.0
+          config: tools/ci_kind_multinode.yaml
+          wait: 120s
+      - name: Verify Helm is installed on runner
+        run: helm version --short
+      - name: Build and load local unpublished application image
+        run: |
+          docker build -t quorivio:kind-multinode .
+          kind load docker-image quorivio:kind-multinode --name quorivio-multinode
+      - name: Exercise HAProxy Technologies real virtual host routing and API pod recovery
+        timeout-minutes: 14
+        run: python3 tools/ci_k8s_multinode_ingress_smoke.py --controller haproxytech
+      - name: Sanitized status-only diagnostics
+        if: failure()
+        run: |
+          kubectl -n quorivio-multinode get pods,deploy,sts,pvc -o wide || true
+          kubectl -n quorivio-ci-haproxy get pods,deploy,services || true
+          kubectl -n quorivio-multinode get ingress,services,endpointslices || true
+          kubectl get ingressclass || true
+      - name: Remove disposable runner assets
+        if: always()
+        run: sudo rm -rf /tmp/quorivio-kind-multinode-shared
+
   runtime-architecture:
     name: OCI amd64/arm64 actual runtime acceptance (opt-in)
     if: github.event_name == 'workflow_dispatch' && inputs.runtime_arch_test

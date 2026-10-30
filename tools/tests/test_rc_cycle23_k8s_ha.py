@@ -10,7 +10,7 @@ from rc_gate_audit import audit
 from rc_release_preflight import preflight
 from verify_rc_cycle22_inventory import load_inventory as previous
 from verify_rc_cycle23_inventory import load_inventory
-from verify_rc_cycle33_inventory import load_inventory as current_inventory, verify_source
+from verify_rc_cycle42_inventory import load_inventory as current_inventory, verify_source
 
 class Cycle23RC(unittest.TestCase):
     def test_frozen_historical_catalog_and_current_tree(self):
@@ -20,9 +20,9 @@ class Cycle23RC(unittest.TestCase):
 
     def test_unchanged_evidence_weight_and_pending_external_gates(self):
         m=json.loads((ROOT/'docs/RC_GATE_MATRIX.json').read_text())
-        self.assertEqual(len(m['gates']),48)
+        self.assertEqual(len(m['gates']),52)
         self.assertEqual(sum(x['weight'] for x in m['gates']),100)
-        self.assertEqual((audit()['score'],preflight()['accepted_gates']),(79.25,31))
+        self.assertEqual((audit()['score'],preflight()['accepted_gates']),(80.75,35))
         self.assertEqual(len(preflight()['unaccepted_gates']),17)
         self.assertFalse(preflight()['release_candidate_ready'])
         self.assertEqual(m['last_verified_full_ci']['head_sha'],'caf6331f15ccf39c218791503b8c6d0ca3503dce')
@@ -37,7 +37,7 @@ class Cycle23RC(unittest.TestCase):
     def test_current_and_historical_inventories_before_secret_scan(self):
         text=(ROOT/'.github/workflows/ci.yml').read_text()
         before='python3 tools/verify_rc_cycle22_inventory.py --historical'
-        after='python3 tools/verify_rc_cycle33_inventory.py'
+        after='python3 tools/verify_rc_cycle41_inventory.py'
         self.assertIn(before,text)
         self.assertIn(after,text)
         self.assertLess(text.index(before),text.index(after))

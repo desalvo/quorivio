@@ -129,6 +129,20 @@ async def main():
    await expect(rehearsal).to_have_count(0)
    assert await preview_trigger.evaluate('(node)=>document.activeElement===node'), 'Modal must restore preview trigger focus'
    assert not await editor.locator('.editor-exit').evaluate('(node)=>!!node.closest("[inert]")'), 'Editor must be interactive after rehearsal'
+   # RC37 regression: unstyled text is black on the white slide, and a
+   # widget's context commands are in an unclipped body-level portal.
+   default_foreground=await page.locator('.widget-canvas-item').first.evaluate('(node)=>getComputedStyle(node).color')
+   assert default_foreground=='rgb(0, 0, 0)',default_foreground
+   await page.locator('.widget-canvas-item').first.click(button='right')
+   widget_menu=page.get_by_role('group',name='Azioni widget text')
+   await expect(widget_menu).to_be_visible()
+   assert await widget_menu.evaluate('''node => {
+    const r=node.getBoundingClientRect();
+    return node.parentElement===document.body && r.left>=0 && r.top>=0 &&
+      r.right<=window.innerWidth+1 && r.bottom<=window.innerHeight+1;
+   }'''), 'Widget context menu must be fully visible outside clipping canvas'
+   await page.keyboard.press('Escape')
+   await expect(widget_menu).to_have_count(0)
    # Canvas's native context menu can only be activated by right-click (long press on touch).
    await open_canvas_context(page)
    await expect(page.get_by_role('group',name='Menu contestuale sfondo canvas')).to_be_visible()

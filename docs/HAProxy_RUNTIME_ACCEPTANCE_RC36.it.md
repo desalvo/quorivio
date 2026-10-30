@@ -1,0 +1,5 @@
+# Collaudo reale Ingress HAProxy Technologies — ciclo RC 36
+
+Avviare manualmente il workflow `Quorivio CI and Docker Hub` con `kubernetes_haproxy_test=true`, `publish_image=false`, `rc_strict=false`. Il job crea un cluster KIND usa-e-getta con control-plane e due worker, compila l'immagine Quorivio senza pubblicarla e installa il chart ufficiale HAProxy Technologies `1.54.3` tramite OCI, in namespace privato `quorivio-ci-haproxy`. Poi effettua richieste HTTP reali dal pod, con il vero header Host e rifiuto di host errati, e verifica PostgreSQL 18, diversità dei nodi, file visibili su entrambi i worker, recupero durante la sostituzione di un pod e visibilità dei file dopo il ripristino. La diagnostica non include Secret, log dei container o dati privati.
+
+**Non ancora certificato:** manca l'esecuzione GitHub del nuovo job; Docker/Helm/KIND non sono disponibili nell'ambiente locale. Il bind condiviso tra i worker KIND non è uno storage NFS/CSI reale, né prova fault tolerance multi-macchina, TLS pubblico, controller HAProxy Community o SLO di produzione. Il punteggio RC non cambia fino a nuove prove indipendenti positive.

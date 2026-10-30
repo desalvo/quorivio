@@ -1,3 +1,98 @@
+# Quorivio 0.1.0-dev — cycle 42: selectable timer faces and custom-fill precedence — 30 October 2026
+
+**Formal RC completion: 80.75%** (52 gates: 35 accepted, 17 partial), unchanged. Cycles 34–42 remain cumulative and uncommitted relative to confirmed commit `f5ccf9a7545e7c17b4323d067db66aff5eca9b41`.
+
+**Changes:** introduce three persisted, server-validated timer faces (`hourglass`, `dial`, `digital`) for Timer and Timed Quiz widgets; they use the same actual countdown on editor, rehearsal, presenter and participant surfaces. The digital face has a dedicated progress bar. Restore author control of transparent/opaque fills: `fillNone`, `fillOpacity` and explicit solid fill suppress decorative background images, including fully transparent opacity. Motion effects respect reduced-motion preferences.
+
+**Testing:** 500/500 API Node tests; 84/84 web Node tests; targeted persisted-schema, input-allowlist, style and surface parity regressions. Full TypeScript/Vite build and live-browser acceptance remain pending. Historical cycle-41 receipt remains immutable; cycle-42 current inventory and CI verification required before committing. Assistant performed no commit, tag, push or publication.
+
+---
+
+# Quorivio 0.1.0-dev — RC cycle 41 — 30 October 2026 — per-widget artistic themes
+
+**Formal RC score remains 80.75% (52 gates: 35 accepted / 17 partial).** Latest confirmed maintainer commit: `f5ccf9a7545e7c17b4323d067db66aff5eca9b41`; cycles 34–41 are cumulative, not yet committed. Implemented server-validated per-widget themes (`studio`, `glass`, `playful`, `minimal`) and optional effects (`none`, `float`, `glow`, `tilt`), with four-surface render parity and precedence for authored fill/images/transparency. Static timer artwork is visible in the editor while timer countdown remains live in presentations. The CSS provides per-kind visual accents and honours reduced-motion settings. Historical source inventory for cycle 39 preserved, new cycle 41 manifest introduced for CI. Validation: 500 API Node and 81 frontend Node tests passed; 4 new Node and 4 Python contract tests passed. Full browser production build and cross-browser manual acceptance still pending. See `docs/RC_WIDGET_ART_THEMES_CYCLE41.en.md`. No commit/push/release/publish by assistant.
+
+---
+
+# Quorivio 0.1.0-dev — RC cycle 40 — artistic widget styling (30 October 2026)
+
+**Formal completion unchanged: 80.75%** (52 gates: 35 accepted, 17 partial). This cycle has not yet been verified by a new GitHub CI run or by the user's real-browser acceptance checks. Last confirmed commit: `f5ccf9a7545e7c17b4323d067db66aff5eca9b41`; cycles 34–40 remain cumulative and uncommitted.
+
+**Implemented:** widgets on the editor canvas, rehearsal panes, presenter page and participant page now use a richer per-kind visual language: card-like surfaces with depth, highlights, chromatic accents and semantic decorations for timers, questions, quizzes, reactions, results, presenter profile, QR, media, text, sticky notes, participant counters and audience questions. The timer was redesigned with a progress ring, hourglass motif and high-contrast digits, plus an urgent state near expiry. Result clouds and tracks were also refreshed for better readability and stronger visual appeal. The same skins are visible inside the editor canvas so presenters preview the look while composing slides.
+
+**Local verification:** shared render points were checked for the new `data-widget-kind` attributes and no obvious serialization regressions were introduced. Full TypeScript/Vite build, real-browser tests, full Node suites and user confirmation still need to run after commit. No new RC points assigned.
+
+**After commit:** run standard CI with browser coverage (`browser_test=true`, preferably `cross_browser_test=true`) and manually validate timer, question/quiz, results, profile and QR widgets in editor, presenter preview, participant preview and live pages.
+
+---
+
+# Quorivio 0.1.0-dev — RC cycle 38 — Presenter/participant state isolation (30 October 2026)
+
+**Verified formal RC score remains 80.75%** (52 gates: 35 accepted, 17 partial). Latest confirmed maintainer commit `f5ccf9a7545e7c17b4323d067db66aff5eca9b41`; cycles 34–38 cumulative and uncommitted. The new implementation is not credited until independent CI/browser acceptance.
+
+**Implemented:** presenter-side interactive questions/quiz/reactions/rating are neutral; only the associated Results widgets show confirmed, aggregate rehearsal responses, with stable seeded background counts. One participant's reaction can replace their previous choice in the local preview and actual PostgreSQL reaction API; a repeat vote never counts twice. Questions and quizzes reject repeat answers by default, while an explicit per-question option allows updates, serialized by row locks and bounded by the timed quiz deadline. Checkbox/radio selectors appear left of their labels. Profile widgets show display name, optional photo and *opt-in published email* only; email is disclosed for the chosen presenter on the active session page and not for all collaborators. The editor and rehearsal can preview authenticated profile details before public activation.
+
+**Limits:** local Node/Python unit and contract tests only; no actual PostgreSQL, Chromium, full TypeScript/Vite production build, native mobile or real HAProxy acceptance on this code yet. Reaction storage is page-scoped, not independently per reaction widget. Keep `publish_image=false`, `rc_strict=false`. No assistant commit, push, tag or publish.
+
+**CI:** standard quality plus `browser_test=true` and `cross_browser_test=true`, optional `kubernetes_haproxy_test=true`. Verify manually side-by-side rehearsal votes/results, reaction change, default immutable and explicitly editable answers, profile consent, and radio/checkbox placement on desktop/mobile.
+
+---
+
+# Quorivio 0.1.0-dev — RC cycle 37 — Editor interaction and page-save hotfix (30 October 2026)
+
+**Formal RC completion remains 80.75% (52 gates: 35 accepted, 17 partial).** No independent CI or live browser acceptance exists yet for the new editor changes. Maintainer-confirmed commit baseline remains `f5ccf9a7545e7c17b4323d067db66aff5eca9b41` (cycle 33); cycles 34–37 are cumulative and uncommitted. No assistant commit, push, tag, publication or release.
+
+**Four reported problems, with screenshots:** (1) editor widgets were inheriting pale foreground from the dark shell; the unconfigured text color is now explicitly black in the shared widget typography model and editor CSS, preserving user-selected colors; (2) widget contextual menus were rendered in a clipped widget, now portaled to `document.body` and positioned inside the viewport for right click, touch hold and keyboard; (3) presenter/participant/dual preview potentially trapped the editor, now has a closable React error boundary, escape/background dismissal, stable remount avoidance and a 1-second refresh cadence; (4) changing a question to multiple choice auto-seeds two valid options, with authoring-side validation against the same `validPageDesign` contract used by the API before autosave. Both the original two-choice model and new default options pass the backend validator.
+
+**Local evidence:** Node's TypeScript strip-mode tests for five new cases pass; 180 Python editor regression contracts pass, plus 20 targeted portal/rehearsal contracts. TSX parser reports no syntax errors. The Chromium acceptance script now checks default black text and an unclipped body-portal context menu, while retaining existing preview/keyboard tests; this browser run has NOT been executed locally (no npm/Playwright dependencies). No remote POST/real PostgreSQL acceptance or full production Vite/TypeScript build was performed for this cycle. The error boundary and local prevention are protective changes, not a substitute for actual user retesting. New code uncredited in the RC score.
+
+**CI after the user's commit:** quality gate with `browser_test=true`, preferably alongside `cross_browser_test=true`, `publish_image=false`, `rc_strict=false`; run the existing full backend/database tests and repeat the four manual workflows in the editor. HAProxy opt-in remains pending on actual KIND until separately executed. Retain all prior SHA-256 evidence catalogs immutably and use cycle37 current-source integrity gate.
+
+---
+
+# Quorivio 0.1.0-dev — RC cycle 36 — HAProxy Technologies multi-worker ingress acceptance (30 October 2026)
+
+**Formal RC completion: 80.75% (35 accepted, 17 partial of 52 gates), unchanged.**
+The most recent maintainer-confirmed commit is `f5ccf9a7545e7c17b4323d067db66aff5eca9b41` (cycle 33). Cycles 34–36 are **cumulative and uncommitted**. The independent successful GitHub run `41048187760` established the accepted bounded ClamAV, NGINX ingress, PostgreSQL bootstrap and graceful-drain evidence credited by cycles 34 and 35; **no new CI evidence** exists for cycle 36.
+
+**Functional implementation:** The existing two-worker KIND smoke now supports `--controller nginx` (unchanged default) or `--controller haproxytech`. The HAProxy mode installs official HAProxy Technologies Kubernetes Ingress Controller chart version `1.54.3` via Helm, bound to a private ClusterIP Service and `haproxy` IngressClass, then generates Quorivio ingress manifests using the real wizard's HAProxy Technologies mode. The runtime acceptance verifies strict two-worker distribution, PostgreSQL 18 readiness, disposable runner-only cross-worker bind visibility, real HTTP virtual-host routing, rejection of unknown hosts, API pod replacement, surviving ingress and asset visibility after recovery. This test is opt-in through `kubernetes_haproxy_test=true`, never publishes an image and does not require access to any real cluster. Sanitized failure diagnostics contain only Kubernetes resource status. The existing NGINX acceptance remains unchanged.
+
+**Local proof:** Python source compiles, workflow YAML parses and 38 focused tests cover the wizard-generated HAProxy class/legacy annotation, private Service selection, pinned official Helm chart and default NGINX compatibility. The monolithic Python regression and the attempted parallel per-module replay did not complete cleanly in this environment; do not treat them as a full-suite pass. The actual HAProxy controller is **not** available locally and must pass GitHub CI before receiving gate credit. Running two KIND worker containers on the same physical host with a shared bind mount is not a real NFS/CSI RWX or multi-machine disaster recovery test. Public TLS, the separate HAProxy community controller, sustained SLO, real devices, independent AGID/GDPR, penetration testing and operator approvals remain open. **RC strict and image publishing stay disabled.**
+
+**CI after user commit:** first the standard quality/container gates, then manual `kubernetes_haproxy_test=true`, optionally alongside `kubernetes_multinode_test=true` and `clamav_runtime_test=true`; set `publish_image=false` and `rc_strict=false`. The new job may need CI environment iteration, which is not counted as a pass in this local package.
+
+---
+
+# Quorivio 0.1.0-dev — RC cycle 35 — 30 October 2026 — 80.75% (+0.50pp)
+
+**Maintainer-committed baseline:** `f5ccf9a7545e7c17b4323d067db66aff5eca9b41` (cycle 33); cycle 34 and 35 remain uncommitted. GitHub Actions `41048187760` quality job `124037870206` passed *actual* PostgreSQL 18 simultaneous bootstrap with a single administrator and two ready API replicas, plus rolling `SIGTERM` readiness `503`, WebSocket `1012` and a healthy surviving replica. These distinct verified checks had not been credited separately. They are not the same as B1-WS/B1-RECONNECT or B4-KIND-INGRESS-RECOVERY.
+
+**Verified RC score:** **80.25 → 80.75%**. Keep the original B1 weight of 2 split into B1 residual 1 (partial), `B1-BOOTSTRAP-PG18` 0.5 (accepted) and `B1-GRACEFUL-DRAIN` 0.5 (accepted). 52 gates total: 35 accepted, 17 partial; all weights total 100. This counts *only* the proven prior commit, not cycle34 or cycle35 code.
+
+**New uncommitted code (not scored):** `withBootstrapLock` permanently removes a connection from the pool if lock acquisition or session setup fails; this avoids recycling an uncertain PostgreSQL session retaining `lock_timeout=120s` or an indeterminate advisory lock state. Additional Node regressions cover acquire timeout, setup failure, post-lock reset failure and false unlock acknowledgements. Tests on actual PostgreSQL 18 must be rerun in CI after user commit. No code or CI change is accepted merely because it was written locally.
+
+**Local validation cycle35:** 18 nonoverlapping Python groups, 1,251 executed, no failed groups; 8 Node bootstrap-lock cases pass. Full Node workspace suites and TypeScript/Vite build not executed locally because npm dependencies are unavailable. Cycle35 source and ZIP hash catalog must be verified before shipping.
+
+**Outstanding:** independent multi-machine CSI/NFS RWX and failover, production TLS and HAProxy, real ARM hardware, sustained SLO with faults, browser/device and screen reader reviews, independent GDPR/AGID and security checks. Strict RC remains blocked; no image publish, push or tag. **CI after commit:** run standard quality (including PostgreSQL two-process bootstrap) and opt-in extended `kubernetes_multinode_test=true`, `clamav_runtime_test=true` with `publish_image=false`, `rc_strict=false`.
+
+---
+
+# Quorivio 0.1.0-dev — ciclo 34 — 30 ottobre 2026 — RC 80,25% (+1,00 pp)
+
+**Baseline committata:** `f5ccf9a7545e7c17b4323d067db66aff5eca9b41`. Il workflow esteso https://github.com/desalvo/quorivio/actions/runs/41048187760 è verde (quality, container, ClamAV, Kubernetes multiworker NGINX), pubblicazione disattivata. **RC formale: 80,25%, 50 gate (33 accettati, 17 parziali). NON RC READY.**
+
+**Riconciliazione basata esclusivamente su GitHub:** `C4-AV-INSTREAM` (peso 1 accettato) separato da C4 parziale (peso da 3 a 2); job `124037870523` verifica `PING/PONG`, scansione INSTREAM ClamAV effettiva, file pulito ed EICAR attraverso il client applicativo. `B4-KIND-INGRESS-RECOVERY` (peso 1 accettato) separato da B4 parziale (peso da 3 a 2); job `124038997005` verifica due worker KIND distinti, PostgreSQL 18, condivisione di file tramite bind temporaneo, NGINX reale con Host, recupero dopo sostituzione di un pod. Risultato 79,25 → 80,25, conservando il peso totale 100; i 17 gate residui non sono promossi.
+
+**Nuovo sviluppo NON conteggiato nel punteggio:** scanner ClamAV con handle `O_NOFOLLOW | O_NONBLOCK`, solo file regolari, streaming dall'handle aperto, controllo `size/mtimeNs/ctimeNs` dopo scansione per rifiutare link simbolici e modifiche in-place prima del risultato pulito; nuovi test Node e regressioni Python. Non certificato da nuova CI sul codice del ciclo 34.
+
+**Limiti espliciti:** non ancora verificati cluster multi-macchina con storage CSI/NFS RWX di produzione, HAProxy reale, TLS pubblico, macchine ARM64 fisiche, upload HTTP concorrenziali al ClamAV gestito, collaudo dispositivo fisico, revisione GDPR/AGID e sicurezza indipendente. Il test KIND è su singolo host, il test ClamAV su server temporaneo. Non attivare `rc_strict` o pubblicare immagini. Nessun commit/push/tag/release a cura dell'assistente.
+
+**Commit suggerito (solo ciclo 34):** `feat(rc): reconcile verified ClamAV and ingress failover gates and harden antivirus file scanning`
+
+**Verifiche locali ciclo 34:** 12/12 test scanner mirati, 492/492 backend Node, 65/65 frontend Node, 1.243 test Python eseguiti in otto gruppi disgiunti (1 saltato, 0 falliti). Inventario corrente SHA-256 e ZIP validati. Build TypeScript/Vite sul nuovo codice non verificata localmente (dipendenze npm mancanti); nuova Full CI dopo commit necessaria. I test ClamAV e multiworker reali che accreditano il punteggio sono quelli del commit precedente, non del codice modificato nel ciclo 34.
+
+---
+
 # Quorivio 0.1.0-dev — RC cycle 32 — 30 October 2026 — production antivirus/Kubernetes parity
 
 **RC formal 79.25%** (48 gates: 31 accepted, 17 partial). Last maintainer-confirmed Git commit `016beea25d5e2d2fab21b0730aa15baf0b573e12` (cycle 28); cycles 29–32 remain cumulative and uncommitted. No independent GitHub CI is yet available for these changes, therefore no score increment is justified.

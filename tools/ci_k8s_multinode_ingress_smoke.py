@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
-"""Opt-in *live* Kubernetes multi-worker and NGINX ingress smoke.
+"""Opt-in *live* Kubernetes multi-worker NGINX or HAProxy ingress smoke.
 
 The two KIND worker nodes bind the SAME disposable runner host directory. This
 proves pod scheduling, HTTP ingress, rolling replacement, and file visibility
 across KIND workers. It does NOT prove NFS, a production CSI RWX driver,
-independent physical machines, HAProxy, HA at the control plane, or SLA/SLO.
+independent physical machines, HA at the control plane, or SLA/SLO.
 No production credentials, image push, host listener, or namespace is used.
 """
 from __future__ import annotations
 
+import argparse
 import json
 import subprocess
 import sys
@@ -25,7 +26,11 @@ IMAGE = 'quorivio:kind-multinode'
 PV = 'quorivio-multinode-ci-host-pv'
 CLASS = 'quorivio-multinode-ci-host'
 HOST = 'quorivio-multi.example.invalid'
-INGRESS = 'ingress-nginx-controller.ingress-nginx.svc.cluster.local'
+NGINX_INGRESS = 'ingress-nginx-controller.ingress-nginx.svc.cluster.local'
+HAPROXY_NAMESPACE = 'quorivio-ci-haproxy'
+HAPROXY_RELEASE = 'quorivio-ci-haproxy'
+# Fixed upstream chart release; avoid following floating chart versions in CI.
+HAPROXY_CHART_VERSION = '1.54.3'
 # Version-pinned upstream KIND manifest, deployed only in a disposable cluster.
 NGINX_MANIFEST = ('https://raw.githubusercontent.com/kubernetes/ingress-nginx/'
                   'controller-v1.12.1/deploy/static/provider/kind/deploy.yaml')
@@ -93,12 +98,12 @@ def ingress_http_source() -> str:
             "req.on('error',()=>{process.exitCode=24});req.end();")
 
 
-def ingress_probe(source: str, path: str = '/api/health/ready', bad_host: bool = False) -> None:
+def ingress_probe(source: str, path: str = '/api/health/ready', bad_host: bool = False, ingress: str = NGINX_INGRESS) -> None:
     if path not in ('/', '/api/health/live', '/api/health/ready'):
         raise ValueError('Unexpected HTTP probe path')
     # Reach the real ingress-nginx Service using the HTTP core client and an
     # explicit Host header; avoid fetch(), which rewrites it to Service DNS.
-    target = f'http://{INGRESS}{path}'
+    target = f'http://{ingress}{path}'
     node_script(source, ingress_http_source(), target,
                 'unknown.example.invalid' if bad_host else HOST,
                 '404' if bad_host else '200')
@@ -134,7 +139,53 @@ def write_pv(path: Path) -> Path:
     return path
 
 
-def main() -> None:
+def haproxy_ingress_service() -> str:
+    """Find the actual chart-created private HTTP Service by label and port.
+
+    Neither a guessed Helm resource name nor the runner's host networking is
+    an acceptable ingress proof; the probe runs inside an application pod.
+    """
+    data = json.loads(run('kubectl', '-n', HAPROXY_NAMESPACE, 'get', 'services',
+                          '-l', f'app.kubernetes.io/instance={HAPROXY_RELEASE}', '-o', 'json'))
+    matches = []
+    for item in data['items']:
+        if item['spec'].get('type') == 'ExternalName':
+            continue
+        if item['spec'].get('clusterIP') in (None, 'None'):
+            continue
+        for port in item['spec'].get('ports', []):
+            if port.get('port') == 80 and port.get('protocol', 'TCP') == 'TCP':
+                matches.append((item['metadata']['name'], port['port']))
+    if len(matches) != 1:
+        raise RuntimeError('Expected exactly one private HAProxy HTTP ingress Service')
+    return f'{matches[0][0]}.{HAPROXY_NAMESPACE}.svc.cluster.local:{matches[0][1]}'
+
+
+def install_ingress(controller: str) -> str:
+    if controller == 'nginx':
+        run('kubectl', 'apply', '-f', NGINX_MANIFEST, timeout=120)
+        run('kubectl', '-n', 'ingress-nginx', 'rollout', 'status',
+            'deployment/ingress-nginx-controller', '--timeout=300s', timeout=330)
+        return NGINX_INGRESS
+    if controller != 'haproxytech':
+        raise ValueError('Unsupported disposable ingress controller')
+    # Chart is pinned, the service is ClusterIP, no external listener or secret.
+    run('helm', 'upgrade', '--install', HAPROXY_RELEASE,
+        'oci://ghcr.io/haproxytech/helm-charts/kubernetes-ingress',
+        '--version', HAPROXY_CHART_VERSION, '--namespace', HAPROXY_NAMESPACE,
+        '--create-namespace', '--set', 'controller.replicaCount=1',
+        '--set', 'controller.service.type=ClusterIP',
+        '--set', 'controller.ingressClass=haproxy',
+        '--wait', '--timeout', '300s', timeout=360)
+    cls = json.loads(run('kubectl', 'get', 'ingressclass', 'haproxy', '-o', 'json'))
+    if cls['metadata']['name'] != 'haproxy':
+        raise RuntimeError('Official HAProxy ingress class missing')
+    return haproxy_ingress_service()
+
+
+def main(controller: str = 'nginx') -> None:
+    if controller not in ('nginx', 'haproxytech'):
+        raise ValueError('Unknown ingress controller')
     checked_context()
     ws = workers()
     for node in ws:
@@ -158,6 +209,8 @@ def main() -> None:
                            'asset_storage_class': CLASS,
                            'app_node_selector': 'quorivio-ci-worker=yes',
                            'host': HOST, 'tls_termination': False,
+                           'ingress_controller': 'haproxy' if controller == 'haproxytech' else 'nginx',
+                           'haproxy_variant': 'haproxytech' if controller == 'haproxytech' else 'community',
                            'antivirus_mode': 'external', 'antivirus_host': 'clamav-ci-unavailable.invalid'})
         manifest_path = home/'kustomize'
         generate(config, manifest_path)
@@ -176,30 +229,28 @@ def main() -> None:
         shared_mount_check(first, second)
         print('PASS KIND multiworker: PostgreSQL 18, strict separate-node scheduling and cross-node asset visibility (runner shared bind, not CSI)', flush=True)
 
-        # Opt-in actual NGINX ingress controller (upstream version pinned).
-        run('kubectl', 'apply', '-f', NGINX_MANIFEST, timeout=120)
-        run('kubectl', '-n', 'ingress-nginx', 'rollout', 'status',
-            'deployment/ingress-nginx-controller', '--timeout=300s', timeout=330)
+        # Use actual isolated controller, not a hand-written mock or fake endpoint.
+        ingress = install_ingress(controller)
         # Admission webhook reconciles separately from controller readiness.
         # Retry actual edge requests rather than trusting a deployment's ready count.
         for attempt in range(30):
             try:
-                ingress_probe(first)
-                ingress_probe(second, '/')
-                ingress_probe(first, bad_host=True)
+                ingress_probe(first, ingress=ingress)
+                ingress_probe(second, '/', ingress=ingress)
+                ingress_probe(first, bad_host=True, ingress=ingress)
                 break
             except RuntimeError:
                 if attempt == 29:
                     raise RuntimeError('Real ingress controller did not route the configured host')
                 time.sleep(2)
-        print('PASS KIND NGINX: real HTTP ingress host routing, nonmatching host rejection and both API origins', flush=True)
+        print(f'PASS KIND {controller.upper()}: real HTTP ingress host routing, nonmatching host rejection and both API origins', flush=True)
 
         # Delete one API pod while a separate node still serves through ingress.
         run('kubectl', '-n', NS, 'delete', 'pod', second, '--wait=false',
             '--grace-period=25', timeout=50)
         for attempt in range(30):
             try:
-                ingress_probe(first, '/api/health/ready')
+                ingress_probe(first, '/api/health/ready', ingress=ingress)
                 break
             except RuntimeError:
                 if attempt == 29:
@@ -213,19 +264,21 @@ def main() -> None:
             if len(refreshed) == 2 and second not in refreshed:
                 assert_distribution(ws)
                 # Re-probe ingress and cross-worker mount after replacement.
-                ingress_probe(first, '/api/health/live')
+                ingress_probe(first, '/api/health/live', ingress=ingress)
                 shared_mount_check(*sorted(refreshed))
                 break
             time.sleep(2)
         else:
             raise RuntimeError('No safe cross-worker replacement was observed')
         print('PASS KIND multiworker: ingress available through pod replacement, two independent worker placements restored', flush=True)
-    print('LIMIT: test uses one Docker host and shared bind; not multi-machine NFS/CSI, HAProxy, native ARM64, TLS certificate, production SLA or operator sign-off')
+    print('LIMIT: test uses one Docker host and shared bind; not multi-machine NFS/CSI, public TLS, native ARM64, production SLA or operator sign-off')
 
 
 if __name__ == '__main__':
     try:
-        main()
+        parser = argparse.ArgumentParser()
+        parser.add_argument('--controller', choices=('nginx', 'haproxytech'), default='nginx')
+        main(parser.parse_args().controller)
     except (RuntimeError, ValueError, KeyError, subprocess.TimeoutExpired) as exc:
         print(f'FAIL disposable multiworker/ingress acceptance: {exc}', file=sys.stderr)
         sys.exit(1)

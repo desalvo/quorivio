@@ -1,6 +1,6 @@
 {
   "version": "0.1.0-dev",
-  "method": "Conservative evidence-scoped gate audit: accepted=100% of bounded gate weight, partial=50%, open/blocked=0%. On 2026-10-28 three previously broad partial gates (A3/B2/B4) were split into separately proven automated subgates and residual independent-acceptance gates; weights still total 100. This is finer granularity, not a claim that the external checks passed. The strict RC gate remains blocked until ALL gates, including residuals, are independently accepted.",
+  "method": "Conservative evidence-scoped gate audit: accepted=100% of bounded gate weight, partial=50%, open/blocked=0%. On 2026-10-28 three previously broad partial gates (A3/B2/B4) were split into separately proven automated subgates and residual independent-acceptance gates; weights still total 100. This is finer granularity, not a claim that the external checks passed. The strict RC gate remains blocked until ALL gates, including residuals, are independently accepted. Cycle 34 reconciles narrowly scoped successful GitHub CI 41048187760 (2026-10-30): live clamd INSTREAM with clean/EICAR and 2-worker KIND NGINX with one API pod replacement. Never counts them as real CSI/production acceptance. Cycle 35 recognizes two previously uncredited, independently CI-proven bounded PostgreSQL bootstrap and SIGTERM scopes from run 41048187760; no credit for local code.",
   "gates": [
     {
       "id": "A1",
@@ -159,12 +159,36 @@
     {
       "id": "B1",
       "area": "B-sessions",
-      "weight": 2,
+      "weight": 1,
       "status": "partial",
-      "evidence": "Presenter dashboard, synced server-driven navigation and participant preview in source; live WebSocket authorization re-audits sessions, presenter memberships/roles and participants every 10s (local policy tests PASS, 2026-10-24); per-session coalesced snapshot delivery and 2 MiB slow-consumer protection, local tests PASS (2026-10-24); LISTEN startup/resync failure now forces reconnection, with local regression tests (2026-10-24); retired listener notification fencing and rejected handler reconnect regression tests PASS (2026-10-24); coalesced snapshot callers now await the final read and failed DB snapshots propagate to listener recovery (152 Node and 252 Python tests PASS, builds PASS, 2026-10-24); disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24); added mandatory CI PostgreSQL two-process WebSocket notification acceptance (not yet run on CI, 2026-10-24); replica smoke now drains pre-mutation notifications to require a fresh post-vote participant snapshot (2026-10-24). Maintainer confirmed green CI including two-replica PostgreSQL 18 WebSocket test (2026-10-24). CI 40141894130: PostgreSQL 18 two-replica WebSocket opening, response propagation, privacy and close PASS; 24 concurrent HTTP clients PASS.\n2026-10-27 local (pending real PG CI): closed-session owner/collaborator duplication exposed in session directory; portable definition-only copy creates fresh draft/credentials and independently remapped media, with no participant/responses/statistics.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: PostgreSQL live 24 concurrent participants, independent audience Chromium and two API replicas WebSocket PASS. Strict RC gate was skipped; status unchanged.\n2026-10-28 evidence reconciliation: automatic CI subgate B1-WS split from broad partial gate, without claiming outstanding external acceptance.\n2026-10-29: GitHub Full CI 40918620911 on caf6331f15cc PASS confirms a bounded automated capability carved out below. Independent production-facing requirements remain within this partial parent; no external SLO, physical offsite or RPO/RTO sign-off inferred.",
+      "evidence": "Presenter dashboard, synced server-driven navigation and participant preview in source; live WebSocket authorization re-audits sessions, presenter memberships/roles and participants every 10s (local policy tests PASS, 2026-10-24); per-session coalesced snapshot delivery and 2 MiB slow-consumer protection, local tests PASS (2026-10-24); LISTEN startup/resync failure now forces reconnection, with local regression tests (2026-10-24); retired listener notification fencing and rejected handler reconnect regression tests PASS (2026-10-24); coalesced snapshot callers now await the final read and failed DB snapshots propagate to listener recovery (152 Node and 252 Python tests PASS, builds PASS, 2026-10-24); disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24); added mandatory CI PostgreSQL two-process WebSocket notification acceptance (not yet run on CI, 2026-10-24); replica smoke now drains pre-mutation notifications to require a fresh post-vote participant snapshot (2026-10-24). Maintainer confirmed green CI including two-replica PostgreSQL 18 WebSocket test (2026-10-24). CI 40141894130: PostgreSQL 18 two-replica WebSocket opening, response propagation, privacy and close PASS; 24 concurrent HTTP clients PASS.\n2026-10-27 local (pending real PG CI): closed-session owner/collaborator duplication exposed in session directory; portable definition-only copy creates fresh draft/credentials and independently remapped media, with no participant/responses/statistics.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: PostgreSQL live 24 concurrent participants, independent audience Chromium and two API replicas WebSocket PASS. Strict RC gate was skipped; status unchanged.\n2026-10-28 evidence reconciliation: automatic CI subgate B1-WS split from broad partial gate, without claiming outstanding external acceptance.\n2026-10-29: GitHub Full CI 40918620911 on caf6331f15cc PASS confirms a bounded automated capability carved out below. Independent production-facing requirements remain within this partial parent; no external SLO, physical offsite or RPO/RTO sign-off inferred.\n2026-10-30 cycle35: CI-backed bootstrap and SIGTERM drain bounded acceptance split into B1-BOOTSTRAP-PG18 and B1-GRACEFUL-DRAIN. Residual production-duration/network-fault/SLO independent checks stay here.",
       "remaining": "Production-like long-running multi-replica load, network impairment/reconnection latency, recovery and operational SLO acceptance.",
       "current_verified_run": 40918620911,
       "pending_local_evidence_20261028": "WYSIWYG and independent-question implementation passes local TypeScript/Vite, 461 Node API, 46 frontend, 33 focused Python, Chromium component desktop/mobile. Unverified by GitHub and real PostgreSQL; prior accepted gates unchanged."
+    },
+    {
+      "id": "B1-BOOTSTRAP-PG18",
+      "area": "B-sessions",
+      "weight": 0.5,
+      "status": "accepted",
+      "evidence": "GitHub Actions run 41048187760, quality job 124037870206, committed SHA f5ccf9a7545e7c17b4323d067db66aff5eca9b41: PASS PostgreSQL 18 simultaneous fresh-schema API bootstrap, exactly one atomic initial administrator and two ready replicas; implemented during cycle31. Not the B1-WS and B1-RECONNECT WebSocket signal tests. The new cycle35 pool-lease failure hardening remains unverified by GitHub.",
+      "remaining": "Preserve the proven bounded concurrent bootstrap guarantee in future CI; production multi-machine PostgreSQL HA, DB partition and operational sign-off remain in B1.",
+      "verified_run_id": 41048187760,
+      "verified_job_id": 124037870206,
+      "verified_commit_sha": "f5ccf9a7545e7c17b4323d067db66aff5eca9b41",
+      "scope": "Disposable PostgreSQL 18 initial schema, two concurrent application startup processes, one initial administrator."
+    },
+    {
+      "id": "B1-GRACEFUL-DRAIN",
+      "area": "B-sessions",
+      "weight": 0.5,
+      "status": "accepted",
+      "evidence": "GitHub Actions run 41048187760 quality job 124037870206 committed SHA f5ccf9a7545e7c17b4323d067db66aff5eca9b41: PASS PostgreSQL rolling SIGTERM readiness 503 before shutdown, WebSocket close code 1012 and surviving replica still healthy. Distinct from B4-KIND-INGRESS-RECOVERY (KIND replacement through real NGINX) and B1-RECONNECT (remote session recovery).",
+      "remaining": "Preserve bounded two-process rolling SIGTERM acceptance; externally measured sustained failover, network impairment, storage and operator SLO review stay in B1.",
+      "verified_run_id": 41048187760,
+      "verified_job_id": 124037870206,
+      "verified_commit_sha": "f5ccf9a7545e7c17b4323d067db66aff5eca9b41",
+      "scope": "Bounded two-process PostgreSQL SIGTERM drain/readiness/WebSocket continuity, no ingress or infrastructure resilience claim."
     },
     {
       "id": "B1-WS",
@@ -235,11 +259,24 @@
     {
       "id": "B4",
       "area": "B-sessions",
-      "weight": 3,
+      "weight": 2,
       "status": "partial",
       "evidence": "Anonymous participation, polling and QR routes implemented; disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24); two-replica participant/presenter privacy and notification smoke added to CI, pending execution; opt-in 500-client disposable PostgreSQL CI load with presenter observer and privacy assertion authored, not yet executed (2026-10-24) Maintainer confirmed green two-replica CI (2026-10-24). CI 40141894130: opt-in 500 independent participants PASS with presenter-observed peak >=475 and zero errors; PostgreSQL two-replica WebSocket privacy PASS. New 2026-10-25 participant flow implements HttpOnly-cookie reload recovery (boolean-only no-store endpoint), duplicate-vote UI guard, server-filtered results and mobile reflow; adds opt-in Chromium real PostgreSQL two-browser acceptance (not yet run). Local Node/Python suites and builds PASS. GitHub workflow 40144692900 / job 121023419425: Chromium + real PostgreSQL audience PASS for QR/short-code join, isolated participants, vote persistence, HttpOnly reload recovery, idempotency, report privacy, mobile touch and closure (2026-10-25).\n2026-10-27 quality job 122235650919, run 40517573850: opt-in 500-participant PostgreSQL/WebSocket acceptance SUCCESS and two-replica WebSocket/privacy E2E SUCCESS. Sustained operation and real-device acceptance still pending.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: PostgreSQL/WebSocket test: 500 independent participants, presenter-observed peak >=475, zero errors PASS; not production-like sustained throughput. Strict RC gate was skipped; status unchanged.\n2026-10-28: after successful Full CI 40638652838, the automated evidence-specific B4-LOAD subgate (weight 2) was formally separated and accepted. Parent remains partial and still requires every independent check listed below.",
-      "remaining": "Sustained representative throughput/memory and latency percentiles, failure-injection recovery, independent real-device and accessibility acceptance.",
+      "remaining": "Sustained representative throughput/memory and latency percentiles, failure-injection recovery, independent real-device and accessibility acceptance. Cycle 34 separately credits only a bounded KIND NGINX one-pod replacement; not sustained participant capacity under load or production-grade multi-machine failover.",
       "current_verified_run": 40595463258
+    },
+    {
+      "id": "B4-KIND-INGRESS-RECOVERY",
+      "area": "B-sessions",
+      "weight": 1,
+      "status": "accepted",
+      "acceptance_kind": "bounded_disposable_ingress_failover",
+      "scope": "One disposable single-host KIND cluster with two independently scheduled worker pods, actual NGINX HTTP ingress with host matching, shared temporary bind assets, and availability while replacing one API pod",
+      "evidence": "GitHub Actions 41048187760 commit f5ccf9a7545e7c17b4323d067db66aff5eca9b41, job 124038997005 SUCCESS: PASS two-worker PostgreSQL 18 + cross-worker asset visibility; PASS real NGINX ingress matching host and rejecting wrong host; PASS ingress stayed available through pod replacement, placements restored. Prior failing 41044420650 is not counted.",
+      "remaining": "Representative sustained 500-user latency and resource percentiles, TLS/HAProxy, real CSI RWX multi-machine host failure, physical devices/accessibility and independent SLO signoff remain under B4 and D3.",
+      "verified_run_id": 41048187760,
+      "verified_job_id": 124038997005,
+      "verified_commit_sha": "f5ccf9a7545e7c17b4323d067db66aff5eca9b41"
     },
     {
       "id": "B4-LOAD",
@@ -338,11 +375,24 @@
     {
       "id": "C4",
       "area": "C-admin",
-      "weight": 3,
+      "weight": 2,
       "status": "partial",
       "evidence": "Administrative directory, profile/preferences, transactional platform settings, and locked private-photo replacement/deletion implemented; build and local unit tests pass (2026-10-24). Post-commit profile cycle 2026-10-26: session-scoped public presenter photo projection (anonymous widget previously used private auth-only URL); atomic nickname+display_name PostgreSQL update; legacy profile name update no longer rewrites photo; one-button frontend save and automatic profile load. Local 317 Node/660 Python and API/web builds PASS; real PostgreSQL/browser pending. 2026-10-26 local 40-item batch: profile-image metadata/role-neutral profile and atomic admin user update with Node/Python/build PASS; new real PostgreSQL HTTP/Chromium acceptance wired but not yet executed; status unchanged. 2026-10-26 privacy hardening: retention update now requires actual session owner; new sessions use administrator-configured default; unit and CI acceptance added, CI pending. 2026-10-26 post-commit: atomic account-deletion avatar queue and atomic old-photo replacement enqueue, bounded leased erasure workers, local file/symlink and 44 Node + 10 Python newly added regression tests PASS; CI PostgreSQL acceptance authored, not executed. No promotion. GitHub CI 40331628755: PostgreSQL profile lifecycle passed, but downstream erasure integration failed on timestamp fence; three worker claim SQL expressions corrected to JS-millisecond precision locally and 433 Node/708 Python PASS, CI replay pending. GitHub Actions 40349577790: 433 Node unit tests and production TS builds PASS, disposable SMTP fixture started, but PostgreSQL email MFA E2E interrupted by shared-IP API throttle 429 after prior profile suite; no MFA browser or full positive CI acceptance established. Local hotfix adds non-production ephemeral load token to MFA-only test requests and regression tests; remote rerun pending (2026-10-26).\n2026-10-27 quality job 122235650919, run 40517573850: browser presenter profile upload and anonymous avatar E2E PASS, PostgreSQL profile lifecycle and durable erasure, email MFA PASS. Operator/real RWX multi-replica tests outstanding.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: Chromium + PostgreSQL presenter profile photo upload, public anonymous scoped avatar, private denial and deletion PASS; real RWX/ClamAV deployment not tested. Strict RC gate was skipped; status unchanged.",
-      "remaining": "Unverified residual: multi-replica RWX storage and actual ClamAV deployment with concurrent uploads, deployment/backup key lifecycle, physical-device and independent assistive-technology acceptance. Presenter profile/PostgreSQL/browser coverage is separated into C4-PROFILE, not a claim that these residual checks passed.",
+      "remaining": "Unverified residual: multi-replica RWX storage and actual ClamAV deployment with concurrent uploads, deployment/backup key lifecycle, physical-device and independent assistive-technology acceptance. Presenter profile/PostgreSQL/browser coverage is separated into C4-PROFILE, not a claim that these residual checks passed. Cycle 34 separately credits only a disposable clamd INSTREAM signature check; real uploads through the HTTP application, RWX storage, managed K8s ClamAV concurrent use and operator/security signoff remain OPEN.",
       "current_verified_run": 40595463258
+    },
+    {
+      "id": "C4-AV-INSTREAM",
+      "area": "C-admin",
+      "weight": 1,
+      "status": "accepted",
+      "acceptance_kind": "bounded_real_clamd_protocol",
+      "scope": "Disposable real ClamAV clamd PING/PONG + clean and EICAR streaming through the actual Quorivio scanUploadedFile implementation, no HTTP upload or production deployment",
+      "evidence": "GitHub Actions 41048187760 commit f5ccf9a7545e7c17b4323d067db66aff5eca9b41, job 124037870523 SUCCESS. PASS clamd PING/PONG readiness; PASS real clamd clean file accepted and EICAR pattern blocked by scanUploadedFile from apps/api/src/malware-scan.ts. Prior 41044420650 failed and is not counted.",
+      "remaining": "Actual production HTTP upload transactions, managed Kubernetes scanner under concurrent real uploads, scanner DB updating, RWX/CSI, key custody and device/AT signoff remain within partial C4.",
+      "verified_run_id": 41048187760,
+      "verified_job_id": 124037870523,
+      "verified_commit_sha": "f5ccf9a7545e7c17b4323d067db66aff5eca9b41"
     },
     {
       "id": "C4-PROFILE",
@@ -554,25 +604,16 @@
     "native_browser_job_id": 123608606057
   },
   "pending_local_batch": {
-    "date": "2026-10-29",
-    "description": "RC cycle 25 after failed standard CI 40972614731: bounded wait for WS restart 1012 after queued snapshots; in-flight frames are not a close. New regression suite and explicit lifecycle-only CI diagnostics. KIND/OCI/manual gates still unverified.",
-    "baseline_commit": "30f7ab98403611ee1a4846e4aa8797e03bac0e6b",
-    "source_full_ci_run": 40918620911,
-    "current_score": 79.0,
+    "description": "RC cycle37 editor bug fixes: contrast, portaled menus, preview recovery and multiple-choice save validation; HAProxy CI acceptance remains pending",
     "new_ci_required": true,
     "new_feature_promoted": false,
-    "new_local_runtime_smoke_promoted": false,
-    "strict_rc_ready": false,
     "gates_promoted": [],
-    "newly_accepted_verified": [],
+    "strict_rc_ready": false,
     "kubernetes_kind_api_smoke_verified": false,
     "kubernetes_kind_runtime_verified": false,
     "graceful_shutdown_postgres_e2e_verified": false,
-    "not_claimed": [
-      "rolling SIGTERM E2E not yet green on new commit",
-      "KIND and multiarch smoke unverified",
-      "no real Kubernetes HA, RWX, rootless Podman, RPO/RTO or external acceptance"
-    ]
+    "new_local_runtime_smoke_promoted": false,
+    "new_editor_fixes_verified_in_github": false
   },
   "scoring_reconciliation_20261028": {
     "baseline_score": 53.0,
@@ -1323,5 +1364,51 @@
     "score_after": 79.25,
     "strict_rc_ready": false,
     "reason": "Only after follow-up CI can new ClamAV and actual ingress host-routing be credited; original two failures remain open."
+  },
+  "rc_cycle34_verified_reconciliation_20261030": {
+    "baseline_score": 79.25,
+    "score_after": 80.25,
+    "verified_run_id": 41048187760,
+    "verified_commit_sha": "f5ccf9a7545e7c17b4323d067db66aff5eca9b41",
+    "accepted_subgates_added": [
+      "B4-KIND-INGRESS-RECOVERY",
+      "C4-AV-INSTREAM"
+    ],
+    "new_local_scanner_file_inode_hardening_unverified_by_github": true,
+    "real_csi_rwx_verified": false,
+    "production_managed_clamav_uploads_verified": false,
+    "rc_strict_ready": false,
+    "retained_partial_gate_count": 17
+  },
+  "rc_cycle35_verified_reconciliation_20261030": {
+    "verified_run_id": 41048187760,
+    "verified_job_id": 124037870206,
+    "verified_commit_sha": "f5ccf9a7545e7c17b4323d067db66aff5eca9b41",
+    "accepted_subgates": [
+      "B1-BOOTSTRAP-PG18",
+      "B1-GRACEFUL-DRAIN"
+    ],
+    "baseline_score": 80.25,
+    "score_after": 80.75,
+    "gate_count_before": 50,
+    "gate_count_after": 52,
+    "accepted_after": 35,
+    "partial_after": 17,
+    "parent_weight_before": 2,
+    "parent_weight_after": 1,
+    "new_source_changes_verified_by_github": false,
+    "production_slo_verified": false,
+    "strict_ready": false
+  },
+  "rc_cycle36_haproxy_local_20261030": {
+    "status": "implemented_locally_not_ci_verified",
+    "formal_score_before": 80.75,
+    "formal_score_after": 80.75,
+    "accepted_gates": 35,
+    "partial_gates": 17,
+    "github_ci_pending": true,
+    "scope": "Official HAProxy Technologies 1.54.3 in disposable two-worker KIND: real HTTP host/rejection, separate worker placement, pod recovery; only after a successful independent CI.",
+    "not_proven": "No current CI; real NFS/CSI RWX, production HAProxy, TLS and physical separate machines or operator SLO not accepted",
+    "last_maintainer_committed_sha": "f5ccf9a7545e7c17b4323d067db66aff5eca9b41"
   }
 }

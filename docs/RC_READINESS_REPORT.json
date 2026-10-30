@@ -1,6 +1,6 @@
 {
   "release_candidate_ready": false,
-  "score": 79.25,
+  "score": 80.75,
   "missing_required_files": [],
   "unaccepted_gates": [
     {
@@ -49,7 +49,7 @@
       "id": "B4",
       "area": "B-sessions",
       "status": "partial",
-      "remaining": "Sustained representative throughput/memory and latency percentiles, failure-injection recovery, independent real-device and accessibility acceptance."
+      "remaining": "Sustained representative throughput/memory and latency percentiles, failure-injection recovery, independent real-device and accessibility acceptance. Cycle 34 separately credits only a bounded KIND NGINX one-pod replacement; not sustained participant capacity under load or production-grade multi-machine failover."
     },
     {
       "id": "C1",
@@ -73,7 +73,7 @@
       "id": "C4",
       "area": "C-admin",
       "status": "partial",
-      "remaining": "Unverified residual: multi-replica RWX storage and actual ClamAV deployment with concurrent uploads, deployment/backup key lifecycle, physical-device and independent assistive-technology acceptance. Presenter profile/PostgreSQL/browser coverage is separated into C4-PROFILE, not a claim that these residual checks passed."
+      "remaining": "Unverified residual: multi-replica RWX storage and actual ClamAV deployment with concurrent uploads, deployment/backup key lifecycle, physical-device and independent assistive-technology acceptance. Presenter profile/PostgreSQL/browser coverage is separated into C4-PROFILE, not a claim that these residual checks passed. Cycle 34 separately credits only a disposable clamd INSTREAM signature check; real uploads through the HTTP application, RWX storage, managed K8s ClamAV concurrent use and operator/security signoff remain OPEN."
     },
     {
       "id": "D2",
@@ -106,7 +106,7 @@
       "remaining": "Independent GDPR/legal and AGID assessment, encrypted backup and key rotation operational reviews, retention/erasure audit and RWX storage sign-off."
     }
   ],
-  "gate_count": 48,
-  "accepted_gates": 31,
+  "gate_count": 52,
+  "accepted_gates": 35,
   "policy": "RC requires every gate accepted with reviewed evidence; local tests alone never promote gates."
 }

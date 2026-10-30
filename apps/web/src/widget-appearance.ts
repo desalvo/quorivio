@@ -24,7 +24,9 @@ export function widgetAppearanceStyle(style:WidgetAppearance|undefined,imageUrl?
  const gradient=style.fillMode==='gradient'&&!style.fillNone?`linear-gradient(135deg, ${color}, ${end})`:undefined;
  const shape=style.shapeType||'';
  const result:Record<string,string|number|undefined>={
-  backgroundColor:style.fillNone?'transparent':!image&&!gradient?(alpha===1?style.fillColor||undefined:color):undefined,
+  backgroundColor:style.fillNone?'transparent':!image&&!gradient?(alpha===1?(style.fillColor||((style.fillMode==='solid'||style.fillOpacity!==undefined)?'#ffffff':undefined)):color):undefined,
+  // An authored transparent/solid fill must not reveal a decorative theme background image.
+  backgroundImage:style.fillNone||(!image&&!gradient&&(style.fillColor!==undefined||style.fillOpacity!==undefined||style.fillMode==='solid'))?'none':undefined,
   borderStyle:style.strokeNone?'none':borderEnabled?dash:undefined,
   borderColor:style.strokeNone?'transparent':borderEnabled?(style.strokeColor||'#334155'):undefined,
   borderWidth:style.strokeNone?0:borderEnabled?`${style.strokeWidth??1}pt`:undefined,
@@ -45,7 +47,7 @@ export function widgetTypographyStyle(style:WidgetTextStyle|undefined):Record<st
  return {
   fontFamily:style?.fontFamily||undefined,
   fontSize:`${(size/1280*100).toFixed(5)}cqw`,
-  color:style?.color||undefined,
+  color:style?.color||'#000000',
   fontWeight:style?.bold?'bold':undefined,
   fontStyle:style?.italic?'italic':undefined,
   textAlign:style?.textAlign||undefined,

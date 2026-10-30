@@ -28,7 +28,7 @@ test('topic question limit locks the participant after page fencing',()=>{
 });
 test('timed widget duplicate acknowledgement takes precedence over expired deadline',()=>{
  assert.ok(widget.includes('SELECT id FROM widget_answers WHERE activity_id=$1 AND participant_id=$2 AND widget_id=$3 AND question_id=$4 AND revision=$5'));
- assert.ok(widget.indexOf('if(existing.rowCount)')<widget.indexOf('timedDeadline('));
+ assert.ok(widget.indexOf('if(existing.rowCount&&part.allowAnswerChange!==true)')<widget.indexOf('timedDeadline('));
  assert.ok(widget.includes('already_submitted:true,question_id:questionId,revision'));
 });
 test('legacy quiz retries are idempotent after expiry and safe on notify failures',()=>{

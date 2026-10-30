@@ -18,3 +18,10 @@ export function commitRehearsalAnswer<T extends Record<string,DemoAnswer>>(
  if(!key||Object.hasOwn(submitted,key)||!canSubmitRehearsalAnswer(mode,value))return submitted;
  return {...submitted,[key]:Array.isArray(value)?[...value]:value} as T;
 }
+
+/** A reaction is a replaceable per-participant choice (one vote in totals), unlike a quiz answer. */
+export function changeRehearsalReaction<T extends Record<string,DemoAnswer>>(state:T,pageKey:string,widgetId:string,emoji:string):T{
+ if(!pageKey||!widgetId||!emoji)return state;
+ if(state[pageKey]===emoji&&state[widgetId]===emoji)return state;
+ return {...state,[pageKey]:emoji,[widgetId]:emoji};
+}

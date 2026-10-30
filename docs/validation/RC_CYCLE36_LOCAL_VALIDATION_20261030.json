@@ -1,0 +1,26 @@
+{
+  "version": "0.1.0-dev",
+  "cycle": 36,
+  "formal_score": 80.75,
+  "source_baseline_cycle35": "quorivio-0.1.0-dev-rc-postgres-bootstrap-drain-cycle35-gate80.75-cumulative.zip",
+  "committed_baseline": "f5ccf9a7545e7c17b4323d067db66aff5eca9b41",
+  "new_function": "disposable two-worker HAProxy Technologies official controller real ingress and pod recovery acceptance",
+  "new_ci_input": "kubernetes_haproxy_test",
+  "new_ci_status": "not_run_requires_user_commit",
+  "local_focused_python_tests": 38,
+  "local_focused_python_failures": 0,
+  "local_python_full_regression": "not_certified: monolithic suite timed out; per-module attempt also timed out and had standalone-import failures. No claimed complete suite pass.",
+  "local_node_backend_and_frontend": "not_run_missing_npm_packages",
+  "local_typescript_build": "not_run_missing_npm_packages",
+  "live_haproxy_controller": "not_run_no_docker_kind_helm",
+  "strict_rc_ready": false,
+  "published": false,
+  "commit_push_tag": false,
+  "additional_local_observations": [
+    "Some legacy test files lack standalone unittest entry points",
+    "Some converter test modules rely on CI-specific PYTHONPATH/import context"
+  ],
+  "source_integrity": "verified_by_cycle36_manifest_and_package_checker",
+  "source_files_excluding_inventory": 948,
+  "full_ci_not_substitute_for_local": "Only after maintainer commit and GitHub independent run"
+}

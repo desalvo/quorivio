@@ -1,0 +1,28 @@
+{
+  "cycle": 34,
+  "version": "0.1.0-dev",
+  "verified_run_id": 41048187760,
+  "verified_commit_sha": "f5ccf9a7545e7c17b4323d067db66aff5eca9b41",
+  "verified_jobs": {
+    "quality": 124037870206,
+    "container": 124038997025,
+    "real_clamav": 124037870523,
+    "two_worker_kind_nginx_recovery": 124038997005
+  },
+  "all_four_jobs": "success",
+  "score_before": 79.25,
+  "score_after": 80.25,
+  "new_verified_subgates": [
+    "C4-AV-INSTREAM",
+    "B4-KIND-INGRESS-RECOVERY"
+  ],
+  "baseline_gate_count": 48,
+  "new_gate_count": 50,
+  "accepted_gates": 33,
+  "partial_gates": 17,
+  "new_source_changes_verified_by_github": false,
+  "kind_shared_storage_production_csi": false,
+  "production_http_upload_clamav_tested": false,
+  "strict_ready": false,
+  "image_published": false
+}

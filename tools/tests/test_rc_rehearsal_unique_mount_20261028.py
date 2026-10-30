@@ -14,9 +14,9 @@ CI=(ROOT/'tools/ci_browser_editor.py').read_text(encoding='utf8')
 class RehearsalUniqueMount(unittest.TestCase):
     def test_only_two_declaration_sites_have_disjoint_guards(self):
         self.assertEqual(UI.count('<SessionRehearsal '), 2)
-        self.assertIn('{rehearsalOpen&&!designActivity&&<SessionRehearsal ', UI,
+        self.assertIn('{rehearsalOpen&&!designActivity&&<RehearsalErrorBoundary ', UI,
                       'Dashboard preview must not mount while the editor exists')
-        self.assertIn('{rehearsalOpen&&<SessionRehearsal ', UI,
+        self.assertIn('{rehearsalOpen&&<RehearsalErrorBoundary ', UI,
                       'Editor preview should mount inside the conditionally rendered editor')
         self.assertIn('{designActivity&&<section className="panel powerpoint-editor editor-ux-v2"', UI)
     def test_chromium_rejects_multiple_dialogs_before_accessibility_assertions(self):

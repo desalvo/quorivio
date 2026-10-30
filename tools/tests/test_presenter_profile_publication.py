@@ -11,7 +11,9 @@ HELPER=(ROOT/'apps/api/src/profile-photo.ts').read_text()
 class PresenterProfilePublicationTests(unittest.TestCase):
     def test_public_projection_is_used_for_anonymous_profile_list(self):
         route=API.split("app.get('/api/join/:code/presenter-profiles'",1)[1].split("app.get('/api/sessions/:id/presenter-profiles'",1)[0]
-        self.assertIn('publicPresenterProfiles(profiles.rows,req.params.code)',route)
+        self.assertIn('publicPresenterProfiles(profiles.rows,req.params.code,publicEmailIds)',route)
+        self.assertIn("w.kind==='profile'&&w.showEmail===true",route)
+        self.assertIn('current_activity_id',route)
         self.assertIn("'Cache-Control','no-store'",route)
         self.assertNotIn('res.json(profiles.rows)',route)
 
@@ -22,7 +24,7 @@ class PresenterProfilePublicationTests(unittest.TestCase):
         self.assertIn("'Cache-Control','no-store'",route)
 
     def test_widget_consumes_only_public_photo_url(self):
-        widget=WEB.split('function PresenterProfileWidget',1)[1].split('function QuestionWidget',1)[0]
+        widget=WEB.split('function PresenterProfileWidget',1)[1].split('function EditorPresenterProfileWidget',1)[0]
         self.assertIn('p.photo_url',widget)
         self.assertNotIn('p.profile_photo_url',widget)
 

@@ -10,7 +10,7 @@ sys.path.insert(0,str(ROOT/'tools'))
 from rc_gate_audit import audit
 from rc_release_preflight import preflight
 from verify_rc_cycle21_inventory import load_inventory as previous
-from verify_rc_cycle33_inventory import load_inventory, verify_source
+from verify_rc_cycle42_inventory import load_inventory, verify_source
 
 SHA='caf6331f15ccf39c218791503b8c6d0ca3503dce'
 RUN=40918620911
@@ -40,9 +40,9 @@ class Cycle22RemoteReconciliation(unittest.TestCase):
         self.assertIn('not offsite',self.gates['D2-ENCRYPTED-DR']['evidence'].lower())
 
     def test_exact_weighted_score_unaccepted_gate_set_and_history(self):
-        self.assertEqual(len(self.gates),48)
+        self.assertEqual(len(self.gates),52)
         self.assertEqual(sum(g['weight'] for g in self.gates.values()),100)
-        self.assertEqual((audit()['score'],preflight()['accepted_gates']), (79.25,31))
+        self.assertEqual((audit()['score'],preflight()['accepted_gates']), (80.75,35))
         self.assertEqual(len(preflight()['unaccepted_gates']),17)
         self.assertFalse(preflight()['release_candidate_ready'])
         self.assertEqual(self.doc['scoring_reconciliation_20261029_cycle16']['reconciled_score'],77)

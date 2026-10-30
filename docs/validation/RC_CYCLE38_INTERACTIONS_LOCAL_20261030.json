@@ -1,0 +1,34 @@
+{
+  "version": "0.1.0-dev",
+  "cycle": 38,
+  "formal_score": 80.75,
+  "confirmed_base_commit": "f5ccf9a7545e7c17b4323d067db66aff5eca9b41",
+  "uncommitted_cycles": [
+    34,
+    35,
+    36,
+    37,
+    38
+  ],
+  "features": [
+    "neutral presenter-side interactive widgets",
+    "participant draft/confirmed answer isolation",
+    "rehearsal aggregation",
+    "replaceable live reactions",
+    "opt-in answer updates",
+    "left-aligned option controls",
+    "presenter profile name/photo/explicit public email consent"
+  ],
+  "api_node_tests_pass": 497,
+  "web_node_tests_pass": 77,
+  "tsx_syntax": "typescript parser pass",
+  "real_postgres_http": "not_available",
+  "real_chromium_manual": "pending",
+  "npm_build": "not_available_in_offline_environment",
+  "rc_credits_added": 0,
+  "assistant_committed": false,
+  "assistant_published": false,
+  "python_expected_tests": 1260,
+  "python_skipped_expected": 1,
+  "react_source_parse": "pass"
+}

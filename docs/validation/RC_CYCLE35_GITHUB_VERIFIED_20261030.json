@@ -1,0 +1,25 @@
+{
+  "cycle": 35,
+  "version": "0.1.0-dev",
+  "source_run": 41048187760,
+  "source_job": 124037870206,
+  "committed_sha": "f5ccf9a7545e7c17b4323d067db66aff5eca9b41",
+  "source_job_success": true,
+  "source_job_pass_lines": [
+    "PASS PostgreSQL 18: simultaneous fresh-schema API bootstrap, one atomic admin, two ready replicas",
+    "PASS PostgreSQL rolling SIGTERM: readiness 503 before shutdown, WS 1012, surviving replica healthy"
+  ],
+  "old_score": 80.25,
+  "new_score": 80.75,
+  "old_gate_count": 50,
+  "new_gate_count": 52,
+  "accepted_gates": 35,
+  "partial_gates": 17,
+  "new_subgates": [
+    "B1-BOOTSTRAP-PG18",
+    "B1-GRACEFUL-DRAIN"
+  ],
+  "new_code_covered_by_source_job": false,
+  "external_slo_verified": false,
+  "rc_ready": false
+}

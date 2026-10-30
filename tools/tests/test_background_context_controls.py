@@ -7,8 +7,8 @@ SOURCE = (ROOT / 'apps/web/src/main.tsx').read_text()
 
 class BackgroundContextControls(unittest.TestCase):
     def test_context_choices_are_separate(self):
-        self.assertIn('Menu contestuale sfondo della pagina', SOURCE)
-        self.assertIn('Menu contestuale sfondo risultati', SOURCE)
+        self.assertIn('Seleziona sfondo pagina dalla libreria', SOURCE)
+        self.assertIn('Seleziona sfondo risultati dalla libreria', SOURCE)
         self.assertIn('uploadBackground(e.target.files?.[0],false)', SOURCE)
         self.assertIn('uploadBackground(e.target.files?.[0],true)', SOURCE)
     def test_removal_clears_url_and_asset(self):

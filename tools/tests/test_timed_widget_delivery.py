@@ -32,7 +32,7 @@ class TimedWidgetDelivery(unittest.TestCase):
         start=UI.index('function QuestionWidget(')
         end=UI.index('function SessionRehearsal(',start)
         content=UI[start:end]
-        self.assertIn('if(busy||submitted)return;',content)
+        self.assertIn('if(busy||(submitted&&widget.allowAnswerChange!==true))return;',content)
         self.assertIn('aria-busy={busy}',content)
         self.assertIn('role="status" aria-live="polite"',content)
 

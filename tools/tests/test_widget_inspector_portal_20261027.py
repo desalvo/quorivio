@@ -8,7 +8,7 @@ CSS=(ROOT/'apps/web/src/style.css').read_text()
 class WidgetInspectorPortal20261027(unittest.TestCase):
     def test_only_one_inspector_opens_in_real_editor(self):
         self.assertIn('contextWidget&&!onInspectWidget&&<div className="canvas-context-properties"',JSX)
-        self.assertIn('contextWidget===w.id&&<div className="canvas-context-menu"',JSX)
+        self.assertIn('contextWidget===w.id&&createPortal(<div className="canvas-context-menu"',JSX)
         self.assertIn('setContextWidget(w.id)',JSX)
         self.assertIn('aria-label="Chiudi proprietà widget"',JSX)
         self.assertIn('className="editor-drawer-close"',JSX)

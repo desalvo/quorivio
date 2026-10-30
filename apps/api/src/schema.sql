@@ -88,6 +88,19 @@ CREATE TABLE IF NOT EXISTS session_assets(
 );
 CREATE INDEX IF NOT EXISTS idx_session_assets_session ON session_assets(session_id);
 
+-- User-owned, persistent backgrounds. Session assets remain scoped to a presentation;
+-- applying a collaborator's background creates a private user copy first.
+CREATE TABLE IF NOT EXISTS presenter_backgrounds(
+ id uuid PRIMARY KEY,
+ owner_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+ mime_type text NOT NULL CHECK(mime_type IN ('image/png','image/jpeg','image/gif','image/webp')),
+ byte_size bigint NOT NULL CHECK(byte_size>0),
+ sha256 text NOT NULL,
+ created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_presenter_backgrounds_owner ON presenter_backgrounds(owner_id,created_at DESC);
+
+
 -- Keep invalidated answers for audit but permit one NEW active response after invalidation.
 -- The original table constraint must be replaced before creating the partial unique index.
 ALTER TABLE responses DROP CONSTRAINT IF EXISTS responses_activity_id_participant_id_key;

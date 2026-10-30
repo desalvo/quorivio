@@ -15,6 +15,7 @@ export async function withBootstrapLock<T>(pool: Pick<Pool, 'connect'>,
     action: (client: PoolClient) => Promise<T>): Promise<T> {
   const client = await pool.connect();
   let locked = false;
+  let sessionReset = false;
   let destroy = false;
   try {
     // A blocked follower must eventually fail readiness rather than hang forever.
@@ -22,8 +23,14 @@ export async function withBootstrapLock<T>(pool: Pick<Pool, 'connect'>,
     await client.query(LOCK_SQL, [...BOOTSTRAP_LOCK_KEYS]);
     locked = true;
     await client.query('SET lock_timeout = DEFAULT');
+    sessionReset = true;
     return await action(client);
   } finally {
+    // If lock acquisition failed, even SET lock_timeout may have changed the
+    // session. Never return that connection to the normal application pool.
+    // On an interrupted lock acquisition PostgreSQL could also have an
+    // uncertain session state. Destroying the lease fails closed.
+    if (!locked || !sessionReset) destroy = true;
     if (locked) {
       try {
         const result = await client.query(UNLOCK_SQL, [...BOOTSTRAP_LOCK_KEYS]);

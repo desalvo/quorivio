@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT/'tools'))
-from verify_rc_cycle33_inventory import verify_source,load_inventory
+from verify_rc_cycle42_inventory import verify_source,load_inventory
 from verify_rc_cycle31_inventory import load_inventory as historical
 from rc_release_preflight import preflight
 
@@ -14,13 +14,13 @@ class Cycle31Inventory(unittest.TestCase):
         self.assertEqual(len(historical()),917)
     def test_strict_rc_stays_blocked(self):
         report=preflight()
-        self.assertEqual(report['score'],79.25)
-        self.assertEqual((report['accepted_gates'],len(report['unaccepted_gates'])),(31,17))
+        self.assertEqual(report['score'],80.75)
+        self.assertEqual((report['accepted_gates'],len(report['unaccepted_gates'])),(35,17))
         self.assertFalse(report['release_candidate_ready'])
     def test_workflow_order(self):
         wf=(ROOT/'.github/workflows/ci.yml').read_text()
         a=wf.index('python3 tools/verify_rc_cycle31_inventory.py --historical')
-        b=wf.index('python3 tools/verify_rc_cycle33_inventory.py')
+        b=wf.index('python3 tools/verify_rc_cycle41_inventory.py')
         c=wf.index('Detect credential leaks')
         self.assertLess(a,b)
         self.assertLess(b,c)

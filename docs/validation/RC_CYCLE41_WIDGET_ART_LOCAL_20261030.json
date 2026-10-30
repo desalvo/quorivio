@@ -1,0 +1,46 @@
+{
+  "version": "0.1.0-dev",
+  "cycle": 41,
+  "date": "2026-10-30",
+  "base_package": "quorivio-0.1.0-dev-rc-artistic-widget-ui-cycle40-gate80.75-cumulative.zip",
+  "new_features": [
+    "per-widget persistable allowlisted art themes",
+    "optional depth/glow/float effects",
+    "custom image and transparency preserved",
+    "four-surface visual parity",
+    "static timer canvas preview and live timer",
+    "reduced-motion support"
+  ],
+  "tests": {
+    "api_node": {
+      "passed": 500,
+      "failed": 0
+    },
+    "web_node": {
+      "passed": 81,
+      "failed": 0
+    },
+    "new_node": {
+      "passed": 4,
+      "failed": 0
+    },
+    "python_contract": {
+      "passed": 4,
+      "failed": 0
+    },
+    "typescript_syntax_errors": 0,
+    "css_syntax_errors": 0
+  },
+  "limitations": [
+    "No full production TypeScript/Vite build in local environment (npm dependencies unavailable)",
+    "No real browser visual regression run",
+    "No new GitHub CI run for cycle 41",
+    "No production or compliance certification"
+  ],
+  "formal_rc_percentage": 80.75,
+  "formal_rc_increment": 0,
+  "accepted_gates": 35,
+  "partial_gates": 17,
+  "commit_status": "maintainer will commit later",
+  "publication": false
+}

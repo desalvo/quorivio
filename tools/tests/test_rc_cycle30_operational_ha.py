@@ -235,7 +235,7 @@ class WizardAndCIContracts(unittest.TestCase):
     def test_rc_score_unchanged_without_ci_and_independent_review(self):
         from rc_gate_audit import audit
         from rc_release_preflight import preflight
-        self.assertEqual(audit()['score'],79.25)
+        self.assertEqual(audit()['score'],80.75)
         self.assertFalse(preflight()['release_candidate_ready'])
 
 
