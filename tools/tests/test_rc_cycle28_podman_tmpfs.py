@@ -7,7 +7,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tools'))
 from verify_rc_cycle27_inventory import load_inventory as prior_inventory
-from verify_rc_cycle42_inventory import load_inventory, verify_source
+from verify_rc_cycle43_inventory import load_inventory, verify_source
 from rc_release_preflight import preflight
 
 

@@ -1,6 +1,6 @@
 /** Compile-time regression: the editor must accept all persisted appearance fields.
  * Keep aligned with the API's authoritative WidgetTextStyle validator. */
-import type {WidgetTextStyle} from '../../api/src/domain';
+import type {PageDesign, WidgetTextStyle} from '../../api/src/domain';
 import type {WidgetAppearance} from './widget-appearance';
 
 type Equal<A,B> = (<T>()=>T extends A?1:2) extends (<T>()=>T extends B?1:2)?true:false;
@@ -15,3 +15,9 @@ export const compileTimeWidgetFill:WidgetTextStyle = {
  fillMode:'image',fillImageAssetId:'8e763f69-9915-4591-b561-177322052709',
  fillOpacity:0.7,shapeType:'speech',gradientEndColor:'#ffffff',
 };
+
+/* Regression for the editor draft's permission flags: both are persisted by
+ * the same PageDesign contract that validates the HTTP save request. */
+type StoredPageWidget=NonNullable<PageDesign['widgets']>[number];
+export type PersistedAnswerChangeFlag=Assert<Equal<StoredPageWidget['allowAnswerChange'],boolean|undefined>>;
+export type PersistedProfileEmailFlag=Assert<Equal<StoredPageWidget['showEmail'],boolean|undefined>>;

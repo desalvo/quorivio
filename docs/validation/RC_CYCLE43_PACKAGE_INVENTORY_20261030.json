@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
-  "cycle": 42,
-  "file_count_excluding_manifest": 984,
+  "cycle": 43,
+  "file_count_excluding_manifest": 987,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -44,14 +44,14 @@
       "e377db62"
     ],
     ".github/workflows/ci.yml": [
-      "ea83e28d",
-      "19347f49",
-      "6db734ff",
-      "b7f49359",
-      "5a748494",
-      "3bd9d194",
-      "f6103eb3",
-      "ba03a446"
+      "eb45adbf",
+      "5e8beb63",
+      "25bf9fe8",
+      "9ad18e11",
+      "0dcc4ca9",
+      "99c0571f",
+      "8b533f51",
+      "03932a92"
     ],
     ".gitignore": [
       "ed25541d",
@@ -1304,14 +1304,14 @@
       "3179a76c"
     ],
     "apps/web/src/main.tsx": [
-      "8cb7a271",
-      "2bf80bf5",
-      "d3c761e6",
-      "b4940f48",
-      "133a6e31",
-      "1b2f608a",
-      "b5a2c73a",
-      "9099bfcd"
+      "b3a48a3c",
+      "0dfcea4d",
+      "7b3b0187",
+      "3b0bed99",
+      "14cd19c2",
+      "3874f3bc",
+      "f9109908",
+      "be51b12c"
     ],
     "apps/web/src/page-autosave.ts": [
       "90dd77a4",
@@ -1544,14 +1544,14 @@
       "2b1c9c8e"
     ],
     "apps/web/src/widget-style-contract.ts": [
-      "ccfef471",
-      "cd9ab0c9",
-      "e0cd272c",
-      "14edf824",
-      "35ba3dd7",
-      "6f0ac509",
-      "924ec304",
-      "f30414aa"
+      "b895f5c1",
+      "c4cf1563",
+      "96297235",
+      "95fd1ced",
+      "5455f042",
+      "f3a8e7b5",
+      "37e92d65",
+      "18537d5e"
     ],
     "apps/web/src/widget-text-marks.ts": [
       "e16bfb16",
@@ -2154,24 +2154,24 @@
       "949f2c92"
     ],
     "docs/COMPLETION_HANDOFF.it.md": [
-      "516d8a34",
-      "b83736a1",
-      "420aad64",
-      "6ae59ea6",
-      "69f94d81",
-      "49a8922d",
-      "3484fdf7",
-      "471aea2e"
+      "913c85ee",
+      "669156aa",
+      "bb2ad677",
+      "29a705ac",
+      "08f16531",
+      "7d9053a9",
+      "ef6b97cc",
+      "eccb2542"
     ],
     "docs/COMPLETION_HANDOFF.md": [
-      "36f79ffa",
-      "eb707580",
-      "d3ae30e0",
-      "a3876664",
-      "4b423499",
-      "49df1c93",
-      "7c778e52",
-      "bf36515e"
+      "3e34f20e",
+      "af5201a5",
+      "88810ecb",
+      "cfd17803",
+      "55d49f16",
+      "cba83ccc",
+      "e2439761",
+      "f6ca58fb"
     ],
     "docs/CONVERSION_ATOMIC_PUBLISH.en.md": [
       "20d0f241",
@@ -2234,24 +2234,24 @@
       "1ac5fb62"
     ],
     "docs/DEVELOPMENT_STATUS.it.md": [
-      "011b0777",
-      "0ee9b764",
-      "221bac1b",
-      "918d4e8f",
-      "d0c3d717",
-      "5d065892",
-      "6659d73c",
-      "82918011"
+      "7983fe6c",
+      "7424a2c3",
+      "f51e889a",
+      "d445dd03",
+      "af33b44e",
+      "98d76274",
+      "0586f6d1",
+      "74550e4e"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "ad55246e",
-      "b0d1e4a6",
-      "d3408510",
-      "6077ca19",
-      "c12bb051",
-      "367a68eb",
-      "e61a8dc5",
-      "51bd3808"
+      "20b916e4",
+      "1722c2fa",
+      "dc02725f",
+      "f7fa2068",
+      "b8e8fac4",
+      "8faff434",
+      "c48e6954",
+      "5ac7c423"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",
@@ -4222,6 +4222,16 @@
       "c2f841c5",
       "dc3ab451",
       "5fc2de8f"
+    ],
+    "docs/RC_CYCLE43_FRONTEND_TYPESCRIPT_CI_HOTFIX.it.md": [
+      "6b64c260",
+      "0b0ca9ca",
+      "ab68da8d",
+      "c969a4a1",
+      "56e58f80",
+      "fcc7686a",
+      "675bdfe7",
+      "9fde389b"
     ],
     "docs/RC_CYCLE9_VERIFIED_GATE_HARDENING_20261028.en.md": [
       "920e2f93",
@@ -8724,14 +8734,14 @@
       "e36920f0"
     ],
     "tools/tests/test_rc_ci_40796695726_40797106013_20261029.py": [
-      "f443f888",
-      "52dd060b",
-      "0499dc52",
-      "0915e489",
-      "ce5aa0b4",
-      "642b4669",
-      "a5bd3ad7",
-      "2550fd08"
+      "a6f71835",
+      "369de452",
+      "b8fb4d2f",
+      "eab5be3d",
+      "41b8cc39",
+      "444dd5c4",
+      "21856eee",
+      "e2eb55c1"
     ],
     "tools/tests/test_rc_conversion_30_cycle.py": [
       "d98445fc",
@@ -8944,84 +8954,84 @@
       "44272ce6"
     ],
     "tools/tests/test_rc_cycle20_authenticated_retention.py": [
-      "34e2953e",
-      "1365718f",
-      "aa76bfdc",
-      "1989be2b",
-      "18812f6a",
-      "988c5e13",
-      "3285a2e2",
-      "d975215f"
+      "2c608a2d",
+      "d239634f",
+      "9f6b8e3c",
+      "b9998703",
+      "fe1a851e",
+      "4fa97bc5",
+      "1aadd4d8",
+      "9ec68d5d"
     ],
     "tools/tests/test_rc_cycle21_mounted_mirror.py": [
-      "3136a9aa",
-      "a6199fbd",
-      "798753b0",
-      "7dfc60dc",
-      "dadb6691",
-      "2cd1e7be",
-      "bcfaf742",
-      "440b6864"
+      "533e8ae0",
+      "8aad902d",
+      "88b230f1",
+      "881bcc53",
+      "a31e84ea",
+      "99811615",
+      "d63a41af",
+      "39ace689"
     ],
     "tools/tests/test_rc_cycle22_verified_dr_reconnect_oci.py": [
-      "a9baaeb9",
-      "649445f1",
-      "68c82710",
-      "377fde12",
-      "bc3177b9",
-      "1cd08224",
-      "37dcbc26",
-      "62d256a4"
+      "55d046f8",
+      "bb0d12b2",
+      "a01b2269",
+      "846f144b",
+      "18dc2c2d",
+      "1c8df0f2",
+      "f5d211dd",
+      "b2c92447"
     ],
     "tools/tests/test_rc_cycle23_k8s_ha.py": [
-      "f52e190b",
-      "7af8ec90",
-      "4bca57aa",
-      "b525b628",
-      "2e692d31",
-      "ba4ec677",
-      "c244605e",
-      "0f819097"
+      "a1b9dfd5",
+      "5b50536c",
+      "b11c5b5b",
+      "9c91271f",
+      "95ab1dd3",
+      "190a4d8e",
+      "1a3c14a8",
+      "f8007647"
     ],
     "tools/tests/test_rc_cycle24_kind_runtime.py": [
-      "9edaf986",
-      "c5ed20b5",
-      "73cb2883",
-      "10839718",
-      "ed376903",
-      "b5616126",
-      "70161415",
-      "a0aaa545"
+      "6ac724f0",
+      "e217ce1e",
+      "0deb9a1f",
+      "52fd8c2d",
+      "550f1f42",
+      "44fae20e",
+      "a306faab",
+      "28b7008b"
     ],
     "tools/tests/test_rc_cycle26_oci_hotfix.py": [
-      "5dd98ba5",
-      "8b2b59a3",
-      "89e052bb",
-      "139ae321",
-      "249636ca",
-      "43b6fb7d",
-      "78558694",
-      "15c0faa9"
+      "de13e9b3",
+      "4bbfd590",
+      "afd0fb81",
+      "3be9bdf5",
+      "83b98760",
+      "189aeb21",
+      "fb5eca93",
+      "7f8b9a3b"
     ],
     "tools/tests/test_rc_cycle27_rootless_podman.py": [
-      "522911cb",
-      "f8c4ae1f",
-      "5e3be228",
-      "05bfb125",
-      "6d0c80c8",
-      "3197a786",
-      "16d1be1c",
-      "161dde01"
+      "9e89b9a0",
+      "6c871324",
+      "70ada965",
+      "abf88d7c",
+      "d7e25b2e",
+      "6ae38cf1",
+      "fec0ac10",
+      "17a755a9"
     ],
     "tools/tests/test_rc_cycle28_podman_tmpfs.py": [
-      "ab452cff",
-      "d33a5fa3",
-      "d312be0c",
-      "3fcca125",
-      "e1997e21",
-      "ed121bd4",
-      "a8e10764",
-      "955e78d6"
+      "873f3b46",
+      "f78cdce0",
+      "0432c512",
+      "2d02a0f9",
+      "2f5849a2",
+      "1e2253f6",
+      "ae4cd33e",
+      "c9623afd"
     ],
     "tools/tests/test_rc_cycle29_multinode_ingress.py": [
       "29f704a7",
@@ -9034,14 +9044,14 @@
       "0d14aa27"
     ],
     "tools/tests/test_rc_cycle30_inventory.py": [
-      "e3b35bc6",
-      "b160970d",
-      "b09f923d",
-      "f8133bd7",
-      "ec74eff1",
-      "07692a7f",
-      "7af078ff",
-      "7ea85260"
+      "e2bee63b",
+      "7e3a4a1e",
+      "810662f9",
+      "80fba9f8",
+      "8057e429",
+      "c71fed27",
+      "f2582469",
+      "86b181ed"
     ],
     "tools/tests/test_rc_cycle30_operational_ha.py": [
       "f325990f",
@@ -9054,14 +9064,14 @@
       "0603f0f1"
     ],
     "tools/tests/test_rc_cycle31_inventory.py": [
-      "f1fb51e1",
-      "99fa8e02",
-      "5810b2d5",
-      "6143f787",
-      "b4a06e28",
-      "1d4ccda9",
-      "f928a491",
-      "0262019c"
+      "3273ccc3",
+      "4dafc465",
+      "3ee01ae3",
+      "acc97339",
+      "bc93c3e9",
+      "1312655e",
+      "bc90fc4b",
+      "08b793d9"
     ],
     "tools/tests/test_rc_cycle32_antivirus_k8s.py": [
       "88886c81",
@@ -9084,14 +9094,14 @@
       "1538df71"
     ],
     "tools/tests/test_rc_cycle34_evidence_scanner.py": [
-      "9a1ed3ae",
-      "eb6e5b32",
-      "2827ba67",
-      "0d1ba99c",
-      "a4d205c3",
-      "371f610d",
-      "ec8bb992",
-      "6f062787"
+      "e257ecd6",
+      "c6ea9cca",
+      "a344872f",
+      "e0b3fecf",
+      "a376efb8",
+      "456d7989",
+      "491be1f9",
+      "569c93b5"
     ],
     "tools/tests/test_rc_cycle35_verified_bootstrap.py": [
       "35c131e6",
@@ -9122,6 +9132,16 @@
       "9f14d19b",
       "d9973546",
       "f00439fe"
+    ],
+    "tools/tests/test_rc_cycle43_frontend_compile.py": [
+      "285c59bb",
+      "005d4848",
+      "ce9eb914",
+      "605985d0",
+      "a3efb8d9",
+      "e59f67e7",
+      "40d7c615",
+      "89dfc198"
     ],
     "tools/tests/test_rc_cycle4_submission_audit_20261028.py": [
       "92f9fe02",
@@ -9822,6 +9842,16 @@
       "3d9f4b23",
       "37a72cf1",
       "6f353282"
+    ],
+    "tools/verify_rc_cycle43_inventory.py": [
+      "e1c8319c",
+      "172e2b0d",
+      "54c2a1d1",
+      "179a42e2",
+      "7ebfc24b",
+      "ebe3564c",
+      "da6a5650",
+      "d5d801a0"
     ],
     "tools/verify_rc_cycle8_inventory.py": [
       "ca6179f9",

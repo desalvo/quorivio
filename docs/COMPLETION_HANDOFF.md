@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC cycle 43 — frontend TypeScript CI hotfix (30 October 2026)
+
+**Baseline committed by maintainer:** `55b5ab70dcc3ee772b47c5acd498b47d58874441` (cycle 42). Standard Actions run `41099464679` fails only on `Production quality gate` / `Compile frontend and backend`: frontend TS2339 on `main.tsx` for missing `allowAnswerChange` and `showEmail` in the editor's local widget-history draft type. Backend and frontend Node tests passed (500/500 and 84/84) before the compile step; downstream container build was skipped, not independently failing.
+
+**Hotfix (uncommitted):** the editor draft now derives `allowAnswerChange` and `showEmail` from the server-validated `PageDesign` widget type through `Pick<>` instead of duplicating these permissions. A type-level parity contract and regression tests cover both saved fields. The historical cycle-42 inventory remains immutable; cycle-43 replaces the current CI catalog. No changes were made to the response/privacy business rules.
+
+**Verification limits:** targeted Python contracts pass; the standard GitHub TypeScript/Vite build has not been re-run on this hotfix. Local npm installation is unavailable in the environment (offline cache misses / npm installer failure). Do not claim that the compile gate passes until GitHub confirms it. Formal RC completion stays **80.75%** (52 gates, 35 accepted, 17 partial); `rc_strict=false` and `publish_image=false`.
+
+**Next maintainer action:** commit/push the cumulative cycle-43 package, rerun standard CI; optional browser/HAProxy checks after the production quality gate succeeds. Assistant made no commit, push, tag or release.
+
+---
+
 # Quorivio 0.1.0-dev — cycle 42: selectable timer faces and custom-fill precedence — 30 October 2026
 
 **Formal RC completion: 80.75%** (52 gates: 35 accepted, 17 partial), unchanged. Cycles 34–42 remain cumulative and uncommitted relative to confirmed commit `f5ccf9a7545e7c17b4323d067db66aff5eca9b41`.

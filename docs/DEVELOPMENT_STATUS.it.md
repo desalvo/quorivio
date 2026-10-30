@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC ciclo 43 — hotfix TypeScript della CI standard (30 ottobre 2026)
+
+**Nuova baseline committata dall'utente:** `55b5ab70dcc3ee772b47c5acd498b47d58874441` (ciclo 42). La run standard `41099464679` fallisce soltanto nel job `Production quality gate`, passo `Compile frontend and backend`: TS2339 in `main.tsx` per i campi `allowAnswerChange` e `showEmail` mancanti nel tipo locale dello storico widget. Prima della compilazione i test Node backend (500/500) e frontend (84/84) erano verdi; il container gate è stato saltato di conseguenza, non è un secondo errore.
+
+**Hotfix non committato:** il tipo del widget nel canvas eredita i due campi dal `PageDesign` validato dal server usando `Pick<>`, evitando che la tipizzazione dell'editor diverga dal backend. Aggiunti contratto TypeScript e regressioni Python. Catalogo storico del ciclo 42 immutato; catalogo 43 corrente verificato in CI. Nessuna modifica alle regole di business su risposte o visibilità e-mail.
+
+**Limiti:** test Python mirati verdi; build TypeScript/Vite non rieseguita sul nuovo codice perché l'installazione npm locale non è disponibile (cache offline incompleta ed errore dell'installer). Il gate dovrà essere confermato su GitHub dopo il prossimo commit. Completamento RC ufficiale **80,75%** invariato (52 gate: 35 accettati, 17 parziali); `rc_strict=false` e `publish_image=false`.
+
+**Azione successiva:** commit/push del cumulativo ciclo 43 e CI standard. Nessun commit, push, tag o rilascio effettuato dall'assistente.
+
+---
+
 # Quorivio 0.1.0-dev — ciclo 42: timer personalizzabili e precedenza riempimenti — 30 ottobre 2026
 
 **RC formale: 80,75%** (52 gate: 35 accettati, 17 parziali), invariata; i cicli 34–42 sono cumulativi e non committati rispetto al commit confermato `f5ccf9a7545e7c17b4323d067db66aff5eca9b41`.
