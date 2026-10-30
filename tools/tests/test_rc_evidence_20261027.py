@@ -29,7 +29,8 @@ class RCEvidenceMilestone(unittest.TestCase):
   self.assertIn('122239629249',g['evidence'])
   self.assertIn('linux/arm64',g['evidence'])
   if g['status']=='partial':
-   self.assertIn('rootless',g['remaining'])
+   self.assertIn('CSI',g['remaining'])
+   self.assertEqual(self.gates['D3-OCI-ROOTLESS-RUNTIME']['status'],'accepted')
  def test_independent_acceptance_remains_pending_until_promoted(self):
   # Prevent a regression to open/blocked; don't veto future reviewed evidence.
   for gate in ('B2','B3','D6'):

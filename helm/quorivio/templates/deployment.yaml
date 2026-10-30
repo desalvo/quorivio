@@ -4,16 +4,40 @@ metadata:
   name: {{ .Release.Name }}-quorivio
 spec:
   replicas: {{ .Values.replicaCount }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
   selector:
     matchLabels: {app: quorivio, release: {{ .Release.Name }}}
   template:
     metadata:
       labels: {app: quorivio, release: {{ .Release.Name }}}
     spec:
+      automountServiceAccountToken: false
 {{- with .Values.nodeSelector }}
       nodeSelector:
 {{ toYaml . | indent 8 }}
 {{- end }}
+{{- if and (gt (int .Values.replicaCount) 1) (ne .Values.assets.accessMode "ReadWriteMany") }}
+{{- fail "multiple replicas require RWX assets.accessMode=ReadWriteMany and real shared storage" }}
+{{- end }}
+{{- if and .Values.enforceNodeDiversity (lt (int .Values.replicaCount) 2) }}
+{{- fail "enforceNodeDiversity requires at least two replicas" }}
+{{- end }}
+{{- if gt (int .Values.replicaCount) 1 }}
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: {{ ternary "DoNotSchedule" "ScheduleAnyway" .Values.enforceNodeDiversity }}
+{{- if .Values.enforceNodeDiversity }}
+          minDomains: 2
+{{- end }}
+          labelSelector:
+            matchLabels: {app: quorivio, release: {{ .Release.Name }}}
+{{- end }}
+      terminationGracePeriodSeconds: 45
       securityContext:
         runAsNonRoot: true
         fsGroup: 1000

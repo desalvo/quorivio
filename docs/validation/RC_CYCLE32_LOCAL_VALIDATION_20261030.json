@@ -1,0 +1,60 @@
+{
+  "baseline_commit": "016beea25d5e2d2fab21b0730aa15baf0b573e12",
+  "cycle": 32,
+  "date": "2026-10-30",
+  "external_evidence": {
+    "k8s_live_deployment": false,
+    "new_github_actions": false,
+    "podman_runtime": false,
+    "production_operational_signoff": false,
+    "real_clamd_ci_job_implemented_not_executed": true,
+    "real_clamd_signature_detection": false
+  },
+  "formal_rc": {
+    "accepted_gates": 31,
+    "gate_count": 48,
+    "partial_gates": 17,
+    "reason": "No independent acceptance on cycle 29–32 source; no local-only score increase",
+    "score": 79.25
+  },
+  "limitations": [
+    "No Docker/Podman/KIND runtime execution of managed ClamAV here",
+    "TypeScript/Vite build on this revision not run locally (npm dependencies absent)",
+    "Actual clamd StreamMaxLength/signature DB, Pod Security and physical installation require operator checks"
+  ],
+  "local_evidence": {
+    "k8s_antivirus_python_focused": {
+      "failures": 0,
+      "tests_run": 6
+    },
+    "malware_scan_node_focused": {
+      "failures": 0,
+      "tests_run": 10
+    },
+    "node_backend": {
+      "failures": 0,
+      "tests_run": 485
+    },
+    "node_frontend": {
+      "failures": 0,
+      "tests_run": 65
+    },
+    "python": {
+      "errors": 0,
+      "failures": 0,
+      "method": "Non-overlapping unittest partitions: 230+211+209+(297+34+42+63)+150; converter-heavy fourth partition split into four process-isolated batches to avoid intermittent monolithic-run stalls",
+      "skipped": 1,
+      "tests_run": 1236
+    }
+  },
+  "no_commit_or_publish": true,
+  "scope": [
+    "Node ClamAV INSTREAM fail-closed protocol and production enforcement",
+    "Managed/private Kubernetes clamd Deployment/Service/NetworkPolicy",
+    "External scanner configuration validation and cleanup",
+    "Helm ClamAV memory sizing",
+    "Bilingual documentation and regressions",
+    "Opt-in real ClamAV clean/EICAR acceptance CI job (not yet executed)"
+  ],
+  "version": "0.1.0-dev"
+}

@@ -1,0 +1,53 @@
+{
+  "version": "0.1.0-dev",
+  "cycle": 29,
+  "date": "2026-10-30",
+  "source_commit": "016beea25d5e2d2fab21b0730aa15baf0b573e12",
+  "previous_score": 79.0,
+  "current_score": 79.25,
+  "delta_percentage_points": 0.25,
+  "gate_count": 48,
+  "accepted": 31,
+  "partial": 17,
+  "accepted_remote_evidence": {
+    "oci_actual_runtime": {
+      "run": 40980312270,
+      "job": 123820527902,
+      "conclusion": "success",
+      "arm64_physical_hardware": false
+    },
+    "rootless_podman_runtime": {
+      "run": 40982728705,
+      "job": 123827805762,
+      "conclusion": "success"
+    }
+  },
+  "cycle29_local_contracts": {
+    "k8s_multinode_job_added": true,
+    "new_public_base_scheme": true,
+    "helm_pdb_rwx_guard": true,
+    "strict_node_diversity": true
+  },
+  "unverified_cycle29": {
+    "actual_kind_multinode": true,
+    "actual_nginx_ingress": true,
+    "production_shared_csi_rwx": true,
+    "physical_arm64": true,
+    "haproxy_ingress": true,
+    "legal_a11y_operator_review": true
+  },
+  "strict_rc_ready": false,
+  "published": false,
+  "committed_by_assistant": false,
+  "python_unittest_run": {
+    "executed": 1193,
+    "skipped": 1,
+    "failures": 0,
+    "source": "local Python unittest discover",
+    "kind_live_executed": false
+  },
+  "node_build_run": {
+    "performed": false,
+    "reason": "offline incomplete npm dependencies"
+  }
+}

@@ -3,7 +3,7 @@
 import argparse, json, re, sys, os, secrets, base64, urllib.parse, tempfile
 from pathlib import Path
 
-DEFAULTS = {'namespace':'quorivio','name':'quorivio','image':'desalvo/quorivio:latest','host':'quorivio.example.org','replicas':1,'max_upload_mb':100,'container_port':8080,'postgres_mode':'internal','postgres_image':'postgres:18.6-alpine','postgres_host':'postgresql','postgres_port':5432,'postgres_sslmode':'require','ingress_controller':'nginx','haproxy_variant':'community','ingress_class':'','postgres_host':'postgresql','postgres_database':'quorivio','postgres_user':'quorivio','secret_name':'quorivio-app-secrets','tls_secret':'','tls_termination':True,'app_node_selector':'','postgres_node_selector':'','admin_email':'admin@example.org','admin_password':'','auth_secret':'','postgres_password':'','storage_class':'','asset_storage_class':'','asset_storage_size':'10Gi','asset_access_mode':'ReadWriteOnce','cpu_request':'100m','memory_request':'256Mi','cpu_limit':'1000m','memory_limit':'1Gi'}
+DEFAULTS = {'namespace':'quorivio','name':'quorivio','image':'desalvo/quorivio:latest','host':'quorivio.example.org','replicas':1,'enforce_node_diversity':False,'max_upload_mb':100,'antivirus_mode':'managed','antivirus_image':'clamav/clamav:stable','antivirus_host':'','container_port':8080,'postgres_mode':'internal','postgres_image':'postgres:18.6-alpine','postgres_host':'postgresql','postgres_port':5432,'postgres_sslmode':'require','ingress_controller':'nginx','haproxy_variant':'community','ingress_class':'','postgres_host':'postgresql','postgres_database':'quorivio','postgres_user':'quorivio','secret_name':'quorivio-app-secrets','tls_secret':'','tls_termination':True,'app_node_selector':'','postgres_node_selector':'','admin_email':'admin@example.org','admin_password':'','auth_secret':'','postgres_password':'','storage_class':'','asset_storage_class':'','asset_storage_size':'10Gi','asset_access_mode':'ReadWriteOnce','cpu_request':'100m','memory_request':'256Mi','cpu_limit':'1000m','memory_limit':'1Gi'}
 FIELDS = tuple(DEFAULTS)
 def quote(s): return json.dumps(str(s), ensure_ascii=False)
 def validate(cfg):
@@ -13,6 +13,13 @@ def validate(cfg):
     if not re.fullmatch(r'[a-z0-9]([-a-z0-9]*[a-z0-9])?',cfg['namespace']):raise ValueError('Invalid namespace')
     if not re.fullmatch(r'[a-zA-Z0-9.-]+',cfg['host']) or '.' not in cfg['host']:raise ValueError('Invalid DNS host')
     if not re.fullmatch(r'[A-Za-z0-9._:/@+-]+',cfg['image']):raise ValueError('Invalid image reference')
+    if cfg['antivirus_mode'] not in ('managed','external'):raise ValueError('Invalid antivirus mode')
+    if not re.fullmatch(r'[A-Za-z0-9._:/@+-]+',cfg['antivirus_image']):raise ValueError('Invalid antivirus image')
+    if cfg['antivirus_mode']=='external':
+        if (not cfg['antivirus_host'] or len(cfg['antivirus_host'])>253 or any(
+            not re.fullmatch(r'[a-z0-9]([-a-z0-9]*[a-z0-9])?', part) or len(part)>63
+            for part in cfg['antivirus_host'].split('.'))):raise ValueError('External antivirus host is required')
+    elif cfg['antivirus_host']:raise ValueError('Managed antivirus host is derived automatically')
     if not re.fullmatch(r'[A-Za-z0-9._:/@+-]+',cfg['postgres_image']):raise ValueError('Invalid PostgreSQL image')
     if cfg['ingress_class'] and not re.fullmatch(r'[a-z0-9]([-a-z0-9]*[a-z0-9])?',cfg['ingress_class']):raise ValueError('Invalid ingress class')
     if cfg['storage_class'] and not re.fullmatch(r'[a-z0-9]([-a-z0-9.]*[a-z0-9])?',cfg['storage_class']):raise ValueError('Invalid storage class')
@@ -27,6 +34,8 @@ def validate(cfg):
     if type(cfg['postgres_port']) is not int or not 1<=cfg['postgres_port']<=65535:raise ValueError('Invalid postgres_port')
     if type(cfg['max_upload_mb']) is not int or not 1<=cfg['max_upload_mb']<=1024:raise ValueError('max_upload_mb must be 1..1024')
     if type(cfg['replicas']) is not int or not 1 <= cfg['replicas'] <= 20: raise ValueError('replicas must be 1-20')
+    if type(cfg['enforce_node_diversity']) is not bool: raise ValueError('enforce_node_diversity must be true or false')
+    if cfg['enforce_node_diversity'] and cfg['replicas'] < 2: raise ValueError('Node diversity requires at least two replicas')
     if type(cfg['container_port']) is not int or not 1 <= cfg['container_port'] <= 65535: raise ValueError('Invalid port')
     if type(cfg['postgres_port']) is not int or not 1 <= cfg['postgres_port'] <= 65535: raise ValueError('Invalid postgres_port')
     if cfg['replicas'] > 1 and cfg['asset_access_mode'] != 'ReadWriteMany':raise ValueError('Multiple API replicas require ReadWriteMany asset storage')
@@ -137,7 +146,9 @@ def generate(cfg,out):
     klass=cfg['ingress_class'] or cfg['ingress_controller']
     upload_annotation=('    nginx.ingress.kubernetes.io/proxy-body-size: '+quote(str(cfg['max_upload_mb'])+'m')+'\n') if cfg['ingress_controller']=='nginx' else (('    haproxy.org/max-body-size: '+quote(str(cfg['max_upload_mb']*1024*1024)+'')+'\n') if cfg['haproxy_variant']=='haproxytech' else '')
     legacy= ('    kubernetes.io/ingress.class: '+quote(klass)+'\n' if cfg['haproxy_variant']=='community' else '    haproxy.org/ingress.class: '+quote(klass)+'\n') if cfg['ingress_controller']=='haproxy' else ''
+    public_scheme='https' if cfg['tls_termination'] else 'http'
     dbhost=(name+'-postgres') if cfg['postgres_mode']=='internal' else cfg['postgres_host']
+    clamavhost=name+'-clamav' if cfg['antivirus_mode']=='managed' else cfg['antivirus_host']
     db_url=('postgresql://'+urllib.parse.quote(cfg['postgres_user'],safe='')+':'+urllib.parse.quote(cfg['postgres_password'],safe='')+'@'+dbhost+':'+str(cfg['postgres_port'])+'/'+urllib.parse.quote(cfg['postgres_database'],safe='')+'?sslmode='+('disable' if cfg['postgres_mode']=='internal' else cfg['postgres_sslmode']))
     secret_data={'DATABASE_URL':db_url,'AUTH_SECRET':cfg['auth_secret'],'ADMIN_EMAIL':cfg['admin_email'],'ADMIN_PASSWORD':cfg['admin_password']}
     if cfg['postgres_mode']=='internal':secret_data['POSTGRES_PASSWORD']=cfg['postgres_password']
@@ -151,10 +162,13 @@ metadata:
   namespace: {ns}
 data:
   NODE_ENV: production
+  QUORIVIO_AV_REQUIRED: "true"
+  CLAMAV_HOST: {quote(clamavhost)}
+  CLAMAV_PORT: "3310"
   MAX_UPLOAD_MB: {quote(cfg['max_upload_mb'])}
   QUORIVIO_ASSET_DIR: /app/assets
   PORT: {quote(port)}
-  PUBLIC_BASE_URL: {quote('https://'+cfg['host'])}
+  PUBLIC_BASE_URL: {quote(public_scheme+'://'+cfg['host'])}
   PGHOST: {quote(dbhost)}
   PGPORT: {quote(cfg['postgres_port'])}
   PGDATABASE: {quote(cfg['postgres_database'])}
@@ -181,7 +195,7 @@ spec:
       labels:
         app: {name}
     spec:
-{selector_yaml(cfg['app_node_selector'])}{('      topologySpreadConstraints:' + chr(10) + '        - maxSkew: 1' + chr(10) + '          topologyKey: kubernetes.io/hostname' + chr(10) + '          whenUnsatisfiable: ScheduleAnyway' + chr(10) + '          labelSelector:' + chr(10) + '            matchLabels:' + chr(10) + '              app: ' + name + chr(10)) if cfg['replicas'] > 1 else ''}      terminationGracePeriodSeconds: 45
+{selector_yaml(cfg['app_node_selector'])}{('      topologySpreadConstraints:' + chr(10) + '        - maxSkew: 1' + chr(10) + '          topologyKey: kubernetes.io/hostname' + chr(10) + '          whenUnsatisfiable: ' + ('DoNotSchedule' if cfg['enforce_node_diversity'] else 'ScheduleAnyway') + chr(10) + ('          minDomains: 2' + chr(10) if cfg['enforce_node_diversity'] else '') + '          labelSelector:' + chr(10) + '            matchLabels:' + chr(10) + '              app: ' + name + chr(10)) if cfg['replicas'] > 1 else ''}      terminationGracePeriodSeconds: 45
       automountServiceAccountToken: false
       securityContext:
         runAsNonRoot: true
@@ -296,6 +310,14 @@ resources:
   - 40-ingress.yaml
 '''
     }
+    if cfg['antivirus_mode']=='managed':
+        files.update(antivirus_resources(cfg,name,ns))
+        files['kustomization.yaml']=files['kustomization.yaml'].replace(
+            '  - 15-assets-pvc.yaml\n',
+            '  - 13-clamav-deployment.yaml\n  - 14-clamav-service.yaml\n  - 15-assets-pvc.yaml\n  - 16-clamav-networkpolicy.yaml\n')
+    else:
+        for old in ('13-clamav-deployment.yaml','14-clamav-service.yaml','16-clamav-networkpolicy.yaml'):
+            (out/old).unlink(missing_ok=True)
     if cfg['replicas'] > 1:
         files['25-disruption-budget.yaml']=f"""apiVersion: policy/v1
 kind: PodDisruptionBudget
@@ -325,6 +347,96 @@ spec:
     overrides={k:cfg[k] for k in FIELDS if cfg[k]!=DEFAULTS[k]}
     secure_write(out/'quorivio-overrides.json',json.dumps(overrides,indent=2,ensure_ascii=False,sort_keys=True)+'\n')
     return list(files)
+
+def antivirus_resources(cfg,name,ns):
+    """Private managed ClamAV endpoint, never exposed by an Ingress/NodePort.
+
+    The official clamd image owns its own startup/privilege lifecycle; unlike
+    the Quorivio API it does not inherit runAsUser=1000. The namespace's Pod
+    Security Admission and real image behavior must be accepted by operators.
+    """
+    deployment=f"""apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {name}-clamav
+  namespace: {ns}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: {name}-clamav
+  template:
+    metadata:
+      labels:
+        app: {name}-clamav
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: clamav
+          image: {cfg['antivirus_image']}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: clamd
+              containerPort: 3310
+          readinessProbe:
+            tcpSocket:
+              port: clamd
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            failureThreshold: 20
+          livenessProbe:
+            tcpSocket:
+              port: clamd
+            initialDelaySeconds: 180
+            periodSeconds: 30
+            failureThreshold: 5
+          securityContext:
+            allowPrivilegeEscalation: false
+          resources:
+            requests:
+              cpu: 100m
+              memory: 2Gi
+            limits:
+              cpu: 2000m
+              memory: 4Gi
+"""
+    service=f"""apiVersion: v1
+kind: Service
+metadata:
+  name: {name}-clamav
+  namespace: {ns}
+spec:
+  type: ClusterIP
+  selector:
+    app: {name}-clamav
+  ports:
+    - name: clamd
+      port: 3310
+      targetPort: clamd
+"""
+    policy=f"""apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {name}-clamav-private
+  namespace: {ns}
+spec:
+  podSelector:
+    matchLabels:
+      app: {name}-clamav
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: {name}
+      ports:
+        - protocol: TCP
+          port: 3310
+"""
+    return {'13-clamav-deployment.yaml':deployment,'14-clamav-service.yaml':service,
+            '16-clamav-networkpolicy.yaml':policy}
 
 def postgres_resources(cfg,name,ns):
     storage=('        storageClassName: '+cfg['storage_class']+'\n') if cfg['storage_class'] else ''
@@ -434,8 +546,8 @@ def main(argv=None):
     for entry in args.set:
         if '=' not in entry:a.error('--set requires KEY=VALUE')
         k,v=entry.split('=',1)
-        if k=='tls_termination':
-            if v.lower() not in ('true','false'):a.error('tls_termination requires true/false')
+        if k in ('tls_termination','enforce_node_diversity'):
+            if v.lower() not in ('true','false'):a.error(f'{k} requires true/false')
             cfg[k]=v.lower()=='true'
         elif k in ('replicas','max_upload_mb','container_port','postgres_port'):
             try: cfg[k]=int(v)

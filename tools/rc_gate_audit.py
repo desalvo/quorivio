@@ -4,6 +4,7 @@ Never infer E2E completion just from the presence of source code or passing unit
 """
 from __future__ import annotations
 import json
+import math
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -16,7 +17,8 @@ def audit():
     total = accepted = 0.0
     for item in doc['gates']:
         assert item['status'] in VALID, item['id']
-        assert isinstance(item['weight'], int) and item['weight'] > 0, item['id']
+        assert (type(item['weight']) in (int, float) and math.isfinite(item['weight'])
+                and item['weight'] >= 0.5 and item['weight'] * 2 == int(item['weight'] * 2)), item['id']
         assert item.get('evidence') and item.get('remaining'), item['id']
         earned = item['weight'] * VALID[item['status']]
         total += item['weight']
@@ -24,8 +26,8 @@ def audit():
         groups.setdefault(item['area'], [0, 0])
         groups[item['area']][0] += earned
         groups[item['area']][1] += item['weight']
-    assert total == 100, f'weights must total 100; got {total}'
-    return {'score': round(accepted, 1), 'accepted_points': accepted,
+    assert math.isclose(total, 100, abs_tol=1e-9), f'weights must total 100; got {total}'
+    return {'score': round(accepted, 2), 'accepted_points': accepted,
             'total_points': total, 'by_area': {k: {'points': v[0], 'weight': v[1],
             'percentage': round(100*v[0]/v[1], 1)} for k, v in groups.items()},
             'unaccepted': [x['id'] for x in doc['gates'] if x['status'] != 'accepted']}

@@ -387,11 +387,30 @@
     {
       "id": "D3",
       "area": "D-validation",
-      "weight": 1,
+      "weight": 0.5,
       "status": "partial",
-      "evidence": "Docker/Podman/Helm manifests and workflows exist CI 40141894130 container build gate SUCCESS, including runtime and converter image scans (runner architecture only). GitHub workflow 40335963980 publisher completed multi-platform linux/amd64 and linux/arm64 build/push with SBOM/provenance; this does NOT prove runnable ARM64, rootless Podman or Kubernetes multi-replica acceptance. New publication policy is manual-only, awaiting its first CI.\n2026-10-27 manually dispatched GitHub workflow 40517573850 / publication job 122239629249 SUCCESS, commit e372a3aec8ba6b028283e9d00f68305a39562ed8. Multi-platform Buildx output includes linux/amd64 and linux/arm64 provenance, and pushed docker.io/desalvo/quorivio:latest and docker.io/desalvo/quorivio:sha-e372a3aec8ba with digest sha256:2be79bc6ca99fa22b6f970c8bb97d9162b4943dafd27c80d3eb1b60ebc474e41. Quality and container scanning gates also SUCCESS. Proof of image build/push, not actual ARM64, Podman rootless, or Kubernetes runtime acceptance.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: Container gate PASS; manual publication built/pushed linux/amd64 and linux/arm64 with SBOM/provenance (runtime smoke on arm64/Podman/Helm not tested). Strict RC gate was skipped; status unchanged.\n2026-10-28 evidence reconciliation: automatic CI subgate D3-IMAGE split from broad partial gate, without claiming outstanding external acceptance.",
-      "remaining": "Actual native ARM64 start/smoke, rootless Podman, multi-replica Kubernetes with HAProxy and NGINX ingress, secrets/TLS, RWX/ClamAV failover. The narrower D3-K8S-GENERATOR automated subgate is separately verified in 40717525524; operator, external/browser and production requirements remain explicitly in this partial parent.",
+      "evidence": "Docker/Podman/Helm manifests and workflows exist CI 40141894130 container build gate SUCCESS, including runtime and converter image scans (runner architecture only). GitHub workflow 40335963980 publisher completed multi-platform linux/amd64 and linux/arm64 build/push with SBOM/provenance; this does NOT prove runnable ARM64, rootless Podman or Kubernetes multi-replica acceptance. New publication policy is manual-only, awaiting its first CI.\n2026-10-27 manually dispatched GitHub workflow 40517573850 / publication job 122239629249 SUCCESS, commit e372a3aec8ba6b028283e9d00f68305a39562ed8. Multi-platform Buildx output includes linux/amd64 and linux/arm64 provenance, and pushed docker.io/desalvo/quorivio:latest and docker.io/desalvo/quorivio:sha-e372a3aec8ba with digest sha256:2be79bc6ca99fa22b6f970c8bb97d9162b4943dafd27c80d3eb1b60ebc474e41. Quality and container scanning gates also SUCCESS. Proof of image build/push, not actual ARM64, Podman rootless, or Kubernetes runtime acceptance.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: Container gate PASS; manual publication built/pushed linux/amd64 and linux/arm64 with SBOM/provenance (runtime smoke on arm64/Podman/Helm not tested). Strict RC gate was skipped; status unchanged.\n2026-10-28 evidence reconciliation: automatic CI subgate D3-IMAGE split from broad partial gate, without claiming outstanding external acceptance.\n2026-10-30 cycle29: split 0.5 of the previously partial D3 weight into a *separately CI-verified* bounded container runtime gate, retaining half the parent weight partial for all unverified real infrastructure/ops. This is a +0.25 percentage point reconciliation of demonstrated runtime acceptance, not an acceptance of production Kubernetes or native ARM64.",
+      "remaining": "Native physical ARM64 execution, NGINX/HAProxy real multiworker ingress (including TLS), independent CSI RWX/ClamAV shared-storage failover, production security/availability and operator acceptance. The new opt-in multi-worker KIND path is not yet validated on GitHub and uses a host bind, NOT a production RWX CSI backend.",
       "current_verified_run": 40595463258
+    },
+    {
+      "id": "D3-OCI-ROOTLESS-RUNTIME",
+      "area": "D-validation",
+      "weight": 0.5,
+      "status": "accepted",
+      "scope": "Opt-in disposable CI real application startup on Linux AMD64 and emulated ARM64, and separate non-root rootless Podman with PostgreSQL 18 and HTTP/ready/HTML (NOT native physical ARM or production ingress/CSI).",
+      "evidence": "Maintainer-confirmed cycle27 run 40980312270 OCI AMD64+ARM64 job 123820527902 SUCCESS; maintainer-confirmed cycle28 run 40982728705 rootless Podman job 123827805762 SUCCESS at 016beea25d5e2d2fab21b0730aa15baf0b573e12. Real production image was built and ran as non-root with PostgreSQL 18, readiness/live/HTML and private tmpfs write. This scope was unverified at 79.0%, and is not duplicated by D3-IMAGE (build/push only) or D3-K8S-GENERATOR (manifest generation only).",
+      "remaining": "Retain these passing opt-in runtime CI checks when relevant code changes. Native hardware, real NGINX/HAProxy ingress, independent storage and multi-worker deployment are still partial parent D3.",
+      "verified_run_ids": [
+        40980312270,
+        40982728705
+      ],
+      "verified_job_ids": [
+        123820527902,
+        123827805762
+      ],
+      "verified_commit_sha": "016beea25d5e2d2fab21b0730aa15baf0b573e12",
+      "acceptance_kind": "bounded_recent_github_ci_automated"
     },
     {
       "id": "D3-K8S-GENERATOR",
@@ -1238,5 +1257,59 @@
     "partial_gates": 17,
     "strict_rc_ready": false,
     "scoring_note": "OCI/QEMU and KIND CI evidence improves confidence in existing bounded tests; parent D3 remains partial because rootless Podman failed and production ingress/RWX/multinode/native ARM remain unverified; no points promoted."
+  },
+  "rc_cycle29_multinode_local_20261030": {
+    "last_user_confirmed_commit": "016beea25d5e2d2fab21b0730aa15baf0b573e12",
+    "confirmed_github_evidence": {
+      "cycle27_oci_qemu_amd64_arm64": 40980312270,
+      "cycle28_rootless_podman": 40982728705
+    },
+    "score_before": 79.0,
+    "score_after": 79.25,
+    "score_delta_pp": 0.25,
+    "method": "Split precisely 0.5 points from partial D3 into independent rootless+OCI runtime subgate; its previously partially credited 0.25 points are now fully credited 0.5 (+0.25pp). No speculative credit for cycle29.",
+    "new_kubernetes_multinode_runtime_executed": false,
+    "new_nginx_ingress_executed": false,
+    "new_helm_ha_rendered": false,
+    "production_csi_rwx_verified": false,
+    "native_physical_arm64_verified": false,
+    "independent_agid_gdpr_review_verified": false,
+    "strict_rc_ready": false,
+    "new_ci_required": true
+  },
+  "rc_cycle30_ha_operator_local_20261030": {
+    "baseline_last_user_confirmed_commit": "016beea25d5e2d2fab21b0730aa15baf0b573e12",
+    "source_package": "quorivio-0.1.0-dev-rc-multinode-ingress-cycle29-gate79.25-cumulative.zip",
+    "cycle29_kind_live_executed_on_github": false,
+    "cycle30_operational_preflight_executed_on_independent_cluster": false,
+    "cycle30_cli_spread_boolean_fix_locally_tested": true,
+    "cycle30_kind_ingress_schedule_label_locally_tested": true,
+    "cycle30_helm_serviceaccount_token_hardening_locally_tested": true,
+    "cycle30_operational_contract_tested_with_synthetic_api_fixtures": true,
+    "production_csi_rwx_storage_verified": false,
+    "production_postgres_ha_verified": false,
+    "native_arm64_hardware_verified": false,
+    "formal_score_before": 79.25,
+    "formal_score_after": 79.25,
+    "accepted_gates": 31,
+    "partial_gates": 17,
+    "rc_strict_ready": false,
+    "reason": "Local contracts and source fixes do not establish live cluster acceptance. Retain 79.25% until GitHub integration and independent production acceptance are recorded; no manufactured new subgates."
+  },
+  "rc_cycle31_pg_bootstrap_local_20261030": {
+    "last_confirmed_commit": "016beea25d5e2d2fab21b0730aa15baf0b573e12",
+    "cumulative_uncommitted_cycles": [
+      29,
+      30,
+      31
+    ],
+    "feature": "Cross-replica advisory-lock bootstrap and atomic first-admin/tutorial provisioning",
+    "node_simulated_lock_tests_pass": true,
+    "new_postgresql18_two_process_smoke_in_ci": true,
+    "postgresql18_two_process_smoke_remotely_executed": false,
+    "cycle29_two_worker_ingress_remotely_executed": false,
+    "formal_rc_before": 79.25,
+    "formal_rc_after": 79.25,
+    "reason": "New implementation and local unit tests need independent PostgreSQL 18 run before any acceptance promotion; no production HA claim."
   }
 }

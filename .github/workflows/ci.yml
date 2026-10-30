@@ -42,6 +42,14 @@ on:
         description: 'Boot two API pods + PostgreSQL 18 on single-node KIND with disposable hostPath RWX; not real multi-node HA/ingress (manual opt-in)'
         type: boolean
         default: false
+      kubernetes_multinode_test:
+        description: 'Real 2-worker KIND, strict replica placement, ephemeral cross-worker bind, NGINX HTTP ingress and pod recovery (NOT production CSI/HA)' 
+        type: boolean
+        default: false
+      clamav_runtime_test:
+        description: 'Real private ClamAV INSTREAM acceptance with clean + harmless EICAR signature (manual opt-in, no publication)'
+        type: boolean
+        default: false
       rootless_podman_test:
         description: 'Build and run the real application with rootless Podman and disposable PostgreSQL 18 (manual opt-in; no publishing)'
         type: boolean
@@ -197,6 +205,9 @@ jobs:
             sleep 1
           done
           bash -c 'echo >/dev/tcp/127.0.0.1/2465'
+      - name: PostgreSQL 18 concurrent fresh-schema bootstrap and atomic first-admin acceptance
+        timeout-minutes: 4
+        run: python3 tools/ci_concurrent_bootstrap_postgres.py
       - name: Start API against real PostgreSQL
         env:
           DATABASE_URL: postgres://quorivio:ci-only-secret@127.0.0.1:5432/quorivio
@@ -471,7 +482,10 @@ jobs:
           python3 tools/verify_rc_cycle25_inventory.py --historical
           python3 tools/verify_rc_cycle26_inventory.py --historical
           python3 tools/verify_rc_cycle27_inventory.py --historical
-          python3 tools/verify_rc_cycle28_inventory.py
+          python3 tools/verify_rc_cycle28_inventory.py --historical
+          python3 tools/verify_rc_cycle30_inventory.py --historical
+          python3 tools/verify_rc_cycle31_inventory.py --historical
+          python3 tools/verify_rc_cycle32_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:
@@ -590,6 +604,41 @@ jobs:
         run: |
           kubectl -n quorivio-runtime get pods,deploy,sts,pvc -o wide || true
           kubectl -n quorivio-runtime get events --sort-by=.lastTimestamp | tail -40 || true
+  kubernetes-multinode-ingress:
+    name: Kubernetes live two-worker NGINX ingress and failover (opt-in)
+    if: github.event_name == 'workflow_dispatch' && inputs.kubernetes_multinode_test
+    needs: validate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions: {contents: read}
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - name: Prepare disposable runner bind mount for KIND workers
+        run: |
+          test "$(id -u)" -ne 0
+          sudo install -d -m 0777 /tmp/quorivio-kind-multinode-shared
+          test "$(stat -c %a /tmp/quorivio-kind-multinode-shared)" = 777
+      - uses: helm/kind-action@v1.12.0
+        with:
+          cluster_name: quorivio-multinode
+          version: v0.26.0
+          config: tools/ci_kind_multinode.yaml
+          wait: 120s
+      - name: Build unpublished application image
+        run: docker build -t quorivio:kind-multinode .
+      - name: Import app image into all KIND nodes
+        run: kind load docker-image quorivio:kind-multinode --name quorivio-multinode
+      - name: Exercise strict multiworker rollout, asset visibility, real NGINX ingress and pod recovery
+        run: python3 tools/ci_k8s_multinode_ingress_smoke.py
+      - name: Safe status-only failure diagnostics (no secrets or pod logs)
+        if: failure()
+        run: |
+          kubectl -n quorivio-multinode get pods,deploy,sts,pvc -o wide || true
+          kubectl -n ingress-nginx get pods,deploy,service || true
+      - name: Remove ephemeral runner-mounted assets
+        if: always()
+        run: sudo rm -rf /tmp/quorivio-kind-multinode-shared
   runtime-architecture:
     name: OCI amd64/arm64 actual runtime acceptance (opt-in)
     if: github.event_name == 'workflow_dispatch' && inputs.runtime_arch_test
@@ -643,6 +692,36 @@ jobs:
         run: podman build --format docker --pull=always -t quorivio:ci-rootless .
       - name: Execute rootless Podman and PostgreSQL 18 application acceptance
         run: bash tools/ci_rootless_podman_smoke.sh quorivio:ci-rootless
+  clamav-runtime:
+    name: Real ClamAV signature and production fail-closed acceptance (opt-in)
+    if: github.event_name == 'workflow_dispatch' && inputs.clamav_runtime_test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-node@v4
+        with: {node-version: '22'}
+      - name: Start disposable ClamAV with private loopback-only port
+        run: |
+          docker run -d --name quorivio-ci-clamav --memory=4g \
+            --security-opt no-new-privileges:true -p 127.0.0.1:23310:3310 \
+            clamav/clamav:stable
+          for i in $(seq 1 180); do
+            if bash -c 'echo >/dev/tcp/127.0.0.1/23310' 2>/dev/null; then break; fi
+            if test "$(docker inspect --format '{{.State.Running}}' quorivio-ci-clamav)" != true; then
+              echo 'ClamAV image stopped before readiness (diagnostics redacted)'; exit 1
+            fi
+            sleep 2
+          done
+          bash -c 'echo >/dev/tcp/127.0.0.1/23310'
+      - name: Verify clean upload and EICAR detection through real ClamAV INSTREAM
+        timeout-minutes: 3
+        run: node --experimental-strip-types tools/ci_clamav_real.mjs
+      - name: Remove disposable ClamAV container
+        if: always()
+        run: docker rm -f quorivio-ci-clamav >/dev/null 2>&1 || true
+
   publish:
     name: Production publication
     if: github.event_name == 'workflow_dispatch' && inputs.publish_image == true && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))

@@ -1,112 +1,112 @@
 {
   "release_candidate_ready": false,
-  "score": 48.0,
+  "score": 79.25,
   "missing_required_files": [],
   "unaccepted_gates": [
     {
       "id": "A1",
       "area": "A-editor",
       "status": "partial",
-      "remaining": "Independent cross-browser, real-device and accessibility acceptance; further editing UX and production-like multi-user latency tests."
+      "remaining": "Independent visual operator acceptance, Firefox/WebKit and physical-device canvas interactions, realistic latency and multi-editor workload sign-off. 2026-10-28 new batch pending GitHub opt-in acceptance and independent browser/device sign-off. Re-run full GitHub CI on linked results / dual rehearsal and independently confirm actual browser source-specific stats, accurate pixel-level editor/presenter/participant parity, real reaction workflow and format-selection interactions. The narrower A1-EDITOR-INTERACTION automated subgate is separately verified in 40717525524; operator, external/browser and production requirements remain explicitly in this partial parent. Cycle 16: native React integration and Chromium recovery browser proofs are separated by scope and verified in GitHub run 40855898307; independent operational/device/provider proof remains outstanding."
     },
     {
       "id": "A2",
       "area": "A-editor",
       "status": "partial",
-      "remaining": "Pixel-accurate thumbnails and cross-browser drag/drop acceptance"
+      "remaining": "Independent pixel-accurate thumbnail/page comparisons, Firefox/WebKit drag and drop and real touchscreen/keyboard operator acceptance remain required. Automated filmstrip baseline separated into A2-ORDER."
     },
     {
       "id": "A3",
       "area": "A-editor",
       "status": "partial",
-      "remaining": "Full widget-by-widget visual and accessibility acceptance; real-world PPTX corpus roundtrip and browser editing verification New visual-fidelity controls still need Chromium and real PPTX corpus acceptance; no gate promotion. Independent Chromium crop-editor acceptance and real third-party PowerPoint/Microsoft Office comparison; new CI pending. New native shape paint editor requires real Chromium/independent device acceptance, Microsoft Office and complex third-party PPTX corpus; GitHub CI pending."
+      "remaining": "Independent pixel-accurate representative editor/presenter/audience/thumbnail comparison; physical touchscreen, full Office roundtrip corpus, human keyboard and screen-reader review, and iOS Safari device acceptance. Native Firefox/WebKit automated CSS stage/reading assertions are separately credited in A3-NATIVE-STAGE, NOT pixel-accurate visual certification."
     },
     {
       "id": "A4",
       "area": "A-editor",
-      "status": "open",
-      "remaining": "Independent mobile/tablet device lab, screen-reader and keyboard usability/accessibility acceptance beyond Chromium smoke."
+      "status": "partial",
+      "remaining": "Independent NVDA/VoiceOver/TalkBack screen-reader testing, human keyboard-only operator audit, real iOS/Android touch and WCAG/AGID sign-off. Native Firefox/WebKit automated modal Tab/contenteditable/inert/focus contracts are separately credited in A4-NATIVE-MODAL, NOT an assistive-technology certification. Cycle 16: native React integration and Chromium recovery browser proofs are separated by scope and verified in GitHub run 40855898307; independent operational/device/provider proof remains outstanding."
     },
     {
       "id": "B1",
       "area": "B-sessions",
       "status": "partial",
-      "remaining": "Production-like latency/recovery measurements and multi-replica stress beyond two processes."
+      "remaining": "Production-like long-running multi-replica load, network impairment/reconnection latency, recovery and operational SLO acceptance."
     },
     {
       "id": "B2",
       "area": "B-sessions",
       "status": "partial",
-      "remaining": "Timed quiz widget concurrency/fairness under variable latency and UI/browser acceptance."
+      "remaining": "Production-like variable-latency, long-lived concurrency across replicas and manual presenter/participant timing validation. Linked topic results and real dual-preview interaction added locally post-CI must pass new CI."
     },
     {
       "id": "B3",
       "area": "B-sessions",
       "status": "partial",
-      "remaining": "Run the new real PostgreSQL moderation/concurrency/atomic-bulk acceptance on GitHub and the optional Chromium participant Q&A workflow; verify full presenter moderation browser UX, screen readers and independent cross-browser acceptance before promotion to accepted."
+      "remaining": "Independent Firefox/WebKit statistics visualization, physically deployed presenter/participant devices and independent screen-reader/keyboard accessibility approval remain open. Per-question PostgreSQL statistics isolated in B3-QUESTION-STATS."
     },
     {
       "id": "B4",
       "area": "B-sessions",
       "status": "partial",
-      "remaining": "Sustained production-like throughput, memory, latency and recovery acceptance; independent device/accessibility verification."
+      "remaining": "Sustained representative throughput/memory and latency percentiles, failure-injection recovery, independent real-device and accessibility acceptance."
     },
     {
       "id": "C1",
       "area": "C-admin",
       "status": "partial",
-      "remaining": "PostgreSQL/browser account recovery and multi-replica revocation E2E"
+      "remaining": "Browser-mediated account recovery and recovery UI on actual PostgreSQL (new local Chromium URL hygiene pending new GitHub CI), real provider deliverability, cross-replica recovery with network impairment, security/operator approval and independent production sign-off. Previously verified SMTP/PostgreSQL API recovery is isolated in C1-RECOVERY; established authentication remains in C1-AUTH. Cycle 16: native React integration and Chromium recovery browser proofs are separated by scope and verified in GitHub run 40855898307; independent operational/device/provider proof remains outstanding."
     },
     {
       "id": "C2",
       "area": "C-admin",
       "status": "partial",
-      "remaining": "Independent real-world SMTP provider, cross-replica retry/outage tests, browser recovery UI, deliverability and operator sign-off."
+      "remaining": "Independent real SMTP providers, outage and cross-replica retries, production deliverability, recovery UI and operator sign-off."
     },
     {
       "id": "C3",
       "area": "C-admin",
       "status": "partial",
-      "remaining": "Real providers, redirects, error cases and UI E2E"
+      "remaining": "Real Google/GitHub/Facebook provider redirects, state/error/mismatch cases, browser E2E and operator approval. Real provider consent, redirects and callback across Google/GitHub/Facebook; cross-replica state, expiry/replay, denied linking, authenticated browser flows, external operator sign-off. Local post-commit OAuth redirect/secret hardening pending new CI."
     },
     {
       "id": "C4",
       "area": "C-admin",
       "status": "partial",
-      "remaining": "Real anonymous-browser presenter photo visibility, concurrent profile save/photo upload on PostgreSQL, actual RWX Kubernetes volume/ClamAV, accessibility and device acceptance. Verify PostgreSQL real retention defaults, per-session overrides and owner isolation in next CI. New post-commit photo erasure/update account-deletion PostgreSQL CI, multi-replica RWX acceptance and UI operator verification remain pending. Replay fixed asset/profile durable erasure test on real PostgreSQL (new CI run). Mandatory CI rerun of real PostgreSQL/TLS SMTP MFA lifecycle after quota isolation (40349577790 failed)."
+      "remaining": "Unverified residual: multi-replica RWX storage and actual ClamAV deployment with concurrent uploads, deployment/backup key lifecycle, physical-device and independent assistive-technology acceptance. Presenter profile/PostgreSQL/browser coverage is separated into C4-PROFILE, not a claim that these residual checks passed."
     },
     {
       "id": "D2",
       "area": "D-validation",
       "status": "partial",
-      "remaining": "Production-like restore drill, encryption/key rotation, retention, representative dataset and RPO/RTO operational sign-off."
+      "remaining": "Independent representative restore drill with actual RTO and RPO measurements (including cutover and lost writes), validated offsite/key custody and retention legal holds, production operator approval. Local technical rehearsal and storage mtime are not sufficient."
     },
     {
       "id": "D3",
       "area": "D-validation",
-      "status": "open",
-      "remaining": "ARM64/AMD64 multi-architecture execution, rootless Podman and Kubernetes multi-replica runtime acceptance."
+      "status": "partial",
+      "remaining": "Native physical ARM64 execution, NGINX/HAProxy real multiworker ingress (including TLS), independent CSI RWX/ClamAV shared-storage failover, production security/availability and operator acceptance. The new opt-in multi-worker KIND path is not yet validated on GitHub and uses a host bind, NOT a production RWX CSI backend."
     },
     {
       "id": "D4",
       "area": "D-validation",
       "status": "partial",
-      "remaining": "Representative third-party PowerPoint corpus, Microsoft Office rendering comparison, independent security/AGID accessibility review and operational sign-off."
+      "remaining": "Independent pentest/security and AGID accessibility sign-off, third-party Microsoft Office PPTX fidelity corpus and deployment threat review. The narrower D4-CONVERTER-BOUNDARY automated subgate is separately verified in 40717525524; operator, external/browser and production requirements remain explicitly in this partial parent."
     },
     {
       "id": "D5",
       "area": "D-validation",
       "status": "partial",
-      "remaining": "Full editorial review, live-browser screenshot accuracy and real-operator acceptance of IT/EN instructions."
+      "remaining": "Independent editorial and IT/EN operator review, current screenshot verification and end-user acceptance of manuals."
     },
     {
       "id": "D6",
       "area": "D-validation",
       "status": "partial",
-      "remaining": "Independent GDPR/legal and AGID accessibility sign-off; representative multi-replica RWX volume/ClamAV operational tests; formal encrypted backup, retention, erasure and log lifecycle validation. Run any new CI changes before promoting further."
+      "remaining": "Independent GDPR/legal and AGID assessment, encrypted backup and key rotation operational reviews, retention/erasure audit and RWX storage sign-off."
     }
   ],
-  "gate_count": 18,
-  "accepted_gates": 1,
+  "gate_count": 48,
+  "accepted_gates": 31,
   "policy": "RC requires every gate accepted with reviewed evidence; local tests alone never promote gates."
 }

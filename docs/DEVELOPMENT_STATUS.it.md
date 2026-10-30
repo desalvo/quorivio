@@ -1,3 +1,56 @@
+# Quorivio 0.1.0-dev — RC ciclo 32 — 30 ottobre 2026 — antivirus produzione e Kubernetes
+
+**RC ufficiale: 79,25% (48 gate: 31 accettati, 17 parziali)**. Ultimo commit confermato dall'utente: `016beea25d5e2d2fab21b0730aa15baf0b573e12` (ciclo 28); cicli 29–32 cumulativi e ancora senza commit. Nessun nuovo risultato GitHub indipendente su queste modifiche: punteggio non aumentato artificiosamente.
+
+**Implementato:** scansione antivirus obbligatoria per ogni upload in produzione anche quando il flag manca o vale `false`; disattivazione possibile soltanto in sviluppo/test. Il client INSTREAM rifiuta chiusure anticipate, false risposte `OK` prima di ricevere tutti i byte, risposte eccessive e timeout complessivi, evitando rigetti di Promise non osservati. Il wizard Kubernetes genera scanner gestito privato (Deployment, Service ClusterIP, NetworkPolicy) e configura `QUORIVIO_AV_REQUIRED=true`; modalità esterna solo con host esplicito validato. Il passaggio a scanner esterno elimina i precedenti manifest gestiti. Helm: limite memoria ClamAV aumentato a 4 GiB. Documentazione IT/EN e regressioni aggiornate.
+
+**Limiti:** i mock e i manifest non costituiscono una prova con ClamAV reale e firme aggiornate, né collaudo CSI RWX/failover, HAProxy/TLS o audit esterno. Il servizio antivirus gestito ha una replica: durante interruzioni gli upload falliscono in sicurezza. In produzione occorre tarare `StreamMaxLength` e verificare risorse e Pod Security Policy. La CI include ora anche `clamav_runtime_test=true` (opt-in) per provare file puliti e firma EICAR innocua con un ClamAV reale; non è stata ancora eseguita. Il collaudo KIND multiworker del ciclo 29 usa un host scanner esterno volutamente non configurato, poiché esercita NGINX e scheduling, non la scansione; non accreditarlo come prova antivirus.
+
+**Test locali:** 1.236 Python (1 saltato), 485 backend Node, 65 frontend Node; 10 test scanner e 6 test mirati Kubernetes verdi. Integrità SHA-256 documentata nella ricevuta del ciclo 32. Nessun commit, push, tag o pubblicazione automatica.
+
+---
+
+# Quorivio 0.1.0-dev — RC ciclo 31 — 30 ottobre 2026 — avvio concorrente PostgreSQL
+
+**RC ufficiale: 79,25% invariata (48 gate: 31 accettati, 17 parziali).** Ultimo commit confermato `016beea25d5e2d2fab21b0730aa15baf0b573e12` (ciclo 28); cicli 29–31 cumulativi senza commit. Non aumentare i gate sulla base di sole prove locali.
+
+**Implementato:** protezione dell'esecuzione dello schema e del bootstrap con advisory lock PostgreSQL sulla stessa connessione, timeout di 120s, rollback atomico di organizzazione/amministratore/tutorial e rilascio protetto della sessione. Introdotta una prova obbligatoria nella quality CI su database PostgreSQL 18 temporaneo con due server avviati insieme, conteggio utenti unico e due readiness; prove Node/Python locali. Documentazione: `docs/POSTGRES_CONCURRENT_BOOTSTRAP_RC31.it.md` / `.en.md`.
+
+**Da verificare:** CI reale della nuova prova PostgreSQL, KIND multiworker e NGINX del ciclo 29, RWX CSI e failover multi-macchina, HAProxy/TLS, PostgreSQL HA, revisioni indipendenti AGID/GDPR/sicurezza/dispositivi. Nessun commit o pubblicazione automatica.
+
+---
+
+# Quorivio 0.1.0-dev RC ciclo 30 — 30 ottobre 2026 — controllo operativo Kubernetes
+
+**RC invariata a 79,25% (31 gate accettati, 17 parziali)**, nessun incremento non verificato. Il ciclo 30 chiude difetti concreti e aggiunge una verifica su API Kubernetes effettive, ma il collaudo GitHub del ciclo 29 e la convalida di produzione restano necessari. Ultimo commit dichiarato: `016beea25d5e2d2fab21b0730aa15baf0b573e12`; cicli 29+30 ancora cumulativi senza commit.
+
+**Implementato:** CLI read-only che verifica deployment su nodi separati, PDB funzionante, EndpointSlice reali, PVC/PV RWX bound su CSI/NFS/CephFS (rifiuta hostPath/local), Ingress Host/classe/TLS e facoltativamente risposta HTTP/TLS pubblica. Protezione del contesto Kubernetes, input, errori sanificati e Secret non letti. Corretto `--set enforce_node_diversity=true` nel wizard; etichetta KIND control-plane `ingress-ready` per schedulare il controller NGINX; Helm disabilita il montaggio automatico del token ServiceAccount. 22 test mirati verdi; suite completa Python: 1.218 test, 1 saltato, zero fallimenti. Verifica SHA-256 sorgenti/ZIP alla creazione del package. Si veda `docs/K8S_OPERATIONAL_PREFLIGHT_RC30.it.md`.
+
+**Limiti:** nessuna prova reale di fault storage CSI/RWX, HA database, HAProxy/TLS di produzione, RTO/RPO o valutazione indipendente di sicurezza/AGID/GDPR. Nessun commit, push o pubblicazione.
+
+---
+
+## Quorivio 0.1.0-dev — ciclo RC 29 — 30 ottobre 2026 — 79,25% (+0,25pp comprovati)
+
+**Regressione locale ciclo 29:** 1.193 test Python eseguiti, uno saltato, nessun fallimento; parsing workflow YAML e inventario sorgenti verificati. Build Node TypeScript/Vite e prova live multi-worker NGINX non eseguite qui (npm incompleto; Docker/KIND non disponibili).
+
+Dopo il commit del ciclo 28 (`016beea25d5e2d2fab21b0730aa15baf0b573e12`), GitHub Actions ha confermato **SUCCESS** per runtime OCI AMD64+ARM64 emulato (`40980312270`, job `123820527902`), e per **Podman rootless con PostgreSQL 18** (`40982728705`, job `123827805762`). Non è certificata l'esecuzione su ARM64 fisico.
+
+Queste evidenze permettono di separare 0,5 punti di peso dal gate D3 ancora parziale e accettarli come sottogate tecnico automatico: il contributo già computato era 0,25 punti (parziale); ora vale 0,5 punti (accettato), quindi **RC 79,00% → 79,25% (+0,25 punti percentuali)**. Matrice di 48 gate: 31 accettati, 17 parziali. Non è stato accettato nessun nuovo test non eseguito.
+
+## Nuovi sviluppi del ciclo 29
+
+- **Wizard Kubernetes:** `enforce_node_diversity=true` richiede almeno due repliche, `ReadWriteMany`, impone `DoNotSchedule` con `minDomains: 2` e assicura la separazione per hostname di due repliche. Il default rimane compatibile con KIND mono-nodo.
+- **URL pubblico corretto:** Ingress HTTP senza TLS genera `PUBLIC_BASE_URL=http://...`, con TLS resta `https://...`. Evita link/reindirizzamenti HTTPS errati nei deployment HTTP interni. In produzione è preferibile utilizzare TLS.
+- **Helm:** `enforceNodeDiversity` opzionale; vincolo RWX quando `replicaCount > 1`; rolling update `maxUnavailable: 0`, `maxSurge: 1`, PDB con `minAvailable = replicas-1`. Rischio significativo di blocco deliberato delle repliche se nodi RWX insufficienti; la configurazione non crea alcuno storage condiviso.
+- **CI opzionale indipendente:** `kubernetes_multinode_test=true` avvia KIND con due worker e un control-plane, costruisce un'immagine locale non pubblicata, avvia PostgreSQL 18 e due pod Quorivio distribuiti obbligatoriamente su worker differenti, verifica la visibilità dei file tra worker, installa un vero controller Ingress NGINX con manifest versionato, verifica routing host/HTTP, rifiuto host errato e continuità attraverso la sostituzione di un pod. Script `tools/ci_k8s_multinode_ingress_smoke.py`.
+
+**Limiti importanti:** il collaudo condiviso usa *bind mount temporaneo del runner Docker* fra i due worker KIND, non NFS/CSI RWX di produzione. Non verifica HAProxy effettivo, TLS pubblico, controllo multi-master, nodi fisici indipendenti, accessibilità AGID, GDPR, RTO/RPO o SLA. Il nuovo job KIND multi-nodo non è stato eseguito in questo ambiente: resta da confermare su GitHub. I test di codice locale e i contratti dello script non certificano un deployment reale.
+
+**Baseline ultimo commit dichiarato dall'utente:** `016beea25d5e2d2fab21b0730aa15baf0b573e12`. Ciclo 29 nuovo senza commit/push. Nuovo job multi-nodo CI non eseguito, solo test/contratti locali. La RC resta bloccata da 17 gate parziali.
+
+---
+
 ## Quorivio 0.1.0-dev — Ciclo RC 26 — 30 ottobre 2026 — correzione test OCI multiarchitettura (nuova CI da verificare)
 
 **Baseline committata dall'utente:** `540fca20a8fe90a6a3aad4e571c0f95ed13ecfe1`. Workflow `40975979003` complessivamente FALLITO, ma sono verdi qualità `123804398587`, schemi Kubernetes `123806382731`, build container `123806382735`, avvio e sostituzione pod KIND mono-nodo `123806382760`, Firefox/WebKit `123806382775`. KIND utilizza hostPath sullo stesso nodo: NON certifica HA multi-nodo o CSI RWX. Il job OCI `123806382783` fallisce prima dell'ARM64 nel controllo AMD64 con exit code 42.

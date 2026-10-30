@@ -9,7 +9,7 @@ sys.path.insert(0, str(ROOT / 'tools'))
 from rc_gate_audit import audit
 from rc_release_preflight import preflight
 from verify_rc_cycle26_inventory import load_inventory as historical
-from verify_rc_cycle28_inventory import load_inventory, verify_source
+from verify_rc_cycle32_inventory import load_inventory, verify_source
 
 
 class Cycle27(unittest.TestCase):
@@ -27,7 +27,7 @@ class Cycle27(unittest.TestCase):
     def test_workflow_immutable_then_current_catalog_before_leak_detection(self):
         workflow = (ROOT / '.github/workflows/ci.yml').read_text()
         older = 'python3 tools/verify_rc_cycle26_inventory.py --historical'
-        newer = 'python3 tools/verify_rc_cycle28_inventory.py'
+        newer = 'python3 tools/verify_rc_cycle32_inventory.py'
         self.assertIn(older, workflow)
         self.assertIn(newer, workflow)
         self.assertLess(workflow.index(older), workflow.index(newer))
@@ -48,7 +48,7 @@ class Cycle27(unittest.TestCase):
         self.assertEqual(receipt['last_full_ci_run'], 40975979003)
         self.assertEqual(sum(g['weight'] for g in matrix['gates']), 100)
         self.assertEqual((audit()['score'], preflight()['accepted_gates'],
-                          len(preflight()['unaccepted_gates'])), (79.0, 30, 17))
+                          len(preflight()['unaccepted_gates'])), (79.25, 31, 17))
         self.assertFalse(preflight()['release_candidate_ready'])
 
     def test_truthful_operator_documentation_and_frozen_source_receipt(self):

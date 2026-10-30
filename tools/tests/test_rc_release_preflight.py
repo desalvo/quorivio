@@ -15,7 +15,7 @@ class ReleasePreflightTest(unittest.TestCase):
   self.assertFalse(report['release_candidate_ready'])
   ledger=json.loads((ROOT/'docs/RC_GATE_MATRIX.json').read_text(encoding='utf-8'))
   earned=sum(g['weight']*{'accepted':1, 'partial':.5, 'open':0, 'blocked':0}[g['status']] for g in ledger['gates'])
-  self.assertEqual(report['score'],round(earned,1))
+  self.assertEqual(report['score'],round(earned,2))
   self.assertEqual({g['id'] for g in report['unaccepted_gates']},
                    {g['id'] for g in ledger['gates'] if g['status']!='accepted'})
   self.assertGreater(len(report['unaccepted_gates']),0)

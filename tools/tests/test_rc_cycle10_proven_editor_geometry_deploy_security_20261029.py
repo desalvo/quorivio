@@ -28,7 +28,7 @@ class Cycle10Evidence(unittest.TestCase):
                 # reconciliation receipt; later verified subgates may reduce
                 # the CURRENT parent without invalidating the old test.
                 self.assertEqual(parent['status'],'partial')
-                self.assertGreaterEqual(parent['weight'],1)
+                self.assertGreaterEqual(parent['weight'],0.5)
                 self.assertLessEqual(parent['weight'],pw)
                 self.assertEqual((child['status'],child['weight']),('accepted',cw))
                 self.assertEqual(child['verified_run_id'],40717525524)

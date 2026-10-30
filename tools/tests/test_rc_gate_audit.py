@@ -26,7 +26,7 @@ class RcGateAuditTests(unittest.TestCase):
         expected = sum(g['weight'] * SCORES[g['status']] for g in gates)
         self.assertEqual(sum(weights), 100)
         self.assertEqual(report['total_points'], 100)
-        self.assertEqual(report['score'], round(expected, 1))
+        self.assertEqual(report['score'], round(expected, 2))
         self.assertEqual(report['accepted_points'], expected)
         self.assertEqual(sum(v['weight'] for v in report['by_area'].values()), 100)
         self.assertEqual(sum(v['points'] for v in report['by_area'].values()), expected)

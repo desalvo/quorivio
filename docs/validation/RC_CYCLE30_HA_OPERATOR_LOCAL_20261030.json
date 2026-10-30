@@ -1,0 +1,24 @@
+{
+  "version": "0.1.0-dev",
+  "cycle": 30,
+  "date": "2026-10-30",
+  "baseline_commit": "016beea25d5e2d2fab21b0730aa15baf0b573e12",
+  "cycle29_new_github_ci_executed": false,
+  "operational_preflight_real_cluster_executed": false,
+  "kubernetes_multinode_nginx_real_cluster_executed": false,
+  "unit_tests_new": 22,
+  "unit_tests_new_result": "PASS",
+  "python_full_suite_result": "PASS: 1218 tests, 1 skipped, 0 failures",
+  "node_api_tests": "NOT_RUN_OFFLINE",
+  "node_web_tests": "NOT_RUN_OFFLINE",
+  "type_script_build": "NOT_RUN_OFFLINE",
+  "deployment_ingress_storage_fault_injection": "NOT_RUN",
+  "formal_rc_score": 79.25,
+  "formal_accepted_gates": 31,
+  "formal_partial_gates": 17,
+  "strict_rc_ready": false,
+  "notes": [
+    "No acceptance points allocated for local-only code",
+    "Single PostgreSQL StatefulSet is not end-to-end HA"
+  ]
+}

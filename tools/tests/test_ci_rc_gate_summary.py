@@ -12,7 +12,7 @@ class RCSummary(unittest.TestCase):
 
     def test_score_and_status(self):
         summary=render(self.sample())
-        self.assertIn('48.0%',summary)
+        self.assertIn('48.00%',summary)
         self.assertIn('1/18 gates',summary)
         self.assertIn('NOT RC READY',summary)
         self.assertIn('ARM64 \\| Podman Kubernetes',summary)

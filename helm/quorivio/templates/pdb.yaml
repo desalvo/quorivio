@@ -1,0 +1,10 @@
+{{- if gt (int .Values.replicaCount) 1 }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ .Release.Name }}-quorivio-availability
+spec:
+  minAvailable: {{ sub (int .Values.replicaCount) 1 }}
+  selector:
+    matchLabels: {app: quorivio, release: {{ .Release.Name }}}
+{{- end }}

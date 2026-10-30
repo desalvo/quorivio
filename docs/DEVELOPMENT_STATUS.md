@@ -1,3 +1,56 @@
+# Quorivio 0.1.0-dev — RC cycle 32 — 30 October 2026 — production antivirus/Kubernetes parity
+
+**RC formal 79.25%** (48 gates: 31 accepted, 17 partial). Last maintainer-confirmed Git commit `016beea25d5e2d2fab21b0730aa15baf0b573e12` (cycle 28); cycles 29–32 remain cumulative and uncommitted. No independent GitHub CI is yet available for these changes, therefore no score increment is justified.
+
+**Implemented:** `malware-scan.ts` requires an antivirus on *every production upload* even with an omitted or explicitly false flag; explicit opt-out is reserved for non-production. The clamd INSTREAM client rejects premature clean results, midstream disconnects, excessive replies and overall deadlines, with no unobserved response rejection. Managed Kubernetes wizard now creates private ClamAV Deployment/ClusterIP/NetworkPolicy and configures mandatory `QUORIVIO_AV_REQUIRED` by default; external mode requires a validated private hostname and removes previous managed resources when switching. Helm's managed ClamAV memory limit is raised to 4Gi and operator instructions updated. CI discovers the new Node and Python protocol/configuration contracts automatically.
+
+**Limits:** local mock scanner and rendered manifests are NOT a real ClamAV/signature database acceptance, live external scanner validation, multi-node RWX/HAProxy/TLS acceptance or independent security audit. The managed antivirus Deployment runs one replica and can be temporarily unavailable while updating signatures; during downtime uploads are refused, not accepted. The official container requires sufficient resources; production Pod Security compatibility must be tested. `StreamMaxLength` must be configured in real clamd to match accepted upload policy. New opt-in `clamav_runtime_test=true` starts a disposable real ClamAV image, scans a clean file and confirms refusal of the harmless EICAR test signature; this job has not run yet. CI workflow `kubernetes_multinode_test` intentionally uses an unconfigured *external* mock scanner hostname because it tests topology/Ingress, not AV; it must not be represented as antivirus acceptance.
+
+**Verification:** 1,236 Python tests (1 skipped), 485 Node backend and 65 Node frontend PASS; 10 focused scanner and 6 focused Kubernetes tests PASS. Source/ZIP SHA-256 integrity recorded in cycle32 validation receipt. No commit, push, tag or image publication.
+
+---
+
+# Quorivio 0.1.0-dev — RC cycle 31 — 30 October 2026 — concurrent PostgreSQL bootstrap safety
+
+**Formal RC: 79.25% unchanged (48 gates: 31 accepted, 17 partial).** Last maintainer-confirmed commit `016beea25d5e2d2fab21b0730aa15baf0b573e12` (cycle 28); cycles 29–31 remain cumulative and uncommitted per maintainer request. No new code has yet passed the independent CI. Do not reclassify gates using local-only evidence.
+
+**Implemented:** PostgreSQL advisory-lock coordinated schema migrations and first-admin provisioning across API replicas, on one dedicated session with 120s bounded wait and fail-closed release. First organization/admin/tutorial provisioned atomically with rollback. New disposable PostgreSQL 18 CI acceptance starts two fresh API instances simultaneously and demands exactly one administrator/organization. Lock-level Node regressions and Python CI contracts added. See `docs/POSTGRES_CONCURRENT_BOOTSTRAP_RC31.en.md` and `.it.md`.
+
+**Pending:** new quality CI compiled two-process PostgreSQL smoke, cycle-29 two-worker KIND + NGINX ingress opt-in smoke, real multi-machine RWX CSI, HAProxy/TLS, actual PostgreSQL HA, operator, device, AGID/GDPR and security reviews. No Git commit, push or publish by the assistant.
+
+---
+
+# Quorivio 0.1.0-dev RC cycle 30 — 30 October 2026 — operational cluster validation
+
+**RC remains 79.25% (31 accepted, 17 partial), not a new certified increase.** Cycle 30 materially closes code gaps in the Kubernetes HA path but cannot credibly claim extra formal gate credit before a new CI run on the cycle-29/30 code and independent on-premise proof. Last maintainer-confirmed commit remains `016beea25d5e2d2fab21b0730aa15baf0b573e12` (cycle 28); cycle 29 and 30 changes are cumulative and not yet committed.
+
+**Developed:** live, read-only operational Kubernetes evidence CLI verifying strict multi-node Ready placement, PDB disruption availability, actual EndpointSlices, bound RWX CSI/NFS/CephFS PV (rejecting hostPath/local), Ingress host/class/TLS and optional real HTTP/TLS public readiness; fail-closed context and name validation, redacted errors, no Secret or logs. Fixed `--set enforce_node_diversity=true` in wizard; enabled NGINX KIND scheduling label on disposable control-plane; disabled automatic ServiceAccount token mount in Helm. 22 focused tests pass; complete local Python suite: 1,218 tests, 1 skipped, 0 failures. Current source/ZIP hash integrity checked at packaging. Consult `docs/K8S_OPERATIONAL_PREFLIGHT_RC30.en.md` / `.it.md`.
+
+**What is still not proven:** real RWX/CSI failover, production database HA, reliable TLS/Ingress HAProxy under real cluster conditions, independent operator/security compliance, native devices, and operational SLO. No production or GitHub deployments; no commits/pushes.
+
+---
+
+# Quorivio 0.1.0-dev — RC cycle 29 — 30 October 2026 — 79.25% (+0.25pp independently verified)
+
+**Cycle 29 local regression:** 1,193 Python tests executed, 1 skipped, no failures; workflow YAML parsed and latest source inventory verified. Node TypeScript/Vite and live multi-worker NGINX test not run in this environment (npm packages incomplete; Docker/KIND unavailable).
+
+After the cycle-28 maintainer commit (`016beea25d5e2d2fab21b0730aa15baf0b573e12`), GitHub Actions confirmed **SUCCESS** for OCI AMD64+QEMU ARM64 actual startup (`40980312270`, job `123820527902`) and **rootless Podman with PostgreSQL 18** (`40982728705`, job `123827805762`). This does not certify physical ARM64 hardware.
+
+These independently verified scopes justify separating 0.5 weight from the still-partial D3 gate into a narrowly accepted automated runtime subgate. Formerly 0.25 of those points was credited as partial; now 0.5 is credited as accepted. Thus **RC 79.00% → 79.25% (+0.25 percentage points)**. Matrix: 48 gates, 31 accepted, 17 partial. No unexecuted test was promoted.
+
+## Cycle 29 development
+
+- **Kubernetes wizard:** opt-in `enforce_node_diversity=true` requires two replicas and `ReadWriteMany`, adds hostname `DoNotSchedule` spread with `minDomains: 2`. Default remains compatible with single-node KIND.
+- **Public origin:** HTTP ingress with TLS disabled generates `PUBLIC_BASE_URL=http://...`; TLS ingress keeps HTTPS. Production should use TLS.
+- **Helm:** optional `enforceNodeDiversity`, rejects replicas >1 without RWX, adds maxUnavailable=0 rolling strategy and a PodDisruptionBudget. Does not provision shared storage; scheduling can intentionally remain Pending without two eligible nodes.
+- **New opt-in CI:** `kubernetes_multinode_test=true` creates a disposable KIND cluster with two workers, real PostgreSQL 18, non-published Quorivio image, strict separate worker placement, cross-worker file visibility, actual NGINX controller, HTTP ingress Host routing/rejection and pod replacement recovery. Script `tools/ci_k8s_multinode_ingress_smoke.py`.
+
+**Critical limits:** KIND uses one Docker host and a shared bind mount, NOT independent physical machines or real NFS/CSI RWX. Not HAProxy, public TLS, multizone/control-plane HA, real storage failover, physical ARM64, AGID/GDPR assessment or SLA. The new Kubernetes multi-worker job has NOT been executed on GitHub yet. Local source contracts do not count as live cluster acceptance.
+
+**Latest user-confirmed commit:** `016beea25d5e2d2fab21b0730aa15baf0b573e12`. New code is local-only until next CI. RC still blocked by 17 partial gates.
+
+---
+
 # Quorivio 0.1.0-dev — RC cycle 28 — Podman tmpfs compatibility, 30 October 2026
 
 **User-confirmed latest commit:** cycle 27, GitHub workflow `40980312270`. **Outcome:** 6/7 substantive CI jobs PASS; only rootless Podman job `123820527939` FAIL with Podman-specific `unknown mount option "uid=1000"` (exit 125). OCI AMD64/ARM64 (QEMU), single-node KIND, Kubernetes API manifest schema, production quality, container build and native Firefox/WebKit are newly verified green on the cycle-27 commit. Publishing skipped.

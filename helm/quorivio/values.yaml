@@ -3,6 +3,8 @@ image:
   tag: latest
   pullPolicy: IfNotPresent
 replicaCount: 1
+# Opt-in: prevent both replicas from sharing one Kubernetes hostname (requires >=2 schedulable nodes).
+enforceNodeDiversity: false
 nodeSelector: {}
 service:
   port: 8080
@@ -32,7 +34,7 @@ antivirus:
       memory: 512Mi
     limits:
       cpu: "2"
-      memory: 2Gi
+      memory: 4Gi
 
 # Required for persisted files. For multiple replicas use a RWX-capable StorageClass.
 assets:

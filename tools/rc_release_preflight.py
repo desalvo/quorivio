@@ -39,7 +39,7 @@ def _audit_custom(ledger: Path) -> dict:
     doc=json.loads(ledger.read_text(encoding='utf-8'))
     assert sum(g['weight'] for g in doc['gates']) == 100
     assert all(g['status'] in VALID and g.get('evidence') and g.get('remaining') for g in doc['gates'])
-    return {'score':round(sum(g['weight']*VALID[g['status']] for g in doc['gates']),1)}
+    return {'score':round(sum(g['weight']*VALID[g['status']] for g in doc['gates']),2)}
 
 def main() -> int:
     parser=argparse.ArgumentParser(description=__doc__)

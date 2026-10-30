@@ -1,0 +1,15 @@
+# Disposable GitHub Actions ONLY. Not a production RWX or CSI storage solution.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+    labels:
+      ingress-ready: "true"
+  - role: worker
+    extraMounts:
+      - hostPath: /tmp/quorivio-kind-multinode-shared
+        containerPath: /var/local/quorivio-ci-rwx
+  - role: worker
+    extraMounts:
+      - hostPath: /tmp/quorivio-kind-multinode-shared
+        containerPath: /var/local/quorivio-ci-rwx

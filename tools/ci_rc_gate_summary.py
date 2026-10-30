@@ -18,7 +18,7 @@ def render(report: dict) -> str:
     if not isinstance(pending,list):
         raise ValueError('invalid pending RC gates')
     rows=['## Quorivio Release Candidate readiness','',
-          f'**Gate-weighted progress: {score:.1f}%** — '
+          f'**Gate-weighted progress: {score:.2f}%** — '
           f'**{report["accepted_gates"]}/{report["gate_count"]} gates accepted**','',
           '**RC READY**' if report['release_candidate_ready'] else '**NOT RC READY**',
           '', '> A passing quality gate is not an independent user, device, legal or operational acceptance.', '',
