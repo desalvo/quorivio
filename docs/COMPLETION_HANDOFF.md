@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC cycle 48 — historical SHA-256 integrity recovery (30 October 2026)
+
+**Last confirmed maintainer commit:** `40e42964063e93aed6cc4a4f7a5fc9e5feebaa15` (through cycle 47). **Formal RC remains 80.75%**, 52 gates (35 accepted, 17 partial); cycle-48 code has not been verified on GitHub.
+
+**Two CI failures, same root cause:** standard run `41117244123` (job `124274549345`) and extended run `41117884354` (job `124276729019`) both stopped in the SHA-256 inventory verification because `RC_CYCLE42_PACKAGE_INVENTORY_20261030.json` was absent. The cycle-43 manifest was also missing and would have failed next. Previous historical verifiers in the same logs passed. Neither failure establishes a Vite, PostgreSQL, Chromium, or ClamAV regression; the fatal error is `FileNotFoundError` for the historical manifest.
+
+**Fix:** restored original cycle-42 and cycle-43 manifest bytes, without regenerating history, from the respective cumulative ZIPs. Frozen SHA-256 values are `dcb77af5 59e66a61 d950ce37 77aabcc4 2a4de61f 5db1af18 1d9b9c44 07a78950` and `109cfa85 3e83d2e8 32fbf975 495ff6f6 97a36d2e f7e89d71 6579a6ef 4b4030a3`. CI now checks every referenced manifest file and whether required evidence is Git-tracked (when a repository checkout exists), before expensive Python tests and the checksum verification step. Cycle 47 becomes historical and cycle 48 is the current checksum inventory. New regression tests guard against missing historical receipts.
+
+**Limits:** prior build and runtime evidence does not certify new changes. A new maintainer commit and complete standard CI are still required before promotion. Do not commit/push/tag/publish automatically. Run standard CI with `publish_image=false`, `rc_strict=false`, then extended CI when green.
+
+---
+
 # Quorivio 0.1.0-dev — RC cycle 47 — PostgreSQL editor portal selector hotfix (30 October 2026)
 
 **Last maintainer commit:** `5163e5a5b4685348810ef24067538967a1bbb536`. Cycles **46 and 47 are still uncommitted** and must be delivered cumulatively. **Formal RC remains 80.75%**: 35 accepted gates and 17 partial; `rc_strict=false`. No credit for local code.

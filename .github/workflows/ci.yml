@@ -467,6 +467,7 @@ jobs:
           python3 -c 'import pptx, aiohttp' # enforce PPTX and load-test integration prerequisites
       - name: Kubernetes wizard and worker integration tests
         run: |
+          python3 tools/ci_inventory_reference_guard.py
           PYTHONPATH=tools python3 -m unittest discover -s tools/tests -v
           python3 -m unittest tools.tests.test_import_presentation.TestImport.test_convert_pdf -v
       - name: Verify Kubernetes credential persistence and unique fresh installations
@@ -480,6 +481,7 @@ jobs:
           for name in admin-guide user-guide; do for lang in en it; do test -s "docs/manuals/${name}.${lang}.pdf"; done; done
       - name: Verify grouped SHA-256 evidence inventory
         run: |
+          python3 tools/ci_inventory_reference_guard.py
           python3 tools/verify_rc_checksum_manifest.py
           python3 tools/verify_rc_public_stage_inventory.py
           python3 tools/verify_rc_cycle8_inventory.py
@@ -517,7 +519,8 @@ jobs:
           python3 tools/verify_rc_cycle44_inventory.py --historical
           python3 tools/verify_rc_cycle45_inventory.py --historical
           python3 tools/verify_rc_cycle46_inventory.py --historical
-          python3 tools/verify_rc_cycle47_inventory.py
+          python3 tools/verify_rc_cycle47_inventory.py --historical
+          python3 tools/verify_rc_cycle48_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

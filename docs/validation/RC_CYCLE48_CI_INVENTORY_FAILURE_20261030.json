@@ -1,0 +1,47 @@
+{
+  "cycle": 48,
+  "version": "0.1.0-dev",
+  "source_commit": "40e42964063e93aed6cc4a4f7a5fc9e5feebaa15",
+  "source_runs": [
+    {
+      "run_id": 41117244123,
+      "job_id": 124274549345,
+      "type": "standard",
+      "conclusion": "failure"
+    },
+    {
+      "run_id": 41117884354,
+      "job_id": 124276729019,
+      "type": "extended",
+      "conclusion": "failure"
+    }
+  ],
+  "blocking_step": "Verify grouped SHA-256 evidence inventory",
+  "cause": "Both runs invoke the historical cycle-42 verifier but the original cycle-42 manifest is missing from committed cycle-47 source. Cycle-43 manifest is also missing and would be the next failure.",
+  "original_receipts_restored_without_mutation": {
+    "docs/validation/RC_CYCLE42_PACKAGE_INVENTORY_20261030.json": [
+      "dcb77af5",
+      "59e66a61",
+      "d950ce37",
+      "77aabcc4",
+      "2a4de61f",
+      "5db1af18",
+      "1d9b9c44",
+      "07a78950"
+    ],
+    "docs/validation/RC_CYCLE43_PACKAGE_INVENTORY_20261030.json": [
+      "109cfa85",
+      "3e83d2e8",
+      "32fbf975",
+      "495ff6f6",
+      "97a36d2e",
+      "f7e89d71",
+      "6579a6ef",
+      "4b4030a3"
+    ]
+  },
+  "formal_rc_score_before": 80.75,
+  "formal_rc_score_after": 80.75,
+  "new_hotfix_github_verified": false,
+  "next_ci_requirements": "Commit restored historical receipts, new cycle-48 current receipt and reference preflight; rerun standard gate and extended only after standard passes; no image publication."
+}

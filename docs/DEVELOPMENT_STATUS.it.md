@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC ciclo 48 — ripristino storico SHA-256 (30 ottobre 2026)
+
+**Baseline del commit confermato:** `40e42964063e93aed6cc4a4f7a5fc9e5feebaa15` (cicli fino al 47). **Punteggio RC ufficiale invariato: 80,75%**, 52 gate (35 accettati, 17 parziali). Nuove modifiche del ciclo 48 non ancora verificate su GitHub.
+
+**Diagnosi di due CI fallite:** le run standard `41117244123` (job `124274549345`) ed estesa `41117884354` (job `124276729019`) sono fallite nello stesso step dell'inventario SHA-256: il verificatore storico del ciclo 42 trova assente `RC_CYCLE42_PACKAGE_INVENTORY_20261030.json`. Il successivo verificatore del ciclo 43 avrebbe fallito a sua volta per lo stesso difetto. Tutti i controlli storici precedenti al 42 nel log passano. Non attribuire il fallimento a PostgreSQL, Chromium, ClamAV o Vite: l'errore conclusivo è `FileNotFoundError` del manifest.
+
+**Correzione:** ripristinati *senza ricostruzione* i manifest 42 e 43, recuperando i byte originali dagli ZIP cumulativi di quei cicli; SHA-256 immutabili `dcb77af5 59e66a61 d950ce37 77aabcc4 2a4de61f 5db1af18 1d9b9c44 07a78950` e `109cfa85 3e83d2e8 32fbf975 495ff6f6 97a36d2e f7e89d71 6579a6ef 4b4030a3`. La CI esegue ora un controllo preventivo di tutti i file referenziati dai verificatori d'inventario e dei file tracciati da Git (quando disponibile) prima della suite Python e prima del gate checksum. Il ciclo 47 resta un'evidenza storica e il 48 diventa l'inventario corrente. Aggiunti test che assicurano l'assenza di regressioni future.
+
+**Limiti:** compilazione applicativa e test infrastrutturali precedentemente superati non sono ripetuti come prove del nuovo codice, e la nuova CI deve verificare l'intero workflow dopo il commit. Niente commit/push/tag/publish dall'assistente. Eseguire dapprima la CI standard con `publish_image=false`, `rc_strict=false`; la CI estesa dopo che la standard è verde.
+
+---
+
 # Quorivio 0.1.0-dev — RC ciclo 47 — hotfix collaudo editor PostgreSQL e portal (30 ottobre 2026)
 
 **Baseline committata:** `5163e5a5b4685348810ef24067538967a1bbb536`. I cicli **46 e 47 non sono committati** e devono essere distribuiti insieme. **RC formale: 80,75%**, 35 gate accettati, 17 parziali, `rc_strict=false`; nessun punto aggiunto.
