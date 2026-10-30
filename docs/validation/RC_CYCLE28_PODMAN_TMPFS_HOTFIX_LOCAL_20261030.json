@@ -1,0 +1,51 @@
+{
+  "version": "0.1.0-dev",
+  "cycle": 28,
+  "source_github_run": 40980312270,
+  "github_passing_job_ids": [
+    123818832091,
+    123820527899,
+    123820527902,
+    123820527914,
+    123820527976,
+    123820528118
+  ],
+  "github_failing_job_id": 123820527939,
+  "github_failed_step": "Execute rootless Podman and PostgreSQL 18 application acceptance",
+  "observed_error": "Error: unknown mount option \"uid=1000\": invalid mount option; process exited 125",
+  "podman_rootless_app_started": false,
+  "rootless_tmpfs_hotfix_locally_code_reviewed": true,
+  "rootless_tmpfs_hotfix_github_executed": false,
+  "oci_amd64_arm64_qemu_runtime_github_passed": true,
+  "kind_single_node_github_passed": true,
+  "github_publish_skipped": true,
+  "fix": "Podman --mount type=tmpfs with U=true, tmpfs-mode=0700, 256MiB size limit and independent image USER write probe before starting API",
+  "source_of_semantics": "https://docs.podman.io/en/latest/markdown/podman-run.1.html",
+  "score_before": 79.0,
+  "score_after": 79.0,
+  "strict_rc_ready": false,
+  "limitations": [
+    "rootless Podman production app + PostgreSQL acceptance not yet passed",
+    "no native ARM64 hardware",
+    "no independent production ingress/multi-node RWX CSI/accessibility/GDPR signoff"
+  ],
+  "production_published": false,
+  "local_test_results": {
+    "python": {
+      "ran": 1177,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 1
+    },
+    "backend_node": {
+      "ran": 474,
+      "failures": 0
+    },
+    "frontend_node": {
+      "ran": 65,
+      "failures": 0
+    },
+    "podman_real": "unavailable locally; fresh GitHub acceptance required",
+    "typescript_vite_build": "NOT VERIFIED: local node_modules incomplete (TS2688 missing @types for send, serve-static, ws); GitHub Production quality gate succeeded on committed cycle27, not cycle28"
+  }
+}

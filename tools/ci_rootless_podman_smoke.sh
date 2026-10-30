@@ -64,8 +64,23 @@ for(const p of ["/app/apps/api/dist/server.js","/app/apps/web/dist/index.html"])
 if(fs.existsSync("/usr/local/bin/npm")){console.error("npm unexpectedly installed");process.exit(44)}
 ' >/dev/null
 
+# Podman rejects Docker-specific tmpfs uid=/gid= options (Ubuntu 24.04).
+# Podman's supported U=true sets tmpfs ownership for the image's configured
+# non-root USER. Preserve mode 0700 and bound the disposable mount to 256MiB.
+asset_mount='type=tmpfs,destination=/app/assets,tmpfs-size=268435456,tmpfs-mode=0700,U=true'
+# Fail before boot if the unprivileged image cannot actually write this mount.
+# This probes the same mount options as production without elevating privileges.
+podman run --rm --mount "$asset_mount" --entrypoint node "$image" -e '
+const fs = require("fs"), p = "/app/assets/.ci-probe-" + process.pid;
+if(!process.getuid || process.getuid()===0) process.exit(42);
+try { fs.writeFileSync(p, "ok", {flag:"wx",mode:0o600});
+  if(fs.readFileSync(p,"utf8")!=="ok") process.exit(45);
+  fs.unlinkSync(p);
+} catch(e) { console.error("unprivileged assets tmpfs is not writable"); process.exit(46); }
+' >/dev/null
+
 podman run -d --name "$service" --network "$network" \
-  --tmpfs /app/assets:rw,uid=1000,gid=1000,mode=0700 \
+  --mount "$asset_mount" \
   -e NODE_ENV=production -e PORT=8080 \
   -e DATABASE_URL="postgres://quorivio_ci:$pg_password@$postgres:5432/quorivio_ci" \
   -e AUTH_SECRET="$auth_secret" \

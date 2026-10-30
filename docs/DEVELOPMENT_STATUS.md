@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC cycle 28 — Podman tmpfs compatibility, 30 October 2026
+
+**User-confirmed latest commit:** cycle 27, GitHub workflow `40980312270`. **Outcome:** 6/7 substantive CI jobs PASS; only rootless Podman job `123820527939` FAIL with Podman-specific `unknown mount option "uid=1000"` (exit 125). OCI AMD64/ARM64 (QEMU), single-node KIND, Kubernetes API manifest schema, production quality, container build and native Firefox/WebKit are newly verified green on the cycle-27 commit. Publishing skipped.
+
+**Cycle 28 development (local-only until next CI):** replace Docker-only tmpfs UID/GID options by Podman `--mount type=tmpfs` with `U=true`, `0700`, 256 MiB; preflight write/read/remove from the actual image's default non-root UID prior to launching API. Keep rootless engine guard, bounded secrets and isolated network, no privileged mode, and automatic cleanup. Add regression tests, bilingual operator report and new complete SHA-256 manifest. Verify cycle-27 historical catalog unchanged and cycle-28 current tree before gitleaks. No commit/push/tag/publish performed by assistant.
+
+**Local verified this cycle:** Python 1,177 PASS (one skipped), Node API 474/474, Node web 65/65; Podman runtime and TypeScript/Vite production build not verified locally.
+
+**RC completeness remains 79.0%** (47 gates; 30 accepted, 17 partial). Fresh remote pass of corrected Podman test needed; independent real ingress, RWX CSI multi-node, native ARM64 hardware, assistive tech, physical device, GDPR/AGID/security review remain open. No strict RC readiness. For next manual workflow: `rootless_podman_test=true`, `runtime_arch_test=true`, `browser_test=true`, `cross_browser_test=true`, `kubernetes_runtime_test=true`, `publish_image=false`, `rc_strict=false`.
+
+---
+
 ## Quorivio 0.1.0-dev — RC cycle 27 — 30 October 2026 — new rootless Podman acceptance path (local only)
 
 **Last maintainer-confirmed commit:** `540fca20a8fe90a6a3aad4e571c0f95ed13ecfe1`, run `40975979003` failed only on OCI amd64/arm64 job `123806382783`. Cycle-26 OCI `amd64` → Node `x64` hotfix remains unconfirmed on GitHub.

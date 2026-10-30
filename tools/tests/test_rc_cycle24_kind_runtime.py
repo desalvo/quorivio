@@ -11,7 +11,7 @@ sys.path.insert(0,str(ROOT/'tools'))
 from rc_gate_audit import audit
 from rc_release_preflight import preflight
 from verify_rc_cycle23_inventory import load_inventory as historical
-from verify_rc_cycle27_inventory import load_inventory, verify_source
+from verify_rc_cycle28_inventory import load_inventory, verify_source
 
 class RC24(unittest.TestCase):
     def test_historical_receipt_immutable_and_current_tree_exact(self):
@@ -35,7 +35,7 @@ class RC24(unittest.TestCase):
     def test_ci_checks_historical_before_current_and_leak_detection(self):
         s=(ROOT/'.github/workflows/ci.yml').read_text()
         older='python3 tools/verify_rc_cycle23_inventory.py --historical'
-        newer='python3 tools/verify_rc_cycle27_inventory.py'
+        newer='python3 tools/verify_rc_cycle28_inventory.py'
         self.assertIn(older,s)
         self.assertIn(newer,s)
         self.assertLess(s.index(older),s.index(newer))

@@ -73,6 +73,23 @@ class RootlessPodmanSmoke(unittest.TestCase):
         self.assertNotIn('--privileged', source)
         self.assertNotIn('--network host', source)
 
+    def test_tmpfs_uses_podman_compatible_owner_mapping_and_fail_closed_probe(self):
+        source = SCRIPT.read_text()
+        # The upstream Ubuntu Podman rejects Docker-specific uid/gid tmpfs
+        # options. U=true maps ownership to the image's non-root USER.
+        self.assertNotIn('uid=1000', source)
+        self.assertNotIn('gid=1000', source)
+        self.assertIn('type=tmpfs,destination=/app/assets,', source)
+        self.assertIn('tmpfs-size=268435456', source)
+        self.assertIn('tmpfs-mode=0700,U=true', source)
+        self.assertEqual(source.count('\"$asset_mount\"'), 2)
+        self.assertIn('fs.writeFileSync(p, "ok"', source)
+        self.assertIn('fs.unlinkSync(p)', source)
+        self.assertIn('unprivileged assets tmpfs is not writable', source)
+        self.assertLess(source.index('fs.writeFileSync'), source.index('podman run -d --name "$service"'))
+        self.assertNotIn('--user 0', source)
+        self.assertNotIn('--userns=host', source)
+
     def test_ci_is_explicitly_opt_in_and_cannot_publish(self):
         workflow = WORKFLOW.read_text()
         self.assertIn('rootless_podman_test:', workflow)

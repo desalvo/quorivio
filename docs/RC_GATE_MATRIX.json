@@ -1211,5 +1211,32 @@
     "partial_gates": 17,
     "strict_rc_ready": false,
     "comment": "New independent opt-in rootless Podman acceptance is source-only until a real GitHub runner validates the image and PostgreSQL. No gate promotion or production claims."
+  },
+  "rc_cycle28_podman_tmpfs_hotfix_20261030": {
+    "source_run_id": 40980312270,
+    "last_maintainer_confirmed_commit": "cycle27 committed (user confirmation); precise commit SHA not independently captured",
+    "passed_jobs": {
+      "production_quality": 123818832091,
+      "container_build": 123820527899,
+      "oci_amd64_arm64_actual_runtime": 123820527902,
+      "kubernetes_api_schema": 123820527914,
+      "firefox_webkit": 123820527976,
+      "kubernetes_kind_runtime": 123820528118
+    },
+    "failed_job": 123820527939,
+    "failure": "Podman rootless exited 125 before application launch: unknown mount option uid=1000",
+    "root_cause": "The script used Docker --tmpfs UID/GID options unsupported by the Podman runner version. This is a CI container-mount incompatibility; application boot was not reached.",
+    "fix": "Use Podman documented --mount type=tmpfs with U=true ownership for image USER, private 0700 mode, 256MiB cap; require a real non-root write/read/remove probe before application boot.",
+    "github_rootless_fixed_verified": false,
+    "oci_amd64_arm64_runtime_verified": true,
+    "kubernetes_kind_single_node_verified": true,
+    "native_firefox_webkit_verified": true,
+    "score_before": 79.0,
+    "score_after": 79.0,
+    "score_delta_pp": 0.0,
+    "accepted_gates": 30,
+    "partial_gates": 17,
+    "strict_rc_ready": false,
+    "scoring_note": "OCI/QEMU and KIND CI evidence improves confidence in existing bounded tests; parent D3 remains partial because rootless Podman failed and production ingress/RWX/multinode/native ARM remain unverified; no points promoted."
   }
 }

@@ -470,7 +470,8 @@ jobs:
           python3 tools/verify_rc_cycle24_inventory.py --historical
           python3 tools/verify_rc_cycle25_inventory.py --historical
           python3 tools/verify_rc_cycle26_inventory.py --historical
-          python3 tools/verify_rc_cycle27_inventory.py
+          python3 tools/verify_rc_cycle27_inventory.py --historical
+          python3 tools/verify_rc_cycle28_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

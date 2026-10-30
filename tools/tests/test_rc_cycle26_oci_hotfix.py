@@ -9,7 +9,7 @@ from rc_gate_audit import audit
 from rc_release_preflight import preflight
 from verify_rc_cycle25_inventory import load_inventory as historical
 from verify_rc_cycle26_inventory import load_inventory as historical_26
-from verify_rc_cycle27_inventory import load_inventory,verify_source
+from verify_rc_cycle28_inventory import load_inventory,verify_source
 
 class Cycle26RC(unittest.TestCase):
     def test_historical_archive_unmodified_and_current_git_hashes(self):
@@ -33,9 +33,9 @@ class Cycle26RC(unittest.TestCase):
         wf=(ROOT/'.github/workflows/ci.yml').read_text()
         self.assertIn('python3 tools/verify_rc_cycle25_inventory.py --historical',wf)
         self.assertIn('python3 tools/verify_rc_cycle26_inventory.py --historical',wf)
-        self.assertIn('python3 tools/verify_rc_cycle27_inventory.py',wf)
+        self.assertIn('python3 tools/verify_rc_cycle28_inventory.py',wf)
         self.assertLess(wf.index('verify_rc_cycle25_inventory.py --historical'),wf.index('verify_rc_cycle26_inventory.py'))
-        self.assertLess(wf.index('verify_rc_cycle27_inventory.py'),wf.index('Detect credential leaks'))
+        self.assertLess(wf.index('verify_rc_cycle28_inventory.py'),wf.index('Detect credential leaks'))
         self.assertIn('bash tools/ci_oci_runtime_smoke.sh quorivio:ci-oci-amd64 amd64',wf)
         self.assertIn('bash tools/ci_oci_runtime_smoke.sh quorivio:ci-oci-arm64 arm64',wf)
         self.assertIn('push: false',wf)
