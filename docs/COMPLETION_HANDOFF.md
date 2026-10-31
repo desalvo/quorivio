@@ -1,3 +1,14 @@
+# Quorivio 0.1.0-dev — RC77 — Campaign cannot publish or run strict release checks (31 October 2026)
+
+- Maintainer baseline `e4f24a9fb8a36ef0b96ddb20b755a5a2f9335343`; standard CI `41209516202` passed. RC campaign `41210395340` ended early because it reported `RC_CAMPAIGN_PUBLISH=true` in the runner despite selecting only the RC checkbox. No proof of why GitHub supplied the value.
+- RC77 hardcodes effective false/false for the campaign admission; publishing and strict jobs refuse campaign mode, as does shell publisher. New early CI tests enforce this policy.
+- Verified score remains 84.75%, 42 accepted / 17 partial of 59. No commit by assistant; maintainer commits package then starts a fresh non-publishing RC dispatch.
+
+
+**RC77 safety policy:** `rc_strict=false`, `publish_image=false`, `publish_latest=false`; manual non-campaign publication is a separate explicitly approved operation.
+
+---
+
 # Quorivio 0.1.0-dev — RC76 — Python CI legacy editor contract reconciliation (31 October 2026)
 
 **Last maintainer commit:** `39564e862a2ed431544cea22e0c0b39bd6794b34` (includes RC75). Standard CI `41208293676`, job `124557792918`, passed the frontend/backend compilation and Node tests, then ran 1439 Python tests with **five failures** from stale literal-code assertions.

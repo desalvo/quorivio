@@ -1,3 +1,14 @@
+# Quorivio 0.1.0-dev — RC77 — Isolamento della campagna RC dalla pubblicazione (31 ottobre 2026)
+
+**Baseline committata:** `e4f24a9fb8a36ef0b96ddb20b755a5a2f9335343` (RC76). CI standard `41209516202` verde; campagne estese `41210085593` e `41210395340` bloccate da `RC_CAMPAIGN_PUBLISH=true`, anche se l'utente ha selezionato soltanto `rc_acceptance_suite`. Il riepilogo fallisce a cascata, non per un secondo problema indipendente. Il dato dell'input originale non è disponibile nella risposta pubblica della API GitHub, quindi la causa della discrepanza non è dimostrata.
+
+**RC77:** con `rc_acceptance_suite=true`, il controllo iniziale vede sempre `false/false` per pubblicazione e strict; entrambi i job corrispondenti escludono la modalità campagna, e lo script di pubblicazione blocca esplicitamente questa modalità. Test di regressione preventivi verificano le protezioni. Pubblicazione manuale separata invariata. **Completamento 84,75%** (42 gate accettati, 17 parziali su 59), RC strict bloccata. Non effettuare commit automatici.
+
+
+**RC77 safety policy:** `rc_strict=false`, `publish_image=false`, `publish_latest=false`; manual non-campaign publication is a separate explicitly approved operation.
+
+---
+
 # Quorivio 0.1.0-dev — RC76 — CI Python: aggiornamento dei contratti editor storici (31 ottobre 2026)
 
 **Nuovo commit confermato:** `39564e862a2ed431544cea22e0c0b39bd6794b34` (comprende RC75). CI standard `41208293676`, job `124557792918`: compilazione frontend/backend e test Node superati; la suite Python ha eseguito 1439 test con **5 errori** dovuti a controlli testuali storici che non riflettono più il codice aggiornato.

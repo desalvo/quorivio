@@ -28,7 +28,12 @@ class RC76EarlyContracts(unittest.TestCase):
         guard = importlib.import_module('ci_inventory_reference_guard')
         self.assertGreaterEqual(guard.verify_references(ROOT, enforce_git=False), 1)
         self.assertIn('verify_rc_cycle75_inventory.py --historical', WORKFLOW)
-        self.assertIn('verify_rc_cycle76_inventory.py\n', WORKFLOW)
+        from tools.ci_inventory_reference_guard import COMMAND
+        commands = COMMAND.findall(WORKFLOW)
+        # RC76 becomes immutable history as new current cycles are added.
+        self.assertIn(('verify_rc_cycle76_inventory.py', '--historical'), commands)
+        self.assertEqual([name for name, historical in commands if not historical and name not in ('verify_rc_cycle8_inventory.py', 'verify_rc_cycle10_inventory.py')], [commands[-1][0]])
+        self.assertFalse(commands[-1][1])
 
     def test_release_remains_opt_in(self):
         self.assertIn('default: false', WORKFLOW)

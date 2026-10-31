@@ -109,6 +109,8 @@ jobs:
       # cumulative archive has silently dropped an immutable receipt.
       - name: Validate historical RC inventory references early
         run: python3 tools/ci_inventory_reference_guard.py
+      - name: Validate RC campaign dispatch isolation before dependencies
+        run: python3 -m unittest tools.tests.test_rc_cycle77_dispatch_isolation -q
       - name: Validate historical documentation acceptance early
         run: |
           PYTHONPATH=tools python3 -m unittest \
@@ -144,11 +146,13 @@ jobs:
         with: {node-version: '22'} # npm caching requires a committed package-lock.json
       - name: Install reproducibly
         run: npm install --ignore-scripts --no-audit --no-fund
+      # RC campaigns are strictly observational, regardless of other dispatch
+      # checkboxes. Separate consent is required for production publication.
       - name: Validate RC campaign is non-publishing and non-strict
         if: github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite
         env:
-          RC_CAMPAIGN_PUBLISH: ${{ inputs.publish_image }}
-          RC_CAMPAIGN_STRICT: ${{ inputs.rc_strict }}
+          RC_CAMPAIGN_PUBLISH: 'false'
+          RC_CAMPAIGN_STRICT: 'false'
         run: |
           test "$RC_CAMPAIGN_PUBLISH" = 'false'
           test "$RC_CAMPAIGN_STRICT" = 'false'
@@ -159,7 +163,7 @@ jobs:
         if: success()
         run: python3 tools/ci_rc_gate_summary.py /tmp/quorivio-rc-readiness.json
       - name: Strict release-candidate gate (manual opt-in)
-        if: github.event_name == 'workflow_dispatch' && inputs.rc_strict
+        if: github.event_name == 'workflow_dispatch' && inputs.rc_strict && !inputs.rc_acceptance_suite
         run: python3 tools/rc_release_preflight.py --strict
       - name: Unit tests
         run: npm test
@@ -644,7 +648,8 @@ jobs:
           python3 tools/verify_rc_cycle73_inventory.py --historical
           python3 tools/verify_rc_cycle74_inventory.py --historical
           python3 tools/verify_rc_cycle75_inventory.py --historical
-          python3 tools/verify_rc_cycle76_inventory.py
+          python3 tools/verify_rc_cycle76_inventory.py --historical
+          python3 tools/verify_rc_cycle77_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:
@@ -986,7 +991,7 @@ jobs:
         run: python3 tools/rc_campaign_result_gate.py
   publish:
     name: Production publication
-    if: github.event_name == 'workflow_dispatch' && inputs.publish_image == true && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+    if: github.event_name == 'workflow_dispatch' && inputs.publish_image == true && !inputs.rc_acceptance_suite && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
     needs: [validate, image-build]
     runs-on: ubuntu-latest
     environment: production
@@ -1006,6 +1011,7 @@ jobs:
           QUORIVIO_PUBLISH_TAG: ${{ inputs.publish_tag }}
           QUORIVIO_PUBLISH_LATEST: ${{ inputs.publish_latest }}
           QUORIVIO_PUBLISH_IMAGE: ${{ inputs.publish_image }}
+          QUORIVIO_RC_ACCEPTANCE_SUITE: ${{ inputs.rc_acceptance_suite }}
         run: bash tools/resolve_image_tags.sh
       - name: Docker Hub authentication
         uses: docker/login-action@v3

@@ -1,3 +1,14 @@
+# Quorivio 0.1.0-dev — RC77 — One-click RC dispatch fix (31 October 2026)
+
+**Last maintainer commit:** `e4f24a9fb8a36ef0b96ddb20b755a5a2f9335343` (RC76), with green standard CI `41209516202`. RC extended runs `41210085593` and `41210395340` stopped at the campaign admission guard because runner env showed `RC_CAMPAIGN_PUBLISH=true`, although user reports ticking only `rc_acceptance_suite`. The summary failure was a consequence (1/11 required jobs passed; others skipped). The public run API did not expose the actual dispatch input set, so the source of the surprising value is not proven.
+
+**RC77 fix:** the RC admission step receives effective `false/false` values independent of other checkboxes; both publication and strict jobs explicitly exclude `rc_acceptance_suite`. The image-tag shell resolver independently refuses publication with the campaign flag. Early tests enforce all three layers. Publishing remains possible only through a separate deliberate manual non-campaign dispatch, subject to the original checks. **RC remains 84.75%** (42 accepted, 17 partial / 59 gates); strict certification remains blocked. Re-run a new extended campaign after committing this package; no commit/push/tag/publish by assistant.
+
+
+**RC77 safety policy:** `rc_strict=false`, `publish_image=false`, `publish_latest=false`; manual non-campaign publication is a separate explicitly approved operation.
+
+---
+
 # Quorivio 0.1.0-dev — RC76 — Python CI legacy editor contract reconciliation (31 October 2026)
 
 **Last maintainer commit:** `39564e862a2ed431544cea22e0c0b39bd6794b34` (includes RC75). Standard CI `41208293676`, job `124557792918`, passed the frontend/backend compilation and Node tests, then ran 1439 Python tests with **five failures** from stale literal-code assertions.

@@ -3,6 +3,7 @@
 set -euo pipefail
 [[ "${GITHUB_EVENT_NAME:-}" == workflow_dispatch ]] || { echo 'Only workflow_dispatch may publish images' >&2; exit 2; }
 [[ "${QUORIVIO_PUBLISH_IMAGE:-}" == true ]] || { echo 'Explicit publish_image consent is required' >&2; exit 2; }
+[[ "${QUORIVIO_RC_ACCEPTANCE_SUITE:-false}" != true ]] || { echo 'RC acceptance runs cannot publish images' >&2; exit 2; }
 [[ "${GITHUB_REPOSITORY:-}" == desalvo/quorivio ]] || { echo 'Unexpected image publisher repository' >&2; exit 2; }
 [[ "${GITHUB_SHA:-}" =~ ^[0-9a-fA-F]{40}$ ]] || { echo 'Invalid checked-out commit SHA' >&2; exit 2; }
 ref="${GITHUB_REF:-}"

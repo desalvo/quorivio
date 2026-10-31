@@ -1,3 +1,14 @@
+# Quorivio 0.1.0-dev — RC77 — Campagna RC sempre non pubblicante (31 ottobre 2026)
+
+- Baseline `e4f24a9fb8a36ef0b96ddb20b755a5a2f9335343`, CI standard verde `41209516202`. CI estesa `41210395340` fermata dal controllo di pubblicazione; la ragione del valore true non è verificabile dagli input pubblici.
+- RC77: variabili effettive false/false nella campagna, publishing e strict esclusi dalla campagna, protezione shell fail-closed, test CI preventivi.
+- Percentuale invariata 84,75% (42/17 di 59 gate); il manutentore deve committare e avviare una nuova esecuzione con `rc_acceptance_suite=true`. Nessun commit automatico.
+
+
+**RC77 safety policy:** `rc_strict=false`, `publish_image=false`, `publish_latest=false`; manual non-campaign publication is a separate explicitly approved operation.
+
+---
+
 # Quorivio 0.1.0-dev — RC76 — CI Python: aggiornamento dei contratti editor storici (31 ottobre 2026)
 
 **Nuovo commit confermato:** `39564e862a2ed431544cea22e0c0b39bd6794b34` (comprende RC75). CI standard `41208293676`, job `124557792918`: compilazione frontend/backend e test Node superati; la suite Python ha eseguito 1439 test con **5 errori** dovuti a controlli testuali storici che non riflettono più il codice aggiornato.

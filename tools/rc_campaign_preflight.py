@@ -35,10 +35,22 @@ def campaign_audit(root: Path = ROOT) -> dict:
  if not re.search(r'^  rc-campaign-conclusion:\s*$',workflow,re.M):
   raise ValueError('campaign conclusion job missing')
  # The campaign must not be able to activate publication or strict sign-off.
- if not re.search(r"if: github.event_name == 'workflow_dispatch' && inputs.publish_image == true", workflow):
-  raise ValueError('publishing guard changed')
+ # An RC campaign cannot trigger publishing or strict sign-off even if
+ # GitHub persists a previously selected checkbox in workflow_dispatch.
+ publish_guard = "if: github.event_name == 'workflow_dispatch' && inputs.publish_image == true && !inputs.rc_acceptance_suite &&"
+ strict_guard = "if: github.event_name == 'workflow_dispatch' && inputs.rc_strict && !inputs.rc_acceptance_suite"
+ if publish_guard not in workflow:
+  raise ValueError('publishing guard must exclude the RC campaign')
+ if strict_guard not in workflow:
+  raise ValueError('strict release gate must exclude the RC campaign')
+ if "RC_CAMPAIGN_PUBLISH: 'false'" not in workflow or "RC_CAMPAIGN_STRICT: 'false'" not in workflow:
+  raise ValueError('RC admission must be isolated from other dispatch inputs')
  if "test \"$RC_CAMPAIGN_PUBLISH\" = 'false'" not in workflow or "test \"$RC_CAMPAIGN_STRICT\" = 'false'" not in workflow:
-  raise ValueError('campaign publication/strict admission guards missing')
+  raise ValueError('campaign admission checks missing')
+ if 'QUORIVIO_RC_ACCEPTANCE_SUITE: ${{ inputs.rc_acceptance_suite }}' not in workflow:
+  raise ValueError('publisher missing RC campaign safety flag')
+ if 'QUORIVIO_RC_ACCEPTANCE_SUITE:-false' not in (root/'tools/resolve_image_tags.sh').read_text():
+  raise ValueError('publisher script must explicitly deny RC campaigns')
  ledger = json.loads((root/'docs/RC_GATE_MATRIX.json').read_text())
  gates = ledger['gates']
  from rc_gate_audit import audit

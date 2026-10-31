@@ -67,6 +67,19 @@ class ManualPublishPolicy(unittest.TestCase):
                 if '\x00' in tag:continue
                 code,out=self.call(tag=tag);self.assertNotEqual(code,0);self.assertEqual(out,'')
 
+    def test_one_click_campaign_cannot_publish_even_with_publish_consent(self):
+        with tempfile.TemporaryDirectory() as temp:
+            output=Path(temp)/'github-output'
+            env={**os.environ,'GITHUB_EVENT_NAME':'workflow_dispatch',
+                 'QUORIVIO_PUBLISH_IMAGE':'true','QUORIVIO_RC_ACCEPTANCE_SUITE':'true',
+                 'GITHUB_REF':'refs/heads/main','GITHUB_SHA':SHA,
+                 'QUORIVIO_PUBLISH_TAG':'','QUORIVIO_PUBLISH_LATEST':'false',
+                 'GITHUB_REPOSITORY':'desalvo/quorivio','GITHUB_OUTPUT':str(output)}
+            result=subprocess.run(['bash',str(SCRIPT)],env=env,capture_output=True,text=True,timeout=6)
+            self.assertNotEqual(result.returncode,0)
+            self.assertIn('RC acceptance runs cannot publish',result.stderr)
+            self.assertFalse(output.exists())
+
     def test_workflow_is_never_push_based(self):
         pub=CI.split('\n  publish:',1)[1]
         self.assertIn("github.event_name == 'workflow_dispatch'",pub.split('\n    needs:',1)[0])

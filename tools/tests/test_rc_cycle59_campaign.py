@@ -33,7 +33,7 @@ class CampaignContracts(unittest.TestCase):
   with self.assertRaises(ValueError):evaluate_results({**jobs,'cross-browser':{'result':'invalid'}})
  def test_workflow_is_explicit_and_does_not_publish(self):
   y=(ROOT/'.github/workflows/ci.yml').read_text()
-  self.assertIn("inputs.publish_image == true && (github.ref == 'refs/heads/main'",y)
+  self.assertIn("inputs.publish_image == true && !inputs.rc_acceptance_suite && (github.ref == 'refs/heads/main'",y)
   self.assertIn('Fail closed on skipped, cancelled or failed RC campaign jobs',y)
   self.assertIn('RC_CAMPAIGN_NEEDS_JSON: ${{ toJSON(needs) }}',y)
   self.assertIn('test "$RC_CAMPAIGN_PUBLISH" = \'false\'',y)
