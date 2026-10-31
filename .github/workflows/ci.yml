@@ -144,6 +144,8 @@ jobs:
         run: python3 -m unittest tools.tests.test_rc_cycle86_palette_acceptance -q
       - name: Validate deterministic backup tampering and fail-closed mirror before npm
         run: python3 -m unittest tools.tests.test_backup_mirror -q
+      - name: Validate RC88 disposable capacity QR URL contracts before npm
+        run: python3 -m unittest tools.tests.test_rc_cycle88_capacity_join_url -q
       - name: Validate RC74 footer alignment before npm
         run: |
           python3 -m unittest \
@@ -678,7 +680,8 @@ jobs:
           python3 tools/verify_rc_cycle84_inventory.py --historical
           python3 tools/verify_rc_cycle85_inventory.py --historical
           python3 tools/verify_rc_cycle86_inventory.py --historical
-          python3 tools/verify_rc_cycle87_inventory.py
+          python3 tools/verify_rc_cycle87_inventory.py --historical
+          python3 tools/verify_rc_cycle88_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC88 — capacity QR URL normalization (31 October 2026)
+
+**RC completion: 84.75%** (42 accepted, 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. GitHub RC87 extended workflow `41241863260` on `982817a7080edb29ca4667e2de6877585af09098` successfully passed editor Chromium and idle WebSocket tests but stopped at 500-user capacity: `tools/ci_capacity_500.py` passed the API's relative `join_url` directly to `tools/load_500.py`, whose CLI correctly requires an absolute URL. RC88 normalizes only on the configured loopback origin and tests rejection of cross-origin/malformed paths. The 500-user load and 90s p95 SLO gates remain real and must be rerun in GitHub; no RC credit until proof. All historical manifests remain immutable. To continue, extract complete RC88 ZIP, `git add -A`, verify source manifest and CI, commit yourself, then run `rc_acceptance_suite=true` with no publishing. No assistant commit/push/tag.
+
+---
 # Quorivio 0.1.0-dev — RC87 — phase-independent idle live acceptance (31 October 2026)
 
 **RC score unchanged: 84.75%** (42 accepted, 17 partial gates), `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Logs `logs_111783956906.zip`: Chromium editor/palette acceptance and cross-replica WebSocket acceptance pass; 70-second idle test fails due to fixed 35/55 second thresholds unrelated to a server-start-aligned 20-second timer. RC87 adjusts receiver assertion (25-second silence timeout, at least three authoritative session snapshots, traffic in final 40/20 seconds), adds deterministic phase-offset regressions, preserves real PostgreSQL/WS test and private participant projection. CI GitHub retest required; no credit before evidence, no commits/publishing by assistant.
