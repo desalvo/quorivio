@@ -122,6 +122,8 @@ jobs:
       - name: Validate evolving editor contracts before npm
         run: |
           python3 -m unittest \
+            tools.tests.test_rc_cycle37_editor_ux \
+            tools.tests.test_rc_cycle84_historical_context_compat \
             tools.tests.test_rc_cycle43_frontend_compile \
             tools.tests.test_rc_dashboard_widget_appearance_20261027 \
             tools.tests.test_rehearsal_timed_deadline_20261028 \
@@ -667,7 +669,8 @@ jobs:
           python3 tools/verify_rc_cycle80_inventory.py --historical
           python3 tools/verify_rc_cycle81_inventory.py --historical
           python3 tools/verify_rc_cycle82_inventory.py --historical
-          python3 tools/verify_rc_cycle83_inventory.py
+          python3 tools/verify_rc_cycle83_inventory.py --historical
+          python3 tools/verify_rc_cycle84_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

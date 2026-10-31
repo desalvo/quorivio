@@ -14,7 +14,14 @@ class EditorCycle37(unittest.TestCase):
   self.assertIn('contextWidget===w.id&&createPortal(',UI)
   self.assertIn('</div>,document.body)}<div className="canvas-layer-tools">',UI)
   self.assertIn('position:fixed!important;z-index:10020',CSS)
-  self.assertIn('positionMenu(e.currentTarget,e.clientX,e.clientY)',UI)
+  # RC83 moved native right-click routing to canvas capture: this must
+  # continue to position the same unclipped, body-portaled widget menu.
+  # The old inline handler no longer owns the native context event.
+  self.assertIn('onContextMenuCapture={handleCanvasContext}',UI)
+  self.assertIn('openWidgetContextMenu(widgetId,widget,e.clientX,e.clientY)',UI)
+  self.assertIn('clearContextHold();clearWidgetHold();positionMenu(element,x,y)',UI)
+  self.assertIn('const widget=direct&&canvas.contains(direct)?direct:canvasWidgetAtPoint(canvas,e.clientX,e.clientY)',UI)
+  self.assertIn('setBackgroundMenu(false);setArrangeMenu(false);setContextWidget(widgetId)',UI)
   self.assertIn('positionMenu(widgetElement)',UI)
   self.assertIn('positionMenu(e.currentTarget);setContextWidget(w.id)',UI)
  def test_modal_has_safe_fallback_and_close_path(self):
