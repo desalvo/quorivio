@@ -37,9 +37,9 @@ class RealEditorPortalRegression(unittest.TestCase):
         workflow=(ROOT/'.github/workflows/ci.yml').read_text()
         self.assertIn('python3 tools/verify_rc_cycle46_inventory.py --historical',workflow)
         self.assertIn('python3 tools/verify_rc_cycle47_inventory.py --historical',workflow)
-        self.assertIn('python3 tools/verify_rc_cycle48_inventory.py',workflow)
+        self.assertIn('python3 tools/verify_rc_cycle54_inventory.py',workflow)
         self.assertLess(workflow.index('python3 tools/verify_rc_cycle48_inventory.py'),workflow.index('Detect credential leaks'))
-        from verify_rc_cycle48_inventory import verify_source,load_inventory
+        from verify_rc_cycle57_inventory import verify_source,load_inventory
         self.assertEqual(verify_source(),len(load_inventory()))
 
     def test_evidence_keeps_source_run_distinct_from_unverified_code(self):

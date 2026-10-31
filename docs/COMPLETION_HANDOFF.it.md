@@ -1,3 +1,107 @@
+# Quorivio 0.1.0-dev — Ciclo RC 57: invio WebSocket condiviso (31 ottobre 2026)
+
+**Ultimo commit confermato:** `64aa34379a07ba6a91c7eebf6f91e6dc12e3ad5c`; **cicli 49–57 cumulativi e non ancora committati**. CI standard `41120048115` ed estesa `41123318359` verdi solo per la baseline precedente. **RC certificata: 81,25% (53 gate: 36 accettati, 17 parziali)**; nessun credito non verificato.
+
+**Sviluppo funzionale:** uno snapshot per 500 partecipanti e un presentatore richiede ora due sole serializzazioni JSON condivise, con separazione lato server dei dati, gestione individuale di socket lenti e guasti di trasporto e primo snapshot nella stessa coda ordinata delle notifiche. Vedere `docs/RC57_LIVE_FANOUT.it.md`. Test unitari e contrattuali locali disponibili, ma restano da completare collaudi GitHub, PostgreSQL e carico reale multi-replica. `publish_image=false`, `rc_strict=false`. Nessun commit/push/tag/pubblicazione dell'assistente.
+
+---
+
+# Quorivio 0.1.0-dev — Ciclo RC 56: snapshot autorevoli nelle sessioni inattive (30 ottobre 2026)
+
+**Ultimo commit confermato:** `64aa34379a07ba6a91c7eebf6f91e6dc12e3ad5c`; **cicli 49–56 cumulativi non ancora committati**. Ultime CI verdi: standard `41120048115` ed estesa `41123318359`, che NON validano i cicli 49–56. **RC certificata: 81,25% (53 gate, 36 accettati / 17 parziali)**, credito nuovo locale **0**. `publish_image=false`, `rc_strict=false`.
+
+**Difetto funzionale risolto:** il watchdog del ciclo 55 si aspettava snapshot periodici, ma il server aggiornava soltanto la presenza in PostgreSQL. Una sessione senza nuove risposte non produceva snapshot dopo quello iniziale: trascorsi 65 secondi il browser avrebbe riconnesso inutilmente i client, causando possibili tempeste di riconnessione con 500 partecipanti.
+
+**Correzione ciclo 56:** invio di snapshot autorevoli ogni 20 secondi **per sessione attiva**, sfruttando la coda già coalescente `broadcastLocal()`. Una sola lettura/fanout per sessione, non una lettura per partecipante; nessuna notifica cross-replica duplicata. Se la lettura dal database fallisce non viene simulato un heartbeat valido: il watchdog del client rileva l'interruzione. Nessuna modifica al protocollo lato browser né ai dati memorizzati. Test deterministici di 10 minuti inattivi, 500 iscritti, database non disponibile, isolamento delle sessioni e sovrapposizioni.
+
+**Nuova prova reale opzionale:** `live_idle_test=true` esegue 70 secondi di snapshot inattivi con due repliche PostgreSQL temporanee dopo il commit; vedere `docs/RC56_IDLE_SNAPSHOT_ACCEPTANCE.it.md`.
+
+**Limiti:** i test locali non certificano una vera infrastruttura a due worker, carico SLO 500 utenti, TLS pubblico, RWX CSI/NFS o conformità indipendente. Dopo il commit eseguire CI standard ed estesa con i collaudi HTTPS e SLO opzionali; nessuna promozione RC prima dell'esito.
+
+---
+
+# Quorivio 0.1.0-dev — Ciclo RC 55: freschezza snapshot WebSocket e visibilità dei dati obsoleti (30 ottobre 2026)
+
+**Ultime CI GitHub verificate:** standard `41120048115`, estesa `41123318359` (baseline `64aa3437`); non certificano le modifiche non committate.
+
+**Opzioni CI richieste:** `rc_strict=false`, `publish_image=false` finché restano gate esterni aperti.
+
+**Ultima baseline committata:** `64aa34379a07ba6a91c7eebf6f91e6dc12e3ad5c`; **cicli 49–55 cumulativi non ancora committati**. **RC certificata invariata: 81,25% (53 gate: 36 accettati, 17 parziali)**. Non attribuire punti ai test locali prima dei collaudi su GitHub e senza confondere l'implementazione con una certificazione di disponibilità.
+
+**Sviluppo reale:** `apps/web/src/live-connection.ts` sorveglia la freschezza degli snapshot dopo l'apertura di ogni WebSocket (65 secondi predefiniti rispetto a snapshot server periodici ~20 secondi). Solo gli snapshot validi e della sessione giusta riarmano il watchdog; uno stream bloccato viene dismesso in modo atomico, il vecchio socket non può più aggiornare dati o stato, e un nuovo tentativo usa il backoff esistente. Anche `onerror` senza `onclose` forza un recupero delimitato. Timer annullati su offline, dispose, close e revoca.
+
+**Interfaccia:** avviso accessibile per statistiche presenter e schermo pubblico con connessione persa o revocata; il contenuto precedente rimane visibile ma è dichiarato potenzialmente obsoleto. Nessuna modifica alle risposte o ai dati di sessione nel database.
+
+**Evidenze locali:** 505 test backend e 99 frontend Node PASS; 1.347 Python PASS (1 saltato) in 8 gruppi, oltre al controllo TypeScript del transport; nuovi test Node deterministici su timeout senza snapshot, reset su snapshot validi, rifiuto di quelli di altra sessione, perdita rete, errori senza evento di close e annullamento timer; contratti Python e inventario. **Non dimostrato:** vera perdita di rete su due nodi indipendenti, 500 client sostenuti, tempi di recovery rappresentativi; CI standard ed estesa da eseguire dopo il commit. Gli input `kubernetes_tls_test` e `capacity_slo_test` dei cicli 50–52 restano opzionali e non ancora eseguiti sul nuovo cumulativo.
+
+---
+
+# Quorivio 0.1.0-dev — Ciclo RC 54: recupero live WebSocket (30 ottobre 2026)
+
+**Baseline committata:** `64aa34379a07ba6a91c7eebf6f91e6dc12e3ad5c`. **Cumulativo ancora non committato:** cicli 49–54. **RC certificata 81,25%**, 53 gate (36 accettati, 17 parziali). Nessun punto aggiunto senza collaudo indipendente.
+
+**Sviluppo funzionale:** il nuovo client live WebSocket evita che messaggi/errori di connessioni sostituite sovrascrivano lo stato corrente. Alla perdita di rete cancella timer e chiude il vecchio socket; al ritorno online apre una sola connessione. Gestisce handshake che non terminano entro 15 secondi, retry esponenziali con jitter individuale e limite di 30 secondi, terminazione per codici 4003/1008 senza reconnessione non autorizzata, messaggio dedicato per accesso revocato e callback React aggiornati. Presenter e partecipanti usano la stessa logica. Il protocollo server/PostgreSQL rimane invariato.
+
+**Evidenze e limiti:** nove test deterministici e controllo TypeScript stretto; le prove di carico/resilienza su browser reale e la CI GitHub rimangono necessarie. Test infrastrutturali HTTPS, SLO 500 partecipanti e CSP dei cicli 49–53 non ancora confermati su GitHub. Nessuna pubblicazione/commit dell'assistente.
+
+---
+
+# Quorivio 0.1.0-dev — RC 53 — Content Security Policy di produzione e permessi del browser (30 ottobre 2026)
+
+**Baseline:** cumulativo ciclo 52; nessun nuovo commit dall'hash `64aa34379a07ba6a91c7eebf6f91e6dc12e3ad5c`. Il package conserva i cicli 49–53. **RC certificata sempre all'81,25%**: mancano il collaudo del runtime GitHub e la revisione indipendente di sicurezza.
+
+## Sviluppi applicativi
+
+`apps/api/src/security-headers.ts` introduce una CSP **effettivamente applicata in produzione** quando `NODE_ENV=production`: nega script inline ed eval, blocca oggetti eseguibili, vincola WebSocket all'origine pubblica configurata e preserva gli iframe dello stesso dominio per anteprima e presentazione. Immagini/media mantengono il supporto a upload, QR/data image, sfondi HTTPS opzionali, PDF e blob. Il CSS inline necessario a posizionamento, animazioni e personalizzazioni dei widget resta autorizzato, senza estendere l'esecuzione JavaScript. `Permissions-Policy` nega camera, microfono, posizione, pagamenti, USB e browsing-topics; lo schermo intero del presentatore rimane utilizzabile. La modalità di sviluppo Vite non applica la CSP di produzione.
+
+## Verifiche e limiti
+
+Cinque nuovi test Node verificano i vincoli CSP, quattro contratti Python verificano l'integrazione API e i test di runtime. I collaudi OCI AMD64/ARM64 e Podman rootless ora rifiutano un container che non restituisce i due header HTTP. **Il nuovo codice non è ancora stato provato in GitHub né su browser con questo aggiornamento**, e non sostituisce penetration test o certificazioni AGID/GDPR.
+
+L'81,25% non aumenta: i collaudi HTTPS KIND, SLO globale 500 utenti, RWX esterno e approvazioni indipendenti D4/D6 sono ancora aperti. Eseguire CI standard e successivamente estesa con runtime OCI/Podman e browser, `publish_image=false`, `rc_strict=false`.
+
+---
+
+# Quorivio 0.1.0-dev — Ciclo 52: SLO globali su 500 partecipanti (30 ottobre 2026)
+
+**Ultima CI standard/estesa verificata:** `41120048115` / `41123318359` (verde sulla baseline del ciclo 48). **Baseline confermata:** `64aa34379a07ba6a91c7eebf6f91e6dc12e3ad5c` (ciclo 48). I cicli **49–52 non sono ancora stati committati**, quindi questo package rimane cumulativo. **RC certificata: 81,25%, 53 gate (36 accettati e 17 parziali)**. Nessun aumento ufficiale prima dei nuovi collaudi CI e della riconciliazione. Il punteggio `rc_strict` rimane bloccato.
+
+**Macroarea B4:** aggiunto `capacity_slo_test` come prova manuale opt-in contro PostgreSQL *temporaneo* della CI. Esegue 500 connessioni indipendenti con ramp-up di 40 secondi e mantenimento di 90 secondi, osservatore WebSocket unico e latenza di ingresso/prima risposta per ogni client. I campioni sono **soltanto numerici, senza pseudonimi, risposte o identificatori**. Il verificatore rifiuta campioni mancanti o non finiti, percentili di shard contraddittori, hold breve, observer mancante, numero incompleto e errori di connessione; calcola i p95 sull'unione di **tutti i campioni individuali** (non sulla media dei p95 dei singoli shard), con soglie opt-in di 5000 ms login/ingresso e 8000 ms primo snapshot. Il vecchio `capacity_test` continua a funzionare invariato.
+
+**Verifiche locali:** contratti Python, esempi multisorgente e suite Node. Il vero test 500 utenti/90 secondi nel job GitHub è ANCORA PENDENTE. Non dimostra hardware fisico, cali di rete reali, server SLO esterno né verifica dei dispositivi. Aggiornati inventory e procedura `docs/RC52_SUSTAINED_500_SLO.it.md`.
+
+**Dopo il commit**: CI standard, poi CI estesa con `capacity_slo_test=true`, `kubernetes_tls_test=true`, `publish_image=false`, `rc_strict=false`. Promuovere B4 solo dopo risultati GitHub e senza doppio conteggio di B4-LOAD già accettato. Nessun commit, push, tag o pubblicazione eseguito dall'assistente.
+
+---
+
+# Quorivio 0.1.0-dev — handoff ciclo 51
+
+**Baseline ultimo commit confermato:** `64aa34379a07ba6a91c7eebf6f91e6dc12e3ad5c`; i cicli **49, 50 e 51 sono ancora da committare** e sono inclusi nel cumulativo. RC certificata **81,25%**, 53 gate: 36 accettati, 17 parziali. CI standard ed estesa verdi per la baseline del ciclo 48. Non effettuare commit/push/tag/release automaticamente.
+
+**Sviluppi ciclo 51:** corretta la chiamata HTTPS che passava un argomento posizionale non ammesso; aggiunti test AST ed esecuzione simulata dell'intero percorso KIND per NGINX e HAProxy, incluso host errato, certificato non attendibile, due pod, sostituzione e recovery. Il client HTTPS Node reale continua a essere esercitato con server TLS temporaneo. La verifica negativa non deve promuovere errori di nome TLS o certificato scaduto a prova della catena non attendibile. Nessun test KIND TLS vero completato nella nuova CI, quindi nessun nuovo credito ufficiale.
+
+**Procedura:** commit manuale cumulativo 49–51, CI standard, poi estesa con `kubernetes_tls_test=true`, `publish_image=false` e `rc_strict=false`. Entrambi i job HTTPS verdi possono autorizzare una successiva riconciliazione ristretta del B4 (obiettivo condizionale **81,50%**); non dichiarare produzione HA/TLS pubblici o RWX CSI/NFS su hardware separato. Dettagli in `docs/RC51_HTTPS_ACCEPTANCE.it.md`.
+
+---
+
+# Quorivio 0.1.0-dev — RC ciclo 50 — collaudo HTTPS reale e certificati temporanei (30 ottobre 2026)
+
+**Baseline utente confermata:** `64aa34379a07ba6a91c7eebf6f91e6dc12e3ad5c` (ciclo 48). **Ciclo 49 non ancora committato**, incluso nel presente cumulativo. RC ufficiale **81,25%**, 53 gate (36 accettati, 17 parziali): nessun incremento senza CI. Il nuovo collaudo opt-in con `kubernetes_tls_test=true` prova **NGINX e HAProxy Technologies** in KIND a 2 worker con certificato TLS autofirmato temporaneo, validazione del trust/SNI nel client Node reale, host virtuale errato, rifiuto del certificato non fidato e recupero dopo sostituzione pod. Il certificato privato non viene stampato; contesto Kubernetes usa esclusivamente il cluster effimero e nessun cluster esterno. Le prove reali su 2 host fisici, TLS pubblico, CSI/NFS RWX, continuità sotto rete degradata e audit indipendenti restano aperte.
+
+**Evidenza locale:** test Python mirati compreso HTTPS Node con vero server TLS locale; CI GitHub/KIND della nuova opzione ancora da eseguire. Non pubblicare immagini, né avviare RC strict, senza accettazione completa. La meta potenziale è uno scorporo circoscritto di parte del gate B4 dopo successo dei due job Kubernetes HTTPS, senza duplicare il precedente HTTP.
+
+---
+
+# Quorivio 0.1.0-dev — RC ciclo 49 — HAProxy verificato e verifica RWX tra nodi (30 ottobre 2026)
+
+**Baseline dell'ultimo commit confermato:** `64aa34379a07ba6a91c7eebf6f91e6dc12e3ad5c` (ciclo 48). Run standard `41120048115` e run estesa `41123318359` entrambe verdi; gli 11 job della estesa hanno superato i controlli. Il job HAProxy Technologies `124297991439` accredita il nuovo sottogate autonomo B4. **RC 81,25% — 53 gate: 36 accettati, 17 parziali**. I collaudi NGINX, OCI, Firefox/WebKit e ClamAV già conteggiati non vengono ripagati. **RC strict non pronta** (`rc_strict=false`).
+
+**Sviluppo ciclo 49 non ancora confermato da una nuova CI:** verificatore Kubernetes RWX tra due pod su nodi distinti, con context `kubectl` esplicito, PVC Bound RWX di tipo CSI/NFS/CephFS, mount valido, verifica incrociata con `--confirm-write` esplicito e pulizia di file temporanei. Default solo lettura; nessun accesso ai Secret o ad asset preesistenti. Test negativi e di cleanup aggiunti. Nessuna esecuzione su cluster reale dell'utente e nessun ulteriore credito RC. Manuale in `docs/RC49_HAPROXY_CROSS_NODE_RWX.it.md`.
+
+**Residui:** storage CSI/NFS RWX su host fisici indipendenti, guasti di rete/storage, TLS pubblico, carico 500 utenti sostenuto e SLO, dispositivi/lettori di schermo reali e verifiche GDPR/AGID/sicurezza indipendenti. Dopo commit manuale, CI standard ed estesa; niente commit/push/tag assistente.
+
+---
+
 # Quorivio 0.1.0-dev — RC ciclo 48 — ripristino storico SHA-256 (30 ottobre 2026)
 
 **Baseline del commit confermato:** `40e42964063e93aed6cc4a4f7a5fc9e5feebaa15` (cicli fino al 47). **Punteggio RC ufficiale invariato: 80,75%**, 52 gate (35 accettati, 17 parziali). Nuove modifiche del ciclo 48 non ancora verificate su GitHub.

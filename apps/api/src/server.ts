@@ -1,6 +1,7 @@
 import {timedDeadline} from './timed-deadline.js';
 import {withBootstrapLock} from './bootstrap-lock.js';
 import {allowedWriteOrigin,allowedLiveOrigin} from './origin-policy.js';
+import {productionCspDirectives,quorivioPermissionsPolicy} from './security-headers.js';
 import {encodeBundle,decodeBundle,referencedAssets,remapPortableAssets,BUNDLE_MIME,MAX_BUNDLE_BYTES,type BundleAsset,type BundleManifest} from './portable-bundle.js';
 import {parseLeaderboardPage} from './pagination-policy.js';
 import {validateSettingsPatch} from './platform-settings.js';
@@ -21,9 +22,16 @@ import {sealSmtpConfig,openSmtpConfig,validateSmtpInput,publicSmtpConfig} from '
 import {widgetAnswerShapeChanged,aggregateWidgetAnswerRevisions,liveTimedWidgetMutation,questionRevisionAtHistory} from './widget-revisions.js';
 import {normalizeWord,validateQuestion,moderationStatus,safeFrequency,parseModerationQueueQuery,parseModerationBulk} from './audience-tools.js';
 import {validPageOrder} from './page-sequence.js';
-import express from 'express';import helmet from 'helmet';import pg from 'pg';import bcrypt from 'bcryptjs';import QRCode from 'qrcode';import {WebSocketServer,WebSocket} from 'ws';import {liveSessionActive,livePresenterAuthorized,liveParticipantAuthorized} from './live-socket-policy.js';import {createLiveSnapshotQueue} from './live-snapshot-queue.js';import {shouldDropSlowSocket} from './live-delivery-policy.js';import {createServer} from 'node:http';import {randomUUID,randomBytes,createHash,createHmac,timingSafeEqual} from 'node:crypto';import {readFileSync,existsSync} from 'node:fs';import {mkdir,writeFile,readFile,unlink,rm,copyFile} from 'node:fs/promises';import {validAsset} from './asset-policy.js';import {receiveAssetStream} from './stream-upload.js';import {scanUploadedFile} from './malware-scan.js';import {readdir,stat} from 'node:fs/promises';import path from 'node:path';import {fileURLToPath} from 'node:url';import {validTransition,validateOptions,checkAnswer,publicActivity,escapeCsvCell,validRetentionDays,validPageDesign,validPseudonym,validAnswerMode,validateSubmittedAnswer,validReaction,type Activity,type SessionStatus} from './domain.js';
+import express from 'express';import helmet from 'helmet';import pg from 'pg';import bcrypt from 'bcryptjs';import QRCode from 'qrcode';import {WebSocketServer,WebSocket} from 'ws';import {liveSessionActive,livePresenterAuthorized,liveParticipantAuthorized} from './live-socket-policy.js';import {createLiveSnapshotQueue} from './live-snapshot-queue.js';import {createLivePeriodicRefresh} from './live-periodic-refresh.js';import {deliverLiveSnapshot} from './live-broadcast.js';import {shouldDropSlowSocket} from './live-delivery-policy.js';import {createServer} from 'node:http';import {randomUUID,randomBytes,createHash,createHmac,timingSafeEqual} from 'node:crypto';import {readFileSync,existsSync} from 'node:fs';import {mkdir,writeFile,readFile,unlink,rm,copyFile} from 'node:fs/promises';import {validAsset} from './asset-policy.js';import {receiveAssetStream} from './stream-upload.js';import {scanUploadedFile} from './malware-scan.js';import {readdir,stat} from 'node:fs/promises';import path from 'node:path';import {fileURLToPath} from 'node:url';import {validTransition,validateOptions,checkAnswer,publicActivity,escapeCsvCell,validRetentionDays,validPageDesign,validPseudonym,validAnswerMode,validateSubmittedAnswer,validReaction,type Activity,type SessionStatus} from './domain.js';
 const db=new pg.Pool({connectionString:process.env.DATABASE_URL});const secret=process.env.AUTH_SECRET||'';if(secret.length<32)throw new Error('AUTH_SECRET must have >= 32 characters');
-const base=process.env.PUBLIC_BASE_URL||'http://localhost:8080';let publicBase=base;const app=express();app.disable('x-powered-by');app.use(helmet({contentSecurityPolicy:false}));app.use(express.json({limit:'32kb'}));const server=createServer(app);const wss=new WebSocketServer({noServer:true});
+const base=process.env.PUBLIC_BASE_URL||'http://localhost:8080';let publicBase=base;const app=express();app.disable('x-powered-by');
+// Vite HMR is used only in development; production serves precompiled local assets.
+// Keep CSP active even behind HTTP-to-HTTPS reverse proxies (PUBLIC_BASE_URL is
+// the trusted browser-facing origin), and do not loosen script-src for Vite.
+app.use(helmet({contentSecurityPolicy:process.env.NODE_ENV==='production'?
+ {useDefaults:false,directives:productionCspDirectives(base)}:false}));
+app.use((_req,res,next)=>{res.setHeader('Permissions-Policy',quorivioPermissionsPolicy);next()});
+app.use(express.json({limit:'32kb'}));const server=createServer(app);const wss=new WebSocketServer({noServer:true});
 const hash=(v:string)=>createHash('sha256').update(v).digest('hex');const sign=(s:string)=>createHmac('sha256',secret).update(s).digest('base64url');const cookies=(s:string='')=>Object.fromEntries(s.split(';').map(x=>x.trim().split('=')).filter(x=>x.length===2));
 function auth(req:express.Request){const token=cookies(req.headers.cookie).q_auth;if(!token)return null;const parts=token.split('.');if(parts.length!==3||!/^\d+$/.test(parts[1]))return null;const body=parts.slice(0,2).join('.');const a=Buffer.from(sign(body));const b=Buffer.from(parts[2]);if(a.length!==b.length||!timingSafeEqual(a,b)||Number(parts[1])<Date.now())return null;return parts[0]}
 async function requireAuth(req:express.Request,res:express.Response,next:express.NextFunction){const uid=auth(req);if(!uid){res.status(401).json({error:'authentication_required'});return}try{const r=await db.query('SELECT approved,must_change_password,password_changed_at,auth_revoked_at FROM users WHERE id=$1',[uid]);if(r.rowCount){const issued=authCookieIssuedAt(req.headers.cookie);const revoked=[r.rows[0].password_changed_at,r.rows[0].auth_revoked_at].some(v=>v&&(issued===null||issued<new Date(v).getTime()));if(revoked){res.status(401).json({error:'session_revoked'});return}}if(!r.rowCount||!r.rows[0].approved){res.status(403).json({error:'account_pending_approval'});return}if(r.rows[0].must_change_password&&!['/api/auth/change-password','/api/auth/me'].includes(req.path)){res.status(403).json({error:'password_change_required'});return}next()}catch{res.status(503).json({error:'auth_unavailable'})}}
@@ -54,9 +62,17 @@ const sockets=new Map<string,Set<WebSocket>>();
 const liveSocketIds=new WeakMap<WebSocket,string>();
 async function connectedParticipants(sid:string){const r=await db.query("SELECT count(DISTINCT participant_id)::int AS n FROM live_connections WHERE session_id=$1 AND participant_id IS NOT NULL AND last_seen>now()-interval '50 seconds'",[sid]);return r.rows[0]?.n||0;}
 
-const liveSnapshots=createLiveSnapshotQueue(async(sid:string)=>{if(!sockets.get(sid)?.size)return;const data=await snapshot(sid);for(const ws of sockets.get(sid)||[])if(ws.readyState===WebSocket.OPEN){const payload=JSON.stringify({type:'snapshot',data:(ws as any).view==='owner'?data:participantSnapshot(data)});if(shouldDropSlowSocket(ws.bufferedAmount,Buffer.byteLength(payload))){ws.close(1013,'slow_consumer');continue}ws.send(payload)}},(error,sid)=>console.error('live snapshot failed',sid,error instanceof Error?error.message:'unknown'));
+const liveSnapshots=createLiveSnapshotQueue(async(sid:string)=>{if(!sockets.get(sid)?.size)return;const data=await snapshot(sid);deliverLiveSnapshot(sockets.get(sid)||[],data,participantSnapshot,ws=>(ws as any).view==='owner',shouldDropSlowSocket,(error)=>console.error('live socket delivery error',sid,error instanceof Error?error.name:'unknown'));},(error,sid)=>console.error('live snapshot failed',sid,error instanceof Error?error.message:'unknown'));
 async function broadcastLocal(sid:string){await liveSnapshots.enqueue(sid)}
 async function broadcast(sid:string){await broadcastLocal(sid);await db.query('SELECT pg_notify($1,$2)',[SESSION_CHANNEL,sid]);}
+// Idle sessions must still receive real database snapshots: without them the
+// 65s browser freshness watchdog would retire a healthy quiet connection.
+// Coalesce at the session, not socket, level; never publish redundant NOTIFY.
+const livePeriodicRefresh=createLivePeriodicRefresh({
+ activeSessions:()=>sockets.keys(),
+ readAndSend:broadcastLocal,
+ onError:(error,sid)=>console.error('periodic live refresh failed',sid,error instanceof Error?error.message:'unknown'),
+});
 
 
 // Audience interactions are session-scoped, use an existing anonymous participant cookie,
@@ -1602,13 +1618,17 @@ async function auditLivePresenterSockets(){
 }
 const liveAuthAudit=setInterval(()=>{void auditLivePresenterSockets()},10000);
 liveAuthAudit.unref();
+const periodicLiveSnapshots=setInterval(()=>{void livePeriodicRefresh.tick()},20000);
+periodicLiveSnapshots.unref();
 wss.on('connection',(ws:WebSocket,_req:unknown,sid:string)=>{
  let group=sockets.get(sid);if(!group){group=new Set();sockets.set(sid,group)}group.add(ws);
  const id=randomUUID();liveSocketIds.set(ws,id);
  const ping=async()=>{if(ws.readyState!==WebSocket.OPEN)return;await db.query('INSERT INTO live_connections(id,session_id,participant_id,last_seen) VALUES($1,$2,$3,now()) ON CONFLICT(id) DO UPDATE SET last_seen=now()',[id,sid,(ws as any).participantId||null]);};
  void ping().then(()=>broadcast(sid)).catch(()=>ws.close(1011,'presence unavailable'));
  const beat=setInterval(()=>void ping().catch(()=>ws.close(1011,'presence unavailable')),20000);beat.unref();
- snapshot(sid).then(data=>{if(ws.readyState===WebSocket.OPEN)ws.send(JSON.stringify({type:'snapshot',data:(ws as any).view==='owner'?data:participantSnapshot(data)}))}).catch(()=>ws.close());
+ // Initial delivery is ordered with notifications and periodic refreshes.
+ // An independent DB read/send here could overwrite a newer queued snapshot.
+ void broadcastLocal(sid).catch(()=>{if(ws.readyState===WebSocket.OPEN)ws.close(1011,'snapshot unavailable')});
  ws.on('close',()=>{clearInterval(beat);group?.delete(ws);if(!group?.size)sockets.delete(sid);void db.query('DELETE FROM live_connections WHERE id=$1',[id]).then(()=>broadcast(sid)).catch(()=>{})});
 });
 function participantSnapshot(data:any){if(!data)return data;const aid=data.session.status==='active'?data.session.current_activity_id:null;const published=aid?data.activities.find((a:Activity)=>a.id===aid&&a.status==='open'):null;return {session:{id:data.session.id,title:data.session.title,status:data.session.status,current_activity_id:published?aid:null},activities:published?[publicActivity(published)]:[],results:published&&data.session.show_results?data.results.filter((r:any)=>r.activity_id===aid):[],totals:published&&data.session.show_results?data.totals.filter((r:any)=>r.activity_id===aid):[]}}

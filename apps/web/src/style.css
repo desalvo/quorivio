@@ -1066,3 +1066,8 @@ header.rehearsal-toolbar{height:auto;min-height:0;flex:0 0 auto;position:relativ
 .widget-timer-design-preview[data-timer-face="digital"]{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:#183a44;color:#eafff5;border-radius:.5em;padding:.2em .4em}
 .widget-timer-design-preview[data-timer-face="dial"] .widget-timer-design-hourglass{border-radius:50%;border-color:#cb8427;background:#fff5db}
 @media(prefers-reduced-motion:reduce){.widget-timer-display[data-timer-face] *,.widget-timer-design-preview[data-timer-face] *{animation:none!important;transition:none!important}}
+
+/* RC55: live continuity indicator without hiding previously rendered content. */
+.live-stale-warning{padding:.7rem 1rem;margin:.5rem 0;border:1px solid #c77a20;border-radius:.6rem;background:#fff1d5;color:#653808;font-weight:600;line-height:1.4;max-width:100%;box-sizing:border-box}
+.projection>.live-stale-warning{position:relative;z-index:3;text-align:center;font-size:clamp(.85rem,1.5vw,1.15rem)}
+@media(prefers-reduced-motion:reduce){.live-stale-warning{transition:none;animation:none}}

@@ -6,16 +6,16 @@ ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT/'tools'))
 from rc_gate_audit import audit
 from rc_release_preflight import preflight
-from verify_rc_cycle48_inventory import verify_source,load_inventory
+from verify_rc_cycle57_inventory import verify_source,load_inventory
 
 class Cycle34Evidence(unittest.TestCase):
  def test_new_credit_is_bounded_and_does_not_duplicate_old_gates(self):
   matrix=json.loads((ROOT/'docs/RC_GATE_MATRIX.json').read_text())
   gates={g['id']:g for g in matrix['gates']}
-  self.assertEqual((audit()['score'],len(gates),preflight()['accepted_gates'],len(preflight()['unaccepted_gates'])),(80.75,52,35,17))
+  self.assertEqual((audit()['score'],len(gates),preflight()['accepted_gates'],len(preflight()['unaccepted_gates'])),(81.25,53,36,17))
   self.assertEqual(sum(g['weight'] for g in gates.values()),100)
   self.assertEqual((gates['C4']['weight'],gates['C4']['status']),(2,'partial'))
-  self.assertEqual((gates['B4']['weight'],gates['B4']['status']),(2,'partial'))
+  self.assertEqual((gates['B4']['weight'],gates['B4']['status']),(1,'partial'))
   for name,job in [('C4-AV-INSTREAM',124037870523),('B4-KIND-INGRESS-RECOVERY',124038997005)]:
    child=gates[name]
    self.assertEqual((child['weight'],child['status'],child['verified_run_id'],child['verified_job_id']),(1,'accepted',41048187760,job))

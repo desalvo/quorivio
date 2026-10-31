@@ -91,6 +91,6 @@ class HAProxyRuntimeAcceptance(unittest.TestCase):
         self.assertIn('ingress-nginx-controller',smoke.NGINX_INGRESS)
         self.assertIn('controller-v1.12.1',smoke.NGINX_MANIFEST)
         self.assertEqual(smoke.ingress_http_source().count('http.request'),1)
-        self.assertEqual(audit()['score'],80.75)
+        self.assertEqual(audit()['score'],81.25)
 
 if __name__=='__main__':unittest.main()

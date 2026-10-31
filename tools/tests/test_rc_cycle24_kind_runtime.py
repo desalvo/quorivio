@@ -11,7 +11,7 @@ sys.path.insert(0,str(ROOT/'tools'))
 from rc_gate_audit import audit
 from rc_release_preflight import preflight
 from verify_rc_cycle23_inventory import load_inventory as historical
-from verify_rc_cycle48_inventory import load_inventory, verify_source
+from verify_rc_cycle57_inventory import load_inventory, verify_source
 
 class RC24(unittest.TestCase):
     def test_historical_receipt_immutable_and_current_tree_exact(self):
@@ -21,9 +21,9 @@ class RC24(unittest.TestCase):
 
     def test_unchanged_scoring_and_external_parent_gates(self):
         matrix=json.loads((ROOT/'docs/RC_GATE_MATRIX.json').read_text())
-        self.assertEqual(len(matrix['gates']),52)
+        self.assertEqual(len(matrix['gates']),53)
         self.assertEqual(sum(g['weight'] for g in matrix['gates']),100)
-        self.assertEqual((audit()['score'],preflight()['accepted_gates']),(80.75,35))
+        self.assertEqual((audit()['score'],preflight()['accepted_gates']),(81.25,36))
         self.assertEqual(len(preflight()['unaccepted_gates']),17)
         self.assertFalse(preflight()['release_candidate_ready'])
         self.assertFalse(matrix['pending_local_batch']['kubernetes_kind_runtime_verified'])

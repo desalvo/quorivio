@@ -97,6 +97,13 @@ for i in $(seq 1 90); do
  for(const path of ["/api/health/ready","/api/health/live","/"]){
   const r=await fetch("http://127.0.0.1:8080"+path,{signal:AbortSignal.timeout(2000)});
   if(!r.ok || (path==="/" && !/<html/i.test(await r.text()))) process.exit(1);
+  // This is the production image, not Vite development server: CSP must be enforced.
+  if(path==="/"){
+   const csp=r.headers.get("content-security-policy")||"";
+   const permission=r.headers.get("permissions-policy")||"";
+   if(!["script-src", "connect-src", "frame-ancestors", "object-src"].every(x=>csp.includes(x)) ||
+      csp.includes("unsafe-eval") || !permission.includes("camera=()"))process.exit(4);
+  }
  }
 })().catch(()=>process.exit(2));' >/dev/null 2>&1; then
     ready=1;break

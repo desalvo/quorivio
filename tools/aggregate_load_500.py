@@ -72,14 +72,89 @@ def reconcile(reports, *, expected=500):
                             'Shard reports are self-reported; operator must verify staging server metrics and timestamps']}
 
 
+def _nearest_rank(values: list[float], percentile: int) -> float:
+    if not values:
+        raise ValueError('empty latency sample population')
+    ordered = sorted(values)
+    return round(ordered[math.ceil(len(ordered) * percentile / 100) - 1], 1)
+
+
+def reconcile_slo(reports, *, expected=500, max_join_p95_ms=5000,
+                  max_snapshot_p95_ms=8000, min_hold_seconds=60):
+    """Fail-closed SLO evidence using *every* numeric client sample across shards.
+
+    Per-shard p95 values must never be averaged: that is not a global percentile.
+    No tokens, session IDs, usernames or answers are needed in the evidence.
+    """
+    base = reconcile(reports, expected=expected)
+    limits = (max_join_p95_ms, max_snapshot_p95_ms, min_hold_seconds)
+    if any(type(v) not in (float, int) or not math.isfinite(v) or v <= 0 for v in limits):
+        raise ValueError('SLO limits and minimum hold must be positive finite numbers')
+    join = []
+    snapshot = []
+    for report in reports:
+        ramp = report.get('ramp_seconds')
+        hold = report.get('hold_seconds')
+        elapsed = report.get('elapsed_seconds')
+        if any(type(x) not in (float, int) or not math.isfinite(x) or x < 0
+               for x in (ramp, hold, elapsed)):
+            raise ValueError('missing or invalid measured load duration')
+        if hold < min_hold_seconds or elapsed + 0.2 < ramp + hold:
+            raise ValueError('SLO run does not cover the required hold period')
+        for field, dest, count_key, summary in (
+            ('join_latency_samples_ms', join, 'anonymous_joins', 'join_latency_ms'),
+            ('first_snapshot_samples_ms', snapshot, 'websocket_completed', 'first_snapshot_ms')
+        ):
+            samples = report.get(field)
+            if not isinstance(samples, list) or len(samples) != report[count_key]:
+                raise ValueError(f'missing or incomplete {field}')
+            if any(type(v) not in (int, float) or not math.isfinite(v) or v < 0 for v in samples):
+                raise ValueError(f'invalid {field} values')
+            if not samples:
+                raise ValueError(f'empty {field}')
+            advertised = report.get(summary)
+            if not isinstance(advertised, dict):
+                raise ValueError(f'missing {summary} percentiles')
+            # Recompute source reports as well as global quantiles; an inconsistent
+            # report must not receive a favourable global result.
+            if any(advertised.get(f'p{p}') is None or
+                   abs(advertised[f'p{p}'] - _nearest_rank(samples, p)) > 0.11
+                   for p in (50, 95, 99)):
+                raise ValueError(f'contradictory {summary} percentiles')
+            dest.extend(samples)
+    if len(join) != expected or len(snapshot) != expected:
+        raise ValueError('SLO evidence must cover every independent participant')
+    join_p95 = _nearest_rank(join, 95)
+    snapshot_p95 = _nearest_rank(snapshot, 95)
+    passed = bool(base['pass'] and join_p95 <= max_join_p95_ms
+                  and snapshot_p95 <= max_snapshot_p95_ms)
+    return {**base, 'pass': passed,
+            'slo': {'join_p95_ms': join_p95, 'first_snapshot_p95_ms': snapshot_p95,
+                    'max_join_p95_ms': max_join_p95_ms,
+                    'max_first_snapshot_p95_ms': max_snapshot_p95_ms,
+                    'minimum_hold_seconds': min_hold_seconds,
+                    'sampled_participants': len(join), 'slo_pass': passed},
+            'limitations': base['limitations'] + [
+                'Per-client latency samples prove only this disposable run, not an external availability SLO',
+                'No actual packet loss, public TLS, physically independent hosts or failure injection is certified',
+                'Verify server CPU/memory, client/device distributions and run reproducibility independently']}
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('reports', nargs='+', type=Path)
     p.add_argument('--expected', type=int, default=500)
     p.add_argument('--json-out', type=Path)
+    p.add_argument('--strict-slo', action='store_true', help='Fail closed unless all numeric samples and 60s hold show global p95 within limits')
+    p.add_argument('--max-join-p95-ms', type=float, default=5000)
+    p.add_argument('--max-snapshot-p95-ms', type=float, default=8000)
     args = p.parse_args()
     try:
-        report = reconcile([json.loads(f.read_text(encoding='utf-8')) for f in args.reports], expected=args.expected)
+        shards = [json.loads(f.read_text(encoding='utf-8')) for f in args.reports]
+        report = (reconcile_slo(shards, expected=args.expected,
+                 max_join_p95_ms=args.max_join_p95_ms,
+                 max_snapshot_p95_ms=args.max_snapshot_p95_ms) if args.strict_slo
+                 else reconcile(shards, expected=args.expected))
     except (ValueError, OSError, json.JSONDecodeError) as exc:
         p.error(str(exc))
     output = json.dumps(report, indent=2, ensure_ascii=False) + '\n'

@@ -30,11 +30,12 @@ class Cycle48HistoricalEvidence(unittest.TestCase):
         self.assertIn('python3 tools/verify_rc_cycle47_inventory.py --historical', workflow)
         self.assertIn('python3 tools/verify_rc_cycle48_inventory.py', workflow)
         self.assertLess(workflow.index('python3 tools/verify_rc_cycle48_inventory.py'), workflow.index('Detect credential leaks'))
-        self.assertNotIn('python3 tools/verify_rc_cycle48_inventory.py --historical', workflow)
+        self.assertIn('python3 tools/verify_rc_cycle48_inventory.py --historical', workflow)
+        self.assertIn('python3 tools/verify_rc_cycle54_inventory.py', workflow)
 
     def test_release_preflight_is_not_falsely_promoted(self):
         from rc_gate_audit import audit
-        self.assertEqual(audit()['score'], 80.75)
+        self.assertEqual(audit()['score'], 81.25)
 
 
 if __name__ == '__main__':

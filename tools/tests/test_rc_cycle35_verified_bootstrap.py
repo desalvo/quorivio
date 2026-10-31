@@ -38,8 +38,8 @@ class Cycle35VerifiedBootstrap(unittest.TestCase):
 
     def test_percentage_only_counts_bounded_prior_ci_evidence(self):
         p=preflight()
-        self.assertEqual((audit()['score'],p['score']),(80.75,80.75))
-        self.assertEqual((p['gate_count'],p['accepted_gates'],len(p['unaccepted_gates'])),(52,35,17))
+        self.assertEqual((audit()['score'],p['score']),(81.25,81.25))
+        self.assertEqual((p['gate_count'],p['accepted_gates'],len(p['unaccepted_gates'])),(53,36,17))
         self.assertFalse(p['release_candidate_ready'])
         self.assertEqual(self.proof['new_score']-self.proof['old_score'],0.5)
         self.assertEqual(self.m['rc_cycle35_verified_reconciliation_20261030']['score_after'],80.75)
@@ -76,12 +76,12 @@ class Cycle35VerifiedBootstrap(unittest.TestCase):
     def test_documentation_records_remaining_risks(self):
         for fn in ('DEVELOPMENT_STATUS.md','DEVELOPMENT_STATUS.it.md','COMPLETION_HANDOFF.md','COMPLETION_HANDOFF.it.md'):
             body=(ROOT/'docs'/fn).read_text()[:4000]
-            self.assertIn('80,75' if fn.endswith('.it.md') else '80.75',body)
+            self.assertIn('81,25' if fn.endswith('.it.md') else '81.25',body)
             # The immutable 2026-10-30 cycle-35 receipt above proves its original
             # commit. Current status headers must instead report the latest CI
             # failure, its unaccepted gates and remaining validation constraints.
-            self.assertIn('41114355433',body)
-            self.assertIn('5163e5a5b4685348810ef24067538967a1bbb536',body)
+            self.assertIn('41123318359',body)
+            self.assertIn('64aa34379a07ba6a91c7eebf6f91e6dc12e3ad5c',body)
             self.assertIn('rc_strict=false',body)
 
 if __name__=='__main__':unittest.main()

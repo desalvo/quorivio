@@ -89,7 +89,14 @@ for i in $(seq 1 90); do
  for(const route of ["/api/health/ready","/api/health/live","/"]){
   const r=await fetch("http://127.0.0.1:8080"+route,{signal:AbortSignal.timeout(2000)});
   if(!r.ok)process.exit(1);
-  if(route==="/" && !/<html/i.test(await r.text()))process.exit(2);
+  if(route==="/"){
+   if(!/<html/i.test(await r.text()))process.exit(2);
+   // Verify the exact compiled production container serves security headers.
+   const csp=r.headers.get("content-security-policy")||"";
+   const permission=r.headers.get("permissions-policy")||"";
+   if(!["script-src", "connect-src", "frame-ancestors", "object-src"].every(x=>csp.includes(x)) ||
+      csp.includes("unsafe-eval") || !permission.includes("camera=()"))process.exit(4);
+  }
  }
 })().catch(()=>process.exit(3));' >/dev/null 2>&1; then
     ready=1; break

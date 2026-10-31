@@ -4,17 +4,18 @@
 Never target public production. This uses the CI's ephemeral local API, generates
 its own private session, and verifies the observer's shared-session peak.
 """
+import argparse
 import json
 import os
 from pathlib import Path
 import subprocess
 import sys
 import tempfile
-from aggregate_load_500 import reconcile
+from aggregate_load_500 import reconcile, reconcile_slo
 from ci_live_http import client, call
 
 
-def run():
+def run(*, strict_slo=False):
     base=os.environ.get('QUORIVIO_CI_BASE_URL','http://127.0.0.1:8080')
     if not (base.startswith('http://127.0.0.1:') or base.startswith('http://localhost:')):
         raise RuntimeError('capacity CI is restricted to disposable loopback APIs')
@@ -35,23 +36,33 @@ def run():
             output=Path(folder)/'shard.json'
             args=[sys.executable,'tools/load_500.py','--join-url',join_url,
                   '--session-id',sid,'--users','500','--ramp-seconds','40',
-                  '--hold-seconds','35','--timeout','30','--load-token',token,
+                  '--hold-seconds','90' if strict_slo else '35','--timeout','30','--load-token',token,
                   '--presenter-cookie',f'q_auth={cookie.value}', '--json-out',str(output)]
+            if strict_slo:
+                args.append('--latency-samples')
             # Suppress secrets from subprocess arguments and logs on failure.
             proc=subprocess.run(args,stdout=subprocess.DEVNULL,stderr=subprocess.PIPE,
-                                text=True,timeout=180)
+                                text=True,timeout=240 if strict_slo else 180)
             if not output.exists():
                 raise RuntimeError(f'capacity runner failed without report (exit {proc.returncode})')
-            report=reconcile([json.loads(output.read_text())],expected=500)
+            shards=[json.loads(output.read_text())]
+            report=(reconcile_slo(shards,expected=500) if strict_slo
+                    else reconcile(shards,expected=500))
             if proc.returncode or not report['pass']:
                 raise RuntimeError(f'capacity acceptance failed: joins={report["anonymous_joins"]}, '
                                    f'websockets={report["websocket_completed"]}, '
                                    f'peak={report["presenter_peak_distinct"]}, '
                                    f'errors={report["reported_errors"]}')
-            print('PASS 500 independent participants, shared-session presenter peak >= 475, no errors')
+            if strict_slo:
+                print('PASS 500 independent participants; full-sample global join/snapshot p95 SLO, >=60s hold and no errors')
+            else:
+                print('PASS 500 independent participants, shared-session presenter peak >= 475, no errors')
     finally:
         call(admin,'DELETE',f'/api/sessions/{sid}',expected=204)
 
 
 if __name__=='__main__':
-    run()
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--strict-slo',action='store_true',help='Opt-in 90s hold and complete per-client percentile evidence')
+    args=parser.parse_args()
+    run(strict_slo=args.strict_slo)

@@ -34,6 +34,10 @@ on:
         description: 'Run 500-participant disposable PostgreSQL acceptance (manual only)'
         type: boolean
         default: false
+      capacity_slo_test:
+        description: 'Opt-in 500-participant 90s sustained global p95 join/snapshot latency acceptance on disposable PostgreSQL only'
+        type: boolean
+        default: false
       kubernetes_manifest_test:
         description: 'API-server dry-run on disposable KIND: NGINX/HAProxy, TLS, RWX, PDB, external/internal database (no runtime/HA certification)'
         type: boolean
@@ -48,6 +52,14 @@ on:
         default: false
       kubernetes_haproxy_test:
         description: 'Real HAProxy Technologies controller on disposable 2-worker KIND with host routing and failover (NOT external CSI/TLS/HA)'
+        type: boolean
+        default: false
+      live_idle_test:
+        description: 'Opt-in real PostgreSQL two-replica 70s quiet WebSocket snapshot/freshness acceptance (no production traffic)'
+        type: boolean
+        default: false
+      kubernetes_tls_test:
+        description: 'Disposable two-worker KIND true HTTPS ingress via NGINX and HAProxy Technologies, ephemeral TLS, strict SNI, wrong-host and pod recovery (NOT public CA)'
         type: boolean
         default: false
       clamav_runtime_test:
@@ -405,6 +417,14 @@ jobs:
         run: |
           python3 -m pip install --disable-pip-version-check --break-system-packages 'aiohttp>=3.9,<4'
           python3 tools/ci_live_replicas.py
+      - name: PostgreSQL two-replica quiet live snapshot freshness (opt-in)
+        if: github.event_name == 'workflow_dispatch' && inputs.live_idle_test
+        timeout-minutes: 3
+        env:
+          QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
+          QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
+          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
+        run: python3 tools/ci_live_idle_snapshots.py
       - name: Optional 500-participant PostgreSQL/WebSocket acceptance
         if: github.event_name == 'workflow_dispatch' && inputs.capacity_test
         timeout-minutes: 6
@@ -413,6 +433,14 @@ jobs:
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
           QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
         run: python3 tools/ci_capacity_500.py
+      - name: Optional sustained 500-participant global-latency SLO acceptance
+        if: github.event_name == 'workflow_dispatch' && inputs.capacity_slo_test
+        timeout-minutes: 7
+        env:
+          QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
+          QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
+          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
+        run: python3 tools/ci_capacity_500.py --strict-slo
       - name: PostgreSQL two-replica graceful rolling SIGTERM acceptance
         env:
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
@@ -520,7 +548,16 @@ jobs:
           python3 tools/verify_rc_cycle45_inventory.py --historical
           python3 tools/verify_rc_cycle46_inventory.py --historical
           python3 tools/verify_rc_cycle47_inventory.py --historical
-          python3 tools/verify_rc_cycle48_inventory.py
+          python3 tools/verify_rc_cycle48_inventory.py --historical
+          python3 tools/verify_rc_cycle49_inventory.py --historical
+          python3 tools/verify_rc_cycle50_inventory.py --historical
+          python3 tools/verify_rc_cycle51_inventory.py --historical
+          python3 tools/verify_rc_cycle52_inventory.py --historical
+          python3 tools/verify_rc_cycle53_inventory.py --historical
+          python3 tools/verify_rc_cycle54_inventory.py --historical
+          python3 tools/verify_rc_cycle55_inventory.py --historical
+          python3 tools/verify_rc_cycle56_inventory.py --historical
+          python3 tools/verify_rc_cycle57_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:
@@ -674,6 +711,45 @@ jobs:
           kubectl -n quorivio-multinode get ingress,service,endpointslices -o wide || true
           kubectl get ingressclass || true
       - name: Remove ephemeral runner-mounted assets
+        if: always()
+        run: sudo rm -rf /tmp/quorivio-kind-multinode-shared
+  kubernetes-https-ingress:
+    name: Kubernetes real HTTPS ingress and failover (${{ matrix.controller }}, opt-in)
+    if: github.event_name == 'workflow_dispatch' && inputs.kubernetes_tls_test
+    needs: validate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    permissions: {contents: read}
+    strategy:
+      fail-fast: false
+      matrix:
+        controller: [nginx, haproxytech]
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - name: Prepare isolated two-worker-only host bind
+        run: |
+          test "$(id -u)" -ne 0
+          sudo install -d -m 0777 /tmp/quorivio-kind-multinode-shared
+      - uses: helm/kind-action@v1.12.0
+        with:
+          cluster_name: quorivio-multinode
+          version: v0.26.0
+          config: tools/ci_kind_multinode.yaml
+          wait: 120s
+      - name: Build and load local unpublished Quorivio image
+        run: |
+          docker build -t quorivio:kind-multinode .
+          kind load docker-image quorivio:kind-multinode --name quorivio-multinode
+      - name: Exercise real TLS/SNI, invalid-host refusal and pod replacement over HTTPS
+        timeout-minutes: 20
+        run: python3 tools/ci_k8s_multinode_ingress_smoke.py --controller '${{ matrix.controller }}' --tls
+      - name: Bounded status-only diagnostics (no Secrets, keys or pod logs)
+        if: failure()
+        run: |
+          kubectl -n quorivio-multinode get pods,deploy,sts,pvc,ingress -o wide || true
+          kubectl get ingressclass || true
+      - name: Clean disposable bind mount
         if: always()
         run: sudo rm -rf /tmp/quorivio-kind-multinode-shared
   kubernetes-haproxy-ingress:

@@ -9,7 +9,7 @@ from rc_gate_audit import audit
 from rc_release_preflight import preflight
 from verify_rc_cycle25_inventory import load_inventory as historical
 from verify_rc_cycle26_inventory import load_inventory as historical_26
-from verify_rc_cycle48_inventory import load_inventory,verify_source
+from verify_rc_cycle57_inventory import load_inventory,verify_source
 
 class Cycle26RC(unittest.TestCase):
     def test_historical_archive_unmodified_and_current_git_hashes(self):
@@ -21,7 +21,7 @@ class Cycle26RC(unittest.TestCase):
     def test_scoring_not_changed_by_failed_oci_run(self):
         m=json.loads((ROOT/'docs/RC_GATE_MATRIX.json').read_text())
         self.assertEqual(sum(x['weight'] for x in m['gates']),100)
-        self.assertEqual((len(m['gates']),audit()['score'],preflight()['accepted_gates']),(52,80.75,35))
+        self.assertEqual((len(m['gates']),audit()['score'],preflight()['accepted_gates']),(53,81.25,36))
         self.assertEqual(len(preflight()['unaccepted_gates']),17)
         self.assertFalse(preflight()['release_candidate_ready'])
         h=m['rc_cycle26_ci_hotfix_20261030']

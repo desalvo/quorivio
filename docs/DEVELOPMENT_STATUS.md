@@ -1,3 +1,111 @@
+# Quorivio 0.1.0-dev — RC cycle 57: shared WebSocket snapshot fanout (31 October 2026)
+
+**Last committed baseline:** `64aa34379a07ba6a91c7eebf6f91e6dc12e3ad5c`; **cycles 49–57 cumulative and uncommitted**. Standard `41120048115` and extended `41123318359` are green for the previous baseline only. **Certified RC: 81.25% (53 gates: 36 accepted, 17 partial)**. This cycle adds no unverified gate credit.
+
+**Functional change:** a 501-client snapshot (500 audience + one presenter) now uses two shared JSON serializations instead of one per socket, with server-side view isolation, per-socket slow-consumer and transport-failure handling, and initial delivery through the ordered per-session queue rather than an independent database read/send. See `docs/RC57_LIVE_FANOUT.en.md`. Local unit/contract checks cover these properties; independent GitHub CI and sustained multi-replica load remain pending. `publish_image=false`, `rc_strict=false`. No assistant commit/push/tag/publication.
+
+---
+
+# Quorivio 0.1.0-dev — RC cycle 56: authoritative quiet-session snapshots (30 October 2026)
+
+**Last committed baseline:** `64aa34379a07ba6a91c7eebf6f91e6dc12e3ad5c`; **cycles 49–56 remain uncommitted and cumulative**. Last successful GitHub runs are standard `41120048115` and extended `41123318359`, which do NOT verify cycles 49–56. **Certified RC is 81.25% (53 gates: 36 accepted / 17 partial)**; new local credit: **0**. `publish_image=false`, `rc_strict=false`.
+
+**Critical functional defect discovered:** cycle-55 browser watchdog expected periodic server snapshots, but the backend heartbeat only updated PostgreSQL presence. During a quiet session, no snapshot was sent after the opening event; after 65 seconds the client would reconnect needlessly, potentially creating a 500-client reconnection storm.
+
+**Cycle 56 fix:** authoritative snapshots every 20 seconds for each *active session*, using the existing coalesced `broadcastLocal()` queue. This is one queued read/fanout **per session**, not per participant or per replica. No extra PostgreSQL cross-replica notification. Snapshot failure never creates a fake keepalive: the browser still times out and recovers. No new client protocol or stored data fields. Tests include 10-minute idle simulation without reconnects, 500 subscribers sharing one read, missing database snapshots, cross-session frames, overlap and retry.
+
+**Added opt-in real acceptance:** `live_idle_test=true` runs a disposable PostgreSQL two-replica 70s quiet presenter/participant snapshot test after maintainer commit; see `docs/RC56_IDLE_SNAPSHOT_ACCEPTANCE.en.md`.
+
+**Limits:** deterministic local tests do not certify real load, failover, public TLS, 500-client SLO, RWX CSI/NFS or external compliance review. After maintainer commit, run standard and extended GitHub acceptance including HTTPS and capacity SLO opt-ins; do not increase certified percentage before their results.
+
+---
+
+# Quorivio 0.1.0-dev — RC cycle 55: WebSocket snapshot freshness and stale data visibility (30 October 2026)
+
+**Last successful GitHub CI:** standard `41120048115` and extended `41123318359` (baseline `64aa3437`); do not certify uncommitted changes.
+
+**Required next CI options:** `rc_strict=false`, `publish_image=false` until independent gates close.
+
+**Last confirmed commit:** `64aa34379a07ba6a91c7eebf6f91e6dc12e3ad5c`; **cycles 49–55 remain uncommitted and cumulative**. **Certified RC unchanged at 81.25% (53 gates, 36 accepted / 17 partial)**; no score promotion from local changes.
+
+**Functional change:** a 65-second snapshot-freshness watchdog for browser live WebSockets, vs server snapshots approximately every 20 seconds. Only valid matching-session snapshots renew freshness. A stale or errored socket is retired/fenced, stale events cannot replace fresh session state, reconnect uses existing bounded jittered backoff, and timers are cleaned on offline/dispose/terminal close.
+
+**UI:** accessible connection-loss/access-revocation warnings on presenter statistics and the projection screen to mark retained data as potentially stale, without hiding it. No database protocol or stored response change.
+
+**Evidence/limits:** 505 backend / 99 frontend Node tests PASS; 1,347 Python tests PASS in eight groups (one skipped); focused TypeScript compile PASS; deterministic new frontend Node tests, Python integration contracts, manifests. Full CI, actual multi-replica impairment, realistic 500-client latency/recovery and independent hardware/device acceptance remain required. HTTPS and SLO opt-in acceptance from earlier cycles still requires GitHub on the uncommitted cumulative.
+
+---
+
+# Quorivio 0.1.0-dev — RC cycle 54: live WebSocket recovery and stale-connection fencing (30 October 2026)
+
+**Last green GitHub CI (committed baseline):** standard `41120048115`, extended `41123318359`, both on `64aa34379a07ba6a91c7eebf6f91e6dc12e3ad5c`. The cycle 54 implementation remains uncommitted.
+
+**Maintainer-confirmed commit baseline:** `64aa34379a07ba6a91c7eebf6f91e6dc12e3ad5c` (cycle 48). **Uncommitted cumulative changes:** cycles 49–54. **RC score remains 81.25%** (53 weighted gates, 36 accepted, 17 partial). This cycle provides *local functional improvement only*; browser/production evidence must be collected in GitHub before crediting a bounded B1 recovery subgate.
+
+**Functional implementation:** `apps/web/src/live-connection.ts` replaces the inline WebSocket retry effect with a single-owner transport shared by presenter and participant views. It fences retired socket events so late error/close/snapshot callbacks cannot alter a newer connection; on network offline it cancels pending timers and closes the retired socket, while online reconnects exactly once. It refuses reconnect after policy/authz closes `4003` or `1008`, shows a clear live-access-denied message, and bounds a stuck connection handshake to 15 seconds. Retry backoff is exponential with 20% per-client jitter and 30-second maximum to limit recovery storms. User-selected session IDs are checked before applying snapshots. Callback refs prevent stale React callback captures across rerenders. Dispose cancels timers and closes the socket without reactivating it. The backend live socket auth, WebSocket routes and PostgreSQL data are unchanged.
+
+**Evidence:** 9 deterministic WebSocket lifecycle tests (including the actual event-order race) and strict standalone TypeScript DOM contract; full Node backend and web unit suites, Python contract/inventory checks required. No actual GitHub/real-browser end-to-end for this uncommitted code yet. Server network fault injection, production long-running reconnection SLO and human acceptance remain open. `rc_strict=false`, `publish_image=false`.
+
+**Next checks after maintainer commit:** standard and extended CI on cycles 49–54, including `kubernetes_tls_test=true`, `capacity_slo_test=true`, `cross_browser_test=true`, `publish_image=false` and `rc_strict=false`; validate real browser rejoin under network loss before moving B1. The assistant made no commit, push, tag, or release.
+
+---
+
+# Quorivio 0.1.0-dev — RC 53 — production Content Security Policy and browser permissions (30 October 2026)
+
+**Baseline:** cycle 52 cumulative, no maintainer commit since `64aa34379a07ba6a91c7eebf6f91e6dc12e3ad5c`. This package includes cycles 49–53. **Certified RC remains 81.25%**: security approval requires real GitHub runtime acceptance and independent review.
+
+## Product changes
+
+`apps/api/src/security-headers.ts` defines an enforcing production CSP (only when `NODE_ENV=production`), disallowing inline/eval scripts and executable objects, binding WebSocket endpoints to the configured browser-facing origin, and retaining same-origin frames required for presenter/rehearsal previews. Image/media schemes preserve local uploads, QR/data images, optional HTTPS background media, PDFs and blob resources. Widget-specific React inline CSS remains explicitly allowed; no relaxation is made to script execution. `Permissions-Policy` disables camera, microphone, location, payment, USB and browsing-topics but leaves presenter fullscreen unaffected. The Vite development server does not use this production policy.
+
+## Verification
+
+Five Node tests enforce policy boundaries and URL validation; four Python contracts cover API integration, unsafe-script denial, media compatibility, and real-container smoke checks. Both `ci_oci_runtime_smoke.sh` and `ci_rootless_podman_smoke.sh` now **fail closed** unless a running production container actually serves both headers. Existing backend/frontend Node tests must remain green; GitHub container gates, real browser integration and external security sign-off **have not yet been run** for this change.
+
+The `81.25%` certified RC score is unchanged; B4 HTTPS KIND, B4 global 500-user SLO, external RWX and D4/D6 independent approvals remain pending. Recommend standard CI first, extended OCI+Podman+browser tests next, with `publish_image=false` and `rc_strict=false`.
+
+---
+
+# Quorivio 0.1.0-dev — RC cycle 52: global 500-client latency SLO evidence (30 October 2026)
+
+**Last verified standard/extended GitHub runs:** `41120048115` / `41123318359` (green on cycle-48 baseline). **Maintainer-confirmed baseline:** `64aa34379a07ba6a91c7eebf6f91e6dc12e3ad5c` (cycle 48); cycles **49–52 are all uncommitted** and included cumulatively. Verified RC remains **81.25%**, 53 weighted gates (36 accepted, 17 partial). `rc_strict=false` until the independent residual gates pass; this patch carries no unverified percentage credit.
+
+**B4 capacity improvement:** `capacity_slo_test` is a separate manual opt-in running 500 independent participants against disposable CI PostgreSQL, 40s ramp and 90s hold. Numeric-only per-client join and first-WebSocket-snapshot samples allow the aggregator to calculate *true global p95 across shards* rather than misleading averages of shard p95s. Strict mode requires complete sample coverage, a single presenter observer with peak >=95%, no errors, consistent reported quantiles, sufficient hold, and default p95 bounds of 5000ms join / 8000ms first snapshot. The historical bounded `capacity_test` is unchanged. No participant names, responses or IDs are included in new sample arrays.
+
+**Evidence/limits:** new Python simulated multisource contracts and Node backend/web suites exercised locally. Actual GitHub 500/90s sustained acceptance is NOT run and is NOT a real distributed-host load SLO. No independent physical-device, public TLS, CSI RWX, network faults or audit sign-off is claimed. Documentation: `docs/RC52_SUSTAINED_500_SLO.en.md`.
+
+**Next maintainer CI:** first standard, then extended with `capacity_slo_test=true`, `kubernetes_tls_test=true`, `publish_image=false`, `rc_strict=false`. Credit a narrow new B4 SLO scope only after real opt-in success and review; do not re-credit existing `B4-LOAD`. Assistant does not commit, push, tag, or publish.
+
+---
+
+# Quorivio 0.1.0-dev — RC cycle 51 — harden real HTTPS acceptance (30 October 2026)
+
+**Last user-confirmed commit:** `64aa34379a07ba6a91c7eebf6f91e6dc12e3ad5c` (cycle 48). **Cycles 49–51 are uncommitted and included cumulatively.** Official conservative RC **81.25%**: 53 gates, 36 accepted, 17 partial; `rc_strict=false`. The user requested genuine progress; no unexecuted KIND or external CA certification is credited.
+
+**Implemented:** correct the invalid second-argument positional `https_ingress_probe(second, '/')` (the path is keyword-only). A new AST regression and end-to-end *simulated* KIND `main()` flow for both NGINX and HAProxy catch future invalid calls and assert both pod clients, strict SNI and CA pinning, bad Host response, untrusted certificate-chain rejection, HTTPS readiness during pod replacement and a final live probe. Harden the negative TLS test so a hostname mismatch or expired certificate alone cannot be accepted as the expected untrusted-chain outcome. The existing Node HTTPS client test against real local TLS remains. No cluster credentials, images or deployment changed.
+
+**Limitations:** no actual two-worker HTTPS KIND jobs or public CA/network fault-injection in this environment. Run CI standard first; then opt-in extended `kubernetes_tls_test=true`, `publish_image=false`, `rc_strict=false`; accept the bounded TLS subgate only if BOTH NGINX and HAProxy HTTPS jobs PASS and relevant logs show the strict positive and negative checks. CSI/NFS on independent hosts, real public TLS, sustained SLO and independent security/device reviews remain open.
+
+---
+
+# Quorivio 0.1.0-dev — RC cycle 50 — live HTTPS ingress with disposable trust tests (30 October 2026)
+
+**Last user-confirmed commit:** `64aa34379a07ba6a91c7eebf6f91e6dc12e3ad5c` (cycle 48). **Cycle 49 not yet committed** and included here. Official RC **81.25%**, 53 gates (36 accepted, 17 partial): no unverified percentage promotion. The opt-in `kubernetes_tls_test=true` launches **NGINX and HAProxy Technologies** on separate ephemeral two-worker KIND tests. Each uses a short-lived self-signed leaf with a valid SAN, a trust-pinned Node HTTPS client with strict TLS/SNI, wrong HTTP Host rejection, untrusted-certificate rejection, and a live HTTPS check after an application pod replacement. TLS keys are not printed, and the workflow never targets external Kubernetes clusters or publishes images. Independent physical hosts, public-CA TLS, real CSI/NFS RWX, degraded network testing and independent operator/security reviews remain open.
+
+**Local evidence:** focused Python and a real Node client against a disposable local TLS server pass; GitHub/KIND execution of the new optional matrix still pending. A narrowly scoped subset of residual B4 may be reconciled only after both live HTTPS CI jobs pass, without re-crediting existing HTTP ingress tests.
+
+---
+
+# Quorivio 0.1.0-dev — RC cycle 49 — verified HAProxy and real RWX data-path probe (30 October 2026)
+
+**Maintainer baseline:** `64aa34379a07ba6a91c7eebf6f91e6dc12e3ad5c` (cycle 48). Standard run `41120048115` and extended run `41123318359` are green; all 11 extended jobs succeeded. Confirmed HAProxy Technologies two-worker KIND job `124297991439` earns an independent, bounded B4 subgate. RC matrix now **81.25% — 53 gates: 36 accepted, 17 partial**. This credit excludes preexisting NGINX, OCI, Firefox/WebKit and ClamAV evidence. Strict RC still **NOT READY** (`rc_strict=false`).
+
+**Cycle 49 work not yet GitHub validated:** added an explicit Kubernetes cross-node RWX verification tool. Read-only checks require exact kubectl context and a bound, network-capable RWX volume mounted by two ready pods on distinct nodes. A separate `--confirm-write` performs two-way real data transfer in random temporary files under the mounted assets path; best-effort cleanup runs in both pods. Tests validate dangerous negative conditions, command scoping, and cleanup. This tool has **not** been run on an actual user cluster and adds no RC credit. Full operational guide: `docs/RC49_HAPROXY_CROSS_NODE_RWX.en.md` and `.it.md`.
+
+**Open:** independent physical host/CSI RWX, fault-injected storage and network loss, TLS public chain, sustained capacity/SLO, real assistive devices and independent GDPR/AGID/security review. CI standard and extended to be rerun after maintainer commit, with no automatic commit/push/tag.
+
+---
+
 # Quorivio 0.1.0-dev — RC cycle 48 — historical SHA-256 integrity recovery (30 October 2026)
 
 **Last confirmed maintainer commit:** `40e42964063e93aed6cc4a4f7a5fc9e5feebaa15` (through cycle 47). **Formal RC remains 80.75%**, 52 gates (35 accepted, 17 partial); cycle-48 code has not been verified on GitHub.

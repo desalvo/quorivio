@@ -9,7 +9,7 @@ sys.path.insert(0, str(ROOT / 'tools'))
 from rc_gate_audit import audit
 from rc_release_preflight import preflight
 from verify_rc_cycle26_inventory import load_inventory as historical
-from verify_rc_cycle48_inventory import load_inventory, verify_source
+from verify_rc_cycle57_inventory import load_inventory, verify_source
 
 
 class Cycle27(unittest.TestCase):
@@ -48,7 +48,7 @@ class Cycle27(unittest.TestCase):
         self.assertEqual(receipt['last_full_ci_run'], 40975979003)
         self.assertEqual(sum(g['weight'] for g in matrix['gates']), 100)
         self.assertEqual((audit()['score'], preflight()['accepted_gates'],
-                          len(preflight()['unaccepted_gates'])), (80.75, 35, 17))
+                          len(preflight()['unaccepted_gates'])), (81.25, 36, 17))
         self.assertFalse(preflight()['release_candidate_ready'])
 
     def test_truthful_operator_documentation_and_frozen_source_receipt(self):

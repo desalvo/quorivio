@@ -31,6 +31,7 @@ def options():
     p.add_argument('--load-token', default='', help='Staging-only rate-limit bypass token')
     p.add_argument('--source-ips', default='', help='Comma-separated LOCAL source addresses already assigned to this host')
     p.add_argument('--json-out', default='', help='Optional path for this shard metrics')
+    p.add_argument('--latency-samples', action='store_true', help='Include anonymous numeric latency samples for cross-shard SLO audit (no identifiers)')
     p.add_argument('--timeout', type=float, default=20)
     args = p.parse_args()
     if not 1 <= args.users <= 500: p.error('users must be 1..500')
@@ -141,7 +142,10 @@ async def main():
             'presenter_peak_distinct':presenter_peak if observe else None,
             'join_latency_ms':{f'p{p}':percentile(joins,p/100) for p in (50,95,99)},
             'first_snapshot_ms':{f'p{p}':percentile(first_snapshots,p/100) for p in (50,95,99)},
-            'error_samples':failures[:15]}
+            'error_samples':failures[:15],
+            'ramp_seconds':a.ramp_seconds,'hold_seconds':a.hold_seconds,
+            **({'join_latency_samples_ms':[round(x,1) for x in joins],
+                'first_snapshot_samples_ms':[round(x,1) for x in first_snapshots]} if a.latency_samples else {})}
     result=json.dumps(output,indent=2,ensure_ascii=False)
     print(result)
     if a.json_out: Path(a.json_out).write_text(result+'\n',encoding='utf-8')

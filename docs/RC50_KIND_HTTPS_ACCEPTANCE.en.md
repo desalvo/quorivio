@@ -1,0 +1,5 @@
+# Live HTTPS ingress acceptance in disposable KIND (cycle 50)
+
+Manual workflow input: `kubernetes_tls_test=true`, `publish_image=false`, `rc_strict=false`. This runs an independent `nginx` and `haproxytech` job after standard quality checks. The test issues a one-day disposable RSA/SHA-256 leaf certificate with SAN `quorivio-multi.example.invalid`, creates a dedicated TLS Secret only in its ephemeral cluster, and tests Node HTTPS with a pinned CA, strict certificate verification, SNI and virtual-host routing, explicit untrusted-certificate denial, then repeats HTTPS after replacing an application pod.
+
+The trusted certificate is self-signed and **not publicly CA-signed**. Both KIND workers are containers on the same Docker host, and RWX storage is a shared bind mount, not a real CSI/NFS/CephFS system. Public TLS, physical independence, long-lived SLOs, external security audits and physical-device acceptance remain open. Do not promote the formal 81.25% RC score until both HTTPS jobs have passed and evidence has been reconciled separately from pre-existing HTTP gate credit.

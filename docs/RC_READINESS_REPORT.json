@@ -1,6 +1,6 @@
 {
   "release_candidate_ready": false,
-  "score": 80.75,
+  "score": 81.25,
   "missing_required_files": [],
   "unaccepted_gates": [
     {
@@ -49,7 +49,7 @@
       "id": "B4",
       "area": "B-sessions",
       "status": "partial",
-      "remaining": "Sustained representative throughput/memory and latency percentiles, failure-injection recovery, independent real-device and accessibility acceptance. Cycle 34 separately credits only a bounded KIND NGINX one-pod replacement; not sustained participant capacity under load or production-grade multi-machine failover."
+      "remaining": "Sustained representative throughput/memory/latency with actual users, physical-device/accessibility tests, real CSI/NFS RWX on independent machines, failover under storage/network partitions and externally reviewed SLOs. HAProxy KIND subgate credited separately; not a production HA certificate."
     },
     {
       "id": "C1",
@@ -106,7 +106,7 @@
       "remaining": "Independent GDPR/legal and AGID assessment, encrypted backup and key rotation operational reviews, retention/erasure audit and RWX storage sign-off."
     }
   ],
-  "gate_count": 52,
-  "accepted_gates": 35,
+  "gate_count": 53,
+  "accepted_gates": 36,
   "policy": "RC requires every gate accepted with reviewed evidence; local tests alone never promote gates."
 }

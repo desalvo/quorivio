@@ -7,7 +7,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tools'))
 from verify_rc_cycle27_inventory import load_inventory as prior_inventory
-from verify_rc_cycle48_inventory import load_inventory, verify_source
+from verify_rc_cycle57_inventory import load_inventory, verify_source
 from rc_release_preflight import preflight
 
 
@@ -38,7 +38,7 @@ class Cycle28(unittest.TestCase):
         self.assertFalse(receipt['github_rootless_fixed_verified'])
         self.assertEqual(receipt['score_before'], receipt['score_after'])
         self.assertEqual((receipt['accepted_gates'],receipt['partial_gates']), (30,17))
-        self.assertEqual(preflight()['accepted_gates'], 35)
+        self.assertEqual(preflight()['accepted_gates'], 36)
         self.assertFalse(preflight()['release_candidate_ready'])
         report = json.loads((ROOT / 'docs/validation/RC_CYCLE28_PODMAN_TMPFS_HOTFIX_LOCAL_20261030.json').read_text())
         self.assertFalse(report['podman_rootless_app_started'])
