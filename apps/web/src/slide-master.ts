@@ -10,6 +10,6 @@ export function widgetDisplay(w:SlideWidget,context:{pageTitle?:string;sessionTi
  const title=w.kind==='title'?(w.titleFollowPage===false?w.label||'':context.pageTitle||w.label||''):w.label||'';
  const style=w.kind==='title'&&w.titleUseMaster!==false?{...w.style,...DEFAULT_TITLE_STYLE,...context.masterTitleStyle}:w.style||{};
  const center=w.kind==='footer'?(w.footerShowSessionTitle!==false?context.sessionTitle||'':w.label||''):'';
- const page=w.kind==='footer'&&w.footerShowPageNumber!==false&&Number.isInteger(context.pageNumber)&&context.pageNumber > 0?String(context.pageNumber):'';
+ const page=w.kind==='footer'&&w.footerShowPageNumber!==false&&typeof context.pageNumber==='number'&&Number.isInteger(context.pageNumber)&&context.pageNumber>0?String(context.pageNumber):'';
  return {title,style,center,page};
 }

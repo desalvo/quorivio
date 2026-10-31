@@ -1,3 +1,14 @@
+# Quorivio 0.1.0-dev — RC75 — Hotfix compilazione TypeScript (31 ottobre 2026)
+
+**Ultimo commit dichiarato dall'utente:** `77486c8f9b902d5e89f0f3f823d3cf496f00d5c3` (comprende RC74). CI standard `41207039782`, job `124554135225`, fallita nel passaggio **Compile frontend and backend**, con quattro errori TypeScript, prima dei test PostgreSQL e della campagna estesa. Nessun commit, push, tag o pubblicazione effettuato dall'assistente.
+
+**Correzione RC75:** il tipo del widget modificabile espone ora `reactionIconSize` già persistito in `PageDesign`; `widgetDisplay` restringe `pageNumber` opzionale a numero prima dei confronti; le domande statistiche e le sottodomande espongono un `answerMode` tipizzato, senza l'intersezione con `any[]`. Conservati comportamento grafico, numero Footer nell'angolo inferiore destro e logica delle risposte della simulazione.
+
+**Evidenze locali:** 560 test API e 123 test frontend superati; test TypeScript strict dei due moduli isolati superato, oltre a test RC75 e di allineamento/Footer. La build integrale `npm run build` non è verificabile localmente per l'impossibilità di recuperare le dipendenze npm (registry irraggiungibile). La suite Python completa non ha terminato entro il timeout, dunque richiede ancora la CI. Una nuova esecuzione GitHub sul prossimo commit resta necessaria.
+
+**Stato RC:** **84,75%** (59 gate, 42 accettati, 17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Non incrementare il punteggio per una correzione CI non ancora accettata. I collaudi fisici e le approvazioni indipendenti rimangono aperti.
+
+---
 # Quorivio 0.1.0-dev — RC74 — Footer: numero nell’angolo inferiore destro (31 ottobre 2026)
 
 **Baseline Git confermata:** `487c960f09b3c9adb996d489f44b52d059da12b2` (RC65); gli sviluppi RC66–RC74 restano cumulativi e non ancora confermati con nuovo commit. Nessun commit/push/tag/publish dell'assistente.

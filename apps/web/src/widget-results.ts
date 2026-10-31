@@ -1,6 +1,6 @@
 /** Page-scoped presenter statistics; result controls never reference participants directly. */
 export const STATISTICAL_WIDGET_KINDS=['question','timed-quiz','rating','reactions','topic-question'] as const;
-export type StatisticalWidget={id:string;kind:string;label?:string;options?:{id:string;label:string}[];targetWidgetId?:string;targetQuestionId?:string;questions?:{id:string;label:string;options?:{id:string;label:string}[]}[];resultsView?:string};
+export type StatisticalWidget={id:string;kind:string;label?:string;answerMode?:string;options?:{id:string;label:string}[];targetWidgetId?:string;targetQuestionId?:string;questions?:{id:string;label:string;answerMode?:string;options?:{id:string;label:string}[]}[];resultsView?:string};
 export type StatRow={id:string;label:string;count:number};
 export function eligibleStatisticSources(widgets:StatisticalWidget[],excluding?:string):StatisticalWidget[]{
  return widgets.filter(w=>w.id!==excluding&&(STATISTICAL_WIDGET_KINDS as readonly string[]).includes(w.kind));
@@ -52,7 +52,7 @@ export function rowsFromWidgetAnswerDetail(source:StatisticalWidget,data:any,que
 
 /** Local rehearsal text answers, presenter-only. Keep authored text distinct from
  * generated samples: no trial response is ever persisted or sent over the network. */
-export function rehearsalFreeTextRows(source:StatisticalWidget&{answerMode?:string;questions?:any[]},answers:Record<string,string|string[]>,questionId=''):StatRow[]{
+export function rehearsalFreeTextRows(source:StatisticalWidget,answers:Record<string,string|string[]>,questionId=''):StatRow[]{
  const part=questionId?source.questions?.find(q=>q.id===questionId):source;
  if(source.kind!=='question'||(part?.answerMode||'text')!=='text')return [];
  const key=source.id+(questionId?':'+questionId:'');

@@ -1,3 +1,14 @@
+# Quorivio 0.1.0-dev — RC75 — TypeScript build hotfix (31 October 2026)
+
+**Last user-confirmed commit:** `77486c8f9b902d5e89f0f3f823d3cf496f00d5c3` (includes RC74). Standard CI `41207039782`, job `124554135225`, failed at **Compile frontend and backend** with four frontend TypeScript diagnostics before PostgreSQL integration and extended acceptance. No assistant commit, push, tag or publication.
+
+**RC75 changes:** the editable widget's type now includes persisted `reactionIconSize`; the optional `pageNumber` is narrowed to number before comparison; statistical sources and subquestions explicitly model `answerMode`, avoiding an untyped `any[]` intersection. Existing footer bottom-right alignment, presentation appearance and free-text rehearsal behavior are preserved.
+
+**Local evidence:** 560 API tests and 123 frontend tests passed, alongside strict TypeScript checks on the two independent affected modules and targeted RC75/footer tests. Full `npm run build` remains unverified locally because the npm registry is unreachable and dependencies could not be installed; the full Python suite timed out. Re-run GitHub CI after the user's commit to establish overall acceptance.
+
+**RC readiness:** **84.75%** (59 gates, 42 accepted, 17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No new scoring credit for an as-yet-unvalidated CI hotfix. External physical and independent approvals remain open.
+
+---
 # Quorivio 0.1.0-dev — RC74 — Footer page number at bottom-right canvas corner (31 October 2026)
 
 **Last user-confirmed Git baseline:** `487c960f09b3c9adb996d489f44b52d059da12b2` (RC65); RC66–RC74 cumulative and not yet confirmed committed. Assistant has not committed, pushed, tagged or published anything.

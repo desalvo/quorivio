@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import ast
+import re
 import unittest
 from pathlib import Path
 from tools.rc_gate_audit import audit
@@ -41,7 +42,9 @@ class HistoricalDocumentationCycle65(unittest.TestCase):
                 body=(ROOT/f'docs/{name}{lang}.md').read_text()
                 current=body.split('\n---\n', 1)[0]
                 with self.subTest(name=name, language=lang):
-                    self.assertRegex(current, r'RC6[6-9]')
+                    match = re.search(r'\bRC(\d+)\b', current)
+                    self.assertIsNotNone(match, 'missing current RC cycle header')
+                    self.assertGreaterEqual(int(match.group(1)), 66)
                     self.assertIn('RC65', body)
                     self.assertIn((str(audit()['score']).replace('.', ',') if lang else str(audit()['score']))+'%', current)
                     self.assertIn('rc_strict=false', current)

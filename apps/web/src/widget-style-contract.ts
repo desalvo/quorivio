@@ -21,3 +21,7 @@ export const compileTimeWidgetFill:WidgetTextStyle = {
 type StoredPageWidget=NonNullable<PageDesign['widgets']>[number];
 export type PersistedAnswerChangeFlag=Assert<Equal<StoredPageWidget['allowAnswerChange'],boolean|undefined>>;
 export type PersistedProfileEmailFlag=Assert<Equal<StoredPageWidget['showEmail'],boolean|undefined>>;
+
+// RC75: size of reaction icons is a persisted per-widget property. Compiler-enforced
+// rather than relying on a successful TypeScript parser-only preflight.
+export type PersistedReactionIconSizeFlag=Assert<Equal<StoredPageWidget['reactionIconSize'],number|undefined>>;
