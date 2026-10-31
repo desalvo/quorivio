@@ -1,3 +1,11 @@
+# Quorivio 0.1.0-dev — RC86 — palette widget Chromium (31 ottobre 2026)
+
+**Completamento RC: 84,75%**, 42 gate accettati, 17 parziali; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Diagnosi dai log allegati `logs_111780102568(1).zip`: il collaudo Chromium supera anteprime, eventi widget, focus e accessibilità, poi fallisce in `tools/ci_browser_editor.py` su `assert await buttons.count()==17`. La palette reale ha 19 tipi, compresi Titolo e Footer. Il numero fisso era obsoleto; non è stato riscontrato un errore applicativo nella palette. La campagna estesa GitHub RC86 resta da eseguire e non dà diritto ad avanzare i gate.
+
+**RC86:** il browser test valida tipi minimi, assenza di duplicazioni nei `data-widget-kind`, nomi accessibili, SVG distinti, nessun tooltip nativo `title`, e mantiene l’aggiunta reale di un widget, salvataggio e reload. Nuovi test di preflight prima di npm. Manifest precedenti immutabili, nuovo SHA catalog RC86. Nessun commit, push, tag o pubblicazione da parte dell'assistente.
+
+---
+
 # Quorivio 0.1.0-dev — RC85 — input secondario e menu contestuali (31 ottobre 2026)
 
 **Completamento RC: 84,75%**, 42 gate accettati, 17 parziali; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Ultimo commit dell’utente `2d081ae95594ab79a743822476dee77336f6ea9e` (RC84). La CI standard è stata dichiarata verde; CI estesa fallita su `https://github.com/desalvo/quorivio/actions/runs/41237085040/job/124643010292` dopo molti test Chromium superati: ancora menu widget assente, menu background aperto. Non sono state falsificate evidenze RC; la nuova CI GitHub è da eseguire.

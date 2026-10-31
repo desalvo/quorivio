@@ -1,3 +1,11 @@
+# Quorivio 0.1.0-dev — RC86 — real Chromium palette acceptance (31 October 2026)
+
+**RC completion: 84.75%**, 42 accepted and 17 partial gates; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. The uploaded `logs_111780102568(1).zip` shows browser acceptance passed the context-menu part and many other Chromium checks, then hit `assert await buttons.count()==17` in `tools/ci_browser_editor.py`. The real widget palette now has 19 kinds including Title and Footer. The fixed assertion is obsolete, not evidence of a missing app feature. No additional RC gate credit until a new extended GitHub run passes.
+
+**RC86:** the native Chromium test checks required widget kind coverage without a brittle fixed total, unique tool kinds and SVG icons, descriptive accessible labels, no native title tooltips, plus the existing real add/autosave/reload sequence. Added early Python regression preflight before npm. Immutable historical manifests are kept; RC86 is the new grouped-SHA current manifest. No assistant commit/push/tag/publication.
+
+---
+
 # Quorivio 0.1.0-dev — RC85 — secondary pointer context ownership (31 October 2026)
 
 **RC completion: 84.75%**, 42 accepted, 17 partial gates; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Maintainer baseline commit `2d081ae95594ab79a743822476dee77336f6ea9e` (RC84). The user confirmed standard CI green. Extended CI `https://github.com/desalvo/quorivio/actions/runs/41237085040/job/124643010292` failed the real native Chromium widget menu, with background menu open, after prior Chromium checks passed. No RC acceptance points have been granted for this unverified fix; new GitHub CI is pending.

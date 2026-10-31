@@ -270,9 +270,21 @@ async def main():
    # Unique palette icons, no duplicate icon semantics or native title tooltips.
    palette=page.get_by_role('complementary',name='Aggiungi widget')
    buttons=palette.locator('.editor-icon-tool')
-   assert await buttons.count()==17
+   # RC86: widgets grew from 17 to 19 with Title and Footer. A fixed count
+   # prevented the browser gate from testing the actual palette semantics.
+   # Require every supported kind, one tool per kind, unique icons and
+   # accessible names, while allowing future widget families to be added.
+   kinds=await buttons.evaluate_all('(els)=>els.map(e=>e.dataset.widgetKind)')
+   required={'rating','reactions','text','divider','timer','qr','profile',
+             'question','postit','image','video','logo','pdf','topic-question',
+             'timed-quiz','results-button','participant-count','title','footer'}
+   assert required<=set(kinds),f'Widget palette missing required kinds: {sorted(required-set(kinds))}'
+   assert len(kinds)==len(set(kinds)),f'Duplicate widget palette kinds: {kinds}'
+   labels=await buttons.evaluate_all('(els)=>els.map(e=>e.getAttribute("aria-label"))')
+   assert all(label and label.startswith('Aggiungi widget: ') for label in labels),labels
+   assert len(labels)==len(set(labels)),f'Duplicate widget palette labels: {labels}'
    names=await buttons.evaluate_all('(els)=>els.map(e=>e.querySelector("svg")?.getAttribute("class"))')
-   assert len(set(names))==len(names),names
+   assert all(names) and len(set(names))==len(names),names
    assert await buttons.evaluate_all('(els)=>els.every(e=>!e.hasAttribute("title"))')
    state['drop_before']=True;state['drop_after']=True
    await page.get_by_role('button',name='Aggiungi widget: Testo').click()
