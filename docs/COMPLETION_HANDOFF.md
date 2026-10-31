@@ -1,3 +1,11 @@
+# Quorivio 0.1.0-dev — RC85 — secondary pointer context ownership (31 October 2026)
+
+**RC completion: 84.75%**, 42 accepted, 17 partial gates; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Maintainer baseline commit `2d081ae95594ab79a743822476dee77336f6ea9e` (RC84). The user confirmed standard CI green. Extended CI `https://github.com/desalvo/quorivio/actions/runs/41237085040/job/124643010292` failed the real native Chromium widget menu, with background menu open, after prior Chromium checks passed. No RC acceptance points have been granted for this unverified fix; new GitHub CI is pending.
+
+**Fix:** prevent secondary-button pointerdown from changing widget selection or initiating a gesture before the browser delivers native contextmenu. Remember the pointerdown widget only for the same native gesture, bounded by <1.5 seconds and <8 pixels, to recover from pointer retargeting. Blank canvas context requests continue to use the page background menu. The Chromium test still requires a real pointer event and now captures native target diagnostics on failure. Added four Node tests and three Python contracts, with early CI preflight. Historical SHA manifests are immutable; RC84 becomes historical and RC85 is current. No assistant commit, push, tag, release, or publication.
+
+---
+
 # Quorivio 0.1.0-dev — RC84 — legacy widget context-menu contract update (31 October 2026)
 
 **RC completion: 84.75%**, 42 accepted / 17 partial gates (59 total); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Maintainer Git baseline `112d3c2a99b44b743bfc56f5137cd9781323f9fd` (RC83). Standard quality job `https://github.com/desalvo/quorivio/actions/runs/41234368553/job/124636106637` ran 1,466 Python tests, failing one stale RC37 source-string check for `positionMenu(e.currentTarget,e.clientX,e.clientY)` following the actual RC83 React canvas-capture event-routing fix. RC84 keeps real native-pointer behavior, menu positioning, body portal, touch and keyboard checks and replaces the outdated literal assertion with assertions about the current handler. Both the historical contract and the new RC84 tests run before npm in CI. All previous manifests remain immutable; RC83 becomes historical and RC84 is current. **New GitHub CI is pending.** No fake acceptance credit, commit, push, tag or publish.

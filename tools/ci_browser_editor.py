@@ -169,15 +169,31 @@ async def main():
    # layout stability and verifies that Chromium can really hit this widget.
    offset={'x':point['offset_x'],'y':point['offset_y']}
    await first_widget.click(button='right',position=offset,trial=True)
+   # Capture native dispatch targets without altering the event, its default,
+   # selection or React state. Record only element classes (never page text).
+   await page.evaluate('''() => {
+     window.__qContextTrace=[];
+     for(const type of ['pointerdown','contextmenu']){
+       document.addEventListener(type, event=>{
+         const widget=event.target instanceof Element?event.target.closest('.widget-canvas-item'):null;
+         const canvas=event.target instanceof Element?event.target.closest('.widget-canvas'):null;
+         if(!canvas)return;
+         window.__qContextTrace.push({type,button:event.button,
+           targetIsWidget:!!widget,hitWidget:!!document.elementFromPoint(event.clientX,event.clientY)?.closest('.widget-canvas-item')});
+       },{capture:true,once:true});
+     }
+   }''')
    await first_widget.click(button='right',position=offset)
    widget_menu=page.get_by_role('group',name='Azioni widget text',exact=True)
    try:
     await expect(widget_menu).to_be_visible(timeout=4000)
    except AssertionError as error:
     background_open=await background_menu.is_visible()
+    trace=await page.evaluate('''() => window.__qContextTrace || []''')
     raise AssertionError('Real widget right-click did not open its menu; '
-                         f'canvas_background_menu_open={background_open}. '
-                         'Check actual pointer routing, not just elementFromPoint before click.') from error
+                         f'canvas_background_menu_open={background_open}; '
+                         f'native_target_trace={trace}. '
+                         'Check pointerdown/contextmenu ownership and layout reflow.') from error
    await expect(background_menu).to_have_count(0)
    assert await widget_menu.evaluate('''node => {
     const r=node.getBoundingClientRect();
