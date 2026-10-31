@@ -1,3 +1,13 @@
+# Quorivio 0.1.0-dev — RC79 — recovered historical manifest and fail-closed cumulative ZIP closure (31 October 2026)
+
+**RC79 CI root cause (run 41215310977, job 124578491540):** the RC78 ZIP and commit omitted `docs/validation/RC_CYCLE77_PACKAGE_INVENTORY_20261031.json`, although the CI workflow still references `verify_rc_cycle77_inventory.py`. Recovered the original, byte-for-byte RC77 receipt (unchanged SHA-256), included it in the current source inventory and in the ZIP. This was a packaging error, not a Chromium functional failure.
+
+**Permanent packaging guard:** `tools/rc_inventory_closure.py` checks all verifier/manifest dependencies in both the source manifest and the actual ZIP. `tools/package_rc_cumulative.py` now includes every historical manifest and requires exact ZIP/source SHA-256 matching. RC79 runs the new closure regressions before npm. Any missing old receipt fails the archive build instead of the GitHub CI. **Operator:** extract the entire cumulative RC79 package, stage all changed and new files with `git add -A` and run `python3 tools/ci_inventory_reference_guard.py` plus `python3 tools/verify_rc_cycle79_inventory.py` before committing. A missing receipt in the Git index is deliberately rejected.
+
+**CI status:** Latest run 41215310977 failed at the missing RC77 receipt preflight before functional tests. The previous RC78 browser fix has NOT yet passed new extended CI. **Certified gate score remains 84.75%** (42 accepted, 17 partial / 59); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag/publication.
+
+---
+
 # Quorivio 0.1.0-dev — RC78 — Chromium rehearsal accessible-name CI fix (31 October 2026)
 
 **Git baseline:** `9c947b6415d1ab5c1509c3f01cbe0b5d872041df`; the maintainer reports the standard CI passed. Extended run `41212067005` proceeded through its earlier Chromium checks, but job `124568946911` timed out in `tools/ci_rehearsal_singleton_offline_chromium.py`: a stale Playwright locator expected `▣ Anteprime affiancate`, whereas the live dashboard renders a graphical icon with accessible text **Anteprime affiancate**. Aggregate job `124569421798` failed as a consequence, not an independent defect.

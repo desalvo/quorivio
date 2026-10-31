@@ -1,3 +1,11 @@
+# Quorivio 0.1.0-dev — RC79 — recupero inventario storico e verifica ZIP completa (31 ottobre 2026)
+
+**Causa della CI fallita:** l’archivio RC78 escludeva erroneamente `docs/validation/RC_CYCLE77_PACKAGE_INVENTORY_20261031.json`, sebbene la CI lo richiedesse. RC79 recupera i byte originali senza alterare il manifest precedente e verifica tutti i riferimenti del workflow anche dentro lo ZIP. Il nuovo `tools/package_rc_cumulative.py` aggiunge automaticamente i manifest precedenti; i test falliscono se manca anche una sola ricevuta.
+
+**Prima del commit:** estrarre tutto RC79, `git add -A`, `python3 tools/ci_inventory_reference_guard.py` e `python3 tools/verify_rc_cycle79_inventory.py`. La verifica richiede che tutti i file siano presenti anche nell’indice Git. **Avanzamento: 84,75%** (42 gate accettati, 17 parziali su 59), `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nuova CI GitHub estesa ancora da eseguire. Nessun commit/push/tag/pubblicazione dell’assistente.
+
+---
+
 # Quorivio 0.1.0-dev — RC78 — Correzione selettore Chromium anteprima (31 ottobre 2026)
 
 **Baseline Git:** `9c947b6415d1ab5c1509c3f01cbe0b5d872041df`, CI standard confermata verde dall’utente. La CI estesa `41212067005` ha completato i controlli precedenti ma il job `124568946911` è fallito sul test Playwright `tools/ci_rehearsal_singleton_offline_chromium.py`, che cercava il vecchio nome con il carattere `▣`. Il pulsante reale si chiama **Anteprime affiancate** e usa ora un’icona grafica; timeout 12 s in modalità Chromium. Il riepilogo RC `124569421798` è fallito di conseguenza.
