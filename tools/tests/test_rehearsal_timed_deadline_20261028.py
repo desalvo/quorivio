@@ -12,7 +12,12 @@ class RehearsalTimedDeadline(unittest.TestCase):
   self.assertIn("openedAt={new Date(pageStartedAt).toISOString()}",UI)
   self.assertIn('kind===\'timed-quiz\'&&<PageTimer',UI)
  def test_deadline_is_checked_on_submit_not_just_on_render(self):
-  self.assertIn('if(timedSeconds!==undefined&&rehearsalExpired(pageStartedAt,timedSeconds,Date.now()))return',UI)
+  # Both the page-wide timer and each timed question are checked at the
+  # instant of submission (not just while rendering a disabled button).
+  submit=UI.split('const submitDemoAnswer=',1)[1].split('const submitDemoDirect=',1)[0]
+  self.assertIn('pageInteractionExpired(widgets,pageStartedAt,Date.now())',submit)
+  self.assertIn('timedSeconds!==undefined&&rehearsalExpired(pageStartedAt,timedSeconds,Date.now())',submit)
+  self.assertIn('return;',submit)
   self.assertIn('disabled={!canInteract||!canSubmitRehearsalAnswer(answerMode,current)}',UI)
   self.assertIn('Tempo scaduto: risposta di prova non più inviabile',UI)
   self.assertIn('return !sent&&!rehearsalExpired(startedAt,seconds,now)',TIMER)

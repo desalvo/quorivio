@@ -1,3 +1,12 @@
+# Quorivio 0.1.0-dev — RC76 — Python CI legacy editor contract reconciliation (31 October 2026)
+
+**Last maintainer commit:** `39564e862a2ed431544cea22e0c0b39bd6794b34` (includes RC75). Standard CI `41208293676`, job `124557792918`, passed the frontend/backend compilation and Node tests, then ran 1439 Python tests with **five failures** from stale literal-code assertions.
+
+**RC76 changes:** preserve actual behavior assertions for the typed persisted widget fields, merged Settings and Live monitoring, submit-time timer deadline, extended Title/Footer widget enumeration, and linked-result simulated free-text statistics. All five suites now run as an early CI preflight before npm installation. No production behavior changes, test omissions, security bypasses or historical manifest rewrites.
+
+**RC readiness:** **84.75%** (59 gates, 42 accepted and 17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full new GitHub CI (including Gitleaks) is pending the next maintainer commit. The assistant has not committed, pushed, tagged or published.
+
+---
 # Quorivio 0.1.0-dev — RC75 — TypeScript build hotfix (31 October 2026)
 
 **Last user-confirmed commit:** `77486c8f9b902d5e89f0f3f823d3cf496f00d5c3` (includes RC74). Standard CI `41207039782`, job `124554135225`, failed at **Compile frontend and backend** with four frontend TypeScript diagnostics before PostgreSQL integration and extended acceptance. No assistant commit, push, tag or publication.

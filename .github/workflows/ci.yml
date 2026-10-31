@@ -117,6 +117,14 @@ jobs:
             tools.tests.test_rc_cycle58_reconciliation_and_backpressure \
             tools.tests.test_rc_cycle63_missing_inventory_recovery \
             tools.tests.test_rc_cycle65_historical_documentation -q
+      - name: Validate evolving editor contracts before npm
+        run: |
+          python3 -m unittest \
+            tools.tests.test_rc_cycle43_frontend_compile \
+            tools.tests.test_rc_dashboard_widget_appearance_20261027 \
+            tools.tests.test_rehearsal_timed_deadline_20261028 \
+            tools.tests.test_session_rehearsal \
+            tools.tests.test_topic_linked_results_rc_20261028 -q
       - name: Validate RC74 footer alignment before npm
         run: |
           python3 -m unittest \
@@ -635,7 +643,8 @@ jobs:
           python3 tools/verify_rc_cycle72_inventory.py --historical
           python3 tools/verify_rc_cycle73_inventory.py --historical
           python3 tools/verify_rc_cycle74_inventory.py --historical
-          python3 tools/verify_rc_cycle75_inventory.py
+          python3 tools/verify_rc_cycle75_inventory.py --historical
+          python3 tools/verify_rc_cycle76_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

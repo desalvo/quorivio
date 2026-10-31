@@ -8,7 +8,13 @@ DOMAIN=(ROOT/'apps/api/src/domain.ts').read_text()
 class DashboardWidgetAppearance(unittest.TestCase):
  def test_dashboard_has_no_legacy_media_card_or_redundant_interaction_tab(self):
   self.assertNotIn('Grafica e media (legacy)',UI)
-  self.assertIn("['results','Monitoraggio live']",UI)
+  # Monitoring is intentionally consolidated inside Settings, not a third tab.
+  self.assertIn("['overview','Impostazioni e monitoraggio']",UI)
+  self.assertIn("['pages','Pagine e contenuti']",UI)
+  self.assertIn('session-tabs',UI)
+  self.assertNotIn("['results','Monitoraggio live']",UI)
+  self.assertIn('live-stale-warning',UI)
+  self.assertIn('live-panel',UI)
   self.assertNotIn("['audience','Interazione']",UI)
   self.assertIn('Apri editor grafico',UI)
   self.assertIn('legacy-page-admin',UI) # Only for real live operations and backward-compatibility

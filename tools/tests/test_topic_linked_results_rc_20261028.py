@@ -26,7 +26,11 @@ class TopicLinkedResultsRC(unittest.TestCase):
   block=CLIENT.split('function SessionRehearsal(',1)[1].split('const editorWidgetKinds',1)[0]
   self.assertIn('setTopicSubmissions(',block)
   self.assertIn('Invia domanda di prova',block)
-  self.assertIn("sampleStatisticRows(linkedStatisticSource(w,widgets)!,seed,submittedAnswers",block)
+  # Rehearsal now prioritizes authored free-text responses, then falls
+  # back to safe synthetic statistics. The presenter never writes to APIs.
+  self.assertIn('linkedStatisticSource(w,widgets)',block)
+  self.assertIn('rehearsalFreeTextRows(source,submittedAnswers',block)
+  self.assertIn('actual.length?actual:sampleStatisticRows(source,seed,submittedAnswers',block)
   self.assertIn('setTopicSubmissions({})',block)
   self.assertNotIn("request('/join/",block)
   self.assertIn('topicQuestionRows',REHEARSAL)

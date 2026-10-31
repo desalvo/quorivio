@@ -1,3 +1,12 @@
+# Quorivio 0.1.0-dev — RC76 — CI Python: aggiornamento dei contratti editor storici (31 ottobre 2026)
+
+**Nuovo commit confermato:** `39564e862a2ed431544cea22e0c0b39bd6794b34` (comprende RC75). CI standard `41208293676`, job `124557792918`: compilazione frontend/backend e test Node superati; la suite Python ha eseguito 1439 test con **5 errori** dovuti a controlli testuali storici che non riflettono più il codice aggiornato.
+
+**Intervento RC76:** aggiornati i contratti per la definizione tipizzata dei widget, l'integrazione del monitoraggio live nella scheda Impostazioni, il blocco dell'invio a countdown scaduto, l'ampliamento dei tipi di widget (Titolo/Footer) e le statistiche simulate che mostrano le risposte libere effettive. Nessuna funzionalità di produzione rimossa, nessun test disabilitato; rimangono controlli di sicurezza e comportamento. Gli stessi 5 gruppi di test sono stati inseriti prima dell'installazione npm nel workflow per prevenire altre iterazioni costose.
+
+**Avanzamento RC:** **84,75%** (59 gate: 42 accettati, 17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Test CI completa e nuova verifica Gitleaks sul prossimo commit ancora da confermare. Nessun commit/push/tag/pubblicazione da parte dell'assistente.
+
+---
 # Quorivio 0.1.0-dev — RC75 — Hotfix compilazione TypeScript (31 ottobre 2026)
 
 **Ultimo commit dichiarato dall'utente:** `77486c8f9b902d5e89f0f3f823d3cf496f00d5c3` (comprende RC74). CI standard `41207039782`, job `124554135225`, fallita nel passaggio **Compile frontend and backend**, con quattro errori TypeScript, prima dei test PostgreSQL e della campagna estesa. Nessun commit, push, tag o pubblicazione effettuato dall'assistente.
