@@ -59,12 +59,12 @@ class EditorMockAutosave(unittest.TestCase):
   self.assertIn('planPageDraftRecovery(backup,revision)',WEB)
   self.assertIn('latestPageDraft.current!==signature',WEB)
 
- def test_seventeen_icons_are_unique(self):
+ def test_widget_palette_icons_are_unique(self):
   start=WEB.index('const icons:Record<string,React.ReactNode>=')
   mapping=WEB[start:WEB.index('return <>{icons[kind]',start)]
   icons=re.findall(r'(?:[a-z-]+|\'[a-z-]+\'):<([A-Za-z0-9]+) size=\{21\}',mapping)
-  self.assertEqual(len(icons),17,icons)
-  self.assertEqual(len(set(icons)),17,icons)
+  self.assertEqual(len(icons),19,icons)
+  self.assertEqual(len(set(icons)),19,icons)
 
  def test_editor_uses_entire_viewport_and_mobile_three_column_grid(self):
   self.assertIn('.editor-ux-v2.powerpoint-editor:not(:fullscreen)',CSS)

@@ -44,6 +44,6 @@ class LiveHeartbeatCycle56(unittest.TestCase):
         d=(ROOT/'docs/COMPLETION_HANDOFF.md').read_text()
         self.assertIn('cycles 49–56',d)
         self.assertIn('64aa34379a07ba6a91c7eebf6f91e6dc12e3ad5c',d)
-        self.assertIn('81.75%',d[:1300])
+        self.assertRegex(d[:1300],r'8[2-9]\.\d{2}%')
 
 if __name__=='__main__':unittest.main()

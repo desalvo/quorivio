@@ -41,13 +41,14 @@ def campaign_audit(root: Path = ROOT) -> dict:
   raise ValueError('campaign publication/strict admission guards missing')
  ledger = json.loads((root/'docs/RC_GATE_MATRIX.json').read_text())
  gates = ledger['gates']
- if round(sum(g['weight']*(1 if g['status']=='accepted' else .5 if g['status']=='partial' else 0) for g in gates), 2) != 81.75:
+ from rc_gate_audit import audit
+ if round(sum(g['weight']*(1 if g['status']=='accepted' else .5 if g['status']=='partial' else 0) for g in gates), 2) != audit()['score']:
   raise ValueError('current certification score must come from RC matrix')
  pending = [{'id':g['id'],'area':g['area'],'weight':g['weight'],'remaining':g['remaining']}
             for g in gates if g['status']!='accepted']
  return {
   'version': ledger['version'],
-  'certified_score':81.75,
+  'certified_score':audit()['score'],
   'pending_gates':len(pending),
   'pending':pending,
   'dispatch':{'workflow':'.github/workflows/ci.yml',

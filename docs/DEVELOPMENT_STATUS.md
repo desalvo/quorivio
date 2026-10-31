@@ -1,3 +1,94 @@
+# Quorivio 0.1.0-dev — RC74 — Footer page number at bottom-right canvas corner (31 October 2026)
+
+**Last user-confirmed Git baseline:** `487c960f09b3c9adb996d489f44b52d059da12b2` (RC65); RC66–RC74 cumulative and not yet confirmed committed. Assistant has not committed, pushed, tagged or published anything.
+
+**Change:** default Footer is x=0%, y=94%, width=100%, height=6% of the 16:9 canvas. The session title stays centered, while page number is positioned `right:0; bottom:0` at the **bottom-right canvas corner**, rather than vertically centered in the footer strip. Page numbers continue to reflect the current page ordering. The participant view now renders the same footer within the page canvas, not in a separate block after it. Editor, rehearsal and projection reuse the anchored footer-number rule.
+
+**PPTX:** editable right-aligned page-number textbox reaches the slide's absolute right/bottom edges, uses bottom vertical alignment and zero text insets. Existing toggles and text customization are unaffected.
+
+**Validation:** RC74 Python regressions check CSS geometry, participant stage placement and actual exported PowerPoint dimensions; RC73 contracts remain. Pending new GitHub CI. **Certified RC score unchanged 84.75%** (42 accepted, 17 partial of 59); `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+---
+# Quorivio 0.1.0-dev — RC73 — Slide master Title/Footer and page numbering (31 October 2026)
+
+**Last user-confirmed commit:** `487c960f09b3c9adb996d489f44b52d059da12b2` (RC65). **No commits made by assistant**; cumulative package contains RC66–RC73.
+
+**Certified RC status: 84.75%** (59 gates: 42 accepted, 17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`. RC73 has no new credit pending the next CI.
+
+Every new slide/page, including new poll/quiz pages, gets a transparent centered `title` widget from the backend with the current page title. The owner can unlink the individual widget and specify custom text. The session-level **Title slide master** in the page settings provides a live preview and global font family, font size, text color and boldness. A title can opt out to use per-widget typography.
+
+An insertable/draggable `footer` widget defaults to full canvas width, at the bottom with one text line. It displays the session name centered and the page number at the right; either can be disabled and the center replaced with custom text. Page numbering follows current order and also appears under each sidebar thumbnail. Both types are server-validated and rendered in the editor, presenter projection, rehearsal, and audience view. PowerPoint export emits editable Title and Footer text, including slide-master typography and computed page numbers.
+
+**Local checks:** 560 Node API tests and 121 Node frontend tests passed, plus 41 targeted Python regression tests and 2 RC73 PPTX tests. The complete Python run did not finish within the local limit. Full TypeScript/npm build is unavailable locally due to missing dependencies. RC73 has not yet passed a new GitHub CI.
+
+**Previous green CI:** standard `41191213305` and extended `41191751069` on `487c960f09b3c9adb996d489f44b52d059da12b2`. Remaining external verification: physical RWX, real devices, independent GDPR/AGID/security approvals. No automatic publication.
+
+---
+# Quorivio RC72 — Live access, dashboard, and widget visuals (31 October 2026)
+
+**RC readiness unchanged at 84.75%** (42 accepted and 17 partial of 59 weighted gates, total 100). No new standard or extended GitHub CI has validated RC72 yet; strict RC remains blocked and publishing disabled. Last user-confirmed Git commit `487c960f09b3c9adb996d489f44b52d059da12b2`; RC66–RC72 remain a cumulative, not-yet-confirmed-committed package; the assistant does not commit/push/tag.
+
+Active-session transition or publishing a page now extends audience-link expiry for at least 24 hours; the displayed participant URL follows the actual browser origin. Authenticated QR GET uses a checked same-origin browser Referer/Host/Sec-Fetch-Site when available, with configured canonical origin fallback. Live WebSocket accepts the application's exact same-host browser Origin only (with existing authorization/revocation) rather than requiring an outdated server setting. Authenticated HTTP polling refreshes dashboard snapshots every 12s during WebSocket outage and labels the fallback honestly.
+
+Dashboard Settings contains monitoring; there is no third Monitoring tab. The one-column layout has no empty grid cells. Timer restart explicitly chooses whether to preserve existing responses/attachments or erase them transactionally; the option is required. Widgets are transparent and square by default, with rounded forms explicit and presentation effects consistently applied across editor, rehearsal, and live surfaces. Connected-participant palette icon uses a gauge. Motion-reduction preferences remain honored.
+
+**Local evidence:** 558 Node API tests and 118 web tests green, TypeScript transpile syntax clean, nine targeted Python RC71 tests green, SHA-256 archive/source validation. Full Python suite timed out locally; full bundle build and live PostgreSQL/browser tests remain CI-pending. No automatic CI gate promotion.
+
+---
+# Quorivio 0.1.0-dev — RC71 — Session lifecycle and widget editor improvements (31 October 2026)
+
+**Readiness unchanged: 84.75% (42 accepted, 17 partial / 59 gates, weight 100).** These new RC71 features require a new successful standard CI, extended browser/device validation and acceptance before progress can be accredited. Strict RC BLOCKED; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Last user-confirmed commit `487c960f09b3c9adb996d489f44b52d059da12b2`; RC66–RC71 changes are cumulative and **not yet confirmed committed**. Assistant must not commit/push/tag.
+
+**RC71 implemented:** cloud frequency counts use square brackets; editor formatting palette enlarged and color-coded with icons and descriptive titles; presenter profile widget optional free text; configurable reaction icons 16–96px in the property drawer and participant/presenter/rehearsal views. The background context file picker survives closing/unmounting its menu, routes upload through the session's authenticated presenter-background endpoint and refreshes library plus canvas selection. Live session dashboard shows audience join QR/direct URL and a separately authenticated presenter-screen QR/direct URL (no credentials embedded). When active/paused, live links replace preview buttons; inactive sessions retain colored, described rehearsal controls.
+
+**Timer:** the first publication of a page sets `opened_at` once; revisiting preserves the original countdown. A confirmed presenter-only timer restart atomically deletes prior page responses, ratings, reactions and topic/Q&A results; participant-owned file submissions are queued for durable physical deletion before the new clock is set. Reopening a page without restart does not grant extra time. On the authenticated presenter screen an authorized user sees a timer restart button on the timer widget; the dashboard also offers one.
+
+**Revert to not started:** owner-only, confirmation-required `POST /api/sessions/:id/reset-to-ready` atomically erases participants, answers, votes, statistics, live connections and participant-owned session files (with durable erasure outbox), sets all page statuses to pending, clears clock starts, rotates audience join credentials and changes the session status to ready. Existing pages, widget styles, background assets owned by presenters, appointment metadata, collaborators and presentation settings remain. Old join URLs cease working. Responses cannot be recovered through ordinary reports after reset.
+
+**Validation:** 554 Node API tests and 115 frontend tests passed locally; additional source/contract regressions passed. TypeScript syntax checks passed using the global TypeScript parser, but the full bundled build requires npm dependencies and CI. A disposable PostgreSQL/HTTP test was added to the standard workflow but has NOT run in GitHub yet. The full Python test suite timed out locally (no successful summary), so full acceptance remains pending. No RC score increase is claimed.
+
+---
+# Quorivio 0.1.0-dev — RC70 — Editor and page countdown corrections (31 October 2026)
+
+**Previously verified readiness: 84.75%**, 42 accepted and 17 partial gates (59 total). RC70 changes are implemented with local regression tests, but **not yet certified by fresh full CI or distributed browser validation**. Readiness remains at 84.75%; strict RC BLOCKED. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Last declared maintainer baseline 487c960f09b3c9adb996d489f44b52d059da12b2. RC66–70 have not been declared committed.
+
+**RC70 changes:** timer widget maximum countdown configurable in the property drawer (1–3600 seconds, 60 default); one page-wide deadline disables all rehearsal and actual audience interaction controls. A PostgreSQL-clock server guard checks every audience page mutation, including replies, reactions, ratings, topics and files. Browser and server safeguards both fail closed at deadline. Presenter-only participant count shows fixtures in rehearsal and never leaks in audience view. Submitted free-text rehearsal answers appear in presenter results alongside sample data. Widget-wide font changes proportionally rescale explicitly formatted character ranges without destroying local font families/colors/styles. Selected widget geometry controls escape shape clipping. Private profile preview shows presenter email (unless disabled), while public email remains opt-in. Preview mode updates are synchronized.
+
+**Pending proof:** compile full TypeScript, standard CI, native Chromium/Firefox/WebKit integration and PostgreSQL runtime boundary acceptance, then operator/device review. Do not promote gates or publish from this uncommitted package.
+
+---
+# Quorivio 0.1.0-dev — RC69 — Thumbnail export and reorder recovery (31 October 2026)
+
+**Verified progress: 84.75%** (42 accepted, 17 partial of 59; +0.50 over RC68, total weight 100). Committed baseline `487c960f09b3c9adb996d489f44b52d059da12b2`, standard CI `41191213305`, full campaign `41191751069` green on previous package. New code needs next GitHub CI. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit by assistant.
+
+**Accepted A2-PAGE-JSON:** real compiled Chromium presenter thumbnail JSON download verified in green quality job `124509777927`, disjoint from A2-ORDER and A3-AUTO; see `docs/RC69_PAGE_ORDER_RECOVERY_20261031.en.md`. **Pending:** actual browser drag/drop and recovered page-order HTTP writes on Chromium/Firefox/WebKit, full TypeScript build on GitHub, external sign-off and physical storage/device tests.
+
+---
+# Quorivio 0.1.0-dev — RC68 — Verified private presenter background ownership (31 ottobre 2026)
+
+**Maintainer-committed baseline:** `487c960f09b3c9adb996d489f44b52d059da12b2`. Standard CI `41191213305` and extended RC campaign `41191751069` succeeded on the same code; publication skipped. User has not declared a new commit for RC66–RC68. No assistant commit, push or tag.
+
+**Evidence-scoped reconciliation:** production-quality job `124509777927` ran `tools/ci_background_library_postgres.py` using authenticated HTTP and disposable PostgreSQL 18. It proved presenter PNG upload, reuse among owned sessions, non-collaborator denial, offered access to a collaborator, independent ownership on copy and original access revocation. Gate `C4-PRIVATE-BACKGROUNDS` is distinct from already-accepted `C4-PROFILE` profile photos and `C4-AV-INSTREAM` raw ClamAV scanning. Parent C4 weight shrinks 2 to 1 while new accepted gate is weight 1, adding 0.50 percentage points.
+
+**Verified RC progress: 84.25%** (41 accepted, 17 partial of 58 gates; +0.50 over RC67). Total weight 100. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. **No claim of real multi-node CSI/NFS RWX storage, managed HTTP-upload ClamAV, assistive-device testing, independent GDPR/AGID/security approval.** New package still needs the next GitHub CI.
+
+---
+# Quorivio 0.1.0-dev — RC67 — Verified client rehearsal acceptance (31 October 2026)
+
+**Maintainer baseline (already committed):** `487c960f09b3c9adb996d489f44b52d059da12b2`. Both standard CI `41191213305` and full non-publishing opt-in campaign `41191751069` passed on that SHA, with 11/11 mandatory jobs successful. No new commit by the assistant.
+
+**Evidence reconciliation:** the already-green quality job `124509777927` proved actual Chromium 1440/390 offline interactive rehearsal: draft/submit, one-shot reactions, stable presenter statistics, exact timed deadline and disabled late submissions. The native Firefox/WebKit job `124511576966` proved built React desktop/mobile dual preview visibility and accessible modal restoration. This is the narrowly accepted `B2-CLIENT-REHEARSAL` gate; `B2-DB` remains unchanged for database concurrency, and A1/A4 still cover modal focus. B2 residual retains long-running multi-replica/user/physical-device acceptance.
+
+**RC readiness: 83.75%** (40 accepted, 17 partial, 57 total); +1.00 percentage point compared with RC66. Gate weights sum to 100; partial B2 decreases from 4 to 2 and accepted client subgate adds weight 2. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. **Strict RC NOT READY**: real provider federation, public TLS, physical multi-machine RWX, independent assistive-technology accessibility and GDPR/AGID/security sign-offs remain outstanding. CI for this NEW inventory and documentation must be rerun after the maintainer commits.
+
+---
+# Quorivio 0.1.0-dev — RC66 — GitHub-verified SSO reconciliation (31 October 2026)
+
+**Latest maintainer commit:** `487c960f09b3c9adb996d489f44b52d059da12b2`. Standard CI `41191213305` and full opt-in campaign `41191751069` PASS (11/11 required checks on the same source); no image publishing. Scoped PostgreSQL SSO link/revocation and account-scoped identity-management HTTP acceptance were both verified in job `124509777927`; this is distinct from the previously accepted protocol-only `C3-AUTO` gate. Split partial C3 weight 4→2 and accepted new `C3-PG-IDENTITY` weight 2; total gate weight remains 100.
+
+**New verified progress: 82.75%** (39 accepted, 17 partial / 56 gates; +1.00 point from 81.75%). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. RC strict is NOT ready: real Google/GitHub/Facebook consent and redirects, public TLS, physical RWX multi-machine storage, human accessibility and independent security/GDPR/AGID sign-offs remain open. All original dated receipts are immutable. No assistant commit, tag or push. Next package uses this commit as base.
+
+---
 # Quorivio 0.1.0-dev — RC65 — Historical CI documentation regression (31 October 2026)
 
 **Latest maintainer commit:** `0786ef2f4b064080dd49b42f41d2f04b3d5f4c8a` (includes RC64). Standard CI run `41189697040` (job `124503743950`) passed 546 API and 99 web Node tests, build, PostgreSQL integrations, Kubernetes, and integrity checks. The Python suite failed 2 of 1399 tests: historic RC57/58 tests required RC58 markers to appear within the first 1700/2000 characters of mutable status documents, which grow by prepending current-cycle sections.

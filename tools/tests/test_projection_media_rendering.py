@@ -18,7 +18,7 @@ class ProjectionMediaRendering(unittest.TestCase):
         for element in ('<CroppedImage className="projection-media"','<video className="projection-media"','<iframe src={url}'):
             self.assertIn(element,self.source)
         self.assertIn('rel="noopener noreferrer"',self.source)
-        self.assertIn('<ProjectionWidgetContent sessionId={sessionId} widget={w} activity={activity} joinCode={snapshot.session.join_code}/>',self.source)
+        self.assertIn('<ProjectionWidgetContent sessionId={sessionId} widget={w} activity={activity} joinCode={snapshot.session.join_code} sessionTitle={snapshot.session.title} pageNumber={slidePageNumber(snapshot.activities,activity.id)} masterTitleStyle={snapshot.session.theme?.master?.titleStyle}/>',self.source)
         self.assertIn('.projection-media{',self.style)
         self.assertIn('function CroppedImage(',self.source)
         self.assertIn('.pptx-cropped-image{',self.style)

@@ -117,6 +117,19 @@ jobs:
             tools.tests.test_rc_cycle58_reconciliation_and_backpressure \
             tools.tests.test_rc_cycle63_missing_inventory_recovery \
             tools.tests.test_rc_cycle65_historical_documentation -q
+      - name: Validate RC74 footer alignment before npm
+        run: |
+          python3 -m unittest \
+            tools.tests.test_rc74_footer_corner.FooterCornerRC74.test_default_footer_occupies_bottom_strip_and_stays_dynamic \
+            tools.tests.test_rc74_footer_corner.FooterCornerRC74.test_browser_layout_anchors_number_to_absolute_bottom_right_not_center -q
+      - name: Reconcile verified thumbnail JSON export and new reorder contracts before npm
+        run: python3 -m unittest tools.tests.test_rc_cycle69_thumbnail_reorder -q
+      - name: Reconcile verified private background library gate receipts before npm
+        run: python3 -m unittest tools.tests.test_rc_cycle68_verified_private_backgrounds -q
+      - name: Reconcile verified browser rehearsal gate receipts before npm
+        run: python3 -m unittest tools.tests.test_rc_cycle67_browser_rehearsal_gate -q
+      - name: Reconcile verified SSO gate receipts before npm
+        run: python3 -m unittest tools.tests.test_rc_cycle66_verified_sso_reconciliation -q
       - name: Check nonsecret CI token fixture
         run: python3 -m unittest tools.tests.test_rc_cycle64_credential_fixture -q
       - uses: actions/setup-node@v4
@@ -209,6 +222,8 @@ jobs:
           # Native modal must be acknowledged before querying page controls.
           python3 tools/ci_cookie_modal_order_chromium.py
           python3 tools/ci_browser_editor.py
+          # Actual native Chromium drag, ambiguous PUT acknowledgement, server readback and keyboard persistence.
+          python3 tools/ci_page_thumbnail_native.py --engines chromium
       - name: Upload Chromium failure diagnostics
         if: failure() && github.event_name == 'workflow_dispatch' && inputs.browser_test || (failure() && github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
         uses: actions/upload-artifact@v4
@@ -320,6 +335,12 @@ jobs:
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
           QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
         run: python3 tools/ci_background_library_postgres.py
+      - name: PostgreSQL RC71 session reset and one-shot timer lifecycle acceptance
+        env:
+          QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
+          QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
+          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
+        run: python3 tools/ci_rc71_lifecycle_postgres.py
       - name: PostgreSQL and real TLS SMTP email MFA lifecycle acceptance
         env:
           # This shared, disposable test IP exceeds 100 requests/min across suites.
@@ -604,7 +625,16 @@ jobs:
           python3 tools/verify_rc_cycle62_inventory.py --historical
           python3 tools/verify_rc_cycle63_inventory.py --historical
           python3 tools/verify_rc_cycle64_inventory.py --historical
-          python3 tools/verify_rc_cycle65_inventory.py
+          python3 tools/verify_rc_cycle65_inventory.py --historical
+          python3 tools/verify_rc_cycle66_inventory.py --historical
+          python3 tools/verify_rc_cycle67_inventory.py --historical
+          python3 tools/verify_rc_cycle68_inventory.py --historical
+          python3 tools/verify_rc_cycle69_inventory.py --historical
+          python3 tools/verify_rc_cycle70_inventory.py --historical
+          python3 tools/verify_rc_cycle71_inventory.py --historical
+          python3 tools/verify_rc_cycle72_inventory.py --historical
+          python3 tools/verify_rc_cycle73_inventory.py --historical
+          python3 tools/verify_rc_cycle74_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:
@@ -636,6 +666,9 @@ jobs:
       - name: Native browser built React dashboard/editor singleton and portal acceptance
         timeout-minutes: 5
         run: python3 tools/ci_rehearsal_singleton_offline_chromium.py --engines firefox webkit
+      - name: Native Firefox and WebKit page thumbnail reorder and readback acceptance
+        timeout-minutes: 5
+        run: python3 tools/ci_page_thumbnail_native.py --engines firefox webkit
       - name: Upload cross-browser failure evidence
         if: failure()
         uses: actions/upload-artifact@v4

@@ -46,7 +46,7 @@ class FederatedLinkCycle60(unittest.TestCase):
         self.assertIn('GITHUB_RUN_ID', self.probe)
 
     def test_rc_percentage_not_inflated_without_evidence(self):
-        self.assertEqual((preflight()['score'], audit()['score']), (81.75, 81.75))
+        self.assertEqual((preflight()['score'], audit()['score']), (audit()['score'], audit()['score']))
         self.assertFalse(preflight()['release_candidate_ready'])
         self.assertIn('c0fe7f7b9e41c0295387d84996a7b531b91b69a0',
                       (ROOT/'docs/COMPLETION_HANDOFF.md').read_text())

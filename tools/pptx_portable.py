@@ -87,7 +87,7 @@ def _validate_export_input(data):
             if not isinstance(widget, dict):
                 raise ValueError('Invalid widget')
             kind = widget.get('kind')
-            if kind not in ('text', 'postit', 'question', 'timed-quiz', 'image', 'logo'):
+            if kind not in ('text', 'postit', 'question', 'timed-quiz', 'image', 'logo', 'title', 'footer'):
                 continue  # Other widget kinds have no native PowerPoint representation.
             position = widget.get('position', {'x': 5, 'y': 5, 'width': 90, 'height': 20})
             if not isinstance(position, dict):
@@ -768,7 +768,7 @@ def portable_to_pptx(data, destination, media_dir=None):
     p.slide_width, p.slide_height = Inches(13.333), Inches(7.5)
     seen_assets = set()
     total_asset_bytes = 0
-    for activity in activities:
+    for page_index, activity in enumerate(activities, 1):
         slide = p.slides.add_slide(p.slide_layouts[6])
         design = activity.get('page_design') or {}
         background = design.get('backgroundColor')
@@ -780,7 +780,7 @@ def portable_to_pptx(data, destination, media_dir=None):
         if len(widgets) > 16:
             raise ValueError('Too many widgets')
         for widget in widgets:
-            if widget.get('kind') not in ('text', 'postit', 'question', 'timed-quiz', 'image', 'logo'):
+            if widget.get('kind') not in ('text', 'postit', 'question', 'timed-quiz', 'image', 'logo', 'title', 'footer'):
                 continue
             position = widget.get('position') or {'x': 5, 'y': 5, 'width': 90, 'height': 20}
             x, y, w, h = (float(position.get(k, v)) for k, v in [('x', 5), ('y', 5), ('width', 90), ('height', 20)])
@@ -836,6 +836,11 @@ def portable_to_pptx(data, destination, media_dir=None):
                 box = slide.shapes.add_textbox(int(p.slide_width*x/100), int(p.slide_height*y/100),
                     int(p.slide_width*w/100), int(p.slide_height*h/100))
             content = str(widget.get('label') or '')
+            if widget.get('kind') == 'title' and widget.get('titleFollowPage') is not False:
+                content = str(activity.get('title') or content)
+            if widget.get('kind') == 'footer':
+                content = (str((data.get('session') or {}).get('title') or '')
+                           if widget.get('footerShowSessionTitle') is not False else content)
             # Imports keep the short UI label and a longer editable description.
             # Export the full text once, instead of repeating the truncated label.
             description = widget.get('description')
@@ -870,6 +875,35 @@ def portable_to_pptx(data, destination, media_dir=None):
             if isinstance(rotation, (int, float)) and math.isfinite(rotation):
                 box.rotation = rotation % 360
             style = widget.get('style') or {}
+            if widget.get('kind') == 'title' and widget.get('titleUseMaster') is not False:
+                master = (((data.get('session') or {}).get('theme') or {}).get('master') or {})
+                master_style = master.get('titleStyle') or {}
+                if not isinstance(master_style, dict):
+                    master_style = {}
+                style = {**style, 'fontFamily':'Arial', 'fontSize':38, 'bold':True,
+                         'textAlign':'center', **master_style}
+            if widget.get('kind') == 'footer':
+                style = {'fontFamily':'Arial', 'fontSize':14, 'textAlign':'center', **style}
+                if widget.get('footerShowPageNumber') is not False:
+                    right = slide.shapes.add_textbox(int(p.slide_width*(x+w*.88)/100),
+                        int(p.slide_height*y/100), int(p.slide_width*w*.12/100),
+                        int(p.slide_height*h/100))
+                    right.text = str(page_index)
+                    from pptx.enum.text import PP_ALIGN
+                    from pptx.util import Pt
+                    # Default footer fills the bottom strip of the canvas.
+                    # Align the number to the absolute right and bottom edges,
+                    # without PowerPoint's implicit textbox inset.
+                    from pptx.enum.text import MSO_ANCHOR
+                    right.text_frame.margin_left = 0
+                    right.text_frame.margin_right = 0
+                    right.text_frame.margin_top = 0
+                    right.text_frame.margin_bottom = 0
+                    right.text_frame.vertical_anchor = MSO_ANCHOR.BOTTOM
+                    right.text_frame.paragraphs[0].alignment = PP_ALIGN.RIGHT
+                    for paragraph in right.text_frame.paragraphs:
+                        for run in paragraph.runs:
+                            run.font.size = Pt(style.get('fontSize',14))
             if isinstance(style, dict):
                 from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
                 if style.get('textAlign'):

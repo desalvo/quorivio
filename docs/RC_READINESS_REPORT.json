@@ -1,6 +1,6 @@
 {
   "release_candidate_ready": false,
-  "score": 81.25,
+  "score": 84.75,
   "missing_required_files": [],
   "unaccepted_gates": [
     {
@@ -13,7 +13,7 @@
       "id": "A2",
       "area": "A-editor",
       "status": "partial",
-      "remaining": "Independent pixel-accurate thumbnail/page comparisons, Firefox/WebKit drag and drop and real touchscreen/keyboard operator acceptance remain required. Automated filmstrip baseline separated into A2-ORDER."
+      "remaining": "Independent pixel-accurate thumbnail/page comparisons, Firefox/WebKit native page drag-and-drop, physical touchscreen and operator acceptance still required. Bounded Chromium filmstrip/keyboard actions are credited in A2-ORDER, while the separately observed browser-downloaded page JSON artifact is credited in A2-PAGE-JSON. RC69 lost-response reorder reconciliation and cross-engine DnD acceptance remain unverified until new CI."
     },
     {
       "id": "A3",
@@ -31,13 +31,13 @@
       "id": "B1",
       "area": "B-sessions",
       "status": "partial",
-      "remaining": "Production-like long-running multi-replica load, network impairment/reconnection latency, recovery and operational SLO acceptance."
+      "remaining": "Residual scope after certified narrow B1-IDLE-TWO-REPLICA: Production-like long-running multi-replica load, network impairment/reconnection latency, recovery and operational SLO acceptance."
     },
     {
       "id": "B2",
       "area": "B-sessions",
       "status": "partial",
-      "remaining": "Production-like variable-latency, long-lived concurrency across replicas and manual presenter/participant timing validation. Linked topic results and real dual-preview interaction added locally post-CI must pass new CI."
+      "remaining": "Production-like variable-latency long-lived timed-widget concurrency across independent replicas, real presenter/participant timing on physical touch devices, human browser/operator verification and independent accessibility approval. Offline Chromium and native-engine dual-preview automated acceptance are separately counted as B2-CLIENT-REHEARSAL; PostgreSQL transactional correctness is counted only in B2-DB."
     },
     {
       "id": "B3",
@@ -49,7 +49,7 @@
       "id": "B4",
       "area": "B-sessions",
       "status": "partial",
-      "remaining": "Sustained representative throughput/memory/latency with actual users, physical-device/accessibility tests, real CSI/NFS RWX on independent machines, failover under storage/network partitions and externally reviewed SLOs. HAProxy KIND subgate credited separately; not a production HA certificate."
+      "remaining": "Residual scope after certified narrow B4-500-GLOBAL-SLO: Sustained representative throughput/memory/latency with actual users, physical-device/accessibility tests, real CSI/NFS RWX on independent machines, failover under storage/network partitions and externally reviewed SLOs. HAProxy KIND subgate credited separately; not a production HA certificate."
     },
     {
       "id": "C1",
@@ -67,13 +67,13 @@
       "id": "C3",
       "area": "C-admin",
       "status": "partial",
-      "remaining": "Real Google/GitHub/Facebook provider redirects, state/error/mismatch cases, browser E2E and operator approval. Real provider consent, redirects and callback across Google/GitHub/Facebook; cross-replica state, expiry/replay, denied linking, authenticated browser flows, external operator sign-off. Local post-commit OAuth redirect/secret hardening pending new CI."
+      "remaining": "Real external Google/GitHub/Facebook consent/redirect/callback across replicas; OIDC provider failure cases; browser E2E against real providers; external operator sign-off and deployment-deliverability validation. No disposable CI run proves real-provider identity federation."
     },
     {
       "id": "C4",
       "area": "C-admin",
       "status": "partial",
-      "remaining": "Unverified residual: multi-replica RWX storage and actual ClamAV deployment with concurrent uploads, deployment/backup key lifecycle, physical-device and independent assistive-technology acceptance. Presenter profile/PostgreSQL/browser coverage is separated into C4-PROFILE, not a claim that these residual checks passed. Cycle 34 separately credits only a disposable clamd INSTREAM signature check; real uploads through the HTTP application, RWX storage, managed K8s ClamAV concurrent use and operator/security signoff remain OPEN."
+      "remaining": "Independent RWX storage across physical nodes; real managed ClamAV under concurrent HTTP uploads and scanner updates; deployment/backup key lifecycle, physical device and assistive-technology tests; external operator/security sign-off. The private PostgreSQL-backed background ownership/copy/revocation smoke is narrowly credited in C4-PRIVATE-BACKGROUNDS, while profile photos remain in C4-PROFILE and raw clamd INSTREAM remains in C4-AV-INSTREAM."
     },
     {
       "id": "D2",
@@ -106,7 +106,7 @@
       "remaining": "Independent GDPR/legal and AGID assessment, encrypted backup and key rotation operational reviews, retention/erasure audit and RWX storage sign-off."
     }
   ],
-  "gate_count": 53,
-  "accepted_gates": 36,
+  "gate_count": 59,
+  "accepted_gates": 42,
   "policy": "RC requires every gate accepted with reviewed evidence; local tests alone never promote gates."
 }

@@ -1,0 +1,41 @@
+{
+  "version": "0.1.0-dev",
+  "reconciliation": "RC66 remote acceptance",
+  "date": "2026-10-31",
+  "standard": {
+    "run": 41191213305,
+    "conclusion": "success",
+    "head_sha": "487c960f09b3c9adb996d489f44b52d059da12b2",
+    "production_gate": 124508208950,
+    "container_gate": 124508903537
+  },
+  "extended": {
+    "run": 41191751069,
+    "conclusion": "success",
+    "head_sha": "487c960f09b3c9adb996d489f44b52d059da12b2",
+    "quality_job": 124509777927,
+    "mandatory_campaign_job_count": 11,
+    "successful_campaign_job_count": 11,
+    "campaign_job": 124512627800
+  },
+  "verified_scope": {
+    "first": "PostgreSQL federated identity link and revocation acceptance: disposable SQL one-shot, duplicate prevention, admin revocation and password reset",
+    "second": "PostgreSQL federated identity management HTTP acceptance: account-scoped password-gated unlink and privilege isolation"
+  },
+  "not_covered": [
+    "Real Google/GitHub/Facebook external provider authorization and consent",
+    "Operational delivery, external identities and login interoperability",
+    "Physical CSI/NFS RWX, publicly trusted TLS and independent GDPR/AGID/security sign-offs"
+  ],
+  "score": {
+    "old": 81.75,
+    "new": 82.75,
+    "delta": 1.0,
+    "weight_total": 100,
+    "parent_C3_weight_old": 4,
+    "parent_C3_weight_new": 2,
+    "accepted_C3_PG_IDENTITY_weight": 2
+  },
+  "strict_rc_ready": false,
+  "publish_image": false
+}

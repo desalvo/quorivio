@@ -1,3 +1,98 @@
+# Quorivio 0.1.0-dev — RC74 — Footer: numero nell’angolo inferiore destro (31 ottobre 2026)
+
+**Baseline Git confermata:** `487c960f09b3c9adb996d489f44b52d059da12b2` (RC65); gli sviluppi RC66–RC74 restano cumulativi e non ancora confermati con nuovo commit. Nessun commit/push/tag/publish dell'assistente.
+
+**Modifica:** il Footer standard occupa x=0%, y=94%, larghezza 100%, altezza 6% del canvas. Il nome della sessione resta centrato nell'area; il numero pagina ora è ancorato a `right:0; bottom:0` **nell’angolo inferiore destro del canvas**, non più al centro verticale della fascia. Numero dinamico all'ordine reale delle pagine, anche dopo un riordino. In anteprima editor, presentazione, vista partecipante e proiezione si usa la medesima struttura di layout. La vista partecipante include il Footer dentro la diapositiva 16:9 invece di duplicarlo sotto il canvas.
+
+**Esportazione PPTX:** la casella autonoma del numero arriva al bordo destro e inferiore della slide, è allineata a destra e in basso, con margini interni zero, mantenendo il testo modificabile. Sono mantenuti i toggle preesistenti per mostrare/nascondere nome e numero del Footer.
+
+**Accettazione:** test Python RC74 di geometria CSS, posizione interna al canvas e verifica geometrica PPTX; test RC73 preesistenti. Non promuovere gate senza successiva CI. **Completamento certificato 84,75%** (42 accettati, 17 parziali su 59); `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+---
+# Quorivio 0.1.0-dev — RC73 — Schemi Titolo/Footer e numerazione pagine (31 ottobre 2026)
+
+**Ultimo commit confermato dal manutentore:** `487c960f09b3c9adb996d489f44b52d059da12b2` (RC65). **Nessun commit effettuato dall'assistente dopo tale commit**: il nuovo cumulativo include i cicli RC66–RC73.
+
+**Stato RC ufficiale: 84,75%** (59 gate: 42 accettati e 17 parziali), `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Il lavoro RC73 non attribuisce credito senza una CI successiva verificata.
+
+**RC73:** ogni nuova pagina, comprese le nuove pagine di sondaggio/quiz, riceve dal backend un widget `title` centrato in alto, trasparente, con contenuto collegato al nome corrente della pagina. Il presentatore può disattivare tale collegamento e impostare un testo personalizzato. Uno **schema Titolo per sessione** nella sezione impostazioni pagina permette di vedere l'anteprima e modificare font, dimensione, colore e grassetto per tutti i Titoli che ereditano lo schema. Per eccezioni locali si può disattivare l'ereditarietà sul singolo Titolo.
+
+Il widget `footer` è disponibile nella palette: per default occupa l'intera larghezza in fondo al canvas, altezza di una riga, nome sessione centrato e numero della pagina a destra. Proprietà indipendenti permettono di nascondere nome/numero o impostare un testo personalizzato. Il numero deriva sempre dall'ordine corrente delle pagine; **ogni miniatura mostra anche il numero sotto l'anteprima**. Le nuove tipologie sono validate dal server e visualizzate in editor, anteprime, presentazione e vista partecipante. Anche l'export PowerPoint genera testo modificabile per Titolo/Footer, usando il master e il numero della pagina.
+
+**Verifiche locali:** 560 test API Node e 121 test web Node superati; 41 regressioni Python mirate superate; 2 test Python RC73 per esportazione/editabilità PPTX superati. La suite Python completa non ha concluso entro il limite locale. Build npm/TypeScript completa non eseguita perché le dipendenze non sono disponibili. CI standard/estesa RC73 ancora da eseguire dopo il commit.
+
+**Storia CI pre-RC73:** CI standard `41191213305` ed estesa `41191751069` verdi sul commit `487c960f09b3c9adb996d489f44b52d059da12b2`; restano prove esterne e approvazioni GDPR/AGID/sicurezza, infrastruttura RWX fisica e collaudi dispositivo. Nessuna pubblicazione automatica.
+
+---
+# Quorivio RC72 — Accesso live, dashboard e aspetto widget (31 ottobre 2026)
+
+**Completamento RC invariato: 84,75%** (42 gate accettati, 17 parziali su 59; peso totale 100). Questi interventi RC72 sono stati implementati e sottoposti a test locali, ma **non ancora certificati da una nuova CI standard/estesa**. RC strict BLOCCATA, publish disabilitato. Ultimo commit confermato `487c960f09b3c9adb996d489f44b52d059da12b2`; RC66–RC72 cumulativi non ancora confermati committati dall'utente. Nessun commit/push/tag/release dell'assistente.
+
+- **Sessioni non disponibili:** un avvio/riavvio dalla pausa o la pubblicazione di una pagina rinnova la validità del link pubblico per almeno 24 ore, anziché conservare una scadenza risalente alla creazione della bozza. L'URL cliccabile per l'utenza è relativo all'istanza corrente. I QR mostrati nella dashboard autenticata possono usare l'origine effettiva del browser se la richiesta è inequivocabilmente same-origin, invece di un hostname pubblico obsoleto. Il fallback esterno mantiene la base configurata e non accetta URL arbitrari dalla query.
+- **Connessione live:** WebSocket ammette l'origine HTTPS/HTTP corrispondente all'Host effettivo dell'app, sempre con autenticazione, appartenenza alla sessione e controlli di revoca. Origini esterne non corrispondenti sono rifiutate. Quando il socket non è disponibile la dashboard effettua recupero periodico autenticato via HTTP (12 secondi), distinto dalla presenza WebSocket; la UI identifica dati HTTP recuperati. Nessuna garanzia di funzionalità oltre le policy del proxy/ingress.
+- **Dashboard:** rimosso il terzo pulsante Monitoraggio live; contenuti di monitoraggio integrati nella vista Impostazioni e monitoraggio. Layout a colonna unica e wrapper `display:contents` per impedire spazi vuoti dovuti a un grid con pannelli nascosti. Resta la voce Pagine e contenuti.
+- **Timer:** scelta esplicita `clear_responses: boolean` al riavvio. Con `true`, reset transazionale delle statistiche/risposte e accodamento cancellazione allegati come RC71; con `false` si conservano risposte, statistiche e file mentre viene riavviato solo `opened_at`. L'API rifiuta omissioni della scelta. La scadenza di pagina al primo accesso resta non rinnovabile tornando indietro; utenti già rispondenti non acquisiscono una seconda risposta in modalità conserva.
+- **Widget:** nuove inserzioni trasparenti e rettangolari, angoli netti di default; campo legacy "Angoli arrotondati" rimosso dalle proprietà in favore della forma esplicita. Aspetto studio predefinito non forza un gradiente quando non scelto; effetti espliciti attivi sulle superfici e adattati all'opzione di accessibilità "riduci movimento". Icona Gauge per partecipanti connessi.
+
+**Verifiche locali:** 558 test API e 118 frontend, parsing TS/TSX dei file modificati con TypeScript globale (zero errori sintattici), 9 test Python RC71 superati, archivio e inventario SHA-256 RC72 verificati. Suite Python generale locale non conclusa per timeout durante i test di conversione; compilazione completa TypeScript/Vite e nuovi collaudi PostgreSQL/browser/ingress restano da verificare nella CI. I provider e le verifiche indipendenti restano fuori perimetro.
+
+---
+# Quorivio 0.1.0-dev — RC71 — Editor, dashboard e lifecycle timer (31 ottobre 2026)
+
+**Completamento verificato precedente 84,75%** (42 gate accettati, 17 parziali su 59, peso 100). Gli interventi RC71 non hanno ancora superato una nuova CI standard ed estesa: nessun punto aggiunto. RC strict BLOCCATA e pubblicazione disabilitata. Ultimo commit confermato `487c960f09b3c9adb996d489f44b52d059da12b2`; il cumulativo RC66–RC71 non risulta ancora committato dall'utente.
+
+**Editor e widget:** conteggi della nuvola fra parentesi quadre; palette di formattazione più grande e colorata; descrizione personale opzionale del presentatore; icone reazioni dimensionabili da 16 a 96 px. Caricamento sfondo da menu contestuale con input file persistente oltre la chiusura del menu, upload privato, applicazione alla pagina e ricarica della libreria.
+
+**Dashboard sessione:** dopo l'avvio, QR e URL distinti per partecipanti e schermo del presentatore, con secondo QR utilizzabile solo dopo autenticazione. I comandi live sostituiscono quelli di anteprima; prima dell'avvio le anteprime restano disponibili con icone colorate e tooltip.
+
+**Timer:** in prima visualizzazione della pagina si salva `opened_at`; tornando alla stessa pagina il countdown mantiene la scadenza originale. Solo il riavvio manuale autorizzato, con conferma, ricomincia il tempo ed elimina i risultati della tornata precedente con cancellazione durabile degli allegati personali. La dashboard e il widget timer nello schermo autenticato del presentatore espongono il pulsante.
+
+**Riporta a non avviata:** endpoint autorizzato solo all'owner, con conferma obbligatoria. Azzera in una transazione partecipanti, risultati, voti, reazioni, risposte, connessioni e allegati dei partecipanti; azzera stato e orologio delle pagine, ruota il link pubblico, porta la sessione a `ready`. Conserva pagine, design, impostazioni e libreria propria del presentatore.
+
+**Prove:** test Node 554 API e 115 frontend verdi; sintassi TypeScript valida; suite Python completa locale non conclusa entro il timeout. Nuova integrazione PostgreSQL/HTTP aggiunta alla CI standard ma non ancora eseguita su GitHub. Restano test reali browser e collaudi esterni, nessun commit/push/tag dall'assistente.
+
+---
+# Quorivio 0.1.0-dev — RC70 — Correzioni editor e timer di pagina (31 ottobre 2026)
+
+**Avanzamento di accettazione precedente: 84,75%** (42 gate accettati, 17 parziali, 59 totali). Le modifiche RC70 sono implementate e coperte da test locali, ma **non sono ancora certificate da una nuova CI completa o da prove di interazione browser sul sistema distribuito**. Di conseguenza il punteggio resta 84,75%; strict RC BLOCCATA. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Baseline Git committata 487c960f09b3c9adb996d489f44b52d059da12b2; RC66–RC70 non ancora dichiarate committate dall'utente.
+
+**Correzioni RC70:** nelle proprietà di un widget timer è possibile impostare una durata da 1 a 3600 secondi, con default 60. Il countdown della pagina disabilita interazioni per partecipanti nel browser e il server applica un controllo autorevole basato su clock PostgreSQL ai POST/PATCH/PUT/DELETE della pagina; vengono considerate tutte le istanze di timer e prevale la scadenza più breve. La simulazione usa un'unica origine temporale per le viste presentatore/partecipante/affiancata, compresi i click in coda alla scadenza. Il contatore dei partecipanti è nascosto al pubblico e riempito con dati dimostrativi per il presentatore in prova; i risultati della domanda testuale possono includere il testo inviato dal partecipante nella prova, insieme a dati di esempio. La modifica globale della dimensione del testo scala proporzionalmente le dimensioni delle porzioni marcate senza cancellare font, colore o altri formati locali. Le maniglie di resize/rotazione del widget selezionato non vengono più ritagliate da clip-path. Profilo presentatore: vista privata mostra la email (se non disattivata) senza duplicazione del titolo; per il pubblico la pubblicazione della email resta opt-in per privacy. I controlli di apertura e cambio modalità della preview sono sincronizzati.
+
+**Prove richieste prima dell'accettazione:** build TypeScript completa in GitHub; CI standard e campagna browser estesa (Chrome/Firefox/WebKit su viewport desktop/mobile), collaudo con più partecipanti simultanei e verifica di timer limite in presenza di ritardi HTTP. La guardia server deve essere ulteriormente collaudata in PostgreSQL integrato prima di dichiarare chiuso il gate parent. Non promuovere alcun gate né avviare una pubblicazione da questo package. Test Node e Python locali documentati nel report dedicato RC70.
+
+---
+# Quorivio 0.1.0-dev — RC69 — Esportazione miniature e recupero riordino (31 ottobre 2026)
+
+**Completamento verificato: 84,75%** (42 gate accettati, 17 parziali, 59 totali; +0,50 su RC68, peso 100). Baseline committata `487c960f09b3c9adb996d489f44b52d059da12b2`, CI standard `41191213305` e campagna estesa `41191751069` verdi sulla vecchia base. Nuovo codice ancora da verificare in CI. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit dell'assistente.
+
+**A2-PAGE-JSON accettato:** download JSON della miniatura nel browser Chromium compilato verificato nel job `124509777927`, indipendente da A2-ORDER e A3-AUTO. Vedi `docs/RC69_PAGE_ORDER_RECOVERY_20261031.it.md`. **Da collaudare:** trascinamento browser Chromium/Firefox/WebKit, recupero scritture HTTP, build TypeScript, verifiche indipendenti su storage/dispositivi/sicurezza.
+
+---
+# Quorivio 0.1.0-dev — RC68 — Libreria privata degli sfondi: accettazione verificata (31 ottobre 2026)
+
+**Baseline committata dal manutentore:** `487c960f09b3c9adb996d489f44b52d059da12b2`; CI standard `41191213305` e campagna estesa `41191751069` superate, pubblicazione saltata. Le modifiche RC66, RC67 e RC68 non sono ancora state dichiarate committate dall'utente. L'assistente non esegue commit o push.
+
+**Nuova riconciliazione:** il job qualità `124509777927` della campagna estesa ha superato `tools/ci_background_library_postgres.py` con HTTP autenticato e PostgreSQL 18 reale. Verificati caricamento PNG, riutilizzo tra sessioni del proprietario, negazione a un non-collaboratore, condivisione di accesso a un collaboratore, copia di proprietà indipendente e isolamento dopo la revoca. `C4-PRIVATE-BACKGROUNDS` (peso 1, accettato) è indipendente dalle foto profilo `C4-PROFILE` e dall'INSTREAM ClamAV `C4-AV-INSTREAM`. Il parent `C4` parziale passa da peso 2 a 1; incrementa il punteggio di 0,50 punti.
+
+**Completamento RC: 84,25%** (41 gate accettati, 17 parziali, 58 totali; +0,50 punti dal RC67). Peso complessivo 100. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. **Non è una prova di storage RWX fisico multi-nodo, ClamAV gestito nel flusso HTTP sotto carico, sistemi assistivi o approvazione indipendente AGID/GDPR/security.** Il nuovo package richiede la prossima CI GitHub.
+
+---
+# Quorivio 0.1.0-dev — RC67 — Accettazione verificata anteprima interattiva (31 ottobre 2026)
+
+**Baseline committata dal manutentore:** `487c960f09b3c9adb996d489f44b52d059da12b2`. CI standard `41191213305` e campagna estesa `41191751069` superate sullo stesso codice, 11/11 job obbligatori verdi, senza pubblicazione. L'assistente non effettua commit.
+
+**Riconciliazione delle prove:** il job qualità `124509777927` ha verificato con Chromium reale 1440/390 le risposte in anteprima, le reazioni singole, le statistiche del presentatore e le scadenze che impediscono risposte tardive. Il job Firefox/WebKit `124511576966` ha verificato il doppio preview React compilato su desktop/mobile con gestione del focus. Il nuovo gate `B2-CLIENT-REHEARSAL` certifica solo questo comportamento client: non replica il credito PostgreSQL `B2-DB` né i controlli di focus A1/A4. Rimangono aperti i collaudi B2 con latenza variabile, più repliche e dispositivi fisici.
+
+**Completamento RC: 83,75%** (40 gate accettati, 17 parziali, 57 totali), +1,00 punto rispetto a RC66. Il peso complessivo è 100: B2 parziale passa da peso 4 a 2, il nuovo gate accettato pesa 2. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. **RC strict NON PRONTA**: provider reali, TLS pubblico, RWX tra macchine fisiche, accessibilità assistiva e approvazioni indipendenti GDPR/AGID/sicurezza. La nuova CI andrà verificata dopo il prossimo commit del manutentore.
+
+---
+# Quorivio 0.1.0-dev — RC66 — Riconciliazione SSO verificata su GitHub (31 ottobre 2026)
+
+**Ultimo commit del manutentore:** `487c960f09b3c9adb996d489f44b52d059da12b2`. CI standard `41191213305` e campagna completa `41191751069` verdi (11/11 verifiche obbligatorie sullo stesso codice), senza pubblicazione. Nel job `124509777927` sono state verificate su PostgreSQL le revoche e il collegamento federato, oltre alla gestione HTTP delle identità isolate per utente. È un perimetro distinto dal precedente gate di solo protocollo `C3-AUTO`. Separati dal C3 parziale 2 punti di peso e accettato `C3-PG-IDENTITY` con peso 2; il peso totale resta 100.
+
+**Progresso verificato: 82,75%** (39 gate accettati, 17 parziali su 56; +1,00 punto rispetto a 81,75%). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. RC strict ANCORA BLOCCATA: consenso/redirect dei provider Google/GitHub/Facebook reali, TLS pubblico, storage RWX su macchine fisiche, accessibilità umana e approvazioni indipendenti GDPR/AGID/sicurezza non verificati. I manifest storici sono immutabili. Nessun commit/tag/push dell'assistente.
+
+---
 # Quorivio 0.1.0-dev — RC65 — CI historical documentation regression (31 ottobre 2026)
 
 **Baseline committata dal manutentore:** `0786ef2f4b064080dd49b42f41d2f04b3d5f4c8a` (include RC64). La CI standard `41189697040` (job `124503743950`) ha superato 546 test API, 99 test web, build, integrazioni PostgreSQL, Kubernetes, verifiche di inventario prima della suite Python; il job si è fermato in `PYTHONPATH=tools python3 -m unittest discover -s tools/tests -v` con 2 failure su 1399 test, perché due regressioni storiche cercano ricevute RC58 solo nei primi 1700/2000 caratteri di documenti ai quali vengono prepese nuove sezioni.

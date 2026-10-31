@@ -39,3 +39,14 @@ export function changedRegion(before:string,after:string):{start:number;end:numb
  let suffix=0;while(suffix<Math.min(before.length-start,after.length-start)&&before[before.length-suffix-1]===after[after.length-suffix-1])suffix++;
  return {start,end:after.length-suffix};
 }
+
+/** Scale the widget's base size and each independently authored size by the same factor.
+ * Do not rewrite colors, faces, weights or per-character overrides. */
+export function scaleWidgetFont(widget:{style?:{fontSize?:number};textMarks?:TextMark[]},nextSize:number):{style:Record<string,unknown>;textMarks:TextMark[]}{
+ const base=widget.style?.fontSize??16;
+ if(!Number.isInteger(nextSize)||nextSize<10||nextSize>96)return {style:{...(widget.style||{})},textMarks:widget.textMarks||[]};
+ const factor=nextSize/base;
+ return {style:{...(widget.style||{}),fontSize:nextSize},textMarks:(widget.textMarks||[]).map(mark=>({
+  ...mark,style:mark.style.fontSize===undefined?mark.style:{...mark.style,fontSize:Math.max(10,Math.min(96,Math.round(mark.style.fontSize*factor)))}
+ }))};
+}

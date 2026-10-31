@@ -1,0 +1,80 @@
+{
+  "cycle": 67,
+  "date": "2026-10-31",
+  "version": "0.1.0-dev",
+  "source": {
+    "commit_sha": "487c960f09b3c9adb996d489f44b52d059da12b2",
+    "standard_run_id": 41191213305,
+    "extended_run_id": 41191751069,
+    "both_success": true,
+    "automatic_rc_required_jobs": 11,
+    "automatic_rc_successful_jobs": 11,
+    "publishing_job": "skipped"
+  },
+  "jobs": {
+    "quality": 124509777927,
+    "native_firefox_webkit": 124511576966,
+    "quality_conclusion": "success",
+    "native_conclusion": "success"
+  },
+  "bounded_proofs": [
+    {
+      "job_id": 124509777927,
+      "engine": "Chromium",
+      "viewports": [
+        1440,
+        390
+      ],
+      "log_excerpt": "PASS offline Chromium 1440px: draft/submit, presenter stats, one-shot reactions and rehearsal reset"
+    },
+    {
+      "job_id": 124509777927,
+      "engine": "Chromium",
+      "viewports": [
+        1440,
+        390
+      ],
+      "log_excerpt": "PASS Chromium 1440px: exact deadline, disabled late submissions, reset and stable presenter stats"
+    },
+    {
+      "job_id": 124509777927,
+      "engine": "built React Chromium",
+      "viewports": [
+        1440,
+        390
+      ],
+      "log_excerpt": "PASS offline built React chromium 1440px: one accessible dual preview, inert background and restored focus"
+    },
+    {
+      "job_id": 124511576966,
+      "engine": "built React Firefox/WebKit",
+      "viewports": [
+        1440,
+        390
+      ],
+      "log_excerpt": "PASS offline built React firefox 1440px: one accessible dual preview, inert background and restored focus"
+    }
+  ],
+  "accounting": {
+    "before": 82.75,
+    "after": 83.75,
+    "delta_percentage_points": 1.0,
+    "total_weight": 100,
+    "B2_parent_old_weight": 4,
+    "B2_parent_new_weight": 2,
+    "B2_client_accepted_weight": 2,
+    "B2_DB_weight_unchanged": true,
+    "accepted_gates": 40,
+    "partial_gates": 17,
+    "gate_count": 57
+  },
+  "unverified": [
+    "real physical touchscreen/screen reader and human accessibility sign-off",
+    "variable latency cross-replica browser timing and independent service SLO",
+    "real external federated identity providers",
+    "public CA issued TLS and physical NFS/CSI RWX",
+    "external GDPR/AGID/security legal and operator review"
+  ],
+  "publish_image": false,
+  "strict_rc_ready": false
+}

@@ -40,10 +40,10 @@
     {
       "id": "A2",
       "area": "A-editor",
-      "weight": 4,
+      "weight": 3,
       "status": "partial",
       "evidence": "Slide thumbnails, order and duplication implemented with keyboard alternative; strict UUID/permutation validation and 8 focused tests (2026-10-24) 2026-10-26 uncommitted: full 16:9 page thumbnails with position-aware preview, menu-based insert before/after, duplication beside source and deletion; drag/drop and keyboard fallback, saved position via /pages/order. Requires real browser verification. Full Chromium 40382686414 exposed menu-on-trigger pointer interception in a one-page session; CSS and actual pointer hit-test fixture corrected locally, CI pending.\nFull opt-in Chromium editor completed in 40517573850, including thumbnail menu and mobile hit testing. Newly added Alt+ArrowUp/Down, keyboard focus return and aria-live order feedback are LOCAL TESTED ONLY, pending next GitHub build/browser. Pixel-accurate thumbnails and cross-engine DnD not independently verified.\n2026-10-27 post-6395b0b: shared style type parity, transparent image fill and widget inspector delete confirmation fixed; local tests PASS. Actual widget-by-widget PostgreSQL persistence, projection parity and cross-browser visual acceptance outstanding. No status promotion.\n2026-10-27 standard push CI 40588408394 on 0bb8fb7856727699384dfe51aea6ee6d961ea022 SUCCESS for quality gate and container build (Docker publication skipped). Opt-in Full CI 40589103128 reached 6 real Chromium preflights PASS but FAILED in tools/ci_browser_editor.py:106 when fixed .editor-mock-header blocked background contextual selection-entry pointer, before real PostgreSQL Chromium acceptance. A viewport-anchored CSS fix for both contextual menu and arrangement panels plus a real desktop/touch Chromium regression was validated LOCALLY only; older CSS gives a genuine header hit-target failure, updated CSS PASS. No gate promotion pending a fresh successful full CI and independent visual/AT review.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: Chromium editor thumb/menu/pointer and responsive editor preflights PASS; physical pixel fidelity and cross-engine drag/drop unverified. Strict RC gate was skipped; status unchanged.\n2026-10-28 local visual parity batch: editor projection-backed widget contents; 16:9 desktop/mobile geometry and rectangular tooltips Chromium preflight PASS; draft participant rehearsal/fullscreen; inline options and persistent bounded typography spans; backend/frontend builds, Node 454+36 PASS. New Full CI and visual operator/physical assistive technology sign-off PENDING. 2026-10-28 local uncommitted: per-widget source-linked results, independent presenter-only rendering, side-by-side simulated presenter/audience and responsive 16:9 CSS; Node backend 455/455, web 44/44, Python focused 58/58, Chromium offline CSS pointer+geometry 1440/390 PASS. New full GitHub Chromium+PostgreSQL pending; this is NOT acceptance evidence.\n2026-10-28: verified remote evidence in GitHub Actions 40717525524 separated as narrow A2-ORDER subgate; parent stays partial and independent acceptance remains required.",
-      "remaining": "Independent pixel-accurate thumbnail/page comparisons, Firefox/WebKit drag and drop and real touchscreen/keyboard operator acceptance remain required. Automated filmstrip baseline separated into A2-ORDER.",
+      "remaining": "Independent pixel-accurate thumbnail/page comparisons, Firefox/WebKit native page drag-and-drop, physical touchscreen and operator acceptance still required. Bounded Chromium filmstrip/keyboard actions are credited in A2-ORDER, while the separately observed browser-downloaded page JSON artifact is credited in A2-PAGE-JSON. RC69 lost-response reorder reconciliation and cross-engine DnD acceptance remain unverified until new CI.",
       "current_verified_run": 40717525524,
       "pending_local_evidence_20261028": "WYSIWYG and independent-question implementation passes local TypeScript/Vite, 461 Node API, 46 frontend, 33 focused Python, Chromium component desktop/mobile. Unverified by GitHub and real PostgreSQL; prior accepted gates unchanged."
     },
@@ -58,6 +58,18 @@
       "verified_commit_sha": "f6738592c648bc620e01b92d2bbaa6b90b459287",
       "verified_job_id": 123073117101,
       "scope": "Automated slide filmstrip layout, action hit-testing and keyboard reordering contracts"
+    },
+    {
+      "id": "A2-PAGE-JSON",
+      "area": "A-editor",
+      "weight": 1,
+      "status": "accepted",
+      "scope": "Actual compiled React Chromium presenter thumbnail context action opens the selected page layout export and receives a downloadable JSON artifact, not merely a visible menu entry. Does not certify JSON import, Office roundtrip, actual content fidelity, native Firefox/WebKit DnD or physical-device approval.",
+      "evidence": "Verified GitHub Actions standard/extended 41191213305 / 41191751069 on commit 487c960f09b3c9adb996d489f44b52d059da12b2, quality job 124509777927 SUCCESS: tools/ci_browser_editor.py opens the real thumbnail context menu, invokes Esporta layout JSON inside page.expect_download(), and asserts the downloaded artifact exists; the concluding compiled-Chromium editor PASS is logged. Separate from A2-ORDER layout/keyboard ordering and A3-AUTO PATCH autosave and revision CAS. This narrow credit does not imply exported content fidelity or real native DnD.",
+      "remaining": "Keep Chromium actual JSON download assertion in the quality gate; full JSON roundtrip fidelity and external accessibility review stay in A2/D4.",
+      "verified_run_id": 41191751069,
+      "verified_job_id": 124509777927,
+      "verified_commit_sha": "487c960f09b3c9adb996d489f44b52d059da12b2"
     },
     {
       "id": "A3",
@@ -218,10 +230,10 @@
     {
       "id": "B2",
       "area": "B-sessions",
-      "weight": 4,
+      "weight": 2,
       "status": "partial",
-      "evidence": "Timed quiz APIs, per-widget results and server timestamps implemented; shared PostgreSQL-clock deadlines for legacy and widget timed answers, local contract and unit tests PASS (2026-10-24); open timed-widget edits now reject duplicate/missing widget IDs (154 Node PASS, 2026-10-24); disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24) CI 40141894130: 24 independent concurrent PostgreSQL-backed HTTP participants, idempotency and timed expiry PASS. 2026-10-26 post-baseline: widget responder avoids pool starvation by resolving identity first and releasing client before notification; already-submitted responses succeed after timed expiry without rescore; legacy timed responses behave analogously. Two presenter-only leaderboards now use PostgreSQL window RANK() for equal elapsed times, instead of ordinal page positions; UI exposes tied ranks. CI 40369919680 prior baseline is GREEN but these new changes still await mandatory PostgreSQL test with 12 clients, strict deadline retries and deterministic tied-rank SQL fixture; local Node 447/447 and focused Python regressions PASS. GitHub CI 40379416187 SHA 5369f438: concurrent audience moderation passed, but new timed-widget acceptance failed in Python at line 79 (duration_ms PG int8 serialized as decimal string; test compared to int). Lossless test-only parser and four regressions now pass locally; mandatory real PG rerun pending.\n2026-10-27 quality job 122235650919, run 40517573850: PostgreSQL timed-widget fairness, retry and topic concurrency acceptance SUCCESS, including deterministic tied ranks, expiry, 12 same-participant concurrent clients. Independent variable-latency/cross-engine/touch screen-reader review still pending.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: Real PostgreSQL timed-widget 12-way idempotency/concurrency/fairness and topic quotas PASS; variable latency, multi-replica load environment not signed off. Strict RC gate was skipped; status unchanged. 2026-10-28 local uncommitted: per-widget source-linked results, independent presenter-only rendering, side-by-side simulated presenter/audience and responsive 16:9 CSS; Node backend 455/455, web 44/44, Python focused 58/58, Chromium offline CSS pointer+geometry 1440/390 PASS. New full GitHub Chromium+PostgreSQL pending; this is NOT acceptance evidence.\n2026-10-28 pending local batch (after last committed e2dc3a97): production WYSIWYG contentEditable DOM ownership fixes duplicated characters and buffers IME composition; desktop/mobile real Chromium offline acceptance PASS including Unicode input. Question-scoped answer revisions derived from existing immutable widget history prevent a change to q2 from reopening q1 responses or resetting its statistics/rankings; 6 API Node tests PASS, full backend 467/467 PASS, web 49/49 PASS. Actual PostgreSQL legacy migration and independent-answer transactional acceptance are added to manual CI but have NOT yet executed on GitHub. No independent sign-off or gate promotion.\n2026-10-28: after successful Full CI 40638652838, the automated evidence-specific B2-DB subgate (weight 2) was formally separated and accepted. Parent remains partial and still requires every independent check listed below.",
-      "remaining": "Production-like variable-latency, long-lived concurrency across replicas and manual presenter/participant timing validation. Linked topic results and real dual-preview interaction added locally post-CI must pass new CI.",
+      "evidence": "Timed quiz APIs, per-widget results and server timestamps implemented; shared PostgreSQL-clock deadlines for legacy and widget timed answers, local contract and unit tests PASS (2026-10-24); open timed-widget edits now reject duplicate/missing widget IDs (154 Node PASS, 2026-10-24); disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24) CI 40141894130: 24 independent concurrent PostgreSQL-backed HTTP participants, idempotency and timed expiry PASS. 2026-10-26 post-baseline: widget responder avoids pool starvation by resolving identity first and releasing client before notification; already-submitted responses succeed after timed expiry without rescore; legacy timed responses behave analogously. Two presenter-only leaderboards now use PostgreSQL window RANK() for equal elapsed times, instead of ordinal page positions; UI exposes tied ranks. CI 40369919680 prior baseline is GREEN but these new changes still await mandatory PostgreSQL test with 12 clients, strict deadline retries and deterministic tied-rank SQL fixture; local Node 447/447 and focused Python regressions PASS. GitHub CI 40379416187 SHA 5369f438: concurrent audience moderation passed, but new timed-widget acceptance failed in Python at line 79 (duration_ms PG int8 serialized as decimal string; test compared to int). Lossless test-only parser and four regressions now pass locally; mandatory real PG rerun pending.\n2026-10-27 quality job 122235650919, run 40517573850: PostgreSQL timed-widget fairness, retry and topic concurrency acceptance SUCCESS, including deterministic tied ranks, expiry, 12 same-participant concurrent clients. Independent variable-latency/cross-engine/touch screen-reader review still pending.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: Real PostgreSQL timed-widget 12-way idempotency/concurrency/fairness and topic quotas PASS; variable latency, multi-replica load environment not signed off. Strict RC gate was skipped; status unchanged. 2026-10-28 local uncommitted: per-widget source-linked results, independent presenter-only rendering, side-by-side simulated presenter/audience and responsive 16:9 CSS; Node backend 455/455, web 44/44, Python focused 58/58, Chromium offline CSS pointer+geometry 1440/390 PASS. New full GitHub Chromium+PostgreSQL pending; this is NOT acceptance evidence.\n2026-10-28 pending local batch (after last committed e2dc3a97): production WYSIWYG contentEditable DOM ownership fixes duplicated characters and buffers IME composition; desktop/mobile real Chromium offline acceptance PASS including Unicode input. Question-scoped answer revisions derived from existing immutable widget history prevent a change to q2 from reopening q1 responses or resetting its statistics/rankings; 6 API Node tests PASS, full backend 467/467 PASS, web 49/49 PASS. Actual PostgreSQL legacy migration and independent-answer transactional acceptance are added to manual CI but have NOT yet executed on GitHub. No independent sign-off or gate promotion.\n2026-10-28: after successful Full CI 40638652838, the automated evidence-specific B2-DB subgate (weight 2) was formally separated and accepted. Parent remains partial and still requires every independent check listed below.\n2026-10-31 RC67: only offline client-side timed rehearsal/presenter-statistics/reaction parity is promoted separately as B2-CLIENT-REHEARSAL, from the already successful 41191751069 real Chromium opt-in + native built React Firefox/WebKit. PostgreSQL answer transactions are already B2-DB and are not counted here.",
+      "remaining": "Production-like variable-latency long-lived timed-widget concurrency across independent replicas, real presenter/participant timing on physical touch devices, human browser/operator verification and independent accessibility approval. Offline Chromium and native-engine dual-preview automated acceptance are separately counted as B2-CLIENT-REHEARSAL; PostgreSQL transactional correctness is counted only in B2-DB.",
       "current_verified_run": 40595463258,
       "pending_local_evidence_20261028": "WYSIWYG and independent-question implementation passes local TypeScript/Vite, 461 Node API, 46 frontend, 33 focused Python, Chromium component desktop/mobile. Unverified by GitHub and real PostgreSQL; prior accepted gates unchanged."
     },
@@ -236,6 +248,19 @@
       "verified_run_id": 40638652838,
       "verified_sha": "a32ef78902a656262d346a0fa622604a4deda405",
       "acceptance_kind": "bounded_automated_only"
+    },
+    {
+      "id": "B2-CLIENT-REHEARSAL",
+      "area": "B-sessions",
+      "weight": 2,
+      "status": "accepted",
+      "scope": "Browser-executed client-side timed and reactive rehearsal controls: desktop/mobile Chromium draft/submit, source-scoped presenter statistics, exactly-once reaction, reset, hard deadline and late-answer denial; real built React accessible dual preview rendering in Chromium/Firefox/WebKit at desktop/mobile. Offline simulations, not real external devices or production user timing.",
+      "evidence": "GitHub Actions extended 41191751069, production quality job 124509777927 PASS (commit 487c960f09b3c9adb996d489f44b52d059da12b2): PASS offline Chromium 1440px and 390px draft/submit, presenter stats, one-shot reactions and rehearsal reset; PASS Chromium 1440px and 390px exact deadline, disabled late submissions, reset and stable presenter stats; PASS offline built React chromium 1440px/390px one accessible dual preview. Native Firefox/WebKit job 124511576966 PASS built React firefox/webkit 1440px and 390px dual preview with inert background/restored focus. This client-side interaction parity is not the B2-DB PostgreSQL fairness/answer-transaction gate, nor A1/A4 modal focus or A3 stage geometry.",
+      "remaining": "Maintain CI client behavior and cross-browser built React acceptance. Physical touchscreen/slow-network/presenter-device sign-off and real distributed timing remain open in B2; no claim of human screen-reader audit or real browser-to-provider transactions.",
+      "verified_run_id": 41191751069,
+      "verified_job_id": 124509777927,
+      "verified_native_job_id": 124511576966,
+      "verified_commit_sha": "487c960f09b3c9adb996d489f44b52d059da12b2"
     },
     {
       "id": "B3",
@@ -397,10 +422,10 @@
     {
       "id": "C3",
       "area": "C-admin",
-      "weight": 4,
+      "weight": 2,
       "status": "partial",
-      "evidence": "Social OAuth/OIDC and admin configuration code exists",
-      "remaining": "Real Google/GitHub/Facebook provider redirects, state/error/mismatch cases, browser E2E and operator approval. Real provider consent, redirects and callback across Google/GitHub/Facebook; cross-replica state, expiry/replay, denied linking, authenticated browser flows, external operator sign-off. Local post-commit OAuth redirect/secret hardening pending new CI.",
+      "evidence": "Social OAuth/OIDC and admin configuration code exists\n2026-10-31 RC66: separate PostgreSQL federated account-linking / unlinking / revocation acceptance accepted in C3-PG-IDENTITY only; no credit here for real providers.",
+      "remaining": "Real external Google/GitHub/Facebook consent/redirect/callback across replicas; OIDC provider failure cases; browser E2E against real providers; external operator sign-off and deployment-deliverability validation. No disposable CI run proves real-provider identity federation.",
       "current_verified_run": null
     },
     {
@@ -414,13 +439,37 @@
       "remaining": "Maintain protocol regression tests on further code; external OAuth provider redirects/callback, browser integration, multifactor integration and multi-replica operator acceptance remain within partial gate C3."
     },
     {
-      "id": "C4",
+      "id": "C3-PG-IDENTITY",
       "area": "C-admin",
       "weight": 2,
+      "status": "accepted",
+      "scope": "PostgreSQL-backed SSO account-linking and identity-management HTTP boundary: one-shot state, concurrent unique linking, revocation/password-reset/approval gating, password-protected account-scoped unlink with cross-user denial; disposable localhost PostgreSQL/API only.",
+      "verified_run_id": 41191751069,
+      "verified_job_id": 124509777927,
+      "verified_commit_sha": "487c960f09b3c9adb996d489f44b52d059da12b2",
+      "evidence": "Verified GitHub Actions 41191751069, production quality job 124509777927 on 487c960f09b3c9adb996d489f44b52d059da12b2: PASS disposable PostgreSQL OAuth linking: valid link, duplicate prevention, one-shot state, admin revocation, password reset and approval gates; PostgreSQL federated identity management HTTP acceptance step SUCCESS; 546 Node API, 99 Node web, full build and quality gate SUCCESS; 11/11 extended opt-in campaign jobs SUCCESS. Different scope from C3-AUTO protocol-only unit proofs.",
+      "remaining": "Maintain PostgreSQL linking/unlink regression acceptance. Real identity-provider consent/callback, remote deliverability, independent browser/operator sign-off stay in parent C3; no live credentials or production tokens exercised."
+    },
+    {
+      "id": "C4",
+      "area": "C-admin",
+      "weight": 1,
       "status": "partial",
       "evidence": "Administrative directory, profile/preferences, transactional platform settings, and locked private-photo replacement/deletion implemented; build and local unit tests pass (2026-10-24). Post-commit profile cycle 2026-10-26: session-scoped public presenter photo projection (anonymous widget previously used private auth-only URL); atomic nickname+display_name PostgreSQL update; legacy profile name update no longer rewrites photo; one-button frontend save and automatic profile load. Local 317 Node/660 Python and API/web builds PASS; real PostgreSQL/browser pending. 2026-10-26 local 40-item batch: profile-image metadata/role-neutral profile and atomic admin user update with Node/Python/build PASS; new real PostgreSQL HTTP/Chromium acceptance wired but not yet executed; status unchanged. 2026-10-26 privacy hardening: retention update now requires actual session owner; new sessions use administrator-configured default; unit and CI acceptance added, CI pending. 2026-10-26 post-commit: atomic account-deletion avatar queue and atomic old-photo replacement enqueue, bounded leased erasure workers, local file/symlink and 44 Node + 10 Python newly added regression tests PASS; CI PostgreSQL acceptance authored, not executed. No promotion. GitHub CI 40331628755: PostgreSQL profile lifecycle passed, but downstream erasure integration failed on timestamp fence; three worker claim SQL expressions corrected to JS-millisecond precision locally and 433 Node/708 Python PASS, CI replay pending. GitHub Actions 40349577790: 433 Node unit tests and production TS builds PASS, disposable SMTP fixture started, but PostgreSQL email MFA E2E interrupted by shared-IP API throttle 429 after prior profile suite; no MFA browser or full positive CI acceptance established. Local hotfix adds non-production ephemeral load token to MFA-only test requests and regression tests; remote rerun pending (2026-10-26).\n2026-10-27 quality job 122235650919, run 40517573850: browser presenter profile upload and anonymous avatar E2E PASS, PostgreSQL profile lifecycle and durable erasure, email MFA PASS. Operator/real RWX multi-replica tests outstanding.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: Chromium + PostgreSQL presenter profile photo upload, public anonymous scoped avatar, private denial and deletion PASS; real RWX/ClamAV deployment not tested. Strict RC gate was skipped; status unchanged.",
-      "remaining": "Unverified residual: multi-replica RWX storage and actual ClamAV deployment with concurrent uploads, deployment/backup key lifecycle, physical-device and independent assistive-technology acceptance. Presenter profile/PostgreSQL/browser coverage is separated into C4-PROFILE, not a claim that these residual checks passed. Cycle 34 separately credits only a disposable clamd INSTREAM signature check; real uploads through the HTTP application, RWX storage, managed K8s ClamAV concurrent use and operator/security signoff remain OPEN.",
+      "remaining": "Independent RWX storage across physical nodes; real managed ClamAV under concurrent HTTP uploads and scanner updates; deployment/backup key lifecycle, physical device and assistive-technology tests; external operator/security sign-off. The private PostgreSQL-backed background ownership/copy/revocation smoke is narrowly credited in C4-PRIVATE-BACKGROUNDS, while profile photos remain in C4-PROFILE and raw clamd INSTREAM remains in C4-AV-INSTREAM.",
       "current_verified_run": 40595463258
+    },
+    {
+      "id": "C4-PRIVATE-BACKGROUNDS",
+      "area": "C-admin",
+      "weight": 1,
+      "status": "accepted",
+      "scope": "Authenticated real PostgreSQL 18 / HTTP / private filesystem presenter background library: upload PNG, private asset reads, reuse across owner sessions, disallow non-collaborator access, offer to collaborator, independently owned copy and post-revocation isolation. Excludes profile pictures, ClamAV signature scan, real RWX/CSI and production operator review.",
+      "evidence": "Successful GitHub Actions 41191751069 at commit 487c960f09b3c9adb996d489f44b52d059da12b2, quality job 124509777927. PASS presenter-owned background upload, reuse, private access, collaborator independent copy and revocation (disposable CI). Executed tools/ci_background_library_postgres.py against real PostgreSQL 18 and authenticated HTTP. This scope is distinct from C4-PROFILE (profile photo), C4-AV-INSTREAM (standalone scanner) and any production RWX/CSI approval.",
+      "remaining": "Keep the reproducible PostgreSQL/HTTP private background smoke in every standard CI; production RWX/ClamAV/device/legal acceptance stays in partial parent C4.",
+      "verified_run_id": 41191751069,
+      "verified_job_id": 124509777927,
+      "verified_commit_sha": "487c960f09b3c9adb996d489f44b52d059da12b2"
     },
     {
       "id": "C4-AV-INSTREAM",
@@ -1561,5 +1610,102 @@
     "rc_score_credit_delta": 0,
     "rc_score_after": 81.75,
     "reason_no_credit": "New code has local tests only; repeat real PostgreSQL CI and external provider/operator acceptance after maintainer commit."
+  },
+  "rc_cycle66_remote_reconciliation_20261031": {
+    "date": "2026-10-31",
+    "source_standard_run_id": 41191213305,
+    "source_extended_run_id": 41191751069,
+    "quality_job_id": 124509777927,
+    "source_sha": "487c960f09b3c9adb996d489f44b52d059da12b2",
+    "source_success": true,
+    "required_rc_campaign_jobs_passed": 11,
+    "required_rc_campaign_jobs_total": 11,
+    "split_parent": "C3",
+    "subgate": "C3-PG-IDENTITY",
+    "before_score": 81.75,
+    "after_score": 82.75,
+    "delta_percentage_points": 1.0,
+    "weight_total": 100,
+    "no_double_credit_from": "C3-AUTO",
+    "real_provider_signoff": false,
+    "public_tls_or_physical_rwx_signoff": false,
+    "strict_rc_ready": false,
+    "publish_image": false
+  },
+  "rc_cycle67_client_rehearsal_reconciliation_20261031": {
+    "date": "2026-10-31",
+    "source_committed_sha": "487c960f09b3c9adb996d489f44b52d059da12b2",
+    "standard_ci": 41191213305,
+    "extended_ci": 41191751069,
+    "source_quality_job": 124509777927,
+    "native_browser_job": 124511576966,
+    "all_required_campaign_jobs_successful": 11,
+    "old_percentage": 82.75,
+    "new_percentage": 83.75,
+    "delta_percentage_points": 1.0,
+    "before_B2_parent_weight": 4,
+    "after_B2_parent_weight": 2,
+    "new_accepted_B2_CLIENT_REHEARSAL_weight": 2,
+    "previous_B2_DB_remains_unchanged": true,
+    "no_image_publication": true,
+    "strict_rc_ready": false,
+    "human_device_approval": false
+  },
+  "rc_cycle68_verified_backgrounds_reconciliation_20261031": {
+    "date": "2026-10-31",
+    "baseline_score": 83.75,
+    "new_score": 84.25,
+    "delta_points": 0.5,
+    "previous_gate_count": 57,
+    "new_gate_count": 58,
+    "accepted_count": 41,
+    "partial_count": 17,
+    "source_run": 41191751069,
+    "source_job": 124509777927,
+    "source_sha": "487c960f09b3c9adb996d489f44b52d059da12b2",
+    "accepted_subgate": "C4-PRIVATE-BACKGROUNDS",
+    "parent_C4_previous_weight": 2,
+    "parent_C4_new_weight": 1,
+    "new_accepted_weight": 1,
+    "disjoint_from": [
+      "C4-PROFILE",
+      "C4-AV-INSTREAM"
+    ],
+    "unverified": [
+      "real multi-node CSI/NFS RWX",
+      "managed Kubernetes ClamAV under concurrent HTTP upload",
+      "third-party security and privacy operator sign-off"
+    ],
+    "publish_image": false,
+    "strict_rc_ready": false,
+    "pending_git_ci_for_cycle68": true
+  },
+  "rc_cycle69_thumbnail_export_reconciliation_20261031": {
+    "date": "2026-10-31",
+    "baseline_score": 84.25,
+    "new_score": 84.75,
+    "delta_points": 0.5,
+    "previous_gate_count": 58,
+    "new_gate_count": 59,
+    "accepted_count": 42,
+    "partial_count": 17,
+    "source_run": 41191751069,
+    "source_job": 124509777927,
+    "source_sha": "487c960f09b3c9adb996d489f44b52d059da12b2",
+    "accepted_subgate": "A2-PAGE-JSON",
+    "parent_A2_previous_weight": 4,
+    "parent_A2_new_weight": 3,
+    "new_accepted_weight": 1,
+    "disjoint_from": [
+      "A2-ORDER",
+      "A3-AUTO",
+      "D4-CONVERTER-BOUNDARY"
+    ],
+    "pending_local_software": "Response-loss page reorder authoritative readback, browser native DnD on Chromium/Firefox/WebKit, concurrency and keyboard regressions",
+    "new_ci_required_for_local_changes": true,
+    "native_dnd_promoted": false,
+    "strict_rc_ready": false,
+    "publish_image": false,
+    "publish_latest": false
   }
 }

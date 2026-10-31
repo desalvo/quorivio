@@ -10,7 +10,7 @@ class FrontendEditorCompileContract(unittest.TestCase):
         main=(ROOT/'apps/web/src/main.tsx').read_text()
         contract=(ROOT/'apps/web/src/widget-style-contract.ts').read_text()
         domain=(ROOT/'apps/api/src/domain.ts').read_text()
-        self.assertIn("type EditorWidgetPermissionFields = Pick<NonNullable<PageDesign['widgets']>[number], 'allowAnswerChange' | 'showEmail'>",main)
+        self.assertIn("type EditorWidgetPermissionFields = Pick<NonNullable<PageDesign['widgets']>[number], 'allowAnswerChange' | 'showEmail' | 'titleFollowPage' | 'titleUseMaster' | 'footerShowSessionTitle' | 'footerShowPageNumber'>",main)
         self.assertIn('style?:WidgetTextStyle} & EditorWidgetPermissionFields>([]));',main)
         self.assertIn("PersistedAnswerChangeFlag=Assert<Equal<StoredPageWidget['allowAnswerChange'],boolean|undefined>>",contract)
         self.assertIn("PersistedProfileEmailFlag=Assert<Equal<StoredPageWidget['showEmail'],boolean|undefined>>",contract)

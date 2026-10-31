@@ -18,7 +18,7 @@ class ProjectionTextFidelity(unittest.TestCase):
         self.assertIn("w.kind==='postit'?<div className=\"rehearsal-postit\" style=", WEB)
 
     def test_rehearsal_uses_imported_typography_and_full_text(self):
-        self.assertIn("...widgetTypographyStyle(w.style)", WEB)
-        self.assertIn('<ProjectionWidgetContent sessionId={snapshot.session.id} widget={w} activity={activity} joinCode={snapshot.session.join_code} usePrivateProfile={true}/>', WEB)
+        self.assertIn("...widgetTypographyStyle(w.kind==='title'?widgetDisplay(w,{pageTitle:activity.title,masterTitleStyle:snapshot.session.theme?.master?.titleStyle}).style:w.style)", WEB)
+        self.assertIn('<ProjectionWidgetContent sessionId={snapshot.session.id} widget={w} activity={activity} joinCode={snapshot.session.join_code} usePrivateProfile={true} sessionTitle={snapshot.session.title} pageNumber={page+1} masterTitleStyle={snapshot.session.theme?.master?.titleStyle}/>', WEB)
 
 if __name__ == '__main__': unittest.main()

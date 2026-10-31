@@ -17,7 +17,9 @@ class PageOrderInflightTests(unittest.TestCase):
         self.assertIn('finally{pageOrderRequestInFlight.current=false;setPageOrderPending(false)}', self.source)
 
     def test_stale_session_response_not_applied(self):
-        self.assertIn('if(selectedSessionRef.current===sessionId){setSnap(updated);setPageOrderAnnouncement(', self.source)
+        self.assertIn('if(selectedSessionRef.current===sessionId){', self.source)
+        self.assertIn('setSnap(outcome.snapshot)', self.source)
+        self.assertIn('snapshot=>snapshot.activities.map(activity=>activity.id)', self.source)
 
     def test_filmstrip_disabled_during_order_change(self):
         self.assertIn('aria-busy={pageOrderPending}', self.source)

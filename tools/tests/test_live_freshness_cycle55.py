@@ -29,7 +29,8 @@ class LiveFreshnessCycle55(unittest.TestCase):
         self.assertGreaterEqual(self.transport.count('cancelFreshness()'),4)
 
     def test_presenter_and_projector_consume_live_status(self):
-        self.assertIn('useLive(selected||undefined,s=>setSnap(s),setPresenterLive)',self.ui)
+        self.assertIn('setPresenterLive',self.ui)
+        self.assertIn('createLiveConnection({',self.ui)
         self.assertIn('useLive(publicId||undefined,setPublicSnap,setScreenLive)',self.ui)
         self.assertIn('live-stale-warning',self.ui)
         self.assertIn('role="status" aria-live="polite"',self.ui)

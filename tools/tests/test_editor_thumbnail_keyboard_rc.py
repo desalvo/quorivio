@@ -17,7 +17,8 @@ class ThumbnailKeyboardRC(unittest.TestCase):
   self.assertIn('aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown"',self.tsx)
   self.assertIn("if(e.altKey){if((e.key==='ArrowUp'||e.key==='ArrowDown')&&to!==i)void dropPage(a.id,pages[to].id);return}",self.tsx)
   self.assertIn('sourceId===targetId||!confirmPageNavigation()',self.tsx)
-  self.assertIn("await request(`/sessions/${sessionId}/pages/order`,'PUT',{activity_ids:activityIds})",self.tsx)
+  self.assertIn("()=>request(`/sessions/${sessionId}/pages/order`,'PUT',{activity_ids:activityIds})",self.tsx)
+  self.assertIn('commitAndReconcilePageOrder(',self.tsx)
  def test_navigation_is_distinct_from_reordering(self):
   self.assertIn("if(pages[to]){beginPageDesign(pages[to]);requestAnimationFrame",self.tsx)
   self.assertIn('onClick={()=>beginPageDesign(a)}',self.tsx)
@@ -25,7 +26,7 @@ class ThumbnailKeyboardRC(unittest.TestCase):
   self.assertIn("e.key==='Escape'){e.preventDefault();e.stopPropagation();setPageThumbMenu('')",self.tsx)
   self.assertIn('requestAnimationFrame(()=>trigger?.focus())',self.tsx)
  def test_page_order_announced_on_completion_failure_and_pending(self):
-  for value in ('Riordino delle pagine in corso','Ordine delle pagine salvato','Riordino non riuscito, ordine precedente conservato'):
+  for value in ('Riordino delle pagine in corso','Ordine delle pagine salvato','Esito del riordino non verificabile'):
    self.assertIn(value,self.tsx)
   self.assertIn('className="page-editor-order-status" role="status" aria-live="polite"',self.tsx)
   self.assertIn('clip:rect(0,0,0,0)',self.css)

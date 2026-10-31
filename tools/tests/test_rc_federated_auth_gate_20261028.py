@@ -12,7 +12,10 @@ class FederatedAuthRC(unittest.TestCase):
  def test_only_github_verified_federated_protocol_subgate_is_accepted(self):
   doc=json.loads((ROOT/'docs/RC_GATE_MATRIX.json').read_text())
   gates={g['id']:g for g in doc['gates']}
-  self.assertEqual((gates['C3']['weight'],gates['C3']['status']),(4,'partial'))
+  # Historical C3-AUTO protocol evidence remains immutable. RC66 separately
+  # accepted PostgreSQL account management; live external providers remain partial.
+  self.assertEqual((gates['C3']['weight'],gates['C3']['status']),(2,'partial'))
+  self.assertEqual((gates['C3-PG-IDENTITY']['weight'],gates['C3-PG-IDENTITY']['status']),(2,'accepted'))
   self.assertEqual((gates['C3-AUTO']['weight'],gates['C3-AUTO']['status'],gates['C3-AUTO']['verified_run_id']),(2,'accepted',40638652838))
   self.assertEqual(gates['C3-AUTO']['verified_commit_sha'],'a32ef78902a656262d346a0fa622604a4deda405')
   self.assertIn('NOT real external provider',gates['C3-AUTO']['evidence'])

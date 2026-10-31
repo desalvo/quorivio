@@ -14,7 +14,7 @@ const polygon:Record<string,string>={
  cloud:'polygon(6% 43%,15% 34%,27% 32%,34% 12%,47% 8%,59% 23%,72% 17%,85% 32%,95% 42%,98% 63%,85% 81%,14% 82%,2% 65%)'
 };
 export function widgetAppearanceStyle(style:WidgetAppearance|undefined,imageUrl?:string):Record<string,string|number|undefined>{
- if(!style)return {};
+ if(!style)return {backgroundColor:'transparent',backgroundImage:'none',borderRadius:0};
  const borderEnabled=!style.strokeNone&&(!!style.strokeColor||style.strokeWidth!==undefined||style.strokeDash!==undefined);
  const dash=style.strokeDash==='dash'?'dashed':style.strokeDash==='dot'?'dotted':'solid';
  const alpha=style.fillOpacity??1;
@@ -24,13 +24,13 @@ export function widgetAppearanceStyle(style:WidgetAppearance|undefined,imageUrl?
  const gradient=style.fillMode==='gradient'&&!style.fillNone?`linear-gradient(135deg, ${color}, ${end})`:undefined;
  const shape=style.shapeType||'';
  const result:Record<string,string|number|undefined>={
-  backgroundColor:style.fillNone?'transparent':!image&&!gradient?(alpha===1?(style.fillColor||((style.fillMode==='solid'||style.fillOpacity!==undefined)?'#ffffff':undefined)):color):undefined,
+  backgroundColor:style.fillNone?'transparent':!image&&!gradient?(alpha===1?(style.fillColor||((style.fillMode==='solid'||style.fillOpacity!==undefined)?'#ffffff':'transparent')):color):undefined,
   // An authored transparent/solid fill must not reveal a decorative theme background image.
   backgroundImage:style.fillNone||(!image&&!gradient&&(style.fillColor!==undefined||style.fillOpacity!==undefined||style.fillMode==='solid'))?'none':undefined,
   borderStyle:style.strokeNone?'none':borderEnabled?dash:undefined,
   borderColor:style.strokeNone?'transparent':borderEnabled?(style.strokeColor||'#334155'):undefined,
   borderWidth:style.strokeNone?0:borderEnabled?`${style.strokeWidth??1}pt`:undefined,
-  borderRadius:shape==='circle'||shape==='ellipse'?'50%':shape==='rounded-rectangle'||style.rounded?14:undefined,
+  borderRadius:shape==='circle'||shape==='ellipse'?'50%':shape==='rounded-rectangle'?14:0,
   clipPath:polygon[shape]
  };
  if(image||gradient){result.backgroundImage=image||gradient;}

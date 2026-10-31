@@ -13,7 +13,8 @@ test('presenter rehearsal uses neutral projection components, never shared draft
  for(const kind of ['question','reactions','rating'])assert.match(source,new RegExp(`kind===['"]${kind}['"].*viewer===['"]presenter['"]`));
  assert.match(source,/kind==='timed-quiz'\)\&\&viewer==='presenter'/);
  assert.match(source,/kind==='results-button'\?<LinkedResultChart/);
- assert.match(source,/sampleStatisticRows\(linkedStatisticSource\(w,widgets\)!,seed,submittedAnswers/);
+ assert.match(source,/sampleStatisticRows\(source,seed,submittedAnswers/);
+ assert.match(source,/rehearsalFreeTextRows\(source,submittedAnswers/);
  assert.doesNotMatch(server,/\/api\/join\/.*\/reactions\/stats/);
 });
 test('choice control is ordered before its caption in the participant and rehearsal',()=>{

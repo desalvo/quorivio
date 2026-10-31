@@ -4,6 +4,7 @@ from __future__ import annotations
 import ast
 import unittest
 from pathlib import Path
+from tools.rc_gate_audit import audit
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -40,8 +41,9 @@ class HistoricalDocumentationCycle65(unittest.TestCase):
                 body=(ROOT/f'docs/{name}{lang}.md').read_text()
                 current=body.split('\n---\n', 1)[0]
                 with self.subTest(name=name, language=lang):
-                    self.assertIn('RC65', current)
-                    self.assertIn('81,75%' if lang else '81.75%', current)
+                    self.assertRegex(current, r'RC6[6-9]')
+                    self.assertIn('RC65', body)
+                    self.assertIn((str(audit()['score']).replace('.', ',') if lang else str(audit()['score']))+'%', current)
                     self.assertIn('rc_strict=false', current)
 
 

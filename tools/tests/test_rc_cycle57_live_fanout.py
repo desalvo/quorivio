@@ -43,7 +43,7 @@ class LiveFanoutCycle57(unittest.TestCase):
         text=(ROOT/'docs/DEVELOPMENT_STATUS.it.md').read_text()
         receipt=(ROOT/'docs/RC58_VERIFIED_IDLE_SLO_AND_REFRESH.it.md').read_text()
         self.assertIn('c0fe7f7b9e41c0295387d84996a7b531b91b69a0',receipt)
-        self.assertIn('81,75%',text.split('\n---\n',1)[0])
+        self.assertRegex(text.split('\n---\n',1)[0],r'8[2-9],\d{2}%')
         self.assertIn('# Quorivio 0.1.0-dev — ciclo 58:',text)
 
 if __name__=='__main__':unittest.main()

@@ -49,3 +49,13 @@ export function rowsFromWidgetAnswerDetail(source:StatisticalWidget,data:any,que
  for(const rev of data?.revisions||[])for(const [id,count] of Object.entries(rev.options||{}))counts.set(id,(counts.get(id)||0)+Number(count));
  return (part.options||[]).map(o=>({id:o.id,label:o.label,count:counts.get(o.id)||0}));
 }
+
+/** Local rehearsal text answers, presenter-only. Keep authored text distinct from
+ * generated samples: no trial response is ever persisted or sent over the network. */
+export function rehearsalFreeTextRows(source:StatisticalWidget&{answerMode?:string;questions?:any[]},answers:Record<string,string|string[]>,questionId=''):StatRow[]{
+ const part=questionId?source.questions?.find(q=>q.id===questionId):source;
+ if(source.kind!=='question'||(part?.answerMode||'text')!=='text')return [];
+ const key=source.id+(questionId?':'+questionId:'');
+ const answer=answers[key];
+ return [{id:'fixture-a',label:'Risposta dimostrativa A',count:2},{id:'fixture-b',label:'Risposta dimostrativa B',count:1},...(typeof answer==='string'&&answer.trim()?[{id:'authored-response',label:answer.trim().slice(0,5000),count:1}]:[])];
+}

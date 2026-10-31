@@ -12,8 +12,8 @@ class ChromiumWidgetTitleEditing(unittest.TestCase):
   self.assertIn('onDoubleClick={e=>',UI)
   self.assertIn('setEditing(w.id);requestAnimationFrame',UI)
   self.assertIn('>Modifica titolo</button>',UI)
-  self.assertIn('<RichWidgetText value={w.label',UI)
-  self.assertIn('active={editing===w.id}',UI)
+  self.assertIn("<RichWidgetText value={w.kind==='title'?widgetDisplay(w,{pageTitle,masterTitleStyle}).title",UI)
+  self.assertIn("active={editing===w.id&&w.kind!=='footer'",UI)
   self.assertIn("ariaLabel={'Titolo '+w.kind}",UI)
   self.assertNotIn('readOnly={editing!==w.id}',UI)
  def test_wysiwyg_finishes_on_enter_without_forcing_a_click(self):

@@ -12,7 +12,7 @@ class CanvasBackgroundNativeContext(unittest.TestCase):
   self.assertIn('Menu contestuale sfondo canvas',SOURCE)
  def test_background_changes_reuse_existing_layout_handler(self):
   self.assertIn('selectLibraryBackground(id,false)',SOURCE)
-  self.assertIn('onBackgroundUpload={file=>{void uploadBackground(file,false)}}',SOURCE)
+  self.assertIn('onBackgroundUpload={file=>uploadBackground(file,false)}',SOURCE)
   self.assertIn('onBackgroundSelect("")',SOURCE)
  def test_existing_widget_menu_is_preserved(self):
   self.assertIn('setContextWidget(onInspectWidget?null:w.id)',SOURCE)

@@ -12,3 +12,14 @@ export function rehearsalExpired(startedAt:number,durationSeconds:number,now:num
 export function maySubmitTimedRehearsal(startedAt:number,seconds:number,now:number,sent:boolean):boolean{
  return !sent&&!rehearsalExpired(startedAt,seconds,now);
 }
+
+/** A timer widget closes ALL interactive widgets on the same preview page.
+ * The shortest configured timer wins; untimed pages remain interactive. */
+export function pageCountdownSeconds(widgets:readonly {kind:string;durationSeconds?:number}[]):number|undefined{
+ const durations=widgets.filter(w=>w.kind==='timer').map(w=>w.durationSeconds??60)
+  .filter(v=>Number.isInteger(v)&&v>=1&&v<=3600);
+ return durations.length?Math.min(...durations):undefined;
+}
+export function pageInteractionExpired(widgets:readonly {kind:string;durationSeconds?:number}[],start:number,now:number):boolean{
+ const seconds=pageCountdownSeconds(widgets);return seconds!==undefined&&rehearsalExpired(start,seconds,now);
+}

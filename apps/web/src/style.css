@@ -1071,3 +1071,88 @@ header.rehearsal-toolbar{height:auto;min-height:0;flex:0 0 auto;position:relativ
 .live-stale-warning{padding:.7rem 1rem;margin:.5rem 0;border:1px solid #c77a20;border-radius:.6rem;background:#fff1d5;color:#653808;font-weight:600;line-height:1.4;max-width:100%;box-sizing:border-box}
 .projection>.live-stale-warning{position:relative;z-index:3;text-align:center;font-size:clamp(.85rem,1.5vw,1.15rem)}
 @media(prefers-reduced-motion:reduce){.live-stale-warning{transition:none;animation:none}}
+
+/* RC70: selected polygon styles must never clip drag/rotate controls. */
+.editor-ux-v2 .widget-canvas-item[data-selected="true"]{clip-path:none!important;overflow:visible!important}
+.editor-ux-v2 .widget-canvas-item[data-selected="true"]>.widget-resize-edge,
+.editor-ux-v2 .widget-canvas-item[data-selected="true"]>.widget-rotate-handle{visibility:visible;opacity:1;pointer-events:auto;z-index:110}
+.rehearsal-page-expired{position:absolute;top:5px;right:5px;z-index:40;padding:.4rem .65rem;background:#7e2222;color:white;border-radius:.4rem;font-size:.85rem}
+
+.rehearsal-presenter-free-text{font-size:.75em;padding:.3em;max-height:45%;overflow:auto}.rehearsal-presenter-free-text ul{padding-left:1.3em;margin:.15em 0}.rehearsal-presenter-free-text li{overflow-wrap:anywhere}
+/* Free-form preview answers stay visible inside the presenter widget even when
+ * its question body uses the full canvas geometry. */
+.rehearsal-widget .rehearsal-presenter-free-text{position:absolute;bottom:0;left:0;right:0;z-index:5;max-height:48%;overflow:auto;background:color-mix(in srgb,#ffffff 95%,transparent);border-top:1px solid #cbd5e1;padding:.3em .55em}
+
+/* RC71: large, artistic, high-contrast formatting palette with readable targets. */
+.widget-selection-palette{gap:9px!important;padding:13px 16px!important;background:linear-gradient(115deg,#122e52,#34265d 55%,#16455d)!important;border:1px solid #aa9eff!important;border-radius:18px!important;box-shadow:0 12px 32px #130e2e55!important}
+.widget-selection-palette button{min-height:44px!important;min-width:44px!important;padding:8px 12px!important;font-size:17px;font-weight:700;background:linear-gradient(135deg,#5166be,#245b99)!important;border:1px solid #a3c8ff!important;border-radius:12px!important;color:#fff!important;transition:filter .12s,transform .12s}
+.widget-selection-palette button:hover:not(:disabled){filter:brightness(1.22);transform:translateY(-2px)}
+.widget-selection-palette button[aria-pressed=true]{background:linear-gradient(125deg,#15899d,#6c50d5)!important}
+.widget-selection-palette label{min-height:44px!important;padding:3px 7px;font-weight:650;color:#fff!important}
+.widget-selection-palette input[type=color]{height:38px!important;width:40px!important;cursor:pointer}
+.widget-selection-palette select,.widget-selection-palette input[type=number]{min-height:38px;border-radius:9px;background:#fff;color:#172643}
+.projection-sample-reactions>div{font-size:var(--reaction-size,32px);line-height:1.25}
+.projection-sample-reactions button{font-size:var(--reaction-size,32px)!important;min-width:1.5em!important;min-height:1.5em!important}
+.presenter-profile-custom-text{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.9em;margin:.5em 0}
+.session-live-access{display:flex;gap:16px;flex-wrap:wrap;padding:16px;border:1px solid #b3caff;border-radius:16px;background:linear-gradient(120deg,#f0f6ff,#f9f2ff);margin-bottom:12px}
+.session-live-qr{display:flex;align-items:center;gap:14px}.session-live-qr img{width:140px;height:140px;background:#fff;border:1px solid #ccd6ef;padding:8px;border-radius:12px}
+.session-live-qr>div,.session-live-presenter{display:flex;flex-direction:column;gap:8px}.session-live-presenter a{display:flex;gap:8px;align-items:center}
+.session-live-access a{color:#2c429d;font-weight:700;overflow-wrap:anywhere}
+@media(max-width:650px){.session-live-qr img{width:100px;height:100px}}
+
+.session-presenter-qr{width:116px;height:116px;border-radius:12px;border:1px solid #c4c8fa;background:#fff;padding:8px}
+.widget-reactions-live button{font-size:var(--reaction-size,32px)!important;min-height:1.5em;min-width:1.5em}
+.presenter-timer-controls{position:relative;z-index:8;display:flex;gap:.4em;flex-wrap:wrap;align-items:center;margin-top:.25em}
+.presenter-timer-controls button{display:flex;gap:.4em;align-items:center;min-height:36px;padding:.3em .6em;font-size:.75em;color:#fff;background:#5144aa;border:1px solid #a7a4e6;border-radius:10px;cursor:pointer}
+.presenter-timer-controls small{background:#fff;color:#1e3156;border-radius:5px;padding:4px}
+
+.rehearsal-launch-actions>button:nth-child(1){background:linear-gradient(125deg,#3f65d1,#7955d8);border-color:#a1a8ff;color:#fff}
+.rehearsal-launch-actions>button:nth-child(2){background:linear-gradient(125deg,#087f94,#169d82);border-color:#75dcd0;color:#fff}
+.rehearsal-launch-actions>button:nth-child(3){background:linear-gradient(125deg,#b7528d,#b16b2a);border-color:#f7b0a2;color:#fff}
+.rehearsal-launch-actions>button svg{stroke-width:2.5;filter:drop-shadow(0 2px 3px #0004)}
+.rehearsal-launch-actions>button{display:inline-flex;gap:8px;align-items:center;justify-content:center;min-height:48px;border-radius:12px;font-weight:750;box-shadow:0 5px 13px #182e5240}
+
+/* RC72: One column per active dashboard section; never create empty CSS-grid cells. */
+.session-detail-layout{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:0!important;width:100%;align-items:start}
+.session-detail-layout>div{display:contents}
+.session-detail-layout.session-tab-overview>div:last-child>section:last-of-type{display:block!important}
+.session-detail-layout.session-tab-overview>div:last-child>.legacy-page-admin{display:none!important}
+.session-detail-layout.session-tab-pages>div:last-child>section:last-of-type{display:none!important}
+.session-detail-layout.session-tab-pages>div:first-child>section:nth-of-type(3),
+.session-detail-layout.session-tab-pages>div:first-child>section:nth-of-type(4){display:block!important}
+.session-detail-layout.session-tab-pages>div:last-child>.legacy-page-admin{display:block!important}
+/* Authored shape, not deprecated rounded flag or widget theme, owns the corners. */
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-art-theme="plain"]{
+ background-color:transparent; background-image:none; border-radius:0;box-shadow:none;
+}
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-art-theme="plain"]::before,
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-art-theme="plain"]::after{display:none}
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-art-theme][data-art-effect="glow"]{box-shadow:0 0 0 1px var(--art-accent,#5fa3df),0 0 20px #4b92da70,0 12px 28px #102b431c}
+/* Stage surfaces and authored non-rounded rectangles must be square even with artistic themes. */
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-art-theme]{border-radius:0}
+
+/* Explicit effects are meaningful even on transparent widgets and every viewer surface. */
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-art-effect="float"]{
+ animation:quorivio-floating-shadow 3.6s ease-in-out infinite;
+}
+@keyframes quorivio-floating-shadow{0%,100%{filter:drop-shadow(0 2px 2px #1d48751a)}50%{filter:drop-shadow(0 9px 6px #1d487566)}}
+@media(prefers-reduced-motion:reduce){:is(.widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-art-effect="float"]{animation:none}}
+
+/* RC73: shared slide-master title and responsive footer text; not the site-wide footer. */
+.projection-widget[data-widget-kind='title'],.rehearsal-widget[data-widget-kind='title'],.widget-canvas-item[data-widget-kind='title']{text-align:center;justify-content:center;align-items:center;display:flex}
+.projection-slide-title{font:inherit;color:inherit;text-align:center;margin:0;width:100%;overflow-wrap:anywhere}
+.projection-widget[data-widget-kind='footer'],.rehearsal-widget[data-widget-kind='footer'],.widget-canvas-item[data-widget-kind='footer']{padding:0!important}
+.projection-slide-footer,.canvas-slide-footer{position:relative;width:100%;height:100%;display:flex;justify-content:center;align-items:center;overflow:hidden;white-space:nowrap;gap:.3em}
+.projection-slide-footer .slide-footer-center,.canvas-slide-footer>span:first-child{display:block;text-align:center;max-width:85%;overflow:hidden;text-overflow:ellipsis}
+.projection-slide-footer .slide-footer-number,.canvas-slide-footer>span:last-child{position:absolute;right:0;bottom:0;top:auto;transform:none;margin:0;text-align:right;line-height:1;font-variant-numeric:tabular-nums}
+.page-editor-thumb-row{position:relative}
+.page-editor-thumbnail-caption{display:block;text-align:center;font-weight:700;color:#c3cae4;font-variant-numeric:tabular-nums;font-size:.8rem;padding:3px 0 5px}
+.slide-master-editor{padding:13px;border:1px solid #7c8abc66;border-radius:12px;margin-bottom:18px;background:#393b651c}
+.slide-master-editor h4{margin:0 0 8px}.slide-master-sample{text-align:center;border:1px dashed #9297af88;border-radius:6px;margin-top:10px;padding:12px 6px;overflow-wrap:anywhere}
+.slide-master-widget-settings{margin-bottom:14px;border-bottom:1px solid #ffffff28;padding:8px 0 14px}
+.participant-slide-title{margin:1.15rem auto 0;text-align:center;max-width:100%}.participant-slide-title h2{font-weight:700;font-size:clamp(23px,4vw,46px);margin:0}
+
+
+/* RC74: the default footer number occupies the bottom-right canvas corner on all stages. */
+.audience-widget-layout>.page-widget[data-widget-kind="footer"]{padding:0!important;overflow:hidden!important}
+.audience-widget-layout>.page-widget[data-widget-kind="footer"] .projection-slide-footer{width:100%;height:100%;min-height:0}

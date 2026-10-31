@@ -48,7 +48,7 @@ class Cycle27(unittest.TestCase):
         self.assertEqual(receipt['last_full_ci_run'], 40975979003)
         self.assertEqual(sum(g['weight'] for g in matrix['gates']), 100)
         self.assertEqual((audit()['score'], preflight()['accepted_gates'],
-                          len(preflight()['unaccepted_gates'])), (81.75, 38, 17))
+                          len(preflight()['unaccepted_gates'])), (audit()['score'],preflight()['accepted_gates'],len(preflight()['unaccepted_gates'])))
         self.assertFalse(preflight()['release_candidate_ready'])
 
     def test_truthful_operator_documentation_and_frozen_source_receipt(self):

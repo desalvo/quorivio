@@ -21,7 +21,7 @@ export function widgetHasAuthoredFill(style?:WidgetTextStyle):boolean{
  return style?.fillNone===true||style?.fillColor!==undefined||style?.fillOpacity!==undefined||style?.fillMode!==undefined;
 }
 export function widgetArtData(style?:WidgetTextStyle){return {
- 'data-art-theme':widgetArtTheme(style),
+ 'data-art-theme':style?.artTheme?widgetArtTheme(style):'plain',
  'data-art-effect':widgetArtEffect(style),
  'data-art-custom-fill':widgetHasAuthoredFill(style)?'true':'false'
 } as const;}
