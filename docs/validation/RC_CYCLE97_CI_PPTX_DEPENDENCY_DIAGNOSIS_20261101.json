@@ -1,0 +1,27 @@
+{
+  "cycle": 97,
+  "version": "0.1.0-dev",
+  "source_log": "logs_111818903235.zip",
+  "failing_job": "Production quality gate",
+  "previous_passed": {
+    "historical_documentation": 30,
+    "editor_contracts": 27,
+    "rc79_inventory_closure": 4,
+    "rc89_editor": 8
+  },
+  "failure": {
+    "stage": "Validate RC90 session actions, slide schemes and footer before npm",
+    "type": "ModuleNotFoundError",
+    "module": "pptx",
+    "tests": 8,
+    "errors": 1
+  },
+  "remedy": "Move only native PPTX tests RC74/RC91 after python-pptx pip install; keep early contracts and exhaustive discovery",
+  "new_external_CI_verified": false,
+  "certified_gate_progress": {
+    "accepted": 42,
+    "partial": 17,
+    "total": 59,
+    "percent": 84.75
+  }
+}

@@ -1,3 +1,12 @@
+# Quorivio 0.1.0-dev — RC97 handoff — native PowerPoint regression staging (1 November 2026)
+
+**Certified RC readiness: 84.75%** (42 accepted, 17 partial out of 59 gates). `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+Maintainer-confirmed commit baseline remains RC95; RC96 was packaged but not explicitly confirmed committed. Uploaded `logs_111818903235.zip` show RC96 documentation gate 30/30 PASS then RC90 native footer test errors on missing `pptx` before pip dependencies are installed. RC97 restricts RC90/RC91 early preflight to dependency-free checks; installs converter dependencies at the existing later gate; explicitly runs both native PPTX cases before full discovery. New RC97 order regression. Certified progress remains 84.75% (42 accepted, 17 partial of 59). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Fresh GitHub CI, TypeScript build and native browsers are not yet certified.
+
+**Suggested single-line cumulative commit since RC95:** `Fix RC documentation checks and stage native PowerPoint CI tests after dependencies`
+
+---
 # Quorivio 0.1.0-dev — RC96 — CI documentation and dated inventory hotfix (1 November 2026)
 
 **Certified RC readiness remains 84.75%** (42/59 accepted; 17 partial).

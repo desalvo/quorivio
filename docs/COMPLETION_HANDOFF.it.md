@@ -1,3 +1,12 @@
+# Quorivio 0.1.0-dev — Handoff RC97 — test PowerPoint dopo installazione dipendenze (1 November 2026)
+
+**Certified RC readiness: 84,75%** (42 accepted, 17 partial out of 59 gates). `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+L'ultimo commit esplicitamente confermato è RC95; il package RC96 non è stato dichiarato committato. I log `logs_111818903235.zip` mostrano le verifiche documentali RC96 verdi (30/30), poi errore RC90 `ModuleNotFoundError: No module named 'pptx'` prima del pip install. RC97 mantiene i contratti senza dipendenze nel preflight ed esegue esplicitamente entrambi i test PPTX RC74/RC91 dopo l'installazione, oltre alla suite completa. Nuova regressione RC97 sull'ordine dei gate. Completamento certificato 84,75% (42 accettati, 17 parziali su 59); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nuova CI GitHub ancora da verificare.
+
+**Suggested single-line cumulative commit since RC95:** `Fix RC documentation checks and stage native PowerPoint CI tests after dependencies`
+
+---
 # Quorivio 0.1.0-dev — RC96 — hotfix CI per documentazione e inventari datati (1 novembre 2026)
 
 **Certified RC readiness remains 84,75%** (42/59 accepted; 17 partial).

@@ -1,3 +1,12 @@
+# Quorivio 0.1.0-dev — RC97 — correzione ordine dipendenze PowerPoint nella CI (1 November 2026)
+
+**Certified RC readiness: 84,75%** (42 accepted, 17 partial out of 59 gates). `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+I log `logs_111818903235.zip` mostrano che le verifiche documentali RC96 passano (30/30), come i contratti editor (27/27). Il gate RC90 fallisce con `ModuleNotFoundError: No module named 'pptx'` (8 test, 1 errore): il controllo nativo PPTX parte prima dell'installazione di `python-pptx`. Anche RC91 conteneva una verifica nativa anticipata. RC97 mantiene i test puri in preflight e sposta entrambi i controlli PPTX dopo l'installazione già prevista, conservandoli anche nella suite completa. Un nuovo test impedisce la regressione dell'ordine CI. Nessuna funzione applicativa rimossa; nuova CI esterna ancora da verificare.
+
+**Suggested single-line cumulative commit since RC95:** `Fix RC documentation checks and stage native PowerPoint CI tests after dependencies`
+
+---
 # Quorivio 0.1.0-dev — RC96 — hotfix CI per documentazione e inventari datati (1 novembre 2026)
 
 **Certified RC readiness remains 84,75%** (42/59 accepted; 17 partial).

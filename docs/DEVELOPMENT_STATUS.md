@@ -1,3 +1,12 @@
+# Quorivio 0.1.0-dev — CI RC97 — dependency order for PowerPoint tests (1 November 2026)
+
+**Certified RC readiness: 84.75%** (42 accepted, 17 partial out of 59 gates). `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+CI logs `logs_111818903235.zip` (Production quality gate) confirm RC96 historical documentation checks 30/30 PASS, editor contracts 27/27 PASS, and RC90 footer preflight fails with `ModuleNotFoundError: No module named 'pptx'` (8 tests, 1 error). Cause: a native PowerPoint regression executed before `python-pptx` installation; RC91 also has an analogous native test. RC97 runs only Python stdlib source contracts in preflight, moves BOTH native tests after the existing converter-dependency install and leaves them in full discovery. New dependency-order regression verifies the gate topology. This does not bypass a PPTX failure or change product code. No new external CI result is claimed.
+
+**Suggested single-line cumulative commit since RC95:** `Fix RC documentation checks and stage native PowerPoint CI tests after dependencies`
+
+---
 # Quorivio 0.1.0-dev — RC96 — CI documentation and dated inventory hotfix (1 November 2026)
 
 **Certified RC readiness remains 84.75%** (42/59 accepted; 17 partial).

@@ -135,10 +135,22 @@ jobs:
         run: python3 -m unittest tools.tests.test_rc_cycle79_inventory_closure -q
       - name: Validate RC89 editor review regressions before npm
         run: python3 -m unittest tools.tests.test_rc_cycle89_editor_feedback -q
+      # Keep pure source/DOM contracts in dependency-free preflight. The native
+      # PowerPoint assertions need python-pptx, installed in the conversion gate.
       - name: Validate RC90 session actions, slide schemes and footer before npm
-        run: python3 -m unittest tools.tests.test_rc90_session_sidebar_master tools.tests.test_rc74_footer_corner -q
-      - name: Validate RC91 scheme editing, stage numbering and PPTX parity before npm
-        run: python3 -m unittest tools.tests.test_rc91_scheme_stage -q
+        run: |
+          python3 -m unittest \
+            tools.tests.test_rc90_session_sidebar_master \
+            tools.tests.test_rc74_footer_corner.FooterCornerRC74.test_default_footer_occupies_bottom_strip_and_stays_dynamic \
+            tools.tests.test_rc74_footer_corner.FooterCornerRC74.test_browser_layout_anchors_number_to_absolute_bottom_right_not_center -q
+      - name: Validate RC91 scheme editing and stage numbering before npm
+        run: |
+          python3 -m unittest \
+            tools.tests.test_rc91_scheme_stage.GlobalMasterRegressions.test_footer_number_is_pinned_to_canvas_in_all_four_surfaces \
+            tools.tests.test_rc91_scheme_stage.GlobalMasterRegressions.test_editor_works_with_selection_and_persistent_schema \
+            tools.tests.test_rc91_scheme_stage.GlobalMasterRegressions.test_pptx_uses_widget_style_override_and_canvas_relative_page_number -q
+      - name: Validate RC97 staged PowerPoint prerequisites before npm
+        run: python3 -m unittest tools.tests.test_rc_cycle97_pptx_dependency_staging -q
       - name: Validate RC92 presenter stage, gated navigation and fullscreen before npm
         run: python3 -m unittest tools.tests.test_rc92_presenter_stage -q
       - name: Validate RC93 participant QR and link parity before npm
@@ -599,6 +611,13 @@ jobs:
           python3 -m pip install --disable-pip-version-check --break-system-packages 'reportlab>=4,<5' 'python-pptx>=1.0,<2' 'Pillow>=11,<14' 'aiohttp>=3.9,<4'
           python3 -c 'import reportlab' # fail gate rather than skipping the PDF rendering test
           python3 -c 'import pptx, aiohttp' # enforce PPTX and load-test integration prerequisites
+      # Explicitly run native PPTX regression cases only after python-pptx is present.
+      # They also remain in the full tools/tests discovery that follows.
+      - name: Verify RC74 footer and RC91 scheme native PowerPoint fidelity
+        run: |
+          python3 -m unittest \
+            tools.tests.test_rc74_footer_corner.FooterCornerRC74.test_powerpoint_number_at_exact_slide_right_and_bottom_without_text_insets \
+            tools.tests.test_rc91_scheme_stage.GlobalMasterRegressions.test_native_pptx_inherits_scheme_with_absolute_number_and_local_title_override -q
       - name: Kubernetes wizard and worker integration tests
         run: |
           python3 tools/ci_inventory_reference_guard.py
@@ -702,7 +721,8 @@ jobs:
           python3 tools/verify_rc_cycle93_inventory.py --historical
           python3 tools/verify_rc_cycle94_inventory.py --historical
           python3 tools/verify_rc_cycle95_inventory.py --historical
-          python3 tools/verify_rc_cycle96_inventory.py
+          python3 tools/verify_rc_cycle96_inventory.py --historical
+          python3 tools/verify_rc_cycle97_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:
