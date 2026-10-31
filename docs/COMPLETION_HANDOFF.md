@@ -1,3 +1,12 @@
+# Quorivio 0.1.0-dev — RC64 — Gitleaks test-fixture false-positive fix (31 October 2026)
+
+**Confirmed maintainer commit:** `118480606d97e3e32ddf92991889c7a577ebfc02` (includes RC63). Standard CI run `41188841418`, job `124501245873`, passed the 546 API / 99 web Node suites, full build, real PostgreSQL HTTP/SSO/background acceptance, multi-replica workflows, Kubernetes and Python tests, and all 50 historical/current SHA-256 checks. Final `gitleaks/gitleaks-action@v2` blocked the run on a test-only static token in `tools/tests/test_rc_cycle62_ci_rate_isolation.py` (generic-api-key). The token was a fixture, not a leaked live credential.
+
+**RC64 resolution:** replace the literal token with a deterministic SHA-256 test fixture assembled at execution time; the real CI load token remains random and restricted to non-production loopback calls. Add early regression checks for this pattern, keep Gitleaks at full strength (no exclusions, no suppressions, no disable), preserve the historical RC63 SHA-256 inventory, and create RC64 as the new source inventory. New CI run required after user commit. **Do not treat a re-run of the old commit as repaired; the new source must be committed.**
+
+**RC readiness:** still **81.75%** formally verified (55 gates: 38 accepted, 17 partial), strict RC blocked. Historical passing standard `41152434205` / extended `41152939003` and `41123318359` do not certify RC64. Opt-in RC acceptance needs CI standard green first; publish_image=false, publish_latest=false, rc_strict=false. External provider tests, physical RWX, independently signed GDPR/AGID/security and cross-device accessibility remain open. No assistant commit/push/tag.
+
+---
 # Quorivio 0.1.0-dev — RC63 — Historical CI manifest recovery (31 October 2026)
 
 **RC certified:** 81.75% (38 accepted, 17 partial of 55); strict RC BLOCKED.

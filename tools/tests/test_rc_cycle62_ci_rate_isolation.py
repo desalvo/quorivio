@@ -1,6 +1,7 @@
 """RC62: real CI 41186895267 regression, PostgreSQL limiter across HTTP suites."""
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import io
 import os
@@ -14,7 +15,9 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tools'))
 from ci_http_isolation import ci_load_headers
 
-TOKEN = 'ephemeral-CI-acceptance-secret-strong-and-unique-123456789'
+# A deterministic stand-in, not an API key or stored secret. The actual CI
+# always generates an independent random load-test token at runtime.
+TOKEN = hashlib.sha256(b'local-regression-fixture-only').hexdigest()
 
 
 def load(name: str):

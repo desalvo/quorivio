@@ -23,7 +23,7 @@ class HistoricalInventoryRecoveryTests(unittest.TestCase):
     def test_stable_current_inventory_bridge_follows_workflow(self):
         from verify_rc_current_inventory import current_verifier_module, load_inventory
         self.assertEqual(current_verifier_module().MANIFEST,
-                         'docs/validation/RC_CYCLE63_PACKAGE_INVENTORY_20261031.json')
+                         'docs/validation/RC_CYCLE64_PACKAGE_INVENTORY_20261031.json')
         self.assertGreater(len(load_inventory()), 1100)
 
     def test_missing_rc59_inventory_is_detected_early(self):
