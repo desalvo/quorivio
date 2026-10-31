@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
-  "cycle": 77,
-  "file_count_excluding_manifest": 1197,
+  "cycle": 78,
+  "file_count_excluding_manifest": 1199,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -44,14 +44,14 @@
       "e377db62"
     ],
     ".github/workflows/ci.yml": [
-      "6948a42a",
-      "40e9b49b",
-      "3d33dd20",
-      "1b5da328",
-      "77e23250",
-      "c1022915",
-      "933bdf84",
-      "9fe832af"
+      "cea6d4e4",
+      "fb66a0de",
+      "2ed6d6cd",
+      "7b3239be",
+      "3d8fddef",
+      "a8c5e224",
+      "a0c0e18b",
+      "a4ee4ec5"
     ],
     ".gitignore": [
       "ed25541d",
@@ -2464,24 +2464,24 @@
       "949f2c92"
     ],
     "docs/COMPLETION_HANDOFF.it.md": [
-      "a58a12bd",
-      "2da5dc1b",
-      "814ddce3",
-      "744c57a8",
-      "5f877950",
-      "c8969673",
-      "149c0803",
-      "e4debd4a"
+      "1fb9d005",
+      "1a9f8a58",
+      "0b7e16d0",
+      "642e73da",
+      "28db952a",
+      "f2c61bae",
+      "79b0ada5",
+      "a83405c1"
     ],
     "docs/COMPLETION_HANDOFF.md": [
-      "670721dd",
-      "6e23ec17",
-      "5eec557f",
-      "ee7eb9eb",
-      "46b3273d",
-      "5e40ea52",
-      "251aae77",
-      "8f84cdde"
+      "535412c0",
+      "3270f520",
+      "b8af2f00",
+      "35f924d2",
+      "ec7971b2",
+      "c675ab7b",
+      "d98b86d7",
+      "0db0911a"
     ],
     "docs/CONVERSION_ATOMIC_PUBLISH.en.md": [
       "20d0f241",
@@ -2544,24 +2544,24 @@
       "1ac5fb62"
     ],
     "docs/DEVELOPMENT_STATUS.it.md": [
-      "095bc8d6",
-      "b1f332dc",
-      "a2928a2b",
-      "94878b25",
-      "f0f1c9a0",
-      "a7923a8e",
-      "8e359811",
-      "f26964f7"
+      "0f3e0ac1",
+      "953dd7af",
+      "18e80652",
+      "665ff581",
+      "66ee25d4",
+      "4327a6ed",
+      "1312c536",
+      "a291f993"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "33fb8c93",
-      "ff7dbb7d",
-      "8a56c4b2",
-      "5a3786f6",
-      "16f6158e",
-      "737c035c",
-      "58ab99db",
-      "28755820"
+      "bd5783eb",
+      "d917a135",
+      "0e37711a",
+      "4a6cf8cc",
+      "b343ff3b",
+      "c3b5bcb8",
+      "29060aae",
+      "39bf0f89"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",
@@ -8674,14 +8674,14 @@
       "aee76156"
     ],
     "tools/ci_rehearsal_singleton_offline_chromium.py": [
-      "1775b5b3",
-      "25f02522",
-      "f63dace1",
-      "7f911cdf",
-      "60c38bf1",
-      "e733fb4e",
-      "42d0e36e",
-      "73f185d2"
+      "4f919443",
+      "b5164b9d",
+      "c7b962e6",
+      "d74a7883",
+      "658e7e89",
+      "d6f38ff3",
+      "2de687e1",
+      "2bfc50c0"
     ],
     "tools/ci_rehearsal_submission_chromium.py": [
       "c058fdd0",
@@ -10903,6 +10903,16 @@
       "87a0c218",
       "2f3f40d8"
     ],
+    "tools/tests/test_rc_cycle78_preview_selector.py": [
+      "86869fba",
+      "2e4ec1f9",
+      "7bb72665",
+      "768c335d",
+      "e648dd96",
+      "e014623e",
+      "8b88254b",
+      "915ce84e"
+    ],
     "tools/tests/test_rc_cycle8_inventory.py": [
       "f4f292c7",
       "98c481eb",
@@ -11952,6 +11962,16 @@
       "9b6928aa",
       "311cfa54",
       "5ca40c05"
+    ],
+    "tools/verify_rc_cycle78_inventory.py": [
+      "451458c8",
+      "1982fa34",
+      "03fa5765",
+      "305de2ec",
+      "a44055b9",
+      "121bba33",
+      "b5ae75cf",
+      "70701521"
     ],
     "tools/verify_rc_cycle8_inventory.py": [
       "ca6179f9",

@@ -1,3 +1,11 @@
+# Quorivio 0.1.0-dev — RC78 — Chromium rehearsal accessible-name CI fix (31 October 2026)
+
+**Git baseline:** `9c947b6415d1ab5c1509c3f01cbe0b5d872041df`; the maintainer reports the standard CI passed. Extended run `41212067005` proceeded through its earlier Chromium checks, but job `124568946911` timed out in `tools/ci_rehearsal_singleton_offline_chromium.py`: a stale Playwright locator expected `▣ Anteprime affiancate`, whereas the live dashboard renders a graphical icon with accessible text **Anteprime affiancate**. Aggregate job `124569421798` failed as a consequence, not an independent defect.
+
+**RC78:** use the actual accessible name and assert a unique visible launch button before clicking. Keep real React portal isolation, focus restoration and Firefox/WebKit coverage unchanged. Add early CI regression contracts for the selector and live dashboard markup; Chromium and native Firefox/WebKit are **pending** new GitHub CI. **Certified score unchanged at 84.75%** (42 accepted, 17 partial of 59); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit, push, tag or publication.
+
+---
+
 # Quorivio 0.1.0-dev — RC77 — Campaign cannot publish or run strict release checks (31 October 2026)
 
 - Maintainer baseline `e4f24a9fb8a36ef0b96ddb20b755a5a2f9335343`; standard CI `41209516202` passed. RC campaign `41210395340` ended early because it reported `RC_CAMPAIGN_PUBLISH=true` in the runner despite selecting only the RC checkbox. No proof of why GitHub supplied the value.

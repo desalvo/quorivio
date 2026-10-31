@@ -1,3 +1,11 @@
+# Quorivio 0.1.0-dev — RC78 — Correzione selettore Chromium anteprima (31 ottobre 2026)
+
+**Baseline Git:** `9c947b6415d1ab5c1509c3f01cbe0b5d872041df`, CI standard confermata verde dall’utente. La CI estesa `41212067005` ha completato i controlli precedenti ma il job `124568946911` è fallito sul test Playwright `tools/ci_rehearsal_singleton_offline_chromium.py`, che cercava il vecchio nome con il carattere `▣`. Il pulsante reale si chiama **Anteprime affiancate** e usa ora un’icona grafica; timeout 12 s in modalità Chromium. Il riepilogo RC `124569421798` è fallito di conseguenza.
+
+**RC78:** selettore accessibile esatto, controllo di unicità/visibilità prima del click e regressioni anticipate nella CI. Test del portale, isolamento, focus, chiusura e Firefox/WebKit invariati. La prova completa Chromium/Firefox/WebKit deve ancora essere eseguita sulla nuova CI. **Completamento invariato 84,75%**, 42 gate accettati e 17 parziali; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag/pubblicazione dell’assistente.
+
+---
+
 # Quorivio 0.1.0-dev — RC77 — Isolamento della campagna RC dalla pubblicazione (31 ottobre 2026)
 
 **Baseline committata:** `e4f24a9fb8a36ef0b96ddb20b755a5a2f9335343` (RC76). CI standard `41209516202` verde; campagne estese `41210085593` e `41210395340` bloccate da `RC_CAMPAIGN_PUBLISH=true`, anche se l'utente ha selezionato soltanto `rc_acceptance_suite`. Il riepilogo fallisce a cascata, non per un secondo problema indipendente. Il dato dell'input originale non è disponibile nella risposta pubblica della API GitHub, quindi la causa della discrepanza non è dimostrata.

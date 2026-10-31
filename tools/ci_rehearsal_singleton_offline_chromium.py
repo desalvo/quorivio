@@ -74,7 +74,14 @@ async def main():
                 await card.get_by_role('button',name='Apri sessione').click()
                 # Open from the session dashboard first. It must also have exactly
                 # one body portal and return focus before the editor is opened.
-                dashboard_open=page.get_by_role('group',name='Anteprime della sessione').get_by_role('button',name='▣ Anteprime affiancate')
+                # Select the accessible name, not an obsolete Unicode icon. The
+                # React control now renders a graphical Square icon followed by
+                # the text label, and the icon is deliberately not part of the
+                # accessible name. This tests the *real* production button.
+                preview_group=page.get_by_role('group',name='Anteprime della sessione')
+                dashboard_open=preview_group.get_by_role('button',name='Anteprime affiancate',exact=True)
+                await expect(dashboard_open).to_have_count(1)
+                await expect(dashboard_open).to_be_visible()
                 await dashboard_open.click()
                 dashboard_overlay=page.locator('.rehearsal-backdrop')
                 await expect(dashboard_overlay).to_have_count(1)
