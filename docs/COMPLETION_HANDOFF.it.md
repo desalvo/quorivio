@@ -1,3 +1,21 @@
+# Quorivio 0.1.0-dev — RC63 — Correzione manifest storici della CI standard (31 ottobre 2026)
+
+**RC certified:** 81,75% (38 accepted, 17 partial of 55); strict RC BLOCKED.
+**RC63 controls:** `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no new gate credit until GitHub acceptance.
+
+
+**Storico verificato:** CI standard `41152434205` e CI estesa `41152939003` sul commit `c0fe7f7b9e41c0295387d84996a7b531b91b69a0`; precedenti prove CI estese `41123318359`. Sono prove precedenti, **non** una certificazione del nuovo RC63.
+
+**Baseline dell'ultimo commit utente:** `8e7d2df0f3badb39136f9901cd91acf2897ca453` (include RC62). La CI standard `41187779633`, job `124498103225`, ha superato la precedente anomalia HTTP 429, test Node, build, collaudi PostgreSQL, vulnerability gate. Si è arrestata in `tools/ci_inventory_reference_guard.py` con `ValueError: workflow referenced missing inventory manifest: docs/validation/RC_CYCLE59_PACKAGE_INVENTORY_20261031.json` durante i test Kubernetes/Python.
+
+**Causa:** RC61 aveva escluso dal package cumulativo due ricevute storiche RC59 e RC60, pur conservando gli script e i riferimenti nella CI; RC62 non le aveva ripristinate. Non era una regressione del backend o della sicurezza SSO.
+
+**Correzione:** ripristinate dai pacchetti originari, senza rigenerazione né modifica, le due ricevute `RC_CYCLE59_PACKAGE_INVENTORY_20261031.json` (SHA-256 `1b8249a51936669090377ca1d170576ad9fc01a0c94197e18a14ce4324f69121`) e `RC_CYCLE60_PACKAGE_INVENTORY_20261031.json` (SHA-256 `0fb86a1049a8c84512d4b5991c05f939ac2473621a014be2ffe83e6055732e5d`). Guard con ricevute immutable pin-nate, regressioni automatiche per presenza e assenza, verificatore RC63 in CI e inventario cumulativo RC63 da verificare prima del commit.
+
+**Consegna:** RC63 cumulativo 0.1.0-dev, nessun commit/push/tag dal modello. CI standard deve essere rieseguita sul commit manuale successivo. La percentuale RC certificata resta **81,75%**, 38 gate accettati e 17 parziali su 55, RC strict bloccata. `publish_image=false`, `rc_strict=false`, `publish_latest=false`.
+
+---
+
 # Handoff — Quorivio RC62 (31 ottobre 2026)
 
 **Ultimo commit dell'utente:** `5a088fc300037b5a6a98a533de36ac6700b3b765` (include RC61). CI standard `41186895267`, job `124495541784`, **fallita** per superamento rate limit PostgreSQL su loopback (risposta HTTP 429 al test sfondi; atteso 200), dopo test Node, build e suite SSO reali superate. **RC62 è l'unico ciclo non committato** dopo quella baseline. Correzione: i due test HTTP portable/sfondi inoltrano il token random temporaneo già presente in CI; guardia fail-closed vincolata a host loopback; nessun cambiamento al backend production. Aggiornati workflow, test, handoff, inventario. Vedere `docs/RC62_CI_THROTTLE_ISOLATION.it.md`. **RC 81,75% verificato (38 accepted/17 partial su 55), strict bloccata.** Fare commit manuale RC62 e verificare prima la CI standard, poi eventuale estesa, senza pubblicazione.

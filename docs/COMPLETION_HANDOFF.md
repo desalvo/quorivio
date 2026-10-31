@@ -1,3 +1,21 @@
+# Quorivio 0.1.0-dev — RC63 — Historical CI manifest recovery (31 October 2026)
+
+**RC certified:** 81.75% (38 accepted, 17 partial of 55); strict RC BLOCKED.
+**RC63 controls:** `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no new gate credit until GitHub acceptance.
+
+
+**Earlier accepted evidence (historical, not RC63):** standard CI `41152434205`, extended CI `41152939003` on commit `c0fe7f7b9e41c0295387d84996a7b531b91b69a0`, plus prior extended run `41123318359`. These runs **do not** certify RC63.
+
+**Last maintainer-confirmed commit:** `8e7d2df0f3badb39136f9901cd91acf2897ca453` (includes RC62). Standard GitHub CI run `41187779633`, job `124498103225`, passed the previous HTTP 429 issue, Node unit tests, full build, real PostgreSQL integrations, and npm vulnerability check. It failed in `tools/ci_inventory_reference_guard.py` because the cycle 59 source checksum receipt was absent from the committed tree. This prevented the Python/Kubernetes test step from running.
+
+**Root cause:** the cumulative RC61 archive accidentally dropped original cycle 59 and 60 inventory receipts while retaining the workflow references and historical verifiers. RC62 did not restore them.
+
+**Resolution:** recover the original RC59 and RC60 JSON inventory receipts byte-for-byte from their original cumulative archives, pin SHA-256 in the CI reference guard, add automatic presence/absence regression tests, and add a current RC63 inventory verification in the standard workflow. No historical manifest is rewritten.
+
+**Limits:** Local source/ZIP verification does not substitute for the next post-commit GitHub CI. Strict RC remains blocked; certified RC score stays at 81.75% (38 accepted / 17 partial of 55). No assistant commits, pushes, tags, or publishing.
+
+---
+
 # Quorivio RC62 — completion handoff (31 October 2026)
 
 **Last maintainer commit:** `5a088fc300037b5a6a98a533de36ac6700b3b765`, containing RC61. Standard GitHub run `41186895267`, job `124495541784`, **failed**: the real PostgreSQL background library CI script hit shared loopback rate limit `429` while expecting `200`, following successful Node build/tests and SSO PostgreSQL checks. **RC62 is the only uncommitted cycle since that commit.** Fix: both `ci_portable_http.py` and `ci_background_library_postgres.py` now attach the existing strong ephemeral nonproduction-only token, validated for loopback before the network; `.github/workflows/ci.yml` forwards it, regression tests cover failure modes. No change to production rate limiting, credentials, features, version, RC score or publishing controls. See `docs/RC62_CI_THROTTLE_ISOLATION.en.md`. **Certified RC 81.75% (38 accepted / 17 partial of 55), strict blocked.** Next step: maintainer manually commits RC62 and runs standard CI before extended opt-in; never publish image with this change automatically.

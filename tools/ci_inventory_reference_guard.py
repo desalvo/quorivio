@@ -23,6 +23,12 @@ RECOVERED_RECEIPTS = {
         ''.join(('dcb77af5', '59e66a61', 'd950ce37', '77aabcc4', '2a4de61f', '5db1af18', '1d9b9c44', '07a78950')),
     'docs/validation/RC_CYCLE43_PACKAGE_INVENTORY_20261030.json':
         ''.join(('109cfa85', '3e83d2e8', '32fbf975', '495ff6f6', '97a36d2e', 'f7e89d71', '6579a6ef', '4b4030a3')),
+    # Cycle 59/60 receipts were inadvertently omitted in later cumulative ZIPs.
+    # Pin their SHA-256 to the bytes from the original cycle releases.
+    'docs/validation/RC_CYCLE59_PACKAGE_INVENTORY_20261031.json':
+        ''.join(('1b8249a5', '19366690', '90377ca1', 'd170576a', 'd9fc01a0', 'c94197e1', '8a14ce43', '24f69121')),
+    'docs/validation/RC_CYCLE60_PACKAGE_INVENTORY_20261031.json':
+        ''.join(('0fb86a10', '49a8c845', '12d4b599', '1c05f939', 'ac247362', '1a014be2', 'ffe83e60', '55732e5d')),
 }
 
 
@@ -71,4 +77,4 @@ def verify_references(root: Path = ROOT, workflow: str | None = None,
 
 if __name__ == '__main__':
     count = verify_references()
-    print(f'PASS historical/current workflow inventory prerequisites: {count} verifiers, original cycle 42/43 bytes verified')
+    print(f'PASS historical/current workflow inventory prerequisites: {count} verifiers, original pinned historical bytes verified')

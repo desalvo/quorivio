@@ -56,6 +56,6 @@ class CampaignContracts(unittest.TestCase):
   self.assertIn('python3 tools/verify_rc_cycle58_inventory.py --historical',y)
   self.assertIn('python3 tools/verify_rc_cycle59_inventory.py --historical',y)
   self.assertIn('python3 tools/verify_rc_cycle61_inventory.py',y)
-  from verify_rc_cycle62_inventory import verify_source,load_inventory
+  from verify_rc_current_inventory import verify_source,load_inventory
   self.assertEqual(verify_source(),len(load_inventory()))
 if __name__=='__main__':unittest.main()

@@ -1,3 +1,13 @@
+# Quorivio 0.1.0-dev — Stato di sviluppo — RC63 (31 ottobre 2026)
+
+**RC certified:** 81,75% (38 accepted, 17 partial of 55); strict RC BLOCKED.
+
+**Storico verificato:** CI standard `41152434205` e CI estesa `41152939003` sul commit `c0fe7f7b9e41c0295387d84996a7b531b91b69a0`; precedenti prove CI estese `41123318359`. Sono prove precedenti, **non** una certificazione del nuovo RC63.
+
+**Baseline corrente:** `8e7d2df0f3badb39136f9901cd91acf2897ca453`; CI standard `41187779633` fallita per inventario RC59 assente, ora ripristinati RC59/60 originali. RC 81,75%; `rc_strict=false`, `publish_image=false`; non ancora validata la nuova CI. Vedere `docs/RC63_HISTORICAL_INVENTORY_RECOVERY.it.md`.
+
+---
+
 # Quorivio 0.1.0-dev — Stato di sviluppo — RC62 (31 ottobre 2026)
 
 **Nuova baseline committata dal manutentore:** `5a088fc300037b5a6a98a533de36ac6700b3b765` (RC61 già committato). CI standard [41186895267](https://github.com/desalvo/quorivio/actions/runs/41186895267) fallita per risposta `429` nel test della libreria sfondi; il limite è globale all'IP della CI (100 richieste/minuto), dopo il superamento di 546 test Node API, 99 frontend, build e precedenti prove PostgreSQL. **RC62 non committato.** Le due suite HTTP su loopback ora passano il token temporaneo non-production già esistente: non si cambia il limite per gli utenti reali. Aggiunti regressioni e inventario RC62, conservando immutabile lo storico RC61. Dettagli in `docs/RC62_CI_THROTTLE_ISOLATION.it.md`. **RC verificata invariata 81,75% (38 accepted/17 partial su 55)** finché non esiste una nuova CI verde. `rc_strict=false`, `publish_image=false`; nessun commit/push/tag dall'assistente.

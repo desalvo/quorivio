@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT/'tools'))
-from verify_rc_cycle62_inventory import verify_source,load_inventory
+from verify_rc_current_inventory import verify_source,load_inventory
 from verify_rc_cycle31_inventory import load_inventory as historical
 from rc_release_preflight import preflight
 
