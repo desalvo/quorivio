@@ -116,3 +116,36 @@ async def wait_for_editor_sync(page,timeout=12000):
     """Wait for the *server-verified* autosave state instead of pressing a removed Save button."""
     from playwright.async_api import expect
     return await expect(page.get_by_role('region',name='Editor grafico delle pagine').get_by_role('status').filter(has_text='Salvato automaticamente')).to_be_visible(timeout=timeout)
+
+
+async def uncovered_widget_context_point(widget):
+    """Find a genuine, hit-testable interior pixel for widget context actions.
+
+    Playwright's default element-center click may land over the canvas backdrop
+    when a floating inspector/palette overlaps the widget. We must never
+    silently fall back to a keyboard event or a synthetic contextmenu, because
+    the Chromium CI is intended to verify a real pointer interaction.
+    """
+    await widget.scroll_into_view_if_needed()
+    point = await widget.evaluate("""el => {
+      const rect=el.getBoundingClientRect();
+      const view=window.visualViewport;
+      const vl=view?.offsetLeft ?? 0, vt=view?.offsetTop ?? 0;
+      const vr=vl+(view?.width ?? window.innerWidth);
+      const vb=vt+(view?.height ?? window.innerHeight);
+      const left=Math.max(rect.left+3,vl+2), right=Math.min(rect.right-3,vr-2);
+      const top=Math.max(rect.top+3,vt+2), bottom=Math.min(rect.bottom-3,vb-2);
+      if(right<=left||bottom<=top)return null;
+      const fractions=[.50,.30,.70,.15,.85,.40,.60];
+      for(const fy of fractions)for(const fx of fractions){
+        const x=left+(right-left)*fx,y=top+(bottom-top)*fy;
+        const hit=document.elementFromPoint(x,y);
+        if(!hit||(hit!==el&&!el.contains(hit)))continue;
+        if(hit.closest('button,input,select,textarea,[contenteditable=true],.canvas-context-menu,.canvas-background-context'))continue;
+        return {x,y};
+      }
+      return null;
+    }""")
+    if not point:
+        raise AssertionError('No real uncovered widget context pixel; canvas controls may be obscured or clipped')
+    return point

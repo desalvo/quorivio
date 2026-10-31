@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC80 — correzione clic destro contestuale Chromium (31 ottobre 2026)
+
+**Completamento RC: 84,75%** (42 accettati e 17 parziali su 59); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Baseline Git `6bfb893c27cb0bbcb2d2c6d92ca5d6b58f487544` (commit RC79 dichiarato); CI standard verde, estesa `41218084773`, job `124586715148` fallito in `tools/ci_browser_editor.py:160`: il tasto destro destinato a `Azioni widget text` ha mostrato `Menu contestuale sfondo canvas`. Le altre prove Chromium precedenti erano passate. RC80 usa un pixel realmente scoperto sul widget tramite `document.elementFromPoint`, chiude prima eventuali overlay dello sfondo e blocca la propagazione e i timer pendenti nell’handler React. Quattro nuovi test sono anticipati prima di npm. Inventari storici immutati, package cumulativo verificato. Nessun commit/push/tag/pubblicazione. La nuova CI estesa è ancora richiesta.
+
+---
+
 # Quorivio 0.1.0-dev — RC79 — recupero inventario storico e verifica ZIP completa (31 ottobre 2026)
 
 **Completamento RC: 84.75%** (42 accettati, 17 parziali su 59; strict bloccata).

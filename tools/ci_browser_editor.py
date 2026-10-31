@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 from playwright.async_api import async_playwright, expect
 from ci_editor_context_tools import ensure_canvas_tools_open, click_canvas_tool, open_canvas_context, canvas_background_point
-from ci_editor_context_tools import wait_for_editor_sync
+from ci_editor_context_tools import wait_for_editor_sync, uncovered_widget_context_point
 
 SESSION='11111111-1111-4111-8111-111111111111'
 ACTIVITY='22222222-2222-4222-8222-222222222222'
@@ -155,9 +155,19 @@ async def main():
    # widget's context commands are in an unclipped body-level portal.
    default_foreground=await page.locator('.widget-canvas-item').first.evaluate('(node)=>getComputedStyle(node).color')
    assert default_foreground=='rgb(0, 0, 0)',default_foreground
-   await page.locator('.widget-canvas-item').first.click(button='right')
+   # Close any stale canvas menu before testing an actual right-click.
+   # A center click can miss a partially covered widget and invoke the
+   # background menu instead; use a viewport/elementFromPoint-verified pixel.
+   background_menu=page.get_by_role('group',name='Menu contestuale sfondo canvas')
+   if await background_menu.is_visible():
+    await background_menu.get_by_role('button',name='Chiudi menu').click()
+   first_widget=page.locator('.widget-canvas-item').first
+   await expect(first_widget).to_be_visible()
+   point=await uncovered_widget_context_point(first_widget)
+   await page.mouse.click(point['x'],point['y'],button='right')
    widget_menu=page.get_by_role('group',name='Azioni widget text')
    await expect(widget_menu).to_be_visible()
+   await expect(background_menu).to_have_count(0)
    assert await widget_menu.evaluate('''node => {
     const r=node.getBoundingClientRect();
     return node.parentElement===document.body && r.left>=0 && r.top>=0 &&

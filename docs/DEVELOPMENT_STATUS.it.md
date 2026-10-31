@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC80 — stabilizzazione menu widget Chromium (31 ottobre 2026)
+
+La CI estesa 41218084773, job 124586715148, ha superato molte verifiche browser, poi il clic destro destinato al widget ha aperto il menu dello sfondo. Il test RC80 chiude eventuali menu precedenti, verifica con `document.elementFromPoint` un pixel effettivamente raggiungibile del widget e usa un evento reale del mouse. Nel componente React il menu widget blocca la propagazione dell’evento e cancella l’eventuale pressione lunga sul canvas. Nuovi test prima dell’installazione npm e verifica di integrità degli inventari. **Completamento RC: 84,75%** (42 gate accettati e 17 parziali su 59); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Serve ancora la CI estesa reale.
+
+---
+
 # Quorivio 0.1.0-dev — RC79 — recupero inventario storico e verifica ZIP completa (31 ottobre 2026)
 
 **Causa della CI fallita:** l’archivio RC78 escludeva erroneamente `docs/validation/RC_CYCLE77_PACKAGE_INVENTORY_20261031.json`, sebbene la CI lo richiedesse. RC79 recupera i byte originali senza alterare il manifest precedente e verifica tutti i riferimenti del workflow anche dentro lo ZIP. Il nuovo `tools/package_rc_cumulative.py` aggiunge automaticamente i manifest precedenti; i test falliscono se manca anche una sola ricevuta.

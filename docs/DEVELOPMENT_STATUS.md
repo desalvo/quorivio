@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC80 — Chromium widget context-menu pointer/hit-test stabilization (31 October 2026)
+
+Failed extended workflow 41218084773, quality job 124586715148, reached real Chromium editor UI and failed when the test expected `Azioni widget text` but found `Menu contestuale sfondo canvas`. The browser test now closes stale background menus, hit-tests a visible interior widget pixel with `document.elementFromPoint`, and sends a genuine right-mouse event; no synthetic contextmenu or keyboard substitution. The React widget handler explicitly stops event propagation and clears any pending background long press. New early regression preflight plus archive-closure checks. **RC completion remains 84.75%** (42 accepted, 17 partial / 59). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. The full new native Chromium acceptance must run on GitHub before certification.
+
+---
+
 # Quorivio 0.1.0-dev — RC79 — recovered historical manifest and fail-closed cumulative ZIP closure (31 October 2026)
 
 **RC79 CI root cause (run 41215310977, job 124578491540):** the RC78 ZIP and commit omitted `docs/validation/RC_CYCLE77_PACKAGE_INVENTORY_20261031.json`, although the CI workflow still references `verify_rc_cycle77_inventory.py`. Recovered the original, byte-for-byte RC77 receipt (unchanged SHA-256), included it in the current source inventory and in the ZIP. This was a packaging error, not a Chromium functional failure.

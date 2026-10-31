@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC80 — Chromium widget context-menu pointer target hardening (31 October 2026)
+
+**Certified RC score: 84.75%** (42 accepted / 17 partial of 59); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Git baseline `6bfb893c27cb0bbcb2d2c6d92ca5d6b58f487544` (user committed RC79); standard CI green by user report, extended run `41218084773`, job `124586715148`, FAILED at `tools/ci_browser_editor.py:160`: right click intended for `Azioni widget text` opened `Menu contestuale sfondo canvas`. Other real Chromium rehearsal/focus/deadline tests had passed earlier in this run. RC80 changes real pointer test to choose an uncovered hit-tested widget pixel and dismiss stale background menus; React handler now stops propagation and clears pending background gestures. Four new regression tests run before npm. Historical inventories remain immutable and package closure is verified. No automatic Git commit/push/tag/publish. Pending new extended CI to validate actual React Chromium behavior.
+
+---
+
 # Quorivio 0.1.0-dev — RC79 — recovered historical manifest and fail-closed cumulative ZIP closure (31 October 2026)
 
 **RC progress: 84.75%** (42 accepted, 17 partial / 59; strict blocked).

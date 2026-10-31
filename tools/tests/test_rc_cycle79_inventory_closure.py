@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tools'))
 from rc_inventory_closure import check_inventory_closure, required_inventory_files
 from package_rc_cumulative import assemble_paths
+from verify_rc_current_inventory import current_verifier_module
 
 CURRENT = 'docs/validation/RC_CYCLE79_PACKAGE_INVENTORY_20261031.json'
 RECOVERED = 'docs/validation/RC_CYCLE77_PACKAGE_INVENTORY_20261031.json'
@@ -22,8 +23,9 @@ class InventoryClosureRC79(unittest.TestCase):
         self.assertEqual(hashlib.sha256((ROOT / RECOVERED).read_bytes()).hexdigest(), original)
 
     def test_every_workflow_reference_is_in_current_inventory(self):
-        manifest = json.loads((ROOT / CURRENT).read_text(encoding='utf8'))
-        names = set(manifest['files_sha256_hex_groups']) | {CURRENT}
+        current = current_verifier_module().MANIFEST
+        manifest = json.loads((ROOT / current).read_text(encoding='utf8'))
+        names = set(manifest['files_sha256_hex_groups']) | {current}
         required = required_inventory_files(lambda name: (ROOT / name).read_text(encoding='utf8'))
         self.assertIn(RECOVERED, required)
         self.assertIn(RECOVERED, names)
@@ -32,8 +34,9 @@ class InventoryClosureRC79(unittest.TestCase):
         self.assertGreater(check_inventory_closure(names, lambda name: (ROOT / name).read_text(encoding='utf8')), 60)
 
     def test_missing_previous_manifest_is_a_fatal_package_error(self):
-        manifest = json.loads((ROOT / CURRENT).read_text(encoding='utf8'))
-        names = set(manifest['files_sha256_hex_groups']) | {CURRENT}
+        current = current_verifier_module().MANIFEST
+        manifest = json.loads((ROOT / current).read_text(encoding='utf8'))
+        names = set(manifest['files_sha256_hex_groups']) | {current}
         names.remove(RECOVERED)
         with self.assertRaisesRegex(ValueError, 'RC_CYCLE77_PACKAGE_INVENTORY'):
             check_inventory_closure(names, lambda name: (ROOT / name).read_text(encoding='utf8'))
