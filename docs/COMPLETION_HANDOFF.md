@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC82 — deterministic GCM backup corruption CI hotfix (31 October 2026)
+
+**Current score 84.75%**, 42 accepted / 17 partial of 59 gates; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. User-confirmed source SHA `280b1bdbffa9073460455335c01ac55dfe468491`. Standard workflow `41229380989`, job `124620158038`, failed a single backup mirror test after 1,461 Python tests: the fixed two-byte replacement may coincidentally match the original random GCM tag suffix, leaving the ciphertext unchanged. The exact random bytes from the failed run were not logged. The cryptographic implementation is correct; only the randomized test setup is faulty. RC82 replaces fixed suffix with non-identity bit-flip and adds fail-closed tests for authenticated header, ciphertext, and tag and for private scratch and destination cleanup. Initial CI preflight executes this suite before expensive browser/database acceptance. No release gate accepted on the basis of this test-only hotfix. No assistant commit/push/tag/publish. Full new GitHub workflow still required.
+
+---
+
 # Quorivio 0.1.0-dev — RC81 — browser right click locator-bound (31 October 2026)
 
 **Current score 84.75%** (42 accepted 17 partial of 59); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Git baseline `d4ed14ee61a673ce6d1ea7767c790e74de79089b` (user committed RC80). Extended run 41220871348, job 124594956256 failed during real Chromium context-menu test; the previous absolute `page.mouse.click` with a snapshot coordinate could move from widget to background during layout reconciliation. RC81 uses Playwright widget locator `.click(button='right', position=offset, trial=True)` then actual locator-bound native click; asserts correct portal menu, no background menu, and diagnostic failure if needed. No bypasses, no new accepted gate. Historical manifests preserved; archive closure verified. Pending full extended campaign after commit.

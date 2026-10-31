@@ -8,9 +8,26 @@ import unittest
 from unittest.mock import patch
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
-from backup_envelope import private_keygen
+from backup_envelope import HEADER_SIZE, TAG_SIZE, private_keygen
 from backup_mirror import mirror_backup, verify_mirror
 from secure_instance_backup import backup_encrypted, verify_encrypted
+
+
+def _flip_authenticated_byte(data: bytes, offset: int = -1) -> bytes:
+    """Always change exactly one bit, even when a random tag ends in ``ZZ``.
+
+    Replacing a random GCM tag suffix with a constant is probabilistic: the
+    replacement can accidentally equal the original bytes (1/65536 for ZZ).
+    XOR guarantees a different ciphertext or tag for every generated backup.
+    """
+    if len(data) < HEADER_SIZE + TAG_SIZE + 1:
+        raise ValueError('encrypted fixture too short for tampering')
+    position = offset if offset >= 0 else len(data) + offset
+    if not 0 <= position < len(data):
+        raise ValueError('out-of-bounds tamper position')
+    mutated = bytearray(data)
+    mutated[position] ^= 0x01
+    return bytes(mutated)
 
 
 class MirrorAcceptance(unittest.TestCase):
@@ -94,11 +111,40 @@ class MirrorAcceptance(unittest.TestCase):
         self.assertEqual(list(self.work.iterdir()), [])
 
     def test_tampered_archive_does_not_publish(self):
-        self.original.write_bytes(self.original.read_bytes()[:-2]+b'ZZ')
+        self.original.write_bytes(_flip_authenticated_byte(self.original.read_bytes()))
         with patch('backup_mirror.os.path.ismount', return_value=True):
             with self.assertRaisesRegex(ValueError, 'authentication failed'):
                 mirror_backup(self.original, self.volume, self.volume, self.key, self.work)
         self.assertFalse(list(self.volume.iterdir()))
+
+    def test_corruption_of_header_ciphertext_and_tag_never_publishes(self):
+        original = self.original.read_bytes()
+        for label, index in (('authenticated-header', len(b'QVBKENC1')),
+                             ('ciphertext', HEADER_SIZE),
+                             ('authentication-tag', -1)):
+            with self.subTest(part=label):
+                altered = _flip_authenticated_byte(original, index)
+                self.assertNotEqual(altered, original)
+                self.original.write_bytes(altered)
+                with patch('backup_mirror.os.path.ismount', return_value=True):
+                    with self.assertRaisesRegex(ValueError, 'authentication failed'):
+                        mirror_backup(self.original, self.volume, self.volume,
+                                      self.key, self.work)
+                self.assertFalse(list(self.volume.iterdir()),
+                                 'tampered archive must not publish mirror or receipt')
+                self.assertFalse(list(self.work.iterdir()),
+                                 'failed authentication must clean private scratch')
+        self.original.write_bytes(original)
+
+    def test_tamper_bit_flip_always_modifies_any_random_tag_suffix(self):
+        original = self.original.read_bytes()
+        for suffix in (b'ZZ', b'\x00\x00', b'\xff\xff', original[-2:]):
+            with self.subTest(suffix=suffix.hex()):
+                synthetic = original[:-2] + suffix
+                mutated = _flip_authenticated_byte(synthetic)
+                self.assertNotEqual(mutated, synthetic)
+                self.assertEqual(mutated[:-1], synthetic[:-1])
+                self.assertEqual(mutated[-1], synthetic[-1] ^ 1)
 
     def test_no_overwrite_even_on_repeat(self):
         self.push()
@@ -119,7 +165,7 @@ class MirrorAcceptance(unittest.TestCase):
     def test_archive_corruption_and_forged_receipt_detected(self):
         self.push()
         backup = self.volume/'source.qenc'
-        backup.write_bytes(backup.read_bytes()[:-2]+b'ZZ')
+        backup.write_bytes(_flip_authenticated_byte(backup.read_bytes()))
         with self.assertRaisesRegex(ValueError, 'checksum mismatch'):
             self.check()
         self.assertEqual(list(self.work.iterdir()), [])

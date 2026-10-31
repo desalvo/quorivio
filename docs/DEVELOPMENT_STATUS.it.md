@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC82 — alterazione deterministica dei backup autenticati (31 ottobre 2026)
+
+**Completamento RC: 84,75%** (42 gate accettati, 17 parziali su 59); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Ultimo commit dell'utente `280b1bdbffa9073460455335c01ac55dfe468491` (RC81). CI standard `41229380989`, job `124620158038`: dopo Node, build e integrazioni fallisce un solo test Python su 1.461, `test_tampered_archive_does_not_publish`. Il test sovrascriveva gli ultimi due byte casuali del tag GCM con `ZZ`: raramente quei byte sono già `ZZ`, quindi non si introduce alcuna alterazione. RC82 sostituisce entrambe le sovrascritture con un XOR di un bit, sicuramente diverso dall'originale; aggiunge test separati per header autenticato, ciphertext e tag, con verifica della pulizia dei file in caso di fallimento. Il codice AES-GCM e quello di mirroring di produzione restano invariati; verifica crittografica fail-closed invariata. La suite backup parte in CI prima dell'installazione npm. Nuova CI GitHub necessaria. Nessun commit o pubblicazione da parte dell'assistente.
+
+---
+
 # Quorivio 0.1.0-dev — RC81 — clic destro widget stabile in Chromium (31 ottobre 2026)
 
 **Completamento RC: 84,75%** (42 accettati/17 parziali su 59). Baseline Git `d4ed14ee61a673ce6d1ea7767c790e74de79089b` (commit RC80 confermato dall’esecuzione GitHub). CI estesa 41220871348, job 124594956256: l’interazione Chromium ha di nuovo mancato `Azioni widget text` dopo un clic con coordinate assolute. RC81 usa il clic reale ancorato al locator widget, con verifica di stabilità e raggiungibilità. Rimangono obbligatori menu corretto, chiusura di quello del canvas e nessun fallback sintetico/tastiera. **Serve nuova CI browser per la certificazione**. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit.

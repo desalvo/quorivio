@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC82 — hotfix CI per corruzione deterministica dei backup AES-GCM (31 ottobre 2026)
+
+**Completamento RC: 84,75%**, 42 gate accettati e 17 parziali su 59; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Ultimo SHA committato dall'utente `280b1bdbffa9073460455335c01ac55dfe468491`. Workflow standard `41229380989`, job `124620158038`: un test di mirroring dei backup fallisce: il test non garantisce la modifica degli ultimi due byte casuali del tag AES-GCM. RC82 impone la modifica di un bit a ogni iterazione, verifica il rigetto di header, ciphertext e tag alterati e controlla che non restino archivi pubblicati né dati temporanei dopo il rigetto. Codice di produzione immutato, sicurezza fail-closed conservata, preflight anticipato in CI. Nessun gate RC promosso o commit effettuato dall'assistente. Serve CI GitHub nuova.
+
+---
+
 # Quorivio 0.1.0-dev — RC81 — clic destro widget Playwright collegato al locator (31 ottobre 2026)
 
 **Completamento RC: 84,75%** (42 accettati, 17 parziali / 59); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Baseline Git `d4ed14ee61a673ce6d1ea7767c790e74de79089b`. La CI estesa 41220871348, job 124594956256 fallisce al menu contestuale widget, dopo coordinate assolute potenzialmente obsolete. RC81 usa Playwright `.click(button='right', position=offset, trial=True)` e poi clic nativo sul widget; conferma menu nel portal e assenza di menu sfondo, senza simulare eventi o sostituire la tastiera. Inventari storici preservati, chiusura ZIP verificata, nessun nuovo gate accettato. Necessaria nuova CI estesa.

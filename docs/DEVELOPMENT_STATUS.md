@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC82 — deterministic authenticated backup tamper verification (31 October 2026)
+
+**RC completion: 84.75%** (42 accepted, 17 partial, 59 gates); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Latest maintainer commit `280b1bdbffa9073460455335c01ac55dfe468491` (RC81). Standard CI run `41229380989`, quality job `124620158038`, completed Node/build/integrations but failed one Python test among 1,461: `test_tampered_archive_does_not_publish`. The test overwrote the final two random GCM tag bytes with `ZZ`: on rare occasions the original random tag already ends in those bytes, producing an **unchanged, valid** ciphertext. RC82 replaces both non-deterministic suffix overwrites with a guaranteed single-bit XOR corruption and adds independent authenticated-header, ciphertext and authentication-tag forgery rejection tests plus cleanup assertions. Production AES-GCM/mirror code is unchanged; authentication verification remains fail-closed. The direct backup suite is run early in CI. No promotion of RC completion or strict release claim; fresh GitHub CI is required. No assistant commit or publication.
+
+---
+
 # Quorivio 0.1.0-dev — RC81 — stable widget context-click Chromium (31 October 2026)
 
 **RC completion: 84.75%** (42 accepted/17 partial; 59 gates). Git baseline `d4ed14ee61a673ce6d1ea7767c790e74de79089b` (RC80 user commit). Extended run 41220871348, job 124594956256 reached built Chromium UI; failed again expecting `Azioni widget text` after a raw absolute `page.mouse.click`. RC81 makes the click locator-relative with a native Playwright stability and hit-target check; the test remains fail-closed and forbids synthetic/keyboard fallback. The source and CI early preflight tests confirm this. **Real Chromium E2E remains unverified pending new CI**; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit or publishing by assistant.
