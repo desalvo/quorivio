@@ -1,0 +1,46 @@
+{
+  "cycle": 98,
+  "version": "0.1.0-dev",
+  "source_log": "logs_111819994228.zip",
+  "observed_ci_commit": "21505ad2541d5be6135ed84fc33697146cf75b8e",
+  "failing_job": "Production quality gate",
+  "failing_step": "Compile frontend and backend",
+  "diagnostics": [
+    {
+      "path": "apps/web/src/main.tsx",
+      "line": 834,
+      "code": "TS18047",
+      "occurrences": 2,
+      "remedy": "null-guard both previous.id and previous.field"
+    },
+    {
+      "path": "apps/web/src/main.tsx",
+      "line": 1005,
+      "code": "TS2304",
+      "occurrences": 1,
+      "remedy": "use defined setData state setter"
+    },
+    {
+      "path": "apps/web/src/main.tsx",
+      "line": 1605,
+      "code": "TS2349",
+      "occurrences": 1,
+      "remedy": "consume array from WidgetCanvas onChange without treating it as a function"
+    }
+  ],
+  "local_checks": {
+    "api_node_tests_pass": 565,
+    "frontend_node_tests_pass": 150,
+    "rc98_regressions_pass": 4,
+    "tsx_parse_errors": 0,
+    "npm_full_build": "not run - required npm dependencies unavailable"
+  },
+  "external_ci_98_verified": false,
+  "strict_gate_unchanged": true,
+  "certified_gate_progress": {
+    "accepted": 42,
+    "partial": 17,
+    "total": 59,
+    "percent": 84.75
+  }
+}

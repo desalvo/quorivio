@@ -1,3 +1,14 @@
+# Quorivio 0.1.0-dev — RC98 — hotfix compilazione TypeScript dopo CI standard (1 novembre 2026)
+
+**Avanzamento RC verificato: 84,75%** (42 gate accettati, 17 parziali su 59); `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+L'archivio `logs_111819994228.zip` della CI standard (job Production quality gate, commit osservato `21505ad2541d5be6135ed84fc33697146cf75b8e`) mostra la risoluzione dei blocchi documentali/PPTX precedenti e il nuovo stop a `npm run build`: quattro diagnostiche TypeScript in `apps/web/src/main.tsx` alle righe 834 (due TS18047), 1005 (TS2304) e 1605 (TS2349). RC98 corregge le guardie su un valore nullo della selezione, usa il setter React `setData` già definito nello schermo presentatore e passa un array di widget senza invocarlo come funzione nell'editor degli schemi. Nessun controllo TypeScript viene disattivato; la build resta bloccante nella CI.
+
+**Verifiche locali RC98:** regressioni dedicate 4/4, parser TSX 0 errori, test API Node 565/565, test frontend Node 150/150. Installazione dipendenze npm offline non possibile (`ENOTCACHED`), tentativo network non concluso: la compilazione TypeScript/Vite completa richiede la nuova CI GitHub. Le verifiche sull'inventario e sullo ZIP cumulativo sono incluse e la percentuale non aumenta senza accettazione esterna. Nessun commit/push/tag/pubblicazione effettuato dall'assistente.
+
+**Messaggio commit cumulativo suggerito dalla baseline RC95 esplicitamente confermata:** `Fix RC documentation and PPTX CI staging, and resolve presenter and slide-master TypeScript build errors`
+
+---
 # Quorivio 0.1.0-dev — Handoff RC97 — test PowerPoint dopo installazione dipendenze (1 November 2026)
 
 **Certified RC readiness: 84,75%** (42 accepted, 17 partial out of 59 gates). `rc_strict=false`, `publish_image=false`, `publish_latest=false`.

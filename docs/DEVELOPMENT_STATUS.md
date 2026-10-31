@@ -1,3 +1,14 @@
+# Quorivio 0.1.0-dev — RC98 — TypeScript build hotfix after standard CI (1 November 2026)
+
+**Verified RC readiness: 84.75%** (42 accepted, 17 partial, 59 total). `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+The submitted standard CI `logs_111819994228.zip` (Production quality gate; observed commit `21505ad2541d5be6135ed84fc33697146cf75b8e`) passed earlier documentation and PPTX staging preflights but stopped in `npm run build` on four TypeScript diagnostics at `apps/web/src/main.tsx`: TS18047 twice at line 834, TS2304 at line 1005, and TS2349 at line 1605. RC98 null-guards both accesses to pending formatting state, refreshes presenter navigation through its actual React `setData` setter, and passes arrays (not updater callbacks) from `WidgetCanvas` to the slide-master editor. TypeScript remains strictly blocking in GitHub CI, and no quality gate has been disabled.
+
+**Local evidence:** 4/4 targeted source regressions, TSX syntax 0 parse diagnostics, 565/565 API Node tests, 150/150 frontend Node tests. The full strict TypeScript/Vite build could not be reproduced locally because `npm ci --offline` lacked cached dependencies; the online install attempt did not complete. The external GitHub CI must verify the build. Historical inventory verification and ZIP integrity are also checked for the cumulative package. No RC readiness increment, remote repository operation, commit, push, tag or publication is claimed.
+
+**Suggested cumulative commit since the last explicitly confirmed RC95 commit:** `Fix RC documentation and PPTX CI staging, and resolve presenter and slide-master TypeScript build errors`
+
+---
 # Quorivio 0.1.0-dev — CI RC97 — dependency order for PowerPoint tests (1 November 2026)
 
 **Certified RC readiness: 84.75%** (42 accepted, 17 partial out of 59 gates). `rc_strict=false`, `publish_image=false`, `publish_latest=false`.

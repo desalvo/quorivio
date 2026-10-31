@@ -831,7 +831,7 @@ function WidgetCanvas({widgets,onChange,pageTitle="",sessionTitle="",pageNumber=
     patch(w.id,{...freeze,textMarks:next});return;
    }
    const previous=pendingTextStyle.current;
-   pendingTextStyle.current={id:w.id,field:sel.field,style:{...(previous?.id===w.id&&previous.field===sel.field?previous.style:{}),...changes} as InlineStyle};return;
+   pendingTextStyle.current={id:w.id,field:sel.field,style:{...(previous?.id===w.id&&previous?.field===sel.field?previous.style:{}),...changes} as InlineStyle};return;
   }
   patch(w.id,{style:{...style,...changes}});
  };return <>
@@ -1002,7 +1002,7 @@ function PresenterLiveScreen({sessionId,renderResults}:{sessionId:string;renderR
    await request(`/sessions/${encodeURIComponent(sessionId)}/activities/${encodeURIComponent(target.id)}/open`,'POST',{expected_current_activity_id:data.session.current_activity_id});
    setData(await request<Snapshot>(`/sessions/${encodeURIComponent(sessionId)}`));
   }catch(e){setScreenError(e instanceof Error?e.message:String(e));
-   try{setRestSnapshot(await request<Snapshot>(`/sessions/${encodeURIComponent(sessionId)}`))}catch{}
+   try{setData(await request<Snapshot>(`/sessions/${encodeURIComponent(sessionId)}`))}catch{}
   }finally{pending.current=false;setBusy(false)}
  };
  const latest=useRef(changePage);latest.current=changePage;
@@ -1602,7 +1602,7 @@ me===undefined?<main id="main-content" className="narrow">Caricamento...</main>:
   <button type="button" className="outline" onClick={()=>navigateDashboard('session')}>Esci dagli schemi</button>
  </header>
  <div className="slide-scheme-commands"><button type="button" className="outline small" disabled={schemaSaving||schemaWidgets.some(w=>w.kind==='title')} onClick={()=>setSchemaWidgets(old=>[...old,newTitleWidget(snap.session.title)])}>Inserisci titolo</button><button type="button" className="outline small" disabled={schemaSaving||schemaWidgets.some(w=>w.kind==='footer')} onClick={()=>setSchemaWidgets(old=>[...old,newFooterWidget('schema-footer')])}>Inserisci footer</button><button type="button" className="primary small" disabled={schemaSaving||snap.session.status==='closed'} onClick={()=>void saveSchemaEditor()}>Salva schema globale</button><span className="muted tiny" role="status">{JSON.stringify(schemaWidgets)!==schemaBaseline.current?'Modifiche non salvate':'Schema sincronizzato'}</span></div>
- <div className="slide-scheme-layout"><div className="slide-scheme-canvas"><WidgetCanvas key={`${selected}:master`} widgets={schemaWidgets} onChange={next=>setSchemaWidgets(old=>masterWidgetTemplate(typeof next==='function'?next(old):next))} onInspectWidget={setSchemaInspected} pageTitle="Titolo della pagina" sessionTitle={snap.session.title} pageNumber={1} masterTitleStyle={snap.session.theme?.master?.titleStyle}/></div>
+ <div className="slide-scheme-layout"><div className="slide-scheme-canvas"><WidgetCanvas key={`${selected}:master`} widgets={schemaWidgets} onChange={next=>setSchemaWidgets(masterWidgetTemplate(next))} onInspectWidget={setSchemaInspected} pageTitle="Titolo della pagina" sessionTitle={snap.session.title} pageNumber={1} masterTitleStyle={snap.session.theme?.master?.titleStyle}/></div>
  <aside className="panel slide-scheme-inspector" aria-label="Proprietà schema selezionato"><h3>Proprietà dello schema</h3>
  {schemaWidgets.filter(w=>w.id===schemaInspected).map(w=><div key={w.id} className="slide-scheme-properties">
  <h4>{w.kind==='title'?'Titolo':'Footer'}</h4>
