@@ -998,7 +998,7 @@ jobs:
           QUORIVIO_PUBLISH_IMAGE: ${{ inputs.publish_image }}
         run: bash tools/resolve_image_tags.sh
       - name: Docker Hub authentication
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
