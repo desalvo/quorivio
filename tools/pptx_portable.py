@@ -137,7 +137,7 @@ def _validate_export_input(data):
                 raise ValueError('Invalid text alignment')
             if 'verticalAlign' in style and style['verticalAlign'] not in ('top', 'middle', 'bottom'):
                 raise ValueError('Invalid vertical alignment')
-            if 'shapeType' in style and style['shapeType'] not in ('ellipse', 'triangle', 'rectangle'):
+            if 'shapeType' in style and style['shapeType'] not in ('ellipse', 'circle', 'triangle', 'rectangle', 'rounded-rectangle', 'diamond', 'hexagon', 'cloud', 'speech'):
                 raise ValueError('Invalid widget shape')
             for key in ('bold', 'italic', 'underline', 'rounded', 'fillNone', 'strokeNone'):
                 if key in style and not isinstance(style[key], bool):
@@ -145,7 +145,7 @@ def _validate_export_input(data):
             if 'strokeDash' in style and style['strokeDash'] not in ('solid', 'dash', 'dot'):
                 raise ValueError('Invalid shape outline dash')
             if 'strokeWidth' in style and (type(style['strokeWidth']) not in (int, float) or
-                not math.isfinite(style['strokeWidth']) or not 0.25 <= style['strokeWidth'] <= 12):
+                not math.isfinite(style['strokeWidth']) or not 0 <= style['strokeWidth'] <= 12):
                 raise ValueError('Invalid shape outline width')
             if 'fontSize' in style and (isinstance(style['fontSize'], bool) or
                 not isinstance(style['fontSize'], (int, float)) or not math.isfinite(style['fontSize']) or
@@ -527,7 +527,9 @@ def pptx_to_portable(source, title=None, media_dir=None):
             editable_shape = (shape.shape_type == MSO_SHAPE_TYPE.AUTO_SHAPE and
                               shape.auto_shape_type in (MSO_AUTO_SHAPE_TYPE.RECTANGLE,
                                   MSO_AUTO_SHAPE_TYPE.ROUNDED_RECTANGLE, MSO_AUTO_SHAPE_TYPE.OVAL,
-                                  MSO_AUTO_SHAPE_TYPE.ISOSCELES_TRIANGLE))
+                                  MSO_AUTO_SHAPE_TYPE.ISOSCELES_TRIANGLE,
+                                  MSO_AUTO_SHAPE_TYPE.DIAMOND, MSO_AUTO_SHAPE_TYPE.HEXAGON,
+                                  MSO_AUTO_SHAPE_TYPE.CLOUD, MSO_AUTO_SHAPE_TYPE.RECTANGULAR_CALLOUT))
             if not editable_shape and (not shape.has_text_frame or not shape.text.strip()):
                 continue
             # Explicitly limit to supported editable elements. Warn separately.
@@ -568,6 +570,14 @@ def pptx_to_portable(source, title=None, media_dir=None):
                     style['shapeType'] = 'ellipse'
                 elif shape.auto_shape_type == MSO_AUTO_SHAPE_TYPE.ISOSCELES_TRIANGLE:
                     style['shapeType'] = 'triangle'
+                elif shape.auto_shape_type == MSO_AUTO_SHAPE_TYPE.DIAMOND:
+                    style['shapeType'] = 'diamond'
+                elif shape.auto_shape_type == MSO_AUTO_SHAPE_TYPE.HEXAGON:
+                    style['shapeType'] = 'hexagon'
+                elif shape.auto_shape_type == MSO_AUTO_SHAPE_TYPE.CLOUD:
+                    style['shapeType'] = 'cloud'
+                elif shape.auto_shape_type == MSO_AUTO_SHAPE_TYPE.RECTANGULAR_CALLOUT:
+                    style['shapeType'] = 'speech'
             widgets.append({'id': f'pptx_{index+1}_{len(widgets)+1}', 'kind': widget_kind,
                             'label': text[:240], 'description': text[:500],
                             'position': position, 'style': style})
@@ -640,7 +650,9 @@ def inspect_pptx_fidelity(source):
                                shape.auto_shape_type in (MSO_AUTO_SHAPE_TYPE.RECTANGLE,
                                    MSO_AUTO_SHAPE_TYPE.ROUNDED_RECTANGLE,
                                    MSO_AUTO_SHAPE_TYPE.OVAL,
-                                   MSO_AUTO_SHAPE_TYPE.ISOSCELES_TRIANGLE))
+                                   MSO_AUTO_SHAPE_TYPE.ISOSCELES_TRIANGLE,
+                                  MSO_AUTO_SHAPE_TYPE.DIAMOND, MSO_AUTO_SHAPE_TYPE.HEXAGON,
+                                  MSO_AUTO_SHAPE_TYPE.CLOUD, MSO_AUTO_SHAPE_TYPE.RECTANGULAR_CALLOUT))
             if shape.shape_type == MSO_SHAPE_TYPE.PICTURE:
                 try:
                     if any(abs(float(getattr(shape, side, 0) or 0)) > 1e-6 for side in ('crop_left','crop_right','crop_top','crop_bottom')):
@@ -777,12 +789,24 @@ def portable_to_pptx(data, destination, media_dir=None):
             slide.background.fill.solid()
             slide.background.fill.fore_color.rgb = RGBColor.from_string(background[1:])
         widgets = (activity.get('page_design') or {}).get('widgets') or []
+        # Export global schema widgets in the same order and geometry as React.
+        master = (((data.get('session') or {}).get('theme') or {}).get('master') or {})
+        scheme = master.get('widgets') or []
+        if (not isinstance(scheme, list) or len(scheme) > 2 or
+            any(not isinstance(w, dict) or w.get('kind') not in ('title','footer') for w in scheme) or
+            len(set(w['kind'] for w in scheme)) != len(scheme)):
+            raise ValueError('Invalid global slide scheme')
+        local_kinds = {w.get('kind') for w in widgets if isinstance(w, dict)}
+        widgets = [{**w,'id':f'inherited-{w["kind"]}'} for w in scheme if w['kind'] not in local_kinds] + widgets
         if len(widgets) > 16:
-            raise ValueError('Too many widgets')
+            raise ValueError('Too many widgets after scheme inheritance')
         for widget in widgets:
             if widget.get('kind') not in ('text', 'postit', 'question', 'timed-quiz', 'image', 'logo', 'title', 'footer'):
                 continue
             position = widget.get('position') or {'x': 5, 'y': 5, 'width': 90, 'height': 20}
+            if (widget.get('kind') == 'footer' and all(position.get(key) == value for key,value in
+                    [('x',0),('y',94),('width',100),('height',6)])):
+                position = {**position,'y':87,'height':13}
             x, y, w, h = (float(position.get(k, v)) for k, v in [('x', 5), ('y', 5), ('width', 90), ('height', 20)])
             if not all(math.isfinite(v) for v in (x, y, w, h)) or x < 0 or y < 0 or w <= 0 or h <= 0 or x+w > 100.00001 or y+h > 100.00001:
                 raise ValueError('Invalid widget geometry')
@@ -828,7 +852,12 @@ def portable_to_pptx(data, destination, media_dir=None):
                 from pptx.enum.shapes import MSO_AUTO_SHAPE_TYPE
                 style = widget.get('style') or {}
                 box = slide.shapes.add_shape(
-                    ({'ellipse': MSO_AUTO_SHAPE_TYPE.OVAL, 'triangle': MSO_AUTO_SHAPE_TYPE.ISOSCELES_TRIANGLE}.get(style.get('shapeType'))
+                    ({'ellipse': MSO_AUTO_SHAPE_TYPE.OVAL, 'circle': MSO_AUTO_SHAPE_TYPE.OVAL,
+                      'triangle': MSO_AUTO_SHAPE_TYPE.ISOSCELES_TRIANGLE,
+                      'rounded-rectangle': MSO_AUTO_SHAPE_TYPE.ROUNDED_RECTANGLE,
+                      'diamond': MSO_AUTO_SHAPE_TYPE.DIAMOND, 'hexagon': MSO_AUTO_SHAPE_TYPE.HEXAGON,
+                      'cloud': MSO_AUTO_SHAPE_TYPE.CLOUD,
+                      'speech': MSO_AUTO_SHAPE_TYPE.RECTANGULAR_CALLOUT}.get(style.get('shapeType'))
                      or (MSO_AUTO_SHAPE_TYPE.ROUNDED_RECTANGLE if style.get('rounded') is True else MSO_AUTO_SHAPE_TYPE.RECTANGLE)),
                     int(p.slide_width*x/100), int(p.slide_height*y/100),
                     int(p.slide_width*w/100), int(p.slide_height*h/100))
@@ -859,7 +888,7 @@ def portable_to_pptx(data, destination, media_dir=None):
                 elif colors.get('fillColor'):
                     box.fill.solid()
                     box.fill.fore_color.rgb = RGBColor.from_string(colors['fillColor'][1:])
-                if colors.get('strokeNone') is True:
+                if colors.get('strokeNone') is True or not colors.get('strokeWidth', 0):
                     box.line.fill.background()
                 elif colors.get('strokeColor'):
                     from pptx.enum.dml import MSO_LINE_DASH_STYLE
@@ -880,14 +909,20 @@ def portable_to_pptx(data, destination, media_dir=None):
                 master_style = master.get('titleStyle') or {}
                 if not isinstance(master_style, dict):
                     master_style = {}
-                style = {**style, 'fontFamily':'Arial', 'fontSize':38, 'bold':True,
-                         'textAlign':'center', **master_style}
+                style = {'fontFamily':'Arial', 'fontSize':24, 'bold':True,
+                         'textAlign':'center', **master_style, **style}
             if widget.get('kind') == 'footer':
                 style = {'fontFamily':'Arial', 'fontSize':14, 'textAlign':'center', **style}
                 if widget.get('footerShowPageNumber') is not False:
-                    right = slide.shapes.add_textbox(int(p.slide_width*(x+w*.88)/100),
-                        int(p.slide_height*y/100), int(p.slide_width*w*.12/100),
-                        int(p.slide_height*h/100))
+                    # 10 CSS px inset from the physical slide bottom and right
+                    # (1 inch = 96 CSS px for the 16:9 stage), independent of
+                    # widget geometry; the center footer remains user-editable.
+                    inset = Inches(10/96)
+                    number_width, number_height = Inches(1.2), Inches(.38)
+                    right = slide.shapes.add_textbox(
+                        int(p.slide_width-number_width-inset),
+                        int(p.slide_height-number_height-inset),
+                        int(number_width), int(number_height))
                     right.text = str(page_index)
                     from pptx.enum.text import PP_ALIGN
                     from pptx.util import Pt
@@ -903,7 +938,13 @@ def portable_to_pptx(data, destination, media_dir=None):
                     right.text_frame.paragraphs[0].alignment = PP_ALIGN.RIGHT
                     for paragraph in right.text_frame.paragraphs:
                         for run in paragraph.runs:
-                            run.font.size = Pt(style.get('fontSize',14))
+                            run.font.size = Pt(max(8,min(120,style.get('fontSize',14))))
+                            if isinstance(style.get('fontFamily'),str) and style['fontFamily']:
+                                run.font.name = style['fontFamily'][:80]
+                            number_color = style.get('color','#26364a')
+                            if isinstance(number_color,str) and re.fullmatch(r'#[0-9A-Fa-f]{6}',number_color):
+                                from pptx.dml.color import RGBColor
+                                run.font.color.rgb = RGBColor.from_string(number_color[1:])
             if isinstance(style, dict):
                 from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
                 if style.get('textAlign'):

@@ -1156,3 +1156,209 @@ header.rehearsal-toolbar{height:auto;min-height:0;flex:0 0 auto;position:relativ
 /* RC74: the default footer number occupies the bottom-right canvas corner on all stages. */
 .audience-widget-layout>.page-widget[data-widget-kind="footer"]{padding:0!important;overflow:hidden!important}
 .audience-widget-layout>.page-widget[data-widget-kind="footer"] .projection-slide-footer{width:100%;height:100%;min-height:0}
+
+/* RC89: always-visible compact horizontal widget palette, above the 16:9 canvas.
+   No vertical padding or unused rail space; icons and captions are stacked. */
+.editor-ux-v2,.editor-ux-v2:fullscreen{grid-template-columns:clamp(120px,14vw,205px) minmax(0,1fr)!important;grid-template-rows:auto auto minmax(0,1fr)!important}
+.editor-ux-v2 .editor-mock-header{grid-column:1/-1!important;grid-row:1!important}
+.editor-ux-v2 .page-editor-sidebar{grid-column:1!important;grid-row:2/4!important}
+.editor-ux-v2 .editor-widget-rail{grid-column:2!important;grid-row:2!important;display:block!important;position:relative;z-index:13;min-height:0!important;max-height:none!important;border:0;border-bottom:1px solid var(--editor-line);padding:0!important;margin:0!important;overflow:visible!important}
+.editor-ux-v2 .editor-widget-rail header{display:none!important}
+.editor-ux-v2 .editor-widget-grid{display:flex!important;flex-flow:row nowrap!important;align-items:flex-start!important;justify-content:flex-start!important;gap:5px!important;padding:0!important;margin:0!important;overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:thin;max-width:100%;white-space:normal}
+.editor-ux-v2 .editor-widget-grid .editor-icon-wrapper{flex:0 0 64px!important;width:64px!important;min-width:58px!important;max-width:72px!important;height:auto!important}
+.editor-ux-v2 .editor-widget-grid .editor-icon-tool{display:flex!important;flex-direction:column!important;justify-content:flex-start!important;gap:2px!important;flex:0 0 auto!important;width:100%!important;max-width:100%!important;height:auto!important;min-height:68px!important;margin:0!important;padding:3px 2px!important;background:#182c42!important;border-radius:5px!important;touch-action:manipulation}
+.editor-ux-v2 .editor-widget-grid .editor-icon-tool svg{flex:none!important;width:24px!important;height:24px!important}
+.editor-ux-v2 .editor-icon-caption{display:block!important;max-width:100%;font-size:9px;line-height:1.1;font-weight:550;white-space:normal;text-align:center;word-break:normal;overflow-wrap:anywhere;color:#edfaff}
+.editor-ux-v2 .editor-widget-grid .editor-icon-tooltip{left:50%!important;right:auto!important;bottom:auto!important;top:calc(100% + 3px)!important;transform:translateX(-50%)!important;z-index:250}
+.editor-ux-v2 .editor-stage{grid-column:2!important;grid-row:3!important;min-height:0;overflow:auto!important;padding:8px!important}
+.editor-ux-v2 .editor-canvas-slot{max-width:calc((100dvh - 180px)*16/9)!important}
+/* Keep controls outside the clipped body regardless of slide shape and hover.
+   The interaction belongs to the widget, not its text content. */
+.editor-ux-v2 .widget-canvas-item,.editor-ux-v2 .widget-canvas-item:focus-within{overflow:visible!important;touch-action:none!important}
+.editor-ux-v2 .widget-canvas-item>.widget-resize-edge,.editor-ux-v2 .widget-canvas-item>.widget-rotate-handle{display:block!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;z-index:150!important}
+.editor-ux-v2 .widget-canvas-item>.canvas-remove{position:absolute!important;top:2px!important;right:2px!important;bottom:auto!important;left:auto!important;z-index:160!important;width:23px!important;height:23px!important;background:#b42334!important;color:#fff!important;font-weight:800!important;border-radius:4px!important}
+/* The only displayed heading for result, reactions and participant counters is the
+   heading owned by the projection widget itself, not the editor's label copy. */
+.editor-ux-v2 .widget-canvas-item:is([data-widget-kind="results-button"],[data-widget-kind="reactions"],[data-widget-kind="participant-count"])>.widget-rich-inline{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important;clip-path:inset(50%)}
+.widget-free-answer-field{display:block;box-sizing:border-box;max-width:100%;width:100%;min-height:2.7em;padding:.45em .6em;border:1px solid #8094a9!important;border-radius:5px;color:#152236!important;opacity:1!important;-webkit-text-fill-color:#152236!important}
+.widget-question>button.outline,.rehearsal-widget button.outline,.projection-interactive-widget button.outline{color:#142c43!important;background:#f7fdff!important;border:1px solid #7096aa!important;font-weight:700!important;opacity:1!important;-webkit-text-fill-color:#142c43!important}
+.widget-question>button.outline:disabled,.rehearsal-widget button.outline:disabled{opacity:.6!important}
+@media(max-width:760px){.editor-ux-v2,.editor-ux-v2:fullscreen{grid-template-columns:clamp(98px,23vw,150px) minmax(0,1fr)!important}.editor-ux-v2 .editor-stage{padding:3px!important}.editor-ux-v2 .editor-icon-caption{font-size:8px}.editor-ux-v2 .editor-widget-grid .editor-icon-wrapper{flex-basis:55px!important;min-width:55px!important}}
+
+/* Footer schema editor and preview feedback. */
+.editor-ux-v2 .schema-footer-controls{display:grid;gap:9px;padding:6px}
+.editor-ux-v2 .schema-footer-controls label:has(input[type=checkbox]){display:flex;flex-direction:row;align-items:center}
+.editor-ux-v2 .editor-preview-open{cursor:pointer;pointer-events:auto!important}
+.editor-ux-v2 .editor-preview-open[aria-expanded="true"]{outline:2px solid #b3efff;outline-offset:2px}
+.editor-ux-v2 .widget-canvas-item textarea.widget-free-answer-field{pointer-events:none!important;resize:none!important;cursor:default}
+.rehearsal-widget .rehearsal-presenter-answer-box{max-height:26%;font-size:.85em;resize:none;pointer-events:none}
+
+/* RC90: slide-number padding is measured inside the 16:9 slide, not below it. */
+.projection-slide-footer .slide-footer-number,.canvas-slide-footer>span:last-child{right:10px!important;bottom:10px!important;line-height:1.2!important;overflow:visible!important}
+.projection-widget[data-widget-kind='footer'],.rehearsal-widget[data-widget-kind='footer'],.widget-canvas-item[data-widget-kind='footer']{min-height:0!important;overflow:visible!important}
+.current-session-actions{display:grid;gap:7px;margin-top:12px}
+.current-session-actions .current-session-name{display:block;overflow-wrap:anywhere}
+.current-session-actions>button{width:100%;min-height:38px;text-align:left}
+.current-session-actions form{display:grid;gap:9px}
+.current-session-actions .danger-action{color:#ff8585;border-color:#e07575}
+.slide-scheme-workspace{display:grid;gap:14px;min-width:0}
+.slide-scheme-header{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.slide-scheme-commands{display:flex;flex-wrap:wrap;gap:9px}
+.slide-scheme-canvas{min-width:0;display:block}
+.slide-scheme-canvas .canvas-editor-group{width:100%}
+.slide-scheme-canvas .widget-canvas{width:100%;aspect-ratio:16/9;min-height:260px}
+
+/* RC91: page number always references the full 16:9 canvas, never a translated or rotated footer. */
+.slide-canvas-page-number{position:absolute!important;right:10px!important;bottom:10px!important;left:auto!important;top:auto!important;z-index:20!important;display:block!important;text-align:right!important;line-height:1.2!important;white-space:nowrap!important;pointer-events:none!important;font-variant-numeric:tabular-nums!important;transform:none!important}
+.audience-widget-layout.stage-reading>.slide-canvas-page-number,.audience-widget-layout.stage-legacy>.slide-canvas-page-number{position:static!important;justify-self:end;margin:0 10px 10px 0}
+.slide-scheme-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(200px,260px);gap:12px;align-items:start}
+.slide-scheme-inspector{margin:0!important;display:grid;gap:8px;min-width:0}
+.slide-scheme-properties{display:grid;gap:10px}
+.slide-scheme-properties label{display:grid;gap:5px}
+.slide-scheme-properties label:has(input[type="checkbox"]){display:flex;align-items:center;gap:8px}
+@media(max-width:860px){.slide-scheme-layout{grid-template-columns:minmax(0,1fr)}}
+
+/* RC92: presenter-only navigation. Hidden until pointer approaches each lower corner;
+   always visible for touch and keyboard focus. Not rendered in audience pages. */
+.presenter-stage{position:relative;isolation:isolate;min-height:100vh;box-sizing:border-box;background:#111632;color:#fff;padding:1.5rem 3vw 4rem;overflow-x:hidden}
+.presenter-stage:fullscreen{width:100vw;height:100vh;overflow:auto;padding:1rem 2vw 4rem;background:#111632}
+.presenter-stage-header{display:flex;align-items:center;justify-content:space-between;gap:1.5rem;margin-bottom:1rem}
+.presenter-stage-tools{display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+.presenter-page-indicator{font-size:.85rem;font-variant-numeric:tabular-nums;color:#e5e9ff}
+.presenter-stage-slide{width:min(100%,calc((100vh - 10rem)*16/9));margin:0 auto;position:relative}
+.presenter-stage:fullscreen .presenter-stage-slide{width:min(100%,calc((100vh - 8rem)*16/9))}
+.presenter-stage-slide>.projection-page-content{width:100%;height:auto}
+.presenter-slide-navigation{position:fixed;inset:auto 0 0 0;z-index:30;pointer-events:none;display:flex;justify-content:space-between;align-items:end}
+.presenter-nav-zone{width:clamp(68px,12vw,180px);height:clamp(96px,19vh,220px);display:flex;align-items:end;padding:0 1rem 1.25rem;box-sizing:border-box;pointer-events:auto}
+.presenter-nav-zone.next{justify-content:end}
+.presenter-nav-arrow{display:grid;place-items:center;min-width:50px;min-height:50px;padding:0 0 .32rem;border-radius:50%;background:#111b32e8;color:white;border:1px solid #ffffffa3;font-size:2.7rem;line-height:1;cursor:pointer;opacity:0;transform:translateY(8px);transition:opacity .16s ease,transform .16s ease;box-shadow:0 4px 20px #0007}
+.presenter-nav-zone:hover .presenter-nav-arrow,.presenter-nav-zone:focus-within .presenter-nav-arrow,.presenter-stage.touch-controls .presenter-nav-arrow{opacity:1;transform:none}
+.presenter-nav-arrow:disabled{opacity:0!important;pointer-events:none}
+.presenter-stage.touch-controls .presenter-nav-arrow:disabled{opacity:.3!important;pointer-events:none}
+.presenter-stage-error{position:relative;z-index:35;padding:.65rem 1rem;background:#602f49;color:#fff;border-radius:6px;margin:.5rem 0}
+@media(hover:none),(pointer:coarse){.presenter-stage .presenter-nav-arrow{opacity:1;transform:none}.presenter-stage .presenter-nav-arrow:disabled{opacity:.3!important}}
+@media(max-width:700px){.presenter-stage{padding:1rem .6rem 5rem}.presenter-stage-header{align-items:flex-start}.presenter-stage-tools{justify-content:flex-end}.presenter-nav-zone{padding:.3rem .6rem 1.25rem}.presenter-stage-slide{width:100%}}
+@media(prefers-reduced-motion:reduce){.presenter-nav-arrow{transition:none}}
+
+/* RC93: QR + the exact participant URL, consistently inside small widgets and on screens. */
+.participant-access-qr{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(3px,.5vw,9px);width:100%;height:100%;min-width:0;min-height:0;overflow:hidden;text-align:center}
+.participant-access-qr>strong{max-width:100%;overflow-wrap:anywhere;line-height:1.2}
+.participant-access-qr>img{display:block;width:auto;height:auto;max-height:min(72%,260px);max-width:min(90%,260px);aspect-ratio:1;object-fit:contain;background:white;padding:3px;border-radius:4px;flex:0 1 auto;min-height:0}
+.participant-access-qr .participant-qr-url{display:block;width:100%;min-width:0;max-height:30%;overflow-wrap:anywhere;word-break:break-word;overflow:auto;font-size:clamp(10px,.8em,17px);line-height:1.25;color:inherit;user-select:text}
+.participant-access-qr .participant-qr-unavailable{font-size:12px;overflow-wrap:anywhere}
+
+/* RC94: SVG vectors follow the actual clipped polygon contours. A normal CSS
+   border is rectangular and clip-path removes its edges on these shapes. */
+.widget-vector-outline{position:absolute!important;inset:0!important;width:100%;height:100%;pointer-events:none!important;
+ z-index:3!important;overflow:visible;display:block;contain:none;}
+.widget-vector-outline path{fill:none;pointer-events:none;}
+/* CSS selection rings are intentionally distinct from the authored border. */
+
+/* RC95 — Ribbon typography toolbar. Office-inspired visual hierarchy, custom to Quorivio.
+   No absolute-positioned controls: the contextual ribbon remains reachable with zoom,
+   touch, assistive input and narrow screens. Scope overrides older RC71 quick-palette rules. */
+.editor-ux-v2 .widget-selection-palette,
+.widget-selection-palette{
+  display:flex!important;flex-direction:column;align-items:stretch;gap:0!important;
+  margin:12px auto 8px!important;padding:0!important;max-width:min(100%,1240px);width:max-content;
+  box-sizing:border-box;min-width:0;
+  background:linear-gradient(180deg,#fff 0%,#f7f9fd 100%)!important;
+  color:#17283f!important;border:1px solid #bdcadc!important;border-radius:13px!important;
+  box-shadow:0 16px 38px #0c193343,0 2px 5px #0c19331c!important;
+  overflow:visible;isolation:isolate;font:inherit;
+}
+.widget-selection-palette .palette-ribbon-head{
+  display:flex;align-items:center;gap:10px;min-height:36px;padding:6px 11px;
+  background:linear-gradient(100deg,#243b73,#37578b 66%,#546b9c);
+  color:#fff;border-radius:12px 12px 0 0;
+}
+.widget-selection-palette .palette-ribbon-context{
+  display:inline-flex;align-items:center;gap:6px;font-size:12px;letter-spacing:.02em;font-weight:750;white-space:nowrap;
+}
+.widget-selection-palette .palette-widget-label{
+  margin:0!important;padding:3px 9px;max-width:175px;
+  background:#ffffff1e;border:1px solid #ffffff2b;border-radius:5px;
+  color:#fff;font-size:11px!important;font-weight:550;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.widget-selection-palette .palette-ribbon-selection{font-size:11px;color:#e1ebff;white-space:nowrap;margin-left:auto}
+.widget-selection-palette .palette-ribbon-groups{
+  display:flex;align-items:stretch;gap:0;padding:7px 8px 6px;overflow-x:auto;scrollbar-width:thin;
+  overscroll-behavior-x:contain;
+}
+.widget-selection-palette .palette-ribbon-group{
+  display:flex;flex-direction:column;justify-content:space-between;align-items:stretch;
+  padding:3px 11px 1px;min-width:max-content;border-right:1px solid #d8e0eb;
+}
+.widget-selection-palette .palette-ribbon-group:first-child{padding-left:3px}
+.widget-selection-palette .palette-ribbon-group:last-child{border-right:0;padding-right:4px}
+.widget-selection-palette .palette-ribbon-controls{display:flex;flex-direction:column;gap:5px;min-height:66px;align-items:stretch}
+.widget-selection-palette .palette-ribbon-group-title{
+  font-size:10px;letter-spacing:.03em;color:#63718a;text-align:center;margin-top:5px;font-weight:650;
+}
+.widget-selection-palette .palette-ribbon-font-picker{display:flex;gap:5px;align-items:center}
+.widget-selection-palette select,
+.widget-selection-palette input[type=number]{
+  height:29px;min-height:29px!important;box-sizing:border-box;border:1px solid #aab8cf;
+  border-radius:5px;background:#fff;color:#1c2b45;font-size:12px;font-weight:500;
+  outline-offset:2px;padding:3px 6px;
+}
+.widget-selection-palette .palette-ribbon-font-picker select{width:168px;max-width:168px}
+.widget-selection-palette .palette-ribbon-font-picker input[type=number]{width:52px;text-align:center}
+.widget-selection-palette .palette-ribbon-buttons{display:flex;align-items:center;gap:3px}
+.widget-selection-palette button,
+.widget-selection-palette .palette-ribbon-color{
+  display:inline-flex;align-items:center;justify-content:center;gap:3px;
+  box-sizing:border-box;flex:none;min-height:30px!important;min-width:31px!important;
+  height:31px;padding:4px 5px!important;font-size:14px!important;font-weight:650;
+  color:#354867!important;background:transparent!important;border:1px solid transparent!important;
+  border-radius:5px!important;cursor:pointer;box-shadow:none!important;
+  transition:background .12s,border-color .12s,box-shadow .12s!important;
+}
+.widget-selection-palette button:hover:not(:disabled),
+.widget-selection-palette .palette-ribbon-color:hover{
+  background:#e7effb!important;color:#173c72!important;border-color:#b9cbe6!important;
+  transform:none!important;filter:none!important;
+}
+.widget-selection-palette button[aria-pressed=true]{
+  color:#1d4c8f!important;background:#dceafa!important;border-color:#88afd9!important;
+  box-shadow:inset 0 1px 3px #2e507026!important;
+}
+.widget-selection-palette button:focus-visible,
+.widget-selection-palette input:focus-visible,
+.widget-selection-palette select:focus-visible{
+  outline:2px solid #356fe1!important;outline-offset:1px;
+}
+.widget-selection-palette .palette-ribbon-color{position:relative;padding:2px 5px!important;margin:0;min-height:31px!important;min-width:40px!important}
+.widget-selection-palette .palette-ribbon-color input[type=color]{
+  width:18px!important;height:18px!important;min-height:18px!important;
+  border:1px solid #b5c2d8;padding:0;background:transparent;cursor:pointer;border-radius:3px;
+}
+.widget-selection-palette .palette-ribbon-color-letter{
+  font:bold 17px Georgia,serif;line-height:18px;color:#273b5b;border-bottom:3px solid #000;min-width:16px;text-align:center;
+}
+.widget-selection-palette .palette-ribbon-no-fill{
+  display:block;width:16px;height:16px;border:1.5px solid #7385a4;
+  background:linear-gradient(135deg,transparent 46%,#d04453 47%,#d04453 54%,transparent 55%),#fff;
+}
+.widget-selection-palette .palette-ribbon-dashed{width:19px;border-top:2px dashed #405f8d}
+.widget-selection-palette .palette-ribbon-help{font-size:10px;color:#738199;text-align:center;margin-top:1px}
+.widget-selection-palette .palette-ribbon-answer{color:#3b4d6c!important;font-size:11px;font-weight:600;padding:0!important}
+.widget-selection-palette .palette-ribbon-answer input[type=color]{width:23px!important;height:21px!important}
+.widget-selection-palette .palette-ribbon-rating{font-size:11px!important;min-width:75px!important}
+.widget-selection-palette .palette-ribbon-dismiss{
+  min-width:26px!important;width:26px;height:26px;min-height:26px!important;
+  margin-left:3px;color:#fff!important;background:#ffffff1a!important;
+}
+.widget-selection-palette .palette-ribbon-dismiss:hover:not(:disabled){background:#ffffff38!important;color:#fff!important}
+@media(max-width:960px){
+  .widget-selection-palette{width:100%;max-width:100%;}
+  .widget-selection-palette .palette-ribbon-groups{justify-content:flex-start}
+}
+@media(max-width:520px){
+  .widget-selection-palette .palette-ribbon-head{gap:7px}
+  .widget-selection-palette .palette-ribbon-selection{display:none}
+  .widget-selection-palette .palette-widget-label{max-width:125px}
+  .widget-selection-palette .palette-ribbon-dismiss{margin-left:auto}
+  .widget-selection-palette .palette-ribbon-group{padding-inline:8px}
+}
+@media(prefers-reduced-motion:reduce){.widget-selection-palette button{transition:none!important}}

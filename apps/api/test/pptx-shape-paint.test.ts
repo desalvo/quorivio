@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {validPageDesign,validWidgetTextStyle} from '../src/domain.ts';
 const shape=(style:unknown)=>({widgets:[{id:'pptx-shape',kind:'postit',label:'Editable shape',style}]});
 test('editable PowerPoint shape outline widths persist in page design',()=>{
- for(const width of [0.25,0.5,1,2,4,8,12])assert.equal(validPageDesign(shape({strokeColor:'#aabbcc',strokeWidth:width})),true);
+ for(const width of [0,0.25,0.5,1,2,4,8,12])assert.equal(validPageDesign(shape({strokeColor:'#aabbcc',strokeWidth:width})),true);
 });
 test('native PowerPoint line dashes are typed and persisted',()=>{
  for(const dash of ['solid','dash','dot'])assert.equal(validPageDesign(shape({strokeColor:'#aabbcc',strokeDash:dash})),true);
@@ -13,7 +13,7 @@ test('transparent fill and absent outline are explicit editable flags',()=>{
  assert.equal(validPageDesign(shape({fillNone:false,strokeNone:false,fillColor:'#abcdef'})),true);
 });
 test('stroke width rejects nonfinite, boolean, strings and out of bounds',()=>{
- for(const width of [-1,0,0.249,12.001,Infinity,-Infinity,NaN,true,'2',null])assert.equal(validWidgetTextStyle({strokeWidth:width}),false);
+ for(const width of [-1,-0.001,12.001,Infinity,-Infinity,NaN,true,'2',null])assert.equal(validWidgetTextStyle({strokeWidth:width}),false);
 });
 test('stroke dash rejects unrecognized PowerPoint enums',()=>{
  for(const dash of ['dash-dot','none','',null,0,'DASH'])assert.equal(validWidgetTextStyle({strokeDash:dash}),false);

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {newTitleWidget,newFooterWidget,widgetDisplay,slidePageNumber,DEFAULT_TITLE_STYLE} from '../src/slide-master.ts';
+import {newTitleWidget,newFooterWidget,widgetDisplay,slidePageNumber,DEFAULT_TITLE_STYLE,footerPageNumber} from '../src/slide-master.ts';
 test('new slide has one central bold title bound to the mutable page name',()=>{
  const w=newTitleWidget('Prima pagina');
  assert.equal(w.kind,'title');assert.deepEqual(w.position,{x:8,y:3,width:84,height:12,rotation:0});
@@ -17,11 +17,29 @@ test('slide master controls all inherited titles while overrides remain local',(
 });
 test('footer is transparent full width at bottom, and page numbering follows current ordering',()=>{
  const f=newFooterWidget('footer-1');
- assert.equal(f.kind,'footer');assert.equal(f.position?.width,100);assert.equal(f.position?.y,94);assert.equal(f.position?.height,6);
+ assert.equal(f.kind,'footer');assert.equal(f.position?.width,100);assert.equal(f.position?.y,87);assert.equal(f.position?.height,13);
  assert.equal(f.style?.fillNone,true);
  assert.deepEqual(widgetDisplay(f,{sessionTitle:'Quorivio session',pageNumber:3}).center,'Quorivio session');
  assert.deepEqual(widgetDisplay(f,{sessionTitle:'Quorivio session',pageNumber:3}).page,'3');
  assert.equal(slidePageNumber([{id:'c'},{id:'a'},{id:'b'}],'a'),2);
  assert.equal(widgetDisplay({...f,footerShowSessionTitle:false,footerShowPageNumber:false,label:'Copyright'},{sessionTitle:'Quorivio session',pageNumber:5}).center,'Copyright');
  assert.equal(widgetDisplay({...f,footerShowSessionTitle:false,footerShowPageNumber:false,label:'Copyright'},{sessionTitle:'Quorivio session',pageNumber:5}).page,'');
+});
+
+test('default master fonts are readable on a white slide and explicit widget styles win over stale theme defaults',()=>{
+ assert.equal(DEFAULT_TITLE_STYLE.color,'#000000');
+ const scheme=newTitleWidget('Default');
+ scheme.style={...scheme.style,color:'#143658',fontSize:46};
+ const result=widgetDisplay(scheme,{masterTitleStyle:{color:'#fefefe',fontSize:90},pageTitle:'Edited'});
+ assert.equal(result.style.color,'#143658');assert.equal(result.style.fontSize,46);
+ assert.equal(result.title,'Edited');
+});
+test('numbering overlay is derived from the footer presence, not footer geometry',()=>{
+ const footer={...newFooterWidget('foot'),position:{x:30,y:30,width:20,height:20,rotation:43},style:{color:'#092f42',fontSize:22}};
+ const number=footerPageNumber([footer],7);
+ assert.deepEqual(number,{text:'7',fontFamily:'Arial',fontSize:22,color:'#092f42'});
+ assert.equal(footerPageNumber([footer],0),null);
+ assert.equal(footerPageNumber([{...footer,footerShowPageNumber:false}],5),null);
+ assert.equal(footerPageNumber([],5),null);
+ assert.equal(slidePageNumber([{id:'a'}],'removed'),0);
 });

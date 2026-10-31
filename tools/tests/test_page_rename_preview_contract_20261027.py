@@ -34,7 +34,7 @@ class PageRenamePreviewContract(unittest.TestCase):
  def test_live_participant_uses_only_server_selected_current_activity(self):
   live=UI.split('entry?.activity?<section className="panel"',1)[1].split('</main>',1)[0]
   self.assertIn('entry.activity.page_design?.widgets',live)
-  self.assertIn("!(entry.activity.page_design?.widgets||[]).length",live)
+  self.assertIn('!resolveSlideMasterWidgets(entry.activity.page_design?.widgets||[],entry?.theme?.master?.widgets).length',live)
   self.assertNotIn('setPage(',live)
  def test_postgres_chromium_checks_title_and_preserves_design(self):
   self.assertIn('Renamed browser slide',E2E)

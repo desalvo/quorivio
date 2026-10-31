@@ -31,7 +31,44 @@ export function styledSegments(text:string,marks:TextMark[]|undefined,field:stri
  return points.slice(0,-1).map((start,index)=>({text:text.slice(start,points[index+1]),style:Object.assign({},...relevant.filter(m=>m.start<=start&&m.end>=points[index+1]).map(m=>m.style))}));
 }
 export function inlineMarkCss(s:InlineStyle):Record<string,string|undefined>{
- return {fontFamily:s.fontFamily,fontSize:s.fontSize!==undefined?`${(s.fontSize/1280*100).toFixed(5)}cqw`:undefined,color:s.color,fontWeight:s.bold?'bold':s.bold===false?'normal':undefined,fontStyle:s.italic?'italic':s.italic===false?'normal':undefined,textDecoration:[s.underline?'underline':'',s.strikethrough?'line-through':''].filter(Boolean).join(' ')||undefined};
+ return {fontFamily:s.fontFamily,fontSize:s.fontSize!==undefined?`${(s.fontSize/1280*100).toFixed(5)}cqw`:undefined,color:s.color,fontWeight:s.bold?'bold':s.bold===false?'normal':undefined,fontStyle:s.italic?'italic':s.italic===false?'normal':undefined,textDecoration:[s.underline?'underline':'',s.strikethrough?'line-through':''].filter(Boolean).join(' ')||(s.underline===false||s.strikethrough===false?'none':undefined)};
+}
+
+
+/** Compute the effective text style from the widget base and ordered inline marks.
+ * A toggle is active only if EVERY character of the selected range has the flag.
+ */
+export function selectionUniformValue<K extends keyof InlineStyle>(text:string,marks:TextMark[],field:string,start:number,end:number,base:InlineStyle,key:K):InlineStyle[K]|undefined{
+ if(start<0||end<=start||end>text.length)return undefined;
+ let offset=0;let current:InlineStyle[K]|undefined;let first=true;
+ for(const part of styledSegments(text,marks,field)){
+  const from=offset,to=offset+part.text.length;offset=to;
+  if(to<=start||from>=end)continue;
+  const value=(part.style[key]??base[key]) as InlineStyle[K]|undefined;
+  if(first){current=value;first=false}else if(current!==value)return undefined;
+ }
+ return current;
+}
+/** Apply a change ONLY to the highlighted text. Rebuild contiguous marks so
+ * repeated toggles overwrite earlier runs instead of creating unbounded layers.
+ * Data is deliberately plain text plus bounded safe inline style objects.
+ */
+export function applySelectionInlineStyle(marks:TextMark[],field:string,text:string,start:number,end:number,change:InlineStyle):TextMark[]{
+ if(start<0||end<=start||end>text.length||end>500)return marks;
+ const current=marks.filter(m=>m.field===field);
+ const other=marks.filter(m=>m.field!==field);
+ const points=[...new Set([0,text.length,start,end,...current.flatMap(m=>[m.start,m.end])])].filter(n=>n>=0&&n<=text.length).sort((a,b)=>a-b);
+ const next:TextMark[]=[];
+ for(let i=0;i<points.length-1;i++){
+  const from=points[i],to=points[i+1];if(from===to)continue;
+  const effective=Object.assign({},...current.filter(m=>m.start<=from&&m.end>=to).map(m=>m.style)) as InlineStyle;
+  const applied=from>=start&&to<=end?{...effective,...change}:effective;
+  if(!Object.keys(applied).length)continue;
+  const last=next[next.length-1];
+  if(last&&last.end===from&&JSON.stringify(last.style)===JSON.stringify(applied))last.end=to;
+  else next.push({field,start:from,end:to,style:applied});
+ }
+ return other.length+next.length<=64?[...other,...next]:marks;
 }
 
 export function changedRegion(before:string,after:string):{start:number;end:number}{

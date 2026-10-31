@@ -23,7 +23,7 @@ class RC75TypescriptRegression(unittest.TestCase):
         self.assertIn("typeof context.pageNumber==='number'", source)
         self.assertIn('Number.isInteger(context.pageNumber)', source)
         self.assertIn('String(context.pageNumber)', source)
-        self.assertIn('position:{x:0,y:94,width:100,height:6,rotation:0}', source)
+        self.assertIn('position:{x:0,y:87,width:100,height:13,rotation:0}', source)
 
     def test_free_text_subquestions_are_typed_consistently(self):
         source = (ROOT / 'apps/web/src/widget-results.ts').read_text(encoding='utf8')

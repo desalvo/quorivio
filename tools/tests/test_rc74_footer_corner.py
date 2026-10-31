@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[2]
 class FooterCornerRC74(unittest.TestCase):
     def test_default_footer_occupies_bottom_strip_and_stays_dynamic(self):
         source = (ROOT / 'apps/web/src/slide-master.ts').read_text()
-        self.assertIn('position:{x:0,y:94,width:100,height:6,rotation:0}', source)
+        self.assertIn('position:{x:0,y:87,width:100,height:13,rotation:0}', source)
         self.assertIn("footerShowPageNumber:true", source)
         self.assertIn("String(context.pageNumber)", source)
 
@@ -32,7 +32,7 @@ class FooterCornerRC74(unittest.TestCase):
         from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
         from tools.pptx_portable import portable_to_pptx
         footer = {'id':'footer-x','kind':'footer','footerShowSessionTitle':True,
-                  'footerShowPageNumber':True,'position':{'x':0,'y':94,'width':100,'height':6}}
+                  'footerShowPageNumber':True,'position':{'x':0,'y':87,'width':100,'height':13}}
         data = {'format':'quorivio-session','version':1,'session':{'title':'Sessione'},
                 'activities':[{'title':'Prima','page_design':{'widgets':[footer]}},
                               {'title':'Seconda','page_design':{'widgets':[footer]}}]}
@@ -42,8 +42,8 @@ class FooterCornerRC74(unittest.TestCase):
             pptx = Presentation(dest)
             for index,slide in enumerate(pptx.slides,1):
                 number = next(shape for shape in slide.shapes if shape.has_text_frame and shape.text == str(index))
-                self.assertAlmostEqual(number.left + number.width,pptx.slide_width,delta=3)
-                self.assertAlmostEqual(number.top + number.height,pptx.slide_height,delta=3)
+                self.assertAlmostEqual(number.left + number.width,pptx.slide_width - __import__('pptx').util.Inches(10/96),delta=3)
+                self.assertAlmostEqual(number.top + number.height,pptx.slide_height - __import__('pptx').util.Inches(10/96),delta=3)
                 self.assertEqual(number.text_frame.vertical_anchor,MSO_ANCHOR.BOTTOM)
                 self.assertEqual(number.text_frame.margin_right,0)
                 self.assertEqual(number.text_frame.margin_bottom,0)

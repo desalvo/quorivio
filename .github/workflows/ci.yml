@@ -132,6 +132,16 @@ jobs:
             tools.tests.test_topic_linked_results_rc_20261028 -q
       - name: Validate RC79 cumulative archive receipt closure before npm
         run: python3 -m unittest tools.tests.test_rc_cycle79_inventory_closure -q
+      - name: Validate RC89 editor review regressions before npm
+        run: python3 -m unittest tools.tests.test_rc_cycle89_editor_feedback -q
+      - name: Validate RC90 session actions, slide schemes and footer before npm
+        run: python3 -m unittest tools.tests.test_rc90_session_sidebar_master tools.tests.test_rc74_footer_corner -q
+      - name: Validate RC91 scheme editing, stage numbering and PPTX parity before npm
+        run: python3 -m unittest tools.tests.test_rc91_scheme_stage -q
+      - name: Validate RC92 presenter stage, gated navigation and fullscreen before npm
+        run: python3 -m unittest tools.tests.test_rc92_presenter_stage -q
+      - name: Validate RC93 participant QR and link parity before npm
+        run: python3 -m unittest tools.tests.test_rc93_participant_qr_contract -q
       - name: Validate RC78 browser rehearsal preview locators before npm
         run: python3 -m unittest tools.tests.test_rc_cycle78_preview_selector -q
       - name: Validate RC80 real widget context menu pointer before npm
@@ -579,6 +589,8 @@ jobs:
           if [ -f /tmp/quorivio-ci-api.log ]; then tail -60 /tmp/quorivio-ci-api.log; fi
       - name: Vulnerability gate (high and critical)
         run: npm audit --omit=dev --audit-level=high
+      # RC94 native editable-shape regression runs in the following complete tools suite,
+      # after python-pptx is installed; it must not run during dependency-free preflight.
       - name: Install Python conversion and load-test dependencies
         run: |
           sudo apt-get update -qq
@@ -681,7 +693,14 @@ jobs:
           python3 tools/verify_rc_cycle85_inventory.py --historical
           python3 tools/verify_rc_cycle86_inventory.py --historical
           python3 tools/verify_rc_cycle87_inventory.py --historical
-          python3 tools/verify_rc_cycle88_inventory.py
+          python3 tools/verify_rc_cycle88_inventory.py --historical
+          python3 tools/verify_rc_cycle89_inventory.py --historical
+          python3 tools/verify_rc_cycle90_inventory.py --historical
+          python3 tools/verify_rc_cycle91_inventory.py --historical
+          python3 tools/verify_rc_cycle92_inventory.py --historical
+          python3 tools/verify_rc_cycle93_inventory.py --historical
+          python3 tools/verify_rc_cycle94_inventory.py --historical
+          python3 tools/verify_rc_cycle95_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

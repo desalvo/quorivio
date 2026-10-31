@@ -16,8 +16,8 @@ class DashboardWidgetAppearance(unittest.TestCase):
   self.assertIn('live-stale-warning',UI)
   self.assertIn('live-panel',UI)
   self.assertNotIn("['audience','Interazione']",UI)
-  self.assertIn('Apri editor grafico',UI)
-  self.assertIn('legacy-page-admin',UI) # Only for real live operations and backward-compatibility
+  self.assertIn('✎ Modifica le pagine',UI)
+  self.assertIn('live-stats-tools',UI) # Live stats only; no duplicated page management
  def test_owner_and_collaborators_have_distinct_identity_treatments(self):
   self.assertIn('editor-owner-chip',UI);self.assertIn('editor-collaborator-chip',UI)
   self.assertIn('availablePresenters.find(p=>p.is_owner)',UI)

@@ -1,3 +1,68 @@
+# Quorivio 0.1.0-dev — RC95 — selezione persistente, testo formattabile e palette stile PowerPoint (1 novembre 2026)
+
+**Completamento certificato invariato: 84,75%** (42 gate accettati, 17 parziali su 59). Cumulativo delle modifiche da RC89–RC94 successive all'ultimo commit esplicitamente dichiarato. Nessun commit, push, tag, pubblicazione o modifica a server e repository remoti da parte dell'assistente.
+
+**Formattazione selettiva:** font, dimensione (10–96 px), colore, grassetto, corsivo, sottolineato e barrato agiscono soltanto sui caratteri selezionati. I pulsanti della palette non cancellano la selezione e dopo la modifica il DOM ripristina l'intervallo evidenziato. Quando una selezione è già in grassetto/corsivo/sottolineato/barrato, un altro clic disattiva lo stile; il clic seguente lo riattiva. Valori derivati dal titolo o dagli stili precedenti vengono rispettati. I marcatori per intervalli sono compattati, validati dal server e non introducono HTML arbitrario.
+
+**Palette grafica:** barra chiara in stile ribbon ispirata a PowerPoint, con icone vettoriali, raggruppamenti Carattere/Paragrafo/Forma/Disponi, stati attivi leggibili, focus accessibile, target touch, scorrimento orizzontale sui dispositivi piccoli e supporto alla riduzione delle animazioni. I font disponibili sono compatibili con l'allowlist del backend.
+
+**Titolo e Footer:** nuovi titoli in grassetto nero `#000000`, sfondo trasparente senza bordo, 24px, anche quando creati trascinandoli dalla palette; restano consentiti gli override espliciti dello schema. Il testo centrale del footer nella proiezione conserva i formati per selezione. La modifica di titoli e footer collegati automaticamente a pagina/sessione congela il testo mostrato per mantenere stabili gli intervalli della selezione.
+
+**Verifiche locali:** API Node 565/565, frontend Node 150/150 (7 regressioni RC95), parsing TypeScript/TSX superato, compilazione Python PPTX superata. **Ancora da eseguire:** build `tsc`/Vite (dipendenze npm assenti), test browser nativi e touchscreen, PostgreSQL e nuova CI GitHub standard/estesa. Non viene dichiarata la parità completa dell'esportazione PPTX per tutti i marcatori di testo.
+
+**Commit cumulativo suggerito (inglese, monoriga):** `Refine slide schemes and presenter navigation, add QR links and vector borders, and introduce PowerPoint-style rich-text ribbon`
+
+---
+# Quorivio 0.1.0-dev — RC94 — bordi zero, contorni vettoriali e menu flottante (1 novembre 2026)
+
+**Avanzamento certificato invariato: 84,75%** (42 gate accettati, 17 parziali su 59). Package cumulativo dalla baseline dell'ultimo commit dichiarato, comprendente anche RC89–RC93. Nessun commit/push/tag, modifica al server o pubblicazione eseguita; release strict ancora disabilitata.
+
+**Bordi:** lo spessore 0 pt è ammesso e diventa quello predefinito; i widget senza spessore esplicito non hanno contorno. Il valore è conservato dal backend, dagli editor di aspetto e forma, nelle miniature e nelle viste live, e nell'esportazione delle forme PowerPoint native. Scegliere un bordo visibile lo imposta a 1 pt; impostare 0 lo nasconde senza perdere il colore selezionato.
+
+**Forme:** triangolo, rombo, esagono, nuvola e fumetto mostrano un vero contorno vettoriale che segue la forma ritagliata anche con fondo trasparente, tratteggio e rotazione; lo stesso componente è condiviso da editor, anteprima, presentatore, partecipanti e miniature. Nell'esportazione PPTX delle forme editabili di tipo post-it vengono utilizzate le forme native corrispondenti, senza forzarle a rettangoli.
+
+**Menu contestuale:** la posizione segue il widget selezionato, preferendo una zona libera a lato o sopra/sotto; non rimane sempre sul punto di clic, non viene tagliato dal widget e viene chiuso quando lo schermo scorre o cambia dimensioni. Rimangono disponibili mouse, touch e tastiera.
+
+**Test locali:** API Node 565/565, frontend Node 143/143, regressioni Python RC94 4/4 e RC93/stili 11/11; parsing TS/TSX superato. Ancora aperti compilazione Vite completa, browser reali e touchscreen, PostgreSQL e CI standard/estesa. Nessun aumento della percentuale prima di certificazione.
+
+**Commit cumulativo suggerito:** `Refine global schemes and presenter navigation, add participant QR URLs, fix zero-width widget borders and shaped outlines, and float context menus`
+
+---
+# Quorivio 0.1.0-dev — RC93 — QR partecipanti con URL leggibile (1 novembre 2026)
+
+**Completamento certificato invariato: 84,75%** (42 gate accettati, 17 parziali su 59). Cumulativo dalla baseline dell'ultimo commit confermato, include RC89–RC92. Nessun commit, push, tag o deployment eseguito; pubblicazione e release strict disabilitate.
+
+I nuovi widget QR usano come titolo predefinito **Accesso partecipanti**. Widget già inseriti e nuovi mostrano QR e URL completo in testo in basso, con ritorno a capo nei riquadri piccoli. La visualizzazione è unificata in editor, proiezione presentatore, anteprima e vista partecipante. Il link viene restituito dal server: la versione JSON del QR autenticato e il QR SVG usano lo stesso URL canonico; il corrispondente endpoint pubblico è accessibile solo durante sessioni attive e non scadute e concorda con il QR SVG pubblico. Un URL non recuperabile non viene sostituito da un codice inventato. I link del presentatore rimangono separati e autenticati.
+
+**Test locali:** 565/565 Node API, 139/139 Node frontend, 6/6 nuovi contratti QR Python, parsing TS/TSX senza errori. **Non ancora verificati:** build completa Vite/TypeScript, browser reali, PostgreSQL, CI GitHub standard ed estesa, esportazione QR nativa in PPTX. Il punteggio di accettazione non aumenta prima della certificazione.
+
+**Commit suggerito:** `Refine slide schemes and footer placement, synchronize presenter navigation, and display participant QR links with readable URLs`
+
+---
+# Quorivio 0.1.0-dev — RC92 — schermo presentatore live autenticato (1 novembre 2026)
+
+**Completamento certificato invariato: 84,75%** (42 gate accettati, 17 parziali, 59 totali). Nessun commit/push/tag o pubblicazione, né esecuzione GitHub CI, è stata effettuata. Interventi cumulativi RC89–RC92.
+
+Lo **Schermo presentatore**, aperto dalla dashboard, riprende la pagina corrente memorizzata sul server e non riavvia il timer già avviato. Se la sessione è pronta o attiva ma nessuna pagina è stata pubblicata, un'operazione atomica autenticata seleziona e pubblica la prima pagina, attivando la sessione pronta. Due finestre concorrenti non reimpostano la pagina scelta dall'altro presentatore. Le sessioni in bozza, pausa o terminate non vengono attivate automaticamente.
+
+Il presentatore naviga con le frecce della tastiera (sinistra/destra/su/giù), PagSu/PagGiù, o con frecce in basso ai due angoli. Le frecce compaiono al passaggio/focus del mouse o restano visibili su mobile; sono disabilitate ai bordi. Gli stessi comandi non compaiono ai partecipanti e richiedono un controllo autenticato owner/collaboratore. La navigazione passa dal server e diffonde lo stato in tempo reale; un controllo di concorrenza impedisce che una finestra disallineata sostituisca senza avviso la pagina di un altro presentatore. Modalità pieno schermo attivabile/disattivabile, con uscita Esc del browser.
+
+**Verifiche locali:** 139/139 test Node frontend, 13/13 test Python mirati RC90–RC92, parsing sintattico TypeScript/TSX superato. Suite Python completa tentata ma scaduta; build npm/Vite completa e test PostgreSQL/Chromium/Firefox/WebKit/CI GitHub ancora da completare (dipendenze npm offline assenti; registry non raggiungibile). Percentuale non aumentata senza evidenza esterna.
+
+---
+# Quorivio 0.1.0-dev — RC91 — schemi robusti, numerazione riferita al canvas (31 ottobre 2026)
+
+**Completamento certificato: 84,75%** (42 gate accettati, 17 parziali su 59); non aumentato per prove locali. RC91 è cumulativo da RC89 e RC90, successive all'ultimo commit noto `4d0901d8805f99f696e85414038ff543d694272a`. Nessun commit/push/tag/release da parte dell'assistente. `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+**Macroarea schemi:** l'editor degli schemi usa il canvas di modifica delle pagine anche per trascinamento, rotazione e ridimensionamento; il pannello di proprietà permette di regolare colore e dimensione dei testi, Titolo dinamico/fisso, Footer sessione/testo personalizzato e visibilità della numerazione. Ogni widget globale può essere rimosso con conferma e reinserito. Le modifiche non salvate sono segnalate; l'uscita e il cambio sezione dalla sidebar richiedono conferma. Prima del PATCH il client legge lo schema autenticato più recente e rifiuta sovrascritture quando differisce dalla baseline iniziale. **Limite:** questa è una verifica client-side pre-salvataggio, non un'operazione CAS atomica sul server; un race simultaneo resta teoricamente possibile.
+
+**Titolo/Footer:** il numero si rende ora una sola volta in un overlay relativo al canvas, non dentro il widget spostabile. L'offset inferiore e destro di 10 pixel è valido nei quattro rendering (editor, presentatore live, anteprima affiancata, vista partecipante). Il testo centrale segue sempre il Footer posizionabile; la lettura accessibile usa un numero a fine flusso. Rimosso il numero interno al widget per evitare duplicazioni e tagli. Il default testo del nuovo Titolo/Footer è scuro su sfondo chiaro; gli stili locali modificabili sovrascrivono i valori di master predefiniti. Gli stili del titolo vengono esportati con la stessa precedenza nel PPTX; font, colore e dimensione del numero PPTX provengono dal Footer. Il vecchio Footer default 94%/6% è normalizzato all'esportazione come sul frontend; le posizioni personalizzate sono conservate.
+
+**Verifiche locali:** Node API 565/565; Node web 136/136; regressioni PPTX/integrazione mirate 35/35, più 4/4 contratti RC91; parsing TSX senza errori sintattici; test legacy RC90 e test footer RC74 OK. Un PPTX reale con due pagine verifica override locale, numerazione corretta, colore/font e posizione inferiore/destra. **Non attestati**: build TypeScript/Vite completa (dipendenze npm non installate qui), sessione PostgreSQL reale, browser grafici/drag/pixel, prove Firefox/WebKit, 500 partecipanti e CI standard/estesa dopo nuovo commit. Zero promozioni di gate finché mancano evidenze di CI.
+
+**Legacy residuo:** la UI duplicata di gestione quiz/pagine è stata rimossa in RC90 ma nel codice rimangono percorsi di import compatibilità, funzioni e colonne storiche. Prima di sopprimere dati persistenti serve mappatura lettori/scrittori, migrazione con rollback, test su DB aggiornato e fresco. Non si è eseguita alcuna cancellazione silenziosa né è stata spacciata per completata.
+
+---
 # Quorivio 0.1.0-dev — RC87 — verifica heartbeat live inattivo (31 ottobre 2026)
 
 **84,75% completato** (42/59 gate accettati, 17 parziali; peso totale 100). Diagnosi log CI successiva a RC86: Chromium completo e WebSocket bidirezionale PostgreSQL verdi; test idle 70s non certificato perché criteri ancorati alla connessione (35 e 55 s) anziché alla scansione globale ogni 20 s. In RC87: validazione a fase indipendente, controllo continuo timeout ≤25 s, almeno 3 snapshot, controlli sessione/privacy conservati, test di regressione deterministici. CI estesa RC87 da eseguire. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit, push, tag o pubblicazione automatica.
@@ -2344,3 +2409,26 @@ Report: `docs/RC_LINKED_RESULTS_DUAL_PREVIEW_20261028.it.md`.
 **RC:** **74,0% invariato**, 40 gate, 23 accettati e 17 parziali. I test locali non promuovono gate. Dopo il nuovo commit eseguire entrambe le CI; con `git add -A` assicurarsi che il log non precedentemente tracciato venga inserito. Restano da verificare Firefox/WebKit, i dispositivi reali, le tecnologie assistive e il gate RC rigoroso.
 
 **Evidenze locali finali:** compilazione TypeScript/Vite PASS; Node backend 474/474, frontend 65/65 PASS; Python completo 1005/1005 PASS; Chromium recupero password sul vero React 12/12 (tre ripetizioni, desktop/mobile e URL legacy/frammento); corrispondenza dell’indice Git e dell’inventario SHA-256 PASS. La nuova Full CI GitHub resta da verificare.
+
+
+## 2026-10-31 — RC89 revisione funzionale editor (0.1.0-dev)
+
+Baseline GitHub confermata: commit `4d0901d8805f99f696e85414038ff543d694272a`; CI standard 41243609282 e CI estesa 41244919887 entrambe verdi.
+
+Revisione editor: palette orizzontale sempre visibile sopra il canvas con icone e testi; handle resize/rotazione e X rossa in alto a destra; caselle di testo libero effettive in editor e anteprima anche presentatore, con sfondo indipendente configurabile e validazione server; titolo singolo per risultati/reazioni/partecipanti; upload sfondo con feedback; pulsanti di invio leggibili; comandi anteprima accessibili; editor schemi Titolo/Footer. La sezione delle operazioni live resta ma si chiama «Statistiche live e strumenti di manutenzione (avanzati)», perché include funzioni non duplicate.
+
+I collaudi reali drag/rotate, upload autenticato e anteprime dopo questo codice sono ancora da certificare. Percentuale RC **84,75% (42 gate accettati, 17 parziali)** invariata fino alla nuova CI. Nessun commit/push/tag automatizzato.
+
+## 2026-10-31 — RC90 session sidebar, global slide schemes and editor cleanup (uncommitted)
+
+**Upstream:** maintainer-confirmed standard and extended CI green on `4d0901d8805f99f696e85414038ff543d694272a`. RC89 is not yet committed; RC90 is cumulative from RC89. Version `0.1.0-dev`, EUPL-1.2 unchanged.
+
+**Session sidebar:** in an open session, a dedicated action panel offers leave view (without ending the live session), terminate session (confirmation), duplicate as a clean draft (existing guarded endpoint), rename (inline form, authorized metadata PATCH, 1–160 chars), delete (owner-only, confirmation), and open the dedicated master editor. Permission is taken from authenticated `GET /sessions/:id`, not the live/public snapshot. The dashboard section previously named “Anteprima presentatore” is now “Schermo presentatore”.
+
+**Presentation master:** session-level Title/Footer templates use the same interactive `WidgetCanvas` drag/resize/rotate UI and are saved through the validated session theme. Presenter screen, participant screen, rehearsal and PowerPoint export inherit missing Title/Footer widgets automatically; local page widgets override the corresponding master kind. Explicit “Applica schema…” adopts the template on a page while preserving unrelated widgets. Dynamic page number is 10 CSS px from the canvas bottom/right; default footer moved inside the canvas to avoid clipping. The export worker uses the same 10 px-equivalent inset.
+
+**Legacy cleanup:** removed the duplicated dashboard page/quiz/poll management and historic activity edit forms, leaving live rating/reaction reporting; the editor remains the supported widget-first authoring route. Removed exposed legacy JSON import/export buttons, retaining reading/migration capability and server data paths to avoid destructive changes. **Pending:** database migration audit before removing any persisted legacy columns or historical import compatibility; full browser/PowerPoint/Kubernetes CI after commit; explicit manual validation of canvas manipulation and schema inheritance.
+
+**Readiness:** keep the externally certified score at **84.75%** (42 accepted and 17 partial gates). The new functionality is awaiting a fresh standard/extended GitHub acceptance run; do not claim it has passed on RC90.
+
+**Final local regression evidence:** Node API 565/565, Node frontend 134/134; 15 focused Python contract/PPTX tests passed. Full Python and complete conversion/infrastructure runs not certified locally due to execution timeout. Browser semantics and visual slide-master UX must be accepted in maintainer-triggered GitHub CI after the next commit.

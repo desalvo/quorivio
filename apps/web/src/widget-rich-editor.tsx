@@ -46,7 +46,7 @@ export function RichWidgetText({value,marks,field,active,onChange,onSelection,on
   lock.current=true;
   el.replaceChildren(fragment);
   lock.current=false;
-  if(active&&document.activeElement===el&&selection)restoreDomTextRange(el,selection);
+  if(active&&selection)restoreDomTextRange(el,selection);
  },[value,marks,field,active]);
  return <div ref={root} className={'widget-rich-inline '+(active?'widget-rich-editing':'widget-rich-display')} role={active?'textbox':undefined} aria-label={ariaLabel} aria-multiline="false" tabIndex={active?0:undefined} contentEditable={active} suppressContentEditableWarning spellCheck={active}
   onFocus={capture} onKeyUp={capture} onMouseUp={capture} onPointerUp={capture}

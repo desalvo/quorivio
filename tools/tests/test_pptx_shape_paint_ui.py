@@ -12,7 +12,7 @@ class ShapePaintUIContracts(unittest.TestCase):
         for text in ('Spessore contorno','Tratteggio contorno','Nessun contorno','Nessun riempimento'):
             self.assertIn(text,MAIN)
     def test_presenter_and_rehearsal_share_dash_and_no_fill(self):
-        self.assertGreaterEqual(MAIN.count("style?.strokeDash==='dot'"),2)
+        self.assertGreaterEqual(MAIN.count('<WidgetShapeOutline style={w.style}/>'),4)
         self.assertIn("backgroundColor:w.style?.fillNone?'transparent'",MAIN)
     def test_page_thumbnails_do_not_force_opaque_fill(self):
         self.assertIn("backgroundColor:w.style?.fillNone?'transparent':w.style?.fillColor",MAIN)

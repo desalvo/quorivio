@@ -9,7 +9,7 @@ test('transparent widget with no border overrides the default theme',()=>{
  assert.equal(result.backgroundColor,'transparent');assert.equal(result.backgroundImage,'none');assert.equal(result.borderStyle,'none');assert.equal(result.borderWidth,0);
 });
 test('no chosen appearance leaves the theme in control',()=>{
- assert.deepEqual(widgetAppearanceStyle(undefined),{backgroundColor:'transparent',backgroundImage:'none',borderRadius:0});
- assert.equal(widgetAppearanceStyle({strokeDash:'dot'}).borderStyle,'dotted');
+ assert.deepEqual(widgetAppearanceStyle(undefined),{backgroundColor:'transparent',backgroundImage:'none',borderRadius:0,borderStyle:'none',borderWidth:0});
+ assert.equal(widgetAppearanceStyle({strokeDash:'dot',strokeWidth:1}).borderStyle,'dotted');
  assert.equal(widgetAppearanceStyle({shapeType:'ellipse'}).borderRadius,'50%');
 });

@@ -18,7 +18,7 @@ class RCMediaEditor(unittest.TestCase):
   self.assertIn('asset_in_use_by_widget',api)
  def test_editor_filmstrip_and_preview(self):
   web=(ROOT/'apps/web/src/main.tsx').read_text()
-  self.assertIn('Anteprime delle pagine',web)
+  self.assertIn('Miniature delle pagine',web)
   self.assertIn('beginPageDesign(a)',web)
   self.assertIn('File multimediale caricato',web)
   self.assertIn('Ricomincia prova',web)

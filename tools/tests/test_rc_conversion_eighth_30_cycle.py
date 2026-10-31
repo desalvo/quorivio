@@ -143,7 +143,13 @@ class EighthConversion30(unittest.TestCase):
         self.assertEqual(self.report['unsupported_shape_outlines'],0)
         self.assertFalse(self.report['lossy'],self.report)
     def test_24_export_rejects_negative_stroke_width(self): self._invalid_width(-1)
-    def test_25_export_rejects_zero_stroke_width(self): self._invalid_width(0)
+    def test_25_export_accepts_zero_stroke_width(self):
+        zero=copy.deepcopy(self.portable)
+        zero['activities'][0]['page_design']['widgets'][0]['style']['strokeWidth']=0
+        _validate_export_input(zero)
+        outfile=self.root/'borderless.pptx'
+        portable_to_pptx(zero,outfile)
+        self.assertEqual(Presentation(outfile).slides[0].shapes[0].line.fill.type,MSO_FILL.BACKGROUND)
     def test_26_export_rejects_oversized_stroke_width(self): self._invalid_width(12.01)
     def test_27_export_rejects_nan_stroke_width(self): self._invalid_width(float('nan'))
     def test_28_export_rejects_boolean_stroke_width(self): self._invalid_width(True)

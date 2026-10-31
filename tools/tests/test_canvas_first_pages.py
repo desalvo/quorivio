@@ -25,6 +25,6 @@ class CanvasFirstPageTests(unittest.TestCase):
         self.assertIn("void createCanvasPageAt(a.id,'before')",self.web)
         self.assertIn("void createCanvasPageAt(a.id,'after')",self.web)
         self.assertIn('beginPageDesign(page)', self.web)
-        self.assertIn('onClick={createCanvasPage}', self.web)
+        self.assertIn('void createCanvasPage()', self.web)
         self.assertIn('Crea contenuti con i widget', self.web)
         self.assertNotIn('Nuova pagina con attività (compatibilità)', self.web)

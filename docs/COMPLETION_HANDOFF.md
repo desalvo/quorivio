@@ -1,3 +1,59 @@
+# Quorivio 0.1.0-dev — RC95 — selection-aware rich text and PowerPoint-style ribbon (1 November 2026)
+
+**Certified readiness remains 84.75%** (42 accepted / 17 partial out of 59 gates); no fresh external CI evidence yet. Cumulative source includes all RC89–RC94 development since the last maintainer-confirmed commit. No assistant commit, push, tag, publication, deployment or change to remote repositories.
+
+**Rich text selection:** changes to font family, 10–96 px size, color, bold, italic, underline and strikethrough are saved as bounded, validated, per-character range marks. The selection remains retained when a ribbon button is pressed; the editable DOM restores the highlighted range after React re-renders. Bold/italic/underline/strike buttons use the effective style of ALL highlighted characters (including title defaults and existing inline spans), toggle it off if uniformly active, and back on when pressed again. Marks are coalesced, not endlessly appended, and unrelated fields (questions, answer options, descriptions) remain untouched. There is no user-authored HTML persistence.
+
+**Ribbon visual design:** a professional, custom PowerPoint-inspired light ribbon with vector icons and semantically grouped **Carattere, Paragrafo, Forma, Disponi** sections, explicit active states, focus visibility, touch-size targets, help labels, horizontal scrolling on narrow screens, and reduced-motion compliance. The quick toolbar keeps object fill/border, alignment and property controls separate from selection-level text formatting. Font choices match the backend allowlist; unsupported fonts are not silently accepted.
+
+**Title/Footer:** new titles default to bold, black `#000000`, transparent fill, no outline, 24px font size. New page titles and drag-created titles follow the same defaults, with explicit scheme/instance overrides still respected. Footer center content now renders saved inline marks on the presenter/participant projection. Editing auto-derived titles and footers freezes their displayed text to preserve valid mark ranges when manual formatting is applied.
+
+**Local checks:** API Node 565/565 PASS; frontend Node 150/150 PASS, including 7 new RC95 unit/contracts; TS/TSX source parse PASS; Python PPTX exporter compiles. **Not verified locally:** full `tsc`/Vite build (npm dependencies not available), real Chromium/Firefox/WebKit or mobile editor interactions, live PostgreSQL and fresh GitHub standard/extended CI. Those release gates stay open. Native PPTX per-character markup parity across every widget kind is not claimed.
+
+**Suggested cumulative commit (single English line):** `Refine slide schemes and presenter navigation, add QR links and vector borders, and introduce PowerPoint-style rich-text ribbon`
+
+---
+# Quorivio 0.1.0-dev — RC94 — borderless widget defaults, vector shape outlines and floating context menus (1 November 2026)
+
+**Certified completion remains 84.75%** (42 accepted / 17 partial of 59 gates). This cumulatively includes the work from RC89–RC93 since the last explicit maintainer-acknowledged commit. No assistant commit, push, tag, server mutation or publication. The strict release gate and image publication remain disabled.
+
+**Widget border 0 pt (default):** backend page-design validation, canvas style, style/shape inspectors, thumbnails, live presenter, rehearsal, participant rendering and editable PowerPoint post-it export now accept and honor zero-width strokes. A color or dash preset alone does not silently enable a border; an explicit request to choose a visible border selects 1 pt, while entering 0 removes the outline without losing the chosen color. Historical zero-width widgets are not silently rewritten.
+
+**Actual shape contours:** clipped polygon elements cannot display their rectangular CSS border. Triangle, diamond, hexagon, cloud and speech bubble now use a single SVG vector path whose geometry matches the responsive clip polygon. The vector overlay follows every widget's size/rotation, stroke color, width and solid/dashed/dotted style in the canvas, rehearsal, live presenter, participant view and slide miniatures. For editable PowerPoint post-it shapes, native PowerPoint diamond, hexagon, cloud, callout, circle and rounded rectangle are now exported instead of a rectangle and imported using equivalent type metadata. Shape fidelity for other widget kinds and advanced fill/effect blending still requires independent PowerPoint and browser checks.
+
+**Floating menu:** the context menu remains portaled to document.body to escape the widget clipping context. Its location is now calculated from the selected widget's live screen rect and the viewport, placing it to a side or above/below rather than always under the click/over the widget. On constrained screens the lowest-overlap visible location is chosen; scrolling/resizing dismisses stale coordinates. Right click, touch hold, keyboard context key and background-menu routing remain supported.
+
+**Local checks:** API Node 565/565; Web Node 143/143; RC94 Python native-shape and menu contracts 4/4; RC93 QR and UI style contracts 11/11; TS/TSX syntax parse diagnostics 0 and portable Python compile passed. No full tsc/Vite build, real browser/touch rendering, live PostgreSQL or fresh standard/extended CI execution is claimed. Those gates remain open and scoring is unchanged.
+
+**Suggested cumulative commit:** `Refine global schemes and presenter navigation, add participant QR URLs, fix zero-width widget borders and shaped outlines, and float context menus`
+
+---
+# Quorivio 0.1.0-dev — RC93 — participant QR with readable canonical URL (1 November 2026)
+
+**Externally certified release readiness remains 84.75%** (42 accepted and 17 partial of 59 gates). This package is cumulative from the last maintainer-confirmed commit, including RC89–RC92. No assistant commit, push, tag, deployment or publication. Strict release and image publishing remain disabled.
+
+**Change:** A newly placed QR widget defaults to **Accesso partecipanti**. All existing QR widgets now display their title, a scan-ready participation QR, and the **full exact URL encoded in the QR** immediately underneath. One shared React view is used by the page editor, presenter projection, rehearsal preview and live participant rendering. Long links wrap safely in small/resized widgets. The URL is not inferred from a short code or guessed from the browser origin: the owner-only `/api/sessions/:id/qr?format=json` returns precisely the same canonical URL that its SVG/PNG encodes (using the validated same-host browser-origin override); the public `/api/join/:code/qr-url` is accessible only for active non-expired sessions and returns the same canonical link as `/api/join/:code/qr.svg`. No privileged presenter URL or session ID is embedded in the default participation QR. When a link fails to load the widget shows an unavailable message instead of an invalid code. URL changes on session code rotation invalidate the cached widget view. The old session QR downloads remain available.
+
+**Evidence:** `node --experimental-strip-types --test apps/api/test/*.test.ts` PASS 565/565; `node --experimental-strip-types --test apps/web/test/*.test.ts` PASS 139/139; RC93 Python QR contracts PASS 6/6; TypeScript/TSX syntax diagnostics 0. Full TypeScript/Vite build, real authenticated PostgreSQL and real browser end-to-end rendering were not performed locally (npm dependencies unavailable); fresh GitHub standard and extended CI are still pending. No new RC scoring credit until those gates pass. PowerPoint export still handles the existing supported widget subset; QR native export fidelity is not claimed in this cycle.
+
+**Suggested cumulative commit:** `Refine slide schemes and footer placement, synchronize presenter navigation, and display participant QR links with readable URLs`
+
+---
+# Quorivio 0.1.0-dev — RC92 — authenticated live presenter screen (1 November 2026)
+
+**Externally certified completion remains 84.75%** (42 accepted / 17 partial, total 59 gates); no new claim of external RC certification. Cumulative after the maintainer's last declared commit, including RC89–RC91 pending changes. No commit, push, tag, GitHub workflow run or publication was performed by the assistant. Strict release and Docker Hub publishing remain disabled.
+
+The dashboard's **Apri schermo presentatore** opens an authenticated live page at `/screen/<session id>`. If the session is already active with a published page, it displays that exact page in its persisted order, even after closing and reopening the screen; it does not reset `opened_at`. When a ready or active session has no published page, opening the authorized screen atomically selects and publishes its first page. This single-transaction server action starts ready sessions and cannot overwrite a page chosen by another presenter; draft, paused and closed sessions are not automatically activated. Empty presentations display an informative message.
+
+Presenters advance with Left/Right/Up/Down/PageUp/PageDown or with small overlay arrows at the bottom left and right. On pointer devices the controls appear on hover/focus in each lower corner. On touch devices the controls are always visible (disabled when at a boundary). The controls are rendered only after an authenticated `GET /sessions/:id` confirms owner/co-presenter access; the participant view receives no navigation controls. Navigation uses the established authoritative `POST /sessions/:id/activities/:aid/open` endpoint and the WebSocket broadcast shared by audience and dashboards. A new optional `expected_current_activity_id` precondition prevents a stale screen from overwriting another presenter's subsequent page change. The normal dashboard open action still works without this new precondition.
+
+The browser Fullscreen API enters and exits from a visible screen toolbar. Native Escape also exits fullscreen. The stage remains keyboard accessible; keyboard shortcuts avoid form fields, editing controls and media widgets. Page counters, previous/next disabled states, in-flight locks, and recoverable network errors are included. Read-only participant presentations and published page timers retain their existing backend restrictions and semantics.
+
+**Local validations:** Web Node tests 139/139 green, 13 targeted Python RC90–RC92 contracts green, TypeScript/TSX syntax parse diagnostics 0. The full Python suite was attempted but timed out inside converter/browser integration tests; full TypeScript/Vite, authenticated PostgreSQL transaction race, native Firefox/WebKit/Chromium pointer and touch interactions, and fresh GitHub standard/extended CI have not been run in this environment because npm dependencies were unavailable offline and npm registry DNS failed. All remain pending for actual certification.
+
+**Commit message (one line; cumulative):** `Refine global schemes and slide footers, simplify session actions, and add synchronized presenter slideshow navigation`
+
+---
 # Quorivio 0.1.0-dev — RC88 — capacity QR URL normalization (31 October 2026)
 
 **RC completion: 84.75%** (42 accepted, 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. GitHub RC87 extended workflow `41241863260` on `982817a7080edb29ca4667e2de6877585af09098` successfully passed editor Chromium and idle WebSocket tests but stopped at 500-user capacity: `tools/ci_capacity_500.py` passed the API's relative `join_url` directly to `tools/load_500.py`, whose CLI correctly requires an absolute URL. RC88 normalizes only on the configured loopback origin and tests rejection of cross-origin/malformed paths. The 500-user load and 90s p95 SLO gates remain real and must be rerun in GitHub; no RC credit until proof. All historical manifests remain immutable. To continue, extract complete RC88 ZIP, `git add -A`, verify source manifest and CI, commit yourself, then run `rc_acceptance_suite=true` with no publishing. No assistant commit/push/tag.
@@ -603,3 +659,22 @@ Source baseline: `quorivio-0.1.0-dev-accessibility-integration-cumulative.zip`.
 - Full documentation/manual reconciliation and user's Kubernetes acceptance.
 
 The last RC matrix remains 37.5% pending verified gate closure. `0.1.0-dev` is unchanged. No GitHub or Kubernetes operations were performed.
+
+
+## RC89 handoff — editor feedback, verified base 2026-10-31
+
+Repository `desalvo/quorivio`, branch default; `0.1.0-dev`. Maintainer-confirmed green standard/extended workflows 41243609282 / 41244919887, commit `4d0901d8805f99f696e85414038ff543d694272a`. RC89 cumulative archive should overlay this commit, not make a second commit automatically. Changes: front-end editor palette/answer fields/context and schema controls, backend strict `answerFillColor` validator, CI regression tests/inventory. Real browser acceptance after RC89 is not yet proved. RC score remains 84.75%; not an approved production publication. Full inventory available `docs/validation/RC_CYCLE89_PACKAGE_INVENTORY_20261031.json`; verify with `python tools/verify_rc_cycle89_inventory.py` before git commit, then standard and extended GitHub Actions.
+
+## 2026-10-31 — RC90 session sidebar, global slide schemes and editor cleanup (uncommitted)
+
+**Upstream:** maintainer-confirmed standard and extended CI green on `4d0901d8805f99f696e85414038ff543d694272a`. RC89 is not yet committed; RC90 is cumulative from RC89. Version `0.1.0-dev`, EUPL-1.2 unchanged.
+
+**Session sidebar:** in an open session, a dedicated action panel offers leave view (without ending the live session), terminate session (confirmation), duplicate as a clean draft (existing guarded endpoint), rename (inline form, authorized metadata PATCH, 1–160 chars), delete (owner-only, confirmation), and open the dedicated master editor. Permission is taken from authenticated `GET /sessions/:id`, not the live/public snapshot. The dashboard section previously named “Anteprima presentatore” is now “Schermo presentatore”.
+
+**Presentation master:** session-level Title/Footer templates use the same interactive `WidgetCanvas` drag/resize/rotate UI and are saved through the validated session theme. Presenter screen, participant screen, rehearsal and PowerPoint export inherit missing Title/Footer widgets automatically; local page widgets override the corresponding master kind. Explicit “Applica schema…” adopts the template on a page while preserving unrelated widgets. Dynamic page number is 10 CSS px from the canvas bottom/right; default footer moved inside the canvas to avoid clipping. The export worker uses the same 10 px-equivalent inset.
+
+**Legacy cleanup:** removed the duplicated dashboard page/quiz/poll management and historic activity edit forms, leaving live rating/reaction reporting; the editor remains the supported widget-first authoring route. Removed exposed legacy JSON import/export buttons, retaining reading/migration capability and server data paths to avoid destructive changes. **Pending:** database migration audit before removing any persisted legacy columns or historical import compatibility; full browser/PowerPoint/Kubernetes CI after commit; explicit manual validation of canvas manipulation and schema inheritance.
+
+**Readiness:** keep the externally certified score at **84.75%** (42 accepted and 17 partial gates). The new functionality is awaiting a fresh standard/extended GitHub acceptance run; do not claim it has passed on RC90.
+
+**Final local regression evidence:** Node API 565/565, Node frontend 134/134; 15 focused Python contract/PPTX tests passed. Full Python and complete conversion/infrastructure runs not certified locally due to execution timeout. Browser semantics and visual slide-master UX must be accepted in maintainer-triggered GitHub CI after the next commit.

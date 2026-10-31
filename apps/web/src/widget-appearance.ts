@@ -6,16 +6,31 @@ export type WidgetAppearance = Pick<WidgetTextStyle,
  'ratingView'|'strokeColor'|'strokeNone'|'strokeWidth'|'strokeDash'|'rounded'|'shapeType'>;
 
 const rgbaHex=(hex:string,alpha:number)=>/^#[a-f\d]{6}$/i.test(hex)?hex+Math.round(Math.max(0,Math.min(1,alpha))*255).toString(16).padStart(2,'0'):undefined;
-const polygon:Record<string,string>={
- triangle:'polygon(50% 0%,100% 100%,0% 100%)',
- diamond:'polygon(50% 0%,100% 50%,50% 100%,0% 50%)',
- hexagon:'polygon(25% 0%,75% 0%,100% 50%,75% 100%,25% 100%,0% 50%)',
- speech:'polygon(0 0,100% 0,100% 78%,42% 78%,25% 100%,28% 78%,0 78%)',
- cloud:'polygon(6% 43%,15% 34%,27% 32%,34% 12%,47% 8%,59% 23%,72% 17%,85% 32%,95% 42%,98% 63%,85% 81%,14% 82%,2% 65%)'
+/** Canvas coordinates are shared by CSS clipping and the vector outline, so
+ * even an unfilled cloud, diamond or speech bubble has an actual shaped edge. */
+const shapeVertices:Record<string,readonly (readonly [number,number])[]>={
+ triangle:[[50,0],[100,100],[0,100]],
+ diamond:[[50,0],[100,50],[50,100],[0,50]],
+ hexagon:[[25,0],[75,0],[100,50],[75,100],[25,100],[0,50]],
+ speech:[[0,0],[100,0],[100,78],[42,78],[25,100],[28,78],[0,78]],
+ cloud:[[6,43],[15,34],[27,32],[34,12],[47,8],[59,23],[72,17],[85,32],[95,42],[98,63],[85,81],[14,82],[2,65]]
 };
+const polygon:Record<string,string>=Object.fromEntries(Object.entries(shapeVertices).map(([shape,points])=>
+ [shape,`polygon(${points.map(([x,y])=>`${x}% ${y}%`).join(',')})`]));
+
+/** The native rectangular CSS border would be clipped away by clip-path.
+ * Return a real vector outline (and no outline at width zero). */
+export function widgetShapeOutline(style:WidgetAppearance|undefined){
+ const points=shapeVertices[style?.shapeType||''];
+ const width=style?.strokeWidth??0;
+ if(!points||style?.strokeNone||!Number.isFinite(width)||width<=0)return null;
+ return {path:`M ${points.map(([x,y])=>`${x} ${y}`).join(' L ')} Z`,
+  color:style?.strokeColor||'#334155',width,dash:style?.strokeDash||'solid'};
+}
+
 export function widgetAppearanceStyle(style:WidgetAppearance|undefined,imageUrl?:string):Record<string,string|number|undefined>{
- if(!style)return {backgroundColor:'transparent',backgroundImage:'none',borderRadius:0};
- const borderEnabled=!style.strokeNone&&(!!style.strokeColor||style.strokeWidth!==undefined||style.strokeDash!==undefined);
+ if(!style)return {backgroundColor:'transparent',backgroundImage:'none',borderRadius:0,borderStyle:'none',borderWidth:0};
+ const borderEnabled=!style.strokeNone&&(style.strokeWidth??0)>0;
  const dash=style.strokeDash==='dash'?'dashed':style.strokeDash==='dot'?'dotted':'solid';
  const alpha=style.fillOpacity??1;
  const color=rgbaHex(style.fillColor||'#ffffff',alpha);
@@ -27,9 +42,9 @@ export function widgetAppearanceStyle(style:WidgetAppearance|undefined,imageUrl?
   backgroundColor:style.fillNone?'transparent':!image&&!gradient?(alpha===1?(style.fillColor||((style.fillMode==='solid'||style.fillOpacity!==undefined)?'#ffffff':'transparent')):color):undefined,
   // An authored transparent/solid fill must not reveal a decorative theme background image.
   backgroundImage:style.fillNone||(!image&&!gradient&&(style.fillColor!==undefined||style.fillOpacity!==undefined||style.fillMode==='solid'))?'none':undefined,
-  borderStyle:style.strokeNone?'none':borderEnabled?dash:undefined,
-  borderColor:style.strokeNone?'transparent':borderEnabled?(style.strokeColor||'#334155'):undefined,
-  borderWidth:style.strokeNone?0:borderEnabled?`${style.strokeWidth??1}pt`:undefined,
+  borderStyle:style.strokeNone||!borderEnabled||!!polygon[style.shapeType||'']?'none':dash,
+  borderColor:!borderEnabled?'transparent':(style.strokeColor||'#334155'),
+  borderWidth:!borderEnabled||!!polygon[style.shapeType||'']?0:`${style.strokeWidth}pt`,
   borderRadius:shape==='circle'||shape==='ellipse'?'50%':shape==='rounded-rectangle'?14:0,
   clipPath:polygon[shape]
  };
