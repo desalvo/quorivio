@@ -132,7 +132,7 @@ jobs:
         run: python3 -m unittest tools.tests.test_rc_cycle66_verified_sso_reconciliation -q
       - name: Check nonsecret CI token fixture
         run: python3 -m unittest tools.tests.test_rc_cycle64_credential_fixture -q
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with: {node-version: '22'} # npm caching requires a committed package-lock.json
       - name: Install reproducibly
         run: npm install --ignore-scripts --no-audit --no-fund
@@ -649,7 +649,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: {persist-credentials: false}
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with: {node-version: '22'}
       - name: Install reproducibly
         run: npm install --ignore-scripts --no-audit --no-fund
@@ -933,7 +933,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: {persist-credentials: false}
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with: {node-version: '22'}
       - name: Start disposable ClamAV with private loopback-only port
         run: |
