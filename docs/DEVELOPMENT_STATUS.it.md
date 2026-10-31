@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC87 — verifica heartbeat live inattivo (31 ottobre 2026)
+
+**84,75% completato** (42/59 gate accettati, 17 parziali; peso totale 100). Diagnosi log CI successiva a RC86: Chromium completo e WebSocket bidirezionale PostgreSQL verdi; test idle 70s non certificato perché criteri ancorati alla connessione (35 e 55 s) anziché alla scansione globale ogni 20 s. In RC87: validazione a fase indipendente, controllo continuo timeout ≤25 s, almeno 3 snapshot, controlli sessione/privacy conservati, test di regressione deterministici. CI estesa RC87 da eseguire. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit, push, tag o pubblicazione automatica.
+
+---
 # Quorivio 0.1.0-dev — RC86 — palette widget Chromium (31 ottobre 2026)
 
 **Completamento RC: 84,75%**, 42 gate accettati, 17 parziali; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Diagnosi dai log allegati `logs_111780102568(1).zip`: il collaudo Chromium supera anteprime, eventi widget, focus e accessibilità, poi fallisce in `tools/ci_browser_editor.py` su `assert await buttons.count()==17`. La palette reale ha 19 tipi, compresi Titolo e Footer. Il numero fisso era obsoleto; non è stato riscontrato un errore applicativo nella palette. La campagna estesa GitHub RC86 resta da eseguire e non dà diritto ad avanzare i gate.

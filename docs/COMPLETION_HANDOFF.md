@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC87 — phase-independent idle live acceptance (31 October 2026)
+
+**RC score unchanged: 84.75%** (42 accepted, 17 partial gates), `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Logs `logs_111783956906.zip`: Chromium editor/palette acceptance and cross-replica WebSocket acceptance pass; 70-second idle test fails due to fixed 35/55 second thresholds unrelated to a server-start-aligned 20-second timer. RC87 adjusts receiver assertion (25-second silence timeout, at least three authoritative session snapshots, traffic in final 40/20 seconds), adds deterministic phase-offset regressions, preserves real PostgreSQL/WS test and private participant projection. CI GitHub retest required; no credit before evidence, no commits/publishing by assistant.
+
+---
 # Quorivio 0.1.0-dev — RC86 — real Chromium palette acceptance (31 October 2026)
 
 **RC completion: 84.75%**, 42 accepted and 17 partial gates; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. The uploaded `logs_111780102568(1).zip` shows browser acceptance passed the context-menu part and many other Chromium checks, then hit `assert await buttons.count()==17` in `tools/ci_browser_editor.py`. The real widget palette now has 19 kinds including Title and Footer. The fixed assertion is obsolete, not evidence of a missing app feature. No additional RC gate credit until a new extended GitHub run passes.

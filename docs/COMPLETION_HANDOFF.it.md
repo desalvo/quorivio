@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC87 — CI idle live: fase heartbeat indipendente (31 ottobre 2026)
+
+**Completamento RC: 84,75%**, 42 gate accettati, 17 parziali; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Archivio di log `logs_111783956906.zip` dopo RC86: test Chromium editor/palette/menu contestuale **verde**, cross-replica WebSocket A↔B **verde**, fallito il test idle 70s perché cercava aggiornamenti dopo 35s e 55s anziché accettare un timer di replica con fase indipendente. RC87 corregge il criterio di accettazione (snapshot entro 25s, almeno 3, continuità negli ultimi 40/20s) e aggiunge regressioni sui casi 0/14/34/54 e 0/19/39/59. Prova PostgreSQL/WS reale mantenuta, nuovi log sicuri dei soli secondi relativi. Manifest RC86 storico, RC87 corrente. CI GitHub RC87 da confermare; nessun gate promosso, nessun commit/push/tag/pubblicazione effettuato.
+
+---
 # Quorivio 0.1.0-dev — RC86 — palette widget Chromium (31 ottobre 2026)
 
 **Completamento RC: 84,75%**, 42 gate accettati, 17 parziali; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Diagnosi dai log allegati `logs_111780102568(1).zip`: il collaudo Chromium supera anteprime, eventi widget, focus e accessibilità, poi fallisce in `tools/ci_browser_editor.py` su `assert await buttons.count()==17`. La palette reale ha 19 tipi, compresi Titolo e Footer. Il numero fisso era obsoleto; non è stato riscontrato un errore applicativo nella palette. La campagna estesa GitHub RC86 resta da eseguire e non dà diritto ad avanzare i gate.

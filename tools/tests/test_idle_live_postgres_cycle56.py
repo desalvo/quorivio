@@ -39,6 +39,22 @@ class IdleLiveCycle56(unittest.TestCase):
         n=asyncio.run(probe.watch_quiet_snapshots(ws,'abc','presenter',now=clock.now))
         self.assertEqual(n,4)
 
+    def test_phase_shifted_replica_timer_is_accepted(self):
+        # The replica's timer starts before the probe; it need not have ticks
+        # at 40s/60s relative to this WebSocket. This exact valid trace failed
+        # the previous 35s/55s test even though no gap exceeded 20 seconds.
+        clock=Clock();ws=SyntheticSocket(clock,[(0,Message()),(14,Message()),(34,Message()),(54,Message())])
+        self.assertEqual(asyncio.run(probe.watch_quiet_snapshots(ws,'abc','presenter',now=clock.now)),4)
+
+    def test_periodic_timer_near_next_tick_is_accepted(self):
+        clock=Clock();ws=SyntheticSocket(clock,[(0,Message()),(19,Message()),(39,Message()),(59,Message())])
+        self.assertEqual(asyncio.run(probe.watch_quiet_snapshots(ws,'abc','participant',now=clock.now)),4)
+
+    def test_quiet_session_without_late_snapshots_still_fails_closed(self):
+        clock=Clock();ws=SyntheticSocket(clock,[(0,Message()),(10,Message()),(30,Message())])
+        with self.assertRaisesRegex(AssertionError,'no authoritative snapshot'):
+            asyncio.run(probe.watch_quiet_snapshots(ws,'abc','presenter',now=clock.now))
+
     def test_initial_only_snapshots_fail_closed(self):
         clock=Clock();ws=SyntheticSocket(clock,[(0,Message()),(1,Message())])
         with self.assertRaisesRegex(AssertionError,'no authoritative snapshot'):

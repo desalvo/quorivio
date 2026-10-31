@@ -53,10 +53,19 @@ async def watch_quiet_snapshots(ws, session_id: str, role: str, duration: float 
         if role == 'participant' and any(k in snap for k in ('connected_participants', 'participants')):
             raise AssertionError('participant received private presenter presence')
         times.append(now() - started)
-    # The first 1-2 deliveries may be caused by initial join/presence. Require
-    # verified snapshots after two and three scheduled 20s heartbeat intervals.
-    if not any(t >= 35 for t in times) or not any(t >= 55 for t in times):
-        raise AssertionError(f'{role}: no sustained idle refresh after 35s and 55s')
+    # The 20-second timer belongs to the API replica, NOT to the WebSocket.
+    # Its phase at the moment of connection is arbitrary. An entirely healthy
+    # 0, 14, 34, 54-second stream has no frame past 55 seconds before the
+    # 70-second probe ends; checking 35/55 is therefore a false failure.
+    # Require continued authoritative snapshots into the last 40 and 20
+    # seconds of the probe instead. The 25-second receive timeout above
+    # independently rejects missing refreshes / excessive delivery gaps.
+    if len(times) < 3 or not any(t >= duration - 40 for t in times) or not any(t >= duration - 20 for t in times):
+        # Only relative elapsed seconds are safe to print: never include
+        # session IDs, cookies, response data, participant names, or URLs.
+        seconds = [round(t, 1) for t in times]
+        raise AssertionError(f'{role}: insufficient periodic authoritative snapshots in {duration}s; '
+                             f'received_at_seconds={seconds}')
     return len(times)
 
 
