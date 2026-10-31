@@ -10,7 +10,7 @@ sys.path.insert(0,str(ROOT/'tools'))
 from rc_gate_audit import audit
 from rc_release_preflight import preflight
 from verify_rc_cycle21_inventory import load_inventory as previous
-from verify_rc_cycle57_inventory import load_inventory, verify_source
+from verify_rc_cycle61_inventory import load_inventory, verify_source
 
 SHA='caf6331f15ccf39c218791503b8c6d0ca3503dce'
 RUN=40918620911
@@ -40,15 +40,15 @@ class Cycle22RemoteReconciliation(unittest.TestCase):
         self.assertIn('not offsite',self.gates['D2-ENCRYPTED-DR']['evidence'].lower())
 
     def test_exact_weighted_score_unaccepted_gate_set_and_history(self):
-        self.assertEqual(len(self.gates),53)
+        self.assertEqual(len(self.gates),55)
         self.assertEqual(sum(g['weight'] for g in self.gates.values()),100)
-        self.assertEqual((audit()['score'],preflight()['accepted_gates']), (81.25,36))
+        self.assertEqual((audit()['score'],preflight()['accepted_gates']), (81.75,38))
         self.assertEqual(len(preflight()['unaccepted_gates']),17)
         self.assertFalse(preflight()['release_candidate_ready'])
         self.assertEqual(self.doc['scoring_reconciliation_20261029_cycle16']['reconciled_score'],77)
         self.assertEqual(self.doc['scoring_reconciliation_20261029_cycle22']['delta_pp'],2.0)
-        self.assertEqual(self.doc['last_verified_full_ci']['head_sha'],SHA)
-        self.assertEqual(self.doc['last_verified_full_ci']['head_sha'],SHA)
+        self.assertEqual(self.doc['last_verified_full_ci']['head_sha'],'c0fe7f7b9e41c0295387d84996a7b531b91b69a0')
+        self.assertEqual(self.doc['last_verified_full_ci']['head_sha'],'c0fe7f7b9e41c0295387d84996a7b531b91b69a0')
         self.assertFalse(self.doc['pending_local_batch']['new_local_runtime_smoke_promoted'])
         self.assertFalse(self.doc['pending_local_batch']['strict_rc_ready'])
 

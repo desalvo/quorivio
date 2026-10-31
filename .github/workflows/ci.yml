@@ -6,6 +6,10 @@ on:
     tags: ['v*', '0.*', '1.*', '2.*']
   workflow_dispatch:
     inputs:
+      rc_acceptance_suite:
+        description: 'One-click full disposable RC automatic acceptance (all opt-in test gates; NO publishing, NO external hardware or legal sign-off)'
+        type: boolean
+        default: false
       rc_strict:
         description: 'Fail if any documented RC gate remains unaccepted (manual verification only)'
         type: boolean
@@ -105,6 +109,15 @@ jobs:
         with: {node-version: '22'} # npm caching requires a committed package-lock.json
       - name: Install reproducibly
         run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Validate RC campaign is non-publishing and non-strict
+        if: github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite
+        env:
+          RC_CAMPAIGN_PUBLISH: ${{ inputs.publish_image }}
+          RC_CAMPAIGN_STRICT: ${{ inputs.rc_strict }}
+        run: |
+          test "$RC_CAMPAIGN_PUBLISH" = 'false'
+          test "$RC_CAMPAIGN_STRICT" = 'false'
+          python3 tools/rc_campaign_preflight.py --check-workflow
       - name: Publish evidence-based RC readiness diagnostics (non-blocking)
         run: python3 tools/rc_release_preflight.py --output /tmp/quorivio-rc-readiness.json
       - name: Publish RC gate summary in GitHub Actions
@@ -120,7 +133,7 @@ jobs:
       - name: Compile frontend and backend
         run: npm run build
       - name: Chromium editor UI acceptance (opt-in)
-        if: github.event_name == 'workflow_dispatch' && inputs.browser_test
+        if: github.event_name == 'workflow_dispatch' && inputs.browser_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
         timeout-minutes: 8
         run: |
           python3 -m pip install --disable-pip-version-check --break-system-packages 'playwright>=1.50,<2'
@@ -183,7 +196,7 @@ jobs:
           python3 tools/ci_cookie_modal_order_chromium.py
           python3 tools/ci_browser_editor.py
       - name: Upload Chromium failure diagnostics
-        if: failure() && github.event_name == 'workflow_dispatch' && inputs.browser_test
+        if: failure() && github.event_name == 'workflow_dispatch' && inputs.browser_test || (failure() && github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
         uses: actions/upload-artifact@v4
         with:
           name: chromium-editor-failure
@@ -270,6 +283,16 @@ jobs:
           test "$(psql -h 127.0.0.1 -U quorivio -d quorivio -Atc 'SELECT count(*) FROM users')" = '1'
           test "$(psql -h 127.0.0.1 -U quorivio -d quorivio -Atc "SELECT count(*) FROM information_schema.tables WHERE table_schema='public' AND table_name IN ('auth_flows','api_rate_windows','widget_answers')")" = '3'
           test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/api/auth/me)" = '401'
+      - name: PostgreSQL federated identity link and revocation acceptance
+        env:
+          DATABASE_URL: postgres://quorivio:ci-only-secret@127.0.0.1:5432/quorivio
+          QUORIVIO_CI_FEDERATED_LINK_TEST: '1'
+        run: node tools/ci_federated_link_postgres.mjs
+      - name: PostgreSQL federated identity management HTTP acceptance
+        env:
+          DATABASE_URL: postgres://quorivio:ci-only-secret@127.0.0.1:5432/quorivio
+          QUORIVIO_CI_FEDERATED_IDENTITIES_TEST: '1'
+        run: node tools/ci_federated_identity_management_pg.mjs
       - name: PostgreSQL-backed portable and profile lifecycle E2E
         env:
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
@@ -346,7 +369,7 @@ jobs:
           QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
         run: python3 tools/ci_independent_widget_questions_postgres.py
       - name: Chromium participant UI and PostgreSQL lifecycle (opt-in)
-        if: github.event_name == 'workflow_dispatch' && inputs.browser_test
+        if: github.event_name == 'workflow_dispatch' && inputs.browser_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
         timeout-minutes: 5
         env:
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
@@ -358,7 +381,7 @@ jobs:
           curl --fail --silent http://127.0.0.1:8080/ >/dev/null
           python3 tools/ci_browser_participant.py
       - name: Chromium editor PostgreSQL persistence and conflict acceptance (opt-in)
-        if: github.event_name == 'workflow_dispatch' && inputs.browser_test
+        if: github.event_name == 'workflow_dispatch' && inputs.browser_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
         timeout-minutes: 5
         env:
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
@@ -368,7 +391,7 @@ jobs:
           python3 tools/ci_widget_title_menu.py
           python3 tools/ci_browser_editor_postgres.py
       - name: Chromium presenter profile upload and anonymous avatar acceptance (opt-in)
-        if: github.event_name == 'workflow_dispatch' && inputs.browser_test
+        if: github.event_name == 'workflow_dispatch' && inputs.browser_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
         timeout-minutes: 5
         env:
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
@@ -376,7 +399,7 @@ jobs:
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
         run: python3 tools/ci_browser_profile.py
       - name: Upload Chromium real editor failure diagnostics
-        if: failure() && github.event_name == 'workflow_dispatch' && inputs.browser_test
+        if: failure() && github.event_name == 'workflow_dispatch' && inputs.browser_test || (failure() && github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
         uses: actions/upload-artifact@v4
         with:
           name: chromium-real-editor-failure
@@ -384,7 +407,7 @@ jobs:
           if-no-files-found: ignore
           retention-days: 3
       - name: Upload Chromium participant failure diagnostics
-        if: failure() && github.event_name == 'workflow_dispatch' && inputs.browser_test
+        if: failure() && github.event_name == 'workflow_dispatch' && inputs.browser_test || (failure() && github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
         uses: actions/upload-artifact@v4
         with:
           name: chromium-participant-failure
@@ -418,7 +441,7 @@ jobs:
           python3 -m pip install --disable-pip-version-check --break-system-packages 'aiohttp>=3.9,<4'
           python3 tools/ci_live_replicas.py
       - name: PostgreSQL two-replica quiet live snapshot freshness (opt-in)
-        if: github.event_name == 'workflow_dispatch' && inputs.live_idle_test
+        if: github.event_name == 'workflow_dispatch' && inputs.live_idle_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
         timeout-minutes: 3
         env:
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
@@ -426,7 +449,7 @@ jobs:
           QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
         run: python3 tools/ci_live_idle_snapshots.py
       - name: Optional 500-participant PostgreSQL/WebSocket acceptance
-        if: github.event_name == 'workflow_dispatch' && inputs.capacity_test
+        if: github.event_name == 'workflow_dispatch' && inputs.capacity_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
         timeout-minutes: 6
         env:
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
@@ -434,7 +457,7 @@ jobs:
           QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
         run: python3 tools/ci_capacity_500.py
       - name: Optional sustained 500-participant global-latency SLO acceptance
-        if: github.event_name == 'workflow_dispatch' && inputs.capacity_slo_test
+        if: github.event_name == 'workflow_dispatch' && inputs.capacity_slo_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
         timeout-minutes: 7
         env:
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
@@ -557,14 +580,18 @@ jobs:
           python3 tools/verify_rc_cycle54_inventory.py --historical
           python3 tools/verify_rc_cycle55_inventory.py --historical
           python3 tools/verify_rc_cycle56_inventory.py --historical
-          python3 tools/verify_rc_cycle57_inventory.py
+          python3 tools/verify_rc_cycle57_inventory.py --historical
+          python3 tools/verify_rc_cycle58_inventory.py --historical
+          python3 tools/verify_rc_cycle59_inventory.py --historical
+          python3 tools/verify_rc_cycle60_inventory.py --historical
+          python3 tools/verify_rc_cycle61_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   cross-browser:
     name: Native Firefox and WebKit acceptance (opt-in)
-    if: github.event_name == 'workflow_dispatch' && inputs.cross_browser_test
+    if: github.event_name == 'workflow_dispatch' && inputs.cross_browser_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
     needs: validate
     runs-on: ubuntu-24.04
     timeout-minutes: 20
@@ -637,7 +664,7 @@ jobs:
           ignore-unfixed: true
   kubernetes-api-manifests:
     name: Kubernetes real API manifest schema (opt-in)
-    if: github.event_name == 'workflow_dispatch' && inputs.kubernetes_manifest_test
+    if: github.event_name == 'workflow_dispatch' && inputs.kubernetes_manifest_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
     needs: validate
     runs-on: ubuntu-24.04
     timeout-minutes: 12
@@ -653,7 +680,7 @@ jobs:
         run: python3 tools/ci_k8s_apiserver_smoke.py
   kubernetes-runtime:
     name: Kubernetes live single-node runtime and pod replacement (opt-in)
-    if: github.event_name == 'workflow_dispatch' && inputs.kubernetes_runtime_test
+    if: github.event_name == 'workflow_dispatch' && inputs.kubernetes_runtime_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
     needs: validate
     runs-on: ubuntu-24.04
     timeout-minutes: 22
@@ -678,7 +705,7 @@ jobs:
           kubectl -n quorivio-runtime get events --sort-by=.lastTimestamp | tail -40 || true
   kubernetes-multinode-ingress:
     name: Kubernetes live two-worker NGINX ingress and failover (opt-in)
-    if: github.event_name == 'workflow_dispatch' && inputs.kubernetes_multinode_test
+    if: github.event_name == 'workflow_dispatch' && inputs.kubernetes_multinode_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
     needs: validate
     runs-on: ubuntu-24.04
     timeout-minutes: 30
@@ -715,7 +742,7 @@ jobs:
         run: sudo rm -rf /tmp/quorivio-kind-multinode-shared
   kubernetes-https-ingress:
     name: Kubernetes real HTTPS ingress and failover (${{ matrix.controller }}, opt-in)
-    if: github.event_name == 'workflow_dispatch' && inputs.kubernetes_tls_test
+    if: github.event_name == 'workflow_dispatch' && inputs.kubernetes_tls_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
     needs: validate
     runs-on: ubuntu-24.04
     timeout-minutes: 35
@@ -754,7 +781,7 @@ jobs:
         run: sudo rm -rf /tmp/quorivio-kind-multinode-shared
   kubernetes-haproxy-ingress:
     name: Kubernetes live HAProxy Technologies two-worker ingress and failover (opt-in)
-    if: github.event_name == 'workflow_dispatch' && inputs.kubernetes_haproxy_test
+    if: github.event_name == 'workflow_dispatch' && inputs.kubernetes_haproxy_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
     needs: validate
     runs-on: ubuntu-24.04
     timeout-minutes: 35
@@ -794,7 +821,7 @@ jobs:
 
   runtime-architecture:
     name: OCI amd64/arm64 actual runtime acceptance (opt-in)
-    if: github.event_name == 'workflow_dispatch' && inputs.runtime_arch_test
+    if: github.event_name == 'workflow_dispatch' && inputs.runtime_arch_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
     needs: validate
     runs-on: ubuntu-24.04
     timeout-minutes: 30
@@ -827,7 +854,7 @@ jobs:
         run: bash tools/ci_oci_runtime_smoke.sh quorivio:ci-oci-arm64 arm64
   runtime-podman-rootless:
     name: Rootless Podman PostgreSQL runtime acceptance (opt-in)
-    if: github.event_name == 'workflow_dispatch' && inputs.rootless_podman_test
+    if: github.event_name == 'workflow_dispatch' && inputs.rootless_podman_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
     needs: validate
     runs-on: ubuntu-24.04
     timeout-minutes: 25
@@ -847,7 +874,7 @@ jobs:
         run: bash tools/ci_rootless_podman_smoke.sh quorivio:ci-rootless
   clamav-runtime:
     name: Real ClamAV signature and production fail-closed acceptance (opt-in)
-    if: github.event_name == 'workflow_dispatch' && inputs.clamav_runtime_test
+    if: github.event_name == 'workflow_dispatch' && inputs.clamav_runtime_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
     runs-on: ubuntu-24.04
     timeout-minutes: 18
     steps:
@@ -870,6 +897,30 @@ jobs:
         if: always()
         run: docker rm -f quorivio-ci-clamav >/dev/null 2>&1 || true
 
+  rc-campaign-conclusion:
+    name: Full automatic RC campaign acceptance summary (opt-in)
+    if: always() && github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite
+    needs:
+      - validate
+      - cross-browser
+      - image-build
+      - kubernetes-api-manifests
+      - kubernetes-runtime
+      - kubernetes-multinode-ingress
+      - kubernetes-https-ingress
+      - kubernetes-haproxy-ingress
+      - runtime-architecture
+      - runtime-podman-rootless
+      - clamav-runtime
+    runs-on: ubuntu-24.04
+    permissions: {contents: read}
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - name: Fail closed on skipped, cancelled or failed RC campaign jobs
+        env:
+          RC_CAMPAIGN_NEEDS_JSON: ${{ toJSON(needs) }}
+        run: python3 tools/rc_campaign_result_gate.py
   publish:
     name: Production publication
     if: github.event_name == 'workflow_dispatch' && inputs.publish_image == true && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))

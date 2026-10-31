@@ -10,7 +10,7 @@ from rc_gate_audit import audit
 from rc_release_preflight import preflight
 from verify_rc_cycle22_inventory import load_inventory as previous
 from verify_rc_cycle23_inventory import load_inventory
-from verify_rc_cycle57_inventory import load_inventory as current_inventory, verify_source
+from verify_rc_cycle61_inventory import load_inventory as current_inventory, verify_source
 
 class Cycle23RC(unittest.TestCase):
     def test_frozen_historical_catalog_and_current_tree(self):
@@ -20,12 +20,12 @@ class Cycle23RC(unittest.TestCase):
 
     def test_unchanged_evidence_weight_and_pending_external_gates(self):
         m=json.loads((ROOT/'docs/RC_GATE_MATRIX.json').read_text())
-        self.assertEqual(len(m['gates']),53)
+        self.assertEqual(len(m['gates']),55)
         self.assertEqual(sum(x['weight'] for x in m['gates']),100)
-        self.assertEqual((audit()['score'],preflight()['accepted_gates']),(81.25,36))
+        self.assertEqual((audit()['score'],preflight()['accepted_gates']),(81.75,38))
         self.assertEqual(len(preflight()['unaccepted_gates']),17)
         self.assertFalse(preflight()['release_candidate_ready'])
-        self.assertEqual(m['last_verified_full_ci']['head_sha'],'caf6331f15ccf39c218791503b8c6d0ca3503dce')
+        self.assertEqual(m['last_verified_full_ci']['head_sha'],'c0fe7f7b9e41c0295387d84996a7b531b91b69a0')
         p=m['pending_local_batch']
         self.assertFalse(p['new_feature_promoted'])
         self.assertTrue(p['new_ci_required'])

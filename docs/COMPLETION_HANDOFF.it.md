@@ -1,3 +1,31 @@
+# Handoff — Quorivio RC61, 31 ottobre 2026
+
+**Ultimo commit confermato:** `c0fe7f7b9e41c0295387d84996a7b531b91b69a0`; CI standard `41152434205`, estesa `41152939003` relative soltanto a questa baseline. **Cicli 58–61 non ancora committati.** RC certificata **81,75%**, 38 gate accepted, 17 partial su 55, strict RC NO. `rc_strict=false`, `publish_image=false`. Nuovo scope: SSO elenco privato e scollegamento confermato con password, lock+revoca transazionali, limite distribuito, UI e prova PostgreSQL HTTP in CI; verifiche locali **546 API**, **99 frontend**. Build npm e prova DB in CI non confermate. Dettagli `docs/RC61_FEDERATED_IDENTITY_MANAGEMENT.it.md`. Fare commit manualmente, poi CI standard e campagna RC non pubblicante; non forzare la percentuale.
+
+---
+
+# Quorivio 0.1.0-dev — handoff ciclo RC60 (31 ottobre 2026)
+
+**Baseline confermata** `c0fe7f7b9e41c0295387d84996a7b531b91b69a0` (CI standard `41152434205` ed estesa `41152939003` superate). **Cicli 58–60 cumulativi NON committati.** Gate RC **81,75%**, 38 accettati e 17 parziali su 55; strict RC NON pronta. Nessun publish/commit/tag/push dall'assistente.
+
+Nuovo ciclo 60: revoca sicura del collegamento account OAuth/OIDC, sessione valida al start e al callback dopo reset password/revoca MFA, PostgreSQL `link_auth_issued_at_ms`, prove Node e CI database; dettagli `docs/RC60_FEDERATED_LINK_REVOCATION.it.md`. Passati localmente **541 test API**, **99 web Node**. Nuova CI PostgreSQL e build completa non verificate localmente. Restano gate fisici RWX, provider/SMTP reali, HTTPS KIND (non eseguito nella CI di riferimento) e approvazioni GDPR/AGID/manuali/UX indipendenti.
+
+**Prossimo passo:** dopo il commit del manutentore eseguire prima CI standard, poi una singola campagna `rc_acceptance_suite=true`, `publish_image=false`, `rc_strict=false`, `publish_latest=false`; non lanciare campagne concorrenti sulla stessa ref. Mantenere il file `docs/RC_GATE_MATRIX.json` invariato finché non c'è nuova evidenza. 
+
+---
+
+# Quorivio 0.1.0-dev — sprint RC59 per macroaree (31 ottobre 2026)
+
+**Ultimo commit confermato:** `c0fe7f7b9e41c0295387d84996a7b531b91b69a0`; CI standard `41152434205`, estesa `41152939003` superate. **RC certificata 81,75% (55 gate, 38 accettati, 17 parziali); RC strict NON PRONTA.** Cicli **58–59 non ancora committati**, cumulativi. Campagna GitHub completa con un solo input per 13 gruppi di prove CI e verdetto finale obbligatorio su 11 job; `publish_image=false`, `rc_strict=false`. Le risposte OAuth/OIDC ora hanno limite di byte effettivo durante lo streaming; lo stato è già archiviato su PostgreSQL tra repliche. Nessun aumento da prove non eseguite, KIND host-bind non è vero storage RWX e le approvazioni esterne rimangono necessarie. Vedere `docs/RC59_ACCELERATED_CLOSURE.it.md`. Nessun commit/push/tag da parte dell'assistente.
+
+---
+
+# Quorivio 0.1.0-dev — Handoff ciclo 58 (31 ottobre 2026)
+
+**Baseline committata `c0fe7f7b9e41c0295387d84996a7b531b91b69a0`:** CI standard `41152434205` / estesa `41152939003` verdi, inclusa prova reale idle 70s e 500 partecipanti global p95 nel job `124393360139`. **Completamento RC 81,75%** (55 gate, 38 accettati/17 parziali), credito +0,50 solo alle due prove nuove. Ciclo 58 non committato: limitazione a 8 refresh PostgreSQL simultanei fra sessioni distinte, regressioni locali e catena SHA-256 da validare dopo il commit. TLS KIND non abilitato nella CI verificata, nessuna certificazione CSI RWX fisica. `publish_image=false`, `rc_strict=false`; mai commit/push/tag dell'assistente. Documenti: `docs/RC58_VERIFIED_IDLE_SLO_AND_REFRESH.it.md`, `docs/RC_GATE_MATRIX.json`.
+
+---
+
 # Quorivio 0.1.0-dev — Ciclo RC 57: invio WebSocket condiviso (31 ottobre 2026)
 
 **Ultimo commit confermato:** `64aa34379a07ba6a91c7eebf6f91e6dc12e3ad5c`; **cicli 49–57 cumulativi e non ancora committati**. CI standard `41120048115` ed estesa `41123318359` verdi solo per la baseline precedente. **RC certificata: 81,25% (53 gate: 36 accettati, 17 parziali)**; nessun credito non verificato.

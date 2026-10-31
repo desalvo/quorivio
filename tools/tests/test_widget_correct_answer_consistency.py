@@ -11,8 +11,8 @@ def test_single_answer_falls_back_to_legacy_when_array_empty():
     assert 'widget.correctOptionIds.length===1' in resolver
 
 
-def test_validation_and_scoring_use_same_key_resolution():
+def test_per_question_validation_and_scoring_use_same_key_resolution():
     handler = SRC.split("app.post('/api/join/:code/activities/:aid/widgets/:wid/respond'", 1)[1].split("app.get('/api/sessions/:id/widget-answers'", 1)[0]
-    assert handler.count('widgetCorrectOptionIds(widget)') == 2
+    assert handler.count('widgetCorrectOptionIds(part)') == 2
     assert 'new Set(correctIds).size!==correctIds.length' in handler
     assert 'answer.optionIds.length===correctIds.length' in handler

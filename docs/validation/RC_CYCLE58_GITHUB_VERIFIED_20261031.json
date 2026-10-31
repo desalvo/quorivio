@@ -1,0 +1,27 @@
+{
+  "version": "0.1.0-dev",
+  "date": "2026-10-31",
+  "source_run_id": 41152939003,
+  "source_job_id": 124393360139,
+  "committed_sha": "c0fe7f7b9e41c0295387d84996a7b531b91b69a0",
+  "source_ci_success": true,
+  "standard_run_id": 41152434205,
+  "standard_ci_success": true,
+  "scoped_pass_lines": [
+    "PASS idle live: 70s two-replica PostgreSQL WebSocket snapshots without mutations, owner/participant isolation, no silent disconnect",
+    "PASS 500 independent participants; full-sample global join/snapshot p95 SLO, >=60s hold and no errors"
+  ],
+  "scope_limits": [
+    "No TLS KIND on current source: kubernetes_tls_test=false",
+    "No real CSI/NFS RWX independently mounted across physical nodes",
+    "No geographic clients, operator SLO signoff or physical mobile accessibility approval",
+    "No promotion from unverified local cycle58 runtime code"
+  ],
+  "calculation": {
+    "before": 81.25,
+    "after": 81.75,
+    "newly_accepted": 2,
+    "parent_partial_weights_adjusted": 2,
+    "gate_weight_total": 100
+  }
+}

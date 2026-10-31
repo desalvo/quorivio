@@ -1,5 +1,10 @@
 # GitHub and Facebook OAuth2 — Quorivio 0.1.0-dev
 
+## RC61 update
+
+Existing GitHub/Facebook associations can now be listed in the account SSO dashboard and unlinked after confirmation and a current-password challenge (5 attempts/minute per account across replicas). OAuth single-use state is persisted in PostgreSQL; it is not process-local any more. Real HTTP/DB unlink acceptance has been wired into CI but has not run yet; real provider consent and operator acceptance remain outstanding. The historical notes below describe the first OAuth implementation.
+
+
 ## Scope
 GitHub and Facebook use dedicated OAuth2 flows rather than OIDC id_tokens. Linking requires an authenticated, approved local account; matching an email never triggers automatic linking.
 

@@ -50,8 +50,8 @@ class LiveRecoveryCycle54(unittest.TestCase):
  def test_rc_remains_conservative(self):
   g=json.loads((ROOT/'docs/RC_GATE_MATRIX.json').read_text())
   self.assertEqual(g['rc_cycle54_live_reconnect_local_20261030']['new_credit'],0)
-  self.assertEqual(len(g['gates']),53)
-  self.assertEqual(sum(x['weight']*(1 if x['status']=='accepted' else 0.5 if x['status']=='partial' else 0) for x in g['gates']),81.25)
+  self.assertEqual(len(g['gates']),55)
+  self.assertEqual(sum(x['weight']*(1 if x['status']=='accepted' else 0.5 if x['status']=='partial' else 0) for x in g['gates']),81.75)
 
  def test_historical_manifest_and_current_verifier_in_ci(self):
   workflow=(ROOT/'.github/workflows/ci.yml').read_text()

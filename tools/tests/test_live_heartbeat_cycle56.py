@@ -23,7 +23,8 @@ class LiveHeartbeatCycle56(unittest.TestCase):
     def test_refresh_never_causes_fanout_per_client_or_cross_replica_notifies(self):
         self.assertIn('activeSessions:()=>sockets.keys()',self.api)
         self.assertIn('const inFlight = new Set<string>()',self.pump)
-        self.assertIn('inFlight.has(sessionId)',self.pump)
+        self.assertIn('if (running) return;',self.pump)
+        self.assertIn('inFlight.add(sessionId)',self.pump)
         self.assertNotIn('pg_notify',self.pump)
         self.assertNotIn('sockets.values()',self.pump)
 
@@ -43,6 +44,6 @@ class LiveHeartbeatCycle56(unittest.TestCase):
         d=(ROOT/'docs/COMPLETION_HANDOFF.md').read_text()
         self.assertIn('cycles 49–56',d)
         self.assertIn('64aa34379a07ba6a91c7eebf6f91e6dc12e3ad5c',d)
-        self.assertIn('81.25%',d[:1300])
+        self.assertIn('81.75%',d[:1300])
 
 if __name__=='__main__':unittest.main()

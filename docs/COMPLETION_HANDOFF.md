@@ -1,3 +1,31 @@
+# Handoff — Quorivio RC61, 31 October 2026
+
+**Last confirmed commit:** `c0fe7f7b9e41c0295387d84996a7b531b91b69a0`. Green standard `41152434205`, extended `41152939003` only validate this earlier baseline. **Cycles 58–61 cumulative and uncommitted.** Official RC **81.75%**, 38 accepted, 17 partial of 55; strict RC not ready. `rc_strict=false`, `publish_image=false`. Added password-confirmed identity self-service list/unlink, transaction and revocation checks, shared attempt limiter, dashboard and CI-only PostgreSQL HTTP acceptance. Local **546 API** and **99 web** tests pass; npm build and new database CI acceptance pending. See `docs/RC61_FEDERATED_IDENTITY_MANAGEMENT.en.md`; maintainer commits, then standard CI and one nonpublishing acceptance campaign.
+
+---
+
+# Quorivio 0.1.0-dev — cycle RC60 handoff (31 October 2026)
+
+**Maintainer baseline** `c0fe7f7b9e41c0295387d84996a7b531b91b69a0`; verified standard `41152434205` and extended `41152939003`. **Cycles 58–60 cumulative and NOT committed.** **Verified 81.75%** (55 gates, 38 accepted, 17 partial); RC strict NOT ready. No assistant git operations or publication.
+
+Cycle 60 closes the local federated-account linking revocation gap: signature issuance checked at start, PostgreSQL stored issuance in single-use flow and conditional link at callback after password/admin revocation. Additive migration; Node and guarded PostgreSQL CI regressions. **Local 541 API Node + 99 web Node tests passed.** New PostgreSQL CI step, complete npm build and live-provider acceptance unverified. Details: `docs/RC60_FEDERATED_LINK_REVOCATION.en.md`.
+
+Remaining gated work: real RWX CSI across physical nodes, disposable KIND HTTPS not yet run on the verified baseline, true Google/GitHub/Facebook and external SMTP, independent UX/accessibility, GDPR/AGID/security approvals. After maintainer commit: standard CI, then one `rc_acceptance_suite=true` nonpublishing dispatch with `publish_image=false`, `rc_strict=false`, `publish_latest=false`. Preserve official matrix until new evidence.
+
+---
+
+# Quorivio 0.1.0-dev — accelerated RC59 closure sprint (31 October 2026)
+
+**Last maintainer-confirmed commit:** `c0fe7f7b9e41c0295387d84996a7b531b91b69a0`; standard CI `41152434205`, extended CI `41152939003` PASS. **Certified 81.75% (55 gates, 38 accepted, 17 partial), RC strict blocked.** Cycles **58–59 uncommitted** and included cumulatively. This sprint implements a one-click full isolated GitHub RC campaign covering 13 optional areas plus a fail-closed 11-job final verdict; `publish_image=false`, `rc_strict=false` mandatory. Identity-provider OIDC/OAuth JSON reads are byte-bounded while streaming; docs now correctly describe PostgreSQL single-use cross-replica state. No new gate promotion without CI proof, true CSI RWX or external sign-off. See `docs/RC59_ACCELERATED_CLOSURE.en.md`. No assistant commit/push/tag/publication.
+
+---
+
+# Quorivio 0.1.0-dev — Cycle 58 recovery handoff (31 October 2026)
+
+**Committed baseline `c0fe7f7b9e41c0295387d84996a7b531b91b69a0`:** standard CI `41152434205` and extended CI `41152939003` green; real 70s idle snapshots and 500 independent global p95 proof passed in quality job `124393360139`. **Verified RC 81.75%** (55 gates, 38 accepted/17 partial), +0.50 for these distinct bounded proofs only. Uncommitted cycle 58: bound cross-session PostgreSQL refresh to 8 concurrent calls; new tests, checksum inventory and fresh CI required. KIND TLS was NOT enabled in the verified run; physical multi-node CSI RWX unverified. `publish_image=false`, `rc_strict=false`; no assistant commit/push/tag. See `docs/RC58_VERIFIED_IDLE_SLO_AND_REFRESH.en.md` and `docs/RC_GATE_MATRIX.json`.
+
+---
+
 # Quorivio 0.1.0-dev — RC cycle 57: shared WebSocket snapshot fanout (31 October 2026)
 
 **Last committed baseline:** `64aa34379a07ba6a91c7eebf6f91e6dc12e3ad5c`; **cycles 49–57 cumulative and uncommitted**. Standard `41120048115` and extended `41123318359` are green for the previous baseline only. **Certified RC: 81.25% (53 gates: 36 accepted, 17 partial)**. This cycle adds no unverified gate credit.

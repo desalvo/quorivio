@@ -1,3 +1,29 @@
+# Quorivio 0.1.0-dev — Development status — RC61 (31 October 2026)
+
+**Cycles 58–61 are cumulative and uncommitted.** Private SSO identity listing and password-confirmed self-service unlink implemented with cross-replica rate limiting and post-lock revocation recheck. Local tests **546/546 API and 99/99 web** pass; new real PostgreSQL HTTP CI fixture is pending execution, full npm build blocked by incomplete local dependencies. `rc_strict=false`, `publish_image=false`. **Official RC score 81.75%, 38 accepted + 17 partial / 55; no unsupported score increase.** See `docs/RC61_FEDERATED_IDENTITY_MANAGEMENT.en.md`. Version unchanged; no commits/releases.
+
+---
+
+# Quorivio 0.1.0-dev — cycle RC60: federated identity link revocation (31 October 2026)
+
+**Last confirmed maintainer commit:** `c0fe7f7b9e41c0295387d84996a7b531b91b69a0`. Green baseline standard `41152434205`, extended `41152939003`, **not** validating new cycles 58–60. **Verified RC 81.75% (55 gates: 38 accepted, 17 partial), strict RC BLOCKED**. No local-only recrediting.
+
+OIDC + GitHub/Facebook account linking now checks a signed cookie's original issuance against revocation both at start and in the one-shot PostgreSQL callback, handles old flow states safely, and rejects duplicate identities. Additive schema migration, Node regressions and a guarded disposable PostgreSQL CI test. **Local 541 API and 99 web Node tests pass**; new database integration, full npm production build, and real providers remain unverified. `publish_image=false`, `rc_strict=false`, `publish_latest=false`. No assistant commit/push/tag. See `docs/RC60_FEDERATED_LINK_REVOCATION.en.md`.
+
+---
+
+# Quorivio 0.1.0-dev — accelerated RC59 closure sprint (31 October 2026)
+
+**Last maintainer-confirmed commit:** `c0fe7f7b9e41c0295387d84996a7b531b91b69a0`; standard CI `41152434205`, extended CI `41152939003` PASS. **Certified 81.75% (55 gates, 38 accepted, 17 partial), RC strict blocked.** Cycles **58–59 uncommitted** and included cumulatively. This sprint implements a one-click full isolated GitHub RC campaign covering 13 optional areas plus a fail-closed 11-job final verdict; `publish_image=false`, `rc_strict=false` mandatory. Identity-provider OIDC/OAuth JSON reads are byte-bounded while streaming; docs now correctly describe PostgreSQL single-use cross-replica state. No new gate promotion without CI proof, true CSI RWX or external sign-off. See `docs/RC59_ACCELERATED_CLOSURE.en.md`. No assistant commit/push/tag/publication.
+
+---
+
+# Quorivio 0.1.0-dev — RC cycle 58: verified evidence and bounded live refresh (31 October 2026)
+
+**Last maintainer commit:** `c0fe7f7b9e41c0295387d84996a7b531b91b69a0` (cycles 49–57). Standard CI `41152434205` and extended CI `41152939003` green. **Verified RC 81.75%** (55 gates: 38 accepted, 17 partial; +0.50 points). The bounded real PostgreSQL idle and 500-client sustained global p95 acceptance proofs in job `124393360139` promote B1-IDLE-TWO-REPLICA and B4-500-GLOBAL-SLO only; their parent gates remain partial. The new cycle 58 local code limits cross-session PostgreSQL refresh concurrency to 8 and requires new CI. Real KIND HTTPS was disabled in that run, while independent-machine RWX, physical-device testing and external sign-offs remain open. `publish_image=false`, `rc_strict=false`. No assistant commits, pushes or tags. See `docs/RC58_VERIFIED_IDLE_SLO_AND_REFRESH.en.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC cycle 57: shared WebSocket snapshot fanout (31 October 2026)
 
 **Last committed baseline:** `64aa34379a07ba6a91c7eebf6f91e6dc12e3ad5c`; **cycles 49–57 cumulative and uncommitted**. Standard `41120048115` and extended `41123318359` are green for the previous baseline only. **Certified RC: 81.25% (53 gates: 36 accepted, 17 partial)**. This cycle adds no unverified gate credit.

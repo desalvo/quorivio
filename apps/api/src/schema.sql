@@ -252,8 +252,13 @@ CREATE TABLE IF NOT EXISTS auth_flows(
  nonce text,
  verifier text,
  link_user uuid REFERENCES users(id) ON DELETE CASCADE,
- expires_at timestamptz NOT NULL
+ link_auth_issued_at_ms bigint,
+ expires_at timestamptz NOT NULL,
+ CONSTRAINT auth_flow_link_issued_together CHECK ((link_user IS NULL) = (link_auth_issued_at_ms IS NULL))
 );
+-- Existing deployments already have auth_flows from previous releases. A legacy
+-- in-flight link has no issuance proof and is deliberately not trusted.
+ALTER TABLE auth_flows ADD COLUMN IF NOT EXISTS link_auth_issued_at_ms bigint;
 CREATE INDEX IF NOT EXISTS auth_flows_expiry ON auth_flows(expires_at);
 CREATE TABLE IF NOT EXISTS api_rate_windows(
  client_hash text NOT NULL,

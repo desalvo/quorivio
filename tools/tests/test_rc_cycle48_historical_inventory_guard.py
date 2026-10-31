@@ -35,7 +35,7 @@ class Cycle48HistoricalEvidence(unittest.TestCase):
 
     def test_release_preflight_is_not_falsely_promoted(self):
         from rc_gate_audit import audit
-        self.assertEqual(audit()['score'], 81.25)
+        self.assertEqual(audit()['score'], 81.75)
 
 
 if __name__ == '__main__':

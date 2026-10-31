@@ -34,12 +34,13 @@ class LiveFanoutCycle57(unittest.TestCase):
         self.assertTrue((ROOT/'docs/validation/RC_CYCLE56_PACKAGE_INVENTORY_20261030.json').exists())
         self.assertTrue((ROOT/'tools/verify_rc_cycle56_inventory.py').exists())
         self.assertIn('python3 tools/verify_rc_cycle56_inventory.py --historical',self.workflow)
-        self.assertIn('python3 tools/verify_rc_cycle57_inventory.py',self.workflow)
+        self.assertIn('python3 tools/verify_rc_cycle57_inventory.py --historical',self.workflow)
+        self.assertIn('python3 tools/verify_rc_cycle61_inventory.py',self.workflow)
 
     def test_maintainer_only_commit_and_unchanged_verified_gate(self):
         text=(ROOT/'docs/DEVELOPMENT_STATUS.it.md').read_text()[:2000]
-        self.assertIn('64aa34379a07ba6a91c7eebf6f91e6dc12e3ad5c',text)
-        self.assertIn('81,25%',text)
-        self.assertIn('49–57',text)
+        self.assertIn('c0fe7f7b9e41c0295387d84996a7b531b91b69a0',text)
+        self.assertIn('81,75%',text)
+        self.assertIn('ciclo 58',text)
 
 if __name__=='__main__':unittest.main()

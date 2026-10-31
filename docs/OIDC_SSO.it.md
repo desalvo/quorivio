@@ -1,5 +1,10 @@
 # SSO OIDC — autenticazione federata (sviluppo)
 
+## Aggiornamento RC61: operazioni self-service
+
+Nella sezione «SSO / Identità» dell'account sono disponibili l'elenco privato delle identità collegate e «Scollega» con conferma e verifica della password locale. Gli endpoint autenticati sono `GET /api/auth/identities` e `POST /api/auth/identities/unlink`; lo scollegamento rimuove l'associazione per i login futuri. Lo stato OAuth è monouso in PostgreSQL condiviso tra repliche, e la revoca dei cookie al callback di collegamento è ricontrollata. Il test PostgreSQL HTTP per lo scollegamento è in CI ma ancora da eseguire: provider reali e sicurezza di produzione restano da verificare. Le note storiche qui sotto descrivono la prima implementazione e non devono essere interpretate come lo stato RC61.
+
+
 Quorivio implementa un primo flusso OpenID Connect Authorization Code + PKCE S256, con state/nonce monouso, cookie HttpOnly SameSite=Lax per il solo callback e verifica della firma RS256 mediante JWKS. L'identità si basa su (provider, sub), non sul solo indirizzo email. Le identità vanno collegate esplicitamente a un account locale autenticato e approvato prima del primo login federato. Chi ha attivato TOTP deve continuare a utilizzare il login locale con MFA: il login OIDC viene rifiutato per impedire il bypass del secondo fattore.
 
 ## Provider

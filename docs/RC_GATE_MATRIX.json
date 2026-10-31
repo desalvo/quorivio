@@ -159,13 +159,26 @@
     {
       "id": "B1",
       "area": "B-sessions",
-      "weight": 1,
+      "weight": 0.5,
       "status": "partial",
       "evidence": "Presenter dashboard, synced server-driven navigation and participant preview in source; live WebSocket authorization re-audits sessions, presenter memberships/roles and participants every 10s (local policy tests PASS, 2026-10-24); per-session coalesced snapshot delivery and 2 MiB slow-consumer protection, local tests PASS (2026-10-24); LISTEN startup/resync failure now forces reconnection, with local regression tests (2026-10-24); retired listener notification fencing and rejected handler reconnect regression tests PASS (2026-10-24); coalesced snapshot callers now await the final read and failed DB snapshots propagate to listener recovery (152 Node and 252 Python tests PASS, builds PASS, 2026-10-24); disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24); added mandatory CI PostgreSQL two-process WebSocket notification acceptance (not yet run on CI, 2026-10-24); replica smoke now drains pre-mutation notifications to require a fresh post-vote participant snapshot (2026-10-24). Maintainer confirmed green CI including two-replica PostgreSQL 18 WebSocket test (2026-10-24). CI 40141894130: PostgreSQL 18 two-replica WebSocket opening, response propagation, privacy and close PASS; 24 concurrent HTTP clients PASS.\n2026-10-27 local (pending real PG CI): closed-session owner/collaborator duplication exposed in session directory; portable definition-only copy creates fresh draft/credentials and independently remapped media, with no participant/responses/statistics.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: PostgreSQL live 24 concurrent participants, independent audience Chromium and two API replicas WebSocket PASS. Strict RC gate was skipped; status unchanged.\n2026-10-28 evidence reconciliation: automatic CI subgate B1-WS split from broad partial gate, without claiming outstanding external acceptance.\n2026-10-29: GitHub Full CI 40918620911 on caf6331f15cc PASS confirms a bounded automated capability carved out below. Independent production-facing requirements remain within this partial parent; no external SLO, physical offsite or RPO/RTO sign-off inferred.\n2026-10-30 cycle35: CI-backed bootstrap and SIGTERM drain bounded acceptance split into B1-BOOTSTRAP-PG18 and B1-GRACEFUL-DRAIN. Residual production-duration/network-fault/SLO independent checks stay here.",
-      "remaining": "Production-like long-running multi-replica load, network impairment/reconnection latency, recovery and operational SLO acceptance.",
+      "remaining": "Residual scope after certified narrow B1-IDLE-TWO-REPLICA: Production-like long-running multi-replica load, network impairment/reconnection latency, recovery and operational SLO acceptance.",
       "current_verified_run": 40918620911,
       "pending_local_evidence_20261028": "WYSIWYG and independent-question implementation passes local TypeScript/Vite, 461 Node API, 46 frontend, 33 focused Python, Chromium component desktop/mobile. Unverified by GitHub and real PostgreSQL; prior accepted gates unchanged.",
       "pending_cycle55_local_evidence": "Client snapshot-freshness watchdog (65s) and stale-data warnings; new simulated tests only. GitHub opt-in multi-replica latency/network impairment and independent SLO signoff still pending; no score promotion."
+    },
+    {
+      "id": "B1-IDLE-TWO-REPLICA",
+      "area": "B-sessions",
+      "weight": 0.5,
+      "status": "accepted",
+      "scope": "Real disposable 70s idle WebSocket session using 2 PostgreSQL-connected API processes, authoritative periodic snapshots, presenter/participant privacy and no false disconnect. No simulated stale socket, no external network partition.",
+      "evidence": "GitHub Actions extended CI run 41152939003, production quality job 124393360139 SUCCESS on committed SHA c0fe7f7b9e41c0295387d84996a7b531b91b69a0: PASS idle live: 70s two-replica PostgreSQL WebSocket snapshots without mutations, owner/participant isolation, no silent disconnect; opt-in live_idle_test=true. Bounded disposable two-process acceptance only, separate from B1-WS and B1-RECONNECT.",
+      "remaining": "Actual WAN impairments, independent machines, 24h operational longevity, real traffic SLO and operator sign-off remain in B1.",
+      "verified_run_id": 41152939003,
+      "verified_job_id": 124393360139,
+      "verified_commit_sha": "c0fe7f7b9e41c0295387d84996a7b531b91b69a0",
+      "acceptance_kind": "bounded_github_automated_20261031"
     },
     {
       "id": "B1-BOOTSTRAP-PG18",
@@ -260,13 +273,26 @@
     {
       "id": "B4",
       "area": "B-sessions",
-      "weight": 1,
+      "weight": 0.5,
       "status": "partial",
       "evidence": "Anonymous participation, polling and QR routes implemented; disposable PostgreSQL 18 HTTP lifecycle smoke added to CI (24 concurrent clients, idempotency, privacy, timed expiry), not yet run on CI (2026-10-24); two-replica participant/presenter privacy and notification smoke added to CI, pending execution; opt-in 500-client disposable PostgreSQL CI load with presenter observer and privacy assertion authored, not yet executed (2026-10-24) Maintainer confirmed green two-replica CI (2026-10-24). CI 40141894130: opt-in 500 independent participants PASS with presenter-observed peak >=475 and zero errors; PostgreSQL two-replica WebSocket privacy PASS. New 2026-10-25 participant flow implements HttpOnly-cookie reload recovery (boolean-only no-store endpoint), duplicate-vote UI guard, server-filtered results and mobile reflow; adds opt-in Chromium real PostgreSQL two-browser acceptance (not yet run). Local Node/Python suites and builds PASS. GitHub workflow 40144692900 / job 121023419425: Chromium + real PostgreSQL audience PASS for QR/short-code join, isolated participants, vote persistence, HttpOnly reload recovery, idempotency, report privacy, mobile touch and closure (2026-10-25).\n2026-10-27 quality job 122235650919, run 40517573850: opt-in 500-participant PostgreSQL/WebSocket acceptance SUCCESS and two-replica WebSocket/privacy E2E SUCCESS. Sustained operation and real-device acceptance still pending.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: PostgreSQL/WebSocket test: 500 independent participants, presenter-observed peak >=475, zero errors PASS; not production-like sustained throughput. Strict RC gate was skipped; status unchanged.\n2026-10-28: after successful Full CI 40638652838, the automated evidence-specific B4-LOAD subgate (weight 2) was formally separated and accepted. Parent remains partial and still requires every independent check listed below.\n2026-10-30 verified extended CI 41123318359 on commit 64aa34379a07ba6a91c7eebf6f91e6dc12e3ad5c: independent B4-HAProxyTECH-KIND evidence credited separately; remainder remains partial and requires sustained multi-node throughput, independent CSI RWX, physical devices and real production fault injection.",
-      "remaining": "Sustained representative throughput/memory/latency with actual users, physical-device/accessibility tests, real CSI/NFS RWX on independent machines, failover under storage/network partitions and externally reviewed SLOs. HAProxy KIND subgate credited separately; not a production HA certificate.",
+      "remaining": "Residual scope after certified narrow B4-500-GLOBAL-SLO: Sustained representative throughput/memory/latency with actual users, physical-device/accessibility tests, real CSI/NFS RWX on independent machines, failover under storage/network partitions and externally reviewed SLOs. HAProxy KIND subgate credited separately; not a production HA certificate.",
       "current_verified_run": 40595463258,
       "pending_cycle50_tls_acceptance": "Dedicated opt-in CI will exercise real TLS/SNI with self-signed ephemeral certificate over NGINX and HAProxy Technologies on two distinct KIND worker nodes, after pod replacement; no public CA, independent host or production network proof. No acceptance credit until GitHub job succeeds.",
       "pending_cycle51_local_evidence": "Cycle 51 (uncommitted): static AST contract test rejects illegal keyword-only HTTPS call sites; full simulated main() KIND flow for NGINX and HAProxy Technologies verifies two originating pod clients, wrong HTTP Host, untrusted chain, post-pod-replacement probes. The actual Node core TLS probe is tested against a disposable local TLS server including strict CA/SNI. The previous cycle 50 positional path bug is fixed. New opt-in Kubernetes HTTPS CI has NOT run on GitHub; no RC points added. Confirm both real KIND HTTPS jobs before any evidence promotion."
+    },
+    {
+      "id": "B4-500-GLOBAL-SLO",
+      "area": "B-sessions",
+      "weight": 0.5,
+      "status": "accepted",
+      "scope": "Disposable CI 500 independent WebSocket participant load, global per-client join and first snapshot p95 without shard averaging, >=60s sustained hold and zero errors. No real mobile devices or physical multi-node resource metrics.",
+      "evidence": "GitHub Actions extended CI run 41152939003, production quality job 124393360139 SUCCESS on committed SHA c0fe7f7b9e41c0295387d84996a7b531b91b69a0: PASS 500 independent participants; full-sample global join/snapshot p95 SLO, >=60s hold and no errors; opt-in capacity_slo_test=true. Separate from prior B4-LOAD bounded 500 simultaneous admission proof.",
+      "remaining": "Actual geographically separated clients, production-like 24h throughput/CPU/memory under partitions, real CSI RWX and independent SLO sign-off remain in B4.",
+      "verified_run_id": 41152939003,
+      "verified_job_id": 124393360139,
+      "verified_commit_sha": "c0fe7f7b9e41c0295387d84996a7b531b91b69a0",
+      "acceptance_kind": "bounded_github_automated_20261031"
     },
     {
       "id": "B4-HAProxyTECH-KIND",
@@ -594,29 +620,22 @@
     }
   ],
   "last_verified_full_ci": {
-    "run_id": 40918620911,
-    "head_sha": "caf6331f15ccf39c218791503b8c6d0ca3503dce",
-    "attempt": 1,
+    "run_id": 41152939003,
+    "head_sha": "c0fe7f7b9e41c0295387d84996a7b531b91b69a0",
     "conclusion": "success",
-    "jobs": {
-      "Production quality gate": "success",
-      "Container build gate": "success",
-      "Native Firefox and WebKit acceptance (opt-in)": "success",
-      "Production publication": "skipped"
+    "quality_job_id": 124393360139,
+    "standard_run_id": 41152434205,
+    "standard_conclusion": "success",
+    "standard_quality_job_id": 124391767601,
+    "standard_container_job_id": 124392601623,
+    "extended_image_job_id": 124395716729,
+    "native_browser_job_id": 124395716798,
+    "bounded_verified_scopes": {
+      "two_replica_idle_websocket_70s": "PASS idle live: 70s two-replica PostgreSQL WebSocket snapshots without mutations, owner/participant isolation, no silent disconnect",
+      "500_independent_global_p95": "PASS 500 independent participants; full-sample global join/snapshot p95 SLO, >=60s hold and no errors"
     },
-    "evidence": {
-      "two_replica_ws_reconnect": "PASS PostgreSQL two-replica WebSocket: A->B opening, B->A response, reconnect on B, private state and closing",
-      "encrypted_dr": "PASS PostgreSQL 18 encrypted instance DR: AES-256-GCM, key rotation, wrong-key refusal, populated-DB refusal, schema and row parity, private assets, integrity, overwrite rejection",
-      "mounted_mirror": "PASS PostgreSQL 18 mounted-volume encrypted mirror: authentic copy, private receipt, independent empty database restore, schema/data/assets parity; CI-only, NOT offsite or RTO/RPO",
-      "retention": "PASS PostgreSQL 18 authenticated DR retention: key generations, legal hold, checksum and age policy, no plaintext residue",
-      "drill": "PASS PostgreSQL 18 DR rehearsal: rotated authenticated backup, distinct empty database, private assets and metadata-only receipt; NOT production RPO/RTO"
-    },
-    "quality_job_id": 123605484902,
-    "standard_run_id": 40917736867,
-    "standard_quality_job_id": 123602360060,
-    "standard_image_job_id": 123603870557,
-    "extended_image_job_id": 123608606172,
-    "native_browser_job_id": 123608606057
+    "kubernetes_tls_test": "skipped (workflow input false)",
+    "published_docker_hub": true
   },
   "pending_local_batch": {
     "description": "RC cycle37 editor bug fixes: contrast, portaled menus, preview recovery and multiple-choice save validation; HAProxy CI acceptance remains pending",
@@ -1113,7 +1132,7 @@
       "GDPR/legal key custody review"
     ]
   },
-  "last_maintainer_confirmed_commit": "64aa34379a07ba6a91c7eebf6f91e6dc12e3ad5c",
+  "last_maintainer_confirmed_commit": "c0fe7f7b9e41c0295387d84996a7b531b91b69a0",
   "scoring_reconciliation_20261029_cycle22": {
     "date": "2026-10-29",
     "prior_score": 77.0,
@@ -1501,5 +1520,46 @@
       "operator 500-client sustained SLO",
       "external RWX/public TLS/security and physical device signoffs"
     ]
+  },
+  "rc_cycle58_verified_reconciliation_20261031": {
+    "old_score": 81.25,
+    "new_score": 81.75,
+    "new_subgates": [
+      "B1-IDLE-TWO-REPLICA",
+      "B4-500-GLOBAL-SLO"
+    ],
+    "new_weight_each": 0.5,
+    "parent_remainder_each": 0.5,
+    "old_gate_count": 53,
+    "new_gate_count": 55,
+    "accepted_before": 36,
+    "accepted_after": 38,
+    "partial_remaining": 17,
+    "ci_standard": 41152434205,
+    "ci_extended": 41152939003,
+    "verified_job": 124393360139,
+    "verified_sha": "c0fe7f7b9e41c0295387d84996a7b531b91b69a0",
+    "kubernetes_tls": "not executed; input false",
+    "external_signoff": false,
+    "new_local_cycle58": "Bounded concurrency for periodic PostgreSQL refresh over independent active sessions; not remotely verified yet."
+  },
+  "rc_cycle60_local_hardening_20261031": {
+    "verified_baseline_sha": "c0fe7f7b9e41c0295387d84996a7b531b91b69a0",
+    "last_verified_standard_run": 41152434205,
+    "last_verified_extended_run": 41152939003,
+    "uncommitted_cycles": [
+      58,
+      59,
+      60
+    ],
+    "scope": "Federated account-link session revocation checked on start and callback via single-use PostgreSQL auth_flows; provider-identity uniqueness and migration",
+    "local_node_api_tests_passed": 541,
+    "local_node_frontend_tests_passed": 99,
+    "new_ci_postgres_link_test_executed": false,
+    "full_production_build_executed": false,
+    "real_external_oauth_providers_tested": false,
+    "rc_score_credit_delta": 0,
+    "rc_score_after": 81.75,
+    "reason_no_credit": "New code has local tests only; repeat real PostgreSQL CI and external provider/operator acceptance after maintainer commit."
   }
 }

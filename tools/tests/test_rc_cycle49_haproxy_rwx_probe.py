@@ -42,15 +42,15 @@ class EvidenceReconciliation(unittest.TestCase):
     def test_verified_haproxy_split_is_not_double_counted(self):
         matrix=json.loads((ROOT/'docs/RC_GATE_MATRIX.json').read_text())
         b4={x['id']:x for x in matrix['gates'] if x['id'].startswith('B4')}
-        self.assertEqual(set(b4),{'B4','B4-LOAD','B4-KIND-INGRESS-RECOVERY','B4-HAProxyTECH-KIND'})
-        self.assertEqual((b4['B4']['status'],b4['B4']['weight']),('partial',1))
+        self.assertEqual(set(b4),{'B4','B4-LOAD','B4-KIND-INGRESS-RECOVERY','B4-HAProxyTECH-KIND','B4-500-GLOBAL-SLO'})
+        self.assertEqual((b4['B4']['status'],b4['B4']['weight']),('partial',0.5))
         self.assertEqual((b4['B4-HAProxyTECH-KIND']['status'],b4['B4-HAProxyTECH-KIND']['weight']),('accepted',1))
         self.assertEqual(b4['B4-HAProxyTECH-KIND']['verified_job_id'],124297991439)
         self.assertEqual(b4['B4-HAProxyTECH-KIND']['verified_commit_sha'],
                          '64aa34379a07ba6a91c7eebf6f91e6dc12e3ad5c')
         self.assertEqual(sum(x['weight'] for x in b4.values()),5)
-        self.assertEqual(audit()['score'],81.25)
-        self.assertEqual((preflight()['accepted_gates'],len(preflight()['unaccepted_gates'])),(36,17))
+        self.assertEqual(audit()['score'],81.75)
+        self.assertEqual((preflight()['accepted_gates'],len(preflight()['unaccepted_gates'])),(38,17))
 
 
 class CrossNodeRWXContract(unittest.TestCase):

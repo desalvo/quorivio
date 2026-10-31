@@ -27,7 +27,7 @@ class Cycle35VerifiedBootstrap(unittest.TestCase):
         self.assertFalse(p['external_slo_verified'])
 
     def test_splits_preserve_weight_and_scope(self):
-        self.assertEqual(self.g['B1']['weight'],1)
+        self.assertEqual(self.g['B1']['weight'],0.5)
         for key in ('B1-BOOTSTRAP-PG18','B1-GRACEFUL-DRAIN'):
             sub=self.g[key]
             self.assertEqual((sub['weight'],sub['status']),(0.5,'accepted'))
@@ -38,8 +38,8 @@ class Cycle35VerifiedBootstrap(unittest.TestCase):
 
     def test_percentage_only_counts_bounded_prior_ci_evidence(self):
         p=preflight()
-        self.assertEqual((audit()['score'],p['score']),(81.25,81.25))
-        self.assertEqual((p['gate_count'],p['accepted_gates'],len(p['unaccepted_gates'])),(53,36,17))
+        self.assertEqual((audit()['score'],p['score']),(81.75,81.75))
+        self.assertEqual((p['gate_count'],p['accepted_gates'],len(p['unaccepted_gates'])),(55,38,17))
         self.assertFalse(p['release_candidate_ready'])
         self.assertEqual(self.proof['new_score']-self.proof['old_score'],0.5)
         self.assertEqual(self.m['rc_cycle35_verified_reconciliation_20261030']['score_after'],80.75)
@@ -76,12 +76,12 @@ class Cycle35VerifiedBootstrap(unittest.TestCase):
     def test_documentation_records_remaining_risks(self):
         for fn in ('DEVELOPMENT_STATUS.md','DEVELOPMENT_STATUS.it.md','COMPLETION_HANDOFF.md','COMPLETION_HANDOFF.it.md'):
             body=(ROOT/'docs'/fn).read_text()[:4000]
-            self.assertIn('81,25' if fn.endswith('.it.md') else '81.25',body)
+            self.assertIn('81,75' if fn.endswith('.it.md') else '81.75',body)
             # The immutable 2026-10-30 cycle-35 receipt above proves its original
             # commit. Current status headers must instead report the latest CI
             # failure, its unaccepted gates and remaining validation constraints.
             self.assertIn('41123318359',body)
-            self.assertIn('64aa34379a07ba6a91c7eebf6f91e6dc12e3ad5c',body)
+            self.assertIn('c0fe7f7b9e41c0295387d84996a7b531b91b69a0',body)
             self.assertIn('rc_strict=false',body)
 
 if __name__=='__main__':unittest.main()

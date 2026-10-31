@@ -1,5 +1,10 @@
 # OAuth2 GitHub e Facebook — Quorivio 0.1.0-dev
 
+## Aggiornamento RC61
+
+La sezione SSO elenca i collegamenti GitHub/Facebook esistenti e consente di scollegarli dopo conferma e nuova verifica della password, con limite distribuito di 5 tentativi/minuto. Il flow OAuth monouso ora risiede in PostgreSQL condiviso, non più in memoria locale; la relativa prova di scollegamento HTTP/DB è preparata nella CI, non ancora eseguita. Il consenso reale dei provider e l'approvazione dell'operatore rimangono aperti. Le note storiche seguenti risalgono al primo ciclo OAuth.
+
+
 ## Scopo
 I provider GitHub e Facebook dispongono di percorsi OAuth2 dedicati, distinti dagli identity provider OIDC. Il collegamento a un account locale approvato è **esplicito**: non è ammesso il collegamento automatico tramite email.
 

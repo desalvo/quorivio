@@ -11,6 +11,9 @@ import {profilePhotoId,publicPresenterProfiles} from './profile-photo.js';
 import {inspectProfileImage} from './profile-image.js';
 import {authCookieIssuedAt,presenterAuthActive} from './live-auth.js';
 import {SESSION_CHANNEL,startSessionBus} from './session-bus.js';
+import {boundedFederatedJson} from './federated-response.js';
+import {FEDERATED_LINK_ELIGIBLE_SQL,FEDERATED_LINK_INSERT_SQL,validFederatedLinkIssuedAt} from './federated-link.js';
+import {FEDERATED_IDENTITY_LIST_SQL,FEDERATED_IDENTITY_UNLINK_SQL,validFederatedProviderId,validFederatedUnlinkPassword} from './federated-identities.js';
 import {socialProviders,socialState,socialAuthorizationUrl,exchangeSocialCode,socialSubject} from './social-oauth.js';
 import {providersFromEnv,nonce,pkceChallenge,authorizationUrl,validateDiscovery,verifyIdToken,fetchOidcJson} from './oidc.js';
 import {generateRecoveryCodes,recoveryCodeDigest,validRecoveryCode} from './recovery-codes.js';
@@ -70,6 +73,8 @@ async function broadcast(sid:string){await broadcastLocal(sid);await db.query('S
 // Coalesce at the session, not socket, level; never publish redundant NOTIFY.
 const livePeriodicRefresh=createLivePeriodicRefresh({
  activeSessions:()=>sockets.keys(),
+ isSessionActive:sid=>!!sockets.get(sid)?.size,
+ maxConcurrent:8, // bound concurrent PostgreSQL snapshots across distinct live sessions
  readAndSend:broadcastLocal,
  onError:(error,sid)=>console.error('periodic live refresh failed',sid,error instanceof Error?error.message:'unknown'),
 });
@@ -248,6 +253,15 @@ app.post('/api/auth/password-reset/confirm',async(req,res)=>{const token=req.bod
  await client.query('DELETE FROM email_mfa_enrollments WHERE user_id=$1',[found.rows[0].user_id]);
  await client.query('COMMIT');res.clearCookie('q_auth',{path:'/'});res.json({ok:true,mfa_still_required:true});
  }catch(e){await client.query('ROLLBACK');sendError(res,e)}finally{client.release()}});
+// Linking is the only federated operation requiring an already valid local
+// login. Check revocation before persisting state; the callback independently
+// rechecks revocation because a password/admin reset may happen meanwhile.
+async function authorizedFederatedLink(req:express.Request){
+ const userId=auth(req),issuedAt=authCookieIssuedAt(req.headers.cookie);
+ if(!userId||issuedAt===null||validFederatedLinkIssuedAt(issuedAt)===null)return null;
+ const eligible=await db.query(FEDERATED_LINK_ELIGIBLE_SQL,[userId,issuedAt]);
+ return eligible.rowCount?{userId,issuedAt}:null;
+}
 // OIDC authorization code + PKCE. Accounts are never silently linked by email.
 const oidcProviders=providersFromEnv();
 // Federated authorization state is persisted in PostgreSQL for cross-replica callbacks.
@@ -258,24 +272,27 @@ app.get('/api/auth/oidc/:provider/start',async(req,res)=>{try{
  const state=nonce(),verifier=nonce()+nonce(),nonceValue=nonce();
 
  // Optional account linking requires an existing authenticated session.
- const linkUser=req.query.link==='true'?auth(req):null;
- if(req.query.link==='true'&&!linkUser){res.status(401).json({error:'authentication_required'});return}
- await db.query("INSERT INTO auth_flows(state_hash,kind,provider,nonce,verifier,link_user,expires_at) VALUES($1,'oidc',$2,$3,$4,$5,now()+interval '5 minutes')",[hash(state),p.id,nonceValue,verifier,linkUser]);
+ const link=req.query.link==='true'?await authorizedFederatedLink(req):null;
+ if(req.query.link==='true'&&!link){res.status(401).json({error:'authentication_required'});return}
+ await db.query("INSERT INTO auth_flows(state_hash,kind,provider,nonce,verifier,link_user,link_auth_issued_at_ms,expires_at) VALUES($1,'oidc',$2,$3,$4,$5,$6,now()+interval '5 minutes')",[hash(state),p.id,nonceValue,verifier,link?.userId||null,link?.issuedAt||null]);
  res.cookie('q_oidc_state',state,{httpOnly:true,sameSite:'lax',secure:true,maxAge:300000,path:'/api/auth/oidc'});
  res.redirect(authorizationUrl(p,d,state,pkceChallenge(verifier),nonceValue));
  }catch(e){console.error('oidc start',e instanceof Error?e.message:'error');res.status(502).json({error:'oidc_unavailable'})}});
 app.get('/api/auth/oidc/:provider/callback',async(req,res)=>{const state=typeof req.query.state==='string'?req.query.state:'',code=req.query.code;
- const flow=await db.query("DELETE FROM auth_flows WHERE state_hash=$1 AND kind='oidc' AND expires_at>now() RETURNING provider,nonce,verifier,link_user",[hash(state)]).catch(()=>null);if(!flow){res.status(503).json({error:'auth_state_unavailable'});return}const pending=flow.rows[0]?{provider:flow.rows[0].provider,nonce:flow.rows[0].nonce,verifier:flow.rows[0].verifier,linkUser:flow.rows[0].link_user,expires:Date.now()+1}:null;res.clearCookie('q_oidc_state',{path:'/api/auth/oidc'});
+ const flow=await db.query("DELETE FROM auth_flows WHERE state_hash=$1 AND kind='oidc' AND expires_at>now() RETURNING provider,nonce,verifier,link_user,link_auth_issued_at_ms",[hash(state)]).catch(()=>null);if(!flow){res.status(503).json({error:'auth_state_unavailable'});return}const pending=flow.rows[0]?{provider:flow.rows[0].provider,nonce:flow.rows[0].nonce,verifier:flow.rows[0].verifier,linkUser:flow.rows[0].link_user,linkIssuedAt:flow.rows[0].link_auth_issued_at_ms,expires:Date.now()+1}:null;res.clearCookie('q_oidc_state',{path:'/api/auth/oidc'});
  if(!pending||pending.expires<Date.now()||pending.provider!==req.params.provider||cookies(req.headers.cookie).q_oidc_state!==state||typeof code!=='string'||code.length>4096){res.status(400).json({error:'oidc_state_invalid'});return}
  const p=oidcProviders.find(x=>x.id===pending.provider);if(!p){res.status(400).json({error:'oidc_provider_missing'});return}
  try{const d=validateDiscovery(p,await fetchOidcJson(p.issuer.replace(/\/$/,'')+'/.well-known/openid-configuration'));
  const tokenReply=await fetch(d.token_endpoint,{method:'POST',signal:AbortSignal.timeout(8000),redirect:'error',headers:{'content-type':'application/x-www-form-urlencoded'},body:new URLSearchParams({grant_type:'authorization_code',code,redirect_uri:p.redirectUri,client_id:p.clientId,client_secret:p.clientSecret,code_verifier:pending.verifier})});
  if(!tokenReply.ok){res.status(401).json({error:'oidc_exchange_failed'});return}
- const tokens=await tokenReply.json();if(typeof tokens.id_token!=='string'||tokens.id_token.length>20000){res.status(401).json({error:'oidc_token_missing'});return}
+ const tokens=await boundedFederatedJson(tokenReply,32768);if(typeof tokens.id_token!=='string'||tokens.id_token.length>20000){res.status(401).json({error:'oidc_token_missing'});return}
  const verified=await verifyIdToken(tokens.id_token,p,pending.nonce,await fetchOidcJson(d.jwks_uri));
  let userId:string;
- if(pending.linkUser){const user=await db.query('SELECT id,approved FROM users WHERE id=$1',[pending.linkUser]);if(!user.rowCount||!user.rows[0].approved){res.status(403).json({error:'link_not_allowed'});return}
- const linked=await db.query('INSERT INTO oidc_identities(provider,subject,user_id) VALUES($1,$2,$3) ON CONFLICT (provider,subject) DO NOTHING RETURNING user_id',[p.id,verified.subject,pending.linkUser]);if(!linked.rowCount){res.status(409).json({error:'identity_already_linked'});return}res.redirect('/?oidc_linked=1');return;
+ if(pending.linkUser){const issuedAt=validFederatedLinkIssuedAt(pending.linkIssuedAt);
+ if(issuedAt===null){res.status(403).json({error:'link_not_allowed'});return}
+ const linked=await db.query(FEDERATED_LINK_INSERT_SQL,[p.id,verified.subject,pending.linkUser,issuedAt]);
+ if(!linked.rowCount){res.status(409).json({error:'link_not_allowed_or_already_linked'});return}
+ res.redirect('/?oidc_linked=1');return;
  }
  const existing=await db.query('SELECT u.id,u.approved,u.must_change_password,u.totp_enabled,u.email_mfa_enabled FROM oidc_identities i JOIN users u ON u.id=i.user_id WHERE i.provider=$1 AND i.subject=$2',[p.id,verified.subject]);
  if(!existing.rowCount){res.status(403).json({error:'identity_not_linked',message:'Sign in with your password and link your identity in account settings first.'});return}
@@ -291,24 +308,24 @@ app.get('/api/auth/oidc/:provider/callback',async(req,res)=>{const state=typeof 
 // Social OAuth uses the same single-consume PostgreSQL state store.
 app.get('/api/auth/social/:provider/start',async(req,res)=>{try{
  const p=socialProviders().find(x=>x.id===req.params.provider);if(!p){res.status(404).json({error:'provider_unavailable'});return}
- const linkUser=req.query.link==='true'?auth(req):null;
- if(req.query.link==='true'&&!linkUser){res.status(401).json({error:'authentication_required'});return}
+ const link=req.query.link==='true'?await authorizedFederatedLink(req):null;
+ if(req.query.link==='true'&&!link){res.status(401).json({error:'authentication_required'});return}
 
- const state=socialState();await db.query("INSERT INTO auth_flows(state_hash,kind,provider,link_user,expires_at) VALUES($1,'social',$2,$3,now()+interval '5 minutes')",[hash(state),p.id,linkUser]);
+ const state=socialState();await db.query("INSERT INTO auth_flows(state_hash,kind,provider,link_user,link_auth_issued_at_ms,expires_at) VALUES($1,'social',$2,$3,$4,now()+interval '5 minutes')",[hash(state),p.id,link?.userId||null,link?.issuedAt||null]);
  res.cookie('q_social_state',state,{httpOnly:true,sameSite:'lax',secure:true,maxAge:300000,path:'/api/auth/social'});
  res.redirect(socialAuthorizationUrl(p,state));
  }catch(e){sendError(res,e)}});
 app.get('/api/auth/social/:provider/callback',async(req,res)=>{
  const state=typeof req.query.state==='string'?req.query.state:'';
- const flow=await db.query("DELETE FROM auth_flows WHERE state_hash=$1 AND kind='social' AND expires_at>now() RETURNING provider,link_user",[hash(state)]).catch(()=>null);if(!flow){res.status(503).json({error:'auth_state_unavailable'});return}const pending=flow.rows[0]?{provider:flow.rows[0].provider,linkUser:flow.rows[0].link_user,expires:Date.now()+1}:null;res.clearCookie('q_social_state',{path:'/api/auth/social'});
+ const flow=await db.query("DELETE FROM auth_flows WHERE state_hash=$1 AND kind='social' AND expires_at>now() RETURNING provider,link_user,link_auth_issued_at_ms",[hash(state)]).catch(()=>null);if(!flow){res.status(503).json({error:'auth_state_unavailable'});return}const pending=flow.rows[0]?{provider:flow.rows[0].provider,linkUser:flow.rows[0].link_user,linkIssuedAt:flow.rows[0].link_auth_issued_at_ms,expires:Date.now()+1}:null;res.clearCookie('q_social_state',{path:'/api/auth/social'});
  const code=req.query.code;
  if(!pending||pending.expires<Date.now()||pending.provider!==req.params.provider||cookies(req.headers.cookie).q_social_state!==state||typeof code!=='string'||code.length>4096){res.status(400).json({error:'social_state_invalid'});return}
  const p=socialProviders().find(x=>x.id===pending.provider);if(!p){res.status(404).json({error:'provider_unavailable'});return}
  try{const subject=await socialSubject(p,await exchangeSocialCode(p,code));
- if(pending.linkUser){const user=await db.query('SELECT id,approved,must_change_password FROM users WHERE id=$1',[pending.linkUser]);
- if(!user.rowCount||!user.rows[0].approved||user.rows[0].must_change_password){res.status(403).json({error:'link_not_allowed'});return}
- const linked=await db.query('INSERT INTO oidc_identities(provider,subject,user_id) VALUES($1,$2,$3) ON CONFLICT (provider,subject) DO NOTHING RETURNING user_id',[p.id,subject,pending.linkUser]);
- if(!linked.rowCount){res.status(409).json({error:'identity_already_linked'});return}
+ if(pending.linkUser){const issuedAt=validFederatedLinkIssuedAt(pending.linkIssuedAt);
+ if(issuedAt===null){res.status(403).json({error:'link_not_allowed'});return}
+ const linked=await db.query(FEDERATED_LINK_INSERT_SQL,[p.id,subject,pending.linkUser,issuedAt]);
+ if(!linked.rowCount){res.status(409).json({error:'link_not_allowed_or_already_linked'});return}
  res.redirect('/?oidc_linked=1');return}
  const existing=await db.query('SELECT u.id,u.approved,u.must_change_password,u.totp_enabled,u.email_mfa_enabled FROM oidc_identities i JOIN users u ON u.id=i.user_id WHERE i.provider=$1 AND i.subject=$2',[p.id,subject]);
  if(!existing.rowCount){res.status(403).json({error:'identity_not_linked'});return}
@@ -427,6 +444,47 @@ app.post('/api/auth/email-mfa/enrollment/confirm',requireAuth,async(req,res)=>{t
  }catch(e){await client.query('ROLLBACK').catch(()=>{});throw e}finally{client.release()}
  res.clearCookie('q_auth',{path:'/'});res.setHeader('Cache-Control','private, no-store');res.json({enabled:true,reauthentication_required:true});
  }catch(e){sendError(res,e)}
+});
+// Account-scoped SSO lifecycle: never expose provider subject IDs or an admin-wide index.
+// requireAuth validates account approval and session revocation before each operation.
+app.get('/api/auth/identities',requireAuth,async(req,res)=>{try{
+ const result=await db.query(FEDERATED_IDENTITY_LIST_SQL,[auth(req)]);
+ res.setHeader('Cache-Control','private, no-store');
+ res.json({identities:result.rows.map(row=>({provider:row.provider,linked_at:row.linked_at}))});
+ }catch(e){sendError(res,e)}
+});
+app.post('/api/auth/identities/unlink',requireAuth,async(req,res)=>{
+ const provider=req.body?.provider,password=req.body?.password;
+ if(!validFederatedProviderId(provider)||!validFederatedUnlinkPassword(password)){
+  res.status(400).json({error:'invalid_unlink_request'});return;
+ }
+ // Account-scoped, cross-replica one-minute password attempt budget.
+ // Do not put this in the transaction below: wrong passwords still count.
+ const userId=auth(req)!;
+ try {
+  const bucket=Math.floor(Date.now()/60000),key=hash('federated-unlink:'+userId);
+  const attempts=await db.query(`INSERT INTO api_rate_windows(client_hash,bucket,hits) VALUES($1,$2,1)
+   ON CONFLICT(client_hash,bucket) DO UPDATE SET hits=api_rate_windows.hits+1 RETURNING hits`,[key,bucket]);
+  if(Number(attempts.rows[0].hits)>5){res.setHeader('Retry-After',String(60-Math.floor(Date.now()/1000)%60));res.status(429).json({error:'rate_limited'});return;}
+ } catch(e){sendError(res,e);return;}
+ const cx=await db.connect();let inTransaction=false;
+ try{
+  await cx.query('BEGIN');inTransaction=true;
+  // Lock credentials against a concurrent password reset or admin revocation.
+  const account=await cx.query('SELECT password_hash,approved,must_change_password,password_changed_at,auth_revoked_at FROM users WHERE id=$1 FOR UPDATE',[userId]);
+  const issued=authCookieIssuedAt(req.headers.cookie);
+  const revoked=!account.rowCount||!account.rows[0].approved||account.rows[0].must_change_password||
+   [account.rows[0].password_changed_at,account.rows[0].auth_revoked_at].some(v=>v&&(issued===null||issued<new Date(v).getTime()));
+  if(revoked){await cx.query('ROLLBACK');inTransaction=false;res.status(401).json({error:'session_revoked'});return;}
+  if(!await bcrypt.compare(password,account.rows[0].password_hash)){
+   await cx.query('ROLLBACK');inTransaction=false;
+   res.status(403).json({error:'invalid_credentials'});return;
+  }
+  const removed=await cx.query(FEDERATED_IDENTITY_UNLINK_SQL,[userId,provider]);
+  if(!removed.rowCount){await cx.query('ROLLBACK');inTransaction=false;res.status(404).json({error:'identity_not_linked'});return;}
+  await cx.query('COMMIT');inTransaction=false;
+  res.setHeader('Cache-Control','private, no-store');res.json({ok:true});
+ }catch(e){if(inTransaction)await cx.query('ROLLBACK').catch(()=>{});sendError(res,e)}finally{cx.release()}
 });
 app.get('/api/auth/me',requireAuth,async(req,res)=>{try{const r=await db.query('SELECT id,email,nickname,is_primary_admin,role,approved,must_change_password,totp_enabled,email_mfa_enabled FROM users WHERE id=$1',[auth(req)]);res.json(r.rows[0]||null)}catch(e){sendError(res,e)}});
 async function requireAdmin(req:express.Request,res:express.Response,next:express.NextFunction){const u=await db.query('SELECT role,approved,must_change_password FROM users WHERE id=$1',[auth(req)]);if(!u.rowCount||!u.rows[0].approved||u.rows[0].must_change_password||u.rows[0].role!=='platform_admin'){res.status(403).json({error:'admin_required'});return}next()}

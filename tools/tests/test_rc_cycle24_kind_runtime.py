@@ -11,7 +11,7 @@ sys.path.insert(0,str(ROOT/'tools'))
 from rc_gate_audit import audit
 from rc_release_preflight import preflight
 from verify_rc_cycle23_inventory import load_inventory as historical
-from verify_rc_cycle57_inventory import load_inventory, verify_source
+from verify_rc_cycle61_inventory import load_inventory, verify_source
 
 class RC24(unittest.TestCase):
     def test_historical_receipt_immutable_and_current_tree_exact(self):
@@ -21,16 +21,16 @@ class RC24(unittest.TestCase):
 
     def test_unchanged_scoring_and_external_parent_gates(self):
         matrix=json.loads((ROOT/'docs/RC_GATE_MATRIX.json').read_text())
-        self.assertEqual(len(matrix['gates']),53)
+        self.assertEqual(len(matrix['gates']),55)
         self.assertEqual(sum(g['weight'] for g in matrix['gates']),100)
-        self.assertEqual((audit()['score'],preflight()['accepted_gates']),(81.25,36))
+        self.assertEqual((audit()['score'],preflight()['accepted_gates']),(81.75,38))
         self.assertEqual(len(preflight()['unaccepted_gates']),17)
         self.assertFalse(preflight()['release_candidate_ready'])
         self.assertFalse(matrix['pending_local_batch']['kubernetes_kind_runtime_verified'])
         self.assertFalse(matrix['pending_local_batch']['new_feature_promoted'])
         self.assertTrue(matrix['pending_local_batch']['new_ci_required'])
         self.assertEqual(matrix['last_verified_full_ci']['head_sha'],
-                         'caf6331f15ccf39c218791503b8c6d0ca3503dce')
+                         'c0fe7f7b9e41c0295387d84996a7b531b91b69a0')
 
     def test_ci_checks_historical_before_current_and_leak_detection(self):
         s=(ROOT/'.github/workflows/ci.yml').read_text()
