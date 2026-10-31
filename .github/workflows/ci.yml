@@ -109,6 +109,14 @@ jobs:
       # cumulative archive has silently dropped an immutable receipt.
       - name: Validate historical RC inventory references early
         run: python3 tools/ci_inventory_reference_guard.py
+      - name: Validate historical documentation acceptance early
+        run: |
+          PYTHONPATH=tools python3 -m unittest \
+            tools.tests.test_rc_cycle35_verified_bootstrap \
+            tools.tests.test_rc_cycle57_live_fanout \
+            tools.tests.test_rc_cycle58_reconciliation_and_backpressure \
+            tools.tests.test_rc_cycle63_missing_inventory_recovery \
+            tools.tests.test_rc_cycle65_historical_documentation -q
       - name: Check nonsecret CI token fixture
         run: python3 -m unittest tools.tests.test_rc_cycle64_credential_fixture -q
       - uses: actions/setup-node@v4
@@ -595,7 +603,8 @@ jobs:
           python3 tools/verify_rc_cycle61_inventory.py --historical
           python3 tools/verify_rc_cycle62_inventory.py --historical
           python3 tools/verify_rc_cycle63_inventory.py --historical
-          python3 tools/verify_rc_cycle64_inventory.py
+          python3 tools/verify_rc_cycle64_inventory.py --historical
+          python3 tools/verify_rc_cycle65_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

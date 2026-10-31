@@ -64,8 +64,16 @@ class RC58VerifiedAcceptance(unittest.TestCase):
 
  def test_status_handoff_records_new_git_baseline(self):
   for rel in ['DEVELOPMENT_STATUS.it.md','DEVELOPMENT_STATUS.md','COMPLETION_HANDOFF.it.md','COMPLETION_HANDOFF.md']:
-   s=(ROOT/'docs'/rel).read_text()[:1700]
-   for t in ('81.75' if not rel.endswith('.it.md') else '81,75', '41152939003', 'c0fe7f7b9e41c0295387d84996a7b531b91b69a0','rc_strict=false'):
+   s=(ROOT/'docs'/rel).read_text()
+   current=s.split('\n---\n',1)[0]
+   self.assertIn('81.75' if not rel.endswith('.it.md') else '81,75',current)
+   self.assertIn('rc_strict=false',current)
+   # The immutable RC58 historical acceptance has its own dated receipt.
+   # Newer status sections are prepended: never impose a fixed byte limit.
+   for t in ('41152939003','c0fe7f7b9e41c0295387d84996a7b531b91b69a0'):
     self.assertIn(t,s)
+   evidence=(ROOT/'docs'/('RC58_VERIFIED_IDLE_SLO_AND_REFRESH.it.md' if rel.endswith('.it.md') else 'RC58_VERIFIED_IDLE_SLO_AND_REFRESH.en.md')).read_text()
+   self.assertIn('41152939003',evidence)
+   self.assertIn('c0fe7f7b9e41c0295387d84996a7b531b91b69a0',evidence)
 
 if __name__=='__main__': unittest.main()

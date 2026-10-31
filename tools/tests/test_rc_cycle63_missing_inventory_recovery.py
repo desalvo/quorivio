@@ -22,8 +22,12 @@ class HistoricalInventoryRecoveryTests(unittest.TestCase):
 
     def test_stable_current_inventory_bridge_follows_workflow(self):
         from verify_rc_current_inventory import current_verifier_module, load_inventory
-        self.assertEqual(current_verifier_module().MANIFEST,
-                         'docs/validation/RC_CYCLE64_PACKAGE_INVENTORY_20261031.json')
+        # Resolve current receipt from CI, not the previous cycle number.
+        current = current_verifier_module()
+        self.assertRegex(current.MANIFEST,
+                         r'^docs/validation/RC_CYCLE[0-9]+_PACKAGE_INVENTORY_20261031\.json$')
+        cycle = int(current.MANIFEST.split('RC_CYCLE', 1)[1].split('_', 1)[0])
+        self.assertGreaterEqual(cycle, 64)
         self.assertGreater(len(load_inventory()), 1100)
 
     def test_missing_rc59_inventory_is_detected_early(self):

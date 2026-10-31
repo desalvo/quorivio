@@ -75,7 +75,8 @@ class Cycle35VerifiedBootstrap(unittest.TestCase):
 
     def test_documentation_records_remaining_risks(self):
         for fn in ('DEVELOPMENT_STATUS.md','DEVELOPMENT_STATUS.it.md','COMPLETION_HANDOFF.md','COMPLETION_HANDOFF.it.md'):
-            body=(ROOT/'docs'/fn).read_text()[:4000]
+            # Preserve verification of historical claims as RC headers grow.
+            body=(ROOT/'docs'/fn).read_text()
             self.assertIn('81,75' if fn.endswith('.it.md') else '81.75',body)
             # The immutable 2026-10-30 cycle-35 receipt above proves its original
             # commit. Current status headers must instead report the latest CI

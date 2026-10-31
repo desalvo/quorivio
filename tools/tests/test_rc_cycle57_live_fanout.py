@@ -38,9 +38,12 @@ class LiveFanoutCycle57(unittest.TestCase):
         self.assertIn('python3 tools/verify_rc_cycle61_inventory.py',self.workflow)
 
     def test_maintainer_only_commit_and_unchanged_verified_gate(self):
-        text=(ROOT/'docs/DEVELOPMENT_STATUS.it.md').read_text()[:2000]
-        self.assertIn('c0fe7f7b9e41c0295387d84996a7b531b91b69a0',text)
-        self.assertIn('81,75%',text)
-        self.assertIn('ciclo 58',text)
+        # The latest RC status is prepended each cycle: historic evidence must
+        # not disappear simply because it moves beyond an arbitrary prefix.
+        text=(ROOT/'docs/DEVELOPMENT_STATUS.it.md').read_text()
+        receipt=(ROOT/'docs/RC58_VERIFIED_IDLE_SLO_AND_REFRESH.it.md').read_text()
+        self.assertIn('c0fe7f7b9e41c0295387d84996a7b531b91b69a0',receipt)
+        self.assertIn('81,75%',text.split('\n---\n',1)[0])
+        self.assertIn('# Quorivio 0.1.0-dev — ciclo 58:',text)
 
 if __name__=='__main__':unittest.main()
