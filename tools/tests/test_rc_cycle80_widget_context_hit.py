@@ -8,9 +8,9 @@ ROOT = Path(__file__).resolve().parents[2]
 class WidgetContextHitRC80(unittest.TestCase):
     def test_widget_context_owns_event_and_cancels_background_long_press(self):
         ui = (ROOT / 'apps/web/src/main.tsx').read_text(encoding='utf8')
-        self.assertIn('onContextMenu={e=>{e.preventDefault();e.stopPropagation();clearContextHold();positionMenu(e.currentTarget,e.clientX,e.clientY);', ui)
+        self.assertIn('onContextMenu={e=>{e.preventDefault();e.stopPropagation();openWidgetContextMenu(w.id,e.currentTarget,e.clientX,e.clientY)', ui)
         self.assertIn("aria-label={'Azioni widget '+w.kind}", ui)
-        self.assertIn('onContextMenu={e=>{if((e.target as HTMLElement).closest(".widget-canvas-item"))return;', ui)
+        self.assertIn('onContextMenuCapture={handleCanvasContext}', ui)
 
     def test_real_browser_right_click_requires_a_hit_tested_widget_pixel(self):
         script = (ROOT / 'tools/ci_browser_editor.py').read_text(encoding='utf8')

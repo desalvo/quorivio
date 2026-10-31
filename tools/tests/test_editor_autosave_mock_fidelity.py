@@ -45,7 +45,7 @@ class EditorMockAutosave(unittest.TestCase):
   self.assertLess(WEB.index('stableJson(persisted.page_design?.widgets||[])'),WEB.index('committed=true;'))
 
  def test_context_is_gesture_driven(self):
-  self.assertIn('onContextMenu={e=>{if((e.target as HTMLElement).closest(".widget-canvas-item"))return;',WEB)
+  self.assertIn('onContextMenuCapture={handleCanvasContext}',WEB)
   self.assertIn('contextHold.current=setTimeout(openBlankMenu,580)',WEB)
   self.assertIn('onPointerCancel={clearContextHold}',WEB)
   self.assertIn('>Salva ora</button>',WEB)

@@ -57,7 +57,7 @@ class ContextualEditorUX(unittest.TestCase):
 
     def test_page_context_not_ribbon(self):
         self.assertIn('onOpenPageSettings={()=>',WEB)
-        self.assertIn('onContextMenu={e=>{if((e.target as HTMLElement).closest(".widget-canvas-item"))return',WEB)
+        self.assertIn('onContextMenuCapture={handleCanvasContext}',WEB)
         self.assertIn('pageContextOpen&&<section className="editor-context-drawer"',WEB)
         self.assertNotIn('className="canvas-blank-menu-trigger"',WEB)
         self.assertIn('contextHold.current=setTimeout(openBlankMenu,580)',WEB)

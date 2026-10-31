@@ -1,3 +1,9 @@
+# Quorivio RC83 — handoff per menu contestuale reale (31 ottobre 2026)
+
+**Completamento RC: 84,75%** (42 accettati / 17 parziali, 59 gate); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Ultimo commit utente `7f73e4b2dbe7edb58fc34805e43e7d95bbabdbf1`; CI estesa `https://github.com/desalvo/quorivio/actions/runs/41232865276/job/124630494242`. Sintomo confermato nei cicli precedenti: clic destro Chromium su un widget apre il menu dello sfondo, nonostante hit-test Playwright. RC83 corregge l'applicazione e non soltanto le coordinate del test: il canvas usa `onContextMenuCapture`, distingue widget tramite DOM/geometria e mostra il relativo menu; il resto del canvas continua a mostrare il menu della pagina. Introdotti helper TypeScript, 3 nuovi test Node e verifiche Python/CI in anticipo. Non dichiarare verde il browser prima della nuova CI GitHub. Nessun gate promosso, nessun commit/push/tag eseguito dall'assistente.
+
+---
+
 # Quorivio 0.1.0-dev — RC82 — hotfix CI per corruzione deterministica dei backup AES-GCM (31 ottobre 2026)
 
 **Completamento RC: 84,75%**, 42 gate accettati e 17 parziali su 59; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Ultimo SHA committato dall'utente `280b1bdbffa9073460455335c01ac55dfe468491`. Workflow standard `41229380989`, job `124620158038`: un test di mirroring dei backup fallisce: il test non garantisce la modifica degli ultimi due byte casuali del tag AES-GCM. RC82 impone la modifica di un bit a ogni iterazione, verifica il rigetto di header, ciphertext e tag alterati e controlla che non restino archivi pubblicati né dati temporanei dopo il rigetto. Codice di produzione immutato, sicurezza fail-closed conservata, preflight anticipato in CI. Nessun gate RC promosso o commit effettuato dall'assistente. Serve CI GitHub nuova.

@@ -7,7 +7,9 @@ CSS=(Path(__file__).resolve().parents[2]/'apps/web/src/style.css').read_text()
 
 class CanvasBackgroundNativeContext(unittest.TestCase):
  def test_only_empty_canvas_opens_background_menu(self):
-  self.assertIn('closest(".widget-canvas-item")',SOURCE)
+  self.assertIn("target.closest('.widget-canvas-item')",SOURCE)
+  self.assertIn('onContextMenuCapture={handleCanvasContext}',SOURCE)
+  self.assertIn('canvasWidgetAtPoint(canvas,e.clientX,e.clientY)',SOURCE)
   self.assertIn('setBackgroundMenu(true)',SOURCE)
   self.assertIn('Menu contestuale sfondo canvas',SOURCE)
  def test_background_changes_reuse_existing_layout_handler(self):

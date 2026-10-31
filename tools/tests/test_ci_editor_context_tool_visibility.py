@@ -22,7 +22,7 @@ class ContextualChromiumGate(unittest.TestCase):
         self.assertIn('Strumenti di selezione e allineamento',WEB)
         self.assertIn('const openBlankMenu=()=>',WEB)
         self.assertIn('setBackgroundMenu(false);setArrangeMenu(true)',WEB)
-        self.assertIn('onContextMenu={e=>{if((e.target as HTMLElement).closest(".widget-canvas-item"))return;',WEB)
+        self.assertIn('onContextMenuCapture={handleCanvasContext}',WEB)
         self.assertNotIn('className="canvas-blank-menu-trigger"',WEB)
         self.assertIn('.editor-ux-v2 .canvas-editor-tools{display:none!important}',CSS)
 
