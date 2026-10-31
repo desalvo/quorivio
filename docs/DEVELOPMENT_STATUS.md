@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — Development status — RC62 (31 October 2026)
+
+**Maintainer commit baseline:** `5a088fc300037b5a6a98a533de36ac6700b3b765` (RC61 already committed). Standard GitHub CI [41186895267](https://github.com/desalvo/quorivio/actions/runs/41186895267) failed in the background library integration due to PostgreSQL API shared-IP `429` (100 requests/minute), *after* all 546 backend/99 frontend Node tests, compilation and earlier PostgreSQL fixtures passed. **RC62 remains uncommitted.** Two loopback-only Python HTTP acceptance suites now use the existing nonproduction ephemeral load token; no production limiter changes. New regression contracts and immutable RC61 inventory are retained. See `docs/RC62_CI_THROTTLE_ISOLATION.en.md`. **Verified RC remains 81.75% (38 accepted / 17 partial of 55); no new score credit** until the next green CI and real gate evidence. `rc_strict=false`, `publish_image=false`; no assistant commit/push/tag.
+
+---
+
 # Quorivio 0.1.0-dev — Development status — RC61 (31 October 2026)
 
 **Cycles 58–61 are cumulative and uncommitted.** Private SSO identity listing and password-confirmed self-service unlink implemented with cross-replica rate limiting and post-lock revocation recheck. Local tests **546/546 API and 99/99 web** pass; new real PostgreSQL HTTP CI fixture is pending execution, full npm build blocked by incomplete local dependencies. `rc_strict=false`, `publish_image=false`. **Official RC score 81.75%, 38 accepted + 17 partial / 55; no unsupported score increase.** See `docs/RC61_FEDERATED_IDENTITY_MANAGEMENT.en.md`. Version unchanged; no commits/releases.

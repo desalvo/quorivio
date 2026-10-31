@@ -10,6 +10,7 @@ import json
 import os
 from urllib.error import HTTPError
 from urllib.request import build_opener, HTTPCookieProcessor, Request
+from ci_http_isolation import ci_load_headers
 
 HOST=os.environ.get('QUORIVIO_CI_BASE_URL','http://127.0.0.1:8080')
 PNG=base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO6X7e8AAAAASUVORK5CYII=')
@@ -18,6 +19,7 @@ def session():return build_opener(HTTPCookieProcessor(http.cookiejar.CookieJar()
 def req(op,method,url,payload=None,expected=200,mime='application/json'):
  if isinstance(payload,(dict,list)):payload=json.dumps(payload).encode('utf8')
  headers={'Content-Type':mime} if payload is not None else {}
+ headers.update(ci_load_headers(HOST))
  try:
   with op.open(Request(HOST+url,data=payload,headers=headers,method=method),timeout=20) as rsp:status,body=rsp.status,rsp.read()
  except HTTPError as e:status,body=e.code,e.read()
@@ -26,6 +28,7 @@ def req(op,method,url,payload=None,expected=200,mime='application/json'):
  return json.loads(body) if body[:1] in (b'{',b'[') else body
 
 def run():
+ ci_load_headers(HOST)  # fail before any API request unless disposable
  a=session();email=os.environ['QUORIVIO_CI_ADMIN_EMAIL'];password=os.environ['QUORIVIO_CI_NEW_PASSWORD']
  req(a,'POST','/api/auth/login',{'email':email,'password':password})
  shared=req(a,'POST','/api/sessions',{'title':'CI background owner session'},201)['id']

@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — Stato di sviluppo — RC62 (31 ottobre 2026)
+
+**Nuova baseline committata dal manutentore:** `5a088fc300037b5a6a98a533de36ac6700b3b765` (RC61 già committato). CI standard [41186895267](https://github.com/desalvo/quorivio/actions/runs/41186895267) fallita per risposta `429` nel test della libreria sfondi; il limite è globale all'IP della CI (100 richieste/minuto), dopo il superamento di 546 test Node API, 99 frontend, build e precedenti prove PostgreSQL. **RC62 non committato.** Le due suite HTTP su loopback ora passano il token temporaneo non-production già esistente: non si cambia il limite per gli utenti reali. Aggiunti regressioni e inventario RC62, conservando immutabile lo storico RC61. Dettagli in `docs/RC62_CI_THROTTLE_ISOLATION.it.md`. **RC verificata invariata 81,75% (38 accepted/17 partial su 55)** finché non esiste una nuova CI verde. `rc_strict=false`, `publish_image=false`; nessun commit/push/tag dall'assistente.
+
+---
+
 # Quorivio 0.1.0-dev — Stato di sviluppo — RC61 (31 ottobre 2026)
 
 **Cicli 58–61 cumulativi non committati (dal ciclo 58).** Gestione SSO self-service implementata (elenco privato + scollegamento protetto da password, rate limit multi-replica e revoche), test Node API **546/546** e web **99/99** localmente verdi; nuova prova HTTP/PostgreSQL CI aggiunta ma non eseguita. Build completa bloccata da dipendenze npm mancanti. `rc_strict=false`, `publish_image=false`. **RC certificata 81,75% (38/55 accepted, 17 partial); incremento ufficiale +0,00** in assenza di nuova CI/evidenza esterna. Dettagli `docs/RC61_FEDERATED_IDENTITY_MANAGEMENT.it.md`. Versione 0.1.0-dev, nessun commit o publish.

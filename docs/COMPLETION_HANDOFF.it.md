@@ -1,3 +1,9 @@
+# Handoff — Quorivio RC62 (31 ottobre 2026)
+
+**Ultimo commit dell'utente:** `5a088fc300037b5a6a98a533de36ac6700b3b765` (include RC61). CI standard `41186895267`, job `124495541784`, **fallita** per superamento rate limit PostgreSQL su loopback (risposta HTTP 429 al test sfondi; atteso 200), dopo test Node, build e suite SSO reali superate. **RC62 è l'unico ciclo non committato** dopo quella baseline. Correzione: i due test HTTP portable/sfondi inoltrano il token random temporaneo già presente in CI; guardia fail-closed vincolata a host loopback; nessun cambiamento al backend production. Aggiornati workflow, test, handoff, inventario. Vedere `docs/RC62_CI_THROTTLE_ISOLATION.it.md`. **RC 81,75% verificato (38 accepted/17 partial su 55), strict bloccata.** Fare commit manuale RC62 e verificare prima la CI standard, poi eventuale estesa, senza pubblicazione.
+
+---
+
 # Handoff — Quorivio RC61, 31 ottobre 2026
 
 **Ultimo commit confermato:** `c0fe7f7b9e41c0295387d84996a7b531b91b69a0`; CI standard `41152434205`, estesa `41152939003` relative soltanto a questa baseline. **Cicli 58–61 non ancora committati.** RC certificata **81,75%**, 38 gate accepted, 17 partial su 55, strict RC NO. `rc_strict=false`, `publish_image=false`. Nuovo scope: SSO elenco privato e scollegamento confermato con password, lock+revoca transazionali, limite distribuito, UI e prova PostgreSQL HTTP in CI; verifiche locali **546 API**, **99 frontend**. Build npm e prova DB in CI non confermate. Dettagli `docs/RC61_FEDERATED_IDENTITY_MANAGEMENT.it.md`. Fare commit manualmente, poi CI standard e campagna RC non pubblicante; non forzare la percentuale.

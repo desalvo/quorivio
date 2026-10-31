@@ -295,12 +295,14 @@ jobs:
         run: node tools/ci_federated_identity_management_pg.mjs
       - name: PostgreSQL-backed portable and profile lifecycle E2E
         env:
+          QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
           QUORIVIO_CI_ADMIN_PASSWORD: ci-only-administrator-password-123
           QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
         run: python3 tools/ci_portable_http.py
       - name: PostgreSQL-backed private presenter background library and collaborator copy-on-use
         env:
+          QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
           QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
         run: python3 tools/ci_background_library_postgres.py
@@ -584,7 +586,8 @@ jobs:
           python3 tools/verify_rc_cycle58_inventory.py --historical
           python3 tools/verify_rc_cycle59_inventory.py --historical
           python3 tools/verify_rc_cycle60_inventory.py --historical
-          python3 tools/verify_rc_cycle61_inventory.py
+          python3 tools/verify_rc_cycle61_inventory.py --historical
+          python3 tools/verify_rc_cycle62_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

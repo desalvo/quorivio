@@ -1,3 +1,9 @@
+# Quorivio RC62 — completion handoff (31 October 2026)
+
+**Last maintainer commit:** `5a088fc300037b5a6a98a533de36ac6700b3b765`, containing RC61. Standard GitHub run `41186895267`, job `124495541784`, **failed**: the real PostgreSQL background library CI script hit shared loopback rate limit `429` while expecting `200`, following successful Node build/tests and SSO PostgreSQL checks. **RC62 is the only uncommitted cycle since that commit.** Fix: both `ci_portable_http.py` and `ci_background_library_postgres.py` now attach the existing strong ephemeral nonproduction-only token, validated for loopback before the network; `.github/workflows/ci.yml` forwards it, regression tests cover failure modes. No change to production rate limiting, credentials, features, version, RC score or publishing controls. See `docs/RC62_CI_THROTTLE_ISOLATION.en.md`. **Certified RC 81.75% (38 accepted / 17 partial of 55), strict blocked.** Next step: maintainer manually commits RC62 and runs standard CI before extended opt-in; never publish image with this change automatically.
+
+---
+
 # Handoff — Quorivio RC61, 31 October 2026
 
 **Last confirmed commit:** `c0fe7f7b9e41c0295387d84996a7b531b91b69a0`. Green standard `41152434205`, extended `41152939003` only validate this earlier baseline. **Cycles 58–61 cumulative and uncommitted.** Official RC **81.75%**, 38 accepted, 17 partial of 55; strict RC not ready. `rc_strict=false`, `publish_image=false`. Added password-confirmed identity self-service list/unlink, transaction and revocation checks, shared attempt limiter, dashboard and CI-only PostgreSQL HTTP acceptance. Local **546 API** and **99 web** tests pass; npm build and new database CI acceptance pending. See `docs/RC61_FEDERATED_IDENTITY_MANAGEMENT.en.md`; maintainer commits, then standard CI and one nonpublishing acceptance campaign.

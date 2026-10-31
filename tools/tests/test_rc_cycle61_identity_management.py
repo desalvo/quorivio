@@ -39,6 +39,6 @@ class RC61Tests(unittest.TestCase):
         self.assertEqual(sum(g['status']=='partial' for g in matrix['gates']),17)
         self.assertEqual(next(g['status'] for g in matrix['gates'] if g['id']=='C3'),'partial')
     def test_current_manifest(self):
-        subprocess.run([sys.executable,'tools/verify_rc_cycle61_inventory.py'],cwd=ROOT,check=True,capture_output=True)
+        subprocess.run([sys.executable,'tools/verify_rc_cycle61_inventory.py','--historical'],cwd=ROOT,check=True,capture_output=True)
 
 if __name__=='__main__': unittest.main()

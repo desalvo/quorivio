@@ -11,6 +11,7 @@ import json
 import os
 from urllib.error import HTTPError
 from urllib.request import HTTPCookieProcessor, Request, build_opener
+from ci_http_isolation import ci_load_headers
 
 BASE = os.environ.get('QUORIVIO_CI_BASE_URL', 'http://127.0.0.1:8080')
 EMAIL = os.environ['QUORIVIO_CI_ADMIN_EMAIL']
@@ -24,6 +25,7 @@ def api(method: str, url: str, data=None, mime='application/json', expected=200,
     if isinstance(data, (dict, list)):
         data = json.dumps(data, separators=(',', ':')).encode()
     headers = {'Content-Type': mime} if data is not None else {}
+    headers.update(ci_load_headers(BASE))
     req = Request(BASE + url, data=data, headers=headers, method=method)
     try:
         with (opener or OPENER).open(req, timeout=15) as response:
@@ -42,6 +44,7 @@ def asset_id(snapshot):
 
 
 def run():
+    ci_load_headers(BASE)  # fail before login if the CI environment is unsafe
     signin = api('POST', '/api/auth/login', {'email': EMAIL, 'password': PASSWORD})
     assert signin['must_change_password'] is True, 'CI expects a fresh disposable admin'
     api('POST', '/api/auth/change-password', {'current_password': PASSWORD, 'new_password': NEW_PASSWORD})

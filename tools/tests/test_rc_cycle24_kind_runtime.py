@@ -11,7 +11,7 @@ sys.path.insert(0,str(ROOT/'tools'))
 from rc_gate_audit import audit
 from rc_release_preflight import preflight
 from verify_rc_cycle23_inventory import load_inventory as historical
-from verify_rc_cycle61_inventory import load_inventory, verify_source
+from verify_rc_cycle62_inventory import load_inventory, verify_source
 
 class RC24(unittest.TestCase):
     def test_historical_receipt_immutable_and_current_tree_exact(self):
