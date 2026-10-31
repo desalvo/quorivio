@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import hashlib
+import re
+from datetime import date, datetime
 import tempfile
 import unittest
 from pathlib import Path
@@ -24,10 +26,18 @@ class HistoricalInventoryRecoveryTests(unittest.TestCase):
         from verify_rc_current_inventory import current_verifier_module, load_inventory
         # Resolve current receipt from CI, not the previous cycle number.
         current = current_verifier_module()
-        self.assertRegex(current.MANIFEST,
-                         r'^docs/validation/RC_CYCLE[0-9]+_PACKAGE_INVENTORY_20261031\.json$')
-        cycle = int(current.MANIFEST.split('RC_CYCLE', 1)[1].split('_', 1)[0])
+        # The 20261031 suffix belongs to historical receipts, not all future
+        # current receipts. Validate a real YYYYMMDD date without rewriting
+        # pinned historical artifacts or relaxing source/archive checks.
+        match = re.fullmatch(
+            r'docs/validation/RC_CYCLE([0-9]+)_PACKAGE_INVENTORY_(20[0-9]{6})\.json',
+            current.MANIFEST,
+        )
+        self.assertIsNotNone(match, 'unsafe or malformed current inventory name')
+        cycle = int(match.group(1))
+        issued = datetime.strptime(match.group(2), '%Y%m%d').date()
         self.assertGreaterEqual(cycle, 64)
+        self.assertGreaterEqual(issued, date(2026, 10, 31))
         self.assertGreater(len(load_inventory()), 1100)
 
     def test_missing_rc59_inventory_is_detected_early(self):

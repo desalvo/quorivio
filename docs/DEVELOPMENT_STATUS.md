@@ -1,3 +1,12 @@
+# Quorivio 0.1.0-dev — RC96 — CI documentation and dated inventory hotfix (1 November 2026)
+
+**Certified RC readiness remains 84.75%** (42/59 accepted; 17 partial).
+
+**Release state:** `rc_strict=false`, `publish_image=false`, `publish_latest=false`. The maintainer confirmed RC95 as the latest committed baseline; RC96 contains only post-commit fixes. The uploaded CI (`logs_111817757197.zip`) failed early on six documentation-acceptance assertions, before compilation. RC96 restores the explicit release flags and fixes a legacy test that pinned all future inventory dates to 31 October 2026; SHA-256 validation and immutable historical receipts remain mandatory. GitHub CI for RC96 is not yet verified.
+
+**Post-RC95 commit suggestion:** `Fix CI release-status documentation and date-agnostic current inventory validation`
+
+---
 # Quorivio 0.1.0-dev — RC95 — selection-aware rich text and PowerPoint-style ribbon (1 November 2026)
 
 **Certified readiness remains 84.75%** (42 accepted / 17 partial out of 59 gates); no fresh external CI evidence yet. Cumulative source includes all RC89–RC94 development since the last maintainer-confirmed commit. No assistant commit, push, tag, publication, deployment or change to remote repositories.

@@ -1,3 +1,12 @@
+# Quorivio 0.1.0-dev — RC96 — hotfix CI per documentazione e inventari datati (1 novembre 2026)
+
+**Certified RC readiness remains 84,75%** (42/59 accepted; 17 partial).
+
+**Stato di rilascio:** `rc_strict=false`, `publish_image=false`, `publish_latest=false`. RC95 è la nuova baseline di commit confermata dal maintainer; gli interventi RC96 sono successivi al commit. La CI caricata (`logs_111817757197.zip`) è fallita nella verifica documentale iniziale (6 errori), prima della build. RC96 riallinea le dichiarazioni di rilascio e corregge il test legacy che vincolava la data degli inventari al 31 ottobre 2026; rimangono attivi tutti i controlli di integrità SHA-256 e gli inventari storici. CI GitHub RC96 ancora da verificare.
+
+**Post-RC95 commit suggestion:** `Fix CI release-status documentation and date-agnostic current inventory validation`
+
+---
 # Quorivio 0.1.0-dev — RC95 — selezione persistente, testo formattabile e palette stile PowerPoint (1 novembre 2026)
 
 **Completamento certificato invariato: 84,75%** (42 gate accettati, 17 parziali su 59). Cumulativo delle modifiche da RC89–RC94 successive all'ultimo commit esplicitamente dichiarato. Nessun commit, push, tag, pubblicazione o modifica a server e repository remoti da parte dell'assistente.
