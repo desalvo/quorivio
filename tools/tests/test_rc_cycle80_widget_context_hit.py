@@ -16,13 +16,14 @@ class WidgetContextHitRC80(unittest.TestCase):
         script = (ROOT / 'tools/ci_browser_editor.py').read_text(encoding='utf8')
         helper = (ROOT / 'tools/ci_editor_context_tools.py').read_text(encoding='utf8')
         self.assertIn('point=await uncovered_widget_context_point(first_widget)', script)
-        self.assertIn("await page.mouse.click(point['x'],point['y'],button='right')", script)
-        self.assertIn("await expect(widget_menu).to_be_visible()", script)
+        self.assertIn("await first_widget.click(button='right',position=offset)", script)
+        self.assertIn("await expect(widget_menu).to_be_visible(timeout=4000)", script)
         self.assertIn("await expect(background_menu).to_have_count(0)", script)
-        self.assertNotIn(".first.click(button='right')", script)
+        self.assertNotIn("await page.mouse.click(point['x'],point['y'],button='right')", script)
         self.assertIn('document.elementFromPoint(x,y)', helper)
         self.assertIn('if(hit.closest(', helper)
         self.assertIn("raise AssertionError('No real uncovered widget context pixel;", helper)
+        self.assertIn('offset_x:x-rect.left', helper)
 
     def test_stale_background_overlay_is_dismissed_before_pointer_test(self):
         script = (ROOT / 'tools/ci_browser_editor.py').read_text(encoding='utf8')

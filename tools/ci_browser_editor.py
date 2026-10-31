@@ -164,9 +164,20 @@ async def main():
    first_widget=page.locator('.widget-canvas-item').first
    await expect(first_widget).to_be_visible()
    point=await uncovered_widget_context_point(first_widget)
-   await page.mouse.click(point['x'],point['y'],button='right')
-   widget_menu=page.get_by_role('group',name='Azioni widget text')
-   await expect(widget_menu).to_be_visible()
+   # RC81: The page.mouse absolute pixel became stale when the app recentered
+   # its stage between hit-test and mousedown. A locator-bound click waits for
+   # layout stability and verifies that Chromium can really hit this widget.
+   offset={'x':point['offset_x'],'y':point['offset_y']}
+   await first_widget.click(button='right',position=offset,trial=True)
+   await first_widget.click(button='right',position=offset)
+   widget_menu=page.get_by_role('group',name='Azioni widget text',exact=True)
+   try:
+    await expect(widget_menu).to_be_visible(timeout=4000)
+   except AssertionError as error:
+    background_open=await background_menu.is_visible()
+    raise AssertionError('Real widget right-click did not open its menu; '
+                         f'canvas_background_menu_open={background_open}. '
+                         'Check actual pointer routing, not just elementFromPoint before click.') from error
    await expect(background_menu).to_have_count(0)
    assert await widget_menu.evaluate('''node => {
     const r=node.getBoundingClientRect();

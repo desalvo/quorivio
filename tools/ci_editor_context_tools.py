@@ -142,7 +142,10 @@ async def uncovered_widget_context_point(widget):
         const hit=document.elementFromPoint(x,y);
         if(!hit||(hit!==el&&!el.contains(hit)))continue;
         if(hit.closest('button,input,select,textarea,[contenteditable=true],.canvas-context-menu,.canvas-background-context'))continue;
-        return {x,y};
+        // Preserve the widget-relative offset: Playwright's locator.click
+        // re-checks the target and scroll/stability immediately before the
+        // real native pointer action. Absolute page.mouse coordinates do not.
+        return {x,y,offset_x:x-rect.left,offset_y:y-rect.top};
       }
       return null;
     }""")

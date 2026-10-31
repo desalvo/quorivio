@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC81 — clic destro widget stabile in Chromium (31 ottobre 2026)
+
+**Completamento RC: 84,75%** (42 accettati/17 parziali su 59). Baseline Git `d4ed14ee61a673ce6d1ea7767c790e74de79089b` (commit RC80 confermato dall’esecuzione GitHub). CI estesa 41220871348, job 124594956256: l’interazione Chromium ha di nuovo mancato `Azioni widget text` dopo un clic con coordinate assolute. RC81 usa il clic reale ancorato al locator widget, con verifica di stabilità e raggiungibilità. Rimangono obbligatori menu corretto, chiusura di quello del canvas e nessun fallback sintetico/tastiera. **Serve nuova CI browser per la certificazione**. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit.
+
+---
+
 # Quorivio 0.1.0-dev — RC80 — stabilizzazione menu widget Chromium (31 ottobre 2026)
 
 La CI estesa 41218084773, job 124586715148, ha superato molte verifiche browser, poi il clic destro destinato al widget ha aperto il menu dello sfondo. Il test RC80 chiude eventuali menu precedenti, verifica con `document.elementFromPoint` un pixel effettivamente raggiungibile del widget e usa un evento reale del mouse. Nel componente React il menu widget blocca la propagazione dell’evento e cancella l’eventuale pressione lunga sul canvas. Nuovi test prima dell’installazione npm e verifica di integrità degli inventari. **Completamento RC: 84,75%** (42 gate accettati e 17 parziali su 59); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Serve ancora la CI estesa reale.

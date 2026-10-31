@@ -133,6 +133,8 @@ jobs:
         run: python3 -m unittest tools.tests.test_rc_cycle78_preview_selector -q
       - name: Validate RC80 real widget context menu pointer before npm
         run: python3 -m unittest tools.tests.test_rc_cycle80_widget_context_hit -q
+      - name: Validate RC81 layout-stable widget right click before npm
+        run: python3 -m unittest tools.tests.test_rc_cycle81_stable_widget_pointer -q
       - name: Validate RC74 footer alignment before npm
         run: |
           python3 -m unittest \
@@ -658,7 +660,8 @@ jobs:
           python3 tools/verify_rc_cycle77_inventory.py --historical
           python3 tools/verify_rc_cycle78_inventory.py --historical
           python3 tools/verify_rc_cycle79_inventory.py --historical
-          python3 tools/verify_rc_cycle80_inventory.py
+          python3 tools/verify_rc_cycle80_inventory.py --historical
+          python3 tools/verify_rc_cycle81_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

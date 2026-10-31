@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC81 — stable widget context-click Chromium (31 October 2026)
+
+**RC completion: 84.75%** (42 accepted/17 partial; 59 gates). Git baseline `d4ed14ee61a673ce6d1ea7767c790e74de79089b` (RC80 user commit). Extended run 41220871348, job 124594956256 reached built Chromium UI; failed again expecting `Azioni widget text` after a raw absolute `page.mouse.click`. RC81 makes the click locator-relative with a native Playwright stability and hit-target check; the test remains fail-closed and forbids synthetic/keyboard fallback. The source and CI early preflight tests confirm this. **Real Chromium E2E remains unverified pending new CI**; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit or publishing by assistant.
+
+---
+
 # Quorivio 0.1.0-dev — RC80 — Chromium widget context-menu pointer/hit-test stabilization (31 October 2026)
 
 Failed extended workflow 41218084773, quality job 124586715148, reached real Chromium editor UI and failed when the test expected `Azioni widget text` but found `Menu contestuale sfondo canvas`. The browser test now closes stale background menus, hit-tests a visible interior widget pixel with `document.elementFromPoint`, and sends a genuine right-mouse event; no synthetic contextmenu or keyboard substitution. The React widget handler explicitly stops event propagation and clears any pending background long press. New early regression preflight plus archive-closure checks. **RC completion remains 84.75%** (42 accepted, 17 partial / 59). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. The full new native Chromium acceptance must run on GitHub before certification.
