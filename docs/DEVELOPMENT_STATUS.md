@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC100 — CI release metadata and package finalization hotfix (1 November 2026)
+
+**Verified RC readiness: 84.75%** (42 accepted, 17 partial, 59 total). `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+**Latest CI diagnosis:** the maintainer-supplied `logs_111823397377.zip` from RC99, GitHub Actions Production quality gate, runs 30 early historical-documentation tests and fails four checks because all four status/handoff file headers still identify RC98 while the current workflow verifier identifies RC99. The RC99 implementation and historical notes remain intact; RC100 corrects all four active release headers and adds a dependency-free, current-inventory-aware metadata guard, executed before other integration checks.
+
+**Root cause:** the RC99 package assembly appended updates to documentation below archived release sections instead of replacing the active first section, and the preflight test was not rerun on the finalized ZIP. **Regression control:** validate active headers against the current inventory in CI, and re-extract the final ZIP and run both legacy and new tests against the extracted files before delivery. The previous RC99 run stopped before compilation or application integration, so those stages remain unverified for RC100.
+
+**Commit baseline:** maintainer last explicitly confirmed a commit at RC95; RC96–RC100 remain cumulative unless a newer commit is confirmed. No commit/push/tag/release is performed by the assistant. EUPL-1.2 and version 0.1.0-dev remain unchanged.
+
+---
+
 # Quorivio 0.1.0-dev — RC98 — TypeScript build hotfix after standard CI (1 November 2026)
 
 **Verified RC readiness: 84.75%** (42 accepted, 17 partial, 59 total). `rc_strict=false`, `publish_image=false`, `publish_latest=false`.

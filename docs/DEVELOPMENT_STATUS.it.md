@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC100 — correzione metadati release e verifica package CI (1 novembre 2026)
+
+**Completamento RC certificato: 84,75%** (42 gate accettati, 17 parziali su 59). `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+**Diagnosi nuova CI:** l'archivio `logs_111823397377.zip` relativo alla RC99 mostra 30 test iniziali di documentazione, con 4 fallimenti: i quattro file status/handoff hanno ancora RC98 nell'intestazione attiva, mentre il verificatore corrente della CI è RC99. RC100 corregge le quattro intestazioni senza rimuovere gli archivi storici e aggiunge un guard dinamico e test negativi per impedire il ripetersi del problema.
+
+**Causa:** la preparazione RC99 aveva accodato le note nuove alle sezioni storiche senza sostituire il sommario iniziale; il controllo non era stato rieseguito sullo ZIP conclusivo. RC100 prevede una validazione dello ZIP riestratto in una cartella pulita dopo la generazione di hash e inventario. La CI RC99 si è fermata prima dei controlli di compilazione e integrazione, che rimangono da verificare.
+
+**Baseline commit:** ultima conferma esplicita RC95; RC96–RC100 cumulativi salvo nuova conferma. Nessun commit/push/tag/release effettuato. Versione 0.1.0-dev e licenza EUPL-1.2 invariate.
+
+---
+
 # Quorivio 0.1.0-dev — RC98 — hotfix compilazione TypeScript dopo CI standard (1 novembre 2026)
 
 **Avanzamento RC verificato: 84,75%** (42 gate accettati, 17 parziali su 59); `rc_strict=false`, `publish_image=false`, `publish_latest=false`.

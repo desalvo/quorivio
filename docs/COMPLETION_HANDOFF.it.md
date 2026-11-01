@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC100 — correzione metadati release e verifica package CI (1 novembre 2026)
+
+**Completamento RC certificato: 84,75%** (42 gate accettati, 17 parziali su 59). `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+**Handoff:** RC100 è cumulativo rispetto al commit RC95 confermato; include le modifiche RC96–RC99. Novità RC100: intestazioni RC100 in tutti e quattro i file di stato, controllo dinamico `tools/verify_rc_release_status.py`, test negativi contro intestazioni obsolete, preflight aggiuntivo obbligatorio nella CI standard.
+
+**CI precedente:** archivio `logs_111823397377.zip`, Production quality gate RC99: 4 fallimenti su 30 test documentali perché le intestazioni erano RC98, anziché RC99. Nessun altro job applicativo RC99 è stato raggiunto in quella esecuzione.
+
+**Verifiche richieste:** rieseguire CI standard ed estesa sul nuovo commit, includendo suite Python completa e controlli in browser; percentuale certificata invariata 84,75%. L'archivio RC100 deve essere riestratto e verificato dopo averne generato inventario e hash, con test legacy e nuovi. Nessuna operazione sul repository remoto.
+
+---
+
 # Quorivio 0.1.0-dev — RC98 — hotfix compilazione TypeScript dopo CI standard (1 novembre 2026)
 
 **Avanzamento RC verificato: 84,75%** (42 gate accettati, 17 parziali su 59); `rc_strict=false`, `publish_image=false`, `publish_latest=false`.

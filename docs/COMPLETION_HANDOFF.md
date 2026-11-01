@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC100 — CI release metadata and package finalization hotfix (1 November 2026)
+
+**Verified RC readiness: 84.75%** (42 accepted, 17 partial, 59 total). `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+**Carry-forward handoff:** cumulative RC100 includes all RC96–RC99 fixes since the maintainer-confirmed RC95 commit. New RC100 changes: update the active header in all four docs to RC100; add the dynamic metadata guard `tools/verify_rc_release_status.py`; add negative regression tests that reject stale release headers; enforce the guard in standard CI before other unit and integration work.
+
+**Observed failure:** RC99 standard CI artifact `logs_111823397377.zip`, Production quality gate, 4 failures out of 30 document tests (each file still headed RC98 despite current RC99 inventory). This happened before the rest of the pipeline. **Required next validation:** standard + extended GitHub CI on RC100, especially full Python suite and browser/runtime gates; current RC completion remains 84.75% without another accepted gate.
+
+**Packaging invariant:** after assembling and hashing the cumulative source tree, extract the finalized ZIP to a fresh directory, run `verify_rc_release_status.py`, legacy RC96 release-status tests and the new RC100 tests, then verify source/ZIP SHA-256 catalogs. No remote actions were performed.
+
+---
+
 # Quorivio 0.1.0-dev — RC98 — TypeScript build hotfix after standard CI (1 November 2026)
 
 **Verified RC readiness: 84.75%** (42 accepted, 17 partial, 59 total). `rc_strict=false`, `publish_image=false`, `publish_latest=false`.

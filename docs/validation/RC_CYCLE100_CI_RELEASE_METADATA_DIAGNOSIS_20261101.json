@@ -1,0 +1,24 @@
+{
+  "version": "0.1.0-dev",
+  "cycle": 100,
+  "source_log": "logs_111823397377.zip",
+  "workflow_job": "Production quality gate",
+  "phase": "Validate historical documentation acceptance early",
+  "tests_run": 30,
+  "failures": 4,
+  "error": "four active documentation headers had RC98, current inventory was RC99",
+  "modified_documents": [
+    "DEVELOPMENT_STATUS.md",
+    "COMPLETION_HANDOFF.md",
+    "DEVELOPMENT_STATUS.it.md",
+    "COMPLETION_HANDOFF.it.md"
+  ],
+  "new_guard": "tools/verify_rc_release_status.py",
+  "new_regressions": "tools/tests/test_rc_cycle100_release_status_guard.py",
+  "release_ready": false,
+  "certified_score": 84.75,
+  "accepted_gates": 42,
+  "partial_gates": 17,
+  "last_explicitly_confirmed_commit": "RC95",
+  "upstream_ci_validation": "pending"
+}
