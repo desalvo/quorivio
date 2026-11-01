@@ -39,3 +39,39 @@ test('27 rejects prototype pollution keys',()=>{reject(mutate(x=>Object.definePr
 test('28 rejects constructor pollution in nested object',()=>reject(mutate(x=>x.draft.widgets[0].style=JSON.parse('{"constructor":{"prototype":{"polluted":true}}}')),'unsafe_draft_key'));
 test('29 stale v2 merges independent recovered and server changes',()=>{const b=base(),l={...b,questionHeader:'Local'},r={...b,resultHeader:'Server'};const backup=read(exportV2(l,b));const plan=planPageDraftRecovery(backup,4);assert.equal(plan.mode,'reconcile');const out=mergePageDrafts(backup.base_draft!,backup.draft,r);assert.equal(out.conflicts.length,0);assert.equal(out.draft.questionHeader,'Local');assert.equal(out.draft.resultHeader,'Server')});
 test('30 stale v2 conflicting edits require explicit choice',()=>{const b=base(),l={...b,questionHeader:'Local'},r={...b,questionHeader:'Server'};const backup=read(exportV2(l,b));const out=mergePageDrafts(backup.base_draft!,backup.draft,r);assert.equal(out.conflicts.length,1);assert.equal(mergePageDrafts(backup.base_draft!,backup.draft,r,{'/questionHeader':'local'}).draft.questionHeader,'Local')});
+
+// RC121: export must be compatible with legitimate optional UI widget props.
+test('31 export omits undefined optional widget props and nested styles without mutating editor state',()=>{
+ const source=base();
+ (source.widgets[0] as any).showTitle=undefined;
+ (source.widgets[0] as any).style={fillColor:'#123456',answerBold:undefined,nested:{label:undefined,strokeWidth:2}};
+ const saved=read(exportV2(source,source));
+ const widget=saved.draft.widgets[0] as any;
+ assert.equal('showTitle' in widget,false);
+ assert.equal('answerBold' in widget.style,false);
+ assert.equal('label' in widget.style.nested,false);
+ assert.equal(widget.style.fillColor,'#123456');
+ assert.equal(widget.style.nested.strokeWidth,2);
+ assert.equal('showTitle' in (source.widgets[0] as any),true);
+ assert.equal('answerBold' in (source.widgets[0] as any).style,true);
+ assert.deepEqual(saved.base_draft?.widgets,saved.draft.widgets);
+});
+test('32 export refuses undefined array elements instead of silently changing positions',()=>{
+ const source=base();(source.widgets[0] as any).options=['yes',undefined,'no'];
+ assert.throws(()=>exportV2(source,source),/invalid_draft_value/);
+});
+test('33 export refuses invalid nested values and non-finite geometry',()=>{
+ const source=base();(source.widgets[0] as any).position.width=Infinity;
+ assert.throws(()=>exportV2(source,source),/invalid_draft_number/);
+ const source2=base();(source2.widgets[0] as any).formatter=()=>{};
+ assert.throws(()=>exportV2(source2,source2),/invalid_draft_value/);
+});
+test('34 export retains prototype-pollution protection after optional-prop normalization',()=>{
+ const source=base();(source.widgets[0] as any).optional=undefined;
+ Object.defineProperty(source.widgets[0],'__proto__',{value:{polluted:true},enumerable:true});
+ assert.throws(()=>exportV2(source,source),/unsafe_draft_key/);
+});
+test('35 export rejects cyclic graph without mutating the input',()=>{
+ const source=base();const cyclic:any={color:'#123456'};cyclic.self=cyclic;(source.widgets[0] as any).style=cyclic;
+ assert.throws(()=>exportV2(source,source),/invalid_draft_value/);
+});

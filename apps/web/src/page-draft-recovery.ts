@@ -40,9 +40,38 @@ export function parsePageDraftBackup(content:string,sessionId:string,activityId:
  const base=raw.format==='quorivio-local-draft-v2'?validateEditablePageDraft(raw.base_draft):undefined;
  return {format:raw.format as PageDraftBackup['format'],session_id:sessionId,activity_id:activityId,base_revision:raw.base_revision,draft,base_draft:base};
 }
+/** Turn in-memory widget props into lossless JSON before validating an export.
+ * React widget state may contain OPTIONAL object properties set to undefined;
+ * JSON.omit semantics are correct for those props, but undefined array items,
+ * non-finite numbers, functions and cyclic objects are never valid draft data.
+ * The original draft is not mutated. Import validation stays strict.
+ */
+function jsonDraftValue(value:unknown, seen:WeakSet<object>=new WeakSet(), inArray=false):unknown{
+ if(value===undefined){if(inArray)throw Error('invalid_draft_value');return undefined}
+ if(value===null||typeof value==='string'||typeof value==='boolean')return value;
+ if(typeof value==='number'){if(!Number.isFinite(value))throw Error('invalid_draft_number');return value}
+ if(typeof value!=='object'||seen.has(value))throw Error('invalid_draft_value');
+ seen.add(value);
+ let result:unknown;
+ if(Array.isArray(value))result=value.map(item=>jsonDraftValue(item,seen,true));
+ else if(isRecord(value)){
+  const out:Record<string,unknown>=Object.create(null);
+  for(const [key,item] of Object.entries(value)){
+   if(item!==undefined)out[key]=jsonDraftValue(item,seen);
+  }
+  result=out;
+ }else throw Error('invalid_draft_value');
+ seen.delete(value);
+ return result;
+}
+function exportReadyPageDraft(draft:EditablePageDraft):EditablePageDraft{
+ // Required page-level fields must never be removed by optional-prop cleanup.
+ if(!isRecord(draft)||!Array.isArray(draft.widgets))throw Error('invalid_page_draft');
+ return validateEditablePageDraft({...draft,widgets:draft.widgets.map(widget=>jsonDraftValue(widget))});
+}
 export function createPageDraftBackup(sessionId:string,activityId:string,revision:number,draft:EditablePageDraft,base:EditablePageDraft):PageDraftBackup{
  if(!sessionId||!activityId||!validDesignRevision(revision))throw Error('invalid_draft_identity');
- return {format:'quorivio-local-draft-v2',session_id:sessionId,activity_id:activityId,base_revision:revision,draft:validateEditablePageDraft(draft),base_draft:validateEditablePageDraft(base)};
+ return {format:'quorivio-local-draft-v2',session_id:sessionId,activity_id:activityId,base_revision:revision,draft:exportReadyPageDraft(draft),base_draft:exportReadyPageDraft(base)};
 }
 export type RecoveryPlan={mode:'restore'|'reconcile'|'blocked';reason?:string};
 export function planPageDraftRecovery(backup:PageDraftBackup,serverRevision:number):RecoveryPlan{

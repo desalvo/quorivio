@@ -29,7 +29,8 @@ class EditorMergeRecovery(unittest.TestCase):
  def test_rebase_retains_remote_revision(self):
   self.assertIn('loadedDesignRevision.current=mergeCandidate.revision',MAIN)
  def test_json_draft_export_is_user_initiated(self):
-     self.assertIn('onClick={()=>{downloadPageDraftFor(a);setPageThumbMenu(',MAIN)
+     self.assertIn('onClick={()=>{try{downloadPageDraftFor(a);setPageExportError',MAIN)
+     self.assertIn('className="page-editor-export-error" role="alert"',MAIN)
      self.assertIn('createPageDraftBackup(selected,designActivity',MAIN)
      self.assertIn('Esporta layout JSON',MAIN)
  def test_browser_acceptance_uses_real_database_not_mock(self):
