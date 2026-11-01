@@ -13,7 +13,9 @@ class ChromiumWidgetTitleEditing(unittest.TestCase):
   self.assertIn('setEditing(w.id);requestAnimationFrame',UI)
   self.assertIn('>Modifica titolo</button>',UI)
   self.assertIn("<RichWidgetText value={w.kind==='title'?widgetDisplay(w,{pageTitle,masterTitleStyle}).title",UI)
-  self.assertIn("active={editing===w.id&&w.kind!=='footer'",UI)
+  # Footer is now editable through the same rich-text path as the title.
+  self.assertIn('active={editing===w.id}',UI)
+  self.assertIn("w.kind==='footer'?widgetDisplay(w,{sessionTitle,pageNumber}).center",UI)
   self.assertIn("ariaLabel={'Titolo '+w.kind}",UI)
   self.assertNotIn('readOnly={editing!==w.id}',UI)
  def test_wysiwyg_finishes_on_enter_without_forcing_a_click(self):

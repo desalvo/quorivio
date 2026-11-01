@@ -27,7 +27,8 @@ class VisualParity20261028(unittest.TestCase):
   self.assertIn('validWidgetInlineMarks(w.textMarks)',(R/'apps/api/src/domain.ts').read_text())
   self.assertIn('WidgetStyledText',UI)
   self.assertIn('widgetTypographyStyle(w.style)',UI)
-  self.assertIn("textSelection.current={id:w.id,field:'label'",UI)
+  self.assertIn("onSelection={r=>recordTextSelection(w.id,'label',r)}",UI)
+  self.assertIn('textSelection.current=next',UI)
  def test_real_mobile_stage_retains_coordinates(self):
   self.assertIn('left:var(--stage-x)!important',CSS)
   self.assertIn('.audience-widget-layout>.page-widget[style*="--stage-x"]',CSS)

@@ -10,7 +10,10 @@ class DashboardNavigationTypes(unittest.TestCase):
         ui = (ROOT / 'apps/web/src/main.tsx').read_text(encoding='utf-8')
         self.assertIn("useState<'workspace'|'new'|'open'|'calendar'|'session'|'master'|'users'|'settings'|'sso'|'mfa'|'profile'>", ui)
         self.assertIn("([['users','Gestione utenti'],['settings','Impostazioni server']] as const)", ui)
-        self.assertIn('onClick={()=>setDashboardPage(key)}', ui)
+        # Navigation must now run the dirty-slide-scheme confirmation guard.
+        self.assertIn('onClick={()=>navigateDashboard(key)}', ui)
+        self.assertIn('function navigateDashboard(page:typeof dashboardPage)', ui)
+        self.assertIn('if(confirmSchemaNavigation())setDashboardPage(page)', ui)
 
 
 if __name__ == '__main__':

@@ -1,0 +1,28 @@
+{
+  "version": "0.1.0-dev",
+  "cycle": 99,
+  "source_log": "logs_111821227952.zip",
+  "step": "Kubernetes wizard and worker integration tests",
+  "observed_python_tests": 1527,
+  "observed_failures": 7,
+  "observed_errors": 1,
+  "source_contract_fixes": [
+    "test_canvas_context_menu",
+    "test_ci_browser_editor_readonly_title",
+    "test_dashboard_navigation_types",
+    "test_live_freshness_cycle55",
+    "test_rc_cycle46_quality_gate",
+    "test_rc_presenter_linked_preview_20261028",
+    "test_visual_parity_rehearsal_20261028"
+  ],
+  "pptx_fix": "native RGB stroke without positive width inherits 1 pt on import; Quorivio new borderless default and explicit 0 export remain unchanged",
+  "local_focused_tests": 55,
+  "local_focused_status": "passed",
+  "full_python_suite": "not completed (local timeout)",
+  "npm_build": "not independently verified locally (incomplete offline dependencies)",
+  "github_ci_rc99": "pending",
+  "certified_score": 84.75,
+  "accepted_gates": 42,
+  "partial_gates": 17,
+  "maintainer_confirmed_commit_baseline": "RC95"
+}

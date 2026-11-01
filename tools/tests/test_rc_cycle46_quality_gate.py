@@ -17,7 +17,13 @@ class Cycle46QualityGate(unittest.TestCase):
 
     def test_current_canvas_has_both_media_sources_and_upload_callbacks(self):
         source=(ROOT/'apps/web/src/main.tsx').read_text()
-        self.assertRegex(source,r'<WidgetCanvas\b[\s\S]*?assets=\{assets\}\s+backgrounds=\{backgrounds\}\s+sessionId=\{selected\}\s+onUpload=\{uploadWidgetMedia\}\s+assetBusy=\{assetBusy\}')
+        import re
+        calls = re.findall(r'<WidgetCanvas\b[\s\S]*?/>', source)
+        self.assertTrue(any(all(token in call for token in (
+            'assets={assets}', 'backgrounds={backgrounds}',
+            'sessionId={selected}', 'onUpload={uploadWidgetMedia}',
+            'assetBusy={assetBusy}', 'joinCode={snap.session.join_code}',
+        )) for call in calls))
         self.assertIn('onBackgroundSelect=', source)
         self.assertIn('onBackgroundUpload=', source)
 

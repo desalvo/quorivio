@@ -707,3 +707,14 @@ Repository `desalvo/quorivio`, branch default; `0.1.0-dev`. Maintainer-confirmed
 **Readiness:** keep the externally certified score at **84.75%** (42 accepted and 17 partial gates). The new functionality is awaiting a fresh standard/extended GitHub acceptance run; do not claim it has passed on RC90.
 
 **Final local regression evidence:** Node API 565/565, Node frontend 134/134; 15 focused Python contract/PPTX tests passed. Full Python and complete conversion/infrastructure runs not certified locally due to execution timeout. Browser semantics and visual slide-master UX must be accepted in maintainer-triggered GitHub CI after the next commit.
+
+
+## 2026-11-01 — RC99: full-Python CI compatibility and native PowerPoint outline round-trip
+
+**Upstream confirmed by maintainer:** RC95 was committed. RC96–RC99 form a cumulative uncommitted set after that commit; do not push, tag, release, or commit automatically. Version `0.1.0-dev` and EUPL-1.2 are unchanged.
+
+**Diagnosis:** GitHub standard run supplied as `logs_111821227952.zip` passes RC98 TypeScript compilation, Node units, PostgreSQL integration, and reaches the final `Kubernetes wizard and worker integration tests` phase. Its 1,527 Python tests return 7 contract failures and 1 native PowerPoint error. The historic source tests asserted literal JSX snippets removed by later valid features (e.g. joinCode inserted among WidgetCanvas props, guarded sidebar navigation, dedicated PresenterLiveScreen useLive, enabling footer rich-text editing, selected text style helper). Every one was updated to test the current semantic contract, without skipping tests or reverting new functionality. Full JSON/media callbacks, live subscriptions, dirty-schema confirmation and selected-text behavior remain asserted.
+
+**Actual export defect:** a PPTX shape can encode an explicit RGB stroke without positive line width (theme-inherited width). On import, `strokeColor` was retained but `strokeWidth` was not, so the new borderless-by-default export silently removed the outline. Native PPTX import now promotes the inherited theme stroke to 1 pt, without changing Quorivio's default border 0 or borderless native export. Added explicit visible-outline and borderless-outline round-trip tests.
+
+**Local evidence:** all 55 focused Python tests pass, including eight previously failing CI tests and the new borderless regression. Full local Python suite exceeded execution limit; full npm build could not run reproducibly due to incomplete offline npm dependency tree; both remain unverified on this revision. Build successfully completed in the supplied RC98 GitHub CI logs before failing downstream. Current RC99 requires GitHub standard and extended acceptance. Certified RC score unchanged **84.75% (42 accepted, 17 partial)**.

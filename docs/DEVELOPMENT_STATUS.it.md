@@ -2461,3 +2461,12 @@ I collaudi reali drag/rotate, upload autenticato e anteprime dopo questo codice 
 **Readiness:** keep the externally certified score at **84.75%** (42 accepted and 17 partial gates). The new functionality is awaiting a fresh standard/extended GitHub acceptance run; do not claim it has passed on RC90.
 
 **Final local regression evidence:** Node API 565/565, Node frontend 134/134; 15 focused Python contract/PPTX tests passed. Full Python and complete conversion/infrastructure runs not certified locally due to execution timeout. Browser semantics and visual slide-master UX must be accepted in maintainer-triggered GitHub CI after the next commit.
+
+
+## 2026-11-01 — RC99: compatibilità CI Python e contorni PowerPoint
+
+Baseline confermata tramite commit: RC95. RC96–RC99 sono cumulativi non ancora confermati come committati. Versione `0.1.0-dev`, licenza EUPL-1.2 invariate; nessun commit/push/tag automatico.
+
+Dai log `logs_111821227952.zip`: build TypeScript e test Node/PostgreSQL superati; nello step finale 1.527 test Python, 7 fallimenti di contratti frontend con vecchie asserzioni su frammenti JSX e 1 errore di esportazione PowerPoint. Aggiornati i controlli al comportamento corrente, mantenendo i gate. Corretta l'importazione dei bordi PowerPoint con colore RGB esplicito e spessore ereditato: ora resta visibile nell'esportazione a 1 pt, senza modificare il default 0 dei widget creati in Quorivio. Test di regressione per contorni visibili e assenti.
+
+Verifiche locali: **55/55 test mirati OK**; suite Python locale completa interrotta per timeout; build npm completa non verificabile a causa di dipendenze offline incomplete. CI standard ed estesa RC99 da rieseguire. Completamento certificato **84,75% (42 gate accettati, 17 parziali)**, invariato.

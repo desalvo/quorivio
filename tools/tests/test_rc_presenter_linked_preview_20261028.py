@@ -24,7 +24,9 @@ class PresenterLinkedPreview(unittest.TestCase):
   self.assertIn('changeRehearsalReaction(previous,pageKey,widgetId,value)',SRC)
   self.assertIn('Nessuna risposta di prova viene salvata',SRC)
  def test_one_full_widget_and_one_selected_text_style_path(self):
-  self.assertIn('formatTextRange(w.textMarks||[]',SRC)
+  # Selected text is styled through the canonical overlap-aware helper.
+  self.assertIn('applySelectionInlineStyle(w.textMarks||[]',SRC)
+  self.assertIn('formatTextRange(marks,field,part.start,part.end,pending.style)',SRC)
   self.assertIn('editing===w.id',SRC)
   self.assertIn('patch(w.id,{style:{...style,...changes}})',SRC)
   self.assertIn('Dimensione del testo',SRC)

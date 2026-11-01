@@ -20,7 +20,15 @@ class ContextMediaContract(unittest.TestCase):
         src = (ROOT / 'apps/web/src/main.tsx').read_text()
         # The canvas now receives both session media and collaborator background
         # libraries. JSX may wrap these independent props across several lines.
-        self.assertRegex(src, r'<WidgetCanvas\b[\s\S]*?assets=\{assets\}\s+backgrounds=\{backgrounds\}\s+sessionId=\{selected\}\s+onUpload=\{uploadWidgetMedia\}\s+assetBusy=\{assetBusy\}')
+        # Check the actual editor JSX invocation, not a particular prop order:
+        # joinCode and future session-scoped props may be inserted safely.
+        import re
+        calls = re.findall(r'<WidgetCanvas\b[\s\S]*?/>', src)
+        self.assertTrue(any(all(token in call for token in (
+            'assets={assets}', 'backgrounds={backgrounds}',
+            'sessionId={selected}', 'onUpload={uploadWidgetMedia}',
+            'assetBusy={assetBusy}', 'joinCode={snap.session.join_code}',
+        )) for call in calls))
         self.assertIn('onBackgroundSelect=', src)
         self.assertIn('onBackgroundUpload=', src)
         self.assertIn('Sostituisci file', src)

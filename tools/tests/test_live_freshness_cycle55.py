@@ -31,7 +31,10 @@ class LiveFreshnessCycle55(unittest.TestCase):
     def test_presenter_and_projector_consume_live_status(self):
         self.assertIn('setPresenterLive',self.ui)
         self.assertIn('createLiveConnection({',self.ui)
-        self.assertIn('useLive(publicId||undefined,setPublicSnap,setScreenLive)',self.ui)
+        # The dedicated presenter stage owns its own authenticated connection.
+        self.assertIn('function PresenterLiveScreen(',self.ui)
+        self.assertIn('useLive(sessionId,setData,setConnection)',self.ui)
+        self.assertIn('useLive(entry?.session?.id,',self.ui)
         self.assertIn('live-stale-warning',self.ui)
         self.assertIn('role="status" aria-live="polite"',self.ui)
         self.assertIn('.live-stale-warning',self.css)

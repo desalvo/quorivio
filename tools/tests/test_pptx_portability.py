@@ -82,6 +82,9 @@ class PptxPortability(unittest.TestCase):
             style = portable['activities'][0]['page_design']['widgets'][0]['style']
             self.assertEqual(style['fillColor'], '#12AB34')
             self.assertEqual(style['strokeColor'], '#56789A')
+            # Native PPTX can omit width and inherit the Office theme's line.
+            # That must remain visible although Quorivio's new default is 0.
+            self.assertGreater(style['strokeWidth'], 0)
             self.assertTrue(style['rounded'])
             target = Path(d) / 'out.pptx'
             portable_to_pptx(portable, target)
@@ -89,6 +92,26 @@ class PptxPortability(unittest.TestCase):
             self.assertEqual(result.auto_shape_type, MSO_AUTO_SHAPE_TYPE.ROUNDED_RECTANGLE)
             self.assertEqual(str(result.fill.fore_color.rgb), '12AB34')
             self.assertEqual(str(result.line.color.rgb), '56789A')
+
+
+    def test_borderless_native_shape_stays_borderless(self):
+        from pptx import Presentation
+        from pptx.enum.shapes import MSO_AUTO_SHAPE_TYPE
+        with tempfile.TemporaryDirectory() as d:
+            target = Path(d) / 'borderless.pptx'
+            portable_to_pptx({
+                'format': 'quorivio-session', 'version': 1,
+                'session': {'title': 'Borderless'},
+                'activities': [{'id': 'a', 'type': 'slide', 'title': 'A',
+                    'page_design': {'widgets': [{
+                        'id': 'w', 'kind': 'postit', 'label': 'No outline',
+                        'position': {'x': 1, 'y': 1, 'width': 40, 'height': 30},
+                        'style': {'shapeType': 'rounded-rectangle', 'strokeColor': '#56789A', 'strokeWidth': 0}
+                    }]}}]
+            }, target)
+            exported = Presentation(target).slides[0].shapes[0]
+            self.assertEqual(exported.auto_shape_type, MSO_AUTO_SHAPE_TYPE.ROUNDED_RECTANGLE)
+            self.assertEqual(exported.line.fill.type, __import__('pptx.enum.dml', fromlist=['MSO_FILL']).MSO_FILL.BACKGROUND)
 
     def test_rectangular_autoshape_remains_editable(self):
         from pptx import Presentation

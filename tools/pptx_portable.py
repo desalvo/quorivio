@@ -383,10 +383,13 @@ def _native_shape_paint(shape):
             style['strokeNone'] = True
         elif line.color.type == MSO_COLOR_TYPE.RGB:
             style['strokeColor'] = '#' + str(line.color.rgb)
-            if line.width is not None:
-                width = round(line.width.pt, 3)
-                if 0.25 <= width <= 12:
-                    style['strokeWidth'] = width
+            # An explicit native RGB stroke is visible even if width is omitted
+            # and inherited from the PowerPoint theme. Since Quorivio widgets
+            # default to strokeWidth=0, preserve that imported native outline
+            # with a modest 1 pt width rather than dropping it on re-export.
+            width = round(line.width.pt, 3) if line.width is not None and line.width.pt > 0 else 1.0
+            if 0.25 <= width <= 12:
+                style['strokeWidth'] = width
             dash = {MSO_LINE_DASH_STYLE.SOLID: 'solid',
                     MSO_LINE_DASH_STYLE.DASH: 'dash',
                     MSO_LINE_DASH_STYLE.ROUND_DOT: 'dot'}.get(line.dash_style)
