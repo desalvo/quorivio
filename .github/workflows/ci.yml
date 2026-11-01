@@ -146,6 +146,8 @@ jobs:
             tools.tests.test_topic_linked_results_rc_20261028 -q
       - name: Validate RC79 cumulative archive receipt closure before npm
         run: python3 -m unittest tools.tests.test_rc_cycle79_inventory_closure -q
+      - name: RC122 historical browser ordering and dynamic release score preflight before npm
+        run: PYTHONPATH=tools python3 -m unittest tools.tests.test_rc_cycle122_historical_preflight tools.tests.test_ci_browser_editor_readonly_title tools.tests.test_live_heartbeat_cycle56 -q
       - name: RC121 JSON backup export and visible errors preflight before npm
         run: python3 -m unittest tools.tests.test_rc_cycle121_json_export -q
       - name: RC120 always-visible autosave conflict regression before npm
@@ -820,7 +822,8 @@ jobs:
           python3 tools/verify_rc_cycle118_inventory.py --historical
           python3 tools/verify_rc_cycle119_inventory.py --historical
           python3 tools/verify_rc_cycle120_inventory.py --historical
-          python3 tools/verify_rc_cycle121_inventory.py
+          python3 tools/verify_rc_cycle121_inventory.py --historical
+          python3 tools/verify_rc_cycle122_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

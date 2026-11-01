@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC122 — Recupero contratti storici Chromium e handoff (1 novembre 2026)
+
+**Full CI precedente:** `41347115255`, commit `993189dd67cd555825afdbbf77e7352e5148cde4`: compilazione, Chromium e browser PostgreSQL inclusa esportazione JSON superati. La suite Python avanzata ha trovato soltanto due contratti storici superati: comandi Chromium obbligatoriamente consecutivi e percentuale cercata soltanto nei primi 1.300 caratteri dell'handoff inglese.
+
+**RC122:** i test ora verificano l'ordine obbligatorio nella fase PostgreSQL reale, anche con controllo intermedio sul conflitto. La percentuale dell'intera sezione attiva deriva dal registro dei gate. Aggiunti cinque test positivi/negativi e verifica preventiva prima di npm. Nessuna modifica all'applicazione; conservati controlli e inventari storici.
+
+**Completamento certificato:** **85,25%**; 43 gate accettati, 17 parziali su 60, invariato; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full CI GitHub RC122 da eseguire; nessun commit/push/pubblicazione dall'assistente.
+
+**Messaggio di commit dopo RC121:** `Align historical browser ordering and handoff progress checks with current CI contracts [full-ci]`.
+
+---
+
 # Quorivio 0.1.0-dev — RC121 — Esportazione JSON delle bozze pagina (1 novembre 2026)
 
 **CI precedente:** GitHub Actions `41341765759`, commit `494416c3cc3c20db6c3da6330ba69d42df51196c`, ha superato compilazione TypeScript/React, Chromium iniziale, prove dei partecipanti con PostgreSQL e verifiche reali di salvataggio/conflitto/riconciliazione. Si è fermata all'esportazione JSON nel test `ci_browser_editor_postgres.py`: `page.expect_download()` senza download. L'artefatto diagnostico della CI riporta `JS errors: ['invalid_draft_value']`; il menu della miniatura è rimasto aperto. I job successivi sono stati saltati.

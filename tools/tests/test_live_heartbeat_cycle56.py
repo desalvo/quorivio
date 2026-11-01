@@ -44,6 +44,11 @@ class LiveHeartbeatCycle56(unittest.TestCase):
         d=(ROOT/'docs/COMPLETION_HANDOFF.md').read_text()
         self.assertIn('cycles 49–56',d)
         self.assertIn('64aa34379a07ba6a91c7eebf6f91e6dc12e3ad5c',d)
-        self.assertRegex(d[:1300],r'8[2-9]\.\d{2}%')
+        # The newest release section may grow as new RC evidence is added.
+        # Check the *ledger-derived* English score in that section, not a
+        # brittle byte range or a permanently hard-coded percentage band.
+        from rc_gate_audit import audit
+        section=d.split('\n---\n',1)[0]
+        self.assertIn(f"{audit()['score']:.2f}%",section)
 
 if __name__=='__main__':unittest.main()

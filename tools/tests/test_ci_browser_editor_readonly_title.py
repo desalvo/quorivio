@@ -1,5 +1,6 @@
 """WYSIWYG editor title regression across real Chromium and PostgreSQL E2E."""
 import unittest
+import re
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
 BROWSER=(ROOT/'tools/ci_browser_editor_postgres.py').read_text()
@@ -46,7 +47,18 @@ class ChromiumWidgetTitleEditing(unittest.TestCase):
   self.assertNotIn('dangerouslySetInnerHTML',RICH)
  def test_opt_in_ci_runs_browser_preflight_before_database_browser(self):
   workflow=(ROOT/'.github/workflows/ci.yml').read_text()
-  self.assertIn('python3 tools/ci_widget_title_menu.py\n          python3 tools/ci_browser_editor_postgres.py',workflow)
+  # Assert the actual PostgreSQL acceptance job executes the title-menu
+  # preflight before the real browser. New safety preflights may run between.
+  # Do not rely on an adjacent two-line literal: that can reject stronger CI.
+  match=re.search(r'(?m)^      - name: Chromium editor PostgreSQL persistence and conflict acceptance \(opt-in\)\n(?P<body>.*?)(?=^      - name:|\Z)',workflow,re.S|re.M)
+  self.assertIsNotNone(match,'PostgreSQL Chromium acceptance step was removed')
+  commands=re.findall(r'(?m)^          python3 (tools/ci_[a-z0-9_]+\.py)\s*$',match.group('body'))
+  self.assertIn('tools/ci_widget_title_menu.py',commands)
+  self.assertIn('tools/ci_browser_editor_postgres.py',commands)
+  self.assertLess(commands.index('tools/ci_widget_title_menu.py'),commands.index('tools/ci_browser_editor_postgres.py'))
+  # The revised test must keep the conflict-visibility guard ahead of the live test.
+  self.assertIn('tools/ci_browser_editor_conflict_visibility.py',commands)
+  self.assertLess(commands.index('tools/ci_browser_editor_conflict_visibility.py'),commands.index('tools/ci_browser_editor_postgres.py'))
  def test_mock_chromium_uses_current_editable_contract(self):
   mock=(ROOT/'tools/ci_widget_title_menu.py').read_text()
   self.assertIn('contenteditable="false"',mock)

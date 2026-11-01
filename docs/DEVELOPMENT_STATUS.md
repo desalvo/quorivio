@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC122 — Historical CI contract alignment (1 November 2026)
+
+**Previous full CI:** GitHub Actions `41347115255` on commit `993189dd67cd555825afdbbf77e7352e5148cde4` passed frontend compilation, Chromium and PostgreSQL browser acceptance, and backup JSON export. It failed in the late Python integration suite, where two historical tests asserted adjacent browser commands and scanned only the first 1,300 characters of the English handoff for progress.
+
+**RC122 fix:** retain real browser and conflict-visibility preflights, validate their execution order within the same workflow job independent of additional preflights, and check the first handoff section against the live gate ledger without arbitrary byte limits. Added five positive/negative source contracts and an early CI step running both historical suites before npm. Application code unchanged. Previous inventory preserved immutable; no attempt to hide failures.
+
+**Certified completion:** **85.25%**; 43 accepted / 17 partial gates out of 60, unchanged. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. RC122 GitHub full CI not yet executed; no assistant commit, push, or publication.
+
+**Suggested commit since RC121:** `Align historical browser ordering and handoff progress checks with current CI contracts [full-ci]`.
+
+---
+
 # Quorivio 0.1.0-dev — RC121 — Safe page-draft JSON export (1 November 2026)
 
 **Previous full CI:** GitHub Actions `41341765759` at commit `494416c3cc3c20db6c3da6330ba69d42df51196c` passed the React/TypeScript build, early Chromium editor acceptance, PostgreSQL audience tests, and the real editor's autosave/conflict/merge flow, then failed on `page.expect_download()` in `tools/ci_browser_editor_postgres.py`. The downloaded failure artifact reported `JS errors: ['invalid_draft_value']`; the page-thumbnail context menu remained open with no export. Downstream RC jobs were skipped.
