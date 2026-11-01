@@ -112,11 +112,15 @@ jobs:
       - name: Validate RC campaign dispatch isolation before dependencies
         run: python3 -m unittest tools.tests.test_rc_cycle77_dispatch_isolation -q
       - name: Validate RC102 editor and explicit commit CI/publish safety before dependencies
-        run: python3 -m unittest tools.tests.test_rc_cycle102_editor_and_commit_markers -q
+        run: |
+          python3 -m unittest tools.tests.test_rc_cycle102_editor_and_commit_markers -q
+          python3 -m unittest tools.tests.test_rc103_native_thumbnail_reconciliation -q
       - name: Validate active RC release headers against the current inventory
         run: |
           PYTHONPATH=tools python3 tools/verify_rc_release_status.py
           PYTHONPATH=tools python3 -m unittest tools.tests.test_rc_cycle100_release_status_guard -q
+      - name: Validate RC105 floating dialogs and selection-only resize geometry before npm
+        run: python3 -m unittest tools.tests.test_rc105_editor_floating -q
       - name: Validate RC101 horizontal widget rail and visible editor stage before npm
         run: |
           python3 -m unittest tools.tests.test_rc_cycle101_horizontal_editor_layout -q
@@ -261,6 +265,8 @@ jobs:
           # Actual editor geometry: expanded keyboard/touch controls must not cover Save.
           python3 tools/ci_editor_save_flow_chromium.py
           python3 tools/ci_editor_mock_layout_chromium.py
+          # RC105: selected-only, pixel-aligned handles and viewport-floating palette.
+          python3 tools/ci_editor_floating_layout_chromium.py
           # Regression: a fixed mock header may cover the 7px canvas corner after scrolling.
           python3 tools/ci_canvas_context_hit_target_chromium.py
           # Real Chromium regression: header must not intercept canvas context
@@ -624,7 +630,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq --no-install-recommends poppler-utils libreoffice-impress fonts-dejavu-core
-          python3 -m pip install --disable-pip-version-check --break-system-packages 'reportlab>=4,<5' 'python-pptx>=1.0,<2' 'Pillow>=11,<14' 'aiohttp>=3.9,<4'
+          python3 -m pip install --disable-pip-version-check --break-system-packages 'reportlab>=4,<5' 'python-pptx>=1.0,<2' 'Pillow>=11,<14' 'qrcode==8.2' 'aiohttp>=3.9,<4'
           python3 -c 'import reportlab' # fail gate rather than skipping the PDF rendering test
           python3 -c 'import pptx, aiohttp' # enforce PPTX and load-test integration prerequisites
       # Explicitly run native PPTX regression cases only after python-pptx is present.
@@ -634,6 +640,10 @@ jobs:
           python3 -m unittest \
             tools.tests.test_rc74_footer_corner.FooterCornerRC74.test_powerpoint_number_at_exact_slide_right_and_bottom_without_text_insets \
             tools.tests.test_rc91_scheme_stage.GlobalMasterRegressions.test_native_pptx_inherits_scheme_with_absolute_number_and_local_title_override -q
+      - name: Verify RC103 native participant QR export to PowerPoint
+        run: python3 -m unittest tools.tests.test_rc103_participant_qr_pptx -v
+      - name: Verify RC104 native editable rich-text PowerPoint roundtrip
+        run: python3 -m unittest tools.tests.test_rc104_pptx_inline_text_roundtrip -v
       - name: Kubernetes wizard and worker integration tests
         run: |
           python3 tools/ci_inventory_reference_guard.py
@@ -743,7 +753,10 @@ jobs:
           python3 tools/verify_rc_cycle99_inventory.py --historical
           python3 tools/verify_rc_cycle100_inventory.py --historical
           python3 tools/verify_rc_cycle101_inventory.py --historical
-          python3 tools/verify_rc_cycle102_inventory.py
+          python3 tools/verify_rc_cycle102_inventory.py --historical
+          python3 tools/verify_rc_cycle103_inventory.py --historical
+          python3 tools/verify_rc_cycle104_inventory.py --historical
+          python3 tools/verify_rc_cycle105_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

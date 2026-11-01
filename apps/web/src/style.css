@@ -1417,3 +1417,66 @@ header.rehearsal-toolbar{height:auto;min-height:0;flex:0 0 auto;position:relativ
   max-height:calc(100dvh - 82px - env(safe-area-inset-bottom,0px))!important;
  }
 }
+
+/* RC105: resize handles belong to the widget BORDER BOX, not the typography
+ * flow. Earlier art-theme rules promoted direct children to position:relative
+ * and legacy !important rules displayed every handle even when not selected. */
+.editor-ux-v2 .widget-canvas-item > .widget-resize-edge,
+.editor-ux-v2 .widget-canvas-item > .widget-rotate-handle {
+  position:absolute!important;display:none!important;visibility:hidden!important;
+  opacity:0!important;pointer-events:none!important;z-index:170!important;
+  margin:0!important;padding:0!important;
+}
+.editor-ux-v2 .widget-canvas-item[data-selected="true"] > .widget-resize-edge,
+.editor-ux-v2 .widget-canvas-item[data-selected="true"] > .widget-rotate-handle {
+  display:block!important;visibility:visible!important;opacity:1!important;
+  pointer-events:auto!important;
+}
+/* Explicit edge-centred geometry survives transforms and artistic widget themes. */
+.editor-ux-v2 .widget-canvas-item > .widget-resize-edge.edge-n {left:50%!important;top:0!important;right:auto!important;bottom:auto!important;transform:translate(-50%,-50%)!important}
+.editor-ux-v2 .widget-canvas-item > .widget-resize-edge.edge-ne {right:0!important;top:0!important;left:auto!important;bottom:auto!important;transform:translate(50%,-50%)!important}
+.editor-ux-v2 .widget-canvas-item > .widget-resize-edge.edge-e {right:0!important;top:50%!important;left:auto!important;bottom:auto!important;transform:translate(50%,-50%)!important}
+.editor-ux-v2 .widget-canvas-item > .widget-resize-edge.edge-se {right:0!important;bottom:0!important;left:auto!important;top:auto!important;transform:translate(50%,50%)!important}
+.editor-ux-v2 .widget-canvas-item > .widget-resize-edge.edge-s {left:50%!important;bottom:0!important;right:auto!important;top:auto!important;transform:translate(-50%,50%)!important}
+.editor-ux-v2 .widget-canvas-item > .widget-resize-edge.edge-sw {left:0!important;bottom:0!important;right:auto!important;top:auto!important;transform:translate(-50%,50%)!important}
+.editor-ux-v2 .widget-canvas-item > .widget-resize-edge.edge-w {left:0!important;top:50%!important;right:auto!important;bottom:auto!important;transform:translate(-50%,-50%)!important}
+.editor-ux-v2 .widget-canvas-item > .widget-resize-edge.edge-nw {left:0!important;top:0!important;right:auto!important;bottom:auto!important;transform:translate(-50%,-50%)!important}
+.editor-ux-v2 .widget-canvas-item > .widget-rotate-handle {left:50%!important;top:-27px!important;right:auto!important;bottom:auto!important;transform:translateX(-50%)!important}
+/* Non-selected widgets do not show editor-only remove controls. */
+.editor-ux-v2 .widget-canvas-item:not([data-selected="true"]) > .canvas-remove,
+.editor-ux-v2 .widget-canvas-item:not([data-selected="true"]) > .canvas-layer-tools {visibility:hidden!important;opacity:0!important;pointer-events:none!important}
+
+/* Floating editor windows: fixed to the viewport, draggable by the title bar,
+ * never participate in the canvas grid or change the slide dimensions. */
+.editor-floating-panel {position:fixed!important;z-index:12000!important;right:auto!important;bottom:auto!important;box-sizing:border-box;touch-action:auto}
+.editor-floating-panel .palette-ribbon-head,
+.editor-floating-panel .editor-drawer-heading {cursor:grab;user-select:none;touch-action:none}
+.editor-floating-panel .palette-ribbon-head:active,
+.editor-floating-panel .editor-drawer-heading:active {cursor:grabbing}
+.editor-floating-panel .palette-ribbon-head button,
+.editor-floating-panel .editor-drawer-heading button {cursor:pointer;touch-action:manipulation}
+body .editor-floating-panel.widget-selection-palette {
+  position:fixed!important;max-width:calc(100vw - 16px)!important;
+  width:min(850px,calc(100vw - 16px))!important;
+  max-height:calc(100dvh - 16px)!important;margin:0!important;
+  overflow:hidden!important;z-index:12000!important;
+}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-groups {overflow:auto;max-height:calc(100dvh - 72px)}
+.editor-ux-v2 .editor-context-drawer.editor-floating-panel {
+  position:fixed!important;right:auto!important;bottom:auto!important;
+  width:min(420px,calc(100vw - 16px))!important;
+  max-height:calc(100dvh - 16px)!important;overflow:auto!important;
+  z-index:12001!important;
+}
+@media(max-width:520px){body .editor-floating-panel.widget-selection-palette{width:calc(100vw - 16px)!important}}
+
+/* Popup hosts preserve the existing editor-specific property form styling, but
+   are display:contents in the document portal: no viewport-sized backdrop, no
+   grid reflow, and no nested z-index trapping below the typography ribbon. */
+.editor-ux-v2.editor-floating-scope {
+  position:static!important;inset:auto!important;z-index:auto!important;
+  display:contents!important;isolation:auto!important;
+  background:none!important;overflow:visible!important;
+  margin:0!important;padding:0!important;pointer-events:none!important;
+}
+.editor-ux-v2.editor-floating-scope > .editor-floating-panel {pointer-events:auto!important}

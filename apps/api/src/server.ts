@@ -1348,7 +1348,16 @@ app.get('/api/sessions/:id/export.pptx',requireAuth,async(req,res)=>{
   const scratch=path.join(process.env.QUORIVIO_CONVERSION_DIR||'/conversions',randomBytes(16).toString('hex'));
   await mkdir(scratch,{recursive:false,mode:0o700});
   try{
-   const portable=JSON.stringify(await portableSession(s.id));
+   const pptxDefinition=await portableSession(s.id);
+   // A QR in an exported deck must be scannable after download. Supply only
+   // the authenticated owner's session-specific public join link; do not
+   // persist that bearer in the reusable JSON import/export format.
+   const exportHasQr=pptxDefinition.activities.some((a:any)=>(a.page_design?.widgets||[]).some((w:any)=>w.kind==='qr'));
+   if(exportHasQr){
+    if(!s.join_secret)throw Error('participant_qr_link_unavailable');
+    pptxDefinition.session.participant_join_url=`${publicBase}/join/${s.join_secret}`;
+   }
+   const portable=JSON.stringify(pptxDefinition);
    if(Buffer.byteLength(portable)>2*1024*1024){res.status(413).json({error:'session_too_large_for_pptx'});return}
    await writeFile(path.join(scratch,'portable.json'),portable,{flag:'wx',mode:0o600});
    // Stage only referenced, session-owned image assets for the isolated PPTX worker.

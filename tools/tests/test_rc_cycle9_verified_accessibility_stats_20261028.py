@@ -65,7 +65,10 @@ class Cycle9Acceptance(unittest.TestCase):
     def test_human_acceptance_remains_explicit(self):
         for parent in ['A1','A2','A3','A4','B1','B2','B3','B4','C1','C2','C3','C4','D2','D3','D4','D5','D6']:
             self.assertEqual(self.g[parent]['status'],'partial')
-        self.assertIn('Firefox/WebKit',self.g['A2']['remaining'])
+        # Native Firefox/WebKit DnD was independently CI-proven in RC103;
+        # human visual, physical touch and operator sign-off remain mandatory.
+        self.assertIn('physical iOS/Android',self.g['A2']['remaining'])
+        self.assertIn('operator',self.g['A2']['remaining'])
         self.assertIn('screen-reader',self.g['A4']['remaining'])
         self.assertIn('external',self.g['C3']['remaining'].lower())
         self.assertFalse(preflight()['release_candidate_ready'])

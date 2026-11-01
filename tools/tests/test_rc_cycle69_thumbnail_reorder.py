@@ -20,14 +20,14 @@ class ThumbnailReorderCycle69(unittest.TestCase):
 
  def test_verified_download_is_distinct_from_prior_thumbnails_and_autosave(self):
   g=self.gates
-  self.assertEqual((g['A2']['weight'],g['A2']['status']),(3,'partial'))
+  self.assertEqual((g['A2']['weight'],g['A2']['status']),(2,'partial'))
   self.assertEqual((g['A2-PAGE-JSON']['weight'],g['A2-PAGE-JSON']['status']),(1,'accepted'))
   self.assertEqual(g['A2-ORDER']['weight'],2)
   self.assertEqual(g['A2-PAGE-JSON']['verified_run_id'],41191751069)
   self.assertEqual(g['A2-PAGE-JSON']['verified_job_id'],124509777927)
   self.assertEqual(g['A2-PAGE-JSON']['verified_commit_sha'],self.receipt['source']['commit_sha'])
   self.assertIn('pixel-accurate',g['A2']['remaining'])
-  self.assertIn('Firefox/WebKit',g['A2']['remaining'])
+  self.assertIn('physical iOS/Android',g['A2']['remaining'])
   self.assertIn('not merely a visible menu',g['A2-PAGE-JSON']['scope'])
   self.assertNotEqual(g['A2-PAGE-JSON']['scope'],g['A2-ORDER']['scope'])
 
@@ -66,8 +66,8 @@ class ThumbnailReorderCycle69(unittest.TestCase):
   self.assertFalse(self.matrix['rc_cycle69_thumbnail_export_reconciliation_20261031']['native_dnd_promoted'])
 
  def test_conservative_progress_and_publication_guard(self):
-  p=preflight();self.assertEqual((audit()['score'],p['score'],campaign_audit()['certified_score']),(84.75,)*3)
-  self.assertEqual((p['gate_count'],p['accepted_gates'],len(p['unaccepted_gates'])),(59,42,17))
+  p=preflight();self.assertEqual((audit()['score'],p['score'],campaign_audit()['certified_score']),(85.25,)*3)
+  self.assertEqual((p['gate_count'],p['accepted_gates'],len(p['unaccepted_gates'])),(60,43,17))
   self.assertEqual(sum(x['weight'] for x in self.matrix['gates']),100)
   self.assertFalse(p['release_candidate_ready'])
   self.assertEqual(self.receipt['accounting']['delta_points'],0.5)

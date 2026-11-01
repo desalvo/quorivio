@@ -40,12 +40,27 @@
     {
       "id": "A2",
       "area": "A-editor",
-      "weight": 3,
+      "weight": 2,
       "status": "partial",
-      "evidence": "Slide thumbnails, order and duplication implemented with keyboard alternative; strict UUID/permutation validation and 8 focused tests (2026-10-24) 2026-10-26 uncommitted: full 16:9 page thumbnails with position-aware preview, menu-based insert before/after, duplication beside source and deletion; drag/drop and keyboard fallback, saved position via /pages/order. Requires real browser verification. Full Chromium 40382686414 exposed menu-on-trigger pointer interception in a one-page session; CSS and actual pointer hit-test fixture corrected locally, CI pending.\nFull opt-in Chromium editor completed in 40517573850, including thumbnail menu and mobile hit testing. Newly added Alt+ArrowUp/Down, keyboard focus return and aria-live order feedback are LOCAL TESTED ONLY, pending next GitHub build/browser. Pixel-accurate thumbnails and cross-engine DnD not independently verified.\n2026-10-27 post-6395b0b: shared style type parity, transparent image fill and widget inspector delete confirmation fixed; local tests PASS. Actual widget-by-widget PostgreSQL persistence, projection parity and cross-browser visual acceptance outstanding. No status promotion.\n2026-10-27 standard push CI 40588408394 on 0bb8fb7856727699384dfe51aea6ee6d961ea022 SUCCESS for quality gate and container build (Docker publication skipped). Opt-in Full CI 40589103128 reached 6 real Chromium preflights PASS but FAILED in tools/ci_browser_editor.py:106 when fixed .editor-mock-header blocked background contextual selection-entry pointer, before real PostgreSQL Chromium acceptance. A viewport-anchored CSS fix for both contextual menu and arrangement panels plus a real desktop/touch Chromium regression was validated LOCALLY only; older CSS gives a genuine header hit-target failure, updated CSS PASS. No gate promotion pending a fresh successful full CI and independent visual/AT review.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: Chromium editor thumb/menu/pointer and responsive editor preflights PASS; physical pixel fidelity and cross-engine drag/drop unverified. Strict RC gate was skipped; status unchanged.\n2026-10-28 local visual parity batch: editor projection-backed widget contents; 16:9 desktop/mobile geometry and rectangular tooltips Chromium preflight PASS; draft participant rehearsal/fullscreen; inline options and persistent bounded typography spans; backend/frontend builds, Node 454+36 PASS. New Full CI and visual operator/physical assistive technology sign-off PENDING. 2026-10-28 local uncommitted: per-widget source-linked results, independent presenter-only rendering, side-by-side simulated presenter/audience and responsive 16:9 CSS; Node backend 455/455, web 44/44, Python focused 58/58, Chromium offline CSS pointer+geometry 1440/390 PASS. New full GitHub Chromium+PostgreSQL pending; this is NOT acceptance evidence.\n2026-10-28: verified remote evidence in GitHub Actions 40717525524 separated as narrow A2-ORDER subgate; parent stays partial and independent acceptance remains required.",
-      "remaining": "Independent pixel-accurate thumbnail/page comparisons, Firefox/WebKit native page drag-and-drop, physical touchscreen and operator acceptance still required. Bounded Chromium filmstrip/keyboard actions are credited in A2-ORDER, while the separately observed browser-downloaded page JSON artifact is credited in A2-PAGE-JSON. RC69 lost-response reorder reconciliation and cross-engine DnD acceptance remain unverified until new CI.",
+      "evidence": "Slide thumbnails, order and duplication implemented with keyboard alternative; strict UUID/permutation validation and 8 focused tests (2026-10-24) 2026-10-26 uncommitted: full 16:9 page thumbnails with position-aware preview, menu-based insert before/after, duplication beside source and deletion; drag/drop and keyboard fallback, saved position via /pages/order. Requires real browser verification. Full Chromium 40382686414 exposed menu-on-trigger pointer interception in a one-page session; CSS and actual pointer hit-test fixture corrected locally, CI pending.\nFull opt-in Chromium editor completed in 40517573850, including thumbnail menu and mobile hit testing. Newly added Alt+ArrowUp/Down, keyboard focus return and aria-live order feedback are LOCAL TESTED ONLY, pending next GitHub build/browser. Pixel-accurate thumbnails and cross-engine DnD not independently verified.\n2026-10-27 post-6395b0b: shared style type parity, transparent image fill and widget inspector delete confirmation fixed; local tests PASS. Actual widget-by-widget PostgreSQL persistence, projection parity and cross-browser visual acceptance outstanding. No status promotion.\n2026-10-27 standard push CI 40588408394 on 0bb8fb7856727699384dfe51aea6ee6d961ea022 SUCCESS for quality gate and container build (Docker publication skipped). Opt-in Full CI 40589103128 reached 6 real Chromium preflights PASS but FAILED in tools/ci_browser_editor.py:106 when fixed .editor-mock-header blocked background contextual selection-entry pointer, before real PostgreSQL Chromium acceptance. A viewport-anchored CSS fix for both contextual menu and arrangement panels plus a real desktop/touch Chromium regression was validated LOCALLY only; older CSS gives a genuine header hit-target failure, updated CSS PASS. No gate promotion pending a fresh successful full CI and independent visual/AT review.\n2026-10-27 GitHub Actions 40595463258 (commit e2dc3a97bd15d82a50c23a98b1fb83c2bd1841c9) quality gate PASS: Chromium editor thumb/menu/pointer and responsive editor preflights PASS; physical pixel fidelity and cross-engine drag/drop unverified. Strict RC gate was skipped; status unchanged.\n2026-10-28 local visual parity batch: editor projection-backed widget contents; 16:9 desktop/mobile geometry and rectangular tooltips Chromium preflight PASS; draft participant rehearsal/fullscreen; inline options and persistent bounded typography spans; backend/frontend builds, Node 454+36 PASS. New Full CI and visual operator/physical assistive technology sign-off PENDING. 2026-10-28 local uncommitted: per-widget source-linked results, independent presenter-only rendering, side-by-side simulated presenter/audience and responsive 16:9 CSS; Node backend 455/455, web 44/44, Python focused 58/58, Chromium offline CSS pointer+geometry 1440/390 PASS. New full GitHub Chromium+PostgreSQL pending; this is NOT acceptance evidence.\n2026-10-28: verified remote evidence in GitHub Actions 40717525524 separated as narrow A2-ORDER subgate; parent stays partial and independent acceptance remains required.\n2026-11-01 GitHub 41265300884 verified native compiled React Chromium, Firefox and WebKit thumbnail drag/drop, rejected PUT, lost response after commit and Alt+ArrowUp persisted order. Awarded a separate A2-NATIVE-DND1 bounded subgate with disjoint coverage.",
+      "remaining": "Independent pixel-accurate thumbnail/page comparison on a representative slide corpus, physical iOS/Android touchscreen and human operator accessibility/visual acceptance. Cross-engine automated DnD with lost acknowledgment, rejected writes and keyboard fallback is credited independently as A2-NATIVE-DND; no physical device, independent PostgreSQL multi-editor deployment or manual approval was exercised.",
       "current_verified_run": 40717525524,
       "pending_local_evidence_20261028": "WYSIWYG and independent-question implementation passes local TypeScript/Vite, 461 Node API, 46 frontend, 33 focused Python, Chromium component desktop/mobile. Unverified by GitHub and real PostgreSQL; prior accepted gates unchanged."
+    },
+    {
+      "id": "A2-NATIVE-DND",
+      "area": "A-editor",
+      "weight": 1,
+      "status": "accepted",
+      "scope": "Built production React filmstrip, Playwright native Chromium/Firefox/WebKit actual HTML DragEvent at 1440px and 390px; deterministic committed PUT response loss with authoritative readback, rejected update without phantom reorder, Alt+ArrowUp persisted keyboard fallback. Independent of A2-ORDER filmstrip layout/keyboard source contracts and A2-PAGE-JSON browser file download.",
+      "evidence": "GitHub Actions workflow_dispatch extended RC 41265300884 commit b3d753e06f6eca2bf771bae7699c65f9370ed399 SUCCESS. Production quality job 124726769311 executed python3 tools/ci_page_thumbnail_native.py --engines chromium; native Firefox/WebKit job 124728693190 SUCCESS, logged four PASS lines for native drag/drop and persistence at 1440px/390px. Final campaign summary job 124729530852 reports 11/11 required job results success. See docs/validation/RC_CYCLE103_NATIVE_THUMBNAIL_RECONCILIATION_20261101.json.",
+      "remaining": "Maintain three-engine production React DnD/readback tests. Physical hardware touch, independent multi-editor PostgreSQL conflict and pixel-accurate operator acceptance remain in A2.",
+      "verified_run_id": 41265300884,
+      "verified_commit_sha": "b3d753e06f6eca2bf771bae7699c65f9370ed399",
+      "verified_job_ids": [
+        124726769311,
+        124728693190
+      ]
     },
     {
       "id": "A2-ORDER",
@@ -1707,5 +1722,38 @@
     "strict_rc_ready": false,
     "publish_image": false,
     "publish_latest": false
+  },
+  "rc_cycle103_native_thumbnail_reconciliation_20261101": {
+    "date": "2026-11-01",
+    "verified_run_id": 41265300884,
+    "verified_sha": "b3d753e06f6eca2bf771bae7699c65f9370ed399",
+    "quality_job_id": 124726769311,
+    "native_browser_job_id": 124728693190,
+    "final_campaign_job_id": 124729530852,
+    "campaign_required_success": "11/11",
+    "before_score": 84.75,
+    "after_score": 85.25,
+    "delta_points": 0.5,
+    "gate_count_before": 59,
+    "gate_count_after": 60,
+    "accepted_before": 42,
+    "accepted_after": 43,
+    "partial_unchanged": 17,
+    "parent_A2_weight_before": 3,
+    "parent_A2_weight_after": 2,
+    "new_scope": "Native browser DnD+lost PUT response+HTTP rejection+keyboard saved order",
+    "no_double_credit": [
+      "A2-ORDER",
+      "A2-PAGE-JSON"
+    ],
+    "not_accepted": [
+      "physical touch devices",
+      "pixel-accurate slide corpus comparison",
+      "independent operator signoff",
+      "production multi-editor PostgreSQL conflict"
+    ],
+    "new_pptx_qr_local_only": true,
+    "rc_strict": false,
+    "docker_published_by_run": false
   }
 }

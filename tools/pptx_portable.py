@@ -20,7 +20,7 @@ from pathlib import Path
 from zipfile import ZipFile, BadZipFile, ZIP_STORED, ZIP_DEFLATED
 import re
 import posixpath
-from urllib.parse import unquote
+from urllib.parse import unquote, urlsplit
 
 MAX_PPTX_BYTES = 50 * 1024 * 1024
 MAX_UNCOMPRESSED_BYTES = 250 * 1024 * 1024
@@ -65,6 +65,74 @@ def _valid_text(value, maximum=MAX_EXPORT_TEXT):
                 for c in value))
 
 
+def _participant_qr_target(session):
+    """Only export the canonical public participant URL supplied by the API.
+
+    PowerPoint QR images are static: rotating a join secret invalidates an
+    already-downloaded slide deck. An unspecified URL is not replaced by a
+    fabricated public link, IP address or presenter authentication URL.
+    """
+    url = session.get('participant_join_url') if isinstance(session, dict) else None
+    if not isinstance(url, str) or not 1 <= len(url) <= 512 or any(c.isspace() for c in url):
+        raise ValueError('Participant QR requires an absolute public joining URL')
+    try:
+        parsed = urlsplit(url)
+        if (parsed.scheme not in ('https', 'http') or not parsed.hostname or
+            parsed.username is not None or parsed.password is not None or
+            parsed.fragment or parsed.query or parsed.port == 0 or
+            not re.fullmatch(r'/join/[A-Za-z0-9_-]{16,100}', parsed.path)):
+            raise ValueError('Invalid participant QR URL')
+    except (ValueError, UnicodeError) as exc:
+        raise ValueError('Invalid participant QR URL') from exc
+    return url
+
+
+def _add_participant_qr(slide, presentation, position, url, image_cache):
+    """Static scannable PNG and editable/clickable raw link on one PPTX slide."""
+    import qrcode
+    from pptx.dml.color import RGBColor
+    from pptx.enum.text import PP_ALIGN, MSO_AUTO_SIZE
+    from pptx.util import Pt
+
+    if url not in image_cache:
+        qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_M,
+                           box_size=8, border=3)
+        qr.add_data(url)
+        qr.make(fit=True)
+        out = io.BytesIO()
+        qr.make_image(fill_color='black', back_color='white').save(out, format='PNG')
+        image_cache[url] = out.getvalue()
+    x, y, width, height = position
+    slide_x = int(presentation.slide_width * x / 100)
+    slide_y = int(presentation.slide_height * y / 100)
+    slide_width = int(presentation.slide_width * width / 100)
+    slide_height = int(presentation.slide_height * height / 100)
+    # Keep space below the square symbol for an editable URL; a wide widget
+    # does not stretch/distort the QR modules and a narrow widget stays square.
+    code_size = max(1, min(slide_width, int(slide_height * .75)))
+    code_left = slide_x + (slide_width - code_size) // 2
+    img = slide.shapes.add_picture(io.BytesIO(image_cache[url]), code_left,
+                                   slide_y, code_size, code_size)
+    img.name = 'QR accesso partecipanti'
+    link_top = slide_y + code_size
+    link_height = max(1, slide_height - code_size)
+    box = slide.shapes.add_textbox(slide_x, link_top, slide_width, link_height)
+    box.name = 'URL accesso partecipanti'
+    frame = box.text_frame
+    frame.clear()
+    frame.word_wrap = True
+    frame.auto_size = MSO_AUTO_SIZE.TEXT_TO_FIT_SHAPE
+    frame.margin_left = frame.margin_right = 0
+    frame.margin_top = frame.margin_bottom = 0
+    para = frame.paragraphs[0]
+    para.alignment = PP_ALIGN.CENTER
+    run = para.add_run()
+    run.text = url
+    run.hyperlink.address = url
+    run.font.size = Pt(9 if width >= 20 else 7)
+    run.font.color.rgb = RGBColor(0, 0, 0)
+
+
 def _validate_export_input(data):
     if not isinstance(data, dict) or data.get('format') != 'quorivio-session' or data.get('version') != 1:
         raise ValueError('Not a Quorivio session definition')
@@ -87,7 +155,7 @@ def _validate_export_input(data):
             if not isinstance(widget, dict):
                 raise ValueError('Invalid widget')
             kind = widget.get('kind')
-            if kind not in ('text', 'postit', 'question', 'timed-quiz', 'image', 'logo', 'title', 'footer'):
+            if kind not in ('text', 'postit', 'question', 'timed-quiz', 'image', 'logo', 'title', 'footer', 'qr'):
                 continue  # Other widget kinds have no native PowerPoint representation.
             position = widget.get('position', {'x': 5, 'y': 5, 'width': 90, 'height': 20})
             if not isinstance(position, dict):
@@ -121,6 +189,7 @@ def _validate_export_input(data):
                 value = widget.get(key)
                 if value is not None and not _valid_text(value):
                     raise ValueError('Invalid widget text')
+            _validate_inline_marks(widget)
             style = widget.get('style', {})
             if not isinstance(style, dict):
                 raise ValueError('Invalid widget style')
@@ -161,6 +230,185 @@ def _validate_export_input(data):
 
 
 SUPPORTED_FONTS = {"Arial", "Georgia", "Verdana", "Tahoma", "Trebuchet MS", "monospace"}
+
+
+# RC104: the same bounded UTF-16 mark representation as the React editor and
+# API.  Never ingest HTML or user-provided OOXML markup for text styling.
+INLINE_STYLE_KEYS = frozenset(('fontFamily', 'fontSize', 'color', 'bold', 'italic',
+                               'underline', 'strikethrough'))
+INLINE_FIELD_RE = re.compile(
+    r'^(?:label|description|option:[A-Za-z0-9_-]{1,40}|'
+    r'question:[A-Za-z0-9_-]{1,40}:(?:label|description|option:[A-Za-z0-9_-]{1,40}))$')
+
+
+def _validate_inline_marks(widget):
+    marks = widget.get('textMarks', [])
+    if not isinstance(marks, list) or len(marks) > 64:
+        raise ValueError('Invalid widget inline text marks')
+    for mark in marks:
+        if (not isinstance(mark, dict) or set(mark) - {'field','start','end','style'} or
+            not isinstance(mark.get('field'), str) or not INLINE_FIELD_RE.fullmatch(mark['field']) or
+            type(mark.get('start')) is not int or type(mark.get('end')) is not int or
+            not 0 <= mark['start'] < mark['end'] <= 500):
+            raise ValueError('Invalid widget inline text range')
+        override = mark.get('style')
+        if not isinstance(override, dict) or set(override) - INLINE_STYLE_KEYS:
+            raise ValueError('Invalid widget inline text style')
+        for key, value in override.items():
+            if key in ('bold','italic','underline','strikethrough'):
+                valid = isinstance(value, bool)
+            elif key == 'fontFamily':
+                valid = isinstance(value, str) and value in SUPPORTED_FONTS
+            elif key == 'color':
+                valid = isinstance(value, str) and bool(re.fullmatch(r'#[0-9a-fA-F]{6}', value))
+            else:
+                valid = type(value) in (int,float) and math.isfinite(value) and 10 <= value <= 96
+            if not valid:
+                raise ValueError('Invalid widget inline text style')
+    return marks
+
+
+def _utf16_boundaries(value):
+    # JS selectionStart and styledSegments use UTF-16, Python slices use codepoints.
+    positions = [0]
+    for ch in value:
+        positions.append(positions[-1] + (2 if ord(ch) > 0xFFFF else 1))
+    return positions
+
+
+def _field_runs(text, field, marks):
+    if not text:
+        return []
+    boundaries = _utf16_boundaries(text)
+    relevant = [m for m in marks if m['field'] == field and
+                m['start'] >= 0 and m['end'] <= boundaries[-1]]
+    # Never split an astral codepoint in the OOXML output; selection marks
+    # touching only half a surrogate are ignored for that character.
+    out = []
+    for start in range(len(text)):
+        a,b = boundaries[start:start+2]
+        effective = {}
+        for mark in relevant:
+            if mark['start'] <= a and mark['end'] >= b:
+                effective.update(mark['style'])
+        if out and out[-1][1] == effective:
+            out[-1] = (out[-1][0] + text[start], effective)
+        else:
+            out.append((text[start], effective))
+    return out
+
+
+def _export_text_parts(widget, activity, session):
+    """Text and corresponding mark field, preserving separators and labels.
+
+    Derived page/master titles use the editor's label field; a full description
+    stored by the text widget uses only the description mark field.
+    """
+    kind = widget.get('kind')
+    label = str(widget.get('label') or '')
+    if kind == 'title' and widget.get('titleFollowPage') is not False:
+        label = str(activity.get('title') or label)
+    if kind == 'footer' and widget.get('footerShowSessionTitle') is not False:
+        label = str(session.get('title') or '')
+    description = widget.get('description')
+    if kind in ('text','postit'):
+        if isinstance(description, str) and description.startswith(label):
+            return [(description, 'description')]
+        # The browser projects two separate fields when description does not
+        # start with label. Preserve each field's independent format marks.
+        return [(label,'label')] + ([('\n',None), (description,'description')]
+                                   if description else [])
+    parts = [(label,'label')]
+    if kind in ('question','timed-quiz'):
+        for option in widget.get('options', [])[:12]:
+            parts.extend([('\n',None),(str(option.get('label','')),'option:'+str(option.get('id','')))])
+    elif description and description != label:
+        parts.extend([('\n',None), (str(description),'description')])
+    return parts
+
+
+def _set_export_rich_text(box, parts, marks, base_style):
+    """Create editable PowerPoint native runs with independently styled spans."""
+    from pptx.enum.text import PP_ALIGN
+    from pptx.util import Pt
+    from pptx.dml.color import RGBColor
+    frame = box.text_frame
+    frame.clear()
+    para = frame.paragraphs[0]
+    align = base_style.get('textAlign')
+    alignment = {'left': PP_ALIGN.LEFT,'center':PP_ALIGN.CENTER,'right':PP_ALIGN.RIGHT}.get(align)
+    if alignment is not None: para.alignment = alignment
+    for content, field in parts:
+        fragments = _field_runs(content, field, marks) if field else [(content,{})]
+        for fragment, overrides in fragments:
+            lines = fragment.split('\n')
+            for index, line in enumerate(lines):
+                if index:
+                    para = frame.add_paragraph()
+                    if alignment is not None: para.alignment = alignment
+                if not line: continue
+                run = para.add_run()
+                run.text = line
+                style = {**base_style, **overrides}
+                font = run.font
+                name = style.get('fontFamily')
+                if isinstance(name, str) and name in SUPPORTED_FONTS: font.name = name
+                size = style.get('fontSize')
+                if type(size) in (int,float) and math.isfinite(size):
+                    font.size = Pt(max(10, min(96, size)))
+                for key in ('bold','italic','underline'):
+                    if isinstance(style.get(key),bool): setattr(font,key,style[key])
+                color = style.get('color')
+                if isinstance(color,str) and re.fullmatch(r'#[0-9a-fA-F]{6}',color):
+                    font.color.rgb = RGBColor.from_string(color[1:])
+                # python-pptx 1.0.2 does not expose strike on Font. a:rPr
+                # supports this native OOXML attribute; values are fixed tokens.
+                if isinstance(style.get('strikethrough'),bool):
+                    font._rPr.set('strike', 'sngStrike' if style['strikethrough'] else 'noStrike')
+
+
+def _pptx_import_text_marks(frame, base_style, maximum=500):
+    """Recover native per-run styling as editable, bounded description marks.
+
+    The imported editor text widgets display the whole text in description;
+    all offsets must therefore refer to that field, not the shorter UI label.
+    """
+    marks=[]
+    offset=0
+    for i, paragraph in enumerate(frame.paragraphs):
+        if i: offset += 1  # pptx text_frame.text uses a newline per paragraph
+        for run in paragraph.runs:
+            width=_utf16_boundaries(run.text)[-1]
+            if not width:
+                continue
+            override={}
+            font=run.font
+            if font.name in SUPPORTED_FONTS and font.name != base_style.get('fontFamily'):
+                override['fontFamily']=font.name
+            if font.size is not None:
+                size=max(10,min(96,round(font.size.pt)))
+                if size!=base_style.get('fontSize'): override['fontSize']=size
+            for key in ('bold','italic','underline'):
+                flag=getattr(font,key)
+                if flag is not None and flag!=base_style.get(key): override[key]=bool(flag)
+            if font._rPr is not None and font._rPr.get('strike') in ('noStrike','sngStrike'):
+                flag=font._rPr.get('strike')=='sngStrike'
+                if flag!=base_style.get('strikethrough',False): override['strikethrough']=flag
+            try:
+                rgb=font.color.rgb
+                if rgb is not None:
+                    color='#'+str(rgb)
+                    if color.upper()!=str(base_style.get('color','')).upper(): override['color']=color
+            except (AttributeError,TypeError,ValueError):
+                pass
+            end=offset+width
+            if override and 0 <= offset < end <= maximum:
+                if marks and marks[-1]['end']==offset and marks[-1]['style']==override:
+                    marks[-1]['end']=end
+                elif len(marks)<64:
+                    marks.append({'field':'description','start':offset,'end':end,'style':override})
+            offset=end
+    return marks
 
 def validate_pptx_archive(source):
     """Reject oversized/bomb-like OOXML packages before python-pptx parses them."""
@@ -581,9 +829,12 @@ def pptx_to_portable(source, title=None, media_dir=None):
                     style['shapeType'] = 'cloud'
                 elif shape.auto_shape_type == MSO_AUTO_SHAPE_TYPE.RECTANGULAR_CALLOUT:
                     style['shapeType'] = 'speech'
+            inline_marks = (_pptx_import_text_marks(shape.text_frame, style)
+                            if shape.has_text_frame else [])
             widgets.append({'id': f'pptx_{index+1}_{len(widgets)+1}', 'kind': widget_kind,
                             'label': text[:240], 'description': text[:500],
-                            'position': position, 'style': style})
+                            'position': position, 'style': style,
+                            **({'textMarks': inline_marks} if inline_marks else {})})
         page_design = {'widgets': widgets}
         background_color = _slide_background(slide)
         if background_color is not None:
@@ -782,6 +1033,7 @@ def portable_to_pptx(data, destination, media_dir=None):
     p = Presentation()
     p.slide_width, p.slide_height = Inches(13.333), Inches(7.5)
     seen_assets = set()
+    qr_image_cache = {}
     total_asset_bytes = 0
     for page_index, activity in enumerate(activities, 1):
         slide = p.slides.add_slide(p.slide_layouts[6])
@@ -803,8 +1055,10 @@ def portable_to_pptx(data, destination, media_dir=None):
         widgets = [{**w,'id':f'inherited-{w["kind"]}'} for w in scheme if w['kind'] not in local_kinds] + widgets
         if len(widgets) > 16:
             raise ValueError('Too many widgets after scheme inheritance')
+        for scheme_widget in scheme:
+            _validate_inline_marks(scheme_widget)
         for widget in widgets:
-            if widget.get('kind') not in ('text', 'postit', 'question', 'timed-quiz', 'image', 'logo', 'title', 'footer'):
+            if widget.get('kind') not in ('text', 'postit', 'question', 'timed-quiz', 'image', 'logo', 'title', 'footer', 'qr'):
                 continue
             position = widget.get('position') or {'x': 5, 'y': 5, 'width': 90, 'height': 20}
             if (widget.get('kind') == 'footer' and all(position.get(key) == value for key,value in
@@ -813,6 +1067,10 @@ def portable_to_pptx(data, destination, media_dir=None):
             x, y, w, h = (float(position.get(k, v)) for k, v in [('x', 5), ('y', 5), ('width', 90), ('height', 20)])
             if not all(math.isfinite(v) for v in (x, y, w, h)) or x < 0 or y < 0 or w <= 0 or h <= 0 or x+w > 100.00001 or y+h > 100.00001:
                 raise ValueError('Invalid widget geometry')
+            if widget.get('kind') == 'qr':
+                _add_participant_qr(slide, p, (x, y, w, h),
+                                    _participant_qr_target(data.get('session')), qr_image_cache)
+                continue
             if widget.get('kind') in ('image', 'logo'):
                 asset_id = widget.get('assetId')
                 try:
@@ -867,22 +1125,18 @@ def portable_to_pptx(data, destination, media_dir=None):
             else:
                 box = slide.shapes.add_textbox(int(p.slide_width*x/100), int(p.slide_height*y/100),
                     int(p.slide_width*w/100), int(p.slide_height*h/100))
-            content = str(widget.get('label') or '')
-            if widget.get('kind') == 'title' and widget.get('titleFollowPage') is not False:
-                content = str(activity.get('title') or content)
-            if widget.get('kind') == 'footer':
-                content = (str((data.get('session') or {}).get('title') or '')
-                           if widget.get('footerShowSessionTitle') is not False else content)
-            # Imports keep the short UI label and a longer editable description.
-            # Export the full text once, instead of repeating the truncated label.
-            description = widget.get('description')
-            if widget.get('kind') in ('text', 'postit') and isinstance(description, str) and description.startswith(content):
-                content = description
-            if widget.get('kind') in ('question', 'timed-quiz'):
-                content += '\n' + '\n'.join(str(o.get('label', '')) for o in widget.get('options', [])[:12])
-            elif widget.get('description') and widget.get('description') != content and widget.get('kind') not in ('text', 'postit'):
-                content += '\n' + str(widget['description'])
+            text_parts = _export_text_parts(widget, activity, data.get('session') or {})
+            content = ''.join(part for part, _ in text_parts)
             box.text = content[:MAX_EXPORT_TEXT]
+            # Marks are intentionally emitted as editable native runs only.
+            # No text run is allowed beyond the portable text quota.
+            remaining = MAX_EXPORT_TEXT
+            clipped_parts = []
+            for piece, field in text_parts:
+                if remaining <= 0: break
+                clipped_parts.append((piece[:remaining], field))
+                remaining -= len(piece[:remaining])
+            text_parts = clipped_parts
             if widget.get('kind') == 'postit' and isinstance(widget.get('style'), dict):
                 from pptx.dml.color import RGBColor
                 colors = widget['style']
@@ -973,6 +1227,10 @@ def portable_to_pptx(data, destination, media_dir=None):
                         if isinstance(color, str) and len(color) == 7 and color.startswith('#'):
                             try: font.color.rgb = RGBColor.from_string(color[1:])
                             except ValueError: pass
+            if widget.get('textMarks'):
+                # Keep the existing base alignment/anchor; rebuild runs only
+                # when there are authored inline styles.
+                _set_export_rich_text(box, text_parts, widget['textMarks'], style)
     destination = Path(destination)
     if destination.exists() or destination.is_symlink():
         raise FileExistsError('PowerPoint destination already exists')

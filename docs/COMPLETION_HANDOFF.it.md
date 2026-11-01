@@ -1,3 +1,34 @@
+# Quorivio 0.1.0-dev — RC105 — handoff popup mobili e ancoraggi widget (1 novembre 2026)
+
+**RC105 handoff:** otto ancoraggi assoluti sul bordo visibili solo sulla selezione, proprietà widget e impostazioni pagina flottanti e trascinabili, palette in portal a posizione fissa senza spostare il canvas e senza perdere la selezione di testo. Documentazione `docs/RC_CYCLE105_FLOATING_EDITOR_AND_RESIZE.it.md`; CI estesa e prova nell’app compilata da confermare.
+**Completamento RC certificato: 85,25%** (43 gate accettati, 17 parziali su 60, peso 100). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. RC definitiva non approvata.
+
+**Baseline ultimo commit confermato:** RC102 `b3d753e06f6eca2bf771bae7699c65f9370ed399` (full CI `41265300884` verde). RC103, RC104 e RC105 sono cumulativi, senza nuovi commit confermati. Nessun commit/push/tag o pubblicazione eseguiti dall'assistente.
+
+**RC104:** in `tools/pptx_portable.py` conversione bidirezionale di `textMarks` con run native modificabili PowerPoint, validazione nel worker, offset UTF-16, gerarchia degli stili e campi separati. Test in `tools/tests/test_rc104_pptx_inline_text_roundtrip.py` eseguiti dopo dipendenze nello workflow CI. Sette regressioni locali native passate, più suite PPTX e test QR RC103; nuova funzionalità non ancora certificata GitHub. Guide dettagliate EN/IT.
+
+**Prossimo passo:** commit RC103+RC104+RC105 con `[full-ci]`, test standard ed estesi, verifica Office/LibreOffice su corpus indipendente, poi audit esterni residui. Il marker `[full-ci]` non pubblica su Docker Hub.
+
+**Messaggio suggerito:** `Add participant QR PowerPoint export and editable rich-text PPTX roundtrip; reconcile thumbnail browser gate [full-ci]`.
+
+---
+
+# Quorivio 0.1.0-dev — RC103 — handoff CI estesa e QR partecipanti PowerPoint (1 November 2026)
+
+**Completamento RC certificato: 85,25%** (43 gate accettati, 17 parziali su 60; peso totale 100). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Non dichiarare RC definitiva né approvazioni indipendenti GDPR/AGID o pubblicazione.
+
+**Ultimo commit confermato:** RC102 SHA `b3d753e06f6eca2bf771bae7699c65f9370ed399`, campagna CI estesa GitHub `41265300884` SUCCESS (11 job obbligatori su 11, 1 novembre 2026). La pubblicazione Docker Hub è stata saltata. RC103 contiene solo modifiche successive al commit; nessun commit/push/tag/deploy da parte dell'assistente.
+
+**Riconciliazione +0,50 punti:** riordino miniature in React compilato con drag-and-drop nativo in Chromium, Firefox e WebKit, viewport 1440/390, recupero dopo commit con risposta persa, rifiuto del riordino e salvataggio con tastiera Alt+Freccia. Job nativo `124728693190`, qualità `124726769311`. Nuovo gate *non duplicato* `A2-NATIVE-DND` accettato, peso 1; residuo A2 da 3 a 2 parziale. I gate storici A2-ORDER/A2-PAGE-JSON restano invariati. Mancano confronto visivo indipendente, dispositivi fisici e revisione operatore. Ricevuta `docs/validation/RC_CYCLE103_NATIVE_THUMBNAIL_RECONCILIATION_20261101.json`.
+
+**Nuovo sviluppo RC103, soltanto verificato localmente:** esportazione PowerPoint del widget QR con codice PNG scansionabile e URL partecipanti leggibile, modificabile e cliccabile sotto. L'API consegna al worker isolato il solo URL pubblico della sessione per deck con widget QR, senza introdurre il bearer nell'export JSON riutilizzabile. Dipendenza Python `qrcode==8.2` bloccata; URL relativi, malformati o del presentatore rifiutati. La revoca del codice di ingresso invalida i QR dei PPTX già scaricati. Test nativi PPTX locali 4/4; da validare integrazione reale browser/API/PostgreSQL/worker e scansione da dispositivo fisico. Zero punti RC per questa nuova funzionalità finché non certificata.
+
+**Prossimi gate:** eseguire `[full-ci]` sul commit RC103, poi completare audit esterni su touchscreen, accessibilità, OIDC, TLS pubblico, RWX/CSI, recupero reale e GDPR/AGID. `[publish-docker]` resta una richiesta distinta soggetta a gate.
+
+**Messaggio di commit monoriga, soltanto post-RC102:** `Reconcile native cross-browser thumbnail gate and export participant QR links in PowerPoint [full-ci]`.
+
+---
+
 # Quorivio 0.1.0-dev — RC102 — handoff menu contestuale e CI dal commit (1 novembre 2026)
 
 **Completamento certificato: 84,75%** (42 accettati/17 parziali su 59). Default `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Versione 0.1.0-dev, licenza EUPL-1.2.

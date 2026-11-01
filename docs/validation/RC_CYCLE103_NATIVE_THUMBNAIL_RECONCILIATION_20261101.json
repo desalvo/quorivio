@@ -1,0 +1,59 @@
+{
+  "project": "Quorivio",
+  "version": "0.1.0-dev",
+  "cycle": 103,
+  "date": "2026-11-01",
+  "source": {
+    "run_id": 41265300884,
+    "url": "https://github.com/desalvo/quorivio/actions/runs/41265300884",
+    "head_sha": "b3d753e06f6eca2bf771bae7699c65f9370ed399",
+    "trigger": "workflow_dispatch",
+    "run_conclusion": "success",
+    "quality_job_id": 124726769311,
+    "native_browser_job_id": 124728693190,
+    "campaign_job_id": 124729530852,
+    "campaign_required_jobs_passed": 11,
+    "campaign_required_jobs_total": 11,
+    "publication_jobs": "skipped"
+  },
+  "bounded_evidence": {
+    "chromium": "tools/ci_page_thumbnail_native.py --engines chromium: succeeded in quality job",
+    "firefox_webkit": {
+      "command": "python3 tools/ci_page_thumbnail_native.py --engines firefox webkit",
+      "logged_pass_records": [
+        "PASS RC69 firefox 1440px native thumbnail DnD, lost PUT response reconciliation, rejection and keyboard persistence",
+        "PASS RC69 firefox 390px native thumbnail DnD, lost PUT response reconciliation, rejection and keyboard persistence",
+        "PASS RC69 webkit 1440px native thumbnail DnD, lost PUT response reconciliation, rejection and keyboard persistence",
+        "PASS RC69 webkit 390px native thumbnail DnD, lost PUT response reconciliation, rejection and keyboard persistence"
+      ]
+    },
+    "fixture_limit": "Built React with in-memory HTTP fixture; actual browser drag events but not actual PostgreSQL multi-editor, deployed hardware or manual visual review"
+  },
+  "accounting": {
+    "before": 84.75,
+    "after": 85.25,
+    "delta": 0.5,
+    "parent_A2_before": 3,
+    "parent_A2_after": 2,
+    "new_subgate_weight": 1,
+    "new_subgate": "A2-NATIVE-DND",
+    "gates_before": 59,
+    "gates_after": 60,
+    "accepted_before": 42,
+    "accepted_after": 43,
+    "partial_before": 17,
+    "partial_after": 17
+  },
+  "nonclaims": [
+    "No promotion of all A2 scope",
+    "No screen-reader or real-device certification",
+    "No public TLS or external CSI/NFS RWX certification",
+    "No RC strict signoff"
+  ],
+  "local_cycle_103": {
+    "pptx_qr_url": "added but not yet certified in GitHub run 41265300884",
+    "requires_new_ci": true,
+    "release_candidate_ready": false,
+    "docker_publication": false
+  }
+}

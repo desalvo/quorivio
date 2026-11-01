@@ -1,3 +1,34 @@
+# Quorivio 0.1.0-dev — RC105 — floating windows and resize geometry handoff (1 November 2026)
+
+**RC105 handoff:** selected-only, absolute eight-edge handle geometry; draggable viewport-constrained property/page windows; ribbon moved to a fixed portal outside canvas layout, preserving text selections. See `docs/RC_CYCLE105_FLOATING_EDITOR_AND_RESIZE.en.md`; new browser and Python contracts are integrated into CI. GitHub full CI and real loaded app drag acceptance remain pending.
+**Certified gate-weighted readiness: 85.25%** (43 accepted, 17 partial / 60 total, total weight 100). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Final release is not approved.
+
+**Maintainer commit baseline RC102:** `b3d753e06f6eca2bf771bae7699c65f9370ed399` (full campaign `41265300884` green). RC103, RC104 and RC105 are additive and not yet committed. Only the maintainer commits or publishes.
+
+**RC104 handoff:** `tools/pptx_portable.py` now translates API-approved `textMarks` to/from native editable PowerPoint runs, including unicode offsets, field identity, style inheritance and validation. New integration tests `tools/tests/test_rc104_pptx_inline_text_roundtrip.py` are explicitly staged after pip deps in `.github/workflows/ci.yml`. Seven cases passed locally before packaging, plus native PPTX suite and RC103 QR tests. This is new uncredited functionality, not external certification. See EN/IT RC104 guides.
+
+**Next maintainer step:** commit cumulative RC103+RC104+RC105 with `[full-ci]`, check CI standard/extended, validate PowerPoint and LibreOffice UI with an external representative deck corpus, then address independent residual gates. Docker Hub publication is not enabled by `[full-ci]`.
+
+**Suggested post-RC102 message:** `Add participant QR PowerPoint export and editable rich-text PPTX roundtrip; reconcile thumbnail browser gate [full-ci]`.
+
+---
+
+# Quorivio 0.1.0-dev — RC103 — full CI evidence and PPTX participant QR handoff (1 November 2026)
+
+**Certified gate-weighted readiness: 85.25%** (43 accepted, 17 partial / 60 total, total weight 100). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Do not declare final RC, independently certified accessibility/privacy or production publication.
+
+**Committed baseline (maintainer):** RC102 SHA `b3d753e06f6eca2bf771bae7699c65f9370ed399`, full RC campaign GitHub Actions `41265300884` SUCCESS (workflow_dispatch, 2026-11-01; 11/11 mandatory jobs). Container publication was skipped. This RC103 package consists only of changes after that commit; no commit/push/tag/deployment/publication by the assistant.
+
+**Evidence reconciliation +0.50 points:** native real-browser thumbnail reordering on compiled React passed Chromium, Firefox and WebKit (desktop 1440 and mobile-size 390). Firefox/WebKit quality job `124728693190` logs native HTML drag-and-drop, authoritative recovery after committed PUT response loss, rejected reorder and Alt+ArrowUp keyboard save. Chromium in quality job `124726769311`. New *disjoint* gate `A2-NATIVE-DND` accepted at weight 1, A2 residual partial weight 3 -> 2; A2-ORDER and A2-PAGE-JSON were already credited. Strict RC still blocked on independently reviewed visual fidelity, physical device and other parent gates. Receipt `docs/validation/RC_CYCLE103_NATIVE_THUMBNAIL_RECONCILIATION_20261101.json`; `docs/RC_GATE_MATRIX.json` is the source of truth.
+
+**RC103 new functionality (LOCAL ONLY; zero acceptance credit):** PowerPoint export now renders each QR widget as a scannable PNG with a readable, editable, clickable participant URL below. The API supplies the canonical public join URL to the isolated converter only for decks containing QR widgets; reusable portable JSON export remains unchanged and does not persist the join credential. The worker includes pinned Python `qrcode==8.2`; malformed, missing, presenter or relative links fail closed rather than becoming misleading QR images. Exported QR decks are static: rotating/revoking the join token makes downloaded codes stale. 4 targeted native PPTX checks; complete GitHub API/export/worker integration and operator scan on a phone still need verification. No claimed fidelity for unrelated interactive widgets.
+
+**Next closure:** get RC103 `[full-ci]` green (standard + optional browser PostgreSQL/cross-browser/container), then schedule external manual audit for physical devices, OIDC providers, public TLS/CSI RWX, accessibility, GDPR and production restore. Keep auto-publication disabled except explicit separately authorized `[publish-docker]` policy.
+
+**Suggested single-line post-RC102 commit:** `Reconcile native cross-browser thumbnail gate and export participant QR links in PowerPoint [full-ci]`.
+
+---
+
 # Quorivio 0.1.0-dev — RC102 — editor context portal and commit-intent CI handoff (1 November 2026)
 
 **Certified readiness: 84.75%** (42 accepted/17 partial out of 59). `rc_strict=false`, `publish_image=false`, `publish_latest=false` by default. Version remains 0.1.0-dev, EUPL-1.2.
