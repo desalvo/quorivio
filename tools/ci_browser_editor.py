@@ -265,6 +265,9 @@ async def main():
    await expect(page.locator('.widget-canvas-item')).to_have_count(5)
    assert not duplication_alerts,duplication_alerts
    page.remove_listener('dialog',observe_duplication_dialog)
+   # One undo must revert the user's duplication, not only an auto-fit side effect.
+   # Focus a non-editable canvas control so Ctrl+Z is handled by the editor.
+   await page.get_by_role('group',name='Allineamento widget selezionati').locator('button:visible').first.focus()
    await page.keyboard.press('Control+z')
    await expect(page.locator('.widget-canvas-item')).to_have_count(3)
    await select_exact_widget_pair(page)

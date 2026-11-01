@@ -34,7 +34,7 @@ import {createLiveConnection} from './live-connection';
 import {reorderWidgetLayers,type LayerAction} from './widget-layer';
 import {existingWidgetIds,deleteWidgetSelection,insertWidgetGroupInFreeSpace,nudgeWidgetSelection} from './widget-selection';
 import {pasteWidget} from './widget-clipboard';
-import {newWidgetHistory,editWidgets,beginWidgetGesture,endWidgetGesture,undoWidgets,redoWidgets} from './widget-history';
+import {newWidgetHistory,editWidgets,reconcileWidgetAutoFit,beginWidgetGesture,endWidgetGesture,undoWidgets,redoWidgets} from './widget-history';
 import {movePageId} from './page-order';
 import {presenterPageIndex,presenterAdjacentPage,presenterKeyboardDirection} from './presenter-navigation';
 import {commitAndReconcilePageOrder} from './page-order-recovery';
@@ -637,7 +637,7 @@ function WidgetSubquestionEditor({widget,onPatch}:{widget:any;onPatch:(changes:R
   <button type="button" onClick={add} disabled={questions.length>=5}>+ Aggiungi domanda indipendente ({questions.length+1}/6)</button>
  </fieldset>;
 }
-function WidgetCanvas({widgets,onChange,pageTitle="",sessionTitle="",pageNumber=1,masterTitleStyle,assets=[],backgrounds=[],sessionId="",joinCode,onUpload,assetBusy=false,backgroundAssetId="",onBackgroundSelect,onBackgroundUpload,onBeginGesture,onEndGesture,onInspectWidget,onSelectionChange,onOpenPageSettings,onRenamePage,onSaveRequested,onContextOpen,dismissContextMenus=false}: {widgets:any[];pageTitle?:string;sessionTitle?:string;pageNumber?:number;masterTitleStyle?:any;onChange:(items:any[])=>void;onBeginGesture?:()=>void;onEndGesture?:()=>void;assets?:any[];backgrounds?:any[];sessionId?:string;joinCode?:string;onUpload?:(widgetId:string,file:File|undefined,kind:string)=>Promise<void>;assetBusy?:boolean;backgroundAssetId?:string;onBackgroundSelect?:(id:string)=>void;onBackgroundUpload?:(file:File|undefined)=>Promise<boolean>;onInspectWidget?:(id:string)=>void;onSelectionChange?:(ids:string[])=>void;onOpenPageSettings?:()=>void;onRenamePage?:()=>void;onSaveRequested?:()=>void;onContextOpen?:()=>void;dismissContextMenus?:boolean}){
+function WidgetCanvas({widgets,onChange,pageTitle="",sessionTitle="",pageNumber=1,masterTitleStyle,assets=[],backgrounds=[],sessionId="",joinCode,onUpload,assetBusy=false,backgroundAssetId="",onBackgroundSelect,onBackgroundUpload,onBeginGesture,onEndGesture,onAutoFit,onInspectWidget,onSelectionChange,onOpenPageSettings,onRenamePage,onSaveRequested,onContextOpen,dismissContextMenus=false}: {widgets:any[];pageTitle?:string;sessionTitle?:string;pageNumber?:number;masterTitleStyle?:any;onChange:(items:any[])=>void;onBeginGesture?:()=>void;onEndGesture?:()=>void;onAutoFit?:(base:any[],fitted:any[])=>void;assets?:any[];backgrounds?:any[];sessionId?:string;joinCode?:string;onUpload?:(widgetId:string,file:File|undefined,kind:string)=>Promise<void>;assetBusy?:boolean;backgroundAssetId?:string;onBackgroundSelect?:(id:string)=>void;onBackgroundUpload?:(file:File|undefined)=>Promise<boolean>;onInspectWidget?:(id:string)=>void;onSelectionChange?:(ids:string[])=>void;onOpenPageSettings?:()=>void;onRenamePage?:()=>void;onSaveRequested?:()=>void;onContextOpen?:()=>void;dismissContextMenus?:boolean}){
  const ref=useRef<HTMLDivElement>(null);
  const contextHold=useRef<ReturnType<typeof setTimeout>|null>(null);
  const widgetHold=useRef<ReturnType<typeof setTimeout>|null>(null);
@@ -784,8 +784,12 @@ function WidgetCanvas({widgets,onChange,pageTitle="",sessionTitle="",pageNumber=
    const accepted:any[]=rejectWidgetCollisions(current,proposal,[w.id]);
    if(accepted.find(z=>z.id===w.id)?.position?.height>p.height+.1)changes=accepted;
   }
-  if(changes)onChange(changes);
- },[widgets,editing]);
+  if(changes){
+   // Layout derived from actual DOM content must not add a second undo entry.
+   // In the page editor the parent reconciles this with the current history.
+   if(onAutoFit)onAutoFit(widgets,changes);else onChange(changes);
+  }
+ },[widgets,editing,onAutoFit]);
  const patch=(id:string,changes:Record<string,unknown>)=>onChange(widgets.map(w=>{
   if(w.id!==id)return w;
   const updated={...w,...changes};
@@ -1177,6 +1181,7 @@ const [widgetHistory,setWidgetHistory]=useState(()=>newWidgetHistory<{id:string;
 const pageWidgets=widgetHistory.present;
 useEffect(()=>{if(inspectedWidget&&!pageWidgets.some(w=>w.id===inspectedWidget))setInspectedWidget('')},[pageWidgets,inspectedWidget]);
 const setPageWidgets:React.Dispatch<React.SetStateAction<typeof pageWidgets>>=(next)=>setWidgetHistory(history=>{const updated=typeof next==='function'?next(history.present):next;const validIds=new Set(updated.map(w=>w.id));return editWidgets(history,updated.map(w=>{if(w.kind!=='results-button'||!w.targetWidgetId)return w;const source=updated.find(s=>s.id===w.targetWidgetId);if(!source)return {...w,targetWidgetId:undefined,targetQuestionId:undefined};if(w.targetQuestionId&&!source.questions?.some(q=>q.id===w.targetQuestionId))return {...w,targetQuestionId:undefined};return w}));});
+const reconcilePageAutoFit=React.useCallback((base:typeof pageWidgets, fitted:typeof pageWidgets)=>setWidgetHistory(h=>reconcileWidgetAutoFit(h,base,fitted)),[]);
 const resetPageWidgets=(next:typeof pageWidgets)=>setWidgetHistory(newWidgetHistory(next));
 const undoPageWidgets=()=>setWidgetHistory(undoWidgets);
 const redoPageWidgets=()=>setWidgetHistory(redoWidgets);
@@ -1834,7 +1839,7 @@ me===undefined?<main id="main-content" className="narrow">Caricamento...</main>:
 </aside>
 <div className="editor-stage">
  <div className="editor-canvas-slot">
-  <WidgetCanvas key={`${selected}:${designActivity}`} widgets={pageWidgets} pageTitle={snap.activities.find(a=>a.id===designActivity)?.title||""} sessionTitle={snap.session.title} pageNumber={slidePageNumber(snap.activities,designActivity)} masterTitleStyle={snap.session.theme?.master?.titleStyle} onChange={setPageWidgets}
+  <WidgetCanvas key={`${selected}:${designActivity}`} widgets={pageWidgets} pageTitle={snap.activities.find(a=>a.id===designActivity)?.title||""} sessionTitle={snap.session.title} pageNumber={slidePageNumber(snap.activities,designActivity)} masterTitleStyle={snap.session.theme?.master?.titleStyle} onChange={setPageWidgets} onAutoFit={reconcilePageAutoFit}
     onBeginGesture={beginPageWidgetGesture} onEndGesture={endPageWidgetGesture}
     assets={assets} backgrounds={backgrounds} sessionId={selected} joinCode={snap.session.join_code} onUpload={uploadWidgetMedia} assetBusy={assetBusy}
     backgroundAssetId={questionBackgroundAsset} onBackgroundSelect={id=>{if(id)void selectLibraryBackground(id,false);else setQuestionBackgroundAsset('')}}

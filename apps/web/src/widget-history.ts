@@ -15,6 +15,18 @@ export function editWidgets<T>(state: WidgetHistory<T>, widgets: T[]): WidgetHis
   if (state.gestureBase !== null) return {...state, present: widgets, future: []};
   return {past: [...state.past, state.present].slice(-MAX_WIDGET_UNDO), present: widgets, future: [], gestureBase: null};
 }
+/** Content-derived auto-fit is part of the initiating user action, not an undo step.
+ * A stale effect must never overwrite a newer user edit, undo, or redo.
+ * The computed result is accepted only for the exact render from which it came.
+ */
+export function reconcileWidgetAutoFit<T>(state: WidgetHistory<T>, base: T[], fitted: T[]): WidgetHistory<T> {
+  if (state.gestureBase !== null || !same(state.present, base) || same(base, fitted)) return state;
+  // The DOM measurement may only adjust existing widget geometry.
+  // Adding/removing/reordering widgets must always use editWidgets instead.
+  if (base.length !== fitted.length || base.some((widget, i) =>
+    (widget as {id?: string}).id !== (fitted[i] as {id?: string}).id)) return state;
+  return {...state, present: fitted};
+}
 export function beginWidgetGesture<T>(state: WidgetHistory<T>): WidgetHistory<T> {
   return state.gestureBase === null ? {...state, gestureBase: state.present} : state;
 }

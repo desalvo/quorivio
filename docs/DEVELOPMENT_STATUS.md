@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC117 — Atomic auto-fit Undo (1 November 2026)
+
+**Status:** RC116 full CI GitHub run `41330955017`, commit `086274a5725a6e8b5d852aabb9cab463057882d4`, compiled TypeScript successfully and created exactly 5 widgets after two-widget duplication, but a single Ctrl+Z left 5 widgets instead of restoring the original 3. ClamAV passed; downstream campaign jobs were skipped.
+
+**Fix:** `WidgetCanvas` previously recorded DOM-computed `autoFit` layout corrections as independent user-edit history entries. The page editor now uses `reconcileWidgetAutoFit` to incorporate a derived geometry update into the same history step. It rejects stale-render updates, changed widget identities, and active pointer gestures. The real Chromium browser gate focuses a non-editable toolbar control before sending Ctrl+Z and keeps its strict count assertions: 5 after duplication, 3 after exactly one undo; no multi-undo masking. New Node tests assert duplicate -> auto-fit -> single undo -> redo and stale-effect rejection. A fail-closed RC117 source preflight runs before npm.
+
+**Limits:** Full GitHub CI RC117 pending. Certified completion stays **85.25%**, 43 accepted/17 partial of 60; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit, push or Docker publication.
+
+**Suggested commit since confirmed RC116:** `Keep auto-fit adjustments in the originating Undo step and verify Chromium group undo [full-ci]`.
+
+---
+
 # Quorivio 0.1.0-dev — RC116 — Deterministic Chromium group selection (1 November 2026)
 
 **Status:** RC115 full CI (GitHub run `41328071305`, commit `731bf6e0505f9431ae51abc46839437d31e2f155`) passed the API/frontend compile and early Chromium steps but failed in `ci_browser_editor.py`: a group duplicate yielded 6 widgets instead of the asserted 5. The aggregate campaign failure was downstream.

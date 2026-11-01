@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC117 — Autofit e Undo atomico (1 novembre 2026)
+
+**Stato:** la full CI RC116, GitHub Actions `41330955017`, commit `086274a5725a6e8b5d852aabb9cab463057882d4`, ha superato la build TypeScript e la duplicazione di due widget (5 attesi/5 rilevati), ma al successivo singolo Ctrl+Z il canvas conteneva ancora 5 widget, non i 3 originali. ClamAV verde; gli altri job dipendenti sono stati saltati.
+
+**Correzione:** il calcolo di `autoFit` in `WidgetCanvas` registrava una seconda modifica cronologica separata dalla duplicazione. Ora il parent usa `reconcileWidgetAutoFit` e sostituisce esclusivamente il layout derivato dello stato corrente senza aggiungere uno step Undo. La riconciliazione rifiuta effetti basati su uno stato superato, identità widget cambiate e gesture attive. Il test Chromium verifica il focus su un controllo non editabile e conserva le condizioni stringenti: 5 widget dopo duplicazione e 3 dopo un solo Undo; nessun ciclo di Undo multipli per nascondere l'errore. Test Node su duplicazione, autofit, singolo Undo, Redo e cambiamenti concorrenti; nuovo preflight Python fail-closed RC117.
+
+**Limiti:** RC117 da verificare nella full CI GitHub. Percentuale certificata invariata: **85.25%**, 43 gate accettati/17 parziali su 60; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/pubblicazione eseguiti dall'assistente.
+
+**Commit suggerito dopo RC116:** `Keep auto-fit adjustments in the originating Undo step and verify Chromium group undo [full-ci]`.
+
+---
+
 # Quorivio 0.1.0-dev — RC116 — Selezione esatta nella CI Chromium (1 novembre 2026)
 
 **Stato:** la full CI RC115 (GitHub run `41328071305`, commit `731bf6e0505f9431ae51abc46839437d31e2f155`) ha superato compilazione frontend/API e test browser preliminari, ma il test `ci_browser_editor.py` ha trovato 6 widget al posto dei 5 attesi dopo `Duplica selezione`. Il rapporto automatico della campagna è fallito per conseguenza.
