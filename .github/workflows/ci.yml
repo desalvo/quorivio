@@ -115,6 +115,9 @@ jobs:
         run: |
           PYTHONPATH=tools python3 tools/verify_rc_release_status.py
           PYTHONPATH=tools python3 -m unittest tools.tests.test_rc_cycle100_release_status_guard -q
+      - name: Validate RC101 horizontal widget rail and visible editor stage before npm
+        run: |
+          python3 -m unittest tools.tests.test_rc_cycle101_horizontal_editor_layout -q
       - name: Validate historical documentation acceptance early
         run: |
           PYTHONPATH=tools python3 -m unittest \
@@ -735,7 +738,8 @@ jobs:
           python3 tools/verify_rc_cycle97_inventory.py --historical
           python3 tools/verify_rc_cycle98_inventory.py --historical
           python3 tools/verify_rc_cycle99_inventory.py --historical
-          python3 tools/verify_rc_cycle100_inventory.py
+          python3 tools/verify_rc_cycle100_inventory.py --historical
+          python3 tools/verify_rc_cycle101_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

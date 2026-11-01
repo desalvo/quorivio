@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC101 — correzione griglia editor Chromium CI estesa (1 novembre 2026)
+
+**Completamento RC certificato: 84,75%** (42 gate accettati, 17 parziali su 59). `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+**Baseline verificata:** commit RC100 `4930ee872798a70ad3ad92f907b647098d339adf`, CI standard `41256022328` verde, inclusa build container. Le modifiche RC101 sono successive a quel commit, senza commit/push/tag eseguiti da ChatGPT.
+
+**Diagnosi CI estesa:** in `logs_111825862452.zip` il test Chromium `tools/ci_editor_mock_layout_chromium.py` verifica ancora l'antica palette verticale a destra, mentre da RC89 la palette è orizzontale in alto. Il CSS lasciava la riga automatica della palette occupare 822px, spingendo l'area canvas sotto il viewport. Il riepilogo RC fallisce in cascata. Passa il controllo ClamAV, mentre i gate successivi risultano non eseguiti.
+
+**Correzione RC101:** 80px per la riga orizzontale, spazio residuo alla diapositiva 16:9; test Chromium aggiornato a desktop e mobile reali, verificando visibilità, ordine verticale e scorrimento palette; test preventivo anche nella CI standard. Nove controlli browser locali OK. La verifica browser che richiede `esbuild` locale non è stata possibile; CI estesa completa ancora da verificare. Nessun incremento artificiale della percentuale.
+
+---
+
 # Quorivio 0.1.0-dev — RC100 — correzione metadati release e verifica package CI (1 novembre 2026)
 
 **Completamento RC certificato: 84,75%** (42 gate accettati, 17 parziali su 59). `rc_strict=false`, `publish_image=false`, `publish_latest=false`.

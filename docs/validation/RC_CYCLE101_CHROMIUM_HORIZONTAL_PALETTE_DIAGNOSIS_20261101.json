@@ -1,0 +1,43 @@
+{
+  "version": "0.1.0-dev",
+  "cycle": 101,
+  "source_log": "logs_111825862452.zip",
+  "baseline_commit": "4930ee872798a70ad3ad92f907b647098d339adf",
+  "baseline_standard_ci_run": 41256022328,
+  "extended_job": "Production quality gate",
+  "failing_step": "Chromium editor UI acceptance (opt-in)",
+  "failing_test": "tools/ci_editor_mock_layout_chromium.py",
+  "assertion": "sb.right <= rb.x+5 (obsolete right rail assumption)",
+  "observed_desktop_geometry": {
+    "viewport": [
+      1440,
+      900
+    ],
+    "stage": {
+      "x": 201.59375,
+      "y": 900,
+      "width": 1238.40625,
+      "height": 16
+    },
+    "rail": {
+      "x": 201.59375,
+      "y": 78,
+      "width": 1238.40625,
+      "height": 822
+    }
+  },
+  "root_cause": "RC89 horizontal widget bar retained unconstrained implicit auto grid row and obsolete 3-column browser test",
+  "fixes": [
+    "Bound middle grid row to 80px desktop and touch",
+    "Reserve grid row 3 for 16:9 stage",
+    "Update browser fixture to viewport-correct horizontal widgets, assert visible geometry and horizontal scrolling",
+    "Add RC101 dependency-free CI contract test"
+  ],
+  "local_browser_suites_passed": 9,
+  "local_tests_missing_dependency": "esbuild (additional keyboard browser suite, not certified)",
+  "extended_ci_full": "pending",
+  "certified_completion_percent": 84.75,
+  "accepted_gates": 42,
+  "partial_gates": 17,
+  "remote_mutations": false
+}

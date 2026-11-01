@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC101 — extended Chromium editor layout gate (1 November 2026)
+
+**Verified RC readiness: 84.75%** (42 accepted, 17 partial of 59). `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+**RC100 baseline confirmed:** GitHub Actions standard run `41256022328`, commit `4930ee872798a70ad3ad92f907b647098d339adf`, passed Production quality gate and Container build gate. RC101 changes are only after that commit, and no local commit/push/tag/release was performed.
+
+**Extended CI failure:** uploaded `logs_111825862452.zip` on the same commit: opt-in Chromium editor acceptance exits in `tools/ci_editor_mock_layout_chromium.py`. A legacy 3-column test expected the widget rail right of the canvas; RC89 had moved it to a horizontal rail above the canvas. Actual Chromium geometry showed the rail consuming 822 px of 900px viewport and the stage starting at y=900 due to an unconstrained middle grid row. Summary campaign failure is a downstream result of this validation failure, not a second independent feature bug. ClamAV real runtime acceptance passed; other opt-in campaign jobs were skipped.
+
+**RC101 remediation:** constrain toolbar grid row to 80px and preserve the remaining viewport for the responsive 16:9 slide (mobile 64px top header); adapt Chromium layout acceptance to the current horizontal palette, with viewport metadata and overflow/visibility assertions; add dependency-free CI guard before npm. Real Chromium locally passed 9 editor/layout suites (including the formerly failing test) at 1440×900 and touch 390×844. The separate keyboard browser test requiring the unavailable local `esbuild` dependency was not run successfully and remains for GitHub. Full extended CI remains unverified; certified completion remains 84.75%.
+
+---
+
 # Quorivio 0.1.0-dev — RC100 — CI release metadata and package finalization hotfix (1 November 2026)
 
 **Verified RC readiness: 84.75%** (42 accepted, 17 partial, 59 total). `rc_strict=false`, `publish_image=false`, `publish_latest=false`.

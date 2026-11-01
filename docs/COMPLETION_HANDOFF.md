@@ -1,3 +1,13 @@
+# Quorivio 0.1.0-dev — RC101 — Chromium horizontal editor rail hotfix (1 November 2026)
+
+**Verified RC readiness: 84.75%** (42 accepted, 17 partial of 59). `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+**Baseline:** RC100 confirmed on commit `4930ee872798a70ad3ad92f907b647098d339adf`, standard workflow `41256022328` successful. RC101 includes one layout remediation, one real-browser test modernization, a source preflight and supporting documentation/inventory. Next commit message must cover RC101 only; no push/tag performed.
+
+**Observed extended gate:** the Chromium editor mock test in uploaded `logs_111825862452.zip` detected `sb y=900 height=16`, `rb y=78 height=822` at 1440×900; existing assertions still assumed the old right-hand rail. The middle grid row consumed all remaining height; end users could not see the slide. CSS now bounds the horizontal palette to 80px. Updated Chromium acceptance checks toolbar placement above the stage, slide visibility, 16:9, and horizontal scroll at desktop and touch viewports. Nine local browser checks passed; complete opt-in GitHub RC campaign and any checks dependent on npm are not certified.
+
+---
+
 # Quorivio 0.1.0-dev — RC100 — CI release metadata and package finalization hotfix (1 November 2026)
 
 **Verified RC readiness: 84.75%** (42 accepted, 17 partial, 59 total). `rc_strict=false`, `publish_image=false`, `publish_latest=false`.

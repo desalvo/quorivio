@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""No-network Chromium layout preflight for mock-fidelity three-column editor."""
+"""No-network Chromium layout preflight for RC89+ horizontal-palette editor layout."""
 import asyncio
 import base64
 import os
@@ -8,13 +8,13 @@ from playwright.async_api import async_playwright, expect
 ROOT=Path(__file__).resolve().parents[1]
 CSS=(ROOT/'apps/web/src/style.css').read_text()
 LOGO='data:image/svg+xml;base64,'+base64.b64encode((ROOT/'apps/web/public/editor-quorivio-logo.svg').read_bytes()).decode()
-HTML='''<!doctype html><html lang="it"><head><style>@CSS@</style></head><body>
+HTML='''<!doctype html><html lang="it"><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>@CSS@</style></head><body>
 <section class="panel powerpoint-editor editor-ux-v2" aria-label="Editor grafico delle pagine">
 <header class="editor-mock-header"><div class="editor-mock-brand"><img alt="Quorivio" src="@LOGO@"><span>Workshop 2024</span><span class="editor-online-chip">Editor</span></div><div class="editor-mock-actions"><span class="editor-autosave-indicator" role="status">Salvato automaticamente</span><button class="editor-exit">Esci</button></div></header>
 <aside class="page-editor-sidebar" aria-label="Miniature delle pagine"><header>Pagine</header><div class="page-editor-thumbnails"><div class="page-editor-thumb-row is-active"><button class="page-editor-thumb"><span class="page-editor-preview">Benvenuti</span></button></div><div class="page-editor-thumb-row"><button class="page-editor-thumb"><span class="page-editor-preview">Programma</span></button></div></div></aside>
 <div class="editor-stage"><div class="editor-canvas-slot"><div class="canvas-editor-group"><div class="canvas-with-rulers"><div class="widget-canvas" role="group" aria-label="Canvas grafico widget"><div class="widget-canvas-item" style="left:15%;top:20%;width:36%;height:25%">Benvenuti</div></div></div></div></div></div>
-<aside class="editor-widget-rail" aria-label="Aggiungi widget"><header>Widget</header><div class="editor-widget-grid"><button class="editor-icon-tool">T</button><button class="editor-icon-tool">◈</button><button class="editor-icon-tool">◉</button><button class="editor-icon-tool">□</button></div></aside>
-</section></body></html>'''.replace('@CSS@',CSS).replace('@LOGO@',LOGO)
+<aside class="editor-widget-rail" aria-label="Aggiungi widget"><header>Widget</header><div class="editor-widget-grid">@ICONS@</div></aside>
+</section></body></html>'''.replace('@CSS@',CSS).replace('@LOGO@',LOGO).replace('@ICONS@',''.join(f'<span class="editor-icon-wrapper"><button class="editor-icon-tool" type="button"><span class="editor-icon-caption">Widget {i}</span></button></span>' for i in range(1,21)))
 async def verify(browser,width,height,mobile):
  page=await browser.new_page(viewport={'width':width,'height':height},has_touch=mobile,is_mobile=mobile)
  try:
@@ -26,7 +26,24 @@ async def verify(browser,width,height,mobile):
   assert all(v for v in (hb,tb,sb,rb,cb))
   assert hb['y']<tb['y']+2 and hb['y']<rb['y']+2
   assert tb['x']+tb['width']<=sb['x']+5,(tb,sb)
-  assert sb['x']+sb['width']<=rb['x']+5,(sb,rb)
+  # RC89+: the widget rail is above the canvas, not a third/right column.
+  # Ensure both its ends and the slide remain visible within the viewport.
+  assert abs(rb['x']-sb['x'])<=5,(rb,sb)
+  assert abs(rb['width']-sb['width'])<=5,(rb,sb)
+  assert rb['y']+rb['height']<=sb['y']+3,(rb,sb)
+  assert sb['y']>=hb['y']+hb['height']-2,(hb,sb)
+  assert sb['y']+min(sb['height'],60)<=height+3,(sb,height)
+  assert rb['height']>=65 and rb['height']<=95,(rb,height)
+  grid=editor.locator('.editor-widget-grid')
+  assert await grid.evaluate('(e)=>getComputedStyle(e).overflowX')=='auto'
+  assert await grid.evaluate('(e)=>e.clientHeight')<=95
+  # The actual toolbar has icon wrappers, and at narrow viewports its last
+  # entry must remain reachable through horizontal scrolling.
+  overflow=await grid.evaluate('(e)=>({scrollWidth:e.scrollWidth,clientWidth:e.clientWidth})')
+  assert overflow['scrollWidth']>overflow['clientWidth']+100,overflow
+  await grid.evaluate('(e)=>{e.scrollLeft=e.scrollWidth}')
+  assert await grid.evaluate('(e)=>e.scrollLeft')>100,overflow
+  assert cb['y']>=sb['y']-1 and cb['y']+cb['height']<=sb['y']+sb['height']+1,(cb,sb)
   assert cb['width']>=sb['width']*.60,(cb,sb)
   assert abs(cb['width']/cb['height']-16/9)<.035,(cb,width,height)
   assert await editor.locator('.editor-bottom-controls').count()==0
@@ -45,5 +62,5 @@ async def main():
    await verify(browser,1440,900,False)
    await verify(browser,390,844,True)
   finally:await browser.close()
- print('PASS mock-fidelity editor: branded header, left thumbnails, responsive 16:9 canvas, right widget rail, Exit only; desktop and mobile Chromium')
+ print('PASS RC101 editor: header, left thumbnails, horizontal widget rail above visible 16:9 canvas, Exit; desktop and mobile Chromium')
 if __name__=='__main__':asyncio.run(main())

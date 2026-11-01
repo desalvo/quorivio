@@ -1,3 +1,13 @@
+# Quorivio 0.1.0-dev — RC101 — correzione editor orizzontale e CI Chromium (1 novembre 2026)
+
+**Completamento RC certificato: 84,75%** (42 gate accettati, 17 parziali su 59). `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+**Commit baseline RC100:** `4930ee872798a70ad3ad92f907b647098d339adf`, CI standard `41256022328` OK. RC101 introduce soltanto correzioni successive.
+
+**Errore risolto localmente:** la CI estesa allegata verifica ancora la vecchia palette a destra; la nuova palette orizzontale occupava tutta la riga e nascondeva il canvas sotto il viewport. In RC101 sono stati corretti griglia CSS, test browser e preflight CI. Verificati 9 test Chromium sul layout, desktop e mobile. Il resto della campagna estesa resta da eseguire; versione 0.1.0-dev ed EUPL-1.2 invariati. Non effettuato commit né push.
+
+---
+
 # Quorivio 0.1.0-dev — RC100 — correzione metadati release e verifica package CI (1 novembre 2026)
 
 **Completamento RC certificato: 84,75%** (42 gate accettati, 17 parziali su 59). `rc_strict=false`, `publish_image=false`, `publish_latest=false`.

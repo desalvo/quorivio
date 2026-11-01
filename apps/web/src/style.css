@@ -1362,3 +1362,26 @@ header.rehearsal-toolbar{height:auto;min-height:0;flex:0 0 auto;position:relativ
   .widget-selection-palette .palette-ribbon-group{padding-inline:8px}
 }
 @media(prefers-reduced-motion:reduce){.widget-selection-palette button{transition:none!important}}
+
+/* RC101: the RC89 compact widget rail is a horizontal toolbar above the slide.
+ * Its old 1:1 icon grid contributed a viewport-sized implicit auto row, pushing
+ * the entire editor stage below the visible window. Constrain row 2 explicitly,
+ * keep the 16:9 canvas in the remaining row and retain independent x scrolling.
+ */
+.editor-ux-v2,.editor-ux-v2:fullscreen{
+  grid-template-rows:78px 80px minmax(0,1fr)!important;
+}
+.editor-ux-v2 .editor-widget-rail{
+  min-height:0!important;height:80px!important;max-height:80px!important;
+  overflow:visible!important;
+}
+.editor-ux-v2 .editor-widget-grid{
+  height:80px!important;max-height:80px!important;
+  min-height:0!important;align-items:flex-start!important;
+}
+.editor-ux-v2 .editor-stage{min-height:0!important;max-height:100%;}
+@media (max-width:760px){
+  .editor-ux-v2,.editor-ux-v2:fullscreen{
+    grid-template-rows:64px 80px minmax(0,1fr)!important;
+  }
+}
