@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC119 — Autofit senza maniglie e duplicazione stabile (1 novembre 2026)
+
+**CI precedente:** GitHub Actions `41336263788`, commit `68b82e3846e1ba62db28495ecc431b09c49ab0b5`, ha superato le verifiche documentali e la build React, ma il test Chromium `ci_browser_editor.py` ha rilevato 3 widget dopo «Duplica selezione» (attesi 5). Il riepilogo RC è fallito di conseguenza; gli altri job dipendenti sono stati saltati. La screenshot Chromium allegata mostra i widget ingranditi fino al fondo del canvas prima della duplicazione.
+
+**Causa e correzione RC119:** l'autofit leggeva `scrollHeight` del contenitore esterno, comprensivo delle maniglie con offset negativo, causando crescita ripetuta anche per brevi testi. Ora legge esclusivamente l'altezza di contenuto (`.widget-fit-content`) rispetto al riquadro interno (`.widget-fit-frame`), lasciando invariati i controlli di ridimensionamento. Il test Chromium rileva l'espansione anomala prima della duplicazione e mostra immediatamente eventuali avvisi di impossibilità di collocazione. Mantiene due widget selezionati, cinque dopo duplicazione e tre dopo un solo Undo.
+
+**Verifica RC:** 85,25% (43 accettati, 17 parziali su 60), percentuale certificata invariata; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full CI RC119 e test React reale ancora obbligatori. Nessun commit, push o pubblicazione eseguiti dall'assistente.
+
+**Commit suggerito dalla RC118:** `Prevent resize handles from causing runaway widget autofit and restore Chromium group duplication [full-ci]`.
+
+---
+
 # Quorivio 0.1.0-dev — RC118 — Correzione verifica documentale localizzata (1 novembre 2026)
 
 **Stato verificato:** la full CI RC117 GitHub Actions `41332909058` (commit `90cef44a8e32cca63c08b9d9e6374e100ff4284b`) è fallita nel controllo anticipato della documentazione: quattro test storici richiedono la percentuale in italiano `85,25%`, mentre le intestazioni RC117 usavano `85.25%`. La compilazione e Chromium NON sono stati eseguiti in questa run; l'esito del precedente bug Undo resta quindi da verificare end-to-end. ClamAV ha superato il controllo.

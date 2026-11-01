@@ -15,7 +15,7 @@ import {widgetGeometryStyle} from './widget-geometry';
 import {mediaUploadMime} from './widget-asset-upload';
 import {answerInputStyle,answerOptionStyle,answerSubmitStyle,requiresAnswerSubmit} from './widget-answer-style';
 import {cloudRankColor,rankCloudItems} from './word-cloud-rank';
-import {autoFitExpandedPosition,widgetMayAutoFit} from './widget-auto-fit';
+import {autoFitExpandedPosition,widgetMayAutoFit,measuredContentOverflowPx} from './widget-auto-fit';
 import {canvasWidgetAtPoint} from './editor-context-hit';
 import {startsWidgetSelectionOnPointerDown} from './editor-context-input';
 import {activateRehearsalDialog} from './rehearsal-dialog';
@@ -773,9 +773,13 @@ function WidgetCanvas({widgets,onChange,pageTitle="",sessionTitle="",pageNumber=
    const node=Array.from(stage.querySelectorAll<HTMLElement>('.widget-canvas-item')).find(el=>el.dataset.widgetId===w.id);
    if(!node)continue;
    const p=w.position;if(!p||!p.height)continue;
-   // Controls used solely for moving/resizing are absolutely positioned.
-   // scrollHeight reflects the real text, options, response field and submit.
-   const overflow=node.scrollHeight-node.clientHeight;
+   // Never measure the outer widget: its resize handles deliberately extend
+   // beyond the bottom/right border, inflating scrollHeight at every render.
+   // Only actual text/answers/media inside the bounded content shell count.
+   const frame=node.querySelector<HTMLElement>(':scope > .widget-fit-frame');
+   const content=frame?.querySelector<HTMLElement>(':scope > .widget-fit-content');
+   if(!frame||!content)continue;
+   const overflow=measuredContentOverflowPx(frame.clientHeight,content.scrollHeight);
    if(overflow<=2)continue;
    const next=autoFitExpandedPosition(p,overflow,rect.height);
    if(!next)continue;

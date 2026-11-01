@@ -146,6 +146,8 @@ jobs:
             tools.tests.test_topic_linked_results_rc_20261028 -q
       - name: Validate RC79 cumulative archive receipt closure before npm
         run: python3 -m unittest tools.tests.test_rc_cycle79_inventory_closure -q
+      - name: RC119 content-only autofit and group-duplication preflight before npm
+        run: PYTHONPATH=tools python3 -m unittest tools.tests.test_rc_cycle119_autofit_duplication -q
       - name: RC118 localized completion ledger preflight before npm
         run: PYTHONPATH=tools python3 -m unittest tools.tests.test_rc_cycle118_localized_release_headers -q
       - name: RC117 atomic auto-fit Undo regression preflight before npm
@@ -290,6 +292,8 @@ jobs:
           # Verify production HTML advertises fingerprinted JS and CSS, not
           # a dev-only /src/main.tsx module or /@vite/client HMR bootstrap.
           python3 tools/ci_built_frontend_asset_probe.py
+          # RC119: selected resize handles may inflate outer scrollHeight, but never content auto-fit.
+          python3 tools/ci_rc119_autofit_handles_chromium.py
           # Real browser CSS preflight: catch hidden nested actions before UI acceptance.
           python3 tools/ci_nested_context_css_chromium.py
           python3 tools/ci_accessible_disclosure_chromium.py
@@ -808,7 +812,8 @@ jobs:
           python3 tools/verify_rc_cycle115_inventory.py --historical
           python3 tools/verify_rc_cycle116_inventory.py --historical
           python3 tools/verify_rc_cycle117_inventory.py --historical
-          python3 tools/verify_rc_cycle118_inventory.py
+          python3 tools/verify_rc_cycle118_inventory.py --historical
+          python3 tools/verify_rc_cycle119_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

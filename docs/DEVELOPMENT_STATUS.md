@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC119 — Content-only autofit and stable group duplication (1 November 2026)
+
+**Previous CI:** GitHub Actions `41336263788`, commit `68b82e3846e1ba62db28495ecc431b09c49ab0b5`, passed release documentation checks and React build, then the Chromium editor test reported 3 widgets after group duplicate (expected 5). The attached browser screenshot shows short text widgets extended to the bottom of the canvas. Downstream RC jobs were skipped.
+
+**RC119 root cause and fix:** the auto-fit effect used the outer widget `scrollHeight`, including resizing controls extending past its borders; this triggered repeated layout expansion for short labels and exhausted collision-free duplication room. Auto-fit now measures inner content scroll height versus its bounded frame, explicitly excluding resizing chrome. The Chromium test checks short-fixture geometry before duplication and asserts immediately on native placement-rejection dialogs, retaining exact two-widget selection, five after duplication and three after one Undo.
+
+**RC certification:** 85.25% (43 accepted, 17 partial / 60), unchanged; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full GitHub CI including real compiled React/Chromium is still required. No assistant commit/push/publication.
+
+**Commit suggestion since RC118:** `Prevent resize handles from causing runaway widget autofit and restore Chromium group duplication [full-ci]`.
+
+---
+
 # Quorivio 0.1.0-dev — RC118 — Localized release-documentation preflight correction (1 November 2026)
 
 **Verified status:** RC117 full CI GitHub Actions run `41332909058` (commit `90cef44a8e32cca63c08b9d9e6374e100ff4284b`) failed early on historical documentation checks: four tests require the decimal-comma Italian percentage `85,25%` but the RC117 active Italian headers used `85.25%`. Frontend compilation and the Chromium editor tests did NOT run, so the previous Undo bug remains unverified end-to-end. ClamAV passed.

@@ -252,6 +252,14 @@ async def main():
    # Undo and layer operations can retain old selection.
    # Explicitly select exactly two widgets, not merely check two boxes.
    await select_exact_widget_pair(page)
+   # RC119: short fixture labels must not repeatedly inflate to the slide edge.
+   # The old outer scrollHeight included edge resize handles; this made group
+   # placement genuinely impossible without any bug in the group command.
+   fixture_geometry=await page.locator('.widget-canvas-item').evaluate_all("""nodes=>
+     nodes.map(n=>({id:n.dataset.widgetId,top:parseFloat(n.style.top),height:parseFloat(n.style.height)}))""")
+   assert len(fixture_geometry)==3 and all(g['height']<26 for g in fixture_geometry), (
+     'AutoFit inflated short fixture widgets before duplication: '+str(fixture_geometry)
+   )
    # A rejected group duplication raises an alert. Capture it rather than letting
    # Playwright silently dismiss it before the widget-count assertion.
    duplication_alerts=[]
@@ -262,8 +270,9 @@ async def main():
     asyncio.create_task(handle_duplication_alert(dialog))
    page.on('dialog',observe_duplication_dialog)
    await click_canvas_tool(page,'Duplica selezione')
+   # Report a real native no-space rejection before a misleading count timeout.
+   assert not duplication_alerts, ('Group duplication rejected: '+str(duplication_alerts)+'; geometry='+str(fixture_geometry))
    await expect(page.locator('.widget-canvas-item')).to_have_count(5)
-   assert not duplication_alerts,duplication_alerts
    page.remove_listener('dialog',observe_duplication_dialog)
    # One undo must revert the user's duplication, not only an auto-fit side effect.
    # Focus a non-editable canvas control so Ctrl+Z is handled by the editor.
