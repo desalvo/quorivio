@@ -1,3 +1,19 @@
+# Quorivio 0.1.0-dev — RC116 — Deterministic Chromium group selection (1 November 2026)
+
+**Status:** RC115 full CI (GitHub run `41328071305`, commit `731bf6e0505f9431ae51abc46839437d31e2f155`) passed the API/frontend compile and early Chromium steps but failed in `ci_browser_editor.py`: a group duplicate yielded 6 widgets instead of the asserted 5. The aggregate campaign failure was downstream.
+
+**Diagnosis and fix:** the browser acceptance test checked two boxes without unchecking a third widget potentially retained from earlier layer and undo actions. It now explicitly configures First/Second via real accessible controls, unchecks any other selection and checks both accessibility inputs and canvas selected IDs. The exact post-duplicate count of five, deletion confirmation, undo, collision and Chromium execution remain mandatory. A desynchronization fails with actionable diagnostics. No application duplication logic or expected widget count was weakened.
+
+**Status:** certified product completion 85.25% (43 accepted and 17 partial of 60 gates), `rc_strict=false`. Full GitHub CI RC116 pending. No publication.
+
+**Suggested commit since confirmed RC115:** `Make Chromium group-selection acceptance deterministic and retain strict duplication checks [full-ci]`.
+
+**Release flag:** `publish_image=false`.
+
+**Release flag:** `publish_latest=false`.
+
+---
+
 # Quorivio 0.1.0-dev — RC115 — Frontend strict TypeScript build hotfix (1 November 2026)
 
 **Status:** RC115 cumulative from committed RC114; full CI RC114 failed in `Production quality gate` at the frontend `npm run build`. Early preflight, 567 API and 165 frontend tests had passed. Certified completion remains **85.25%** (43 accepted and 17 partial of 60 gates), `rc_strict=false`, `publish_image=false`, `publish_latest=false`.

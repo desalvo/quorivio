@@ -1,3 +1,19 @@
+# Quorivio 0.1.0-dev — RC116 — Selezione esatta nella CI Chromium (1 novembre 2026)
+
+**Stato:** la full CI RC115 (GitHub run `41328071305`, commit `731bf6e0505f9431ae51abc46839437d31e2f155`) ha superato compilazione frontend/API e test browser preliminari, ma il test `ci_browser_editor.py` ha trovato 6 widget al posto dei 5 attesi dopo `Duplica selezione`. Il rapporto automatico della campagna è fallito per conseguenza.
+
+**Diagnosi e correzione:** il test spuntava due checkbox senza deselezionare eventuali widget già selezionati da precedenti operazioni. La selezione permane deliberatamente tra operazioni di layer e undo. Prima delle azioni di gruppo il test ora imposta esplicitamente First/Second tramite controlli accessibili reali, deseleziona il terzo e verifica due checkbox e due widget selezionati nel canvas. Restano obbligatori il conteggio a 5, la conferma cancellazione, undo, collisioni e test Chromium. Se la selezione si desincronizza, il test fallisce con dettagli specifici. Non è stata modificata la logica di duplicazione dell’applicazione né è stato alterato il risultato atteso per nascondere bug.
+
+**Gate:** 85,25% certificato, 43 accettati/17 parziali su 60, `rc_strict=false`. Nessuna pubblicazione in RC116. Full CI GitHub non ancora verificata.
+
+**Commit suggerito dalla RC115 già committata:** `Make Chromium group-selection acceptance deterministic and retain strict duplication checks [full-ci]`.
+
+**Release flag:** `publish_image=false`.
+
+**Release flag:** `publish_latest=false`.
+
+---
+
 # Quorivio 0.1.0-dev — RC115 — Correzione TypeScript strict frontend (1 novembre 2026)
 
 **Stato:** cumulativo RC115 dalla RC114 committata; full CI RC114 fallita nel job `Production quality gate`, durante `npm run build` frontend. I preflight, 567 test API e 165 frontend erano passati. Completamento certificato **85,25%** (43 gate accettati, 17 parziali su 60), `rc_strict=false`, `publish_image=false`, `publish_latest=false`.

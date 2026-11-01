@@ -55,6 +55,32 @@ async def await_frontend_mount(page, errors=None):
               'React did not mount. Inspect the built asset probe before editor actions.', flush=True)
         raise
 
+async def select_exact_widget_pair(page):
+    """Select exactly two via genuine accessible controls and check both UI layers.
+
+    The previous CI only checked two boxes; it did not uncheck a third box
+    retained across undo or context operations (run 41328071305).
+    """
+    await expect(page.locator('.widget-canvas-item')).to_have_count(3)
+    rows=page.locator('.canvas-accessible-row')
+    await expect(rows).to_have_count(3)
+    wanted={'First','Second'}
+    observed=set()
+    for row in await rows.all():
+        description=(await row.locator('strong').inner_text()).strip()
+        label=description.split('. ',1)[-1]
+        if label in wanted:
+            observed.add(label)
+        checkbox=row.locator('input[type="checkbox"]')
+        await checkbox.set_checked(label in wanted)
+    assert observed==wanted, f'Unexpected fixture row labels: {sorted(observed)}'
+    checked_rows=await rows.evaluate_all("elements => elements.filter(e=>e.querySelector('input[type=checkbox]')?.checked).map(e=>e.querySelector('strong')?.textContent)")
+    selected_ids=await page.locator('.widget-canvas-item[data-selected="true"]').evaluate_all('nodes => nodes.map(n=>n.dataset.widgetId)')
+    assert len(checked_rows)==2 and set(selected_ids)=={'widget-a','widget-b'}, (
+        f'Explicit selection mismatch: checked={checked_rows}, canvas_ids={selected_ids}'
+    )
+    await expect(page.locator('.widget-canvas-item[data-selected="true"]')).to_have_count(2)
+
 async def main():
  async with async_playwright() as pw:
   launch={'executable_path':os.environ['QUORIVIO_CHROMIUM_PATH']} if os.environ.get('QUORIVIO_CHROMIUM_PATH') else {}
@@ -218,12 +244,14 @@ async def main():
    disclosure=page.locator('.canvas-accessible-controls > summary')
    await disclosure.click()
    checks=page.get_by_role('region',name='Organizzazione accessibile dei widget').get_by_role('checkbox',name='Seleziona')
-   await checks.nth(0).check();await checks.nth(1).check()
+   await select_exact_widget_pair(page)
    await click_canvas_tool(page,'Sposta selezione a destra')
    await page.keyboard.press('Control+z')
    await click_canvas_tool(page,'Porta selezione davanti')
    await page.keyboard.press('Control+z')
-   await checks.nth(0).check();await checks.nth(1).check()
+   # Undo and layer operations can retain old selection.
+   # Explicitly select exactly two widgets, not merely check two boxes.
+   await select_exact_widget_pair(page)
    # A rejected group duplication raises an alert. Capture it rather than letting
    # Playwright silently dismiss it before the widget-count assertion.
    duplication_alerts=[]
@@ -239,7 +267,7 @@ async def main():
    page.remove_listener('dialog',observe_duplication_dialog)
    await page.keyboard.press('Control+z')
    await expect(page.locator('.widget-canvas-item')).to_have_count(3)
-   await checks.nth(0).check();await checks.nth(1).check()
+   await select_exact_widget_pair(page)
    # The product requires an explicit confirmation for every destructive action.
    # Playwright otherwise auto-dismisses native confirm dialogs, making this
    # acceptance test fail even when the UI correctly asks the user.
