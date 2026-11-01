@@ -226,6 +226,8 @@ jobs:
       - name: Strict release-candidate gate (manual opt-in)
         if: github.event_name == 'workflow_dispatch' && inputs.rc_strict && !inputs.rc_acceptance_suite
         run: python3 tools/rc_release_preflight.py --strict
+      - name: RC107 colored Vite startup and WebSocket fail-closed contract
+        run: python3 -m unittest tools.tests.test_rc107_colored_preview_readiness -q
       - name: RC106 isolated compiled-preview and floating portal contracts
         run: python3 -m unittest tools.tests.test_rc106_ci_contract tools.tests.test_editor_contextual_layout_v2 -q
       - name: Unit tests
@@ -768,7 +770,8 @@ jobs:
           python3 tools/verify_rc_cycle103_inventory.py --historical
           python3 tools/verify_rc_cycle104_inventory.py --historical
           python3 tools/verify_rc_cycle105_inventory.py --historical
-          python3 tools/verify_rc_cycle106_inventory.py
+          python3 tools/verify_rc_cycle106_inventory.py --historical
+          python3 tools/verify_rc_cycle107_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

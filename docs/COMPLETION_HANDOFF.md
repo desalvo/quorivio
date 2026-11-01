@@ -1,3 +1,10 @@
+# Quorivio 0.1.0-dev — RC107 — ANSI-aware Vite preview CI readiness (1 November 2026)
+
+The RC106 full CI in `logs_111954785384.zip` completed Chromium browser checks, but `ci_preview_proxy_guard.py` failed incorrectly with `compiled-preview readiness evidence is absent`. Vite's colorized terminal startup banner has ANSI sequences between `Local`, `:` and the URL. RC107 strips ANSI styling from a diagnostic copy of the log, preserves strict startup host/port checks and fail-closed socket/proxy diagnostics, and adds regressions using the reconstructed observed banner and negative failure fixtures. `docs/RC_CYCLE107_ANSI_PREVIEW_GUARD.en.md`.
+**Certified gate-weighted readiness: 85.25%** (43 accepted, 17 partial / 60). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. GitHub push commit RC106 `6b5cd19230c8b68fe4ba852abbb6236b24c06a5a` is the confirmed baseline; RC107 only is new. No assistant commit/push/tag/publication.
+
+---
+
 # Quorivio 0.1.0-dev — RC106 — Chromium proxy and historical portal CI fix handoff (1 November 2026)
 
 **RC106 handoff:** failed GitHub push full campaign `41305315027`, SHA `454eaf729c9487146f2c89a47178a64161d5683b`. The real blocking failure was one obsolete source-structure assertion in `tools/tests/test_editor_contextual_layout_v2.py`; updated to demand the RC105 draggable page-settings body portal. `ECONNREFUSED` in the Chromium job was an unreported Vite preview WS proxy failure (no API until later PostgreSQL phase). `preview.proxy={}` is now explicit, and `tools/ci_preview_proxy_guard.py` runs in the Chromium step `EXIT` trap and fails on proxy/socket errors or missing preview startup evidence, even if Playwright succeeded or failed earlier. Real API live/PG tests remain in the workflow. Test with `[full-ci]` and reconcile independently. Details `docs/RC_CYCLE106_CI_PREVIEW_AND_PORTAL.en.md`.

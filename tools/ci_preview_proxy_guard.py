@@ -14,6 +14,11 @@ import re
 
 # Include both OS socket rejections and Vite/HTTP proxy errors. These are
 # intentionally checked even if Chromium interactions otherwise pass.
+# Vite colours the startup banner (including "Local" and its punctuation).
+# GitHub runners capture the ANSI SGR sequences verbatim; normalize only for
+# comparison, never alter the raw log in the diagnostic artifact.
+ANSI_SEQUENCE = re.compile(r"\x1b(?:\[[0-?]*[ -/]*[@-~]|\][^\x07]*(?:\x07|\x1b\\))")
+
 UNEXPECTED_PROXY = re.compile(
     r"ECONNREFUSED|\bEHOSTUNREACH\b|\bENETUNREACH\b|\[vite\].*(?:ws )?proxy error|\bproxy error:",
     flags=re.IGNORECASE,
@@ -21,13 +26,16 @@ UNEXPECTED_PROXY = re.compile(
 
 
 def verify_preview_log(content: str) -> int:
-    matches = [line for line in content.splitlines() if UNEXPECTED_PROXY.search(line)]
+    normalized = ANSI_SEQUENCE.sub('', content)
+    matches = [line for line in normalized.splitlines() if UNEXPECTED_PROXY.search(line)]
     if matches:
         raise RuntimeError(
             f"offline compiled-preview emitted {len(matches)} upstream/proxy "
             "failure log lines; Chromium UI acceptance must fail closed"
         )
-    if not re.search(r"\bLocal:\s*http://", content):
+    # Require the actual loopback preview banner, but tolerate ANSI styles
+    # inserted inside the URL or between `Local` and its colon.
+    if not re.search(r"\bLocal:\s*http://127\.0\.0\.1:5173/", normalized):
         raise RuntimeError("compiled-preview readiness evidence is absent")
     return len(content.splitlines())
 

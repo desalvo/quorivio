@@ -1,3 +1,10 @@
+# Quorivio 0.1.0-dev — RC107 — controllo avvio preview con ANSI (1 November 2026)
+
+La full CI RC106 allegata (`logs_111954785384.zip`) ha completato positivamente i test Chromium ma il controllo finale `ci_preview_proxy_guard.py` ha segnalato erroneamente `compiled-preview readiness evidence is absent`: il banner reale di Vite contiene sequenze ANSI tra `Local`, `:` e URL. RC107 normalizza i colori nella copia del log usata per la verifica senza alterare il log originale, richiede ancora host/porta esatti e mantiene fatali `ECONNREFUSED` ed errori proxy. Aggiunti test negativi e un test sul banner colorato verificato. `docs/RC_CYCLE107_ANSI_PREVIEW_GUARD.it.md`.
+**Completamento 85,25%** (43 gate accettati, 17 parziali / 60). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Ultimo commit RC106 verificato su GitHub: `6b5cd19230c8b68fe4ba852abbb6236b24c06a5a`; soltanto RC107 è nuova. Nessun commit/push/tag/pubblicazione dell’assistente.
+
+---
+
 # Quorivio 0.1.0-dev — RC106 — handoff controllo WS Chromium e popup flottanti (1 novembre 2026)
 
 **Handoff RC106:** la full CI del push `41305315027` (SHA RC105 `454eaf729c9487146f2c89a47178a64161d5683b`) fallisce per un test Python che cerca ancora la vecchia struttura inline del pannello pagina, mentre l'interfaccia usa correttamente un portal body trascinabile. Il test aggiornato verifica il contratto corrente. Gli `ECONNREFUSED` segnalati provengono dal proxy WebSocket della preview Vite usata nei test offline, prima dell'avvio API; non generavano una eccezione Playwright. Con RC106 la preview non inoltra `/live` al backend assente e il controllo del log si esegue sempre alla chiusura del passo Chromium, fallendo se il proxy registra errori. Le prove reali WS/PostgreSQL restano obbligatorie. `docs/RC_CYCLE106_CI_PREVIEW_AND_PORTAL.it.md`.

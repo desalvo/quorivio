@@ -1,3 +1,10 @@
+# Quorivio 0.1.0-dev — RC107 — controllo avvio preview con ANSI (1 November 2026)
+
+La full CI RC106 allegata (`logs_111954785384.zip`) ha completato positivamente i test Chromium ma il controllo finale `ci_preview_proxy_guard.py` ha segnalato erroneamente `compiled-preview readiness evidence is absent`: il banner reale di Vite contiene sequenze ANSI tra `Local`, `:` e URL. RC107 normalizza i colori nella copia del log usata per la verifica senza alterare il log originale, richiede ancora host/porta esatti e mantiene fatali `ECONNREFUSED` ed errori proxy. Aggiunti test negativi e un test sul banner colorato verificato. `docs/RC_CYCLE107_ANSI_PREVIEW_GUARD.it.md`.
+**Completamento 85,25%** (43 gate accettati, 17 parziali / 60). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Ultimo commit RC106 verificato su GitHub: `6b5cd19230c8b68fe4ba852abbb6236b24c06a5a`; soltanto RC107 è nuova. Nessun commit/push/tag/pubblicazione dell’assistente.
+
+---
+
 # Quorivio 0.1.0-dev — RC106 — CI Chromium fail-closed WebSocket e contratti popup (1 novembre 2026)
 
 **Correzione CI RC106:** nella run `41305315027` sul commit RC105 `454eaf729c9487146f2c89a47178a64161d5683b` il job qualità si è fermato nel discovery Python perché un vecchio test cercava il pannello pagina statico anziché l'attuale popup trascinabile tramite `EditorFloatingWindow` con portal nel body. La verifica è stata aggiornata senza rinunciare al requisito del popup flottante. I messaggi `ECONNREFUSED` provengono invece dal proxy WebSocket Vite della preview del bundle compilato, che contattava localhost:8080 prima dell'avvio del backend; i test Chromium non li vedevano come `pageerror`. RC106 isola la preview offline (`preview.proxy={}`), mantiene il proxy in modalità sviluppo e verifica il log completo della preview con esito bloccante in caso di errori WebSocket/proxy anche in uscita anticipata. I test reali PostgreSQL/WebSocket non vengono sostituiti. Aggiunte regressioni negative e documentazione: `docs/RC_CYCLE106_CI_PREVIEW_AND_PORTAL.it.md`.
