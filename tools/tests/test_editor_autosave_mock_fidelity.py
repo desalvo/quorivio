@@ -63,8 +63,13 @@ class EditorMockAutosave(unittest.TestCase):
   start=WEB.index('const icons:Record<string,React.ReactNode>=')
   mapping=WEB[start:WEB.index('return <>{icons[kind]',start)]
   icons=re.findall(r'(?:[a-z-]+|\'[a-z-]+\'):<([A-Za-z0-9]+) size=\{21\}',mapping)
-  self.assertEqual(len(icons),19,icons)
-  self.assertEqual(len(set(icons)),19,icons)
+  kinds=WEB[WEB.index('const editorWidgetKinds='):WEB.index(' as const;',WEB.index('const editorWidgetKinds='))]
+  insertable=re.findall(r"'([a-z-]+)'",kinds)
+  self.assertIn('shape',insertable)
+  self.assertIn('line',insertable)
+  self.assertNotIn('divider',insertable) # compatibility retained, no new separator
+  self.assertEqual(len(icons),len(insertable),icons)
+  self.assertEqual(len(set(icons)),len(icons),icons)
 
  def test_editor_uses_entire_viewport_and_mobile_three_column_grid(self):
   self.assertIn('.editor-ux-v2.powerpoint-editor:not(:fullscreen)',CSS)

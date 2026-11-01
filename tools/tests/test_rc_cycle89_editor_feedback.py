@@ -28,8 +28,14 @@ class RC89EditorFeedback(unittest.TestCase):
   for marker in ('Casella di risposta libera nell\'editor','Campo risposta libera nella vista presentatore','Risposta simulata ','widget-free-answer-field','Colore sfondo casella risposta libera','Casella domanda libera nell\'editor','Casella domanda libera vista presentatore'):
    self.assertIn(marker,UI)
   self.assertIn('answerFillColor?:string',DOMAIN)
-  self.assertIn("'fillColor','answerFillColor','fillNone'",DOMAIN)
-  self.assertIn("['fillColor','answerFillColor','strokeColor'",DOMAIN)
+  # RC109/110/113 extended the allowed fields. Verify that answerFillColor is
+  # still in the API allowlist *and* its strict hex-color validation instead
+  # of freezing the precise order of an obsolete three-field source literal.
+  self.assertRegex(DOMAIN,r"Object\.keys\(v\).*?'answerFillColor'.*?\.includes\(k\)")
+  self.assertRegex(DOMAIN,r"\['fillColor','answerFillColor','strokeColor','gradientEndColor'\]\.every")
+  self.assertIn('answerInputStyle(w.style)',UI)
+  self.assertIn('answerInputStyle(marks.style)',UI)
+  self.assertIn('answerInputStyle(widget.style)',UI)
 
  def test_single_headings_in_reaction_results_and_participant_widgets(self):
   for kind in ('results-button','reactions','participant-count'):
@@ -38,7 +44,13 @@ class RC89EditorFeedback(unittest.TestCase):
 
  def test_background_picker_is_hidden_but_upload_persists(self):
   self.assertIn('style={{display:"none"}} aria-hidden="true" tabIndex={-1} type="file"',UI)
-  self.assertIn('void onBackgroundUpload(file).then(()=>setBackgroundMenu(false))',UI)
+  # RC110 intentionally keeps the menu open on upload failure: a blind
+  # .then(()=>close) would mask server rejections and break the user's JPG flow.
+  self.assertIn('onBackgroundUpload(file).then(applied=>{if(applied)',UI)
+  self.assertIn("setBackgroundUploadStatus('Sfondo caricato e applicato.');setBackgroundMenu(false)",UI)
+  self.assertIn("else setBackgroundUploadStatus('Caricamento non riuscito:",UI)
+  self.assertIn(".catch(error=>{setBackgroundUploadStatus('Caricamento non riuscito:",UI)
+  self.assertNotIn('onBackgroundUpload(file).then(()=>setBackgroundMenu(false))',UI)
   self.assertIn('Carica immagine nello sfondo e nella libreria…',UI)
   self.assertIn("/backgrounds`,{method:'POST'",UI)
   self.assertIn('setQuestionBackgroundAsset(applied.id)',UI)

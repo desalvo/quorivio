@@ -1,3 +1,14 @@
+# Quorivio 0.1.0-dev — RC114 — Editor CI preflight handoff (1 November 2026)
+
+**Status:** RC114 cumulative local correction after the failed RC113 GitHub full CI on `6a51c67074a4dccb481e13516f4dc04601c2ada7`. Two legacy RC89 preflight assertions rejected intentional safer behavior: only dismiss background-upload context on confirmed success, and accept newly validated answer style keys. Five new negative RC114 assertions check that unsafe regressions still fail. RC113 historical SHA-256 catalog retained and RC114 is the only current inventory. Full CI has not yet verified RC114. Baseline RC107 full CI `41309042012` green; certified **85.25%** (43/17/60). `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+**Next:** Push only after user commit. Run full CI via `[full-ci]`. If green, resume feature development and reconcile CI evidence without counting manual/independent acceptance automatically.
+
+**Additional full-suite reconciliation:** A complete 1,607-test Python run found three further stale/graphic contracts: the canvas menu right-click expectation, Shift+Arrow resize now disabling auto-fit, and duplicated legacy Separator/Line icons. The old contracts are now updated to verify context hit-testing and collision-safe keyboard resizing; the obsolete Separator icon is removed from the insertable mapping, leaving unique icons for all 20 insertable widgets. The historical Separator remains supported in saved documents. RC114 includes two further negative/graphic regressions. The full suite must be rerun after packaging and in GitHub Actions.
+
+
+---
+
 # Quorivio 0.1.0-dev — RC113 — Inline editing, media upload, optional titles, fitted content, and graphic shapes/lines (1 November 2026)
 
 **Certified baseline:** RC107 full CI `41309042012` SUCCESS, commit `99a801ab7623347ba776b8214d054aa872ddb5c6`, Docker Hub published. RC108–RC113 remain cumulative **uncertified local changes**. Version `0.1.0-dev`, `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Certified completion remains **85.25%** (43 accepted/17 partial of 60).

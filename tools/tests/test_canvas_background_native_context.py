@@ -17,7 +17,11 @@ class CanvasBackgroundNativeContext(unittest.TestCase):
   self.assertIn('onBackgroundUpload={file=>uploadBackground(file,false)}',SOURCE)
   self.assertIn('onBackgroundSelect("")',SOURCE)
  def test_existing_widget_menu_is_preserved(self):
-  self.assertIn('setContextWidget(onInspectWidget?null:w.id)',SOURCE)
+  # Widget context is now opened by the shared hit-tested floating menu,
+  # not by automatically invoking the Properties dialog during right-click.
+  self.assertIn('openWidgetContextMenu(widgetId,widget,e.clientX,e.clientY)',SOURCE)
+  self.assertIn('setContextWidget(widgetId)',SOURCE)
+  self.assertIn('onContextMenuCapture={handleCanvasContext}',SOURCE)
   self.assertIn('onInspectWidget?.(w.id)',SOURCE)
   self.assertIn('.canvas-background-context',CSS)
 

@@ -1,3 +1,18 @@
+# Quorivio 0.1.0-dev — RC114 — CI editor preflight compatibility and fail-closed upload validation (1 November 2026)
+
+**Status:** RC114 cumulative local correction to RC113. GitHub full CI for commit `6a51c67074a4dccb481e13516f4dc04601c2ada7` failed in the early RC89 legacy source-contract preflight (2/8 tests); later stages were not executed. RC107 is still the last successful full-CI release baseline (run `41309042012`). Certified completion **85.25%** (43 accepted, 17 partial / 60); `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+**CI regression repaired:** Two obsolete RC89 source-string expectations mistakenly demanded unconditional background-menu closure after uploading and pre-RC110 allowlist ordering. The RC110+ behavior instead closes the upload menu only when the server successfully applies the image, preserving a visible error on rejection; answer text/background formatting now has additional strictly validated properties. The restored legacy tests inspect the current safe behavior, and five RC114 tests include negative mutations that fail if silent close/error swallowing or color validation returns. New preflight executes before npm; previous RC113 inventory is retained as immutable historical evidence. Only the redundant legacy Separator palette icon was removed; editor semantics remain unchanged.
+
+**Verification and limitations:** Local RC89 and RC114 preflight, affected prior tests, Node API/frontend suites and package checks; the GitHub full CI for RC114 is required before declaring this issue resolved in the remote build. No commit/push/tag/image publication performed.
+
+**Suggested commit since RC113:** `Align legacy editor CI assertions with safe background uploads and validated answer styling [full-ci]`.
+
+**Additional full-suite reconciliation:** A complete 1,607-test Python run found three further stale/graphic contracts: the canvas menu right-click expectation, Shift+Arrow resize now disabling auto-fit, and duplicated legacy Separator/Line icons. The old contracts are now updated to verify context hit-testing and collision-safe keyboard resizing; the obsolete Separator icon is removed from the insertable mapping, leaving unique icons for all 20 insertable widgets. The historical Separator remains supported in saved documents. RC114 includes two further negative/graphic regressions. The full suite must be rerun after packaging and in GitHub Actions.
+
+
+---
+
 # Quorivio 0.1.0-dev — RC113 — Inline editing, media upload, optional titles, fitted content, and graphic shapes/lines (1 November 2026)
 
 **Certified baseline:** RC107 full CI `41309042012` SUCCESS, commit `99a801ab7623347ba776b8214d054aa872ddb5c6`, Docker Hub published. RC108–RC113 remain cumulative **uncertified local changes**. Version `0.1.0-dev`, `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Certified completion remains **85.25%** (43 accepted/17 partial of 60).

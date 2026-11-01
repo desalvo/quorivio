@@ -1,3 +1,18 @@
+# Quorivio 0.1.0-dev — RC114 — Compatibilità preflight editor e validazione sicura dell’upload (1 novembre 2026)
+
+**Stato:** correzione locale cumulativa RC114 della RC113. La full CI del commit `6a51c67074a4dccb481e13516f4dc04601c2ada7` è fallita nel preflight storico RC89 (2/8 test); i job successivi non sono stati eseguiti. L'ultima baseline con full CI verde rimane RC107, run `41309042012`. Completamento certificato **85,25%** (43 gate accettati, 17 parziali / 60); `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+**Correzione CI:** due asserzioni storiche RC89 cercavano la chiusura incondizionata del menu sfondo e un elenco ormai obsoleto di proprietà stilistiche. Il flusso RC110+ chiude il menu solo dopo l'applicazione riuscita e mostra l'errore sui rifiuti; i nuovi campi risposta sono validati rigorosamente. I test storici ora controllano i comportamenti effettivi; cinque test RC114 con mutazioni negative intercettano regressioni di chiusura silenziosa o validazione colore. Preflight eseguito prima di npm e inventario RC113 mantenuto come storico immutabile. Rimossa soltanto l’icona ridondante del Separatore legacy dalla palette; la logica dei widget resta invariata.
+
+**Verifiche e limiti:** test RC89/RC114 e regressioni locali, suite Node e controllo ZIP; è necessaria la full CI GitHub RC114 prima di dichiarare risolto il blocco remoto. Nessun commit/push/tag/pubblicazione eseguito.
+
+**Commit proposto dalla RC113:** `Align legacy editor CI assertions with safe background uploads and validated answer styling [full-ci]`.
+
+**Riconciliazione suite completa:** La suite Python da 1.607 test ha individuato tre problemi ulteriori: contratti storici di menu contestuale e ridimensionamento con Maiusc+frecce, oltre a un’icona duplicata fra Separatore legacy e Linee. Ora i test verificano il menu flottante e la gestione delle collisioni con autofit; l'icona legacy non compare più nella palette di inserimento e le 20 icone inseribili sono distinte. I documenti storici con Separatore restano leggibili. Aggiunte altre due regressioni RC114. La full CI dovrà comunque certificare la revisione.
+
+
+---
+
 # Quorivio 0.1.0-dev — RC113 — Testo inline, asset JPG, titoli, autofit visivo e forme/linee (1 novembre 2026)
 
 **Baseline certificata:** RC107 full CI `41309042012` SUCCESS, commit `99a801ab7623347ba776b8214d054aa872ddb5c6`, pubblicazione Docker Hub confermata. Le revisioni RC108–RC113 sono modifiche cumulative **non ancora certificate da GitHub**. Versione `0.1.0-dev`; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Completamento certificato invariato: **85,25%** (43 gate accettati, 17 parziali su 60).

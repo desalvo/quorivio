@@ -1,3 +1,14 @@
+# Quorivio 0.1.0-dev — RC114 — Passaggio CI editor (1 novembre 2026)
+
+**Stato:** RC114 cumulativa locale dopo la full CI RC113 fallita sul commit `6a51c67074a4dccb481e13516f4dc04601c2ada7`. Due test storici RC89 respingevano comportamenti corretti: chiudere il menu sfondo solo dopo upload riuscito e ammettere le nuove proprietà delle risposte con validazione rigorosa. Cinque test negativi RC114 verificano che eventuali regressioni non vengano ignorate. Inventario RC113 mantenuto immutabile e RC114 unico inventario corrente. Full CI RC114 ancora da eseguire; ultima baseline full CI verde RC107 `41309042012`. Completamento certificato **85,25%** (43/17/60). `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+**Prossimi passi:** il commit/push è a carico dell'utente; avviare la full CI con `[full-ci]`. Se verde, riprendere lo sviluppo funzionale riconciliando le evidenze senza promuovere automaticamente gate manuali/indipendenti.
+
+**Riconciliazione suite completa:** La suite Python da 1.607 test ha individuato tre problemi ulteriori: contratti storici di menu contestuale e ridimensionamento con Maiusc+frecce, oltre a un’icona duplicata fra Separatore legacy e Linee. Ora i test verificano il menu flottante e la gestione delle collisioni con autofit; l'icona legacy non compare più nella palette di inserimento e le 20 icone inseribili sono distinte. I documenti storici con Separatore restano leggibili. Aggiunte altre due regressioni RC114. La full CI dovrà comunque certificare la revisione.
+
+
+---
+
 # Quorivio 0.1.0-dev — RC113 — Testo inline, asset JPG, titoli, autofit visivo e forme/linee (1 novembre 2026)
 
 **Baseline certificata:** RC107 full CI `41309042012` SUCCESS, commit `99a801ab7623347ba776b8214d054aa872ddb5c6`, pubblicazione Docker Hub confermata. Le revisioni RC108–RC113 sono modifiche cumulative **non ancora certificate da GitHub**. Versione `0.1.0-dev`; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Completamento certificato invariato: **85,25%** (43 gate accettati, 17 parziali su 60).
