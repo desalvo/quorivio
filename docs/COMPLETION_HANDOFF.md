@@ -1,3 +1,17 @@
+# Quorivio 0.1.0-dev — RC118 — Localized release-documentation preflight correction (1 November 2026)
+
+**Verified status:** RC117 full CI GitHub Actions run `41332909058` (commit `90cef44a8e32cca63c08b9d9e6374e100ff4284b`) failed early on historical documentation checks: four tests require the decimal-comma Italian percentage `85,25%` but the RC117 active Italian headers used `85.25%`. Frontend compilation and the Chromium editor tests did NOT run, so the previous Undo bug remains unverified end-to-end. ClamAV passed.
+
+**RC118 fix:** current localized release headers now display the certified score **85,25%** in Italian and **85.25%** in English. The early `verify_rc_release_status.py` guard computes the score from the actual `RC_GATE_MATRIX.json` ledger through `rc_gate_audit`, and verifies exact locale-specific percentages in the CURRENT sections only. Negative tests reject missing scores, stale scores, and wrong decimal separators; the existing flags and exact cycle verification remain. The audit ledger is untouched: 43 accepted and 17 partial gates out of 60.
+
+**Further full-suite regression repairs:** the historical browser-contract test now checks the exact accessible selection helper instead of two obsolete `.check()` calls; Chromium requires Shapes and Lines in the palette and rejects legacy Separator. Strict 5→3 widget counts, selected accessible rows and one-step Undo remain mandatory.
+
+**Limitations:** GitHub full CI, especially real Chromium group duplication / single Undo / Redo, remains to be verified. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit, push, Docker publication, or promotion to final RC.
+
+**Suggested commit since RC117:** `Fix locale-specific RC completion headers and enforce ledger-matched release documentation [full-ci]`.
+
+---
+
 # Quorivio 0.1.0-dev — RC117 — Atomic auto-fit Undo (1 November 2026)
 
 **Status:** RC116 full CI GitHub run `41330955017`, commit `086274a5725a6e8b5d852aabb9cab463057882d4`, compiled TypeScript successfully and created exactly 5 widgets after two-widget duplication, but a single Ctrl+Z left 5 widgets instead of restoring the original 3. ClamAV passed; downstream campaign jobs were skipped.

@@ -9,6 +9,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 from verify_rc_current_inventory import current_verifier_module
+from rc_gate_audit import audit
 
 ROOT = Path(__file__).resolve().parents[1]
 FILES = (
@@ -28,6 +29,10 @@ def verify_headers(root: Path = ROOT, cycle: int | None = None) -> int:
             raise ValueError('unrecognized current inventory: ' + name)
         cycle = int(match.group(1))
     expected = f'RC{cycle}'
+    score = audit()['score']
+    # Percentage is derived from the gate ledger, not an unverified status note.
+    score_en = f'{score:.2f}%'
+    score_it = score_en.replace('.', ',')
     for file in FILES:
         path = root / 'docs' / file
         text = path.read_text(encoding='utf8')
@@ -39,6 +44,9 @@ def verify_headers(root: Path = ROOT, cycle: int | None = None) -> int:
             raise ValueError(f'{file}: active heading {heading!r} does not identify {expected}')
         if not all(flag in current for flag in FLAGS):
             raise ValueError(f'{file}: missing one or more explicit release flags')
+        score_label = score_it if file.endswith('.it.md') else score_en
+        if re.search(rf'(?<![0-9]){re.escape(score_label)}(?![0-9])', current) is None:
+            raise ValueError(f'{file}: missing ledger-derived localized completion score {score_label}')
     return len(FILES)
 
 

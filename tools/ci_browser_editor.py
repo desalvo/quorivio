@@ -306,10 +306,11 @@ async def main():
    # Require every supported kind, one tool per kind, unique icons and
    # accessible names, while allowing future widget families to be added.
    kinds=await buttons.evaluate_all('(els)=>els.map(e=>e.dataset.widgetKind)')
-   required={'rating','reactions','text','divider','timer','qr','profile',
+   required={'rating','reactions','text','shape','line','timer','qr','profile',
              'question','postit','image','video','logo','pdf','topic-question',
              'timed-quiz','results-button','participant-count','title','footer'}
    assert required<=set(kinds),f'Widget palette missing required kinds: {sorted(required-set(kinds))}'
+   assert 'divider' not in kinds,'Legacy Separator must not be offered for new pages'
    assert len(kinds)==len(set(kinds)),f'Duplicate widget palette kinds: {kinds}'
    labels=await buttons.evaluate_all('(els)=>els.map(e=>e.getAttribute("aria-label"))')
    assert all(label and label.startswith('Aggiungi widget: ') for label in labels),labels

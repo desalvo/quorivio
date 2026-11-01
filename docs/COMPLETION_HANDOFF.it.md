@@ -1,3 +1,17 @@
+# Quorivio 0.1.0-dev — RC118 — Correzione verifica documentale localizzata (1 novembre 2026)
+
+**Stato verificato:** la full CI RC117 GitHub Actions `41332909058` (commit `90cef44a8e32cca63c08b9d9e6374e100ff4284b`) è fallita nel controllo anticipato della documentazione: quattro test storici richiedono la percentuale in italiano `85,25%`, mentre le intestazioni RC117 usavano `85.25%`. La compilazione e Chromium NON sono stati eseguiti in questa run; l'esito del precedente bug Undo resta quindi da verificare end-to-end. ClamAV ha superato il controllo.
+
+**Correzione RC118:** le quattro intestazioni correnti riportano il completamento certificato esatto, in italiano **85,25%** e in inglese **85.25%**. Il controllo anticipato `verify_rc_release_status.py` legge il punteggio dal registro `RC_GATE_MATRIX.json` tramite `rc_gate_audit` e verifica il formato per lingua nelle sezioni correnti (non nelle note storiche); sono aggiunti test negativi per percentuale mancante, errata e con separatore decimale sbagliato. Non vengono modificati conteggi, prove o gate: 43 accettati e 17 parziali su 60.
+
+**Ulteriori regressioni individuate dalla suite completa:** aggiornato il test storico che richiedeva due chiamate `.check()` invece della nuova selezione esatta; il test Chromium esige ora Forme e Linee e rifiuta il Separatore legacy nella palette. Rimangono intatte le verifiche 5→3 widget, selezione accessibile e undo, senza indebolire la CI.
+
+**Limiti:** la release candidate non è ancora certificata; RC118 attende la full CI GitHub, inclusa la prova Chromium di duplicazione, singolo Undo e Redo; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/pubblicazione eseguiti dall'assistente.
+
+**Commit suggerito dopo RC117:** `Fix locale-specific RC completion headers and enforce ledger-matched release documentation [full-ci]`.
+
+---
+
 # Quorivio 0.1.0-dev — RC117 — Autofit e Undo atomico (1 novembre 2026)
 
 **Stato:** la full CI RC116, GitHub Actions `41330955017`, commit `086274a5725a6e8b5d852aabb9cab463057882d4`, ha superato la build TypeScript e la duplicazione di due widget (5 attesi/5 rilevati), ma al successivo singolo Ctrl+Z il canvas conteneva ancora 5 widget, non i 3 originali. ClamAV verde; gli altri job dipendenti sono stati saltati.
