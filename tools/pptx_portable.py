@@ -226,6 +226,12 @@ def _validate_export_input(data):
                     not isinstance(option, dict) or not _valid_text(option.get('label', ''), 500)
                     for option in options):
                     raise ValueError('Invalid quiz options')
+                _validate_export_question_group(widget)
+                # A slide with multiple questions must never silently discard
+                # its final questions when the native OOXML text budget ends.
+                parts = _export_text_parts(widget, activity, data.get('session') or {})
+                if sum(len(value) for value, _ in parts) > MAX_EXPORT_TEXT:
+                    raise ValueError('PowerPoint grouped questions exceed editable text quota')
     return activities
 
 
@@ -266,6 +272,74 @@ def _validate_inline_marks(widget):
             if not valid:
                 raise ValueError('Invalid widget inline text style')
     return marks
+
+
+def _validate_export_question_group(widget):
+    """Mirror the bounded API subquestion shape before producing a public PPTX.
+
+    Answer keys intentionally never appear in the projected text; this is an
+    editable visual export, not a reversible private quiz/answer-key backup.
+    """
+    questions = widget.get('questions')
+    if questions is None:
+        if any(mark['field'].startswith('question:') for mark in widget.get('textMarks', [])):
+            raise ValueError('Orphaned grouped question mark')
+        return
+    if not isinstance(questions, list) or not 1 <= len(questions) <= 5:
+        raise ValueError('Invalid question group size')
+    seen = set()
+    for question in questions:
+        if not isinstance(question, dict) or set(question) - {
+            'id', 'label', 'description', 'answerMode', 'options', 'required',
+            'allowAnswerChange', 'correctOptionId', 'correctOptionIds'}:
+            raise ValueError('Invalid grouped question')
+        identifier = question.get('id')
+        label = question.get('label')
+        if (not isinstance(identifier, str) or
+            not re.fullmatch(r'[A-Za-z0-9_-]{1,40}', identifier) or identifier in seen or
+            not _valid_text(label, 240) or not label.strip()):
+            raise ValueError('Invalid grouped question identity or label')
+        seen.add(identifier)
+        if 'description' in question and not _valid_text(question['description'], 500):
+            raise ValueError('Invalid grouped question description')
+        mode = question.get('answerMode', 'text')
+        if mode not in ('single', 'multiple', 'text', 'file') or (widget['kind']=='timed-quiz' and mode not in ('single','multiple')):
+            raise ValueError('Invalid grouped question answer mode')
+        if any(k in question and not isinstance(question[k], bool)
+               for k in ('required','allowAnswerChange')):
+            raise ValueError('Invalid grouped question flags')
+        options = question.get('options', [])
+        if not isinstance(options, list) or len(options)>12 or (mode in ('single','multiple') and len(options)<2):
+            raise ValueError('Invalid grouped question options count')
+        option_ids = set()
+        for option in options:
+            if not isinstance(option, dict) or not isinstance(option.get('id'), str) or not re.fullmatch(r'[A-Za-z0-9_-]{1,40}', option['id']) or option['id'] in option_ids or not _valid_text(option.get('label'),160) or not option['label'].strip():
+                raise ValueError('Invalid grouped question option')
+            option_ids.add(option['id'])
+        answer = question.get('correctOptionId')
+        if answer is not None and (not isinstance(answer,str) or answer not in option_ids):
+            raise ValueError('Invalid grouped question answer reference')
+        answers = question.get('correctOptionIds', [])
+        if not isinstance(answers,list) or any(not isinstance(a,str) or a not in option_ids for a in answers) or len(answers)!=len(set(answers)):
+            raise ValueError('Invalid grouped question answer references')
+    # Inline spans are only meaningful when the referenced field actually
+    # exists and its end is inside the corresponding JS UTF-16 text boundary.
+    for mark in widget.get('textMarks', []):
+        field = mark['field']
+        if not field.startswith('question:'):
+            continue
+        match = re.fullmatch(r'question:([A-Za-z0-9_-]{1,40}):(label|description|option:([A-Za-z0-9_-]{1,40}))',field)
+        if match is None:
+            raise ValueError('Invalid grouped question mark field')
+        question = next((q for q in questions if q['id']==match.group(1)),None)
+        if question is None:
+            raise ValueError('Orphaned grouped question mark')
+        if match.group(3):
+            text = next((o['label'] for o in question.get('options',[]) if o['id']==match.group(3)),None)
+        else:
+            text = question.get(match.group(2))
+        if text is None or mark['end'] > _utf16_boundaries(text)[-1]:
+            raise ValueError('Grouped question mark extends beyond its field')
 
 
 def _utf16_boundaries(value):
@@ -320,8 +394,22 @@ def _export_text_parts(widget, activity, session):
                                    if description else [])
     parts = [(label,'label')]
     if kind in ('question','timed-quiz'):
+        if description and description != label:
+            parts.extend([('\n',None), (str(description),'description')])
         for option in widget.get('options', [])[:12]:
-            parts.extend([('\n',None),(str(option.get('label','')),'option:'+str(option.get('id','')))])
+            parts.extend([('\n',None), (str(option.get('label','')),'option:'+str(option.get('id','')))])
+        # A question widget can contain up to five *additional* independent
+        # questions. Export their complete visible text and inline marks, not
+        # just the legacy top-level label/options. Delimiters are unstyled.
+        for number, question in enumerate(widget.get('questions') or [], 1):
+            qid = str(question['id'])
+            prefix = f'question:{qid}:'
+            parts.extend([('\n\n',None),(str(question['label']),prefix+'label')])
+            q_description = question.get('description')
+            if q_description:
+                parts.extend([('\n',None),(q_description,prefix+'description')])
+            for option in question.get('options') or []:
+                parts.extend([('\n',None),(str(option['label']),prefix+'option:'+str(option['id']))])
     elif description and description != label:
         parts.extend([('\n',None), (str(description),'description')])
     return parts
@@ -1047,13 +1135,19 @@ def portable_to_pptx(data, destination, media_dir=None):
         # Export global schema widgets in the same order and geometry as React.
         master = (((data.get('session') or {}).get('theme') or {}).get('master') or {})
         scheme = master.get('widgets') or []
-        if (not isinstance(scheme, list) or len(scheme) > 2 or
-            any(not isinstance(w, dict) or w.get('kind') not in ('title','footer') for w in scheme) or
-            len(set(w['kind'] for w in scheme)) != len(scheme)):
+        if (not isinstance(scheme, list) or len(scheme) > 16 or
+            any(not isinstance(w, dict) or not isinstance(w.get('id'),str) or not isinstance(w.get('kind'),str) for w in scheme) or
+            len(set(w['id'] for w in scheme)) != len(scheme) or
+            any(sum(w['kind']==kind for w in scheme)>1 for kind in ('title','footer'))):
             raise ValueError('Invalid global slide scheme')
         local_kinds = {w.get('kind') for w in widgets if isinstance(w, dict)}
-        widgets = [{**w,'id':f'inherited-{w["kind"]}'} for w in scheme if w['kind'] not in local_kinds] + widgets
-        if len(widgets) > 16:
+        local_ids = {w.get('id') for w in widgets if isinstance(w, dict)}
+        source = [w for w in scheme if w['id'] not in local_ids and (w['kind'] not in ('title','footer') or w['kind'] not in local_kinds)]
+        inherited_ids = {w['id'] for w in source}
+        widgets = [{**w,'id':f'inherited-{w["id"]}'[:48],
+                    **({'targetWidgetId':f'inherited-{w["targetWidgetId"]}'[:48]} if w.get('targetWidgetId') in inherited_ids else {})}
+                   for w in source] + widgets
+        if len(widgets) > 32:
             raise ValueError('Too many widgets after scheme inheritance')
         for scheme_widget in scheme:
             _validate_inline_marks(scheme_widget)
@@ -1127,7 +1221,13 @@ def portable_to_pptx(data, destination, media_dir=None):
                     int(p.slide_width*w/100), int(p.slide_height*h/100))
             text_parts = _export_text_parts(widget, activity, data.get('session') or {})
             content = ''.join(part for part, _ in text_parts)
-            box.text = content[:MAX_EXPORT_TEXT]
+            if len(content) > MAX_EXPORT_TEXT:
+                raise ValueError('PowerPoint widget text exceeds export quota')
+            box.text = content
+            if widget.get('kind') in ('question', 'timed-quiz'):
+                from pptx.enum.text import MSO_AUTO_SIZE
+                box.text_frame.word_wrap = True
+                box.text_frame.auto_size = MSO_AUTO_SIZE.TEXT_TO_FIT_SHAPE
             # Marks are intentionally emitted as editable native runs only.
             # No text run is allowed beyond the portable text quota.
             remaining = MAX_EXPORT_TEXT
@@ -1170,15 +1270,39 @@ def portable_to_pptx(data, destination, media_dir=None):
                          'textAlign':'center', **master_style, **style}
             if widget.get('kind') == 'footer':
                 style = {'fontFamily':'Arial', 'fontSize':14, 'textAlign':'center', **style}
+                if widget.get('footerSeparator') is not False:
+                    from pptx.enum.shapes import MSO_CONNECTOR
+                    from pptx.dml.color import RGBColor
+                    from pptx.util import Pt
+                    line_color = widget.get('footerSeparatorColor','#9ca3af')
+                    if not isinstance(line_color,str) or not re.fullmatch(r'#[0-9A-Fa-f]{6}',line_color):
+                        raise ValueError('Invalid footer separator color')
+                    divider = slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT,
+                        int(p.slide_width*x/100),int(p.slide_height*y/100),
+                        int(p.slide_width*(x+w)/100),int(p.slide_height*y/100))
+                    divider.line.color.rgb = RGBColor.from_string(line_color[1:])
+                    divider.line.width = Pt(0.8)
                 if widget.get('footerShowPageNumber') is not False:
                     # 10 CSS px inset from the physical slide bottom and right
                     # (1 inch = 96 CSS px for the 16:9 stage), independent of
                     # widget geometry; the center footer remains user-editable.
                     inset = Inches(10/96)
                     number_width, number_height = Inches(1.2), Inches(.38)
-                    right = slide.shapes.add_textbox(
-                        int(p.slide_width-number_width-inset),
-                        int(p.slide_height-number_height-inset),
+                    if 'footerNumberX' in widget or 'footerNumberY' in widget:
+                        x_percent = widget.get('footerNumberX', 100)
+                        y_percent = widget.get('footerNumberY', 100)
+                        if (not isinstance(x_percent,(int,float)) or isinstance(x_percent,bool) or
+                            not isinstance(y_percent,(int,float)) or isinstance(y_percent,bool) or
+                            not all(math.isfinite(n) and 0<=n<=100 for n in (x_percent,y_percent))):
+                            raise ValueError('Invalid footer page-number placement')
+                        number_x = (x + w*x_percent/100)*float(p.slide_width)/100
+                        number_y = (y + h*y_percent/100)*float(p.slide_height)/100
+                        number_left = max(0,min(int(number_x-number_width),int(p.slide_width-number_width)))
+                        number_top = max(0,min(int(number_y-number_height),int(p.slide_height-number_height)))
+                    else:
+                        number_left = int(p.slide_width-number_width-inset)
+                        number_top = int(p.slide_height-number_height-inset)
+                    right = slide.shapes.add_textbox(number_left,number_top,
                         int(number_width), int(number_height))
                     right.text = str(page_index)
                     from pptx.enum.text import PP_ALIGN

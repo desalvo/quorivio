@@ -1,3 +1,97 @@
+# Quorivio 0.1.0-dev — RC113 — Inline editing, media upload, optional titles, fitted content, and graphic shapes/lines (1 November 2026)
+
+**Certified baseline:** RC107 full CI `41309042012` SUCCESS, commit `99a801ab7623347ba776b8214d054aa872ddb5c6`, Docker Hub published. RC108–RC113 remain cumulative **uncertified local changes**. Version `0.1.0-dev`, `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Certified completion remains **85.25%** (43 accepted/17 partial of 60).
+
+**Editing and titles:** Double-click activates in-place text editing without launching Widget Properties. Properties remain available through explicit context-menu commands. `showTitle` defaults to true and is strictly validated; page/master properties expose the switch without removing saved text or semantic accessible names.
+
+**Media:** Logo/Image uploads accept OS file-picker JPEG/JPG and supported MIME fallback, preserve server-side signature scanning, validate the returned media UUID, refresh the library, clear autosave blocked state and provide useful diagnostics rather than reporting an early missing attachment as upload failure. Background uploads are a separate flow and still require real browser/PostgreSQL verification.
+
+**Content fitting:** Shared `WidgetContentFit` observes geometry and content and uniformly reduces visual contents to fit authored rectangles, without moving widget borders/handles. The editor displays a percentage status by Delete only when scaling is active. The accessibility reading mode is intentionally unscaled.
+
+**Graphics:** New Shapes and Lines replace Divider in the creation palette, without deleting legacy divider data. Standard editable SVG polygons and four line directions support fill, outline, width, dash and color. Graphic widgets may overlap interactive widgets; collision rejection between ordinary widgets remains unchanged. Decorative overlays do not intercept live participant actions.
+
+**Acceptance:** Node and targeted local checks and immutable SHA-256 manifest; GitHub full CI and real physical/user browser upload and resizing acceptance remain pending. Do not promote the certified gate percentage or announce a final RC. No commit, push, tag or publication performed.
+
+**Cumulative commit since RC107:** `Complete grouped PPTX and editor workflows, fix asset uploads and inline widget editing, and add scalable graphic shapes and lines [full-ci]`.
+
+---
+
+# Quorivio 0.1.0-dev — RC112 — PowerPoint-style master editor, Footer and rulers (1 November 2026)
+
+**Certified baseline:** RC107 GitHub full CI `41309042012` SUCCESS, commit `99a801ab7623347ba776b8214d054aa872ddb5c6`, Docker Hub published. RC108–RC112 cumulative changes remain **uncertified on GitHub**. Version `0.1.0-dev`; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Certified completion stays **85.25%** (43 accepted, 17 partial of 60); no local-only promotion.
+
+**Slide scheme editor:** RC105 selected-only border-box resize handles are now shared with the master canvas; Exit remains above overlapping content and receives pointer hits. The top PowerPoint-like ribbon groups Insert, Align, Distribute, Save, and a horizontal widget rail enables adding non-media widgets. Masters support up to 16 valid widgets; a single Title and Footer each plus multiple generic kinds. Persisted master widgets are inherited by page views, with result/source links remapped to inherited IDs. Media widgets (Image, Video, Logo, PDF) are shown in the master rail and enabled only when the session library contains a compatible authorized asset; their asset selection is editable in master properties.
+
+**Configurable footer:** central session title vs custom label, font/size/bold/italic/underline/color, geometry, independent page-number visibility and placement within the Footer (0–100% in both axes), separator visibility and color. Existing footers retain the 10px lower-right number when custom coordinates are absent. React and native PPTX use the same customizable numbering, with strict API validation; numbers remain dynamic by slide order.
+
+**Page editor rulers:** the same horizontal and vertical rulers displayed in the master are now visible around the normal page editor canvas, responsive on desktop/mobile while retaining 16:9 ratio.
+
+**Evidence and limits:** Node API 567/567 and frontend 159/159 passing. Native Chromium CSS checks on 1440px and 390px verify selected-only handle positions, Exit hit target and page ruler. Generated PPTX checks cover custom number placement and suppression plus separator. Full React/Vite production build and authenticated end-to-end master-editor gestures still require GitHub full CI. No commit/push/tag/image publication.
+
+**Suggested cumulative commit since RC107:** `Export grouped-question PPTX, improve interactive widgets and backgrounds, fix previews, and complete draggable slide schemes and configurable footer [full-ci]`.
+
+---
+
+# Quorivio 0.1.0-dev — RC111 — Rehearsal visibility, result text wrapping, scheme navigation (1 November 2026)
+
+**Baseline:** RC107 GitHub full CI `41309042012` SUCCESS and Docker Hub publication, commit `99a801ab7623347ba776b8214d054aa872ddb5c6`. RC108–RC111 cumulative changes remain **uncertified on GitHub**. Version `0.1.0-dev` unchanged. `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+**Presenter / Participant / Side-by-side preview:** The authenticated page editor sits in a fixed `z-index:9000` layer, while its body-portalled rehearsal backdrop was below it at 5000. All three buttons updated pressed state but displayed the modal under the editor. The global body rehearsal backdrop now stacks at 15000, above the editor and its draggable property/ribbon windows (12000). The modal keeps its existing focus trap, accessible dialog, click-away closure and page-specific unsaved preview state. A real Chromium CSS geometry regression checks hit testing above the editor at desktop and mobile widths; the compiled React rehearsal CI regression now checks actual topmost hit testing in addition to DOM presence. Full application acceptance still requires GitHub.
+
+**Linked result widgets:** Previously the source question and long answer labels were forced into a single ellipsized line. They now wrap to the actual widget width in bar/table/cloud and other linked modes, break long unspaced terms safely and remain scroll-accessible when manually sized too short. Count values and chart tracks retain their semantics. CSS tests use native Chromium desktop/mobile viewports and verify multi-line text without horizontal overflow. Source data/aggregation is unchanged.
+
+**Scheme editor discoverability:** Retain the global title/footer scheme canvas and concurrency-safe save. Add a dedicated `Editor degli schemi` link to the authenticated dashboard navigation for an open session and a `▤ Schemi` button in the fullscreen page-editor header, in addition to the existing `Modifica schemi` action above the thumbnail strip. Opening the scheme editor from the fullscreen page editor blocks navigation while autosave is pending to prevent data loss.
+
+**Acceptance and limits:** Node API 565/565, web 157/157, RC111 contract tests and native Chromium CSS smoke tests pass locally. The npm offline cache is incomplete, so a fresh production React/Vite build and end-to-end application modal test must be verified by GitHub CI. Certified completion remains **85.25%** (43 accepted, 17 partial of 60); do not promote automatic or independent gates without evidence. No commit, push, tag or Docker publication performed.
+
+**Suggested cumulative commit since RC107:** `Export grouped question PPTX, improve response inputs and footers, fix JPG backgrounds, word clouds and floating previews, and expose slide schemes [full-ci]`.
+
+---
+
+# Quorivio 0.1.0-dev — RC110 — Background JPG upload, ranked clouds and free-answer field sizing (1 November 2026)
+
+**Baseline:** RC107 GitHub full CI `41309042012` SUCCESS and Docker Hub published, commit `99a801ab7623347ba776b8214d054aa872ddb5c6`. RC108–RC110 cumulative local changes are **not yet certified** by GitHub CI.
+
+**Background upload fix:** The canvas context menu opens the system file picker and calls the authorized `/api/sessions/:id/backgrounds` raw-image upload. On success the returned session-scoped asset id is applied to the current page, background library is refreshed, and page autosave retains the ID. Errors no longer silently close the canvas menu: pending and failed upload states appear in the menu with `role=status`, and only a successful server response closes it. JPG, JPEG, PNG, GIF, WebP are accepted with MIME fallback for common platform file pickers. API remains fail-closed with size, image-signature, ClamAV and authorization checks. *The real OS-picker/JPG/PostgreSQL/browser end-to-end path remains to be certified in CI and deployment.*
+
+**Word clouds:** Top five ranked words/options have five different accessible colors; ranks six onward share a neutral color. Count descending with stable alphabetical tie-break; deterministic, without mutating source data. Applied to presenter-linked results, widget results and moderated audience topic word cloud. Other chart modes retain original ordering.
+
+**Free text response field dimensions:** New `style.answerFieldWidth` (25–100%) and `style.answerFieldHeight` (48–400px) can be set from the floating ribbon and widget Properties. Shared `answerInputStyle` applies to the actual participant textarea, rehearsal and canvas preview. Backend strictly validates integer ranges and disallows arbitrary CSS/HTML; existing documents with unspecified values use 100%/96px. This does not change submit-button size or manual outer widget resize. Auto-fit remains available where free layout space permits.
+
+**Cumulative:** RC108 editable grouped-question PowerPoint and RC109 responsive answer controls/auto-fit/single-line footer remain included. Node API 565/565, web 157/157, RC110 targeted tests passed locally. The Python full suite did not complete within the available timeout, and integrated browser+real PostgreSQL upload is unverified. Version remains `0.1.0-dev` and the certified RC gate score remains **85.25%** (43 accepted, 17 partial of 60). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Commit/push/tag/publication not performed.
+
+Suggested cumulative commit since the last confirmed RC107: `Export grouped question PPTX, improve editor answers and footer, and fix JPG backgrounds, cloud colors and response field sizing [full-ci]`.
+
+---
+
+# Quorivio 0.1.0-dev — RC109 — answer controls, auto-fit and single-row footer (1 November 2026)
+
+**Baseline:** RC107 GitHub full CI `41309042012` SUCCESS; the maintained SHA `99a801ab7623347ba776b8214d054aa872ddb5c6` is published on Docker Hub. RC108 and RC109 are local cumulative changes **not yet GitHub-CI certified**.
+
+**Editor and answer controls:** Questions, timed quizzes and audience-topic questions now show their real (disabled preview) Submit button on the edit canvas, including independent nested questions. Answer text boxes and options have independently configurable font family, font size, text color, bold and italic; the answer button font size (12–40 px) is configurable from the PowerPoint-like floating ribbon and the widget properties dialog. Shared style helpers apply in the authenticated participant surface, rehearsal and editor. Fields are validated strictly by the API and cannot smuggle arbitrary CSS or HTML.
+
+**Auto-fit:** Eligible text/interactive widgets expand to fit their content by default after text, font, or answer-control changes. Growth is bounded to the 16:9 slide and uses the existing collision-rejection policy. A manual edge-resize or Shift+Arrow resize disables auto-fit only on that widget; a Properties checkbox reenables it. The algorithm never silently moves other widgets or writes outside the canvas. If the slide has no free space, content cannot be guaranteed to fit without manual rearrangement (deliberate fail-closed choice).
+
+**Footer:** New footers use a 7%-height single-row strip starting at 93%, center the session title horizontally, add a subtle separator line above, keep transparent background, and preserve the independent 10 px lower-right page number. Previously saved custom geometries remain unchanged; legacy normalization still works.
+
+**Previous cumulative RC108:** Native editable PowerPoint export of grouped questions and rich text with no answer-key disclosure remains included.
+
+**Verification:** API Node 565/565; frontend Node 154/154; RC109 Python contracts and old footer/rehearsal contracts passed locally. Chromium real application and full CI remain to be verified via GitHub.
+
+**Certified weighted completion:** 85.25% (43 accepted / 17 partial, 60 gates). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No additional gate credit without evidence. Suggested cumulative commit since RC107: `Export grouped questions to PPTX and improve editor answers, auto-fit and slide footers [full-ci]`. No assistant commit, push, tag or image publishing.
+
+---
+
+# Quorivio 0.1.0-dev — RC108 — grouped-question PowerPoint handoff (1 November 2026)
+
+**Verified baseline:** RC107 GitHub full CI run `41309042012` **SUCCESS**, commit `99a801ab7623347ba776b8214d054aa872ddb5c6` on `main`; 11/11 automatic RC campaign jobs succeeded. Docker image `desalvo/quorivio:latest` was published for this commit. This is the new committed baseline. No assistant remote operations.
+
+**RC108 functional development (local, pending CI):** native PowerPoint export now writes the entire visible content of grouped question/timed-quiz widgets, including up to five nested questions, labels, descriptions, individual options, and field-specific editable rich-text runs. UTF-16/Unicode formatting and explicit validation follow the API contract; invalid nested IDs, missing mark targets and oversized output fail before publishing a partial deck. Correct answer IDs and private answer keys are never exported in this public visual deck. Reimporting such a PPTX yields an **editable plain text widget**, NOT a reactivated multi-question quiz. Changing PowerPoint text does not change Quorivio quiz logic. Added 9 real-PPTX regressions to the post-dependency CI quality gate. Details: `docs/RC_CYCLE108_GROUPED_QUESTION_PPTX.en.md`.
+
+**Certified weighted completion remains 85.25%** (43 accepted / 17 partial, 60 total). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. A green CI is necessary but does not replace independent device, privacy/accessibility, Office fidelity and operational sign-offs. New code receives no RC gate credit prior to external verification. Suggested next commit since RC107: `Export complete grouped questions and styled answers in editable PowerPoint slides [full-ci]`.
+
+---
+
 # Quorivio 0.1.0-dev — RC107 — ANSI-aware Vite preview CI readiness (1 November 2026)
 
 The RC106 full CI in `logs_111954785384.zip` completed Chromium browser checks, but `ci_preview_proxy_guard.py` failed incorrectly with `compiled-preview readiness evidence is absent`. Vite's colorized terminal startup banner has ANSI sequences between `Local`, `:` and the URL. RC107 strips ANSI styling from a diagnostic copy of the log, preserves strict startup host/port checks and fail-closed socket/proxy diagnostics, and adds regressions using the reconstructed observed banner and negative failure fixtures. `docs/RC_CYCLE107_ANSI_PREVIEW_GUARD.en.md`.

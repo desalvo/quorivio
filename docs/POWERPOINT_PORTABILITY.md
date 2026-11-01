@@ -1,3 +1,11 @@
+## RC108 CURRENT BEHAVIOR (1 November 2026) — read before historical sections below
+
+**Native PowerPoint export:** all visible text from grouped question and timed-quiz widgets (top-level question plus up to five nested questions, descriptions and answer-option labels) is emitted as editable PowerPoint text. Per-span font/color/weight/size and UTF-16 safe formatting are preserved. The generated PPTX remains static: there is no voting, grading, results collection, answer key or quiz interactivity. Reimporting this PPTX produces editable plain text widgets, not interactive quiz groups. Oversized groups fail explicitly instead of being truncated. New regression coverage: `tools/tests/test_rc108_pptx_grouped_questions.py`.
+
+**Important:** historical paragraphs below describe functionality as it was on older dates; their limitations may have been superseded by later RC cycles. The independent Microsoft Office fidelity audit is still pending.
+
+---
+
 ## 2026-10-24 — Native PPTX table-cell recovery (current behavior)
 PowerPoint native table text is flattened into **editable, independently positioned text widgets**, one per nonempty cell, up to the existing **16-widget/page** capacity. Original native table formatting, borders, merged-cell semantics, and underlying OOXML table objects are **NOT preserved**. The fidelity report exposes `editable_table_cells`, `table_cells_over_page_limit`, and `unsupported_tables`; a PPTX containing tables is always marked lossy. The browser/worker path uses this same converter; physical browser and Kubernetes tests remain pending.
 

@@ -19,7 +19,9 @@ class GlobalMasterRegressions(unittest.TestCase):
   self.assertIn('pageNumber={Number(entry.activity.position)+1}',UI)
   self.assertEqual(UI.count('className="slide-footer-number"'),0)
   self.assertIn('className="slide-canvas-page-number"',UI)
-  self.assertIn('style={{fontFamily:item.fontFamily,fontSize:item.fontSize,color:item.color}}',UI)
+  self.assertIn('style={{fontFamily:item.fontFamily,fontSize:item.fontSize,color:item.color',UI)
+  self.assertIn('data-custom-number=',UI)
+  self.assertIn('slide-canvas-page-number[data-custom-number="true"]',CSS)
  def test_editor_works_with_selection_and_persistent_schema(self):
   for text in ('slide-scheme-layout','slide-scheme-inspector','onInspectWidget={setSchemaInspected}',
                'Mostra nome della sessione','Numero pagina (10 px dal bordo del canvas)',

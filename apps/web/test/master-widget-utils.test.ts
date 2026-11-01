@@ -16,9 +16,9 @@ test('local page Title and Footer override only matching scheme kinds',()=>{
  assert.deepEqual(resolveSlideMasterWidgets(page,master).map(w=>w.kind),['footer','title']);
  assert.deepEqual(resolveSlideMasterWidgets(page,[...master]),resolveSlideMasterWidgets(page,master));
 });
-test('scheme editor only persists one Title and one Footer',()=>{
+test('scheme editor keeps generic widgets but at most one Title and Footer',()=>{
  const all=[{id:'t',kind:'title'},{id:'f',kind:'footer'},{id:'t2',kind:'title'},{id:'other',kind:'quiz'}];
- assert.deepEqual(masterWidgetTemplate(all).map(w=>w.id),['t','f']);
+ assert.deepEqual(masterWidgetTemplate(all).map(w=>w.id),['t','f','other']);
 });
 
 test('an old unmodified default footer is moved back inside the stage; custom layout is untouched',()=>{
@@ -26,4 +26,11 @@ test('an old unmodified default footer is moved back inside the stage; custom la
  assert.deepEqual(normalizeLegacyFooter(old).position,{x:0,y:87,width:100,height:13,rotation:0});
  assert.equal(old.position.y,94);
  assert.equal(normalizeLegacyFooter({...old,position:{...old.position,x:5}}).position.x,5);
+});
+
+test('a linked result in the master inherits its linked source ID correctly',()=>{
+ const master=[{id:'source',kind:'question',label:'Q'}, {id:'results',kind:'results-button',targetWidgetId:'source'}];
+ const merged=resolveSlideMasterWidgets([{id:'own',kind:'text'}],master);
+ assert.equal((merged[1] as any).targetWidgetId,merged[0].id);
+ assert.equal(merged[0].id,'inherited-source');
 });

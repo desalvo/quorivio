@@ -17,7 +17,7 @@ test('slide master controls all inherited titles while overrides remain local',(
 });
 test('footer is transparent full width at bottom, and page numbering follows current ordering',()=>{
  const f=newFooterWidget('footer-1');
- assert.equal(f.kind,'footer');assert.equal(f.position?.width,100);assert.equal(f.position?.y,87);assert.equal(f.position?.height,13);
+ assert.equal(f.kind,'footer');assert.equal(f.position?.width,100);assert.equal(f.position?.y,93);assert.equal(f.position?.height,7);
  assert.equal(f.style?.fillNone,true);
  assert.deepEqual(widgetDisplay(f,{sessionTitle:'Quorivio session',pageNumber:3}).center,'Quorivio session');
  assert.deepEqual(widgetDisplay(f,{sessionTitle:'Quorivio session',pageNumber:3}).page,'3');
@@ -42,4 +42,14 @@ test('numbering overlay is derived from the footer presence, not footer geometry
  assert.equal(footerPageNumber([{...footer,footerShowPageNumber:false}],5),null);
  assert.equal(footerPageNumber([],5),null);
  assert.equal(slidePageNumber([{id:'a'}],'removed'),0);
+});
+
+test('footer numbering can be independently hidden and repositioned in footer space',()=>{
+ const f=newFooterWidget('foot');
+ const custom={...f,footerNumberX:50,footerNumberY:45};
+ const number=footerPageNumber([custom],9)!;
+ assert.equal(number.text,'9');
+ assert.equal(number.x,50);
+ assert.ok(Math.abs(number.y-96.15)<1e-5);
+ assert.equal(footerPageNumber([{...custom,footerShowPageNumber:false}],9),null);
 });

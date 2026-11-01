@@ -226,6 +226,16 @@ jobs:
       - name: Strict release-candidate gate (manual opt-in)
         if: github.event_name == 'workflow_dispatch' && inputs.rc_strict && !inputs.rc_acceptance_suite
         run: python3 tools/rc_release_preflight.py --strict
+      - name: RC113 graphical overlays, media upload, inline editing and content fit regressions
+        run: node --experimental-strip-types --test apps/web/test/rc113-graphics-upload-fit.test.ts
+      - name: RC112 scheme editor ribbon and footer source contracts
+        run: python3 -m unittest tools.tests.test_rc112_scheme_ribbon_footer.MasterRibbonAndFooter.test_scheme_widget_rail_and_real_shared_selection tools.tests.test_rc112_scheme_ribbon_footer.MasterRibbonAndFooter.test_shared_canvas_rulers_and_selected_only_handles tools.tests.test_rc112_scheme_ribbon_footer.MasterRibbonAndFooter.test_number_and_separator_remain_strictly_validated -q
+      - name: RC111 preview stacking, result wrapping and scheme access preflight
+        run: python3 -m unittest tools.tests.test_rc111_preview_results_schemes -q
+      - name: RC110 background menu, ranked cloud and free-text sizing preflight
+        run: python3 -m unittest tools.tests.test_rc110_background_cloud_answer -q
+      - name: RC109 editor response controls, auto-fit and centered footer preflight
+        run: python3 -m unittest tools.tests.test_rc109_editor_autofit_answer_footer -q
       - name: RC107 colored Vite startup and WebSocket fail-closed contract
         run: python3 -m unittest tools.tests.test_rc107_colored_preview_readiness -q
       - name: RC106 isolated compiled-preview and floating portal contracts
@@ -288,6 +298,7 @@ jobs:
           python3 tools/ci_background_context_portal_chromium.py
           # Geometric parity across editor, rehearsal and audience at 1440px / 390px.
           python3 tools/ci_widget_visual_geometry_20261028.py
+          python3 tools/ci_rc112_scheme_canvas_chromium.py
           # Dual presenter/participant preview must preserve 16:9 and real reaction hit targets.
           python3 tools/ci_preview_layout_offline.py
           # Actual TS keyboard module: modal focus trap, Escape and scroll cleanup, 1440/390px.
@@ -304,6 +315,7 @@ jobs:
           # Public participant 16:9 stage and an accessible linear-reading alternative.
           python3 tools/ci_rc_public_stage_chromium.py
           # The real TS rehearsal handler also isolates portals created after opening.
+          python3 tools/ci_rc111_preview_results_chromium.py
           python3 tools/ci_rc_rehearsal_dynamic_portals_chromium.py
           python3 tools/ci_rehearsal_singleton_offline_chromium.py
           # Real built React: one-time account recovery bearer never lingers in URL/history.
@@ -653,10 +665,14 @@ jobs:
           python3 -m unittest \
             tools.tests.test_rc74_footer_corner.FooterCornerRC74.test_powerpoint_number_at_exact_slide_right_and_bottom_without_text_insets \
             tools.tests.test_rc91_scheme_stage.GlobalMasterRegressions.test_native_pptx_inherits_scheme_with_absolute_number_and_local_title_override -q
+      - name: Verify RC112 editable master footer and PowerPoint parity
+        run: python3 -m unittest tools.tests.test_rc112_scheme_ribbon_footer -q
       - name: Verify RC103 native participant QR export to PowerPoint
         run: python3 -m unittest tools.tests.test_rc103_participant_qr_pptx -v
       - name: Verify RC104 native editable rich-text PowerPoint roundtrip
         run: python3 -m unittest tools.tests.test_rc104_pptx_inline_text_roundtrip -v
+      - name: Verify RC108 native multi-question PowerPoint export and answer-key isolation
+        run: python3 -m unittest tools.tests.test_rc108_pptx_grouped_questions -v
       - name: Kubernetes wizard and worker integration tests
         run: |
           python3 tools/ci_inventory_reference_guard.py
@@ -771,7 +787,13 @@ jobs:
           python3 tools/verify_rc_cycle104_inventory.py --historical
           python3 tools/verify_rc_cycle105_inventory.py --historical
           python3 tools/verify_rc_cycle106_inventory.py --historical
-          python3 tools/verify_rc_cycle107_inventory.py
+          python3 tools/verify_rc_cycle107_inventory.py --historical
+          python3 tools/verify_rc_cycle108_inventory.py --historical
+          python3 tools/verify_rc_cycle109_inventory.py --historical
+          python3 tools/verify_rc_cycle110_inventory.py --historical
+          python3 tools/verify_rc_cycle111_inventory.py --historical
+          python3 tools/verify_rc_cycle112_inventory.py --historical
+          python3 tools/verify_rc_cycle113_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

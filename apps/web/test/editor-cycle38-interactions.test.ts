@@ -18,7 +18,7 @@ test('presenter rehearsal uses neutral projection components, never shared draft
  assert.doesNotMatch(server,/\/api\/join\/.*\/reactions\/stats/);
 });
 test('choice control is ordered before its caption in the participant and rehearsal',()=>{
- assert.match(source,/<label className="widget-answer-option" key=\{o\.id\}><input type=/);
+ assert.match(source,/<label className="widget-answer-option" style=\{answerOptionStyle\((?:marks|w)\.style\)\} key=\{o\.id\}><input type=/);
  assert.match(css,/\.widget-question \.widget-answer-option>input/);
  assert.match(css,/order:-1!important/);
  assert.match(css,/gap:\.35em!important/);

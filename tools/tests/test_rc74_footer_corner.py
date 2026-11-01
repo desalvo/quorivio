@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[2]
 class FooterCornerRC74(unittest.TestCase):
     def test_default_footer_occupies_bottom_strip_and_stays_dynamic(self):
         source = (ROOT / 'apps/web/src/slide-master.ts').read_text()
-        self.assertIn('position:{x:0,y:87,width:100,height:13,rotation:0}', source)
+        self.assertIn('position:{x:0,y:93,width:100,height:7,rotation:0}', source)
         self.assertIn("footerShowPageNumber:true", source)
         self.assertIn("String(context.pageNumber)", source)
 

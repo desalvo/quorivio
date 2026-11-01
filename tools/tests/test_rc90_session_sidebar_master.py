@@ -38,7 +38,7 @@ class SessionSidebarAndMaster(unittest.TestCase):
   self.assertIn("if(!window.confirm('Applicare Titolo e Footer",UI)
   self.assertIn('inherited-',MASTER)
  def test_footer_is_visible_with_ten_pixel_number_inset(self):
-  self.assertIn('position:{x:0,y:87,width:100,height:13,rotation:0}',(ROOT/'apps/web/src/slide-master.ts').read_text())
+  self.assertIn('position:{x:0,y:93,width:100,height:7,rotation:0}',(ROOT/'apps/web/src/slide-master.ts').read_text())
   self.assertIn('right:10px!important;bottom:10px!important',CSS)
 
 if __name__=='__main__':unittest.main()

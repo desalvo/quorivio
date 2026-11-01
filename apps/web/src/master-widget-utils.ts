@@ -11,11 +11,13 @@ export function normalizeLegacyFooter<W extends {kind:string;position?:{x:number
 }
 export function resolveSlideMasterWidgets<W extends {id:string;kind:string}>(local:readonly W[],master:readonly W[]|undefined):W[]{
  const kinds=new Set(local.map(w=>w.kind));
- const inherited=(master||[]).filter(w=>['title','footer'].includes(w.kind)&&!kinds.has(w.kind))
-   .map(w=>normalizeLegacyFooter({...w,id:`inherited-${w.kind}`} as W));
+ const pageIds=new Set(local.map(w=>w.id));
+ const source=(master||[]).filter(w=>!pageIds.has(w.id)&&(!['title','footer'].includes(w.kind)||!kinds.has(w.kind)));
+ const inheritedIds=new Set(source.map(w=>w.id));
+ const inherited=source.map(w=>normalizeLegacyFooter({...w,id:`inherited-${w.id}`.slice(0,48),
+    ...((w as any).targetWidgetId&&inheritedIds.has((w as any).targetWidgetId)?{targetWidgetId:`inherited-${(w as any).targetWidgetId}`.slice(0,48)}:{})} as W));
  return [...inherited,...local.map(w=>normalizeLegacyFooter(w))];
 }
 export function masterWidgetTemplate<T extends {id:string;kind:string}>(widgets:readonly T[]):T[]{
- return widgets.filter(w=>w.kind==='title'||w.kind==='footer')
-   .filter((w,index,all)=>all.findIndex(v=>v.kind===w.kind)===index);
+ return widgets.filter((w,index,all)=>['title','footer'].includes(w.kind)?all.findIndex(v=>v.kind===w.kind)===index:all.findIndex(v=>v.id===w.id)===index).slice(0,16);
 }

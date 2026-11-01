@@ -2,13 +2,14 @@
  * A collision is rejected rather than persisted; rotations use their saved
  * unrotated bounding rectangles, a conservative placement rule. */
 type Box={x:number;y:number;width:number;height:number};
-type Widget={id:string;position?:Partial<Box>};
+type Widget={id:string;kind?:string;position?:Partial<Box>};
+export const isFreeGraphic=(kind?:string)=>kind==='shape'||kind==='line'||kind==='divider';
 const number=(n:unknown,fallback:number)=>typeof n==='number'&&Number.isFinite(n)?n:fallback;
 const rect=(w:Widget):Box=>({x:number(w.position?.x,0),y:number(w.position?.y,0),width:number(w.position?.width,22),height:number(w.position?.height,20)});
 const hit=(a:Box,b:Box)=>a.x<b.x+b.width-0.0001&&a.x+a.width>b.x+0.0001&&a.y<b.y+b.height-0.0001&&a.y+a.height>b.y+0.0001;
 export function overlapsOtherWidgets<T extends Widget>(widgets:readonly T[],movingIds:readonly string[]):boolean{
  const ids=new Set(movingIds);const moved=widgets.filter(w=>ids.has(w.id)),fixed=widgets.filter(w=>!ids.has(w.id));
- return moved.some(a=>fixed.some(b=>hit(rect(a),rect(b))));
+ return moved.some(a=>!isFreeGraphic(a.kind)&&fixed.some(b=>!isFreeGraphic(b.kind)&&hit(rect(a),rect(b))));
 }
 /** Return the original positions when the proposed movement overlaps another widget. */
 export function rejectWidgetCollisions<T extends Widget>(original:readonly T[],proposed:T[],movingIds:readonly string[]):T[]{
@@ -30,7 +31,7 @@ export function magneticSnapWidget<T extends Widget>(candidate:T,others:readonly
  * Return null if the slide has no free rectangle of the requested size. */
 export function freeWidgetPosition<T extends Widget>(items:readonly T[],preferred:{x:number;y:number},width=22,height=20):Box|null{
  const first={x:Math.max(0,Math.min(100-width,preferred.x)),y:Math.max(0,Math.min(100-height,preferred.y)),width,height};
- const available=(b:Box)=>items.every(w=>!hit(b,rect(w)));
+ const available=(b:Box)=>items.every(w=>isFreeGraphic(w.kind)||!hit(b,rect(w)));
  if(available(first))return first;
  const cells:Box[]=[];
  for(let y=0;y<=100-height;y+=2)for(let x=0;x<=100-width;x+=2)cells.push({x,y,width,height});

@@ -1480,3 +1480,211 @@ body .editor-floating-panel.widget-selection-palette .palette-ribbon-groups {ove
   margin:0!important;padding:0!important;pointer-events:none!important;
 }
 .editor-ux-v2.editor-floating-scope > .editor-floating-panel {pointer-events:auto!important}
+
+/* RC109: single-line slide footer, centered title and unobtrusive separator.
+ * The slide number remains independently anchored to the canvas. */
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-widget-kind="footer"]{
+  box-shadow:inset 0 1px 0 #9ca3af!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  min-height:0!important;padding:0 2%!important;line-height:1.15!important;
+}
+.editor-ux-v2 .widget-canvas-item[data-widget-kind="footer"]>.widget-rich-inline{
+  position:relative!important;left:auto!important;top:auto!important;transform:none!important;
+  display:block!important;flex:0 1 88%!important;text-align:center!important;
+  white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;
+  font-weight:400!important;min-height:0!important;max-height:100%!important;
+}
+.projection-slide-footer>.slide-footer-center{width:90%;max-width:90%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
+/* Editor previews show the same answer-submit controls as the participant surface. */
+.editor-ux-v2 .widget-canvas-item>.canvas-widget-submit-preview,
+.editor-ux-v2 .widget-canvas-item .canvas-widget-submit-preview{
+  flex:none;position:relative!important;display:inline-flex;align-self:flex-start;
+  align-items:center;justify-content:center;max-width:100%;white-space:normal;
+  font-weight:650;border:1px solid #6489ac;border-radius:7px;
+  color:#1b3753;background:#e5f0fa;opacity:1!important;pointer-events:none!important;
+}
+.editor-ux-v2 .widget-canvas-item[data-widget-kind="question"],
+.editor-ux-v2 .widget-canvas-item[data-widget-kind="timed-quiz"],
+.editor-ux-v2 .widget-canvas-item[data-widget-kind="topic-question"]{gap:3px;}
+.editor-ux-v2 .widget-canvas-item .canvas-widget-answer-preview{max-height:none!important;overflow:visible!important}
+.widget-free-answer-field{font-size:inherit;line-height:1.25;overflow-wrap:anywhere}
+
+/* Response text color must remain user-configurable even under accessibility contrast rules. */
+.widget-free-answer-field{color:var(--answer-color,#152236)!important;-webkit-text-fill-color:var(--answer-color,#152236)!important}
+
+.widget-selection-palette .palette-ribbon-answer-types{min-width:255px}
+.widget-selection-palette .palette-ribbon-answer-types .palette-ribbon-font-picker select{width:136px}
+.widget-selection-palette .palette-ribbon-answer-types input[type=number]{width:53px;min-width:53px;padding:4px}
+
+/* RC110: keyboard-accessible feedback remains within the page menu on failed upload. */
+.canvas-background-upload-status{font-size:.9rem;line-height:1.4;overflow-wrap:anywhere;max-width:22rem;margin:6px 0;padding:7px;border-radius:6px;background:#eef4fc;color:#183a68}
+
+
+/* RC111: The editor occupies a fixed z-index:9000 stacking context and its
+   draggable inspectors sit at 12000. The body-owned rehearsal portal must
+   stack *above both*, otherwise the preview buttons appear pressed but the
+   dialog is completely hidden behind the editor. */
+body > .rehearsal-backdrop {
+  position:fixed!important; inset:0!important;
+  z-index:15000!important;
+  isolation:isolate;
+}
+
+/* RC111: Linked results must wrap both the source question and response labels
+   inside their actual widget width, not truncate them to one line. Preserve
+   scroll access if the author manually gives the widget too little height. */
+.linked-results {
+  min-width:0;
+  overflow-x:hidden;
+  overflow-y:auto;
+  overflow-wrap:anywhere;
+}
+.linked-results > strong,
+.linked-results > small,
+.linked-results-row > span {
+  display:block;
+  min-width:0;
+  max-width:100%;
+  white-space:normal!important;
+  overflow-wrap:anywhere!important;
+  word-break:normal;
+  text-overflow:clip!important;
+  overflow:visible!important;
+  line-height:1.25;
+}
+.linked-results-items {min-width:0;overflow-x:hidden;overflow-y:auto}
+.linked-results-row {min-width:0;max-width:100%;align-items:start}
+.result-view-cloud .linked-results-row {max-width:100%;min-width:0;vertical-align:top;align-items:start}
+.result-view-cloud .linked-results-row > span {min-width:0;flex:0 1 auto;max-width:100%}
+/* Direct results components (without a linked statistics source) obey the
+   same wrapping contract. */
+.widget-results-bars > div,
+.widget-results-table > div,
+.widget-results-cloud > span,
+.widget-results-pie > div {
+  max-width:100%;min-width:0;white-space:normal;overflow-wrap:anywhere;
+}
+
+/* RC112: unified selection geometry between page and slide-master canvases.
+ * Art-themed direct children must not be re-positioned by generic theme CSS. */
+.slide-scheme-workspace .widget-canvas-item {position:absolute!important;box-sizing:border-box!important;overflow:visible!important;touch-action:none!important}
+.slide-scheme-workspace .widget-canvas-item > .widget-resize-edge,
+.slide-scheme-workspace .widget-canvas-item > .widget-rotate-handle {
+ position:absolute!important;display:none!important;visibility:hidden!important;opacity:0!important;
+ pointer-events:none!important;z-index:170!important;margin:0!important;padding:0!important
+}
+.slide-scheme-workspace .widget-canvas-item[data-selected="true"] > .widget-resize-edge,
+.slide-scheme-workspace .widget-canvas-item[data-selected="true"] > .widget-rotate-handle {
+ display:block!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important
+}
+
+.slide-scheme-workspace .widget-canvas-item > .widget-resize-edge.edge-n {left:50%!important;top:0!important;right:auto!important;bottom:auto!important;transform:translate(-50%,-50%)!important}
+.slide-scheme-workspace .widget-canvas-item > .widget-resize-edge.edge-ne {right:0!important;top:0!important;left:auto!important;bottom:auto!important;transform:translate(50%,-50%)!important}
+.slide-scheme-workspace .widget-canvas-item > .widget-resize-edge.edge-e {right:0!important;top:50%!important;left:auto!important;bottom:auto!important;transform:translate(50%,-50%)!important}
+.slide-scheme-workspace .widget-canvas-item > .widget-resize-edge.edge-se {right:0!important;bottom:0!important;left:auto!important;top:auto!important;transform:translate(50%,50%)!important}
+.slide-scheme-workspace .widget-canvas-item > .widget-resize-edge.edge-s {left:50%!important;bottom:0!important;right:auto!important;top:auto!important;transform:translate(-50%,50%)!important}
+.slide-scheme-workspace .widget-canvas-item > .widget-resize-edge.edge-sw {left:0!important;bottom:0!important;right:auto!important;top:auto!important;transform:translate(-50%,50%)!important}
+.slide-scheme-workspace .widget-canvas-item > .widget-resize-edge.edge-w {left:0!important;top:50%!important;right:auto!important;bottom:auto!important;transform:translate(-50%,-50%)!important}
+.slide-scheme-workspace .widget-canvas-item > .widget-resize-edge.edge-nw {left:0!important;top:0!important;right:auto!important;bottom:auto!important;transform:translate(-50%,-50%)!important}
+.slide-scheme-workspace .widget-canvas-item > .widget-rotate-handle {left:50%!important;top:-27px!important;right:auto!important;bottom:auto!important;transform:translateX(-50%)!important}
+.slide-scheme-workspace .widget-canvas-item:not([data-selected="true"]) > .canvas-remove,
+.slide-scheme-workspace .widget-canvas-item:not([data-selected="true"]) > .canvas-layer-tools{display:none!important}
+/* The master header is independently layered above the canvas: Exit remains clickable. */
+.slide-scheme-workspace{position:relative;isolation:isolate;overflow:visible!important}
+.slide-scheme-header{position:relative;z-index:130;align-items:center;padding:10px 12px;background:#f8fbff;color:#192c45;border:1px solid #bccbdb;border-radius:12px}
+.slide-scheme-header h2{margin:0;color:#162e4b}
+.slide-scheme-header .muted{margin:3px 0 0;color:#445974}
+.slide-scheme-exit{position:relative;z-index:131;flex:none;min-height:44px!important;background:#294467!important;color:#fff!important;border:1px solid #6788b0!important;pointer-events:auto!important}
+.slide-scheme-ribbon{position:relative;z-index:120;display:flex;flex-wrap:wrap;gap:0;align-items:stretch;background:#f9fbff;color:#253b5a;border:1px solid #b9cadd;border-radius:12px;padding:5px;box-shadow:0 3px 12px #0c29421a}
+.slide-scheme-ribbon-group{display:grid;align-content:space-between;gap:7px;padding:7px 12px;min-width:0;border-right:1px solid #d6e0ec}
+.slide-scheme-ribbon-group>strong{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:#516780}
+.slide-scheme-ribbon-actions{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+.slide-scheme-ribbon-actions button{min-height:34px!important;background:#eff5ff!important;color:#233f60!important;border:1px solid #c4d5e6!important;border-radius:6px!important;padding:5px 9px!important;font-size:12px!important;font-weight:650}
+.slide-scheme-ribbon-actions button:hover:not(:disabled){background:#d7e8ff!important}
+.slide-scheme-ribbon-actions button:disabled{opacity:.45}
+.slide-scheme-ribbon-save{margin-left:auto;border-right:0}
+.slide-scheme-ribbon-actions button.primary{background:#315da0!important;color:white!important}
+.slide-scheme-widget-rail{z-index:50;min-width:0;display:flex;gap:8px;align-items:center;background:#132940;color:#e9f2ff;padding:9px;border-radius:10px}
+.slide-scheme-widget-rail>strong{font-size:13px;flex:none;margin:0 8px}
+.slide-scheme-widget-options{display:flex;gap:6px;flex:1;min-width:0;overflow-x:auto;padding:3px 2px;scrollbar-width:thin}
+.slide-scheme-widget-options>button{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:0 0 83px;gap:4px;min-height:67px;border-radius:7px!important;border:1px solid #66869b!important;background:#25415b!important;color:#fff!important;font-size:11px;font-weight:650}
+.slide-scheme-widget-options>button>svg{width:22px;height:22px}
+.slide-scheme-widget-options>button:hover:not(:disabled){background:#366d93!important}
+.slide-scheme-widget-options>button:disabled{opacity:.4}
+.slide-scheme-canvas{position:relative;min-width:0;z-index:1}
+.slide-scheme-workspace .canvas-editor-tools{display:none!important}
+.slide-scheme-workspace .canvas-with-rulers{max-width:100%;overflow:visible}
+.slide-scheme-workspace .widget-canvas{min-height:0!important;aspect-ratio:16/9;overflow:visible!important}
+.slide-scheme-number-controls{display:grid;gap:8px;min-width:0;border:1px solid #aebfd4;border-radius:8px;padding:8px}
+.slide-scheme-number-controls label{min-width:0}
+.slide-scheme-typography{display:flex;flex-wrap:wrap;gap:8px}
+/* The ruler in the page editor is no longer suppressed by the legacy full-screen theme. */
+.editor-ux-v2 .canvas-with-rulers{grid-template-columns:28px minmax(0,1fr)!important;grid-template-rows:25px minmax(0,auto)!important}
+.editor-ux-v2 .canvas-ruler-horizontal{display:flex!important;grid-column:2;grid-row:1}
+.editor-ux-v2 .canvas-ruler-vertical{display:flex!important;grid-column:1;grid-row:2}
+.editor-ux-v2 .canvas-with-rulers .widget-canvas{grid-column:2!important;grid-row:2!important}
+.slide-canvas-page-number[data-custom-number="true"]{left:var(--footer-number-x,auto)!important;top:var(--footer-number-y,auto)!important;right:auto!important;bottom:auto!important;transform:translate(-100%,-100%)!important}
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-widget-kind="footer"]{box-shadow:inset 0 1px 0 var(--footer-divider-color,#9ca3af)!important}
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-widget-kind="footer"][data-footer-separator="false"]{box-shadow:none!important}
+@media(max-width:720px){.slide-scheme-ribbon-group{padding:6px}.slide-scheme-ribbon-save{margin-left:0}.slide-scheme-layout{grid-template-columns:minmax(0,1fr)}.editor-ux-v2 .canvas-with-rulers{grid-template-columns:17px minmax(0,1fr)!important;grid-template-rows:19px minmax(0,auto)!important}}
+
+/* RC113 graphic primitives: independent graphic overlays never intercept answer inputs. */
+.widget-graphic-line{display:block;position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget)[data-widget-kind="line"]{background:transparent!important;border:none!important;box-shadow:none!important}
+:is(.projection-widget,.rehearsal-widget)[data-show-title="false"] :is(.projection-sample-rating,.projection-sample-reactions,.projection-sample-topic,.projection-sample-timer,.projection-participant-count) > strong:first-child{display:none!important}
+
+/* RC113: fit content uniformly without changing authored widget coordinates. */
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget)>.widget-fit-frame{
+ position:absolute!important;inset:0;box-sizing:border-box;overflow:hidden;z-index:2;pointer-events:auto;
+ padding:inherit;
+}
+.widget-fit-content{position:relative;width:100%;min-height:100%;transform-origin:top left;box-sizing:border-box}
+.editor-ux-v2 .widget-rescale-indicator{position:absolute!important;right:29px;top:2px;z-index:161!important;
+ color:#fff;background:#8856c9;border-radius:6px;padding:2px 4px;font:700 10px/1.2 Arial,sans-serif;
+ white-space:nowrap;pointer-events:none}
+.editor-ux-v2 .widget-canvas-item:not([data-selected="true"])>.widget-rescale-indicator{visibility:hidden}
+/* Preserve widget controls and vector shapes outside the scaled content shell. */
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget)>.widget-vector-outline{z-index:1}
+/* Shape graphics draw their own SVG fill and perimeter; never clip editor handles. */
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget)[data-widget-kind="shape"]{
+ clip-path:none!important;background:transparent!important;background-image:none!important;
+ border:0!important;box-shadow:none!important;
+}
+.widget-graphic-shape{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+:is(.projection-widget,.rehearsal-widget)[data-widget-kind="shape"],
+:is(.projection-widget,.rehearsal-widget)[data-widget-kind="line"]{pointer-events:none!important}
+.rehearsal-widget[data-show-title="false"] .projection-interactive-widget[data-question-id=""]>strong:first-child{display:none!important}
+.rehearsal-widget[data-show-title="false"] .projection-sample-topic>strong:first-child{display:none!important}
+.audience-widget-layout>.page-widget>.widget-fit-frame{position:absolute;inset:0;overflow:hidden;padding:inherit;box-sizing:border-box}
+.audience-widget-layout.stage-reading>.page-widget>.widget-fit-frame{position:relative!important;inset:auto!important;overflow:visible!important}
+.audience-widget-layout.stage-reading .widget-fit-content{transform:none!important}
+.audience-widget-layout>.page-widget[data-widget-kind="shape"],
+.audience-widget-layout>.page-widget[data-widget-kind="line"]{clip-path:none!important;background:transparent!important;background-image:none!important;border:0!important;pointer-events:none!important}
+.audience-widget-layout>.page-widget[data-widget-kind="shape"] .widget-graphic-shape,
+.audience-widget-layout>.page-widget[data-widget-kind="line"] .widget-graphic-line{pointer-events:none}
+/* Existing editor typography and placeholder rules continue through the fit shell. */
+.editor-ux-v2 .widget-canvas-item .widget-fit-content>.widget-rich-inline{
+ font-weight:700;line-height:1.2;min-width:0;white-space:pre-wrap;overflow-wrap:anywhere;
+ max-width:100%;flex:none;min-height:1.25em;outline:0
+}
+.editor-ux-v2 .widget-canvas-item .widget-fit-content>.widget-rich-editing{
+ background:#fff6;outline:1px dotted #3470be;border-radius:3px;
+ cursor:text;user-select:text;pointer-events:auto
+}
+.editor-ux-v2 .widget-canvas-item:is([data-widget-kind="results-button"],[data-widget-kind="reactions"],[data-widget-kind="participant-count"]) .widget-fit-content>.widget-rich-inline{
+ position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;
+ pointer-events:none!important;clip-path:inset(50%)
+}
+.editor-ux-v2 .widget-canvas-item[data-widget-kind="footer"] .widget-fit-content>.widget-rich-inline{width:100%;max-width:100%}
+.editor-ux-v2 .widget-canvas-item .widget-fit-content>.canvas-widget-body-preview{height:calc(100% - 1.6em);min-height:0;max-width:100%;overflow:hidden;pointer-events:none;line-height:1.2;white-space:normal}
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)>.widget-graphic-shape,
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)>.widget-graphic-line{
+ position:absolute!important;inset:0!important;z-index:2;pointer-events:none!important
+}
+/* All new widgets show their user-editable title by default, including graphics. */
+.widget-graphic-label{display:block;position:relative;z-index:3;pointer-events:none;
+ text-align:center;font-weight:600;overflow-wrap:anywhere;padding:3px;max-width:100%}
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-widget-kind="shape"] .widget-fit-content,
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-widget-kind="line"] .widget-fit-content{
+ display:flex;justify-content:center;align-items:center;text-align:center
+}

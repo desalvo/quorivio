@@ -97,6 +97,12 @@ async def main():
                 overlay=page.locator('.rehearsal-backdrop')
                 await expect(overlay).to_have_count(1)
                 await expect(overlay).to_be_visible()
+                # A visible element can still be completely covered by the fullscreen editor.
+                # Verify the topmost element at the overlay's centre belongs to the dialog.
+                assert await overlay.evaluate('''node => {
+                    const rect=node.getBoundingClientRect();
+                    return node.contains(document.elementFromPoint(rect.left+rect.width/2,rect.top+rect.height/2));
+                }'''), 'Rehearsal portal is underneath the editor or floating inspector'
                 assert await overlay.evaluate('(node)=>node.parentElement===document.body&&!node.inert&&!node.closest("[inert],[aria-hidden=true]")'), 'Portal hidden or not body-owned'
                 dlg=page.get_by_role('dialog',name='Anteprima interattiva della sessione')
                 await expect(dlg).to_be_visible()

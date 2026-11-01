@@ -1,3 +1,97 @@
+# Quorivio 0.1.0-dev — RC113 — Testo inline, asset JPG, titoli, autofit visivo e forme/linee (1 novembre 2026)
+
+**Baseline certificata:** RC107 full CI `41309042012` SUCCESS, commit `99a801ab7623347ba776b8214d054aa872ddb5c6`, pubblicazione Docker Hub confermata. Le revisioni RC108–RC113 sono modifiche cumulative **non ancora certificate da GitHub**. Versione `0.1.0-dev`; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Completamento certificato invariato: **85,25%** (43 gate accettati, 17 parziali su 60).
+
+**Editor testo:** doppio clic seleziona il widget e attiva la modifica inline senza aprire il pannello Proprietà. Tale pannello si apre da «Proprietà widget» nel menu contestuale (la palette mantiene un comando esplicito di apertura). La selezione e i comandi restano separati. Il titolo/nome del widget è opzionale, mostrato per default (`showTitle` omesso o `true`), con validazione server; la configurazione è disponibile nelle proprietà della pagina e dello schema. Per i principali widget risultati/interattivi è nascosto l'header visivo senza cancellare l'etichetta semantica.
+
+**Caricamento Logo/Immagine:** risoluzione MIME sicura per JPG/JPEG/PNG/GIF/WebP, anche quando il selettore del sistema operativo non restituisce il tipo o usa octet-stream. L'upload resta limitato ai tipi ammessi e verificato sul server (dimensione, firma, autorizzazione, ClamAV). L'ID media viene verificato prima di associarlo al widget, viene aggiornato l'inventario asset, viene sbloccato l'autosalvataggio e l'errore di bozza senza allegato non viene presentato come errore di un upload riuscito. Il percorso sfondo rimane distinto e deve essere verificato end-to-end con JPG e PostgreSQL reali.
+
+**Adattamento del contenuto:** nuovo contenitore `WidgetContentFit` con ResizeObserver e MutationObserver, scala uniformemente il contenuto quando supera la superficie disponibile senza modificare la geometria o le maniglie del widget. In editor compare un indicatore percentuale vicino alla X, soltanto quando selezionato e il contenuto è effettivamente riscalato. Il meccanismo è condiviso con presentatore, simulazione e vista partecipante; la modalità «Lettura accessibile» non riduce il testo.
+
+**Grafica:** i nuovi inserimenti sono «Forme» e «Linee» al posto di «Separatore». I vecchi separatori rimangono validi per retrocompatibilità. Forme SVG (rettangolo, arrotondato, cerchio/ovale, triangolo, rombo, esagono, pentagono, stella, freccia, cuore, nuvola, fumetto); linee orizzontali/verticali/diagonali con colore, larghezza e tratto selezionabili. Le forme e le linee, essendo elementi grafici decorativi, possono sovrapporsi ai widget funzionali senza allentare i controlli di collisione tra widget ordinari. In proiezione e nella vista partecipante non intercettano i clic destinati alle risposte.
+
+**Verifiche e limiti:** suite Node e regressioni RC113 locali; sintassi TypeScript/TSX e inventario SHA-256; full CI GitHub ancora da eseguire. Sono richieste verifiche end-to-end del caricamento OS-picker/Logo/sfondo, del dimensionamento dinamico e dei layout con schermi reali. Nessun commit, push, tag o pubblicazione effettuati.
+
+**Commit cumulativo suggerito da RC107:** `Complete grouped PPTX and editor workflows, fix asset uploads and inline widget editing, and add scalable graphic shapes and lines [full-ci]`.
+
+---
+
+# Quorivio 0.1.0-dev — RC112 — editor schemi PowerPoint, Footer e righelli (1 novembre 2026)
+
+**Baseline certificata:** RC107 full CI GitHub `41309042012` SUCCESS, SHA `99a801ab7623347ba776b8214d054aa872ddb5c6`, Docker Hub pubblicato. RC108–RC112 cumulativi rimangono **non certificati da GitHub**. Versione `0.1.0-dev`; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Avanzamento certificato invariato **85,25%** (43 gate accettati, 17 parziali su 60). Non attribuire punti a modifiche locali.
+
+**Editor degli schemi:** acquisisce le correzioni RC105 di ridimensionamento: otto ancoraggi allineati al bordo del widget, visibili solo alla selezione; pulsante Esci sempre in primo piano e colpibile, anche con impostazioni aperte. Barra orizzontale in stile PowerPoint con gruppi Inserisci/Allinea/Distribuisci/Salva e nuova palette orizzontale di widget. Lo schema può contenere fino a 16 widget; Titolo/Footer rimangono univoci, gli altri possono avere più istanze. Gli elementi vengono salvati realmente nel master e ereditati dalle pagine; le coppie widget Risultati/sorgente preservano il collegamento rimappando l'ID ereditato. I widget media (Immagine, Video, Logo, PDF) sono disponibili nella palette se la sessione possiede un allegato autorizzato del tipo richiesto; senza allegato il comando è visibile ma disabilitato. La selezione del file si modifica nelle proprietà dello schema.
+
+**Footer completamente configurabile:** è possibile modificare testo centrale/nome della sessione, font, dimensione, grassetto/corsivo/sottolineato, colore, geometria del widget, mostra/nascondi numero pagina, coordinate del numero relative al Footer (0–100%), mostra/nascondi separatore superiore e colore del separatore. I Footer già salvati senza coordinate personalizzate continuano a mostrare il numero a 10 px dal bordo destro/inferiore. Rendering editor/proiezione, API e PowerPoint condividono la regola e le validazioni. Il numero pagina rimane derivato dall'ordine delle slide.
+
+**Righelli:** il righello orizzontale e verticale già presente negli schemi ora si visualizza anche nell'editor delle pagine. Il canvas resta 16:9; dimensionamento del righello responsivo desktop/mobile.
+
+**Prove e limiti:** API Node 567/567, frontend Node 159/159. Browser Chromium CSS desktop 1440px e mobile 390px verifica ancoraggi, hit-target del pulsante Esci e presenza del righello senza spostamenti. PowerPoint reale verifica numero riposizionato, nascosto e separatore. Build React completa, click end-to-end del vero editor e full CI devono ancora essere verificati in GitHub. Nessun commit/push/tag/pubblicazione.
+
+**Commit cumulativo consigliato da RC107:** `Export grouped-question PPTX, improve interactive widgets and backgrounds, fix previews, and complete draggable slide schemes and configurable footer [full-ci]`.
+
+---
+
+# Quorivio 0.1.0-dev — RC111 — Anteprime visibili, testi risultati a capo, editor schemi accessibile (1 novembre 2026)
+
+**Baseline:** RC107 full CI GitHub `41309042012` verde e immagine Docker Hub pubblicata, commit `99a801ab7623347ba776b8214d054aa872ddb5c6`. Le modifiche cumulative RC108–RC111 non sono ancora certificate da GitHub. Versione `0.1.0-dev` invariata. `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+**Anteprime Presentatore, Partecipante, Affiancate:** Il problema non era nel click: il fullscreen editor aveva `z-index:9000`, il dialog delle anteprime solo 5000. Le anteprime si aprivano sotto l'editor, pur mostrando il pulsante selezionato. Il portale montato su `document.body` ora usa livello 15000, sopra editor e finestre proprietà/formattazione (12000), mantenendo focus trap, chiusura e anteprima dei dati non salvati. Il test Chromium verifica il livello che riceve davvero i clic su desktop/mobile; in CI il test React compilato viene rafforzato con controllo di hit-test, non soltanto di presenza nel DOM.
+
+**Risultati:** il CSS troncava domanda e risposte lunghe con `white-space:nowrap` ed ellissi. Ora i testi vanno a capo rispetto alla larghezza effettiva del widget, anche in modalità nuvola, con spezzatura sicura delle parole lunghe e scroll interno se l'autore ha assegnato un'altezza troppo piccola. Non viene modificata la logica dei conteggi. Prova Chromium reale su 1440×900 e 390×844.
+
+**Schemi:** conservato l'editor globale Titolo/Footer e il salvataggio con controllo concorrenza. Aggiunto accesso `Editor degli schemi` nella navigazione della dashboard quando una sessione è aperta, e bottone `▤ Schemi` nell'intestazione dell'editor delle pagine. Rimane il comando `Modifica schemi` sulle miniature. Il passaggio dall'editor è bloccato durante autosalvataggi incompleti.
+
+**Verifiche e limiti:** test Node API 565/565, web 157/157, regressioni RC111 e prove Chromium CSS locali verdi. Installazione npm offline incompleta: build React completa e end-to-end vanno confermati dalla full CI GitHub. Completamento certificato invariato **85,25%** (43 gate accettati, 17 parziali su 60). Nessun commit/push/tag/pubblicazione effettuato.
+
+**Commit cumulativo suggerito da RC107:** `Export grouped question PPTX, improve response inputs and footers, fix JPG backgrounds, word clouds and floating previews, and expose slide schemes [full-ci]`.
+
+---
+
+# Quorivio 0.1.0-dev — RC110 — Caricamento JPG sfondi, nuvola risultati e dimensioni risposta libera (1 novembre 2026)
+
+**Baseline:** full CI RC107 `41309042012` SUCCESS; commit `99a801ab7623347ba776b8214d054aa872ddb5c6`, pubblicazione Docker Hub completata. Le RC108–RC110 sono un cumulativo locale **da certificare in GitHub CI**.
+
+**Caricamento sfondi:** Dal menu contestuale del canvas si apre il selettore del sistema operativo per JPEG/JPG, PNG, GIF, WebP. Il server restituisce un asset della sessione e lo carica nella libreria personale; il suo ID è immediatamente assegnato alla pagina, poi l'autosalvataggio conserva il layout. Prima il menu si chiudeva anche quando l'upload falliva perché l'errore veniva intercettato dalla funzione; ora chiude soltanto se il server risponde con successo e mostra nell'interfaccia avanzamento e mancata riuscita. Il backend continua ad applicare autorizzazione, limiti di dimensione, firma immagini e scansione antivirus. Il percorso reale con JPG, browser e PostgreSQL va ancora verificato end-to-end.
+
+**Nuvola:** i cinque risultati più frequenti hanno colori diversi, dal sesto tutti usano lo stesso colore neutro. Ordinamento per frequenza discendente, alfabetico in caso di parità; widget risultati, grafico risultati collegato e nuvola delle domande del pubblico. Gli altri grafici conservano l'ordine originario.
+
+**Dimensioni della risposta libera:** `answerFieldWidth` tra 25 e 100% e `answerFieldHeight` tra 48 e 400px sono configurabili dalla palette flottante e dalla finestra Proprietà widget. Stessa visualizzazione in editor, simulazione e partecipanti; le proprietà vengono validate rigorosamente nel backend. Valori predefiniti 100% e 96px; nessun cambiamento ai widget già salvati se non modificati. Autofit rimane disponibile quando c'è spazio.
+
+**Cumulativo:** incluse RC108 (PowerPoint domande raggruppate) e RC109 (invio risposte, auto-fit, Footer monoriga). Test Node API 565/565 e frontend 157/157 superati; regressioni mirate verdi. Suite Python completa non conclusa entro il timeout; test reale browser/upload ancora da certificare. Versione `0.1.0-dev`, completamento certificato **85,25%** (43/60 gate accettati, 17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit, push, tag o pubblicazione effettuati.
+
+Commit cumulativo suggerito da RC107: `Export grouped question PPTX, improve editor answers and footer, and fix JPG backgrounds, cloud colors and response field sizing [full-ci]`.
+
+---
+
+# Quorivio 0.1.0-dev — RC109 — risposte, adattamento widget e Footer monoriga (1 novembre 2026)
+
+**Baseline:** full CI RC107 `41309042012` SUCCESS, commit `99a801ab7623347ba776b8214d054aa872ddb5c6`, immagine Docker Hub pubblicata. Gli sviluppi RC108 e RC109 sono cumulativi locali e **non ancora certificati dalla CI GitHub**.
+
+**Editor:** per Domanda, Quiz a tempo e Domande del pubblico appare già nel canvas il pulsante di invio (anteprima non interattiva), anche nelle domande annidate. Testo delle risposte e opzioni possono avere carattere, dimensione, colore, grassetto e corsivo indipendenti; la dimensione del pulsante (12–40 px) è modificabile dalla palette flottante o dalle proprietà. Le stesse proprietà sono usate nella vista partecipante e nella simulazione. Tutti i nuovi campi sono validati dal backend.
+
+**Adattamento automatico:** i widget testuali e interattivi crescono per far entrare i contenuti dopo le modifiche, senza oltrepassare il canvas 16:9 o spostare altre widget. Un resize manuale disattiva il comportamento solo per quella widget; nelle Proprietà si può riattivarlo. In presenza di collisioni o spazio insufficiente il ridimensionamento viene rifiutato: è necessario intervenire sul layout.
+
+**Footer:** i nuovi Footer sono una sola fascia alta 7% da y=93%, con titolo della sessione centrato, sfondo trasparente, separatore superiore sottile e numerazione indipendente ancorata a 10 px dagli angoli inferiori. Posizioni personalizzate già salvate non sono alterate e la normalizzazione legacy rimane supportata.
+
+**Cumulativo:** incluso anche RC108 con esportazione PowerPoint di gruppi di domande e relativo testo formattato senza chiavi di risposta.
+
+**Verifiche locali:** 565/565 API Node, 154/154 frontend Node, test Python mirati RC109 e regressioni storiche Footer superati. Browser completo e full CI GitHub ancora da confermare.
+
+**Completamento certificato invariato:** 85,25% (43 gate accettati, 17 parziali su 60). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag/pubblicazione dell'assistente. Commit cumulativo da RC107: `Export grouped questions to PPTX and improve editor answers, auto-fit and slide footers [full-ci]`.
+
+---
+
+# Quorivio 0.1.0-dev — RC108 — handoff PowerPoint domande multiple (1 novembre 2026)
+
+**Baseline verificata:** full CI GitHub RC107 `41309042012` **SUCCESS**, commit `99a801ab7623347ba776b8214d054aa872ddb5c6`, 11/11 job obbligatori superati. Pubblicata anche l'immagine `desalvo/quorivio:latest` da tale commit. Nessun intervento remoto dell'assistente.
+
+**Sviluppi RC108 locali (CI da confermare):** l'esportatore PowerPoint rende ora tutte le domande annidate nei widget domanda/quiz a tempo, fino a cinque, con titolo, descrizioni, opzioni e formattazione selettiva editabile per singolo campo. Sono preservati gli indici UTF-16 degli emoji. Identificatori errati, riferimenti a campi inesistenti e output sopra quota causano errore esplicito prima della pubblicazione di un file incompleto. Le risposte corrette e gli ID riservati NON sono inclusi nel PPTX pubblico. L'importazione da PPTX riporta un **testo editabile**, NON ricrea un quiz interattivo. Aggiunti 9 test nativi PowerPoint nel workflow dopo l'installazione delle dipendenze. Dettagli in `docs/RC_CYCLE108_GROUPED_QUESTION_PPTX.it.md`.
+
+**Completamento certificato invariato: 85,25%** (43 gate accettati, 17 parziali su 60). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Le prove indipendenti su dispositivi, Office, GDPR/AGID e sicurezza non sono sostituite dalla CI automatica. Commit suggerito dalla RC107: `Export complete grouped questions and styled answers in editable PowerPoint slides [full-ci]`.
+
+---
+
 # Quorivio 0.1.0-dev — RC107 — controllo avvio preview con ANSI (1 November 2026)
 
 La full CI RC106 allegata (`logs_111954785384.zip`) ha completato positivamente i test Chromium ma il controllo finale `ci_preview_proxy_guard.py` ha segnalato erroneamente `compiled-preview readiness evidence is absent`: il banner reale di Vite contiene sequenze ANSI tra `Local`, `:` e URL. RC107 normalizza i colori nella copia del log usata per la verifica senza alterare il log originale, richiede ancora host/porta esatti e mantiene fatali `ECONNREFUSED` ed errori proxy. Aggiunti test negativi e un test sul banner colorato verificato. `docs/RC_CYCLE107_ANSI_PREVIEW_GUARD.it.md`.

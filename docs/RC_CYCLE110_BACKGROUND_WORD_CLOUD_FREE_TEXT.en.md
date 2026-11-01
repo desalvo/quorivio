@@ -1,0 +1,13 @@
+# Quorivio 0.1.0-dev — RC110 — Background JPG upload, ranked clouds and free-answer field sizing (1 November 2026)
+
+**Baseline:** RC107 GitHub full CI `41309042012` SUCCESS and Docker Hub published, commit `99a801ab7623347ba776b8214d054aa872ddb5c6`. RC108–RC110 cumulative local changes are **not yet certified** by GitHub CI.
+
+**Background upload fix:** The canvas context menu opens the system file picker and calls the authorized `/api/sessions/:id/backgrounds` raw-image upload. On success the returned session-scoped asset id is applied to the current page, background library is refreshed, and page autosave retains the ID. Errors no longer silently close the canvas menu: pending and failed upload states appear in the menu with `role=status`, and only a successful server response closes it. JPG, JPEG, PNG, GIF, WebP are accepted with MIME fallback for common platform file pickers. API remains fail-closed with size, image-signature, ClamAV and authorization checks. *The real OS-picker/JPG/PostgreSQL/browser end-to-end path remains to be certified in CI and deployment.*
+
+**Word clouds:** Top five ranked words/options have five different accessible colors; ranks six onward share a neutral color. Count descending with stable alphabetical tie-break; deterministic, without mutating source data. Applied to presenter-linked results, widget results and moderated audience topic word cloud. Other chart modes retain original ordering.
+
+**Free text response field dimensions:** New `style.answerFieldWidth` (25–100%) and `style.answerFieldHeight` (48–400px) can be set from the floating ribbon and widget Properties. Shared `answerInputStyle` applies to the actual participant textarea, rehearsal and canvas preview. Backend strictly validates integer ranges and disallows arbitrary CSS/HTML; existing documents with unspecified values use 100%/96px. This does not change submit-button size or manual outer widget resize. Auto-fit remains available where free layout space permits.
+
+**Cumulative:** RC108 editable grouped-question PowerPoint and RC109 responsive answer controls/auto-fit/single-line footer remain included. Node API 565/565, web 157/157, RC110 targeted tests passed locally. The Python full suite did not complete within the available timeout, and integrated browser+real PostgreSQL upload is unverified. Version remains `0.1.0-dev` and the certified RC gate score remains **85.25%** (43 accepted, 17 partial of 60). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Commit/push/tag/publication not performed.
+
+Suggested cumulative commit since the last confirmed RC107: `Export grouped question PPTX, improve editor answers and footer, and fix JPG backgrounds, cloud colors and response field sizing [full-ci]`.
