@@ -146,6 +146,8 @@ jobs:
             tools.tests.test_topic_linked_results_rc_20261028 -q
       - name: Validate RC79 cumulative archive receipt closure before npm
         run: python3 -m unittest tools.tests.test_rc_cycle79_inventory_closure -q
+      - name: RC120 always-visible autosave conflict regression before npm
+        run: python3 -m unittest tools.tests.test_rc_cycle120_conflict_visibility -q
       - name: RC119 content-only autofit and group-duplication preflight before npm
         run: PYTHONPATH=tools python3 -m unittest tools.tests.test_rc_cycle119_autofit_duplication -q
       - name: RC118 localized completion ledger preflight before npm
@@ -541,6 +543,7 @@ jobs:
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
         run: |
           python3 tools/ci_widget_title_menu.py
+          python3 tools/ci_browser_editor_conflict_visibility.py
           python3 tools/ci_browser_editor_postgres.py
       - name: Chromium presenter profile upload and anonymous avatar acceptance (opt-in)
         if: github.event_name == 'workflow_dispatch' && inputs.browser_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite) || (github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[full-ci]') || contains(github.event.head_commit.message, '[publish-docker]')))
@@ -813,7 +816,8 @@ jobs:
           python3 tools/verify_rc_cycle116_inventory.py --historical
           python3 tools/verify_rc_cycle117_inventory.py --historical
           python3 tools/verify_rc_cycle118_inventory.py --historical
-          python3 tools/verify_rc_cycle119_inventory.py
+          python3 tools/verify_rc_cycle119_inventory.py --historical
+          python3 tools/verify_rc_cycle120_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

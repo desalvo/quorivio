@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC120 — Conflitto di revisione visibile nell'editor (1 novembre 2026)
+
+**CI precedente:** GitHub Actions `41338170505`, commit `273196b30ab24f0e71d198c1dda1a75f24a08023`, ha superato compilazione TypeScript, suite Chromium iniziale e verifiche partecipanti/PostgreSQL; ha fallito in `Chromium editor PostgreSQL persistence and conflict acceptance` perché il test trovava `Conflitto di revisione` nel DOM ma non visibile. La campagna downstream è stata saltata.
+
+**Correzione RC120:** l'HTML del test reale conferma che la barra dei pulsanti di anteprima comprime il messaggio di stato a larghezza insufficiente. Corretto il layout flex senza nascondere avvisi e conflitti: l'indicatore non può ridursi sotto la dimensione leggibile e sugli schermi stretti un errore viene mostrato sotto l'intestazione, non coperto dai controlli. `pageConflict` attiva lo stile di errore anche se `pageSaveError` è vuoto. Regressione Chromium reale sul CSS produzione a 1440, 1100, 960 e 390 px; resta attiva l'asserzione PostgreSQL sulla visibilità del conflitto e la riconciliazione dei dati.
+
+**Completamento certificato:** **85,25%**, 43 gate accettati e 17 parziali su 60, invariato. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full CI RC120 ancora da eseguire, nessun commit/push/pubblicazione dall'assistente.
+
+**Commit suggerito dopo RC119:** `Prevent editor revision conflict status from collapsing and test real Chromium visibility [full-ci]`.
+
+---
+
 # Quorivio 0.1.0-dev — RC119 — Autofit senza maniglie e duplicazione stabile (1 novembre 2026)
 
 **CI precedente:** GitHub Actions `41336263788`, commit `68b82e3846e1ba62db28495ecc431b09c49ab0b5`, ha superato le verifiche documentali e la build React, ma il test Chromium `ci_browser_editor.py` ha rilevato 3 widget dopo «Duplica selezione» (attesi 5). Il riepilogo RC è fallito di conseguenza; gli altri job dipendenti sono stati saltati. La screenshot Chromium allegata mostra i widget ingranditi fino al fondo del canvas prima della duplicazione.

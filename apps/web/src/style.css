@@ -1688,3 +1688,14 @@ body > .rehearsal-backdrop {
 :is(.widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-widget-kind="line"] .widget-fit-content{
  display:flex;justify-content:center;align-items:center;text-align:center
 }
+
+/* RC120: revision conflicts must remain visible even with the full header toolbar.
+   The fixed-width status may not shrink to zero beside the preview buttons.
+   At smaller widths show errors below the header without suppressing the alert. */
+.editor-ux-v2 .editor-mock-brand{flex:1 1 0;overflow:hidden}
+.editor-ux-v2 .editor-mock-brand>span:not(.editor-online-chip){flex:1 1 auto;min-width:0}
+.editor-ux-v2 .editor-mock-actions{flex:0 0 auto;gap:clamp(6px,.85vw,12px)}
+.editor-ux-v2 .editor-autosave-indicator{flex:0 0 auto;min-width:125px;max-width:160px;overflow:visible;text-overflow:clip}
+@media(max-width:1100px){
+  .editor-ux-v2 .editor-autosave-indicator.has-error{position:absolute;top:calc(100% + 6px);right:12px;z-index:175;width:max-content;max-width:calc(100vw - 24px);min-width:0;padding:6px 10px;border:1px solid #ffb3ab;background:#4f1725;color:#fff;border-radius:8px;box-shadow:0 5px 16px #0009;pointer-events:none;line-height:1.3}
+}

@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC120 — Visible editor revision-conflict status (1 November 2026)
+
+**Previous CI:** GitHub Actions `41338170505`, commit `273196b30ab24f0e71d198c1dda1a75f24a08023`, passed TypeScript build, initial Chromium editor acceptance and Chromium PostgreSQL audience acceptance. It failed at `Chromium editor PostgreSQL persistence and conflict acceptance`: the text `Conflitto di revisione` existed in the DOM but was not visible. Dependent campaign jobs were skipped.
+
+**RC120 fix:** the actual CI DOM shows the preview toolbar flex layout shrinking the conflict status until it becomes visually clipped. The status now has a non-shrinking readable width; on narrow screens error status is positioned directly below the header, without disabling conflict detection, PostgreSQL version checks or reconciliation. Conflict styling applies whenever `pageConflict` is true, even without a separate save error. Chromium regression uses the production stylesheet at widths 1440, 1100, 960 and 390 px; existing real PostgreSQL conflict visibility and merge checks remain mandatory.
+
+**Certified completion:** **85.25%**, 43 accepted and 17 partial gates out of 60, unchanged. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full RC120 CI not run yet. No assistant commit, push or publication.
+
+**Suggested commit since RC119:** `Prevent editor revision conflict status from collapsing and test real Chromium visibility [full-ci]`.
+
+---
+
 # Quorivio 0.1.0-dev — RC119 — Content-only autofit and stable group duplication (1 November 2026)
 
 **Previous CI:** GitHub Actions `41336263788`, commit `68b82e3846e1ba62db28495ecc431b09c49ab0b5`, passed release documentation checks and React build, then the Chromium editor test reported 3 widgets after group duplicate (expected 5). The attached browser screenshot shows short text widgets extended to the bottom of the canvas. Downstream RC jobs were skipped.
