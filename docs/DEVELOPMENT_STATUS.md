@@ -1,3 +1,11 @@
+# Quorivio 0.1.0-dev — RC106 — Chromium preview WebSocket fail-closed and floating page contracts (1 November 2026)
+
+**RC106 CI correction:** GitHub run `41305315027` on commit `454eaf729c9487146f2c89a47178a64161d5683b` (RC105) failed in the Python discovery phase: one historical test still demanded the obsolete inline `pageContextOpen&&<section ...>` instead of the actual draggable `EditorFloatingWindow` body portal. Updated this contract to verify portal ownership, draggable header and absence of the old inline drawer. The other visible `ECONNREFUSED` entries were Vite `ws proxy error` messages from the compiled preview forwarding `/live` to localhost:8080 before the API started. Chromium acceptance reported success because Playwright `pageerror` does not cover preview server proxy errors. RC106 isolates the offline compiled preview (`preview.proxy={}`), preserves the real API proxy for Vite development, and adds a fatal preview log guard on every Chromium-step exit. Real WebSocket/PostgreSQL acceptance stays mandatory and is not replaced by the offline UI fixture. Targeted unit/negative tests added. No claim of external CI success before a new GitHub run. Details: `docs/RC_CYCLE106_CI_PREVIEW_AND_PORTAL.en.md`.
+**Certified gate-weighted readiness: 85.25%** (43 accepted, 17 partial / 60 total, total weight 100). `rc_strict=false`, `publish_image=false`, `publish_latest=false`; strict RC and independent compliance sign-offs not certified.
+**Commit baseline:** the maintainer's RC105 commit `454eaf729c9487146f2c89a47178a64161d5683b` is confirmed by the `push` run; RC106 changes are uncommitted and should be described alone in the next commit message. No assistant commit, push, tag or publication.
+
+---
+
 # Quorivio 0.1.0-dev — RC105 — draggable floating widget panels and corrected resize handles (1 November 2026)
 
 **RC105 local changes:** corrected selected-only resize handles at widget border corners and rotation geometry, bypassing art-theme positioning conflicts; PowerPoint-style ribbon now renders in a viewport-fixed portal and cannot shift the canvas; widget properties and page settings are draggable viewport-bounded windows. Automated Chromium CSS geometry 1440/390px and source contracts added to CI. No new GitHub gate accepted for RC105.

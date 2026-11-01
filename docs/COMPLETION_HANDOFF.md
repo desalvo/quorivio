@@ -1,3 +1,11 @@
+# Quorivio 0.1.0-dev — RC106 — Chromium proxy and historical portal CI fix handoff (1 November 2026)
+
+**RC106 handoff:** failed GitHub push full campaign `41305315027`, SHA `454eaf729c9487146f2c89a47178a64161d5683b`. The real blocking failure was one obsolete source-structure assertion in `tools/tests/test_editor_contextual_layout_v2.py`; updated to demand the RC105 draggable page-settings body portal. `ECONNREFUSED` in the Chromium job was an unreported Vite preview WS proxy failure (no API until later PostgreSQL phase). `preview.proxy={}` is now explicit, and `tools/ci_preview_proxy_guard.py` runs in the Chromium step `EXIT` trap and fails on proxy/socket errors or missing preview startup evidence, even if Playwright succeeded or failed earlier. Real API live/PG tests remain in the workflow. Test with `[full-ci]` and reconcile independently. Details `docs/RC_CYCLE106_CI_PREVIEW_AND_PORTAL.en.md`.
+**Certified gate-weighted readiness: 85.25%** (43 accepted, 17 partial / 60). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No new gates credited, no final RC.
+**Most recent maintainer commit:** RC105 SHA `454eaf729c9487146f2c89a47178a64161d5683b`, confirmed by push GitHub run; RC106 changes are new and uncommitted. No assistant remote mutations.
+
+---
+
 # Quorivio 0.1.0-dev — RC105 — floating windows and resize geometry handoff (1 November 2026)
 
 **RC105 handoff:** selected-only, absolute eight-edge handle geometry; draggable viewport-constrained property/page windows; ribbon moved to a fixed portal outside canvas layout, preserving text selections. See `docs/RC_CYCLE105_FLOATING_EDITOR_AND_RESIZE.en.md`; new browser and Python contracts are integrated into CI. GitHub full CI and real loaded app drag acceptance remain pending.

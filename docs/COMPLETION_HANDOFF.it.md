@@ -1,3 +1,11 @@
+# Quorivio 0.1.0-dev — RC106 — handoff controllo WS Chromium e popup flottanti (1 novembre 2026)
+
+**Handoff RC106:** la full CI del push `41305315027` (SHA RC105 `454eaf729c9487146f2c89a47178a64161d5683b`) fallisce per un test Python che cerca ancora la vecchia struttura inline del pannello pagina, mentre l'interfaccia usa correttamente un portal body trascinabile. Il test aggiornato verifica il contratto corrente. Gli `ECONNREFUSED` segnalati provengono dal proxy WebSocket della preview Vite usata nei test offline, prima dell'avvio API; non generavano una eccezione Playwright. Con RC106 la preview non inoltra `/live` al backend assente e il controllo del log si esegue sempre alla chiusura del passo Chromium, fallendo se il proxy registra errori. Le prove reali WS/PostgreSQL restano obbligatorie. `docs/RC_CYCLE106_CI_PREVIEW_AND_PORTAL.it.md`.
+**Completamento RC certificato: 85,25%** (43 accettati, 17 parziali su 60). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessuna RC definitiva.
+**Ultimo commit verificato:** RC105 SHA `454eaf729c9487146f2c89a47178a64161d5683b`; RC106 da committare. Nessun commit/push/tag o pubblicazione da parte dell'assistente.
+
+---
+
 # Quorivio 0.1.0-dev — RC105 — handoff popup mobili e ancoraggi widget (1 novembre 2026)
 
 **RC105 handoff:** otto ancoraggi assoluti sul bordo visibili solo sulla selezione, proprietà widget e impostazioni pagina flottanti e trascinabili, palette in portal a posizione fissa senza spostare il canvas e senza perdere la selezione di testo. Documentazione `docs/RC_CYCLE105_FLOATING_EDITOR_AND_RESIZE.it.md`; CI estesa e prova nell’app compilata da confermare.

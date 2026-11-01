@@ -58,7 +58,14 @@ class ContextualEditorUX(unittest.TestCase):
     def test_page_context_not_ribbon(self):
         self.assertIn('onOpenPageSettings={()=>',WEB)
         self.assertIn('onContextMenuCapture={handleCanvasContext}',WEB)
-        self.assertIn('pageContextOpen&&<section className="editor-context-drawer"',WEB)
+        # The canvas settings now open in a body-level draggable portal. A
+        # historically inline drawer could be clipped by the canvas and move
+        # its layout; a literal <section> check must not reject the safer UI.
+        self.assertRegex(WEB, r'pageContextOpen&&<EditorFloatingWindow\s+portal\s+placement="page"\s+className="editor-context-drawer"')
+        self.assertIn('return portal?createPortal(', WEB)
+        self.assertIn('document.body):content', WEB)
+        self.assertIn("closest('.palette-ribbon-head,.editor-drawer-heading')", WEB)
+        self.assertNotIn('pageContextOpen&&<section className="editor-context-drawer"', WEB)
         self.assertNotIn('className="canvas-blank-menu-trigger"',WEB)
         self.assertIn('contextHold.current=setTimeout(openBlankMenu,580)',WEB)
         self.assertNotIn('className="editor-heading"',WEB)

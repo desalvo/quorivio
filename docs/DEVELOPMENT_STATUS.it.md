@@ -1,3 +1,11 @@
+# Quorivio 0.1.0-dev — RC106 — CI Chromium fail-closed WebSocket e contratti popup (1 novembre 2026)
+
+**Correzione CI RC106:** nella run `41305315027` sul commit RC105 `454eaf729c9487146f2c89a47178a64161d5683b` il job qualità si è fermato nel discovery Python perché un vecchio test cercava il pannello pagina statico anziché l'attuale popup trascinabile tramite `EditorFloatingWindow` con portal nel body. La verifica è stata aggiornata senza rinunciare al requisito del popup flottante. I messaggi `ECONNREFUSED` provengono invece dal proxy WebSocket Vite della preview del bundle compilato, che contattava localhost:8080 prima dell'avvio del backend; i test Chromium non li vedevano come `pageerror`. RC106 isola la preview offline (`preview.proxy={}`), mantiene il proxy in modalità sviluppo e verifica il log completo della preview con esito bloccante in caso di errori WebSocket/proxy anche in uscita anticipata. I test reali PostgreSQL/WebSocket non vengono sostituiti. Aggiunte regressioni negative e documentazione: `docs/RC_CYCLE106_CI_PREVIEW_AND_PORTAL.it.md`.
+**Completamento RC certificato: 85,25%** (43 gate accettati, 17 parziali su 60, peso 100). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. RC definitiva e audit esterni non ancora approvati.
+**Baseline commit:** RC105 `454eaf729c9487146f2c89a47178a64161d5683b` verificato tramite push; RC106 non ancora committata. Nessuna modifica remota dell'assistente.
+
+---
+
 # Quorivio 0.1.0-dev — RC105 — popup mobili e ancoraggi resize corretti (1 novembre 2026)
 
 **RC105 locale:** ancoraggi ridimensionamento visibili solo sui widget selezionati, posizionati sui bordi anche con temi artistici; palette stile PowerPoint fuori dalla griglia, senza muovere il canvas; Proprietà widget e Impostazioni pagina diventano popup mobili trascinabili. Aggiunti controlli Chromium desktop/mobile e regressioni prima delle dipendenze CI. Nessun nuovo gate RC certificato.

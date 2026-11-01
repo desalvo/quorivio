@@ -226,6 +226,8 @@ jobs:
       - name: Strict release-candidate gate (manual opt-in)
         if: github.event_name == 'workflow_dispatch' && inputs.rc_strict && !inputs.rc_acceptance_suite
         run: python3 tools/rc_release_preflight.py --strict
+      - name: RC106 isolated compiled-preview and floating portal contracts
+        run: python3 -m unittest tools.tests.test_rc106_ci_contract tools.tests.test_editor_contextual_layout_v2 -q
       - name: Unit tests
         run: npm test
       - name: Editor autosave recovery and shared geometry unit tests
@@ -248,7 +250,16 @@ jobs:
           # Preview serves immutable /assets/* with no HMR/optimizer races.
           npm run preview -w @quorivio/web > /tmp/quorivio-ci-preview.log 2>&1 &
           preview_pid=$!
-          trap 'kill "$preview_pid" || true; tail -50 /tmp/quorivio-ci-preview.log' EXIT
+          # Always inspect the *server* log, even when Playwright passes or
+          # exits early. Vite's WebSocket ECONNREFUSED is not a pageerror.
+          cleanup_preview() {
+            rc=$?
+            python3 tools/ci_preview_proxy_guard.py /tmp/quorivio-ci-preview.log || rc=1
+            kill "$preview_pid" || true
+            tail -50 /tmp/quorivio-ci-preview.log
+            exit "$rc"
+          }
+          trap cleanup_preview EXIT
           for i in $(seq 1 45); do
             if curl --fail --silent http://127.0.0.1:5173/ >/dev/null; then break; fi
             sleep 1
@@ -756,7 +767,8 @@ jobs:
           python3 tools/verify_rc_cycle102_inventory.py --historical
           python3 tools/verify_rc_cycle103_inventory.py --historical
           python3 tools/verify_rc_cycle104_inventory.py --historical
-          python3 tools/verify_rc_cycle105_inventory.py
+          python3 tools/verify_rc_cycle105_inventory.py --historical
+          python3 tools/verify_rc_cycle106_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:
