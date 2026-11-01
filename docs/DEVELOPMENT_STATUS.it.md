@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC115 — Correzione TypeScript strict frontend (1 novembre 2026)
+
+**Stato:** cumulativo RC115 dalla RC114 committata; full CI RC114 fallita nel job `Production quality gate`, durante `npm run build` frontend. I preflight, 567 test API e 165 frontend erano passati. Completamento certificato **85,25%** (43 gate accettati, 17 parziali su 60), `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+**Correzione:** tipizzazione esplicita degli array usati dall’autofit e dalla verifica collisioni (TS7022/TS7006), campi `showTitle` e `autoFit` aggiunti al Pick dal tipo condiviso `PageDesign` (TS2339), e valori di Forma/Linea/Tratto limitati alle unioni `WidgetTextStyle` (TS2345). Nessuna modifica ai dati, alla validazione API o alla modalità strict. Preflight RC115 con test negativi, incluso nel workflow prima di npm.
+
+**Limiti:** test mirati e suite locali da registrare, ma `npm ci` locale impossibile per registry non raggiungibile (`EAI_AGAIN`), pertanto la compilazione TypeScript/Vite completa resta da certificare con full CI GitHub. Nessun commit, push, tag o rilascio.
+
+**Messaggio commit dalla RC114:** `Fix strict TypeScript inference for widget autofit, editor properties and graphic styles [full-ci]`.
+
+---
+
 # Quorivio 0.1.0-dev — RC114 — Compatibilità preflight editor e validazione sicura dell’upload (1 novembre 2026)
 
 **Stato:** correzione locale cumulativa RC114 della RC113. La full CI del commit `6a51c67074a4dccb481e13516f4dc04601c2ada7` è fallita nel preflight storico RC89 (2/8 test); i job successivi non sono stati eseguiti. L'ultima baseline con full CI verde rimane RC107, run `41309042012`. Completamento certificato **85,25%** (43 gate accettati, 17 parziali / 60); `rc_strict=false`, `publish_image=false`, `publish_latest=false`.

@@ -146,6 +146,8 @@ jobs:
             tools.tests.test_topic_linked_results_rc_20261028 -q
       - name: Validate RC79 cumulative archive receipt closure before npm
         run: python3 -m unittest tools.tests.test_rc_cycle79_inventory_closure -q
+      - name: RC115 frontend strict-type regression preflight before npm
+        run: python3 -m unittest tools.tests.test_rc_cycle115_typescript_strict -q
       - name: RC114 fail-closed JPG background and answer style preflight before npm
         run: python3 -m unittest tools.tests.test_rc_cycle114_editor_preflight -q
       - name: Validate RC89 editor review regressions before npm
@@ -796,7 +798,8 @@ jobs:
           python3 tools/verify_rc_cycle111_inventory.py --historical
           python3 tools/verify_rc_cycle112_inventory.py --historical
           python3 tools/verify_rc_cycle113_inventory.py --historical
-          python3 tools/verify_rc_cycle114_inventory.py
+          python3 tools/verify_rc_cycle114_inventory.py --historical
+          python3 tools/verify_rc_cycle115_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC115 — Correzione TypeScript strict frontend (1 novembre 2026)
+
+**Stato:** cumulativo RC115 dalla RC114 committata; full CI RC114 fallita nel job `Production quality gate`, durante `npm run build` frontend. I preflight, 567 test API e 165 frontend erano passati. Completamento certificato **85,25%** (43 gate accettati, 17 parziali su 60), `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+**Correzione:** tipizzazione esplicita degli array usati dall’autofit e dalla verifica collisioni (TS7022/TS7006), campi `showTitle` e `autoFit` aggiunti al Pick dal tipo condiviso `PageDesign` (TS2339), e valori di Forma/Linea/Tratto limitati alle unioni `WidgetTextStyle` (TS2345). Nessuna modifica ai dati, alla validazione API o alla modalità strict. Preflight RC115 con test negativi, incluso nel workflow prima di npm.
+
+**Limiti:** test mirati e suite locali da registrare, ma `npm ci` locale impossibile per registry non raggiungibile (`EAI_AGAIN`), pertanto la compilazione TypeScript/Vite completa resta da certificare con full CI GitHub. Nessun commit, push, tag o rilascio.
+
+**Messaggio commit dalla RC114:** `Fix strict TypeScript inference for widget autofit, editor properties and graphic styles [full-ci]`.
+
+---
+
 # Quorivio 0.1.0-dev — RC114 — Passaggio CI editor (1 novembre 2026)
 
 **Stato:** RC114 cumulativa locale dopo la full CI RC113 fallita sul commit `6a51c67074a4dccb481e13516f4dc04601c2ada7`. Due test storici RC89 respingevano comportamenti corretti: chiudere il menu sfondo solo dopo upload riuscito e ammettere le nuove proprietà delle risposte con validazione rigorosa. Cinque test negativi RC114 verificano che eventuali regressioni non vengano ignorate. Inventario RC113 mantenuto immutabile e RC114 unico inventario corrente. Full CI RC114 ancora da eseguire; ultima baseline full CI verde RC107 `41309042012`. Completamento certificato **85,25%** (43/17/60). `rc_strict=false`, `publish_image=false`, `publish_latest=false`.

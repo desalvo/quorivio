@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC115 — Frontend strict TypeScript build hotfix (1 November 2026)
+
+**Status:** RC115 cumulative from committed RC114; full CI RC114 failed in `Production quality gate` at the frontend `npm run build`. Early preflight, 567 API and 165 frontend tests had passed. Certified completion remains **85.25%** (43 accepted and 17 partial of 60 gates), `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+**Correction:** Explicitly type auto-fit/collision candidate arrays (TS7022/TS7006); include `showTitle` and `autoFit` in the editor's `PageDesign`-derived Pick (TS2339); narrow shape, line direction and stroke dash controls to `WidgetTextStyle` discriminated unions (TS2345). No API changes, validation bypass or weakened compiler checks. RC115 regression preflight, including negative mutations, executes before npm.
+
+**Limits:** Local npm installation is unavailable because the registry cannot be reached (`EAI_AGAIN`); full TypeScript/Vite compile remains an obligatory GitHub CI gate. No commit, push, tag or publication.
+
+**Suggested commit since RC114:** `Fix strict TypeScript inference for widget autofit, editor properties and graphic styles [full-ci]`.
+
+---
+
 # Quorivio 0.1.0-dev — RC114 — Editor CI preflight handoff (1 November 2026)
 
 **Status:** RC114 cumulative local correction after the failed RC113 GitHub full CI on `6a51c67074a4dccb481e13516f4dc04601c2ada7`. Two legacy RC89 preflight assertions rejected intentional safer behavior: only dismiss background-upload context on confirmed success, and accept newly validated answer style keys. Five new negative RC114 assertions check that unsafe regressions still fail. RC113 historical SHA-256 catalog retained and RC114 is the only current inventory. Full CI has not yet verified RC114. Baseline RC107 full CI `41309042012` green; certified **85.25%** (43/17/60). `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
