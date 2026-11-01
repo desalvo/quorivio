@@ -1,3 +1,19 @@
+# Quorivio 0.1.0-dev — RC102 — menu canvas flottante e CI comandata dal commit (1 novembre 2026)
+
+**Completamento RC certificato: 84,75%** (42 gate accettati, 17 parziali su 59). Default `rc_strict=false`, `publish_image=false`, `publish_latest=false`; la pubblicazione tramite commit è attivata esclusivamente dal marker esplicito `[publish-docker]` e dopo i gate.
+
+**Baseline di commit confermata:** RC100 `4930ee872798a70ad3ad92f907b647098d339adf`, CI standard verde `41256022328`. RC101–RC102 sono cumulativi da quel commit; nessun commit/push/tag/pubblicazione effettuato dall'assistente.
+
+**Errore CI estesa:** `logs_111827641365.zip`: Chromium supera la verifica della palette orizzontale RC101 ma il pulsante «Strumenti di selezione e allineamento» risulta coperto da un livello dell'editor nonostante sia visibile nel DOM. Il sommario della campagna fallisce in cascata.
+
+**Correzione RC102:** menu del canvas spostato mediante React portal direttamente sotto `document.body`, fuori dagli elementi trasformati/ritagliati dell'editor. Posizionamento fixed sotto l'intestazione, priorità di sovrapposizione, dimensioni limitate al viewport e scroll interno; Escape/clic esterno chiudono il menu. Smoke Chromium con clic reali superato su desktop 1440×900 e touch 390×844. Resta da verificare il componente React completo nella CI estesa con PostgreSQL.
+
+**Marker di commit:** normale => CI standard; `[full-ci]` => campagna estesa dal push su `main`; `[publish-docker]` => campagna estesa e pubblicazione multiarch su Docker Hub con tag `sha-<12>` e `latest` **solo se** i gate qualità, immagine e riepilogo esteso sono tutti verdi. Mai da PR/branch diversi da main, run non riuscite o campagne manuali RC; la pubblicazione manuale esistente resta separata. Nessun incremento della percentuale e nessun rilascio strict automatico.
+
+**Commit proposto dalla baseline RC100:** `Fix Chromium canvas context overlay and add gated commit CI modes [full-ci]`.
+
+---
+
 # Quorivio 0.1.0-dev — RC101 — correzione griglia editor Chromium CI estesa (1 novembre 2026)
 
 **Completamento RC certificato: 84,75%** (42 gate accettati, 17 parziali su 59). `rc_strict=false`, `publish_image=false`, `publish_latest=false`.

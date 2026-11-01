@@ -1,3 +1,17 @@
+# Quorivio 0.1.0-dev — RC102 — handoff menu contestuale e CI dal commit (1 novembre 2026)
+
+**Completamento certificato: 84,75%** (42 accettati/17 parziali su 59). Default `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Versione 0.1.0-dev, licenza EUPL-1.2.
+
+**Baseline:** RC101 cumulativa, dopo il commit RC100 `4930ee872798a70ad3ad92f907b647098d339adf`, CI standard `41256022328` verde. Il maintainer non ha confermato un commit successivo. Nessun push/tag o pubblicazione eseguiti dall'assistente.
+
+**Blocco CI:** `logs_111827641365.zip`, test reale Chromium in `ci_editor_context_tools.py:85`: pulsante di selezione canvas visibile ma coperto da intestazione/livelli dell'editor. La griglia orizzontale RC101 supera i test; il job riepilogativo fallisce di conseguenza.
+
+**Interventi:** popover dello sfondo canvas spostato tramite portal React sul body, classe floating viewport-safe con alto z-index e chiusura tramite Escape/clic esterno. Verifiche Chromium real-pointer desktop/touch e contratti di sicurezza CI. Marker su commit `main`: `[full-ci]` abilita tutta la campagna estesa; `[publish-docker]` abilita tutta la campagna estesa e, solo dopo qualità+container+riepilogo tutti verdi, push Docker Hub dei tag `sha-<12>` e `latest` nell'environment production. La pubblicazione manuale storica resta indipendente; niente publication da PR/branch diversi/fallimenti o CI RC manuale.
+
+**Verifiche ancora aperte:** campagna GitHub RC102 completa, test React Chromium con database reale e eventuale pubblicazione effettiva su Docker Hub. Gate e percentuale invariati. Messaggio commit proposto: `Fix Chromium canvas context overlay and add gated commit CI modes [full-ci]`.
+
+---
+
 # Quorivio 0.1.0-dev — RC101 — correzione editor orizzontale e CI Chromium (1 novembre 2026)
 
 **Completamento RC certificato: 84,75%** (42 gate accettati, 17 parziali su 59). `rc_strict=false`, `publish_image=false`, `publish_latest=false`.

@@ -111,6 +111,8 @@ jobs:
         run: python3 tools/ci_inventory_reference_guard.py
       - name: Validate RC campaign dispatch isolation before dependencies
         run: python3 -m unittest tools.tests.test_rc_cycle77_dispatch_isolation -q
+      - name: Validate RC102 editor and explicit commit CI/publish safety before dependencies
+        run: python3 -m unittest tools.tests.test_rc_cycle102_editor_and_commit_markers -q
       - name: Validate active RC release headers against the current inventory
         run: |
           PYTHONPATH=tools python3 tools/verify_rc_release_status.py
@@ -204,7 +206,7 @@ jobs:
       # RC campaigns are strictly observational, regardless of other dispatch
       # checkboxes. Separate consent is required for production publication.
       - name: Validate RC campaign is non-publishing and non-strict
-        if: github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite
+        if: github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite || (github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[full-ci]') || contains(github.event.head_commit.message, '[publish-docker]')))
         env:
           RC_CAMPAIGN_PUBLISH: 'false'
           RC_CAMPAIGN_STRICT: 'false'
@@ -227,7 +229,7 @@ jobs:
       - name: Compile frontend and backend
         run: npm run build
       - name: Chromium editor UI acceptance (opt-in)
-        if: github.event_name == 'workflow_dispatch' && inputs.browser_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
+        if: github.event_name == 'workflow_dispatch' && inputs.browser_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite) || (github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[full-ci]') || contains(github.event.head_commit.message, '[publish-docker]')))
         timeout-minutes: 8
         run: |
           python3 -m pip install --disable-pip-version-check --break-system-packages 'playwright>=1.50,<2'
@@ -264,6 +266,7 @@ jobs:
           # Real Chromium regression: header must not intercept canvas context
           # or selection/layer controls (full run 40589103128).
           python3 tools/ci_editor_context_header_overlay_chromium.py
+          python3 tools/ci_background_context_portal_chromium.py
           # Geometric parity across editor, rehearsal and audience at 1440px / 390px.
           python3 tools/ci_widget_visual_geometry_20261028.py
           # Dual presenter/participant preview must preserve 16:9 and real reaction hit targets.
@@ -292,7 +295,7 @@ jobs:
           # Actual native Chromium drag, ambiguous PUT acknowledgement, server readback and keyboard persistence.
           python3 tools/ci_page_thumbnail_native.py --engines chromium
       - name: Upload Chromium failure diagnostics
-        if: failure() && github.event_name == 'workflow_dispatch' && inputs.browser_test || (failure() && github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
+        if: failure() && github.event_name == 'workflow_dispatch' && inputs.browser_test || (failure() && github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite) || (failure() && (github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[full-ci]') || contains(github.event.head_commit.message, '[publish-docker]'))))
         uses: actions/upload-artifact@v4
         with:
           name: chromium-editor-failure
@@ -473,7 +476,7 @@ jobs:
           QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
         run: python3 tools/ci_independent_widget_questions_postgres.py
       - name: Chromium participant UI and PostgreSQL lifecycle (opt-in)
-        if: github.event_name == 'workflow_dispatch' && inputs.browser_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
+        if: github.event_name == 'workflow_dispatch' && inputs.browser_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite) || (github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[full-ci]') || contains(github.event.head_commit.message, '[publish-docker]')))
         timeout-minutes: 5
         env:
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
@@ -485,7 +488,7 @@ jobs:
           curl --fail --silent http://127.0.0.1:8080/ >/dev/null
           python3 tools/ci_browser_participant.py
       - name: Chromium editor PostgreSQL persistence and conflict acceptance (opt-in)
-        if: github.event_name == 'workflow_dispatch' && inputs.browser_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
+        if: github.event_name == 'workflow_dispatch' && inputs.browser_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite) || (github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[full-ci]') || contains(github.event.head_commit.message, '[publish-docker]')))
         timeout-minutes: 5
         env:
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
@@ -495,7 +498,7 @@ jobs:
           python3 tools/ci_widget_title_menu.py
           python3 tools/ci_browser_editor_postgres.py
       - name: Chromium presenter profile upload and anonymous avatar acceptance (opt-in)
-        if: github.event_name == 'workflow_dispatch' && inputs.browser_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
+        if: github.event_name == 'workflow_dispatch' && inputs.browser_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite) || (github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[full-ci]') || contains(github.event.head_commit.message, '[publish-docker]')))
         timeout-minutes: 5
         env:
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
@@ -503,7 +506,7 @@ jobs:
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
         run: python3 tools/ci_browser_profile.py
       - name: Upload Chromium real editor failure diagnostics
-        if: failure() && github.event_name == 'workflow_dispatch' && inputs.browser_test || (failure() && github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
+        if: failure() && github.event_name == 'workflow_dispatch' && inputs.browser_test || (failure() && github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite) || (failure() && (github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[full-ci]') || contains(github.event.head_commit.message, '[publish-docker]'))))
         uses: actions/upload-artifact@v4
         with:
           name: chromium-real-editor-failure
@@ -511,7 +514,7 @@ jobs:
           if-no-files-found: ignore
           retention-days: 3
       - name: Upload Chromium participant failure diagnostics
-        if: failure() && github.event_name == 'workflow_dispatch' && inputs.browser_test || (failure() && github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
+        if: failure() && github.event_name == 'workflow_dispatch' && inputs.browser_test || (failure() && github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite) || (failure() && (github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[full-ci]') || contains(github.event.head_commit.message, '[publish-docker]'))))
         uses: actions/upload-artifact@v4
         with:
           name: chromium-participant-failure
@@ -547,7 +550,7 @@ jobs:
       - name: Validate phase-independent quiet live snapshot test (post aiohttp installation)
         run: python3 -m unittest tools.tests.test_idle_live_postgres_cycle56 -q
       - name: PostgreSQL two-replica quiet live snapshot freshness (opt-in)
-        if: github.event_name == 'workflow_dispatch' && inputs.live_idle_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
+        if: github.event_name == 'workflow_dispatch' && inputs.live_idle_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite) || (github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[full-ci]') || contains(github.event.head_commit.message, '[publish-docker]')))
         timeout-minutes: 3
         env:
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
@@ -555,7 +558,7 @@ jobs:
           QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
         run: python3 tools/ci_live_idle_snapshots.py
       - name: Optional 500-participant PostgreSQL/WebSocket acceptance
-        if: github.event_name == 'workflow_dispatch' && inputs.capacity_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
+        if: github.event_name == 'workflow_dispatch' && inputs.capacity_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite) || (github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[full-ci]') || contains(github.event.head_commit.message, '[publish-docker]')))
         timeout-minutes: 6
         env:
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
@@ -563,7 +566,7 @@ jobs:
           QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
         run: python3 tools/ci_capacity_500.py
       - name: Optional sustained 500-participant global-latency SLO acceptance
-        if: github.event_name == 'workflow_dispatch' && inputs.capacity_slo_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
+        if: github.event_name == 'workflow_dispatch' && inputs.capacity_slo_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite) || (github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[full-ci]') || contains(github.event.head_commit.message, '[publish-docker]')))
         timeout-minutes: 7
         env:
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
@@ -739,14 +742,15 @@ jobs:
           python3 tools/verify_rc_cycle98_inventory.py --historical
           python3 tools/verify_rc_cycle99_inventory.py --historical
           python3 tools/verify_rc_cycle100_inventory.py --historical
-          python3 tools/verify_rc_cycle101_inventory.py
+          python3 tools/verify_rc_cycle101_inventory.py --historical
+          python3 tools/verify_rc_cycle102_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   cross-browser:
     name: Native Firefox and WebKit acceptance (opt-in)
-    if: github.event_name == 'workflow_dispatch' && inputs.cross_browser_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
+    if: github.event_name == 'workflow_dispatch' && inputs.cross_browser_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite) || (github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[full-ci]') || contains(github.event.head_commit.message, '[publish-docker]')))
     needs: validate
     runs-on: ubuntu-24.04
     timeout-minutes: 20
@@ -822,7 +826,7 @@ jobs:
           ignore-unfixed: true
   kubernetes-api-manifests:
     name: Kubernetes real API manifest schema (opt-in)
-    if: github.event_name == 'workflow_dispatch' && inputs.kubernetes_manifest_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
+    if: github.event_name == 'workflow_dispatch' && inputs.kubernetes_manifest_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite) || (github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[full-ci]') || contains(github.event.head_commit.message, '[publish-docker]')))
     needs: validate
     runs-on: ubuntu-24.04
     timeout-minutes: 12
@@ -838,7 +842,7 @@ jobs:
         run: python3 tools/ci_k8s_apiserver_smoke.py
   kubernetes-runtime:
     name: Kubernetes live single-node runtime and pod replacement (opt-in)
-    if: github.event_name == 'workflow_dispatch' && inputs.kubernetes_runtime_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
+    if: github.event_name == 'workflow_dispatch' && inputs.kubernetes_runtime_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite) || (github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[full-ci]') || contains(github.event.head_commit.message, '[publish-docker]')))
     needs: validate
     runs-on: ubuntu-24.04
     timeout-minutes: 22
@@ -863,7 +867,7 @@ jobs:
           kubectl -n quorivio-runtime get events --sort-by=.lastTimestamp | tail -40 || true
   kubernetes-multinode-ingress:
     name: Kubernetes live two-worker NGINX ingress and failover (opt-in)
-    if: github.event_name == 'workflow_dispatch' && inputs.kubernetes_multinode_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
+    if: github.event_name == 'workflow_dispatch' && inputs.kubernetes_multinode_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite) || (github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[full-ci]') || contains(github.event.head_commit.message, '[publish-docker]')))
     needs: validate
     runs-on: ubuntu-24.04
     timeout-minutes: 30
@@ -900,7 +904,7 @@ jobs:
         run: sudo rm -rf /tmp/quorivio-kind-multinode-shared
   kubernetes-https-ingress:
     name: Kubernetes real HTTPS ingress and failover (${{ matrix.controller }}, opt-in)
-    if: github.event_name == 'workflow_dispatch' && inputs.kubernetes_tls_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
+    if: github.event_name == 'workflow_dispatch' && inputs.kubernetes_tls_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite) || (github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[full-ci]') || contains(github.event.head_commit.message, '[publish-docker]')))
     needs: validate
     runs-on: ubuntu-24.04
     timeout-minutes: 35
@@ -939,7 +943,7 @@ jobs:
         run: sudo rm -rf /tmp/quorivio-kind-multinode-shared
   kubernetes-haproxy-ingress:
     name: Kubernetes live HAProxy Technologies two-worker ingress and failover (opt-in)
-    if: github.event_name == 'workflow_dispatch' && inputs.kubernetes_haproxy_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
+    if: github.event_name == 'workflow_dispatch' && inputs.kubernetes_haproxy_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite) || (github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[full-ci]') || contains(github.event.head_commit.message, '[publish-docker]')))
     needs: validate
     runs-on: ubuntu-24.04
     timeout-minutes: 35
@@ -979,7 +983,7 @@ jobs:
 
   runtime-architecture:
     name: OCI amd64/arm64 actual runtime acceptance (opt-in)
-    if: github.event_name == 'workflow_dispatch' && inputs.runtime_arch_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
+    if: github.event_name == 'workflow_dispatch' && inputs.runtime_arch_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite) || (github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[full-ci]') || contains(github.event.head_commit.message, '[publish-docker]')))
     needs: validate
     runs-on: ubuntu-24.04
     timeout-minutes: 30
@@ -1012,7 +1016,7 @@ jobs:
         run: bash tools/ci_oci_runtime_smoke.sh quorivio:ci-oci-arm64 arm64
   runtime-podman-rootless:
     name: Rootless Podman PostgreSQL runtime acceptance (opt-in)
-    if: github.event_name == 'workflow_dispatch' && inputs.rootless_podman_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
+    if: github.event_name == 'workflow_dispatch' && inputs.rootless_podman_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite) || (github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[full-ci]') || contains(github.event.head_commit.message, '[publish-docker]')))
     needs: validate
     runs-on: ubuntu-24.04
     timeout-minutes: 25
@@ -1032,7 +1036,7 @@ jobs:
         run: bash tools/ci_rootless_podman_smoke.sh quorivio:ci-rootless
   clamav-runtime:
     name: Real ClamAV signature and production fail-closed acceptance (opt-in)
-    if: github.event_name == 'workflow_dispatch' && inputs.clamav_runtime_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite)
+    if: github.event_name == 'workflow_dispatch' && inputs.clamav_runtime_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite) || (github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[full-ci]') || contains(github.event.head_commit.message, '[publish-docker]')))
     runs-on: ubuntu-24.04
     timeout-minutes: 18
     steps:
@@ -1057,7 +1061,7 @@ jobs:
 
   rc-campaign-conclusion:
     name: Full automatic RC campaign acceptance summary (opt-in)
-    if: always() && github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite
+    if: always() && github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite || (github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[full-ci]') || contains(github.event.head_commit.message, '[publish-docker]')))
     needs:
       - validate
       - cross-browser
@@ -1109,6 +1113,50 @@ jobs:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Publish approved image to Docker Hub
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.label.outputs.tags }}
+          sbom: true
+          provenance: mode=max
+          labels: |
+            org.opencontainers.image.source=https://github.com/desalvo/quorivio
+            org.opencontainers.image.licenses=EUPL-1.2
+            org.opencontainers.image.revision=${{ github.sha }}
+
+  publish-on-commit:
+    name: Production publication requested by commit
+    if: >-
+      ${{ always() && github.event_name == 'push' && github.ref == 'refs/heads/main' &&
+          contains(github.event.head_commit.message, '[publish-docker]') &&
+          needs.validate.result == 'success' && needs.image-build.result == 'success' &&
+          needs.rc-campaign-conclusion.result == 'success' }}
+    needs: [validate, image-build, rc-campaign-conclusion]
+    runs-on: ubuntu-24.04
+    environment: production
+    permissions: {contents: read}
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - name: Verify publisher repository
+        shell: bash
+        run: test "$GITHUB_REPOSITORY" = 'desalvo/quorivio'
+      - name: Verify explicit commit publication authorization and full gate result
+        id: label
+        env:
+          QUORIVIO_COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          QUORIVIO_CAMPAIGN_CONCLUSION: ${{ needs.rc-campaign-conclusion.result }}
+        run: bash tools/resolve_commit_image_tags.sh
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - name: Docker Hub authentication
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Publish approved commit image to Docker Hub
         uses: docker/build-push-action@v6
         with:
           context: .

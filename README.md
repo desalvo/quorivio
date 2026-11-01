@@ -171,3 +171,14 @@ The current cumulative development package contains **seven uncommitted conversi
 
 ### Chromium native top-layer hotfix (2026-10-25)
 Full Chromium CI 40215782964 failed because the dashboard intercepted the cookie acknowledgement click despite the previous body portal. The notice now uses native HTML dialog.showModal() in the browser top layer; the opt-in browser tests assert :modal and perform a real click. Local Node 314/314, Python 630/630, API/web builds PASS; full-app browser rerun required.
+
+
+## Commit-controlled CI (RC102)
+
+On a push to `main`, the message controls which checks run:
+
+- Ordinary commit: standard quality and container build only.
+- `[full-ci]`: all optional release-candidate acceptance checks and final campaign summary; no Docker publication.
+- `[publish-docker]`: automatically requests the full campaign; **only after every required gate is successful**, publishes multi-arch `desalvo/quorivio:sha-<12>` and `desalvo/quorivio:latest` via the protected `production` environment. Do not use it unless you explicitly intend to update `latest`.
+
+Manual `workflow_dispatch` with `rc_acceptance_suite=true` never publishes, even if a publish checkbox was previously selected. Manual `publish_image` remains separate. PRs, non-main pushes and incomplete checks cannot trigger publication. Configure `DOCKERHUB_USERNAME` (variable) and `DOCKERHUB_TOKEN` (secret) and any desired required reviewers on the `production` environment.

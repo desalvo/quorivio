@@ -1,3 +1,21 @@
+# Quorivio 0.1.0-dev — RC102 — floating canvas context and explicit commit CI modes (1 November 2026)
+
+**Verified RC readiness: 84.75%** (42 accepted, 17 partial of 59). `rc_strict=false`, `publish_image=false`, `publish_latest=false` by default. Explicit `[publish-docker]` changes publication behavior only after every extended gate passes.
+
+**Last confirmed commit baseline:** RC100 `4930ee872798a70ad3ad92f907b647098d339adf`, standard CI run `41256022328` green. RC101 and RC102 changes are cumulative since that commit; maintainer has not confirmed a newer commit. No commit, push, tag, Docker publication or remote mutation by the assistant.
+
+**Extended CI diagnosis:** uploaded `logs_111827641365.zip`, Production quality gate, Chromium `tools/ci_browser_editor.py` through `ci_editor_context_tools.ensure_canvas_tools_open()`: the `Strumenti di selezione e allineamento` button is DOM-visible but fails `elementFromPoint`, covered by the fixed editor header or another layer; the summary RC job fails downstream. The earlier RC101 horizontal palette check passes.
+
+**RC102 frontend fix:** the page/canvas background context menu is portalled under `document.body`, outside transformed/clipped editor ancestors. Dedicated fixed viewport geometry below the header, high stacking level and scroll constraints make entry buttons truly pointer-interactive on desktop and mobile. Outside pointer and Escape dismiss it; widget context menus remain independent. Real Chromium offline CSS/DOM smoke tested both desktop 1440×900 and touch 390×844. Full compiled-React PostgreSQL Chromium acceptance is still pending external CI.
+
+**Commit-driven CI:** ordinary main commit => standard CI; `[full-ci]` => full optional RC campaign directly on main; `[publish-docker]` => full campaign and, **only when production quality, image build and final RC campaign summary all pass**, production-environment Docker Hub publication to immutable `sha-<12>` and `latest` tags. No pull request, non-main push, failed/skipped campaign, or workflow_dispatch campaign may publish by these markers. Manual `publish_image` remains an independent opt-in with its historical safety policy. `rc_strict` remains off by default; release status does not change.
+
+**New local checks:** 20 targeted commit-policy/manual-policy tests, 2 real-Chromium fixture viewports, static workflow safety and no-default-publication preflight. A real CI success on RC102 is not yet available. Certified percentage remains unchanged.
+
+**Suggested post-RC100 commit (full test run without Docker push):** `Fix Chromium canvas context overlay and add gated commit CI modes [full-ci]`.
+
+---
+
 # Quorivio 0.1.0-dev — RC101 — extended Chromium editor layout gate (1 November 2026)
 
 **Verified RC readiness: 84.75%** (42 accepted, 17 partial of 59). `rc_strict=false`, `publish_image=false`, `publish_latest=false`.

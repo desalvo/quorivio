@@ -137,3 +137,8 @@ Il package cumulativo include **sette lotti di conversione ancora non committati
 
 ### Chromium native top-layer hotfix (2026-10-25)
 La CI full 40215782964 falliva perché la dashboard intercettava il clic di conferma dei cookie, nonostante il portal nel body. L’informativa usa ora il dialog HTML nativo showModal() nel top layer del browser; i test opt-in verificano :modal ed eseguono il clic reale. Localmente Node 314/314, Python 630/630 e build API/web PASS; serve rieseguire Chromium end-to-end.
+
+
+## CI controllata dal commit (RC102)
+
+Un push su `main` con commit ordinario avvia la CI standard; `[full-ci]` avvia direttamente tutti i gate automatici estesi, senza pubblicare. Il marker esplicito `[publish-docker]` avvia la stessa campagna estesa e **solo quando tutti i gate risultano verdi** pubblica `desalvo/quorivio:sha-<12>` e `desalvo/quorivio:latest` nell'environment protetto `production`. Non usare questo marker se non vuoi aggiornare `latest`. La pubblicazione manuale `workflow_dispatch` rimane separata; mai pubblicazione da PR, branch diversi da `main` o test falliti. Configura la variabile `DOCKERHUB_USERNAME` e il segreto `DOCKERHUB_TOKEN`, più eventuali revisori richiesti nell'environment `production`.

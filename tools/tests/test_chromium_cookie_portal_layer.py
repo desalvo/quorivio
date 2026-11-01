@@ -31,7 +31,9 @@ class CookiePortalLayer(unittest.TestCase):
     def test_modal_cookie_portal_and_nonblocking_widget_tooltip_are_distinct(self):
         source=(ROOT/'apps/web/src/main.tsx').read_text(encoding='utf-8')
         # Cookie consent, widget tooltip and the accessible rehearsal are distinct portals.
-        self.assertEqual(source.count('createPortal('),5)
+        self.assertGreaterEqual(source.count('createPortal('),6)
+        self.assertIn('backgroundMenu&&onBackgroundSelect&&createPortal(',source)
+        self.assertEqual(source.count('backgroundMenu&&onBackgroundSelect&&createPortal('),1)
         self.assertIn('return createPortal(<div className="rehearsal-backdrop"',source)
         self.assertIn('createPortal(<span className=',source)
         self.assertEqual(source.count('<dialog ref={node=>{if(node&&!node.open)node.showModal()}'),1)

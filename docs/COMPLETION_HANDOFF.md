@@ -1,3 +1,19 @@
+# Quorivio 0.1.0-dev — RC102 — editor context portal and commit-intent CI handoff (1 November 2026)
+
+**Certified readiness: 84.75%** (42 accepted/17 partial out of 59). `rc_strict=false`, `publish_image=false`, `publish_latest=false` by default. Version remains 0.1.0-dev, EUPL-1.2.
+
+**Source baseline:** RC101 cumulative archive, following last maintainer-confirmed RC100 commit `4930ee872798a70ad3ad92f907b647098d339adf`, GitHub standard run `41256022328` success. No assistant commit, push, tag or Docker deployment. All future suggested commits are cumulative only since RC100 until a newer commit is confirmed.
+
+**Observed blocker:** `logs_111827641365.zip`, full opt-in Chromium editor acceptance fails `AssertionError: Canvas selection menu is covered by the editor header or another element`, at `tools/ci_editor_context_tools.py:85`, after numerous browser successes including the RC101 layout. No other independent failing acceptance is established from this log. RC campaign summary failed because its production quality dependency failed.
+
+**Changes:** Portalled `.canvas-background-context` to `document.body`; fixed, viewport-bounded `.canvas-background-context-floating`, with Escape and outside-dismiss behavior. Added real pointer smoke fixture and unit contract tests. CI `push` main marker `[full-ci]` runs all automated RC opt-ins and summary. Marker `[publish-docker]` runs the same tests and then requires `validate`, `image-build`, and `rc-campaign-conclusion` all `success` before a protected `production` Docker Hub push. Tags: `sha-<12>` and `latest` from main; independent authorization script validates event/ref/repository/SHA/message and campaign result. Preserve manual workflow_dispatch publication and non-publishing manual campaign. Do not use `[publish-docker]` until explicitly intending to update `latest`.
+
+**Next checks:** CI standard/extended GitHub on RC102, built React real editor Chromium and PostgreSQL, actual production publication only if explicitly requested. RC strict release remains blocked. GitHub/remote deployments unchanged by assistant.
+
+**Suggested commit (recommended):** `Fix Chromium canvas context overlay and add gated commit CI modes [full-ci]`.
+
+---
+
 # Quorivio 0.1.0-dev — RC101 — Chromium horizontal editor rail hotfix (1 November 2026)
 
 **Verified RC readiness: 84.75%** (42 accepted, 17 partial of 59). `rc_strict=false`, `publish_image=false`, `publish_latest=false`.

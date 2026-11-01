@@ -1,0 +1,48 @@
+{
+  "cycle": 102,
+  "version": "0.1.0-dev",
+  "certified_completion_percent": 84.75,
+  "verified_baseline": {
+    "last_confirmed_git_commit": "4930ee872798a70ad3ad92f907b647098d339adf",
+    "standard_ci_run": 41256022328
+  },
+  "failure_evidence": {
+    "uploaded_log": "logs_111827641365.zip",
+    "primary_failure": "Chromium editor page background context entry visually present but obscured / not receiving pointer",
+    "assertion": "Canvas selection menu is covered by the editor header or another element",
+    "downstream_failure": "Full RC campaign summary requires production quality gate success"
+  },
+  "changes": [
+    "Portal page-background canvas context menu to document.body and make it viewport-safe",
+    "Dismiss background menu on Escape/outside pointer",
+    "Opt-in full RC campaign by push commit marker [full-ci]",
+    "Opt-in full RC campaign plus gated Docker Hub publication by push commit marker [publish-docker]",
+    "Preserve explicit manual image publication isolated from manual full RC acceptance",
+    "Block commit publication on any failed/skipped required validation, image build or campaign summary"
+  ],
+  "tag_policy": {
+    "commit_trigger": "[publish-docker]",
+    "event": "push on main only",
+    "required_results": [
+      "validate:success",
+      "image-build:success",
+      "rc-campaign-conclusion:success"
+    ],
+    "tags": [
+      "sha-<12>",
+      "latest"
+    ],
+    "manual_publish_unchanged": true
+  },
+  "local_verification": {
+    "targeted_python_contract_tests": "20/20 before inventory generation",
+    "real_chromium_fixture_viewports": [
+      "1440x900 desktop",
+      "390x844 touch"
+    ],
+    "browser_fixture_status": "passed",
+    "full_built_react_editor_acceptance": "not run locally",
+    "full_github_extended_ci": "not run on RC102"
+  },
+  "disclaimer": "No automated release certification or Docker Hub push has been performed."
+}

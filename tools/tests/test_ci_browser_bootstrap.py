@@ -29,7 +29,9 @@ class BrowserBootstrapTests(unittest.TestCase):
         self.assertNotIn('apt-get',step)
         self.assertIn('python3 tools/ci_nested_context_css_chromium.py',step)
         self.assertIn('python3 tools/ci_browser_editor.py',step)
-        self.assertEqual(workflow.count('name: Production publication'),1)
+        self.assertEqual(workflow.count('name: Production publication\n'),1)
+        self.assertEqual(workflow.count('name: Production publication requested by commit'),1)
+        self.assertIn('needs: [validate, image-build, rc-campaign-conclusion]',workflow)
 
     def test_all_browser_tests_accept_the_shared_preinstalled_binary(self):
         for name in ('ci_browser_editor.py','ci_browser_editor_postgres.py',
