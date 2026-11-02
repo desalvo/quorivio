@@ -93,7 +93,7 @@ async def main():
             assert stored_logo['assetId'] != background_id, 'Logo and background must be independent attachments'
             logo_asset = await context.request.get(BASE + f'/api/sessions/{sid}/assets/{stored_logo["assetId"]}')
             assert logo_asset.status == 200 and await logo_asset.body() == JPG.read_bytes()
-            await open_editor(page, title)
+            await open_editor(page, title, session_id=sid, activity_id=aid)
             await expect(page.locator('.widget-canvas-item[data-widget-kind="logo"]')).to_have_count(1)
             assert not errors, f'Browser JavaScript errors: {errors[:4]}'
             print('PASS real PostgreSQL Chromium JPG background picker, private library, Logo upload and persisted reload')

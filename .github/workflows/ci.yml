@@ -161,6 +161,8 @@ jobs:
             tools.tests.test_rc_cycle26_oci_hotfix.Cycle26RC.test_ci_checks_historical_then_current_without_publication -q
       - name: RC129 Chromium persisted editor recovery preflight before npm
         run: python3 -m unittest tools.tests.test_rc129_browser_reload_restoration -q
+      - name: RC130 authenticated browser editor reentry and real media picker preflight
+        run: python3 -m unittest tools.tests.test_rc130_browser_reentry -q
       - name: RC128 screenshot parity, workspace reload and collision boundary preflight
         run: python3 -m unittest tools.tests.test_rc128_rehearsal_parity_contract -q
 
@@ -872,7 +874,8 @@ jobs:
           python3 tools/verify_rc_cycle126_inventory.py --historical
           python3 tools/verify_rc_cycle127_inventory.py --historical
           python3 tools/verify_rc_cycle128_inventory.py --historical
-          python3 tools/verify_rc_cycle129_inventory.py
+          python3 tools/verify_rc_cycle129_inventory.py --historical
+          python3 tools/verify_rc_cycle130_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

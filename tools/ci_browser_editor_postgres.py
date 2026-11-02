@@ -31,7 +31,7 @@ async def call(context,method,path,body=None,status=200):
  assert response.status==status,(method,path,response.status,status,(await response.text())[:240])
  return await response.json() if (await response.body()) else None
 
-async def open_editor(page,title):
+async def open_editor(page,title,*,session_id=None,activity_id=None):
  await page.goto(BASE+'/',wait_until='domcontentloaded')
  # The cookie notice is a native modal and therefore hides the underlying
  # navigation from accessibility locators until the user closes it.
@@ -53,6 +53,28 @@ async def open_editor(page,title):
   assert visible_hit, 'Cookie acknowledgement button must be inside the visual viewport before a real click'
   await button.click()
   await expect(notice).to_have_count(0)
+ # A browser reload keeps the authenticated session/page open (RC128).
+ # Do not try to click the background dashboard through the active editor.
+ # Resolve the *exact* original test session and page, never merely any visible
+ # editor, so an unrelated stale workspace cannot create a false CI pass.
+ if session_id is not None and activity_id is not None:
+  restored=await page.evaluate("""() => {
+    try { return JSON.parse(sessionStorage.getItem('quorivio.workspace.v1') || 'null') }
+    catch { return null }
+  }""")
+  if restored and restored.get('sessionId'):
+   assert restored.get('sessionId')==session_id, 'Reload recovered a different session than the disposable CI fixture'
+   assert restored.get('pageId')==activity_id, 'Reload recovered a different page than the disposable CI fixture'
+   saved=await call(page.context,'GET',f'/api/sessions/{session_id}')
+   assert saved['session']['title']==title, 'Recovered session title does not match the CI fixture'
+   assert any(a['id']==activity_id for a in saved['activities']), 'Recovered page is absent from the persisted session'
+   editor=page.get_by_role('region',name='Editor grafico delle pagine')
+   await expect(editor).to_be_visible(timeout=20000)
+   current=editor.locator('.page-editor-thumb-row.is-active .page-editor-thumb')
+   await expect(current).to_have_count(1)
+   await expect(current).to_have_attribute('aria-current','page')
+   await expect(editor.get_by_role('group',name='Canvas grafico widget')).to_be_visible()
+   return
  await page.get_by_role('button',name='Apri sessione').first.wait_for()
  await page.get_by_role('button',name='Apri sessione').first.click()
  card=page.locator('details').filter(has=page.get_by_text(title,exact=True))
@@ -120,7 +142,7 @@ async def main():
    saved=await await_revision(context,sid,aid,3)
    assert [w['position']['x'] for w in saved['page_design']['widgets']]==[11,40,75]
    await expect(editor.get_by_text('Salvato automaticamente')).to_be_visible()
-   await open_editor(page,title)
+   await open_editor(page,title,session_id=sid,activity_id=aid)
    assert await widgets.first.evaluate('(e)=>parseFloat(e.style.left)')==11
    # Rename the current page through the thumbnail menu. No question options,
    # response history, or widget geometry may be overwritten by a title edit.
@@ -134,7 +156,7 @@ async def main():
    assert renamed_activity['design_revision']==3
    assert renamed_activity['options']==[{'id':'yes','label':'Yes'},{'id':'no','label':'No'}]
    assert renamed_activity['page_design']['widgets'][0]['position']['x']==11
-   await open_editor(page,title)
+   await open_editor(page,title,session_id=sid,activity_id=aid)
    # Concurrent presenter modifies another field while browser retains stale revision.
    remote_before=await call(context,'GET',f'/api/sessions/{sid}')
    remote_page=next(x for x in remote_before['activities'] if x['id']==aid)

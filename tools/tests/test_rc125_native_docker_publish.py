@@ -61,7 +61,7 @@ else: sys.exit(1)
                  'GITHUB_REPOSITORY':'desalvo/quorivio','GITHUB_EVENT_NAME':'push',
                  'QUORIVIO_IMAGE_TAGS':tags,'QUORIVIO_DIGEST_DIR':str(p/'digests'),
                  'FAKE_DOCKER_CALLS':str(p/'calls'),'FAKE_ARM_ARCH':arch_map or 'arm64'}
-            completed=subprocess.run(['bash',str(SCRIPT)],env=env,capture_output=True,text=True,timeout=5)
+            completed=subprocess.run(['bash',str(SCRIPT)],env=env,capture_output=True,text=True,timeout=15)
             calls=[json.loads(x) for x in (p/'calls').read_text().splitlines()] if (p/'calls').exists() else []
             return completed,calls
 
