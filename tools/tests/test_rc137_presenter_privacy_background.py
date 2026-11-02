@@ -32,6 +32,18 @@ class RC137PresenterPrivacyAndBackground(unittest.TestCase):
   self.assertIn('type={mode===\'multiple\'?\'checkbox\':\'radio\'} disabled',projected)
   self.assertNotIn('onChange=',projected)
   self.assertNotIn('onClick=',projected)
+ def test_node_only_background_error_test_is_outside_browser_typescript_sources(self):
+  # apps/web/tsconfig.json includes src/ but deliberately excludes Node test types.
+  # The CI runner explicitly executes all apps/web/test/*.test.ts separately.
+  from json import loads
+  self.assertFalse((ROOT/'apps/web/src/background-upload-error.test.ts').exists())
+  node_test=ROOT/'apps/web/test/background-upload-error.test.ts'
+  self.assertTrue(node_test.is_file())
+  self.assertIn("'../src/background-upload-error.ts'",node_test.read_text())
+  tsconfig=loads((ROOT/'apps/web/tsconfig.json').read_text())
+  self.assertEqual(tsconfig['include'],['src'])
+  workflow=(ROOT/'.github/workflows/ci.yml').read_text()
+  self.assertIn('node --experimental-strip-types --test apps/web/test/*.test.ts',workflow)
  def test_background_upload_reports_actual_rejection_and_never_swallows_errors(self):
   upload=SRC.split('async function uploadBackground(')[1].split('async function deleteAsset(')[0]
   self.assertIn('backgroundUploadError(r.status,code)',upload)

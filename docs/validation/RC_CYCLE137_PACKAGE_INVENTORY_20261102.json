@@ -1523,16 +1523,6 @@
       "830b13a5",
       "1b603b64"
     ],
-    "apps/web/src/background-upload-error.test.ts": [
-      "3cd4e1f0",
-      "9e2f6069",
-      "b9c8a967",
-      "b32262b2",
-      "9d8c7705",
-      "b058bf6e",
-      "c602bd2d",
-      "9980c026"
-    ],
     "apps/web/src/background-upload-error.ts": [
       "0624d330",
       "988c3aef",
@@ -1962,6 +1952,16 @@
       "42e5d027",
       "0dc95867",
       "acf0d37d"
+    ],
+    "apps/web/test/background-upload-error.test.ts": [
+      "83165c08",
+      "2606a15e",
+      "63a7af4f",
+      "2c0e155f",
+      "864cde18",
+      "a7a6b0ad",
+      "1c7eda13",
+      "952f50fc"
     ],
     "apps/web/test/editor-context-hit.test.ts": [
       "499ca1f6",
@@ -2794,24 +2794,24 @@
       "949f2c92"
     ],
     "docs/COMPLETION_HANDOFF.it.md": [
-      "a1c2a869",
-      "9d35d49b",
-      "372193aa",
-      "e732f056",
-      "ec59690b",
-      "2e36f1ee",
-      "bb952d45",
-      "d40fcd1f"
+      "74f06bb6",
+      "d1298120",
+      "e4a09efd",
+      "6a020183",
+      "4a101e65",
+      "86d2825d",
+      "c50733f4",
+      "933435d2"
     ],
     "docs/COMPLETION_HANDOFF.md": [
-      "1e8ece37",
-      "3e446f16",
-      "9824c7b6",
-      "55db1a74",
-      "d5e6fc24",
-      "96feb456",
-      "f974d987",
-      "0e80d5fa"
+      "55762e60",
+      "2b0ed15c",
+      "31235795",
+      "860c821d",
+      "24781401",
+      "59051d50",
+      "0e0db5a6",
+      "b362da26"
     ],
     "docs/CONVERSION_ATOMIC_PUBLISH.en.md": [
       "20d0f241",
@@ -2874,24 +2874,24 @@
       "1ac5fb62"
     ],
     "docs/DEVELOPMENT_STATUS.it.md": [
-      "6835b073",
-      "c292408c",
-      "e17cc4b3",
-      "f4e65e68",
-      "a84c53bd",
-      "cd1029cc",
-      "16af7486",
-      "8ddfad7b"
+      "b8ab3c86",
+      "cda6ee0f",
+      "d3b269b4",
+      "9841d1d4",
+      "4d515c2d",
+      "b07046f8",
+      "283abb41",
+      "999c3c78"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "5077423c",
-      "ffd296ba",
-      "7a3b0074",
-      "636ce067",
-      "4e541fc2",
-      "36d91afc",
-      "a1af7ba0",
-      "a5ba16fc"
+      "0f63d637",
+      "0b6d9cb1",
+      "2bb3c6a3",
+      "bd45ee23",
+      "169fa1a1",
+      "8bdc6469",
+      "1ab40014",
+      "4500d495"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",
@@ -5934,24 +5934,24 @@
       "746dda7b"
     ],
     "docs/RC_CYCLE137_PRESENTER_PRIVACY_BACKGROUND.en.md": [
-      "98237888",
-      "d5fbbf93",
-      "ec721940",
-      "48df6541",
-      "6977a95c",
-      "9abdcbd1",
-      "a648bdce",
-      "45315ca2"
+      "9f8a629c",
+      "2a9bb028",
+      "ddefc13c",
+      "c9959f04",
+      "001ffd20",
+      "d0199ba3",
+      "23a565d7",
+      "d3ee075d"
     ],
     "docs/RC_CYCLE137_PRESENTER_PRIVACY_BACKGROUND.it.md": [
-      "c95d241b",
-      "8be037bc",
-      "499e0b69",
-      "54b27dd0",
-      "8baf765d",
-      "0ced8fac",
-      "de3fdc32",
-      "c519a64e"
+      "a9ea39ce",
+      "1a85cb1f",
+      "a7c1e88f",
+      "f8d9f13b",
+      "20271ea8",
+      "b02e8723",
+      "1e6fda8f",
+      "abd466bb"
     ],
     "docs/RC_CYCLE14_NATIVE_BROWSERS_VERIFIED.en.md": [
       "b35ae30c",
@@ -12304,14 +12304,14 @@
       "88adaa47"
     ],
     "tools/tests/test_rc137_presenter_privacy_background.py": [
-      "9e3b9c3f",
-      "d81eccfe",
-      "5f37d625",
-      "5441eb68",
-      "87e6ed98",
-      "ed9b36f2",
-      "e6f45d9e",
-      "a6202304"
+      "67a9e9d9",
+      "9f022260",
+      "740dc0af",
+      "6698c3f6",
+      "44c62e12",
+      "3b5f4194",
+      "b74eb1fe",
+      "83880398"
     ],
     "tools/tests/test_rc73_slide_master.py": [
       "2c080f2d",

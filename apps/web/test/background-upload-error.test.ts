@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
-import {backgroundUploadError} from './background-upload-error.ts';
+import {backgroundUploadError} from '../src/background-upload-error.ts';
 test('background rejection reports actionable status without leaking server HTML',()=>{
  assert.match(backgroundUploadError(413,'invalid_upload_size'),/File troppo grande/);
  assert.match(backgroundUploadError(415,'unsupported_background_media'),/JPG/);

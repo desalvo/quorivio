@@ -14,3 +14,9 @@
 - Nuovo preflight RC137 per separazione dei dati e caricamenti; test Node per MIME/errori; contratti storici aggiornati senza disabilitare controlli.
 - I test Chromium/PostgreSQL reali già presenti per libreria e persistenza sfondi saranno rieseguiti sulla prossima CI. Se l'installazione reale continua a rifiutare il file, il nuovo messaggio permetterà di distinguere un errore di configurazione (antivirus, cartella asset, limite) da un problema del browser; non viene dichiarato risolto un problema server non riprodotto.
 - **Avanzamento certificato 85,25% (43 gate accettati/17 parziali)**; restano necessarie le evidenze indipendenti esterne. `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+## Hotfix CI RC137 (run 41473679963)
+
+La compilazione TypeScript del frontend è fallita (TS2307) perché `background-upload-error.test.ts`, che importa `node:assert/strict` e `node:test`, si trovava nella cartella browser `apps/web/src/`. Il test è stato spostato in `apps/web/test/`, già eseguita dal comando CI `node --experimental-strip-types --test apps/web/test/*.test.ts`, e il percorso dell'import è stato aggiornato. Il compilatore browser non include più questo test. Nessuna modifica al runtime applicativo, alla sicurezza, ai gate RC o alla pubblicazione Docker. La correzione richiede un nuovo commit e una nuova CI.
+
+**Verifiche locali hotfix:** suite Python completa 1.709 test (1.708 superati, 1 saltato, nessun fallimento); frontend Node 210/210, compreso il test trasferito; quattro intestazioni di rilascio e 124 verificatori storici/correnti validati; controlli SHA-256 di sorgenti e ZIP superati. Build npm/Vite e browser GitHub da confermare con una nuova CI.

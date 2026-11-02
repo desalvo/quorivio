@@ -15,3 +15,9 @@
 - Frontend Node tests include MIME whitelist and safe HTTP errors. Older source-contract tests are updated only for the newly intended presenter interaction; no tests are disabled.
 - The real API/Chromium background library/persistence path is already covered by `tools/ci_browser_media_picker_postgres.py` and `tools/ci_background_library_postgres.py`; rerun them via full CI after commit. Configuration failures on a real operator installation need their exact HTTP status and server scan/storage logs for further diagnosis; no unverified server-specific fix is claimed.
 - **Certified completion remains 85.25% (43 accepted/17 partial)**; independent external evidence is still required. `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+## RC137 CI hotfix (run 41473679963)
+
+The frontend TypeScript build failed with TS2307 for `node:assert/strict` and `node:test` because `background-upload-error.test.ts` was mistakenly under `apps/web/src/`, which the browser TypeScript compiler includes. Moved this Node-only regression test to the existing `apps/web/test/` directory and updated its import path. The pre-existing GitHub Actions command `node --experimental-strip-types --test apps/web/test/*.test.ts` now runs it, while `apps/web/tsconfig.json` excludes Node-only imports. No frontend runtime, API upload, privacy, security, RC gate or Docker publication logic was changed. Full GitHub CI needs a new commit to validate this change.
+
+**Local hotfix verification:** Python full suite 1,709 executed (1,708 passed, 1 skipped, no failures); frontend Node 210/210 passed including the newly moved regression; four release headers and all 124 historical/current inventory verifiers validated; full source/ZIP SHA-256 verification passed. GitHub npm/Vite and browser gates still require a new CI run.
