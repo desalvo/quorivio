@@ -18,7 +18,7 @@ def background_contract(source:str)->bool:
     if end < 0: return False
     chunk=source[start:end]
     return bool(re.search(r'onBackgroundUpload\(file\)\.then\(applied=>\{if\(applied\)\{[^}]*setBackgroundMenu\(false\)',chunk)) and all(x in chunk for x in (
-        "else setBackgroundUploadStatus('Caricamento non riuscito:",
+        "else setBackgroundUploadStatus('Caricamento annullato:",
         ".catch(error=>{setBackgroundUploadStatus('Caricamento non riuscito:",
     )) and 'then(()=>setBackgroundMenu(false))' not in chunk
 
@@ -46,7 +46,7 @@ class RC114EditorPreflight(unittest.TestCase):
 
     def test_must_fail_closed_if_errors_are_silently_dismissed(self):
         self.assertFalse(background_contract(MAIN.replace('if(applied){','if(true){',1)))
-        self.assertFalse(background_contract(MAIN.replace("else setBackgroundUploadStatus('Caricamento non riuscito:","else void 0 /* error hidden */",1)))
+        self.assertFalse(background_contract(MAIN.replace("else setBackgroundUploadStatus('Caricamento annullato:","else void 0 /* error hidden */",1)))
         self.assertFalse(background_contract(MAIN.replace(".catch(error=>{setBackgroundUploadStatus('Caricamento non riuscito:",".catch(error=>{void 0 /* error hidden */",1)))
 
     def test_answer_background_formatting_remains_validated_and_shared(self):

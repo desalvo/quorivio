@@ -1788,3 +1788,8 @@ body > .rehearsal-backdrop {
  min-height:0!important;resize:none!important;pointer-events:none;
 }
 :is(.projection-widget,.rehearsal-widget) [data-readonly-preview="true"] .widget-answer-option>input:is([type="radio"],[type="checkbox"]){font-size:inherit!important;}
+
+/* RC137: linked statistics are opened by the presenter, never injected into editable answer controls. */
+.projection-results-widget-trigger{display:flex;align-items:center;justify-content:center;width:100%;min-height:100%;padding:8px;background:transparent;border:0;color:inherit;font:inherit;font-weight:600;cursor:pointer;text-align:center;white-space:normal;overflow-wrap:anywhere}
+.projection-results-widget-trigger:focus-visible{outline:3px solid #2563eb;outline-offset:-3px}
+.rehearsal-statistics{margin:10px 0;padding:10px;border:1px solid #c7cedb;border-radius:8px;max-width:100%;overflow:auto;background:#fff;color:#1c273b}

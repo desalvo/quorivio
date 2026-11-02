@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC137 handoff — Private presenter projection and canvas upload (2 November 2026)
+
+**RC135 ultima baseline CI completa verde** (`41437489546`); **RC136+RC137 cumulativo non committato**. Risposte partecipanti isolate da widget e domande sullo schermo reale e nella prova affiancata; risultati e statistiche mostrati soltanto su richiesta esplicita del presentatore. Migliorata segnalazione del motivo HTTP del fallimento nel caricamento background e compatibilità MIME JPEG, senza bypass di antivirus o controllo formati. Nuovo preflight RC137; npm/Vite e GitHub CI per RC137 ancora da confermare. **Certificato 85.25%** (43 accepted /17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Dettagli in `docs/RC_CYCLE137_PRESENTER_PRIVACY_BACKGROUND.en.md`. Nessun commit/push/pubblicazione.
+
+---
+
+# Quorivio 0.1.0-dev — RC136 handoff — Independent acceptance workflow (2 November 2026)
+
+**Committed and full-CI-green baseline: RC135**, GitHub Actions run `41437489546`, commit `6c1118e93076c5d2eb8d60e96a43f8c663178053` (17 jobs passed, explicit multiarch publication passed). **RC136 is a local cumulative review-tool improvement; no commit/push/release is performed.** Added 17-gate offline evidence packets, automatic SHA-256 attachment import and verification, commit binding, independent reviewer fields, missing-facet detection, documented IT/EN review workflow, new automated contract tests, and strict RC gate that cannot be satisfied by changing ledger statuses alone. Existing product runtime and approved RC135 CI baseline remain unchanged. **Certified 85.25%** (43 accepted /17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Only independent real-world signoffs can unblock formal RC; CI RC136 still pending. See `docs/RC136_EXTERNAL_ACCEPTANCE_EN.md` and `docs/RC136_EXTERNAL_ACCEPTANCE_IT.md`.
+
+---
+
 # Quorivio RC135 handoff — legacy editor contract CI repair
 
 **RC134 committed, CI failed:** GitHub run `41435798792`, commit `3c75a548b277d179db49f1293fef3d5da5926f8b`; one RC89 source assertion still matched a removed editor label, so no application build or browser gates ran. **RC135 is the new local, uncommitted cumulative starting from committed RC134**, preserving all RC131–RC134 changes. Updated legacy checks for the actual free-answer label (typographic apostrophe), native disabled presenter answer choices, manual resize autoFit logic and pointer slider guard. Added early Python CI checks and a new SHA-256 source inventory; no production app changes. See `docs/RC_CYCLE135_LEGACY_CI_EDITOR_CONTRACTS.en.md`. Last verified green GitHub baseline RC130, run `41420021082`. **Certified 85.25%**, 43 accepted/17 partial. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. GitHub CI still unverified for RC135; no assistant commit/push/release.

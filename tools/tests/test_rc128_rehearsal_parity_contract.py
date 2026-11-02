@@ -9,7 +9,8 @@ class RehearsalParityContracts(unittest.TestCase):
  def test_no_presenter_free_text_demo_under_question(self):
   self.assertNotIn('rehearsal-presenter-free-text" aria-label="Risposte libere nella simulazione',JSX)
   self.assertIn("viewer==='presenter'?'Invia risposta':'Invia risposta di prova'",JSX)
-  self.assertIn('kind===\'results-button\'?<LinkedResultChart',JSX)
+  self.assertIn('kind===\'results-button\'?<button type="button" className="projection-results-widget-trigger"',JSX)
+  self.assertIn('demoResultsVisible&&<section id="rehearsal-simulated-results"',JSX)
  def test_preview_preserves_authored_geometry_and_fonts(self):
   self.assertIn("'--stage-width':`${w.position?.width??45}%`",JSX)
   self.assertIn("'--authored-widget-font-size':widgetTypographyStyle",JSX)

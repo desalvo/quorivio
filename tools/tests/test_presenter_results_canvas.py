@@ -10,10 +10,14 @@ CSS = (ROOT / 'apps/web/src/style.css').read_text()
 class PresenterResultsTests(unittest.TestCase):
     def test_results_are_in_canvas_at_saved_geometry(self):
         component = UI.split('function PresenterPageResults(')[1].split('\nfunction AudienceExtensions(')[0]
-        # Each result is a genuine canvas widget, not a floating button.
+        # The result widget keeps its geometry, but is only a button until the presenter opens results.
         self.assertIn('widgets.map((w:any)', component)
         self.assertIn('widgetGeometryStyle(w.position)', component)
-        self.assertIn("w.kind==='results-button'?<PresenterLinkedResult", component)
+        self.assertIn('className="projection-results-widget-trigger"', component)
+        self.assertIn('onClick={()=>setVisible(v=>!v)}', component)
+        self.assertIn('{visible&&<div id="presenter-page-results"', component)
+        self.assertIn('<PresenterLinkedResult key={w.id}', component)
+        self.assertLess(component.index('{visible&&<div id="presenter-page-results"'),component.index('<PresenterLinkedResult key={w.id}'))
         self.assertIn('aria-expanded={visible}', component)
         self.assertIn('aria-controls="presenter-page-results"', component)
         self.assertIn('linked-results', UI)

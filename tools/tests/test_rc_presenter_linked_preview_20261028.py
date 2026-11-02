@@ -6,7 +6,9 @@ DOMAIN=(ROOT/'apps/api/src/domain.ts').read_text()
 CSS=(ROOT/'apps/web/src/style.css').read_text()
 class PresenterLinkedPreview(unittest.TestCase):
  def test_presenter_only_result_control(self):
-  self.assertIn("w.kind==='results-button'?<PresenterLinkedResult",SRC)
+  self.assertIn('className="projection-results-widget-trigger"',SRC)
+  self.assertIn('{visible&&<div id="presenter-page-results"',SRC)
+  self.assertIn('<PresenterLinkedResult key={w.id}',SRC)
   self.assertIn("w.kind!=='results-button'",SRC)
   self.assertIn("w.kind==='results-button'?null",SRC)
  def test_results_source_is_page_scoped(self):

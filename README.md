@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev
+
+> **RC readiness (2 November 2026):** RC135 passed the complete GitHub CI campaign (run 41437489546). The formal RC is **not approved**: 43/60 gates accepted, 17 partial; certified 85.25%. Follow [`docs/RC136_EXTERNAL_ACCEPTANCE_EN.md`](docs/RC136_EXTERNAL_ACCEPTANCE_EN.md) for the private, independently reviewed evidence packet. Do not commit operator evidence or infer legal/physical-device certification from CI.
+
+## Historical development checkpoints
+
 **RC checkpoint (2026-10-26):** Committed green baseline GitHub Actions 40335963980. From this uncommitted batch Docker Hub publishing requires explicit manual `workflow_dispatch` `publish_image=true`; push and tag workflows will no longer publish `latest`. Email MFA disposable TLS SMTP/PostgreSQL acceptance was added, pending fresh CI. Evidence-based RC readiness **48.0%** (D6 partial, not GDPR/AGID sign-off). See [batch evidence](docs/RC_MANUAL_PUBLICATION_MFA_BATCH.en.md) and [Docker Hub manual release](docs/GITHUB_DOCKERHUB.en.md).
 
 **Latest profile cycle (2026-10-26, uncommitted):** Anonymous audience presenter-photo widgets now use session-scoped public photo URLs; nickname and display name save atomically with one button and automatic profile loading. Previous full CI run `40304413948` is committed and quality/container gates passed. Local 317 Node + 660 Python tests and API/web builds PASS; new end-to-end PostgreSQL/browser acceptance pending. See `docs/DEVELOPMENT_STATUS.md`.

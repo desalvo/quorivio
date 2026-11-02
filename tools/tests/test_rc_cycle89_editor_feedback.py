@@ -66,7 +66,7 @@ class RC89EditorFeedback(unittest.TestCase):
   # .then(()=>close) would mask server rejections and break the user's JPG flow.
   self.assertIn('onBackgroundUpload(file).then(applied=>{if(applied)',UI)
   self.assertIn("setBackgroundUploadStatus('Sfondo caricato e applicato.');setBackgroundMenu(false)",UI)
-  self.assertIn("else setBackgroundUploadStatus('Caricamento non riuscito:",UI)
+  self.assertIn("else setBackgroundUploadStatus('Caricamento annullato:",UI)
   self.assertIn(".catch(error=>{setBackgroundUploadStatus('Caricamento non riuscito:",UI)
   self.assertNotIn('onBackgroundUpload(file).then(()=>setBackgroundMenu(false))',UI)
   self.assertIn('Carica immagine nello sfondo e nella libreria…',UI)

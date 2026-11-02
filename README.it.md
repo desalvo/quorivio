@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev
+
+> **Stato RC (2 novembre 2026):** RC135 ha superato la CI completa GitHub (run 41437489546). La RC formale **non è ancora approvata**: 43/60 gate accettati, 17 parziali; certificato 85,25%. Procedura per i fascicoli di prova privati e la revisione indipendente: [`docs/RC136_EXTERNAL_ACCEPTANCE_IT.md`](docs/RC136_EXTERNAL_ACCEPTANCE_IT.md). Non caricare in Git le evidenze private e non confondere CI verde con certificazioni legali o su dispositivi reali.
+
+## Cronologia dello sviluppo
+
 **Checkpoint RC (26/10/2026):** Baseline committata e verde, GitHub Actions 40335963980. Da questo nuovo batch non committato, Docker Hub pubblica **solo con `workflow_dispatch` e `publish_image=true`**; i push e i tag non aggiornano più `latest`. Aggiunti test MFA email su SMTP TLS/PG effimeri, nuova CI ancora necessaria. Avanzamento RC verificabile **48,0%** (D6 partial, non un’approvazione AGID/GDPR). Consulta [resoconto batch](docs/RC_MANUAL_PUBLICATION_MFA_BATCH.it.md) e [guida Docker Hub](docs/GITHUB_DOCKERHUB.it.md).
 
 **Ultimo ciclo profili (26 ottobre 2026, non committato):** Foto presentatore accessibili nelle sessioni pubbliche tramite URL limitati alla sessione; nickname e nome salvati atomicamente con un unico pulsante e caricamento automatico. La CI estesa precedente `40304413948` è verde e committata. Localmente 317 test Node, 660 Python e build API/web PASS; collaudo PostgreSQL/browser del nuovo ciclo ancora da eseguire. Vedi `docs/DEVELOPMENT_STATUS.it.md`.

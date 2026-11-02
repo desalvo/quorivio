@@ -14,8 +14,8 @@ class BackgroundUploadAndFormatting(unittest.TestCase):
   self.assertIn('setBackgroundUploading(true)',M)
   self.assertIn('setBackgroundMenu(true);setBackgroundUploading(true)',M)
   self.assertIn('role="status" aria-live="polite"',M)
-  self.assertIn('setNotice(\'Errore durante il caricamento dello sfondo:',M)
-  self.assertIn('return false}finally{setAssetBusy(false)}',M)
+  self.assertIn('backgroundUploadError(r.status,code)',M)
+  self.assertIn('catch(e){notify(e);throw e}finally{setAssetBusy(false)}',M)
   self.assertIn('return true;',M)
  def test_background_upload_and_use_server_response_contract(self):
   self.assertIn("app.post('/api/sessions/:id/backgrounds'",API)

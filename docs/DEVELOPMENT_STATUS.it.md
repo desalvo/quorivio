@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC137 — Riservatezza schermo presentatore e caricamento sfondi (2 novembre 2026)
+
+**RC135 ultima baseline CI completa verde** (`41437489546`); **RC136+RC137 cumulativo non committato**. Le risposte dei partecipanti non appaiono nei campi dello schermo presentatore o nella prova affiancata; statistiche e risultati soltanto su richiesta esplicita. Upload background: messaggi HTTP specifici e migliore riconoscimento JPEG, mantenendo scanner e controlli di sicurezza. Nuovo preflight RC137, CI GitHub RC137 ancora da confermare. **Certificato 85,25%** (43 accettati /17 parziali), `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Vedi `docs/RC_CYCLE137_PRESENTER_PRIVACY_BACKGROUND.it.md`. Nessun commit/push/pubblicazione.
+
+---
+
+# Quorivio 0.1.0-dev — RC136 — Chiusura delle evidenze indipendenti e protezione del rilascio (2 novembre 2026)
+
+**Ultima baseline committata e con CI completa verde: RC135**, run GitHub Actions `41437489546`, commit `6c1118e93076c5d2eb8d60e96a43f8c663178053` (17 job superati, pubblicazione multiarch riuscita). **RC136 è un cumulativo locale; nessun commit/push/release eseguito dall'assistente.** Aggiunti fascicoli di evidenze per 17 gate, importazione con SHA-256, associazione esatta al commit, revisori indipendenti, verifica delle prove mancanti, istruzioni IT/EN, test di regressione e controllo rigoroso che impedisce il rilascio con un semplice cambio di stato nel registro. Nessuna modifica al runtime applicativo. **Certificato 85,25%**, 43 gate accettati /17 parziali. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Occorrono collaudi e approvazioni esterne per la RC ufficiale; CI RC136 ancora da eseguire. Vedi `docs/RC136_EXTERNAL_ACCEPTANCE_IT.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC135 — Riconciliazione dei test CI storici (2 novembre 2026)
 
 **Commit RC134 su GitHub:** `3c75a548b277d179db49f1293fef3d5da5926f8b`, workflow `41435798792` **fallito** nel preflight RC89 per aspettative obsolete sulle etichette. **Ultima baseline con CI completa verde: RC130**, run `41420021082`. **RC131–RC134 ora sono committate; RC135 è corretta localmente e non ancora committata.** Aggiornati i contratti RC89, RC109, sicurezza puntatore e opzioni proiettate: campo accessibile, maniglia di ridimensionamento da tastiera, collisioni continue, radio/checkbox presentatore disabilitati e disattivazione dell'autoFit dopo il ridimensionamento manuale. Nessuna modifica al codice applicativo RC134. Nuovo preflight prima di npm. Vedi `docs/RC_CYCLE135_LEGACY_CI_EDITOR_CONTRACTS.it.md`. **Certificato 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. CI GitHub da rieseguire, nessun commit/push/release dell'assistente.

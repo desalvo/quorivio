@@ -7,8 +7,10 @@ when any gate is not accepted or evidence/required files are missing.
 from __future__ import annotations
 import argparse
 import json
+import os
 from pathlib import Path
 from rc_gate_audit import audit, LEDGER, ROOT
+from rc_external_evidence import verify_packet
 
 REQUIRED = (
  'README.md', 'README.it.md', 'docs/GDPR.en.md', 'docs/GDPR.it.md',
@@ -18,7 +20,8 @@ REQUIRED = (
  'tools/ci_retention_postgres.mjs', 'helm', 'compose.yaml', 'Dockerfile',
 )
 
-def preflight(root: Path = ROOT, ledger: Path = LEDGER) -> dict:
+def preflight(root: Path = ROOT, ledger: Path = LEDGER,
+              evidence_dir: Path | None = None, release_commit: str | None = None) -> dict:
     # Explicitly do not infer a gate is accepted from a passing test or CI.
     result = audit() if root == ROOT and ledger == LEDGER else _audit_custom(ledger)
     doc = json.loads(ledger.read_text(encoding='utf-8'))
@@ -28,8 +31,15 @@ def preflight(root: Path = ROOT, ledger: Path = LEDGER) -> dict:
          'remaining': gate['remaining']}
         for gate in doc['gates'] if gate['status'] != 'accepted'
     ]
-    return {'release_candidate_ready': not missing and not unaccepted,
-            'score': result['score'], 'missing_required_files': missing,
+    # Optional external packet is ALWAYS incomplete by default.  Strict RC
+    # cannot be granted solely by editing gate statuses in a JSON ledger.
+    proof = {'packet_valid': False, 'reason': 'No independently reviewed evidence packet supplied'}
+    if evidence_dir is not None and release_commit is not None:
+        proof = verify_packet(evidence_dir, ledger_path=ledger, expected_commit=release_commit)
+    elif evidence_dir is not None:
+        proof = {'packet_valid': False, 'reason': 'Exact reviewed release commit missing'}
+    return {'release_candidate_ready': not missing and not unaccepted and proof['packet_valid'],
+            'score': result['score'], 'external_evidence': proof, 'missing_required_files': missing,
             'unaccepted_gates': unaccepted, 'gate_count': len(doc['gates']),
             'accepted_gates': len(doc['gates']) - len(unaccepted),
             'policy': 'RC requires every gate accepted with reviewed evidence; local tests alone never promote gates.'}
@@ -45,8 +55,16 @@ def main() -> int:
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--strict', action='store_true', help='fail unless every RC gate is accepted')
     parser.add_argument('--output', type=Path, help='write JSON report to this path')
+    parser.add_argument('--evidence-dir', type=Path,
+                        help='private external-review packet directory (not stored in Git)')
+    parser.add_argument('--commit', help='exact reviewed 40-character commit SHA')
     args=parser.parse_args()
-    report=preflight()
+    evidence_dir = args.evidence_dir or (Path(os.environ['QUORIVIO_RC_EVIDENCE_DIR'])
+                      if os.environ.get('QUORIVIO_RC_EVIDENCE_DIR') else None)
+    expected_commit = args.commit or os.environ.get('GITHUB_SHA')
+    if args.strict and (evidence_dir is None or not expected_commit):
+        parser.error('--strict requires evidence dir and reviewed commit (or QUORIVIO_RC_EVIDENCE_DIR and GITHUB_SHA)')
+    report=preflight(evidence_dir=evidence_dir, release_commit=expected_commit)
     rendered=json.dumps(report,indent=2,ensure_ascii=False)
     print(rendered)
     if args.output:

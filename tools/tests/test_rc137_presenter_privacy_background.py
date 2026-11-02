@@ -1,0 +1,45 @@
+"""RC137: participant drafts and live answers never populate presenter slide fields."""
+import re
+import unittest
+from pathlib import Path
+ROOT=Path(__file__).resolve().parents[2]
+SRC=(ROOT/'apps/web/src/main.tsx').read_text()
+UP=(ROOT/'apps/web/src/widget-asset-upload.ts').read_text()
+ERRORS=(ROOT/'apps/web/src/background-upload-error.ts').read_text()
+CSS=(ROOT/'apps/web/src/style.css').read_text()
+
+class RC137PresenterPrivacyAndBackground(unittest.TestCase):
+ def test_live_projection_requires_presenter_action_before_live_results(self):
+  projection=SRC.split('function PresenterPageResults(')[1].split('function AudienceExtensions(')[0]
+  canvas=projection.split('className="projection-page-content"')[1].split('<SlideCanvasNumber')[0]
+  self.assertIn('className="projection-results-widget-trigger"',canvas)
+  self.assertNotIn('<PresenterLinkedResult',canvas)
+  result_block=projection.split('{visible&&<div id="presenter-page-results"')[1]
+  self.assertIn('<PresenterLinkedResult key={w.id}',result_block)
+  self.assertIn('aria-expanded={visible}',projection)
+  self.assertIn('onClick={()=>setVisible(v=>!v)}',projection)
+ def test_rehearsal_drafts_and_choices_are_never_mirrored_into_presenter(self):
+  rehearsal=SRC.split('function SessionRehearsal(')[1].split('const editorWidgetKinds=')[0]
+  self.assertIn("const answer=viewer==='participant'?responses[w.id]:undefined",rehearsal)
+  self.assertIn("const current=viewer==='participant'?responses[key]:undefined",rehearsal)
+  self.assertIn("const sent=viewer==='participant'&&submittedAnswers[key]!==undefined",rehearsal)
+  self.assertIn('className="projection-results-widget-trigger"',rehearsal)
+  self.assertIn('demoResultsVisible&&<section id="rehearsal-simulated-results"',rehearsal)
+  self.assertIn('setDemoResultsVisible(false)',rehearsal)
+ def test_real_projection_question_parts_remain_read_only(self):
+  projected=SRC.split('function ProjectedQuestionPart(')[1].split('function SlideCanvasNumber(')[0]
+  self.assertIn('readOnly disabled tabIndex={-1}',projected)
+  self.assertIn('type={mode===\'multiple\'?\'checkbox\':\'radio\'} disabled',projected)
+  self.assertNotIn('onChange=',projected)
+  self.assertNotIn('onClick=',projected)
+ def test_background_upload_reports_actual_rejection_and_never_swallows_errors(self):
+  upload=SRC.split('async function uploadBackground(')[1].split('async function deleteAsset(')[0]
+  self.assertIn('backgroundUploadError(r.status,code)',upload)
+  self.assertIn('catch(e){notify(e);throw e}',upload)
+  self.assertNotIn('return false}finally',upload)
+  self.assertIn("error instanceof Error?error.message:String(error)",SRC)
+  self.assertIn('invalid_upload_size',ERRORS)
+  self.assertIn('image/pjpeg',UP)
+  self.assertIn('.projection-results-widget-trigger',CSS)
+
+if __name__=='__main__':unittest.main()

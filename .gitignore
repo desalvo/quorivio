@@ -19,3 +19,7 @@ __pycache__/
 k8s-generated/
 **/quorivio-overrides.json
 **/05-app-secret.yaml
+
+# Private RC acceptance artefacts and reviewer identity data: never commit.
+rc-operator-evidence/
+operator-evidence/

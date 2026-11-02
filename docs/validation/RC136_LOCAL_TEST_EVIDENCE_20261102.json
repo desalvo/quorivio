@@ -1,0 +1,22 @@
+{
+  "schema": "quorivio-local-verification-v1",
+  "cycle": 136,
+  "baseline_ci_run": 41437489546,
+  "baseline_sha": "6c1118e93076c5d2eb8d60e96a43f8c663178053",
+  "release_candidate_ready": false,
+  "independent_gates_approved_in_cycle": 0,
+  "certified_score": 85.25,
+  "python": {
+    "command": "PYTHONPATH=tools python3 -m unittest discover -s tools/tests -p 'test*.py' -q",
+    "run": 1704,
+    "failed": 0,
+    "skipped": 1
+  },
+  "web_node": {
+    "command": "node --experimental-strip-types --test apps/web/test/*.test.ts",
+    "run": 209,
+    "failed": 0
+  },
+  "full_github_ci_for_cycle": "not_run",
+  "notes": "Local checks do not promote any independent operator gate; user commit/CI and human signoffs still required."
+}

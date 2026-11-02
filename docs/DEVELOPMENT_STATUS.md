@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC137 — Presenter result privacy and canvas background feedback (2 November 2026)
+
+**RC135 ultima baseline CI completa verde** (`41437489546`); **RC136+RC137 cumulativo non committato**. Risposte partecipanti isolate da widget e domande sullo schermo reale e nella prova affiancata; risultati e statistiche mostrati soltanto su richiesta esplicita del presentatore. Migliorata segnalazione del motivo HTTP del fallimento nel caricamento background e compatibilità MIME JPEG, senza bypass di antivirus o controllo formati. Nuovo preflight RC137; npm/Vite e GitHub CI per RC137 ancora da confermare. **Certificato 85.25%** (43 accepted /17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Dettagli in `docs/RC_CYCLE137_PRESENTER_PRIVACY_BACKGROUND.en.md`. Nessun commit/push/pubblicazione.
+
+---
+
+# Quorivio 0.1.0-dev — RC136 — Independent evidence closeout and strict release safeguard (2 November 2026)
+
+**Committed and full-CI-green baseline: RC135**, GitHub Actions run `41437489546`, commit `6c1118e93076c5d2eb8d60e96a43f8c663178053` (17 jobs passed, explicit multiarch publication passed). **RC136 is a local cumulative review-tool improvement; no commit/push/release is performed.** Added 17-gate offline evidence packets, automatic SHA-256 attachment import and verification, commit binding, independent reviewer fields, missing-facet detection, documented IT/EN review workflow, new automated contract tests, and strict RC gate that cannot be satisfied by changing ledger statuses alone. Existing product runtime and approved RC135 CI baseline remain unchanged. **Certified 85.25%** (43 accepted /17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Only independent real-world signoffs can unblock formal RC; CI RC136 still pending. See `docs/RC136_EXTERNAL_ACCEPTANCE_EN.md` and `docs/RC136_EXTERNAL_ACCEPTANCE_IT.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC135 — Early CI source-contract reconciliation (2 November 2026)
 
 **GitHub RC134 commit:** `3c75a548b277d179db49f1293fef3d5da5926f8b`, workflow `41435798792` **failed** in the early RC89 preflight because legacy assertions expected obsolete labels. **Last full-CI-green baseline remains RC130**, run `41420021082`. **RC131–RC134 have now been committed; RC135 is locally patched but not committed.** RC135 refreshes RC89, RC109, pointer-capture and projected-option contracts to verify actual accessible textarea, keyboard resize handle, first-contact collision geometry, disabled native presenter choices, and manual-resize autoFit transition. Application code remains identical to RC134. A consolidated early preflight checks these source contracts before npm. See `docs/RC_CYCLE135_LEGACY_CI_EDITOR_CONTRACTS.en.md`. **Certified 85.25%** (43 accepted / 17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`. New GitHub CI remains required; no assistant commit/push/release.

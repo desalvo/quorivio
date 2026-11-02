@@ -25,6 +25,9 @@ test('asset MIME fallback remains strict and never guesses an unapproved extensi
  }
  assert.equal(mediaUploadMime({name:'report.jpg',type:'text/html'},'logo'),null);
  assert.equal(mediaUploadMime({name:'report.JPG',type:'IMAGE/JPEG; charset=binary'},'logo'),'image/jpeg');
+ assert.equal(mediaUploadMime({name:'report.jpg',type:'image/jpg'},'image'),'image/jpeg');
+ assert.equal(mediaUploadMime({name:'report.jpg',type:'image/pjpeg'},'image'),'image/jpeg');
+ assert.equal(mediaUploadMime({name:'report.jpg',type:'application/x-jpeg'},'image'),'image/jpeg');
 });
 
 test('all five presenter file-picker entry points use the same validated MIME resolution',()=>{

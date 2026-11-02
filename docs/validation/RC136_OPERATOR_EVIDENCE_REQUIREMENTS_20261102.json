@@ -1,0 +1,176 @@
+{
+  "schema": "quorivio-rc-external-evidence-requirements-v1",
+  "version": "0.1.0-dev",
+  "claims_approval": false,
+  "gates": [
+    {
+      "id": "A1",
+      "area": "A-editor",
+      "objective": "Editor, touchscreen, pixel-parity and concurrent editing",
+      "facets": [
+        "touch-device",
+        "concurrent-editor",
+        "visual-parity"
+      ]
+    },
+    {
+      "id": "A2",
+      "area": "A-editor",
+      "objective": "Filmstrip and representative slide fidelity",
+      "facets": [
+        "thumbnail-comparison",
+        "physical-touch"
+      ]
+    },
+    {
+      "id": "A3",
+      "area": "A-editor",
+      "objective": "Editor/presenter/audience real visual parity and Office corpus",
+      "facets": [
+        "office-roundtrip",
+        "ios-safari",
+        "three-view-parity"
+      ]
+    },
+    {
+      "id": "A4",
+      "area": "A-editor",
+      "objective": "Real assistive-technology accessibility",
+      "facets": [
+        "nvda",
+        "voiceover",
+        "talkback",
+        "keyboard-audit"
+      ]
+    },
+    {
+      "id": "B1",
+      "area": "B-sessions",
+      "objective": "Real multi-replica network recovery and latency",
+      "facets": [
+        "multi-replica-duration",
+        "network-disruption",
+        "latency-slo"
+      ]
+    },
+    {
+      "id": "B2",
+      "area": "B-sessions",
+      "objective": "Concurrent timed participation and real timing",
+      "facets": [
+        "physical-timer",
+        "independent-replica-latency"
+      ]
+    },
+    {
+      "id": "B3",
+      "area": "B-sessions",
+      "objective": "Real participant result visualization and accessibility",
+      "facets": [
+        "physical-results",
+        "screenreader-results"
+      ]
+    },
+    {
+      "id": "B4",
+      "area": "B-sessions",
+      "objective": "Representative availability and capacity",
+      "facets": [
+        "independent-csi-rwx",
+        "partition-failover",
+        "capacity-slo"
+      ]
+    },
+    {
+      "id": "C1",
+      "area": "C-admin",
+      "objective": "Account recovery via external provider and browser",
+      "facets": [
+        "external-smtp-recovery",
+        "cross-replica-recovery"
+      ]
+    },
+    {
+      "id": "C2",
+      "area": "C-admin",
+      "objective": "MFA delivery, outage and recovery",
+      "facets": [
+        "real-smtp-mfa",
+        "smtp-outage-recovery"
+      ]
+    },
+    {
+      "id": "C3",
+      "area": "C-admin",
+      "objective": "Actual OAuth/OIDC provider consent",
+      "facets": [
+        "google-consent",
+        "github-consent",
+        "facebook-consent",
+        "provider-failure"
+      ]
+    },
+    {
+      "id": "C4",
+      "area": "C-admin",
+      "objective": "Shared assets and scanner operational lifecycle",
+      "facets": [
+        "managed-clamav",
+        "physical-rwx",
+        "backup-key-custody"
+      ]
+    },
+    {
+      "id": "D2",
+      "area": "D-validation",
+      "objective": "Offsite encrypted restore RTO/RPO",
+      "facets": [
+        "offsite-restore",
+        "rpo-rto-measurement",
+        "key-custody",
+        "legal-hold"
+      ]
+    },
+    {
+      "id": "D3",
+      "area": "D-validation",
+      "objective": "Deployment on independent hardware and storage",
+      "facets": [
+        "physical-arm64",
+        "independent-ingress-tls",
+        "real-csi-failover"
+      ]
+    },
+    {
+      "id": "D4",
+      "area": "D-validation",
+      "objective": "Independent security/accessibility/Office review",
+      "facets": [
+        "independent-pentest",
+        "agid-a11y",
+        "office-fidelity-review"
+      ]
+    },
+    {
+      "id": "D5",
+      "area": "D-validation",
+      "objective": "Editorially reviewed bilingual manuals",
+      "facets": [
+        "italian-manual",
+        "english-manual",
+        "end-user-review"
+      ]
+    },
+    {
+      "id": "D6",
+      "area": "D-validation",
+      "objective": "GDPR/legal and operational retention assessment",
+      "facets": [
+        "independent-gdpr-review",
+        "key-rotation",
+        "erasure-retention",
+        "storage-review"
+      ]
+    }
+  ]
+}
