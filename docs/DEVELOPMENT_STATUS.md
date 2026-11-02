@@ -1,3 +1,11 @@
+# Quorivio 0.1.0-dev — RC135 — Early CI source-contract reconciliation (2 November 2026)
+
+**GitHub RC134 commit:** `3c75a548b277d179db49f1293fef3d5da5926f8b`, workflow `41435798792` **failed** in the early RC89 preflight because legacy assertions expected obsolete labels. **Last full-CI-green baseline remains RC130**, run `41420021082`. **RC131–RC134 have now been committed; RC135 is locally patched but not committed.** RC135 refreshes RC89, RC109, pointer-capture and projected-option contracts to verify actual accessible textarea, keyboard resize handle, first-contact collision geometry, disabled native presenter choices, and manual-resize autoFit transition. Application code remains identical to RC134. A consolidated early preflight checks these source contracts before npm. See `docs/RC_CYCLE135_LEGACY_CI_EDITOR_CONTRACTS.en.md`. **Certified 85.25%** (43 accepted / 17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`. New GitHub CI remains required; no assistant commit/push/release.
+
+
+**RC135 local verification:** 1,689 Python tests (1,688 passed, 1 skipped, 0 failures); 209/209 frontend Node tests; no TSX/TypeScript parse errors. Source/ZIP SHA-256 inventory validated. npm/Vite compilation and GitHub CI remain unverified.
+---
+
 # Quorivio 0.1.0-dev — RC134 — Actual presenter question/submit parity (2 November 2026)
 
 **Latest committed and full-CI-green baseline RC130:** workflow `41420021082`, commit `d3e89fb2f27cee0cb6aa87d57a61927cef2c874d`. **Uncommitted RC131–RC134 cumulative:** RC131 continuous collision and participant fonts; RC132 keyboard movements/accessibility; RC133 collision-safe resizing; RC134 real presenter screen now renders authored read-only question/answer/submit UI with styled choices, matches the rehearsal topic-question and preserves mobile 16:9 proportions. Local Node 209/209 PASS, RC134 Chromium 1440/390px PASS, TypeScript syntax 0 errors; full npm/Vite/GitHub CI pending. See `docs/RC_CYCLE134_PRESENTER_QUESTION_PARITY.en.md`. Certified **85.25%** (43 accepted/17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/release.

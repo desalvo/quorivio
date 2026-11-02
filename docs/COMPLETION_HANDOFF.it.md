@@ -1,3 +1,11 @@
+# Quorivio RC135 handoff — correzione CI dei contratti dell'editor
+
+**RC134 committata, CI fallita:** run GitHub `41435798792`, commit `3c75a548b277d179db49f1293fef3d5da5926f8b`; una asserzione RC89 cercava un'etichetta rimossa, quindi build e browser non sono partiti. **RC135 è il nuovo cumulativo locale non committato**, a partire da RC134 committata e senza perdere RC131–RC134. Corretti i test per etichetta accessibile con apostrofo tipografico, controlli radio/checkbox disabilitati nella proiezione, autoFit dopo ridimensionamento manuale e protezione della maniglia da tastiera. Aggiunti preflight CI e inventario SHA-256; codice applicativo invariato. Vedi `docs/RC_CYCLE135_LEGACY_CI_EDITOR_CONTRACTS.it.md`. Ultima baseline verde RC130, run `41420021082`. **Certificato 85,25%**, 43 accettati/17 parziali; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. CI GitHub RC135 ancora da verificare. Nessun commit/push/release dell'assistente.
+
+
+**Verifiche locali RC135:** 1.689 test Python eseguiti (1.688 superati, 1 saltato, 0 falliti); 209 test frontend Node superati; analisi sintattica TSX/TypeScript senza errori. Inventario e ZIP SHA-256 validati. Build npm/Vite e CI GitHub ancora da verificare.
+---
+
 # Quorivio RC134 handoff — fedeltà domande e tasti nella proiezione
 
 **Baseline committata e CI verde RC130:** workflow `41420021082`, commit `d3e89fb2f27cee0cb6aa87d57a61927cef2c874d`. **Cumulativo RC131–RC134 da committare:** movimenti e ridimensionamenti con collisioni, font partecipante fedeli, controlli domanda/risposta disabilitati ma coerenti sullo schermo presentatore reale, anteprima delle domande sul tema uniforme, CSS mobile 16:9. Vedi `docs/RC_CYCLE134_PRESENTER_QUESTION_PARITY.it.md`. Node 209/209 e Chromium CSS 1440/390 PASS locali; sintassi TypeScript PASS, npm/Vite e CI GitHub da eseguire. Certificato **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessuna accettazione esterna presunta, nessun commit/push/release.

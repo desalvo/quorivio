@@ -25,9 +25,13 @@ class WidgetInspectorPortal20261027(unittest.TestCase):
 
     def test_options_reach_canvas_and_projected_slide(self):
         self.assertIn('canvas-widget-answer-preview',JSX)
-        self.assertIn('projection-interactive-options',JSX)
+        # RC134 uses explicit disabled native radio/checkbox controls in the
+        # real presenter projection, not the historical decorative option list.
+        self.assertIn('role="group" aria-label="Opzioni di risposta"',JSX)
+        self.assertIn('className="widget-answer-option" style={answerOptionStyle(widget.style)}',JSX)
+        self.assertIn("type={mode==='multiple'?'checkbox':'radio'} disabled tabIndex={-1}",JSX)
         self.assertIn('widget-choice-marker',JSX)
-        self.assertIn('.projection-interactive-options li{display:flex;align-items:flex-start;',CSS)
+        self.assertIn('.projection-interactive-widget .widget-answer-option>input{flex:none;',CSS)
         self.assertIn('.widget-question>label:has(>input[type=radio])',CSS)
         self.assertIn('.widget-question>label:has(>input[type=checkbox])',CSS)
 

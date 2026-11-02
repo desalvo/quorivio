@@ -1,3 +1,11 @@
+# Quorivio 0.1.0-dev — RC135 — Riconciliazione dei test CI storici (2 novembre 2026)
+
+**Commit RC134 su GitHub:** `3c75a548b277d179db49f1293fef3d5da5926f8b`, workflow `41435798792` **fallito** nel preflight RC89 per aspettative obsolete sulle etichette. **Ultima baseline con CI completa verde: RC130**, run `41420021082`. **RC131–RC134 ora sono committate; RC135 è corretta localmente e non ancora committata.** Aggiornati i contratti RC89, RC109, sicurezza puntatore e opzioni proiettate: campo accessibile, maniglia di ridimensionamento da tastiera, collisioni continue, radio/checkbox presentatore disabilitati e disattivazione dell'autoFit dopo il ridimensionamento manuale. Nessuna modifica al codice applicativo RC134. Nuovo preflight prima di npm. Vedi `docs/RC_CYCLE135_LEGACY_CI_EDITOR_CONTRACTS.it.md`. **Certificato 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. CI GitHub da rieseguire, nessun commit/push/release dell'assistente.
+
+
+**Verifiche locali RC135:** 1.689 test Python eseguiti (1.688 superati, 1 saltato, 0 falliti); 209 test frontend Node superati; analisi sintattica TSX/TypeScript senza errori. Inventario e ZIP SHA-256 validati. Build npm/Vite e CI GitHub ancora da verificare.
+---
+
 # Quorivio 0.1.0-dev — RC134 — Domande e invio nello schermo presentatore (2 novembre 2026)
 
 **Baseline committata con CI verde RC130:** workflow `41420021082`, commit `d3e89fb2f27cee0cb6aa87d57a61927cef2c874d`. **Cumulativo RC131–RC134 non committato:** RC131 collisioni continue e font partecipanti; RC132 tastiera e accessibilità; RC133 ridimensionamento fino al limite; RC134 campo e pulsante di invio disabilitati nello schermo presentatore reale, opzioni formattate, anteprima domande sul tema uniforme e proporzioni mobili 16:9 corrette. Node locale 209/209 PASS, Chromium RC134 1440/390 px PASS, parser TypeScript senza errori; build npm/Vite/CI GitHub da verificare. Dettagli `docs/RC_CYCLE134_PRESENTER_QUESTION_PARITY.it.md`. **85,25%** certificato (43 accettati/17 parziali), `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/release dell'assistente.

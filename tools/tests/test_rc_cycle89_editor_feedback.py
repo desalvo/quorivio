@@ -25,7 +25,19 @@ class RC89EditorFeedback(unittest.TestCase):
   self.assertIn("if(!window.confirm('Eliminare questo widget dal canvas?'))return",UI)
 
  def test_text_fields_are_visible_and_styled_in_editor_and_both_rehearsals(self):
-  for marker in ('Casella di risposta libera nell\'editor','Risposta simulata ','widget-free-answer-field','Colore sfondo casella risposta libera','Casella domanda libera nell\'editor','Casella domanda libera vista presentatore'):
+  # RC132 introduced a shared, keyboard-resizable editor field (with the
+  # Italian typographic apostrophe); RC134 replaced the old presenter label
+  # with a non-interactive projection textarea and submit button.
+  for marker in ('function EditorAnswerFieldPreview(',
+                 'Casella di risposta libera nell’editor',
+                 'Casella domanda libera nell’editor',
+                 'className="widget-answer-height-handle"',
+                 'onKeyDown={e=>{if(e.altKey||e.ctrlKey||e.metaKey)return;',
+                 'Risposta simulata ',
+                 'widget-free-answer-field',
+                 'Colore sfondo casella risposta libera',
+                 'Casella per la domanda, sola anteprima presentatore',
+                 'className="outline small projection-readonly-submit" disabled tabIndex={-1}'):
    self.assertIn(marker,UI)
   # RC128 uses the same text-area geometry for both rehearsal viewers and
   # makes the presenter preview read-only, with its real submit disabled.

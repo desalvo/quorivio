@@ -205,6 +205,8 @@ jobs:
         run: python3 -m unittest tools.tests.test_rc_cycle114_editor_preflight -q
       - name: Validate RC89 editor review regressions before npm
         run: python3 -m unittest tools.tests.test_rc_cycle89_editor_feedback -q
+      - name: RC135 shared editor geometry and projection source contracts before npm
+        run: python3 -m unittest tools.tests.test_editor_capture tools.tests.test_rc109_editor_autofit_answer_footer tools.tests.test_widget_inspector_portal_20261027 -q
       # Keep pure source/DOM contracts in dependency-free preflight. The native
       # PowerPoint assertions need python-pptx, installed in the conversion gate.
       - name: Validate RC90 session actions, slide schemes and footer before npm
@@ -897,7 +899,8 @@ jobs:
           python3 tools/verify_rc_cycle131_inventory.py --historical
           python3 tools/verify_rc_cycle132_inventory.py --historical
           python3 tools/verify_rc_cycle133_inventory.py --historical
-          python3 tools/verify_rc_cycle134_inventory.py
+          python3 tools/verify_rc_cycle134_inventory.py --historical
+          python3 tools/verify_rc_cycle135_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

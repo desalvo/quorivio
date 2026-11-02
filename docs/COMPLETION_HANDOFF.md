@@ -1,3 +1,11 @@
+# Quorivio RC135 handoff — legacy editor contract CI repair
+
+**RC134 committed, CI failed:** GitHub run `41435798792`, commit `3c75a548b277d179db49f1293fef3d5da5926f8b`; one RC89 source assertion still matched a removed editor label, so no application build or browser gates ran. **RC135 is the new local, uncommitted cumulative starting from committed RC134**, preserving all RC131–RC134 changes. Updated legacy checks for the actual free-answer label (typographic apostrophe), native disabled presenter answer choices, manual resize autoFit logic and pointer slider guard. Added early Python CI checks and a new SHA-256 source inventory; no production app changes. See `docs/RC_CYCLE135_LEGACY_CI_EDITOR_CONTRACTS.en.md`. Last verified green GitHub baseline RC130, run `41420021082`. **Certified 85.25%**, 43 accepted/17 partial. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. GitHub CI still unverified for RC135; no assistant commit/push/release.
+
+
+**RC135 local verification:** 1,689 Python tests (1,688 passed, 1 skipped, 0 failures); 209/209 frontend Node tests; no TSX/TypeScript parse errors. Source/ZIP SHA-256 inventory validated. npm/Vite compilation and GitHub CI remain unverified.
+---
+
 # Quorivio RC134 handoff — presenter question/answer UI fidelity
 
 **Committed CI-green baseline RC130:** workflow `41420021082`, commit `d3e89fb2f27cee0cb6aa87d57a61927cef2c874d`. **Uncommitted cumulative RC131–RC134:** collision-safe mouse/keyboard movement and resizing, authored participant typography, and corrected real presenter projection of read-only answer fields, choices and disabled submit buttons with topic-question rehearsal parity and a mobile 16:9 CSS fix. See `docs/RC_CYCLE134_PRESENTER_QUESTION_PARITY.en.md`. Local Node 209/209, Chromium CSS 1440/390 PASS; TypeScript syntax PASS, npm/Vite and GitHub CI pending. Certified **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Do not claim external RC acceptance, no assistant commit/push/release.
