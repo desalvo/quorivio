@@ -152,6 +152,17 @@ jobs:
         run: python3 -m unittest tools.tests.test_rc124_smart_guides -q
       - name: RC125 native OCI publication safety and fail-closed digest tests before npm
         run: PYTHONPATH=tools python3 -m unittest tools.tests.test_rc125_native_docker_publish -q
+      - name: RC126 legacy Docker and Kubernetes CI contract reconciliation before npm
+        run: |
+          PYTHONPATH=tools python3 -m unittest \
+            tools.tests.test_ci_browser_bootstrap \
+            tools.tests.test_ci_integration \
+            tools.tests.test_ci_rootless_podman_smoke \
+            tools.tests.test_image_defaults \
+            tools.tests.test_manual_docker_publish \
+            tools.tests.test_rc76_editor_contracts_preflight \
+            tools.tests.test_rc_cycle59_campaign \
+            tools.tests.test_rc125_native_docker_publish -q
       - name: RC123 media lifecycle and bounded explicit Docker publication preflight
         run: python3 -m unittest tools.tests.test_rc_cycle123_media_publish -q
       - name: RC121 JSON backup export and visible errors preflight before npm
@@ -843,7 +854,8 @@ jobs:
           python3 tools/verify_rc_cycle122_inventory.py --historical
           python3 tools/verify_rc_cycle123_inventory.py --historical
           python3 tools/verify_rc_cycle124_inventory.py --historical
-          python3 tools/verify_rc_cycle125_inventory.py
+          python3 tools/verify_rc_cycle125_inventory.py --historical
+          python3 tools/verify_rc_cycle126_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

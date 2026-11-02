@@ -11,7 +11,14 @@ class ImageDefaults(unittest.TestCase):
   self.assertIn('QUORIVIO_IMAGE:-desalvo/quorivio:latest', (ROOT/'compose.yaml').read_text())
  def test_ci_publish(self):
   workflow=(ROOT/'.github/workflows/ci.yml').read_text()
-  self.assertIn('tags: ${{ steps.label.outputs.tags }}', workflow)
+  # Native images are pushed by digest, then the approved tags are
+  # assembled only after both image architectures have been verified.
+  import yaml
+  jobs=yaml.safe_load(workflow)['jobs']
+  self.assertIn('publish-platform', jobs['publish']['needs'])
+  self.assertIn('push-by-digest=true', str(jobs['publish-platform']['steps']))
+  self.assertIn('QUORIVIO_IMAGE_TAGS: ${{ steps.label.outputs.tags }}', workflow)
+  self.assertIn('bash tools/publish_multiarch_manifest.sh',workflow)
   self.assertIn('inputs.publish_image == true', workflow)
   self.assertIn("github.event_name == 'workflow_dispatch'", workflow)
   self.assertIn('bash tools/resolve_image_tags.sh', workflow)

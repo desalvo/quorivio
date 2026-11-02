@@ -17,7 +17,20 @@ class CiIntegrationTests(unittest.TestCase):
         self.assertIn('file: Dockerfile.converter', flow)
         self.assertIn('quorivio-converter:gate', flow)
         self.assertIn('image-ref: quorivio:gate', flow)
-        self.assertIn('needs: [validate, image-build]', flow)
+        # Release authorization is now two-stage: native digest builders
+        # follow the scanned image-build gate; tag assembly follows both.
+        import yaml
+        jobs = yaml.safe_load(flow)['jobs']
+        image_gate = jobs['image-build']
+        self.assertEqual(image_gate['needs'], 'validate')
+        self.assertEqual(jobs['publish-platform']['needs'],
+                         ['validate','image-build','rc-campaign-conclusion'])
+        for publisher in ('publish','publish-on-commit'):
+            self.assertIn('image-build', jobs[publisher]['needs'])
+            self.assertIn('publish-platform', jobs[publisher]['needs'])
+        self.assertTrue(all(step.get('with',{}).get('push') is False
+                            for step in image_gate['steps']
+                            if step.get('uses')=='docker/build-push-action@v6'))
 
     def test_password_reset_throttle_is_shared(self):
         server = (ROOT / 'apps/api/src/server.ts').read_text()

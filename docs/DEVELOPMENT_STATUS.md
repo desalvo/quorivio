@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC126 — CI regression compatibility with native Docker pipeline (2 November 2026)
+
+**Actual GitHub result:** run `41371521619` at commit `d0aa86bd9efe12180e418344aabd9255e5056a3a` completed **failure**. Production quality gate passed TypeScript/Vite build, real PostgreSQL/Chromium checks and ClamAV, then failed in the late Kubernetes wizard/worker Python suite: 8 obsolete CI-workflow assertions out of 1,656 tests (1,648 passing). The final RC campaign summary failed as a consequence; Docker native image jobs were skipped (not executed). This is not evidence of a repeat QEMU hang or a completed Docker Hub publication.
+
+**RC126 change:** update seven historical Python test suites containing eight obsolete expectations about single-job Docker build/tagging and legacy release job names. Assertions now inspect parsed GitHub Actions job boundaries, verify manual opt-in vs explicitly marked `[publish-docker]` push, require the full RC campaign for commit publication, preserve image-build/Trivy prerequisites, and prohibit credentials/publishing in rootless Podman smoke. Keep real `linux/amd64` and `linux/arm64` runners and fail-closed manifest checks from RC125 untouched. Run these eight suites in the early pre-npm preflight, alongside existing RC125 native digest failure tests; late full suite remains mandatory. See `docs/RC_CYCLE126_CI_NATIVE_PUBLISH_CONTRACTS.en.md`.
+
+**Evidence:** 57 targeted tests executed locally: 56 passed, one environment-dependent skip, historical receipts and current SHA-256 inventory verified. A local attempt at the entire Python suite exceeded the execution limit; this is not a full-suite pass. The revised GitHub workflow, Docker Hub authentication, actual native ARM64 push and manifest still require GitHub execution. **Certified product completion: 85.25%** (43 accepted / 17 partial out of 60); engineering estimate **85.75%** remains provisional. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit, push, Docker publication or release by assistant.
+
+**Suggested commit after confirmed RC125:** `Align legacy CI contracts with native multiarch publication and gate both digest builds [full-ci]`.
+
+---
+
 # Quorivio 0.1.0-dev — RC125 — Native multiarch Docker publication (2 November 2026)
 
 **Root cause:** GitHub Docker Hub job `41361426087/attempts/2` reports `qemu: uncaught target signal 4 (Illegal instruction)` during ARM64 `npm install`; AMD64 finishes successfully. **Fix:** separate native Ubuntu AMD64 and ARM64 GitHub runners, push by digest only, validate both architectures and assemble/tags the manifest in a later protected job. Per-platform 35-minute and manifest 10-minute timeouts; no implicit publishing with `[full-ci]`. All previous authorization and CI acceptance conditions are retained. See `docs/RC_CYCLE125_NATIVE_DOCKER_PUBLISH.en.md`.

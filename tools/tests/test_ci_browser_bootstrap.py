@@ -29,9 +29,18 @@ class BrowserBootstrapTests(unittest.TestCase):
         self.assertNotIn('apt-get',step)
         self.assertIn('python3 tools/ci_nested_context_css_chromium.py',step)
         self.assertIn('python3 tools/ci_browser_editor.py',step)
-        self.assertEqual(workflow.count('name: Production publication\n'),1)
-        self.assertEqual(workflow.count('name: Production publication requested by commit'),1)
-        self.assertIn('needs: [validate, image-build, rc-campaign-conclusion]',workflow)
+        # RC125 split native digest builders from manifest publishers. Check
+        # the actual job identities and dependencies, not obsolete display names.
+        import yaml
+        jobs=yaml.safe_load(workflow)['jobs']
+        self.assertEqual(jobs['publish']['needs'], ['validate','image-build','publish-platform'])
+        self.assertEqual(jobs['publish-on-commit']['needs'],
+                         ['validate','image-build','rc-campaign-conclusion','publish-platform'])
+        self.assertEqual(jobs['publish-platform']['needs'],
+                         ['validate','image-build','rc-campaign-conclusion'])
+        self.assertIn("github.event_name == 'workflow_dispatch'", jobs['publish']['if'])
+        self.assertIn("contains(github.event.head_commit.message, '[publish-docker]')",
+                      jobs['publish-on-commit']['if'])
 
     def test_all_browser_tests_accept_the_shared_preinstalled_binary(self):
         for name in ('ci_browser_editor.py','ci_browser_editor_postgres.py',

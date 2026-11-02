@@ -37,7 +37,12 @@ class RC76EarlyContracts(unittest.TestCase):
 
     def test_release_remains_opt_in(self):
         self.assertIn('default: false', WORKFLOW)
-        self.assertIn('name: Production publication', WORKFLOW)
+        import yaml
+        jobs=yaml.safe_load(WORKFLOW)['jobs']
+        self.assertEqual(set(('publish','publish-on-commit','publish-platform'))-set(jobs),set())
+        self.assertIn('inputs.publish_image == true',jobs['publish']['if'])
+        self.assertIn("'[publish-docker]'",jobs['publish-on-commit']['if'])
+        self.assertIn('rc-campaign-conclusion',jobs['publish-on-commit']['needs'])
         self.assertIn('publish_image', WORKFLOW)
 
 if __name__ == '__main__':

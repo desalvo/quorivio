@@ -1,3 +1,17 @@
+# Quorivio 0.1.0-dev — RC126 — Correzione test storici CI e pubblicazione multiarch nativa (2 novembre 2026)
+
+**Esito reale GitHub:** run `41371521619`, commit `d0aa86bd9efe12180e418344aabd9255e5056a3a`: **fallita**. Compilazione TypeScript/Vite, verifiche PostgreSQL/Chromium e ClamAV riuscite; il test tardivo Kubernetes wizard/worker ha trovato 8 asserzioni obsolete su 1.656 (1.648 riuscite). Il riepilogo della campagna RC è fallito per dipendenza; le build native e la pubblicazione Docker sono state saltate. Nessun nuovo blocco QEMU dimostrato.
+
+**Modifiche RC126:** aggiornate sette suite Python storiche (otto test) che cercavano il precedente job Docker unico, il vecchio nome della pubblicazione e i tag passati direttamente a `build-push-action`. Ora i test controllano i job YAML realmente separati, autorizzazione manuale, marcatore esplicito `[publish-docker]` e campagna completa per la pubblicazione da commit, gate di scansione, permessi GitHub sola lettura e assenza di login/pubblicazione nel test Podman. Aggiunta verifica preventiva prima di npm, senza disabilitare alcun test di integrazione. Conservata intatta la correzione ARM64 nativa di RC125. Vedere `docs/RC_CYCLE126_CI_NATIVE_PUBLISH_CONTRACTS.it.md`.
+
+**Verifiche locali:** 57 test mirati eseguiti (56 superati, uno saltato per condizioni ambientali); inventario e ricevute storiche validi. La prova locale della suite completa Python ha superato il limite di esecuzione: **non** è una full CI verde.
+
+**Certificazione:** invariata **85,25%** (43 gate accettati / 17 parziali su 60); stima ingegneristica locale **85,75%** non ancora certificata. Pubblicazione Docker reale da verificare su GitHub. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/pubblicazione da parte dell'assistente.
+
+**Commit suggerito successivo al commit RC125:** `Align legacy CI contracts with native multiarch publication and gate both digest builds [full-ci]`.
+
+---
+
 # Quorivio 0.1.0-dev — RC125 — Pubblicazione Docker nativa senza QEMU (2 novembre 2026)
 
 **Diagnosi:** nel log del job Docker Hub `41361426087/attempts/2`, ARM64 tramite QEMU si blocca durante `npm install` con `Illegal instruction`, mentre AMD64 termina correttamente. **Intervento:** build separate su runner nativi `ubuntu-24.04` e `ubuntu-24.04-arm`, push per digest, verifica preliminare di entrambe le architetture e solo dopo creazione del manifest e aggiornamento dei tag. Timeout di 35+10 minuti, nessuna pubblicazione in `[full-ci]`; tutte le autorizzazioni e i gate precedenti restano obbligatori. Vedere `docs/RC_CYCLE125_NATIVE_DOCKER_PUBLISH.it.md`.

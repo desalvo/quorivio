@@ -33,7 +33,18 @@ class CampaignContracts(unittest.TestCase):
   with self.assertRaises(ValueError):evaluate_results({**jobs,'cross-browser':{'result':'invalid'}})
  def test_workflow_is_explicit_and_does_not_publish(self):
   y=(ROOT/'.github/workflows/ci.yml').read_text()
-  self.assertIn("inputs.publish_image == true && !inputs.rc_acceptance_suite && (github.ref == 'refs/heads/main'",y)
+  import yaml
+  jobs=yaml.safe_load(y)['jobs']
+  manual=jobs['publish']['if']
+  self.assertIn('inputs.publish_image == true',manual)
+  self.assertIn('!inputs.rc_acceptance_suite',manual)
+  self.assertIn("github.ref == 'refs/heads/main'",manual)
+  self.assertIn("github.event_name == 'workflow_dispatch'",manual)
+  self.assertNotIn("github.event_name == 'push'",manual)
+  commit=jobs['publish-on-commit']['if']
+  self.assertIn("contains(github.event.head_commit.message, '[publish-docker]')",commit)
+  self.assertIn("needs.rc-campaign-conclusion.result == 'success'",commit)
+  self.assertIn("needs.publish-platform.result == 'success'",commit)
   self.assertIn('Fail closed on skipped, cancelled or failed RC campaign jobs',y)
   self.assertIn('RC_CAMPAIGN_NEEDS_JSON: ${{ toJSON(needs) }}',y)
   self.assertIn('test "$RC_CAMPAIGN_PUBLISH" = \'false\'',y)

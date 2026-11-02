@@ -80,22 +80,43 @@ class ManualPublishPolicy(unittest.TestCase):
             self.assertIn('RC acceptance runs cannot publish',result.stderr)
             self.assertFalse(output.exists())
 
-    def test_workflow_is_never_push_based(self):
-        pub=CI.split('\n  publish:',1)[1]
-        self.assertIn("github.event_name == 'workflow_dispatch'",pub.split('\n    needs:',1)[0])
-        self.assertIn('inputs.publish_image == true',pub.split('\n    needs:',1)[0])
-        self.assertNotIn("github.event_name == 'push'",pub.split('\n    needs:',1)[0])
-        self.assertIn("publish_image:\n        description:",CI)
-        self.assertIn("publish_latest:\n        description:",CI)
+    def test_manual_publication_is_opt_in_and_never_implicit(self):
+        import yaml
+        jobs=yaml.safe_load(CI)['jobs']
+        manual=jobs['publish']
+        condition=manual['if']
+        self.assertIn("github.event_name == 'workflow_dispatch'",condition)
+        self.assertIn('inputs.publish_image == true',condition)
+        self.assertIn('!inputs.rc_acceptance_suite',condition)
+        self.assertNotIn("github.event_name == 'push'",condition)
+        self.assertIn("needs.publish-platform.result == 'success'",condition)
+        self.assertEqual(manual['needs'],['validate','image-build','publish-platform'])
+        self.assertIn('publish_image:\n        description:',CI)
+        self.assertIn('publish_latest:\n        description:',CI)
         self.assertIn('default: false',CI)
-        self.assertIn('tags: ${{ steps.label.outputs.tags }}',pub)
-        self.assertIn('needs: [validate, image-build]',pub)
+        self.assertTrue(any('bash tools/resolve_image_tags.sh'==x.get('run') for x in manual['steps']))
+        self.assertTrue(any('bash tools/publish_multiarch_manifest.sh'==x.get('run') for x in manual['steps']))
+        self.assertIn('QUORIVIO_IMAGE_TAGS',str(manual['steps']))
 
-    def test_publish_runner_has_no_write_permission(self):
-        pub=CI.split('\n  publish:',1)[1]
-        self.assertIn('permissions: {contents: read}',pub)
-        self.assertIn('environment: production',pub)
-        self.assertIn('docker/build-push-action@v6',pub)
-        self.assertIn('platforms: linux/amd64,linux/arm64',pub)
+    def test_native_build_and_both_publishers_have_read_only_github_permissions(self):
+        import yaml
+        jobs=yaml.safe_load(CI)['jobs']
+        build=jobs['publish-platform']
+        for key in ('publish-platform','publish','publish-on-commit'):
+            self.assertEqual(jobs[key]['permissions'],{'contents':'read'})
+            self.assertEqual(jobs[key]['environment'],'production')
+        self.assertTrue(any(x.get('uses')=='docker/build-push-action@v6'
+                            for x in build['steps']))
+        self.assertEqual({x['arch']:x['platform'] for x in build['strategy']['matrix']['include']},
+                         {'amd64':'linux/amd64','arm64':'linux/arm64'})
+        for name in ('publish','publish-on-commit'):
+            self.assertFalse(any(x.get('uses')=='docker/build-push-action@v6'
+                                 for x in jobs[name]['steps']))
+            self.assertTrue(any('bash tools/publish_multiarch_manifest.sh'==x.get('run')
+                                for x in jobs[name]['steps']))
+        commit=jobs['publish-on-commit']['if']
+        self.assertIn("contains(github.event.head_commit.message, '[publish-docker]')",commit)
+        self.assertIn("needs.rc-campaign-conclusion.result == 'success'",commit)
+        self.assertIn("needs.publish-platform.result == 'success'",commit)
 
 if __name__=='__main__': unittest.main()

@@ -93,14 +93,21 @@ class RootlessPodmanSmoke(unittest.TestCase):
     def test_ci_is_explicitly_opt_in_and_cannot_publish(self):
         workflow = WORKFLOW.read_text()
         self.assertIn('rootless_podman_test:', workflow)
-        block = workflow.split('  runtime-podman-rootless:\n', 1)[1].split('\n  publish:', 1)[0]
-        self.assertIn("github.event_name == 'workflow_dispatch' && inputs.rootless_podman_test", block)
-        self.assertIn('needs: validate', block)
-        self.assertIn('runs-on: ubuntu-24.04', block)
-        self.assertIn('podman build --format docker --pull=always', block)
-        self.assertIn('bash tools/ci_rootless_podman_smoke.sh', block)
-        self.assertNotIn('docker/login-action', block)
-        self.assertNotIn('push:', block)
+        # Isolate this job structurally so the following native publisher
+        # cannot be mistaken for part of the rootless acceptance job.
+        import yaml
+        job=yaml.safe_load(workflow)['jobs']['runtime-podman-rootless']
+        self.assertIn("github.event_name == 'workflow_dispatch' && inputs.rootless_podman_test",job['if'])
+        self.assertEqual(job['needs'],'validate')
+        self.assertEqual(job['runs-on'],'ubuntu-24.04')
+        self.assertIn('podman build --format docker --pull=always',str(job['steps']))
+        self.assertIn('bash tools/ci_rootless_podman_smoke.sh',str(job['steps']))
+        self.assertFalse(any('docker/login-action' in step.get('uses','')
+                             for step in job['steps']))
+        self.assertFalse(any('podman push' in step.get('run','') or
+                             'docker push' in step.get('run','')
+                             for step in job['steps']))
+        self.assertEqual(job['permissions'],{'contents':'read'})
 
 
 if __name__ == '__main__':
