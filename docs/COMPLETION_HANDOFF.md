@@ -2,6 +2,8 @@
 
 Source cumulative includes RC127 native OCI runtime and 17 external gate acceptance checklist. New RC128 fixes: presenter's free-text preview shows the disabled real submit button, not simulated answers; shared logical slide geometry/fonts in single and split rehearsal; a draggable free-text field-height handle in editor; full horizontal ruler; per-tab authenticated workspace/session/page recovery; collision-constrained widget dragging with first-contact stopping. Tests: 185/185 frontend Node pass, 5/5 RC128 Python pass. Syntax checked; npm/Vite build, live Chromium visual checks and RC128 GitHub CI not yet validated. See `docs/RC_CYCLE128_EDITOR_PREVIEW_RECOVERY.en.md`. Certified release gate remains 85.25% (43/60 accepted, 17 partial); strict RC not accepted. No push/publication. Suggested cumulative commit since confirmed RC126: `Add native OCI runtime gates and fix editor-preview parity, reload recovery and collision boundaries [full-ci]`.
 
+GitHub run `41385372942` failed the early release metadata preflight before compiling or running the app. Current release safety flags are explicitly `rc_strict=false`, `publish_image=false`, `publish_latest=false`. They are documentation-only declarations, not workflow switches; no publication was authorized.
+
 ---
 
 # Quorivio 0.1.0-dev — RC127 — Real native ARM64 runtime and external RC acceptance plan (2 November 2026)

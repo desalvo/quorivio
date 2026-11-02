@@ -2,6 +2,8 @@
 
 Il cumulativo mantiene RC127 e il piano di 17 gate esterni. RC128 risolve: presentatore con comando invio disabilitato al posto di testo dimostrativo; proporzioni/font uniformi nell'anteprima singola/affiancata; maniglia per altezza della casella risposta; righello intero; ritorno dopo reload a sessione/scheda/pagina con controllo autenticazione; widget bloccato al primo ostacolo durante trascinamento. Evidenza: 185/185 test frontend Node e 5/5 test contratti Python superati; parsing TS controllato, build npm/Vite, Chromium reale e CI RC128 non ancora verificati. Vedere `docs/RC_CYCLE128_EDITOR_PREVIEW_RECOVERY.it.md`. Certificazione invariata 85,25%, RC stretta non accettata. Nessun push/pubblicazione. Commit cumulativo da RC126: `Add native OCI runtime gates and fix editor-preview parity, reload recovery and collision boundaries [full-ci]`.
 
+La run GitHub `41385372942` è fallita nel preflight dei metadati RC prima di compilazione/test applicativi. Opzioni di sicurezza dichiarate: `rc_strict=false`, `publish_image=false`, `publish_latest=false`; sono indicazioni documentali, non modifiche alla CI. Nessuna pubblicazione autorizzata.
+
 ---
 
 # Quorivio 0.1.0-dev — RC127 — Runtime ARM64 realmente nativo e piano per RC (2 novembre 2026)
