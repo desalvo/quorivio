@@ -1,5 +1,11 @@
 # RC128 — Editor, rehearsal geometry, reload recovery and collision boundary
 
+**Current local hotfix verification:** Full Python suite 1,666 tests: 1,665 passed, 1 skipped, 0 failed; 185/185 frontend Node tests passed. Corrected RC89, RC91 and RC124 legacy source contracts; app logic, Docker publication and current release gate scoring unchanged. GitHub still requires a fresh successful run. `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+
+**RC128 CI smart-guide regression hotfix (GitHub run `41387175909`, commit `3c01b88f994cd28d88c43330170dc21a737e4109`):** The release-header preflight passed, but RC124 source-contract preflight failed 2/4 assertions because it still expected drag-on-collision to revert fully to origin and the older alignment-guide expression. RC128 deliberately stops dragged widgets at the first collision boundary and only draws magnetic guides if the proposed snap is reachable. Updated `tools/tests/test_rc124_smart_guides.py` to require actual first-contact sweep and no-tunnelling guards, guide visibility at the accepted snapped position, and the RC128 Node regression suite in CI. Full-suite checks also identified outdated RC91 footer font-unit and RC89 free-text presenter-label assertions; both now validate the current authored typography and read-only presenter submit controls. No production widget geometry or release-security logic was changed in this hotfix. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. GitHub full CI and live browser visual parity must still be rerun on the corrected commit.
+
+
 Date: 2026-11-02. Base: RC127 cumulative. Screenshot-driven regression repairs without external operator approvals.
 
 ## Symptoms and source correction

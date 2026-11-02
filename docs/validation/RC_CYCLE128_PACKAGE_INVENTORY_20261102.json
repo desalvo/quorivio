@@ -2735,24 +2735,24 @@
       "949f2c92"
     ],
     "docs/COMPLETION_HANDOFF.it.md": [
-      "ef8aaef5",
-      "ea206edd",
-      "e457836f",
-      "938a9630",
-      "0de35cfc",
-      "d7de1690",
-      "cebda2bf",
-      "01bb92b2"
+      "5f152c3b",
+      "5a8566c9",
+      "b5dc1145",
+      "affa8fd6",
+      "ea5cdf20",
+      "625f2f77",
+      "0f2eda3f",
+      "79d2b91c"
     ],
     "docs/COMPLETION_HANDOFF.md": [
-      "84d6c2a6",
-      "58939009",
-      "04c88ead",
-      "878f5546",
-      "6e9535c9",
-      "b2811eec",
-      "0f47acbb",
-      "5ed0cc5f"
+      "192db809",
+      "b2ce8029",
+      "af662367",
+      "1974c17d",
+      "43893595",
+      "bef97fbe",
+      "8060609a",
+      "3b85ba2b"
     ],
     "docs/CONVERSION_ATOMIC_PUBLISH.en.md": [
       "20d0f241",
@@ -2815,24 +2815,24 @@
       "1ac5fb62"
     ],
     "docs/DEVELOPMENT_STATUS.it.md": [
-      "0437a567",
-      "72209acc",
-      "1837fd84",
-      "89c8f5df",
-      "b8af7384",
-      "363de574",
-      "3fd39955",
-      "f80b30e3"
+      "0083fba9",
+      "a94e3b92",
+      "2f24c976",
+      "f22c1ab5",
+      "bf04c35a",
+      "c723e855",
+      "67b1ae12",
+      "5da14a99"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "432e076c",
-      "56db56e2",
-      "7c5ef020",
-      "ff037143",
-      "3ace1dcc",
-      "ddd4cd4f",
-      "faf06922",
-      "bb6060a9"
+      "0d56ea53",
+      "8439a708",
+      "56de4cab",
+      "9ff3101f",
+      "05912c20",
+      "92c14d57",
+      "a39853c4",
+      "860d9715"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",
@@ -5695,24 +5695,24 @@
       "50ec4fb0"
     ],
     "docs/RC_CYCLE128_EDITOR_PREVIEW_RECOVERY.en.md": [
-      "16422216",
-      "1a7d2af1",
-      "a409ee53",
-      "62e1b28a",
-      "9fd8ff56",
-      "ae59ddc6",
-      "c39df4e2",
-      "f22adc46"
+      "84208a06",
+      "2885ca09",
+      "bdf4cc0a",
+      "a7458215",
+      "5e2fc081",
+      "4fafe337",
+      "3942b3c9",
+      "c67396aa"
     ],
     "docs/RC_CYCLE128_EDITOR_PREVIEW_RECOVERY.it.md": [
-      "2989cbd0",
-      "3bae2b81",
-      "e1fc0890",
-      "39ea363a",
-      "08265327",
-      "67a60239",
-      "a667ae8a",
-      "97582e63"
+      "ee8fd12b",
+      "b83a15e4",
+      "b48d16c5",
+      "de3766e8",
+      "234dfb29",
+      "1fd48810",
+      "ccd37267",
+      "b50e3747"
     ],
     "docs/RC_CYCLE14_NATIVE_BROWSERS_VERIFIED.en.md": [
       "b35ae30c",
@@ -11815,14 +11815,14 @@
       "56e67291"
     ],
     "tools/tests/test_rc124_smart_guides.py": [
-      "7263680e",
-      "b6e62d8a",
-      "665d5056",
-      "35e7df2e",
-      "f07170e8",
-      "bbf9811b",
-      "db0979b4",
-      "3fac2b7c"
+      "ffd0cc7e",
+      "545cef80",
+      "14b2ac93",
+      "971c14ec",
+      "77fb8b97",
+      "c29d2794",
+      "520c5049",
+      "8424cf5c"
     ],
     "tools/tests/test_rc125_native_docker_publish.py": [
       "1dab4833",
@@ -11905,14 +11905,14 @@
       "38c10f84"
     ],
     "tools/tests/test_rc91_scheme_stage.py": [
-      "aa0f5960",
-      "cf28bbcd",
-      "4cb2182d",
-      "28b32bc1",
-      "7c631bef",
-      "1c9d8f21",
-      "ca4926de",
-      "6c73e80f"
+      "2b62b127",
+      "2fa23883",
+      "fa78e59d",
+      "64b46946",
+      "0e05407f",
+      "49b0acd6",
+      "1aa14381",
+      "ff9908ee"
     ],
     "tools/tests/test_rc92_presenter_stage.py": [
       "85092bf2",
@@ -12875,14 +12875,14 @@
       "ea0cc927"
     ],
     "tools/tests/test_rc_cycle89_editor_feedback.py": [
-      "7f8484c1",
-      "26c0ee5f",
-      "8508a6ef",
-      "42ef7893",
-      "694c247b",
-      "beb0dc7b",
-      "eeab3bee",
-      "e4741ddf"
+      "3d51f7a3",
+      "a5f3a827",
+      "c38cb0ed",
+      "8e292486",
+      "30554c59",
+      "fb9667ac",
+      "fc37d27c",
+      "e8f25780"
     ],
     "tools/tests/test_rc_cycle8_inventory.py": [
       "f4f292c7",

@@ -25,8 +25,14 @@ class RC89EditorFeedback(unittest.TestCase):
   self.assertIn("if(!window.confirm('Eliminare questo widget dal canvas?'))return",UI)
 
  def test_text_fields_are_visible_and_styled_in_editor_and_both_rehearsals(self):
-  for marker in ('Casella di risposta libera nell\'editor','Campo risposta libera nella vista presentatore','Risposta simulata ','widget-free-answer-field','Colore sfondo casella risposta libera','Casella domanda libera nell\'editor','Casella domanda libera vista presentatore'):
+  for marker in ('Casella di risposta libera nell\'editor','Risposta simulata ','widget-free-answer-field','Colore sfondo casella risposta libera','Casella domanda libera nell\'editor','Casella domanda libera vista presentatore'):
    self.assertIn(marker,UI)
+  # RC128 uses the same text-area geometry for both rehearsal viewers and
+  # makes the presenter preview read-only, with its real submit disabled.
+  self.assertIn("aria-label={'Risposta simulata '+key}",UI)
+  self.assertIn("readOnly={viewer==='presenter'}",UI)
+  self.assertIn("{viewer==='presenter'?'Invia risposta':'Invia risposta di prova'}",UI)
+  self.assertIn('disabled={!canInteract||!canSubmitRehearsalAnswer(answerMode,current)}',UI)
   self.assertIn('answerFillColor?:string',DOMAIN)
   # RC109/110/113 extended the allowed fields. Verify that answerFillColor is
   # still in the API allowlist *and* its strict hex-color validation instead

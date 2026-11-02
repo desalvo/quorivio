@@ -19,7 +19,11 @@ class GlobalMasterRegressions(unittest.TestCase):
   self.assertIn('pageNumber={Number(entry.activity.position)+1}',UI)
   self.assertEqual(UI.count('className="slide-footer-number"'),0)
   self.assertIn('className="slide-canvas-page-number"',UI)
-  self.assertIn('style={{fontFamily:item.fontFamily,fontSize:item.fontSize,color:item.color',UI)
+  # RC128 scales the page-number font to canvas container units, preserving
+  # authored font family/color across editor and all rehearsal surfaces.
+  self.assertIn('fontFamily:item.fontFamily',UI)
+  self.assertIn('fontSize:`${(item.fontSize/12.8).toFixed(5)}cqw`',UI)
+  self.assertIn('color:item.color',UI)
   self.assertIn('data-custom-number=',UI)
   self.assertIn('slide-canvas-page-number[data-custom-number="true"]',CSS)
  def test_editor_works_with_selection_and_persistent_schema(self):

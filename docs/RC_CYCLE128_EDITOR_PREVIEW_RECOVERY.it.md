@@ -1,5 +1,11 @@
 # RC128 — Uniformità editor e anteprime, ripristino pagina e arresto alle collisioni
 
+**Verifiche locali dell’hotfix:** suite Python completa: 1.666 test, 1.665 superati, 1 saltato e nessun errore; frontend Node: 185/185 superati. Corretti i contratti storici RC89, RC91 e RC124; invariati logica applicativa, pubblicazione Docker e punteggio RC. Serve una nuova CI GitHub verde. `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+
+**Hotfix CI RC128 guide magnetiche (run GitHub `41387175909`, commit `3c01b88f994cd28d88c43330170dc21a737e4109`):** il preflight delle intestazioni RC è passato, ma 2/4 asserzioni storiche RC124 richiedevano ancora il ritorno all'origine in caso di collisione e la vecchia espressione per le guide. RC128 arresta invece correttamente la widget al primo ostacolo e mostra le guide magnetiche soltanto se la posizione proposta è raggiungibile. Aggiornato `tools/tests/test_rc124_smart_guides.py` per verificare arresto al contatto, anti-attraversamento, visibilità delle guide sulla posizione accettata e presenza dei test Node RC128 nella CI. La suite completa ha evidenziato anche asserzioni obsolete RC91 sui font del numero pagina e RC89 sull’etichetta della risposta libera: ora verificano le unità tipografiche aggiornate e l’invio disabilitato nel presentatore. Nessuna modifica al codice di geometria dei widget o alle condizioni di sicurezza del rilascio. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. La CI GitHub completa e la verifica visuale nel browser vanno ripetute sul nuovo commit.
+
+
 Data: 2 novembre 2026. Base: cumulativo RC127. Correzioni nate dalle tre schermate dell'utente; nessuna accettazione esterna inventata.
 
 ## Problemi corretti nel sorgente

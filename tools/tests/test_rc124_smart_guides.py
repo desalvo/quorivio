@@ -12,7 +12,10 @@ class RC124SmartGuides(unittest.TestCase):
  def test_guides_are_transient_and_editor_only(self):
   self.assertIn('setAlignmentGuides([]);',MAIN)
   self.assertIn('alignmentGuides.length>0&&<div className="widget-alignment-guides" aria-hidden="true"',MAIN)
-  self.assertIn('setAlignmentGuides(accepted===moved?guides:[])',MAIN)
+  # The RC128 sweep permits partial travel to the first obstacle; guides
+  # appear only when the proposed magnetic snap is actually reachable.
+  self.assertIn('setAlignmentGuides(accepted.find(w=>w.id===g.id)',MAIN)
+  self.assertIn('?guides:[])',MAIN)
   self.assertIn('pointer-events:none',CSS)
   self.assertIn('.slide-scheme-workspace .widget-canvas > .widget-alignment-guides',CSS)
   self.assertIn('magneticSnapWithGuides',PLACE)
@@ -24,8 +27,14 @@ class RC124SmartGuides(unittest.TestCase):
   self.assertIn('Math.round((top+dy)/step)*step-top',PLACE)
   self.assertIn('background-size:5% 5%',CSS)
  def test_bounded_collision_and_pointer_safety_not_bypassed(self):
-  self.assertIn('const accepted=rejectWidgetCollisions(base,moved,ids)',MAIN)
+  self.assertIn('moveWidgetsToCollisionLimit(base,ids,candidate.x-origin.x,candidate.y-origin.y)',MAIN)
   self.assertIn('onChange(accepted);return;',MAIN)
+  # Geometry must stop at the first obstacle even when the pointer leaps
+  # beyond a narrow widget. Do not weaken these guards to make CI green.
+  self.assertIn('overlapsOtherWidgets(moveWidgetGroup(original,ids,dx*t,dy*t),ids)',PLACE)
+  self.assertIn('return moveWidgetGroup(original,ids,dx*low,dy*low)',PLACE)
+  self.assertIn('return moveWidgetGroup(original,ids,dx*lo,dy*lo)',PLACE)
+  self.assertIn('apps/web/test/rc128-preview-recovery-collision.test.ts',WORKFLOW)
   self.assertIn('onEndGesture?.()',MAIN)
   self.assertIn('widget-alignment-guide.axis-x',CSS)
   self.assertIn('widget-alignment-guide.axis-y',CSS)
