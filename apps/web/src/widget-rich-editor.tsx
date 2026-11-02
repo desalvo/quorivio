@@ -48,8 +48,9 @@ export function RichWidgetText({value,marks,field,active,onChange,onSelection,on
   lock.current=false;
   if(active&&selection)restoreDomTextRange(el,selection);
  },[value,marks,field,active]);
- return <div ref={root} className={'widget-rich-inline '+(active?'widget-rich-editing':'widget-rich-display')} role={active?'textbox':undefined} aria-label={ariaLabel} aria-multiline="false" tabIndex={active?0:undefined} contentEditable={active} suppressContentEditableWarning spellCheck={active}
+ return <div ref={root} data-widget-text-field={field} className={'widget-rich-inline '+(active?'widget-rich-editing':'widget-rich-display')} role={active?'textbox':undefined} aria-label={ariaLabel} aria-multiline="false" tabIndex={active?0:undefined} contentEditable={active} suppressContentEditableWarning spellCheck={active}
   onFocus={capture} onKeyUp={capture} onMouseUp={capture} onPointerUp={capture}
+  onPointerDown={e=>{if(active)e.stopPropagation()}} onDoubleClick={e=>{if(active){e.stopPropagation();capture()}}}
   onBeforeInput={e=>{const evt=e.nativeEvent as InputEvent;if(evt.inputType==='insertParagraph'||evt.inputType==='insertLineBreak')e.preventDefault()}}
   onPaste={e=>{e.preventDefault();const plain=e.clipboardData.getData('text/plain').replace(/[\r\n]+/g,' ');const selection=window.getSelection();if(!selection||!selection.rangeCount)return;const range=selection.getRangeAt(0);const old=root.current?.textContent||'';const selected=domTextRange(root.current!);if(!selected)return;const available=maxLength-(old.length-(selected.end-selected.start));const safe=plain.slice(0,Math.max(0,available));range.deleteContents();const node=document.createTextNode(safe);range.insertNode(node);range.setStartAfter(node);range.collapse(true);selection.removeAllRanges();selection.addRange(range);remembered.current={start:selected.start+safe.length,end:selected.start+safe.length};onSelection(remembered.current);onChange(root.current?.textContent?.slice(0,maxLength)||'')}}
   // An IME may emit several interim onInput events. React must not replace the

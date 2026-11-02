@@ -20,7 +20,8 @@ class VisualParity20261028(unittest.TestCase):
   self.assertIn("if(kind==='rating')",UI)
   self.assertIn("if(kind==='timer')",UI)
  def test_editor_dblclick_edits_questions_and_options_inline(self):
-  self.assertIn('setEditing(w.id);requestAnimationFrame',UI)
+  self.assertIn('setEditing(w.id);setFormatScope(targetField.includes',UI)
+  self.assertIn('data-widget-text-field',UI)
   self.assertIn('Modifica opzione ',UI)
   self.assertIn('Aggiungi opzione di risposta',UI)
  def test_text_styles_reach_api_and_all_visual_contexts(self):

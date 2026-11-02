@@ -527,9 +527,22 @@ def main(argv=None):
     a.add_argument('--unattended',action='store_true',help='Use defaults plus overrides without prompting')
     a.add_argument('--output',default='k8s-generated',help='Target directory for deterministic Kustomize manifests')
     a.add_argument('--values',help='Existing JSON with custom overrides, e.g. saved quorivio-overrides.json')
+    a.add_argument('--inspect-cluster',action='store_true',help='Read-only inspect live installation; write nonsecret discovery report, never generate/apply replacement manifests')
     a.add_argument('--set',action='append',default=[],metavar='KEY=VALUE')
     args=a.parse_args(argv)
     cfg=dict(DEFAULTS);out=Path(args.output)
+    if args.inspect_cluster:
+        from k8s_cluster_inspection import inspect_resources,derive_nonsecret_config,save_report
+        # A read-only path is required: never generate new Secret or overwrite
+        # any prior Kubernetes YAML during discovery.
+        namespace=next((entry.split('=',1)[1] for entry in args.set if entry.startswith('namespace=')),cfg['namespace'])
+        name=next((entry.split('=',1)[1] for entry in args.set if entry.startswith('name=')),cfg['name'])
+        report=derive_nonsecret_config(inspect_resources(namespace,name),namespace,name)
+        save_report(out,report)
+        print(f'Read-only inventory saved in {out}/quorivio-cluster-discovery.json')
+        print('No Secret values collected, no Kubernetes resources modified, no manifests applied.')
+        for note in report['warnings']:print('WARNING:',note)
+        return 0
     try: guarded_output_directory(out)
     except ValueError as e: a.error(str(e))
     saved=out/'quorivio-overrides.json'

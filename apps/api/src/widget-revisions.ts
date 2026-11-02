@@ -44,6 +44,20 @@ export function aggregateWidgetAnswerRevisions(rows:{revision:number;answer_mode
  return [...revisions.values()].sort((a,b)=>a.revision-b.revision);
 }
 
+/** Presenter-only frequency of short text answers, without participant identity or
+ * individual response records. Only one/two-word labels are used; long answers
+ * appear solely in the total response count. Limit output to prevent floods. */
+export function aggregateShortTextAnswers(rows:{answer_mode:string;answer_payload:{text?:string|null}}[]):{word:string;count:number}[]{
+ const counts=new Map<string,number>();
+ for(const row of rows){
+  if(row.answer_mode!=='text'||typeof row.answer_payload?.text!=='string')continue;
+  const word=row.answer_payload.text.normalize('NFKC').trim().replace(/\s+/g,' ').toLocaleLowerCase('it');
+  if(!word||word.length>48||word.split(' ').length>2||/[<>\x00-\x1f\x7f]/u.test(word))continue;
+  counts.set(word,(counts.get(word)||0)+1);
+ }
+ return [...counts].map(([word,count])=>({word,count})).sort((a,b)=>b.count-a.count||a.word.localeCompare(b.word)).slice(0,100);
+}
+
 /** Prevent changing the answer key or duration of a live timed quiz. Pure geometry and styling are safe. */
 export function liveTimedWidgetMutation(previous:any[],next:any[]):boolean {
  // Duplicate IDs make answer attribution ambiguous. Reject them before building

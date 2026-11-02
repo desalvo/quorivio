@@ -28,7 +28,9 @@ class Cycle99CiContract(unittest.TestCase):
     def test_title_footer_and_selected_text_share_rich_editor(self):
         self.assertIn("w.kind==='footer'?widgetDisplay(w,{sessionTitle,pageNumber}).center",UI)
         self.assertIn('active={editing===w.id}', UI)
-        self.assertIn('applySelectionInlineStyle(w.textMarks||[]',UI)
+        self.assertIn('formatSelectedOrEntireField(w.textMarks||[]',UI)
+        self.assertIn('applyAllWidgetTypeface(w,changes as InlineStyle)',UI)
+        self.assertIn('applySelectionInlineStyle(marks,field,text,from,to,style)',(ROOT/'apps/web/src/widget-text-marks.ts').read_text())
         self.assertIn("onSelection={r=>recordTextSelection(w.id,'label',r)}",UI)
 
     def test_pptx_explicit_rgb_stroke_does_not_inherit_widget_borderless_default(self):

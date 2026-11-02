@@ -23,10 +23,10 @@ import {generateTotpSecret,makeTotp,verifyTotp,sealTotp,openTotp,totpAuthUrl,val
 import {smtpConfigFromEnv,sendTestEmail,sendPasswordResetEmail,sendEmailOtp} from './smtp.js';
 import {createEmailOtp,emailOtpDigest,matchesEmailOtp,validEmailOtp} from './email-otp.js';
 import {sealSmtpConfig,openSmtpConfig,validateSmtpInput,publicSmtpConfig} from './smtp-store.js';
-import {widgetAnswerShapeChanged,aggregateWidgetAnswerRevisions,liveTimedWidgetMutation,questionRevisionAtHistory} from './widget-revisions.js';
+import {widgetAnswerShapeChanged,aggregateWidgetAnswerRevisions,aggregateShortTextAnswers,liveTimedWidgetMutation,questionRevisionAtHistory} from './widget-revisions.js';
 import {normalizeWord,validateQuestion,moderationStatus,safeFrequency,parseModerationQueueQuery,parseModerationBulk} from './audience-tools.js';
 import {validPageOrder} from './page-sequence.js';
-import express from 'express';import helmet from 'helmet';import pg from 'pg';import bcrypt from 'bcryptjs';import QRCode from 'qrcode';import {WebSocketServer,WebSocket} from 'ws';import {liveSessionActive,livePresenterAuthorized,liveParticipantAuthorized} from './live-socket-policy.js';import {createLiveSnapshotQueue} from './live-snapshot-queue.js';import {createLivePeriodicRefresh} from './live-periodic-refresh.js';import {deliverLiveSnapshot} from './live-broadcast.js';import {shouldDropSlowSocket} from './live-delivery-policy.js';import {createServer} from 'node:http';import {randomUUID,randomBytes,createHash,createHmac,timingSafeEqual} from 'node:crypto';import {readFileSync,existsSync} from 'node:fs';import {mkdir,writeFile,readFile,unlink,rm,copyFile} from 'node:fs/promises';import {validAsset} from './asset-policy.js';import {receiveAssetStream} from './stream-upload.js';import {scanUploadedFile} from './malware-scan.js';import {readdir,stat} from 'node:fs/promises';import path from 'node:path';import {fileURLToPath} from 'node:url';import {validTransition,validateOptions,checkAnswer,publicActivity,escapeCsvCell,validRetentionDays,validPageDesign,validPseudonym,validAnswerMode,validateSubmittedAnswer,validReaction,type Activity,type SessionStatus} from './domain.js';
+import express from 'express';import helmet from 'helmet';import pg from 'pg';import bcrypt from 'bcryptjs';import QRCode from 'qrcode';import {WebSocketServer,WebSocket} from 'ws';import {liveSessionActive,livePresenterAuthorized,liveParticipantAuthorized} from './live-socket-policy.js';import {createLiveSnapshotQueue} from './live-snapshot-queue.js';import {createLivePeriodicRefresh} from './live-periodic-refresh.js';import {deliverLiveSnapshot} from './live-broadcast.js';import {shouldDropSlowSocket} from './live-delivery-policy.js';import {createServer} from 'node:http';import {randomUUID,randomBytes,createHash,createHmac,timingSafeEqual} from 'node:crypto';import {readFileSync,existsSync} from 'node:fs';import {mkdir,writeFile,readFile,unlink,rm,copyFile} from 'node:fs/promises';import {validAsset} from './asset-policy.js';import {receiveAssetStream} from './stream-upload.js';import {scanUploadedFile} from './malware-scan.js';import {classifyBackgroundUploadFailure,backgroundUploadLog,type BackgroundUploadPhase} from './background-upload-failure.js';import {readdir,stat} from 'node:fs/promises';import path from 'node:path';import {fileURLToPath} from 'node:url';import {validTransition,validateOptions,checkAnswer,publicActivity,escapeCsvCell,validRetentionDays,validPageDesign,validPseudonym,validAnswerMode,validateSubmittedAnswer,validReaction,type Activity,type SessionStatus} from './domain.js';
 const db=new pg.Pool({connectionString:process.env.DATABASE_URL});const secret=process.env.AUTH_SECRET||'';if(secret.length<32)throw new Error('AUTH_SECRET must have >= 32 characters');
 const base=process.env.PUBLIC_BASE_URL||'http://localhost:8080';let publicBase=base;const app=express();app.disable('x-powered-by');
 // Vite HMR is used only in development; production serves precompiled local assets.
@@ -934,22 +934,33 @@ app.get('/api/sessions/:id/backgrounds/:bid/image',requireAuth,async(req,res)=>{
  res.setHeader('Cache-Control','private, no-store');res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Content-Security-Policy',"default-src 'none'; sandbox");res.type(b.mime_type);
  res.sendFile(backgroundPath(b.owner_id,b.id));
  }catch(e){sendError(res,e)}});
-app.post('/api/sessions/:id/backgrounds',requireAuth,async(req,res)=>{try{
- const uid=auth(req)!;const s=await owner(req.params.id,uid);if(!s){res.status(404).end();return}
- if(s.status==='closed'){res.status(409).json({error:'session_closed'});return}
- const cap=await allowedUploadBytes();const length=Number(req.headers['content-length']);
- if(!Number.isSafeInteger(length)||length<1||length>cap){res.status(413).json({error:'invalid_upload_size'});return}
- const mime=String(req.headers['content-type']||'').split(';')[0].trim().toLowerCase();
- if(!backgroundTypes.has(mime)){res.status(415).json({error:'unsupported_background_media'});return}
- const id=randomUUID();const folder=path.join(backgroundRoot,uid);
- const received=await receiveAssetStream(req,folder,id,mime,cap,length);
+app.post('/api/sessions/:id/backgrounds',requireAuth,async(req,res)=>{
+ let phase:BackgroundUploadPhase='authorization';
  try{
-  await scanUploadedFile(received.destination);
-  await db.query('INSERT INTO presenter_backgrounds(id,owner_id,mime_type,byte_size,sha256) VALUES($1,$2,$3,$4,$5)',[id,uid,mime,received.size,received.sha256]);
- }catch(e){await unlink(received.destination).catch(()=>{});throw e}
- try{const applied=await useBackground(s,uid,{id,owner_id:uid,mime_type:mime,byte_size:received.size,sha256:received.sha256});res.status(201).json(applied)}
- catch(e){sendError(res,e)}
- }catch(e){sendError(res,e)}});
+  const uid=auth(req)!;const s=await owner(req.params.id,uid);if(!s){res.status(404).end();return}
+  if(s.status==='closed'){res.status(409).json({error:'session_closed'});return}
+  const cap=await allowedUploadBytes();const length=Number(req.headers['content-length']);
+  if(!Number.isSafeInteger(length)||length<1||length>cap){res.status(413).json({error:'invalid_upload_size'});return}
+  const mime=String(req.headers['content-type']||'').split(';')[0].trim().toLowerCase();
+  if(!backgroundTypes.has(mime)){res.status(415).json({error:'unsupported_background_media'});return}
+  const id=randomUUID();const folder=path.join(backgroundRoot,uid);
+  phase='receiving';
+  const received=await receiveAssetStream(req,folder,id,mime,cap,length);
+  try{
+   phase='scanning';await scanUploadedFile(received.destination);
+   phase='registering';await db.query('INSERT INTO presenter_backgrounds(id,owner_id,mime_type,byte_size,sha256) VALUES($1,$2,$3,$4,$5)',[id,uid,mime,received.size,received.sha256]);
+  }catch(e){await unlink(received.destination).catch(()=>{});throw e}
+  phase='applying';
+  const applied=await useBackground(s,uid,{id,owner_id:uid,mime_type:mime,byte_size:received.size,sha256:received.sha256});
+  res.status(201).json(applied);
+ }catch(e){
+  const diagnosis=classifyBackgroundUploadFailure(phase,e);
+  console.error('background_upload_failed',backgroundUploadLog(phase,e));
+  res.setHeader('Cache-Control','no-store');
+  if(diagnosis.status===503)res.setHeader('Retry-After','10');
+  res.status(diagnosis.status).json({error:diagnosis.code});
+ }
+});
 app.post('/api/sessions/:id/backgrounds/:bid/use',requireAuth,async(req,res)=>{try{
  const uid=auth(req)!;const s=await owner(req.params.id,uid);if(!s){res.status(404).end();return}
  if(s.status==='closed'){res.status(409).json({error:'session_closed'});return}
@@ -1724,7 +1735,7 @@ app.get('/api/sessions/:id/widget-answers/detail',requireAuth,async(req,res)=>{t
  if(!/^[0-9a-f-]{36}$/i.test(activity)||!/^[a-zA-Z0-9_-]{1,48}$/.test(widget)||(questionId!==''&&!/^[a-zA-Z0-9_-]{1,40}$/.test(questionId))){res.status(400).json({error:'invalid_filter'});return}
  const r=await db.query('SELECT revision,answer_mode,answer_payload FROM widget_answers WHERE session_id=$1 AND activity_id=$2 AND widget_id=$3 AND question_id=$4 ORDER BY submitted_at',[s.id,activity,widget,questionId]);
  const revisions=aggregateWidgetAnswerRevisions(r.rows);
- res.json({activity_id:activity,widget_id:widget,question_id:questionId,revisions});
+ res.json({activity_id:activity,widget_id:widget,question_id:questionId,revisions,text_counts:aggregateShortTextAnswers(r.rows)});
  }catch(e){sendError(res,e)}});
 // Independent, presenter-only timed rankings scoped to the exact widget and revision.
 app.get('/api/sessions/:id/activities/:aid/widgets/:wid/timed-leaderboard',requireAuth,async(req,res)=>{try{

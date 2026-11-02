@@ -19,9 +19,9 @@ class RC133ResizeBoundary(unittest.TestCase):
   self.assertIn("g.edge.includes('n')",MAIN)
  def test_collision_math_fail_closed_no_forced_click_or_unsafe_skipping(self):
   self.assertIn('export function resizeWidgetToCollisionLimit',PLACEMENT)
-  self.assertIn('if(fixed.some(w=>hit(base,rect(w))))return [...original];',PLACEMENT)
-  self.assertIn('for(let n=0;n<36;n++)',PLACEMENT)
-  self.assertIn('return fixed.some(w=>hit(candidate,rect(w)))?[...original]:withBox(candidate);',PLACEMENT)
+  self.assertIn('proposed.x+proposed.width>100.0001',PLACEMENT)
+  self.assertIn('proposed.y+proposed.height>100.0001',PLACEMENT)
+  self.assertIn('autoFit:false',PLACEMENT)
   self.assertNotIn('force: true',MAIN)
  def test_cancelled_response_resize_reverts_to_pointer_down_height(self):
   self.assertIn('const cancel=(e:React.PointerEvent<HTMLSpanElement>)=>{const start=drag.current;',MAIN)

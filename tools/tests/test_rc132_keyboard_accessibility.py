@@ -11,11 +11,10 @@ CSS=(ROOT/'apps/web/src/style.css').read_text(encoding='utf8')
 WORKFLOW=(ROOT/'.github/workflows/ci.yml').read_text(encoding='utf8')
 
 class RC132KeyboardAndAnswerBox(unittest.TestCase):
- def test_keyboard_single_widget_uses_continuous_sweep_not_bounce(self):
+ def test_keyboard_pointer_share_slide_boundaries_without_collision_rejection(self):
   self.assertIn('else if(!e.altKey&&!e.shiftKey)onChange(moveWidgetsToCollisionLimit(widgets,[w.id]',APP)
   self.assertIn('return moveWidgetsToCollisionLimit(widgets,existingWidgetIds(widgets,ids),dx,dy)',SELECTION)
-  self.assertIn('const contact=sweptContact(rect(a),rect(b),actualX,actualY)',GEOMETRY)
-  self.assertIn('return overlapsOtherWidgets(stopped,ids)?original:stopped',GEOMETRY)
+  self.assertIn('return moveWidgetGroup(original,ids,dx,dy)',GEOMETRY)
  def test_resize_handle_is_keyboard_focused_and_bounded(self):
   self.assertIn('role="slider" tabIndex={0}',APP)
   self.assertIn("{w.kind==='topic-question'&&<div className=\"canvas-widget-answer-preview\"><EditorAnswerFieldPreview questionField",APP)

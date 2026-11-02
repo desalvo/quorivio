@@ -5,11 +5,10 @@ SRC=(ROOT/'apps/web/src/main.tsx').read_text()
 DOMAIN=(ROOT/'apps/api/src/domain.ts').read_text()
 CSS=(ROOT/'apps/web/src/style.css').read_text()
 class PresenterLinkedPreview(unittest.TestCase):
- def test_presenter_only_result_control(self):
-  self.assertIn('className="projection-results-widget-trigger"',SRC)
+ def test_presenter_only_live_results_respect_authored_geometry(self):
+  self.assertIn('<PresenterLinkedResult sessionId={sessionId}',SRC)
   self.assertIn('{visible&&<div id="presenter-page-results"',SRC)
-  self.assertIn('<PresenterLinkedResult key={w.id}',SRC)
-  self.assertIn("w.kind!=='results-button'",SRC)
+  self.assertIn('className="primary presenter-results-button"',SRC)
   self.assertIn("w.kind==='results-button'?null",SRC)
  def test_results_source_is_page_scoped(self):
   self.assertIn('Widget sorgente statistiche',SRC)
@@ -27,7 +26,9 @@ class PresenterLinkedPreview(unittest.TestCase):
   self.assertIn('Nessuna risposta di prova viene salvata',SRC)
  def test_one_full_widget_and_one_selected_text_style_path(self):
   # Selected text is styled through the canonical overlap-aware helper.
-  self.assertIn('applySelectionInlineStyle(w.textMarks||[]',SRC)
+  self.assertIn('formatSelectedOrEntireField(w.textMarks||[]',SRC)
+  self.assertIn('scaleAllWidgetTypography(w,1.1)',SRC)
+  self.assertIn('applySelectionInlineStyle(marks,field,text,from,to,style)',(ROOT/'apps/web/src/widget-text-marks.ts').read_text())
   self.assertIn('formatTextRange(marks,field,part.start,part.end,pending.style)',SRC)
   self.assertIn('editing===w.id',SRC)
   self.assertIn('patch(w.id,{style:{...style,...changes}})',SRC)

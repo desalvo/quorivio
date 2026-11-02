@@ -29,12 +29,9 @@ class RC124SmartGuides(unittest.TestCase):
  def test_bounded_collision_and_pointer_safety_not_bypassed(self):
   self.assertIn('moveWidgetsToCollisionLimit(base,ids,candidate.x-origin.x,candidate.y-origin.y)',MAIN)
   self.assertIn('onChange(accepted);return;',MAIN)
-  # Geometry must stop at the first obstacle even when the pointer leaps
-  # beyond a narrow widget. Do not weaken these guards to make CI green.
-  self.assertIn('function sweptContact(a:Box,b:Box,dx:number,dy:number)',PLACE)
-  self.assertIn('firstContact=Math.min(firstContact,contact)',PLACE)
-  self.assertIn('const stopped=moveWidgetGroup(original,ids,actualX*safe,actualY*safe)',PLACE)
-  self.assertIn('return overlapsOtherWidgets(stopped,ids)?original:stopped',PLACE)
+  # Overlap is intentional; the same bounded movement is used by pointer/keyboard.
+  self.assertIn('return moveWidgetGroup(original,ids,dx,dy)',PLACE)
+  self.assertIn('function moveWidgetsToCollisionLimit',PLACE)
   self.assertIn('apps/web/test/rc128-preview-recovery-collision.test.ts',WORKFLOW)
   self.assertIn('onEndGesture?.()',MAIN)
   self.assertIn('widget-alignment-guide.axis-x',CSS)

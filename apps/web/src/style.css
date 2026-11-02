@@ -1793,3 +1793,63 @@ body > .rehearsal-backdrop {
 .projection-results-widget-trigger{display:flex;align-items:center;justify-content:center;width:100%;min-height:100%;padding:8px;background:transparent;border:0;color:inherit;font:inherit;font-weight:600;cursor:pointer;text-align:center;white-space:normal;overflow-wrap:anywhere}
 .projection-results-widget-trigger:focus-visible{outline:3px solid #2563eb;outline-offset:-3px}
 .rehearsal-statistics{margin:10px 0;padding:10px;border:1px solid #c7cedb;border-radius:8px;max-width:100%;overflow:auto;background:#fff;color:#1c273b}
+
+/* RC138: a result widget displays its own statistics (editor sample, presenter
+   real aggregate, rehearsal simulation) without spurious global downscaling.
+   Source-scoped results remain inaccessible on participant slides. */
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget)[data-widget-kind="results-button"]>.widget-fit-frame[data-fit-mode="scroll"]{overflow:hidden!important}
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget)[data-widget-kind="results-button"] .widget-fit-content{height:100%;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget)[data-widget-kind="results-button"] .linked-results{flex:1 1 auto;min-height:0;height:100%;overflow:auto;box-sizing:border-box}
+.editor-ux-v2 .widget-canvas-item[data-widget-kind="results-button"] .widget-fit-content>.canvas-widget-body-preview{height:100%;min-height:0;overflow:auto;flex:1 1 auto;box-sizing:border-box}
+/* The preview's submit button must keep the authored width, not the width of
+   the question/answer field or a legacy full-width rehearsal button. */
+:is(.rehearsal-widget,.projection-widget) .projection-interactive-widget>.outline.small,
+:is(.rehearsal-widget,.projection-widget) .projection-interactive-widget>.projection-readonly-submit{align-self:flex-start!important;width:max-content!important;max-width:100%;flex:0 0 auto;justify-content:center;margin:0!important;text-align:center}
+
+/* RC138: results chart obeys the author's explicit content-fit mode. */
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget)[data-widget-kind="results-button"] .widget-fit-frame[data-fit-mode="scroll"]{overflow:hidden!important}
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget)[data-widget-kind="results-button"] .widget-fit-frame[data-fit-mode="scroll"] .widget-fit-content{height:100%;width:100%;min-height:0;overflow:hidden;transform:none!important}
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget)[data-widget-kind="results-button"] .widget-fit-frame[data-fit-mode="scroll"] .linked-results{max-height:100%;overflow-y:auto;overflow-x:hidden}
+
+/* RC139: text input and inline selection must never inherit widget drag behavior. */
+.editor-floating-panel :is(input[type="text"],input:not([type]),textarea,[contenteditable="true"]){user-select:text!important;-webkit-user-select:text!important;cursor:text!important;touch-action:auto!important}
+.editor-ux-v2 .widget-canvas-item:has(.widget-rich-editing){touch-action:auto!important}
+.editor-ux-v2 .widget-canvas-item .widget-rich-editing{user-select:text!important;-webkit-user-select:text!important;touch-action:auto!important;cursor:text!important}
+/* Rating uses one visually clear, accessible scale on all slide surfaces. */
+.rating-choice-buttons{display:flex;flex-wrap:wrap;align-items:center;align-content:flex-start;gap:.35em;width:100%;max-width:100%;min-width:0;margin:.35em 0 .15em!important}
+.rating-choice-buttons button{flex:0 0 auto;min-width:2.1em;min-height:2.1em;padding:.22em .35em!important;background:linear-gradient(165deg,#ffffff,#e2ecff)!important;border:1.5px solid #7796c4!important;border-radius:.65em!important;color:#18365f!important;font-weight:700;font-size:1em;line-height:1.2;font-family:inherit;box-shadow:0 2px 5px #0a35621b!important;cursor:pointer}
+.rating-choice-buttons button:disabled{opacity:.85;cursor:default}
+.rating-choice-buttons button:not(:disabled):hover,.rating-choice-buttons button:not(:disabled):focus-visible,.rating-choice-buttons button[aria-pressed="true"]{background:linear-gradient(160deg,#ffe39b,#ffbf44)!important;border-color:#ba6c00!important;outline:2px solid #224b83;outline-offset:1px}
+.rating-choice-buttons .rating-choice-endpoint{font-weight:700;color:#29466c;font-size:.75em;white-space:nowrap}
+.rating-choice-select{max-width:100%;min-height:2.5em;border:2px solid #839ec8;border-radius:8px;font:inherit}
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-widget-kind="rating"] .widget-fit-content{min-height:0!important}
+/* Content should not expand to the unused bottom area merely because its parent is tall. */
+.widget-fit-content{min-height:0}
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-show-title="false"][data-widget-kind="title"] .projection-slide-title{display:none!important}
+/* RC139: equal inner spacing for author canvas and both presentation surfaces.
+   Remove the old 23px editor-only right gutter reserved for action buttons;
+   resize handles live outside the fit shell, not inside its content padding. */
+.editor-ux-v2 .widget-canvas-item,
+.rehearsal-pane .rehearsal-widget,
+.projection-page-content>.projection-widget,
+.audience-widget-layout.stage-fidelity>.page-widget{
+ padding:.55em!important;
+}
+:is(.editor-ux-v2 .widget-canvas-item,.rehearsal-pane .rehearsal-widget,.projection-page-content>.projection-widget,.audience-widget-layout.stage-fidelity>.page-widget)[data-widget-kind="footer"]{padding:0 2%!important}
+
+/* RC140: answer choices use one text flow and one set of typography values
+   on the editor canvas, rehearsals, and the real projection surface. */
+.editor-ux-v2 .widget-canvas-item .canvas-widget-answer-preview[data-answer-mode] > span {
+ white-space:normal!important;align-items:flex-start;overflow:visible!important;
+ text-overflow:clip!important;overflow-wrap:anywhere;min-width:0
+}
+.editor-ux-v2 .widget-canvas-item .canvas-widget-answer-preview[data-answer-mode] .widget-rich-inline,
+.editor-ux-v2 .widget-canvas-item .canvas-subquestion-option .widget-rich-inline {
+ font-family:inherit;font-size:inherit;color:inherit;font-style:inherit;font-weight:inherit;
+ white-space:pre-wrap;overflow-wrap:anywhere;min-width:0
+}
+.widget-selection-palette .palette-ribbon-target{min-width:155px}
+.widget-selection-palette .palette-ribbon-target label{display:flex;flex-direction:column;gap:3px;font-size:11px}
+.widget-selection-palette .palette-ribbon-target select{max-width:160px;width:155px}
+.widget-selection-palette .palette-ribbon-scale{display:flex;gap:6px;align-items:center}
+.widget-selection-palette .palette-ribbon-scale button{min-width:53px;font-weight:700}

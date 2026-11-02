@@ -9,12 +9,11 @@ APP=(ROOT/'apps/web/src/main.tsx').read_text(encoding='utf8')
 WORKFLOW=(ROOT/'.github/workflows/ci.yml').read_text(encoding='utf8')
 
 class RC131StageAndCollision(unittest.TestCase):
- def test_analytic_continuous_first_contact_and_fail_closed(self):
-  self.assertIn('function sweptContact(a:Box,b:Box,dx:number,dy:number)',PLACEMENT)
-  self.assertIn('const enter=Math.max(x[0],y[0]),leave=Math.min(x[1],y[1])',PLACEMENT)
-  self.assertIn('firstContact=Math.min(firstContact,contact)',PLACEMENT)
-  self.assertIn('return overlapsOtherWidgets(stopped,ids)?original:stopped',PLACEMENT)
-  self.assertIn('const target=moveWidgetGroup(original,ids,dx,dy)',PLACEMENT)
+ def test_free_overlap_with_canvas_boundary_and_nonmutating_pointers(self):
+  self.assertIn('export function moveWidgetsToCollisionLimit',PLACEMENT)
+  self.assertIn('return moveWidgetGroup(original,ids,dx,dy)',PLACEMENT)
+  self.assertIn('proposed.x+proposed.width>100.0001',PLACEMENT)
+  self.assertIn('return proposed;',PLACEMENT)
   self.assertNotIn('const segments=Math.min(400',PLACEMENT)
  def test_audience_fidelity_respects_explicit_font_at_all_widths(self):
   self.assertIn("'--authored-widget-font-size':widgetTypographyStyle(w.style).fontSize",APP)

@@ -13,10 +13,10 @@ class FullCIGroupDuplicateRegression(unittest.TestCase):
   self.assertNotIn('rejectWidgetCollisions(widgets,result.widgets,result.selected)',UI)
  def test_clipboard_group_uses_same_placement_validation(self):
   self.assertIn('insertWidgetGroupInFreeSpace(widgets,copiedWidgets,',UI)
-  self.assertIn('overlapsOtherWidgets([...widgets,...translated],newIds)',PLACEMENT)
+  self.assertIn('const copies=pasteWidgetGroup(source,newIds,preferredOffset)',PLACEMENT)
  def test_no_space_failure_is_reported_not_overlapped(self):
-  self.assertIn("if(!result){window.alert('Non c’è spazio per duplicare senza sovrapposizioni.');return}",UI)
-  self.assertIn('return null;',PLACEMENT)
+  self.assertIn("if(!result){window.alert('Impossibile duplicare i widget: controlla la geometria.');return}",UI)
+  self.assertIn('if(!source.length)return null',PLACEMENT)
  def test_browser_acceptance_detects_rejected_duplicate_alert(self):
   self.assertIn('duplication_alerts',BROWSER)
   self.assertIn("await expect(page.locator('.widget-canvas-item')).to_have_count(5)",BROWSER)

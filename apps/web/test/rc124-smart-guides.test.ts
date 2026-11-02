@@ -40,7 +40,7 @@ test('RC124: do not mutate the input; do not persist any guide in the widget',()
 test('RC124: collision rule still rejects magnetic overlaps and graphic overlays stay permitted',()=>{
  const original=[w('a',5,5),w('b',50,50)];
  const proposed=[original[0],w('b',10,10)];
- assert.deepEqual(rejectWidgetCollisions(original,proposed,['b']),original);
+ assert.deepEqual(rejectWidgetCollisions(original,proposed,['b']),proposed);
  assert.ok(overlapsOtherWidgets(proposed,['b']));
  assert.equal(overlapsOtherWidgets([original[0],w('shape',10,10,18,12,'shape')],['shape']),false);
 });

@@ -1,3 +1,32 @@
+# Quorivio 0.1.0-dev — RC140 — Ambiti di formattazione
+
+**Baseline RC137 committata, CI verde** (run `41475936282`); **cumulativo RC138–RC140 ancora non committato**. Eliminate le icone intrusive; formattazione distinta per titolo, descrizione, risposte o intero widget. A−/A+ mantiene le proporzioni dei testi e i font/colori delle risposte usano gli stessi dati in editor, anteprime e proiezioni. Doppio clic sul campo effettivo; le frecce degli input numerici non attivano il canvas. Dettagli: `docs/RC_CYCLE140_FORMAT_SCOPE_PARITY.it.md`. Node e Python mirati verdi; npm/Vite e browser reali da collaudare. **Completamento certificato 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/release.
+
+---
+
+# Quorivio 0.1.0-dev — RC139 — Gradimento e modifica testo
+
+**Baseline: RC137 già committata e CI verde** (run `41475936282`), **cumulativo RC138–RC139 non ancora committato**. Unica scala di gradimento 0–10 in editor/anteprime/presentatore/partecipante, eliminato il doppio titolo nell’editor; cursore e selezione del testo non avviano trascinamenti; la finestra Formato widget si chiude mantenendo la selezione. Uniformato il padding senza cambiare le coordinate configurate. Documentazione: `docs/RC_CYCLE139_RATING_CARET_AND_CANVAS_PARITY.it.md`. **Completamento certificato 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. CI GitHub e collaudo nel browser reale ancora necessari; nessun commit/push/release.
+
+---
+
+# Quorivio 0.1.0-dev — RC138 — Sovrapposizione widget, fedeltà dei risultati e wizard Kubernetes
+
+Baseline: **RC137**, CI GitHub `41475936282` verde, commit `4b33e67ec2ee22973b557ab3ec6759bad356dedc`.
+
+- Tutti i widget possono sovrapporsi con mouse, touch, tastiera, copia/incolla e otto maniglie. Rimangono i confini del canvas e Undo/Redo.
+- I risultati live aggregati tornano direttamente nella widget Risultati della pagina del presentatore; nessuna risposta digitata viene riprodotta nelle caselle del presentatore e la widget risultati non compare sulla vista partecipante.
+- Risultati offre una casella di controllo per disattivare la riscalatura automatica. Il ridimensionamento manuale la disattiva e il contenuto rimane alla dimensione impostata, scorrendo entro il riquadro senza badge fuorviante.
+- I pulsanti invio delle anteprime mantengono dimensione e posizione proprie, senza allargarsi come il campo di risposta.
+- Risposte testuali brevi aggregate per frequenza, soltanto etichette anonime da 1–2 parole (massimo 48 caratteri); i testi lunghi aumentano soltanto il totale.
+- Il wizard ora offre `--inspect-cluster`: legge in sola lettura Deployment, ConfigMap, PVC, Ingress, ClamAV e PostgreSQL ed esporta `quorivio-cluster-discovery.json` **senza valori dei Secret**. Non applica modifiche, non rigenera credenziali e non è ancora una modalità di riconciliazione/applicazione automatica. Per installazioni esistenti proteggere Secret e PVC e valutare manualmente il diff prima di applicare manifest completi.
+
+Esempio: `python3 tools/k8s_wizard.py --inspect-cluster --output ./quorivio-inspection --set namespace=quorivio --set name=quorivio`.
+
+**Certificato 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. RC138 non committata, CI GitHub ed evidenze indipendenti ancora da verificare. Nessun commit/push/release dell'assistente.
+
+---
+
 # Quorivio 0.1.0-dev — RC137 — Riservatezza schermo presentatore e caricamento sfondi (2 novembre 2026)
 
 **RC135 ultima baseline CI completa verde** (`41437489546`); **RC136+RC137 committati** (`f2dd75030c07e3d948b14b2ec4c51e9c2cf9e34a`), ma la CI `41473679963` è fallita compilando il frontend: un test Node si trovava in `apps/web/src`. Hotfix RC137: test trasferito in `apps/web/test`, senza modifiche all’applicazione. Le risposte dei partecipanti non appaiono nei campi dello schermo presentatore o nella prova affiancata; statistiche e risultati soltanto su richiesta esplicita. Upload background: messaggi HTTP specifici e migliore riconoscimento JPEG, mantenendo scanner e controlli di sicurezza. Nuovo preflight RC137; CI GitHub hotfix da confermare. **Certificato 85,25%** (43 accettati /17 parziali), `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Vedi `docs/RC_CYCLE137_PRESENTER_PRIVACY_BACKGROUND.it.md`. Nessun commit/push/pubblicazione.

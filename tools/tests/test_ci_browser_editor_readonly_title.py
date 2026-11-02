@@ -11,7 +11,8 @@ CSS=(ROOT/'apps/web/src/style.css').read_text()
 class ChromiumWidgetTitleEditing(unittest.TestCase):
  def test_real_canvas_title_has_explicit_context_action_and_double_click(self):
   self.assertIn('onDoubleClick={e=>',UI)
-  self.assertIn('setEditing(w.id);requestAnimationFrame',UI)
+  self.assertIn('setEditing(w.id);setFormatScope(targetField.includes',UI)
+  self.assertIn('requestAnimationFrame(()=>{const field=Array.from(root.querySelectorAll',UI)
   self.assertIn('>Modifica titolo</button>',UI)
   self.assertIn("<RichWidgetText value={w.kind==='title'?widgetDisplay(w,{pageTitle,masterTitleStyle}).title",UI)
   # Footer is now editable through the same rich-text path as the title.

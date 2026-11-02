@@ -10,16 +10,15 @@ CSS = (ROOT / 'apps/web/src/style.css').read_text()
 class PresenterResultsTests(unittest.TestCase):
     def test_results_are_in_canvas_at_saved_geometry(self):
         component = UI.split('function PresenterPageResults(')[1].split('\nfunction AudienceExtensions(')[0]
-        # The result widget keeps its geometry, but is only a button until the presenter opens results.
+        # The authored Result widget keeps its geometry AND renders live,
+        # aggregate-only charts. A separate detail panel opens on request.
         self.assertIn('widgets.map((w:any)', component)
         self.assertIn('widgetGeometryStyle(w.position)', component)
-        self.assertIn('className="projection-results-widget-trigger"', component)
-        self.assertIn('onClick={()=>setVisible(v=>!v)}', component)
+        self.assertIn('<PresenterLinkedResult sessionId={sessionId}', component)
         self.assertIn('{visible&&<div id="presenter-page-results"', component)
-        self.assertIn('<PresenterLinkedResult key={w.id}', component)
-        self.assertLess(component.index('{visible&&<div id="presenter-page-results"'),component.index('<PresenterLinkedResult key={w.id}'))
-        self.assertIn('aria-expanded={visible}', component)
-        self.assertIn('aria-controls="presenter-page-results"', component)
+        self.assertLess(component.index('<PresenterLinkedResult sessionId={sessionId}'),component.index('{visible&&<div id="presenter-page-results"'))
+        self.assertIn('aria-expanded={visible}',component)
+        self.assertIn('aria-controls="presenter-page-results"',component)
         self.assertIn('linked-results', UI)
         self.assertIn('.linked-results{', CSS)
 

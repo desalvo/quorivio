@@ -7,20 +7,16 @@ import {beginWidgetGesture,editWidgets,endWidgetGesture,newWidgetHistory,undoWid
 
 const w=(id:string,x:number,y:number,width=10,height=10,kind='question')=>({id,kind,position:{x,y,width,height,rotation:0},style:{answerFieldHeight:96}});
 
-test('RC132 keyboard nudge stops at first obstacle, rather than tunneling through it',()=>{
+test('RC138 keyboard nudge can travel through another widget',()=>{
  const base=[w('moving',2,10,5,10),w('thin',30.05,10,.05,10)];
  const moved=nudgeWidgetSelection(base,['moving'],90,0);
- assert.ok(moved[0].position.x>=25.04&&moved[0].position.x<=25.051,JSON.stringify(moved));
- assert.equal(overlapsOtherWidgets(moved,['moving']),false);
- assert.equal(base[0].position.x,2);
+ assert.equal(moved[0].position.x,92);assert.equal(base[0].position.x,2);
 });
-test('RC132 keyboard group nudge moves rigidly only as far as common collision permits',()=>{
+test('RC138 keyboard group nudge preserves offsets and respects canvas bounds',()=>{
  const base=[w('a',5,10),w('b',5,35),w('wall',35,10,5,10)];
  const moved=nudgeWidgetSelection(base,['a','b'],90,0);
- assert.equal(moved[0].position.x,moved[1].position.x);
+ assert.equal(moved[0].position.x,90);assert.equal(moved[1].position.x,90);
  assert.equal(moved[1].position.y-moved[0].position.y,25);
- assert.ok(moved[0].position.x>=24.99&&moved[0].position.x<=25.01);
- assert.equal(overlapsOtherWidgets(moved,['a','b']),false);
 });
 test('RC132 keyboard nudge honors graphic overlays and canvas bounds',()=>{
  const base=[w('shape',8,10,10,10,'shape'),w('block',25,10,5,10)];

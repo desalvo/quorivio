@@ -159,6 +159,8 @@ jobs:
             tools.tests.test_rc127_native_runtime_and_operator_plan \
             tools.tests.test_rc_cycle22_verified_dr_reconnect_oci.Cycle22RemoteReconciliation.test_runtime_job_only_manual_no_publish_or_credit \
             tools.tests.test_rc_cycle26_oci_hotfix.Cycle26RC.test_ci_checks_historical_then_current_without_publication -q
+      - name: RC138 widget overlap and Kubernetes wizard inspection preflight
+        run: PYTHONPATH=tools python3 -m unittest tools.tests.test_rc138_cluster_inspection tools.tests.test_rc131_stage_collision_contract tools.tests.test_rc132_keyboard_accessibility -q
       - name: RC137 presenter response privacy and canvas background upload feedback preflight
         run: python3 -m unittest tools.tests.test_rc137_presenter_privacy_background -q
       - name: RC136 independent operator evidence and strict release safety preflight
@@ -910,7 +912,12 @@ jobs:
           python3 tools/verify_rc_cycle134_inventory.py --historical
           python3 tools/verify_rc_cycle135_inventory.py --historical
           python3 tools/verify_rc_cycle136_inventory.py --historical
-          python3 tools/verify_rc_cycle137_inventory.py
+          python3 tools/verify_rc_cycle137_inventory.py --historical
+          python3 tools/verify_rc_cycle138_inventory.py --historical
+          python3 -m unittest tools.tests.test_rc139_rating_text_selection -q
+          python3 tools/verify_rc_cycle139_inventory.py --historical
+          python3 -m unittest tools.tests.test_rc140_widget_format_scope -q
+          python3 tools/verify_rc_cycle140_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

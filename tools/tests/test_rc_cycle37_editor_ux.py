@@ -12,7 +12,8 @@ class EditorCycle37(unittest.TestCase):
   self.assertIn('.editor-ux-v2 .widget-canvas-item{color:#000000;}',CSS)
  def test_widget_menu_escapes_clipping_and_handles_keyboard_touch(self):
   self.assertIn('contextWidget===w.id&&createPortal(',UI)
-  self.assertIn('</div>,document.body)}<div className="canvas-layer-tools">',UI)
+  self.assertIn('</div>,document.body)}',UI)
+  self.assertNotIn('className="canvas-layer-tools"',UI)
   self.assertIn('position:fixed!important;z-index:10020',CSS)
   # RC83 moved native right-click routing to canvas capture: this must
   # continue to position the same unclipped, body-portaled widget menu.

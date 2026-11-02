@@ -18,7 +18,9 @@ test('logo and backgrounds support JPEG selected by desktop OS file picker with 
  assert.match(web,/headers:\{'Content-Type':mime\},body:file/);
 });
 test('double click starts inline editing without auto-opening the inspector',()=>{
- assert.match(web,/onDoubleClick=\{e=>\{setActive\(w\.id\);setSelectedWidgets\(\[w\.id\]\);setContextWidget\(null\);/);
+ assert.match(web,/onDoubleClick=\{e=>\{if\(\(e\.target as HTMLElement\)\.closest\(\x27\[contenteditable=true\]\x27\)\)return;const targetField=/);
+ assert.match(web,/setSelectedWidgets\(\[w\.id\]\);setRibbonDismissed\(false\);setContextWidget\(null\);/);
+ assert.match(web,/data-widget-text-field/);
  assert.match(web,/Proprietà widget<\/button>/);
 });
 test('new shape and line are validated, old separator remains readable',()=>{
@@ -29,7 +31,7 @@ test('new shape and line are validated, old separator remains readable',()=>{
  assert.equal(validPageDesign({widgets:[{id:'g2',kind:'line',showTitle:'no'}]}),false);
  assert.match(web,/editorWidgetKinds=\['rating','reactions','text','shape','line'/);
 });
-test('graphics can overlay functional widgets without collision relaxation between normal widgets',()=>{
+test('every widget can overlap a functional widget, including graphics',()=>{
  const normal={id:'a',kind:'question',position:pos};
  const other={id:'b',kind:'text',position:pos};
  const shape={id:'c',kind:'shape',position:pos};

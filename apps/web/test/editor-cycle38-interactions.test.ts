@@ -18,8 +18,8 @@ test('presenter rehearsal uses neutral projection components, never shared draft
  assert.match(source,/disabled=\{!canInteract\|\|!canSubmitRehearsalAnswer\(answerMode,current\)\}/);
  assert.match(source,/viewer==='presenter'\?'Invia risposta':'Invia risposta di prova'/);
  assert.match(source,/kind==='timed-quiz'\&\&<PageTimer/);
- // Results remain behind an explicit presenter action; neither pane mirrors participant drafts.
- assert.match(source,/kind==='results-button'\?<button type=\"button\" className=\"projection-results-widget-trigger\"/);
+ // Authored presenter results widgets display aggregate simulations, never participant drafts.
+ assert.match(source,/kind==='results-button'\?<LinkedResultChart widget=\{w\}/);
  assert.match(source,/demoResultsVisible&&<section id=\"rehearsal-simulated-results\"/);
  assert.match(source,/const current=viewer==='participant'\?responses\[key\]:undefined/);
  assert.match(source,/sampleStatisticRows\(source,seed,submittedAnswers/);

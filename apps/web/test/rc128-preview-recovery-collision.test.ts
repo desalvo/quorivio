@@ -6,25 +6,22 @@ import {answerInputStyle,answerSubmitStyle} from '../src/widget-answer-style.ts'
 import {widgetTypographyStyle} from '../src/widget-appearance.ts';
 
 const rect=(id:string,x:number,y:number,width=10,height=10,kind='text')=>({id,kind,position:{x,y,width,height,rotation:0}});
-test('RC128: drag stops at the real collision edge rather than teleporting back',()=>{
+test('RC138: pointer may move across other widgets while keeping bounds',()=>{
  const a=rect('dragged',10,10),b=rect('fixed',40,10),original=[a,b];
  const moved=moveWidgetsToCollisionLimit(original,['dragged'],60,0);
- assert.ok(moved[0].position.x>=29.9&&moved[0].position.x<=30.001,JSON.stringify(moved[0]));
- assert.deepEqual(moved[1],b);assert.equal(overlapsOtherWidgets(moved,['dragged']),false);
+ assert.equal(moved[0].position.x,70);assert.deepEqual(moved[1],b);
  assert.equal(original[0].position.x,10);
 });
-test('RC128: no tunneling through narrow blocker even when final target is empty',()=>{
+test('RC138: a narrow blocker does not prohibit traversal',()=>{
  const moved=moveWidgetsToCollisionLimit([rect('a',2,2,5,5),rect('b',20,2,2,5)],['a'],70,0);
- assert.ok(moved[0].position.x<=15.01,JSON.stringify(moved[0]));
+ assert.equal(moved[0].position.x,72);
 });
-test('RC128: selection stays rigid and graphic overlays may overlap',()=>{
+test('RC138: multiple selected widgets preserve their relative positions',()=>{
  const source=[rect('a',10,10),rect('b',10,25),rect('blocker',31,10),rect('shape',12,12,8,8,'shape')];
  const moved=moveWidgetsToCollisionLimit(source,['a','b'],50,0);
- assert.ok(moved[0].position.x>=20.9&&moved[0].position.x<=21.001);
- assert.equal(moved[1].position.x,moved[0].position.x);
- assert.equal(overlapsOtherWidgets(moved,['a','b']),false);
- const graphic=moveWidgetsToCollisionLimit(source,['shape'],50,0);
- assert.equal(graphic[3].position.x,62);
+ assert.equal(moved[0].position.x,60);assert.equal(moved[1].position.x,60);
+ assert.equal(moved[1].position.y-moved[0].position.y,15);
+ assert.equal(moveWidgetsToCollisionLimit(source,['shape'],50,0)[3].position.x,62);
 });
 test('RC128: tab-scoped workspace location accepts only nonsecret typed identifiers',()=>{
  const sid='12345678-1234-4234-8234-123456789abc',pid='12345678-1234-4234-8234-123456789def';

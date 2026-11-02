@@ -1,3 +1,32 @@
+# Quorivio 0.1.0-dev — RC140 handoff
+
+**Committed CI-green baseline: RC137** (run `41475936282`); **RC138–RC140 cumulative uncommitted**. Fixed editor overlay actions obscuring text; authored title, description, answers or whole-widget typography can be targeted separately. Whole-widget A−/A+ adjusts relative text sizes while answer face/size/color match presenter, rehearsal and participant data. Double-click focuses the actual field; arrow keys in formatting controls do not move canvas focus. Details: `docs/RC_CYCLE140_FORMAT_SCOPE_PARITY.en.md`. Node and targeted Python tests local PASS; full npm/Vite and browser acceptance pending. **Certified 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/release.
+
+---
+
+# Quorivio 0.1.0-dev — RC139 handoff
+
+**Baseline: RC137 committed and CI-green** (run `41475936282`), **RC138–RC139 cumulative remains uncommitted**. One visual 0–10 rating control is now reused on editor/rehearsals/presenter/participant, editor double heading removed, text cursor/selection respects pointer events, and the formatting ribbon closes without deselecting a widget. Uniform internal padding replaces the old editor-only right gutter; no change to authored widget coordinates. RC139 documentation: `docs/RC_CYCLE139_RATING_CARET_AND_CANVAS_PARITY.en.md`. **Certified 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. GitHub CI and real browser verification pending; no assistant commit/push/release.
+
+---
+
+# Quorivio 0.1.0-dev — RC138 — Intentional widget layers, result widget fidelity and Kubernetes inspection
+
+Baseline: **RC137**, GitHub CI `41475936282` green, commit `4b33e67ec2ee22973b557ab3ec6759bad356dedc`.
+
+- All widgets can overlap intentionally via mouse, touch, keyboard, copy/paste, and eight-edge resizing. The canvas bounds still apply and Undo/Redo remains functional.
+- Results live in their authored slide widget on the presenter screen, showing aggregates only; participant projections never render results or mirror participants' inputs into the presenter answer fields.
+- Results now offer an auto-resize/scale toggle. Manual resizing disables scaling, maintaining chosen text/chart size and allowing scrolling within the widget, without a misleading downscale indicator.
+- Presenter/participant rehearsal uses intrinsic submit-button width, matching the authored editor layout.
+- Short free-text answer frequency data are aggregated into anonymous 1–2 word labels (max 48 characters); long responses contribute only to counts.
+- The wizard accepts `--inspect-cluster` with `--output` and `--set namespace=... --set name=...`, writing a nonsecret read-only cluster inventory to `quorivio-cluster-discovery.json`. It does not read Secret values, mutate Kubernetes, or regenerate credentials in inspection mode. It is a discovery foundation **not** an auto-apply or complete reconciliation feature; never apply full generated installation manifests to an existing cluster without manual approval and Secret/PVC preservation.
+
+CLI example: `python3 tools/k8s_wizard.py --inspect-cluster --output ./quorivio-inspection --set namespace=quorivio --set name=quorivio`.
+
+**Certified 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. RC138 remains uncommitted with new GitHub CI and independent acceptance pending. No assistant commit/push/release.
+
+---
+
 # Quorivio 0.1.0-dev — RC137 handoff — Private presenter projection and canvas upload (2 November 2026)
 
 **RC135 ultima baseline CI completa verde** (`41437489546`); **RC136+RC137 committati** (`f2dd75030c07e3d948b14b2ec4c51e9c2cf9e34a`), ma la CI `41473679963` ha fallito in `tsc` su un test Node sotto `apps/web/src`. Hotfix: test trasferito in `apps/web/test` (già eseguita dalla CI), senza modificare il codice applicativo. Risposte partecipanti isolate da widget e domande sullo schermo reale e nella prova affiancata; risultati e statistiche mostrati soltanto su richiesta esplicita del presentatore. Migliorata segnalazione del motivo HTTP del fallimento nel caricamento background e compatibilità MIME JPEG, senza bypass di antivirus o controllo formati. Nuovo preflight RC137; CI GitHub hotfix da verificare dopo la correzione. **Certificato 85.25%** (43 accepted /17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Dettagli in `docs/RC_CYCLE137_PRESENTER_PRIVACY_BACKGROUND.en.md`. Nessun commit/push/pubblicazione.

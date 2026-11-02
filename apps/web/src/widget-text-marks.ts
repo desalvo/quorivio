@@ -87,3 +87,38 @@ export function scaleWidgetFont(widget:{style?:{fontSize?:number};textMarks?:Tex
   ...mark,style:mark.style.fontSize===undefined?mark.style:{...mark.style,fontSize:Math.max(10,Math.min(96,Math.round(mark.style.fontSize*factor)))}
  }))};
 }
+
+/** A whole-widget typography change keeps all authored relative size differences.
+ * Text options, answer field and submit text inherit the same proportional factor.
+ * Persist only server-approved fields; never turn a multi-size widget into one size.
+ */
+export function scaleAllWidgetTypography(widget:{style?:{fontSize?:number;answerFontSize?:number;submitButtonSize?:number};textMarks?:TextMark[]},factor:number){
+ if(!Number.isFinite(factor)||factor<=0)return {style:{...(widget.style||{})},textMarks:widget.textMarks||[]};
+ const scale=(size:number,min:number,max:number)=>Math.max(min,Math.min(max,Math.round(size*factor)));
+ return {style:{...(widget.style||{}),fontSize:scale(widget.style?.fontSize??16,10,96),
+  answerFontSize:scale(widget.style?.answerFontSize??widget.style?.fontSize??16,10,96),
+  ...(widget.style?.submitButtonSize?{submitButtonSize:scale(widget.style.submitButtonSize,12,40)}:{})},
+  textMarks:(widget.textMarks||[]).map(mark=>({...mark,style:mark.style.fontSize===undefined?mark.style:
+    {...mark.style,fontSize:scale(mark.style.fontSize,10,96)}}))};
+}
+
+/** Apply formatting to a chosen field without accidentally applying it to the
+ * entire widget. An empty caret selection formats the complete field. */
+export function formatSelectedOrEntireField(marks:TextMark[],field:string,text:string,range:{start:number;end:number}|null,style:InlineStyle):TextMark[]{
+ if(!text||text.length>500)return marks;
+ const from=range&&range.end>range.start?range.start:0;
+ const to=range&&range.end>range.start?range.end:text.length;
+ return applySelectionInlineStyle(marks,field,text,from,to,style);
+}
+
+/** Apply whole-widget font/color changes across existing inline overrides too,
+ * including independent subquestions and response-option marks. */
+export function applyAllWidgetTypeface(widget:{style?:Record<string,unknown>;textMarks?:TextMark[]},change:InlineStyle){
+ const style={...(widget.style||{}),...change};
+ if(change.fontFamily!==undefined)style.answerFontFamily=change.fontFamily;
+ if(change.color!==undefined)style.answerColor=change.color;
+ if(change.bold!==undefined)style.answerBold=change.bold;
+ if(change.italic!==undefined)style.answerItalic=change.italic;
+ const marks=(widget.textMarks||[]).map(mark=>({...mark,style:{...mark.style,...change}}));
+ return {style,textMarks:marks};
+}

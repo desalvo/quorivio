@@ -19,7 +19,8 @@ class FrontendCompilerHotfix(unittest.TestCase):
         cls.workflow = CI.read_text(encoding='utf8')
 
     def test_pending_text_style_guards_both_nullable_properties(self):
-        self.assertRegex(self.source, r'previous\?\.id===w\.id&&previous\?\.field===sel\.field\?previous\.style:\{\}')
+        self.assertIn('if(pending!==null&&pending.id===widget.id&&pending.field===field)',self.source)
+        self.assertIn('pendingTextStyle.current=null',self.source)
         self.assertNotIn('previous?.id===w.id&&previous.field===sel.field', self.source)
 
     def test_presenter_navigation_recovers_using_the_component_state_setter(self):

@@ -47,6 +47,13 @@ export function rowsFromWidgetAnswerDetail(source:StatisticalWidget,data:any,que
  if(!part)return [];
  const counts=new Map<string,number>();
  for(const rev of data?.revisions||[])for(const [id,count] of Object.entries(rev.options||{}))counts.set(id,(counts.get(id)||0)+Number(count));
+ if((part.answerMode==='text'||(!part.answerMode&&!part.options?.length))&&source.kind==='question'){
+  const aggregate=Array.isArray(data?.text_counts)?data.text_counts:[];
+  const shortRows:StatRow[]=aggregate.filter((x:any)=>typeof x.word==='string'&&x.word.length<=48&&Number.isSafeInteger(x.count)&&x.count>0).slice(0,100).map((x:any)=>({id:'text:'+x.word,label:x.word,count:x.count}));
+  if(shortRows.length)return shortRows;
+  const total=(data?.revisions||[]).reduce((sum:number,revision:any)=>sum+(Number(revision.texts)||0),0);
+  return total>0?[{id:'total-text',label:'Risposte testuali',count:total}]:[];
+ }
  return (part.options||[]).map(o=>({id:o.id,label:o.label,count:counts.get(o.id)||0}));
 }
 

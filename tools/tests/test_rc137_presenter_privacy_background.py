@@ -9,13 +9,14 @@ ERRORS=(ROOT/'apps/web/src/background-upload-error.ts').read_text()
 CSS=(ROOT/'apps/web/src/style.css').read_text()
 
 class RC137PresenterPrivacyAndBackground(unittest.TestCase):
- def test_live_projection_requires_presenter_action_before_live_results(self):
+ def test_live_projection_scopes_aggregates_to_authored_result_widget(self):
   projection=SRC.split('function PresenterPageResults(')[1].split('function AudienceExtensions(')[0]
   canvas=projection.split('className="projection-page-content"')[1].split('<SlideCanvasNumber')[0]
-  self.assertIn('className="projection-results-widget-trigger"',canvas)
-  self.assertNotIn('<PresenterLinkedResult',canvas)
+  self.assertIn('<PresenterLinkedResult sessionId={sessionId}',canvas)
+  self.assertNotIn('widget-answers/detail',canvas)
+  self.assertIn("w.kind==='results-button'",canvas)
   result_block=projection.split('{visible&&<div id="presenter-page-results"')[1]
-  self.assertIn('<PresenterLinkedResult key={w.id}',result_block)
+  self.assertNotIn('<PresenterLinkedResult key={w.id}',result_block)
   self.assertIn('aria-expanded={visible}',projection)
   self.assertIn('onClick={()=>setVisible(v=>!v)}',projection)
  def test_rehearsal_drafts_and_choices_are_never_mirrored_into_presenter(self):
@@ -23,7 +24,8 @@ class RC137PresenterPrivacyAndBackground(unittest.TestCase):
   self.assertIn("const answer=viewer==='participant'?responses[w.id]:undefined",rehearsal)
   self.assertIn("const current=viewer==='participant'?responses[key]:undefined",rehearsal)
   self.assertIn("const sent=viewer==='participant'&&submittedAnswers[key]!==undefined",rehearsal)
-  self.assertIn('className="projection-results-widget-trigger"',rehearsal)
+  self.assertIn('<LinkedResultChart widget={w} widgets={widgets}',rehearsal)
+  self.assertIn("viewer==='presenter'||!['results-button'",rehearsal)
   self.assertIn('demoResultsVisible&&<section id="rehearsal-simulated-results"',rehearsal)
   self.assertIn('setDemoResultsVisible(false)',rehearsal)
  def test_real_projection_question_parts_remain_read_only(self):
