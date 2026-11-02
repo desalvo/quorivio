@@ -1,4 +1,6 @@
-# Quorivio RC128 — handoff: uniformità anteprime e ripristino sessione
+# Quorivio RC129 — Handoff test Chromium ripristino dopo reload
+
+**RC129 — esito CI:** la run GitHub `41389141345` è fallita nel test Chromium dopo reload: il test tentava di riaprire la sessione dietro l'editor già ripristinato, la cui miniatura intercettava legittimamente il clic. RC129 attende l'editor recuperato e verifica pagina attiva, quattro widget salvati e persistenza della sessione nella scheda. Aggiunto test preventivo nella CI, senza forzare clic né cambiare codice applicativo o sicurezza della pubblicazione. Test browser reale e CI complessiva RC129 da rieseguire. **Completamento certificato 85,25%**; `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
 
 **Verifiche locali dell’hotfix:** suite Python completa: 1.666 test, 1.665 superati, 1 saltato e nessun errore; frontend Node: 185/185 superati. Corretti i contratti storici RC89, RC91 e RC124; invariati logica applicativa, pubblicazione Docker e punteggio RC. Serve una nuova CI GitHub verde. `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
 

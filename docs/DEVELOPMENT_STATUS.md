@@ -1,4 +1,6 @@
-# Quorivio 0.1.0-dev — RC128 — Screenshot-driven editor/rehearsal parity and recovery (2 November 2026)
+# Quorivio 0.1.0-dev — RC129 — Chromium editor reload acceptance recovery (2 November 2026)
+
+**RC129 CI update (GitHub run `41389141345`, commit `9411373f644f1e4fdc1246a02a1c3bd4c8be28ac`):** RC128 source-contract preflights, frontend build and unit checks progressed, but `Chromium editor UI acceptance` failed after a successful autosave and browser reload. RC128 restores the active authenticated session and editor automatically; the historical acceptance script attempted to click `Apri sessione` behind the already open editor, which correctly intercepts pointer events. RC129 updates the real Chromium regression to require the restored editor, selected page and four saved widgets and verify the per-tab persisted session/page identifiers. No forced clicks, product CSS/JS behavior, publish permissions or security gates changed. Local contract tests passed; GitHub Chromium/complete CI must be rerun. **Certified 85.25%** (43 accepted, 17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
 
 **Current local hotfix verification:** Full Python suite 1,666 tests: 1,665 passed, 1 skipped, 0 failed; 185/185 frontend Node tests passed. Corrected RC89, RC91 and RC124 legacy source contracts; app logic, Docker publication and current release gate scoring unchanged. GitHub still requires a fresh successful run. `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
 

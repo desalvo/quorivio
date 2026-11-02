@@ -1,4 +1,6 @@
-# Quorivio RC128 — handoff: editor/preview parity and session recovery
+# Quorivio RC129 — Chromium editor reload acceptance handoff
+
+**RC129 CI evidence:** GitHub workflow `41389141345` failed at the Chromium editor UI test after reload: the restored editor's selected thumbnail intercepted a stale dashboard `Apri sessione` click. This is expected protection, because RC128 deliberately restores the authenticated page. The Chromium test now waits for the restored editor and requires its active thumbnail, exact four saved widgets, session and page continuity. New early CI regression tests cover this, preserving real pointer safety and strict release flags. The real browser and full GitHub gate remain unverified on RC129. **Certified completion 85.25%**; `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
 
 **Current local hotfix verification:** Full Python suite 1,666 tests: 1,665 passed, 1 skipped, 0 failed; 185/185 frontend Node tests passed. Corrected RC89, RC91 and RC124 legacy source contracts; app logic, Docker publication and current release gate scoring unchanged. GitHub still requires a fresh successful run. `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
 

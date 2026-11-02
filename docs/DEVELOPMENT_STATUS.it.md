@@ -1,4 +1,6 @@
-# Quorivio 0.1.0-dev — RC128 — Uniformità anteprime, ripristino e collisioni (2 novembre 2026)
+# Quorivio 0.1.0-dev — RC129 — Correzione test Chromium del ripristino editor (2 novembre 2026)
+
+**Hotfix CI RC129 (run GitHub `41389141345`, commit `9411373f644f1e4fdc1246a02a1c3bd4c8be28ac`):** le verifiche storiche RC128 e la build sono avanzate, ma il test Chromium si arresta dopo un autosalvataggio e un reload. RC128 ripristina già la sessione autenticata e l'editor: il test precedente tentava di cliccare «Apri sessione» nella dashboard dietro l'editor, che correttamente intercetta il puntatore. RC129 verifica direttamente la pagina editor ripristinata, i quattro widget salvati e gli identificatori di sessione/pagina nello stato della scheda; nessun clic forzato né modifiche al codice applicativo, alla pubblicazione Docker o ai gate di sicurezza. Test di contratto locali verdi; Chromium e CI GitHub completi ancora da rieseguire. **Completamento certificato 85,25%** (43 gate accettati, 17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
 
 **Verifiche locali dell’hotfix:** suite Python completa: 1.666 test, 1.665 superati, 1 saltato e nessun errore; frontend Node: 185/185 superati. Corretti i contratti storici RC89, RC91 e RC124; invariati logica applicativa, pubblicazione Docker e punteggio RC. Serve una nuova CI GitHub verde. `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
 

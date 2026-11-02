@@ -338,11 +338,21 @@ async def main():
    assert state['saves']==1 and len(state['widgets'])==4 and not state['drop_before'] and not state['drop_after'],state
    await expect(editor.get_by_text('Salvato automaticamente')).to_be_visible()
    await page.reload(wait_until='domcontentloaded')
-   await page.get_by_role('button',name='Apri sessione').first.click()
-   card=page.locator('details').filter(has=page.get_by_text('Browser acceptance',exact=True))
-   await card.locator('summary').click();await card.get_by_role('button',name='Apri sessione').click()
-   await page.get_by_role('button',name='✎ Modifica le pagine').first.click()
-   await expect(page.locator('.widget-canvas-item')).to_have_count(4)
+   await await_frontend_mount(page,errors)
+   # RC129: RC128 intentionally restores the authenticated session, selected tab
+   # and open page editor after a browser reload. Re-opening from the dashboard
+   # is an obsolete action: the restored editor is above the sidebar and must
+   # correctly intercept clicks on background controls (GitHub 41389141345).
+   # Test the actual restored state; never force-click or disable pointer safety.
+   editor=page.get_by_role('region',name='Editor grafico delle pagine')
+   await expect(editor).to_be_visible(timeout=30000)
+   await expect(editor.get_by_role('button',name='Esci',exact=True)).to_be_visible()
+   await expect(editor.locator('.page-editor-thumb-row.is-active')).to_have_count(1)
+   await expect(editor.locator('.page-editor-thumb-row.is-active .page-editor-thumb')).to_have_attribute('aria-current','page')
+   await expect(editor.locator('.widget-canvas-item')).to_have_count(4)
+   recovered=await page.evaluate("() => JSON.parse(sessionStorage.getItem('quorivio.workspace.v1') || '{}')")
+   assert recovered.get('sessionId')==SESSION and recovered.get('pageId')==ACTIVITY, (
+       'Reload lost the selected authenticated session or editor page')
    # Import/export live only on the relevant thumbnail, never below the artboard.
    await page.get_by_role('button',name='Menu pagina 1: crea, duplica, elimina, sposta').click()
    async with page.expect_download() as info:
