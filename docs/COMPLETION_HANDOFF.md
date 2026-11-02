@@ -1,3 +1,37 @@
+# Quorivio 0.1.0-dev — RC125 — Native multiarch Docker publication (2 November 2026)
+
+**Root cause:** GitHub Docker Hub job `41361426087/attempts/2` reports `qemu: uncaught target signal 4 (Illegal instruction)` during ARM64 `npm install`; AMD64 finishes successfully. **Fix:** separate native Ubuntu AMD64 and ARM64 GitHub runners, push by digest only, validate both architectures and assemble/tags the manifest in a later protected job. Per-platform 35-minute and manifest 10-minute timeouts; no implicit publishing with `[full-ci]`. All previous authorization and CI acceptance conditions are retained. See `docs/RC_CYCLE125_NATIVE_DOCKER_PUBLISH.en.md`.
+
+**Evidence:** local workflow contracts and simulated Docker failure-injection PASS. Native hosted ARM64 build, authenticated Docker Hub push and final registry index **not yet verified**. **Certified completion: 85.25%** (43 accepted, 17 partial gates / 60). RC124 provisional **85.75%** engineering estimate remains unpromoted. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit, push or publication.
+
+**Cumulative commit since RC122 (RC123–RC125):** `Fix native multiarch Docker publication and improve editor media uploads and magnetic grid guides [full-ci]`.
+
+---
+
+# Quorivio 0.1.0-dev — RC124 — Smart alignment guides and absolute grid (2 November 2026)
+
+**CI baseline:** RC122 run `41350047731`, all 11 automatic campaign jobs succeeded; overall run was cancelled due to a stuck Docker publication. RC123 cumulative has not been committed yet.
+
+**RC124 functional work:** transient independent-axis magnetic alignment guides for page and master/scheme editing, visible absolute 5% grid and correct group bounding-box snapping, collision rejection, pointer transparency and no persisted guide state. See `docs/RC_CYCLE124_SMART_GUIDES_AND_GRID.en.md`.
+
+**Certified completion: 85.25%**, 43 accepted and 17 partial gates out of 60. **Local engineering estimate: 85.75% (+0.50 provisional)** only if the proposed narrow A1-SMART-GUIDES subgate passes the full CI and is formally accepted; the certified ledger is unchanged. `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+**Cumulative commit RC123–RC124:** `Unify safe editor image uploads, bound Docker publication, and add PowerPoint-like alignment guides with absolute grid snapping [full-ci]`. No commit, push or publication by the assistant.
+
+---
+
+# Quorivio 0.1.0-dev — RC123 — Editor media lifecycle and bounded Docker publication (2 November 2026)
+
+**Verified baseline:** GitHub run `41350047731`, commit `a97b80b8d09ebd1a6054111bf88326581e2cc80f`: **11/11 automatic RC jobs passed**, but the overall run ended cancelled because its Docker publication job stalled. Automated quality is verified; Docker Hub publication is not.
+
+**RC123:** unify safe filename-based MIME fallback for five editor media flows (Logo, backgrounds, asset library, fill images, converted image import). Add real browser file-chooser + disposable PostgreSQL persistence acceptance to CI, not yet GitHub-certified. Bound the explicit `[publish-docker]` job to 45 minutes while `[full-ci]` remains non-publishing. Details: `docs/RC_CYCLE123_MEDIA_PICKER_AND_PUBLISH_BOUNDARY.en.md`.
+
+**Certified completion:** **85.25%**, 43 accepted / 17 partial gates of 60; unchanged pending GitHub confirmation. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit, push, release or external publication.
+
+**Suggested commit since RC122:** `Unify safe editor image uploads and bound authorized multiarch Docker publication [full-ci]`.
+
+---
+
 # Quorivio 0.1.0-dev — RC122 — Historical browser and handoff acceptance recovery (1 November 2026)
 
 **Previous full CI:** `41347115255`, commit `993189dd67cd555825afdbbf77e7352e5148cde4`, passed frontend compilation, compiled Chromium and real PostgreSQL browser including JSON export. The late Python suite reported only two historical contract mismatches: mandatory adjacent browser command lines (new conflict visibility preflight sits between them) and an 85.25% score search limited to first 1,300 characters.

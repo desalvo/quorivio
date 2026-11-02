@@ -1755,5 +1755,23 @@
     "new_pptx_qr_local_only": true,
     "rc_strict": false,
     "docker_published_by_run": false
+  },
+  "rc124_local_progress_proposal_20261102": {
+    "scope": "A1 PowerPoint-like alignment of page and scheme widgets: magnetic visual guides and absolute 5% grid for group movement",
+    "baseline_certified_score": 85.25,
+    "local_engineering_estimate": 85.75,
+    "proposed_reconciliation": {
+      "original_parent": "A1",
+      "parent_current_weight": 2,
+      "parent_current_status": "partial",
+      "post_review_parent_weight": 1,
+      "new_technical_subgate_id": "A1-SMART-GUIDES",
+      "new_technical_subgate_weight": 1,
+      "local_evidence": "RC124 Node geometry regression and actual Chromium CSS/pointer geometry at 1440/390 px",
+      "new_gate_status": "PENDING full GitHub CI, compiled React pointer acceptance and independent operator review",
+      "arithmetic": "A1 parent 2 partial -> parent 1 partial + new 1 accepted = +0.50 points, conditional only"
+    },
+    "scoring_policy": "Proposal is NOT an accepted gate. The certified 60-gate ledger remains unchanged until test review and Github success.",
+    "commit_status": "Uncommitted local cycle; no publication."
   }
 }

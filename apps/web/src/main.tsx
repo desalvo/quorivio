@@ -10,7 +10,7 @@ import {widgetArtData,widgetTimerFace,type WidgetTimerFace} from './widget-art.j
 import {styledSegments,inlineMarkCss,formatTextRange,remapMarks,changedRegion,inlineKeys,applySelectionInlineStyle,selectionUniformValue,scaleWidgetFont,type InlineStyle,type TextMark} from './widget-text-marks.js';
 import {RichWidgetText} from './widget-rich-editor.js';
 import {eligibleStatisticSources,linkedStatisticSource,effectiveResultView,sampleStatisticRows,rehearsalFreeTextRows,rowsFromWidgetAnswerDetail,topicQuestionRows,REHEARSAL_EMOJIS,type StatRow} from './widget-results.js';
-import {rejectWidgetCollisions,magneticSnapWidget,freeWidgetPosition} from './widget-placement.js';
+import {rejectWidgetCollisions,magneticSnapWithGuides,snapWidgetGroupDelta,freeWidgetPosition} from './widget-placement.js';
 import {widgetGeometryStyle} from './widget-geometry';
 import {mediaUploadMime} from './widget-asset-upload';
 import {answerInputStyle,answerOptionStyle,answerSubmitStyle,requiresAnswerSubmit} from './widget-answer-style';
@@ -665,6 +665,7 @@ function WidgetCanvas({widgets,onChange,pageTitle="",sessionTitle="",pageNumber=
   patch(widget.id,{...changes,textMarks:marks});
  };
  const [snapGrid,setSnapGrid]=useState(false);
+ const [alignmentGuides,setAlignmentGuides]=useState<{axis:'x'|'y';at:number;source:'canvas'|'widget'}[]>([]);
  const [contextWidget,setContextWidget]=useState<string|null>(null);
  const [contextPoint,setContextPoint]=useState({x:12,y:12});
  // Preserve ownership from the genuine secondary-pointer down: browsers can
@@ -819,6 +820,7 @@ function WidgetCanvas({widgets,onChange,pageTitle="",sessionTitle="",pageNumber=
   const edge=(e.target as HTMLElement).closest('[data-resize-edge]')?.getAttribute('data-resize-edge')||'';
   const rotate=!!(e.target as HTMLElement).closest('[data-rotate-handle]');
   const p=w.position||{x:0,y:0,width:48,height:24};
+  setAlignmentGuides([]);
   onBeginGesture?.();
   const groupIds=!rotate&&!edge&&selectedWidgets.includes(w.id)?selectedWidgets:[w.id];
   gesture.current={id:w.id,pointerId:e.pointerId,mode:rotate?'rotate':edge?'resize':'move',edge,startX:e.clientX,startY:e.clientY,pos:{x:p.x,y:p.y,width:p.width,height:p.height??24,rotation:p.rotation??0},groupIds,groupBase:structuredClone(widgets)};
@@ -832,9 +834,19 @@ function WidgetCanvas({widgets,onChange,pageTitle="",sessionTitle="",pageNumber=
   if(g.mode==='rotate'){const cx=b.left+(g.pos.x+g.pos.width/2)*b.width/100,cy=b.top+(g.pos.y+g.pos.height/2)*b.height/100;const angle=Math.atan2(e.clientY-cy,e.clientX-cx)*180/Math.PI;const next=(g.pos.rotation??0)+(angle-(g.startAngle??angle));patch(g.id,{position:{...g.pos,rotation:+Math.max(-360,Math.min(360,next)).toFixed(4)}});return}
   if(g.mode==='move'){
    const base=g.groupBase||widgets,ids=g.groupIds||[g.id];
-   let moved=moveWidgetGroup(base,ids,snap(dx),snap(dy));
-   if(ids.length===1){const candidate=moved.find(w=>w.id===g.id);if(candidate)moved=moved.map(w=>w.id===g.id?magneticSnapWidget(candidate,base.filter(z=>z.id!==g.id)):w)}
-   onChange(rejectWidgetCollisions(base,moved,ids));return;
+   const delta=snapGrid?snapWidgetGroupDelta(base,ids,dx,dy):{dx,dy};
+   let moved=moveWidgetGroup(base,ids,delta.dx,delta.dy);
+   let guides:typeof alignmentGuides=[];
+   if(!snapGrid&&ids.length===1){
+    const candidate=moved.find(w=>w.id===g.id);
+    if(candidate){const aligned=magneticSnapWithGuides(candidate,base.filter(z=>z.id!==g.id));
+     guides=aligned.guides;moved=moved.map(w=>w.id===g.id?aligned.widget:w);
+    }
+   }
+   const accepted=rejectWidgetCollisions(base,moved,ids);
+   // Never show a successful snap if collision safety rejected the movement.
+   setAlignmentGuides(accepted===moved?guides:[]);
+   onChange(accepted);return;
   }
   else {
    if(g.edge.includes('e'))width=clamp(width+dx,0.01,100-x);
@@ -872,8 +884,8 @@ function WidgetCanvas({widgets,onChange,pageTitle="",sessionTitle="",pageNumber=
   if(!e.altKey&&!e.shiftKey&&selectedWidgets.length>1&&selectedWidgets.includes(w.id))nudgeSelected(horizontal?direction:0,horizontal?0:direction);
   else onChange(rejectWidgetCollisions(widgets,widgets.map(item=>item.id===w.id?{...item,position,autoFit:e.shiftKey?false:item.autoFit}:item),[w.id]));
  }
- function end(e:React.PointerEvent<HTMLDivElement>){if(gesture.current?.pointerId===e.pointerId){gesture.current=null;onEndGesture?.()}} // Keep the selected widget active so its properties editor remains usable after pointer release.
- function cancelGesture(e:React.PointerEvent<HTMLDivElement>){const g=gesture.current;if(!g||g.pointerId!==e.pointerId)return;onChange(g.groupBase||widgets);gesture.current=null;onEndGesture?.()}
+ function end(e:React.PointerEvent<HTMLDivElement>){if(gesture.current?.pointerId===e.pointerId){gesture.current=null;setAlignmentGuides([]);onEndGesture?.()}} // Keep the selected widget active so its properties editor remains usable after pointer release.
+ function cancelGesture(e:React.PointerEvent<HTMLDivElement>){const g=gesture.current;if(!g||g.pointerId!==e.pointerId)return;onChange(g.groupBase||widgets);gesture.current=null;setAlignmentGuides([]);onEndGesture?.()}
  const nudge=(w:any,axis:'x'|'y',amount:number)=>{const p=w.position||{x:0,y:0,width:48,height:24,rotation:0};const width=p.width??48,height=p.height??24;patch(w.id,{position:{...p,[axis]:+clamp((p[axis]??0)+amount,0,100-(axis==='x'?width:height)).toFixed(1)}})};
  const edges=['n','ne','e','se','s','sw','w','nw'];
  const selectedQuestion=widgets.find(w=>w.id===active&&['question','timed-quiz','topic-question'].includes(w.kind));
@@ -904,7 +916,7 @@ function WidgetCanvas({widgets,onChange,pageTitle="",sessionTitle="",pageNumber=
  else if(key==='c'&&active){e.preventDefault();copySelectedWidget()}
  else if(key==='x'&&active){e.preventDefault();cutSelectedWidget()}
  else if(key==='v'&&copiedWidgets.length){e.preventDefault();pasteCopiedWidget()}
-}}>{onBackgroundUpload&&<input ref={backgroundFileRef} style={{display:"none"}} aria-hidden="true" tabIndex={-1} type="file" accept="image/png,image/jpeg,image/gif,image/webp" disabled={assetBusy||backgroundUploading} onChange={e=>{const file=e.currentTarget.files?.[0];e.currentTarget.value="";if(!file)return;setBackgroundMenu(true);setBackgroundUploading(true);setBackgroundUploadStatus('Caricamento dello sfondo e applicazione alla pagina…');void onBackgroundUpload(file).then(applied=>{if(applied){setBackgroundUploadStatus('Sfondo caricato e applicato.');setBackgroundMenu(false)}else setBackgroundUploadStatus('Caricamento non riuscito: controlla il messaggio di errore e riprova.')}).catch(error=>{setBackgroundUploadStatus('Caricamento non riuscito: '+String(error))}).finally(()=>setBackgroundUploading(false))}}/>} {contextWidget&&!onInspectWidget&&<div className="canvas-context-properties">{questionEditor}{cropEditor}{shapePaintEditor}</div>}<div className="canvas-editor-tools"><label><input type="checkbox" checked={snapGrid} onChange={e=>setSnapGrid(e.target.checked)}/> Aggancia alla griglia (5%)</label><button type="button" className="outline small" disabled={!active} onClick={copySelectedWidget}>Copia selezione</button><button type="button" className="outline small" disabled={!active} onClick={cutSelectedWidget}>Taglia selezione</button><button type="button" className="outline small" disabled={!copiedWidgets.length} onClick={pasteCopiedWidget}>Incolla selezione</button><button type="button" className="outline small" disabled={!groupSelection().length} onClick={duplicateSelected}>Duplica selezione</button><button type="button" className="outline small" disabled={!groupSelection().length} onClick={deleteSelected}>Elimina selezione</button><span>Ctrl/Cmd+A seleziona tutti · Maiusc+clic seleziona più widget · trascina la selezione insieme · Ctrl/Cmd+C, X, V, D</span></div><div className="canvas-editor-tools" role="group" aria-label="Allineamento widget selezionati"><strong>{selectedWidgets.length} selezionati</strong>{([['left','Sinistra'],['center-x','Centro orizzontale'],['right','Destra'],['top','Alto'],['center-y','Centro verticale'],['bottom','Basso'],['same-width','Stessa larghezza'],['same-height','Stessa altezza'],['distribute-x','Distribuisci orizzontalmente'],['distribute-y','Distribuisci verticalmente'],['space-x','Spazi orizzontali uguali'],['space-y','Spazi verticali uguali'],['canvas-center-x','Centra selezione nel canvas orizzontalmente'],['canvas-center-y','Centra selezione nel canvas verticalmente'],['canvas-left','Allinea al bordo sinistro della pagina'],['canvas-right','Allinea al bordo destro della pagina'],['canvas-top','Allinea al bordo alto della pagina'],['canvas-bottom','Allinea al bordo basso della pagina']] as [ArrangeMode,string][]).map(([mode,label])=><button key={mode} type="button" className="outline small" disabled={selectedWidgets.length<(mode.startsWith('canvas-')?1:mode.startsWith('distribute')||mode.startsWith('space')?3:2)} onClick={()=>arrangeSelected(mode)}>{label}</button>)}<button type="button" className="outline small" disabled={!selectedWidgets.length} onClick={()=>{setSelectedWidgets([]);setActive(null)}}>Deseleziona</button><div className="canvas-editor-tools" role="group" aria-label="Ordine e spostamento widget selezionati"><button type="button" className="outline small" disabled={!selectedWidgets.length} onClick={()=>layerSelected('front')}>Porta selezione davanti</button><button type="button" className="outline small" disabled={!selectedWidgets.length} onClick={()=>layerSelected('back')}>Porta selezione dietro</button><button type="button" className="outline small" disabled={!selectedWidgets.length} onClick={()=>layerSelected('forward')}>Un livello avanti</button><button type="button" className="outline small" disabled={!selectedWidgets.length} onClick={()=>layerSelected('backward')}>Un livello indietro</button><button type="button" className="outline small" disabled={!selectedWidgets.length} onClick={()=>nudgeSelected(-1,0)} aria-label="Sposta selezione a sinistra">←</button><button type="button" className="outline small" disabled={!selectedWidgets.length} onClick={()=>nudgeSelected(1,0)} aria-label="Sposta selezione a destra">→</button><button type="button" className="outline small" disabled={!selectedWidgets.length} onClick={()=>nudgeSelected(0,-1)} aria-label="Sposta selezione in alto">↑</button><button type="button" className="outline small" disabled={!selectedWidgets.length} onClick={()=>nudgeSelected(0,1)} aria-label="Sposta selezione in basso">↓</button></div></div><div className="canvas-with-rulers"><div className="canvas-ruler-horizontal" aria-hidden="true">{Array.from({length:11},(_,i)=><span key={i}>{i*10}</span>)}</div><div className="canvas-ruler-vertical" aria-hidden="true">{Array.from({length:11},(_,i)=><span key={i}>{i*10}</span>)}</div><div className="widget-canvas" ref={ref} role="group" aria-label="Canvas grafico widget" style={{"--editor-page-background":backgroundAssetId&&sessionId?`url(/api/sessions/${sessionId}/assets/${backgroundAssetId})`:"none"} as React.CSSProperties} onClick={e=>{if(e.target===e.currentTarget){setSelectedWidgets([]);setActive(null);setEditing(null);setContextWidget(null)}}} onContextMenuCapture={handleCanvasContext} onPointerDownCapture={e=>{
+}}>{snapGrid&&<div className="widget-snap-grid" aria-hidden="true"/>}{alignmentGuides.length>0&&<div className="widget-alignment-guides" aria-hidden="true">{alignmentGuides.map(g=><span key={g.axis} className={"widget-alignment-guide axis-"+g.axis} data-guide-source={g.source} style={g.axis==='x'?{left:g.at+'%'}:{top:g.at+'%'}}/>)}</div>}{onBackgroundUpload&&<input ref={backgroundFileRef} style={{display:"none"}} aria-hidden="true" tabIndex={-1} type="file" accept="image/png,image/jpeg,image/gif,image/webp" disabled={assetBusy||backgroundUploading} onChange={e=>{const file=e.currentTarget.files?.[0];e.currentTarget.value="";if(!file)return;setBackgroundMenu(true);setBackgroundUploading(true);setBackgroundUploadStatus('Caricamento dello sfondo e applicazione alla pagina…');void onBackgroundUpload(file).then(applied=>{if(applied){setBackgroundUploadStatus('Sfondo caricato e applicato.');setBackgroundMenu(false)}else setBackgroundUploadStatus('Caricamento non riuscito: controlla il messaggio di errore e riprova.')}).catch(error=>{setBackgroundUploadStatus('Caricamento non riuscito: '+String(error))}).finally(()=>setBackgroundUploading(false))}}/>} {contextWidget&&!onInspectWidget&&<div className="canvas-context-properties">{questionEditor}{cropEditor}{shapePaintEditor}</div>}<div className="canvas-editor-tools"><label><input type="checkbox" checked={snapGrid} onChange={e=>setSnapGrid(e.target.checked)}/> Aggancia alla griglia (5%)</label><button type="button" className="outline small" disabled={!active} onClick={copySelectedWidget}>Copia selezione</button><button type="button" className="outline small" disabled={!active} onClick={cutSelectedWidget}>Taglia selezione</button><button type="button" className="outline small" disabled={!copiedWidgets.length} onClick={pasteCopiedWidget}>Incolla selezione</button><button type="button" className="outline small" disabled={!groupSelection().length} onClick={duplicateSelected}>Duplica selezione</button><button type="button" className="outline small" disabled={!groupSelection().length} onClick={deleteSelected}>Elimina selezione</button><span>Ctrl/Cmd+A seleziona tutti · Maiusc+clic seleziona più widget · trascina la selezione insieme · Ctrl/Cmd+C, X, V, D</span></div><div className="canvas-editor-tools" role="group" aria-label="Allineamento widget selezionati"><strong>{selectedWidgets.length} selezionati</strong>{([['left','Sinistra'],['center-x','Centro orizzontale'],['right','Destra'],['top','Alto'],['center-y','Centro verticale'],['bottom','Basso'],['same-width','Stessa larghezza'],['same-height','Stessa altezza'],['distribute-x','Distribuisci orizzontalmente'],['distribute-y','Distribuisci verticalmente'],['space-x','Spazi orizzontali uguali'],['space-y','Spazi verticali uguali'],['canvas-center-x','Centra selezione nel canvas orizzontalmente'],['canvas-center-y','Centra selezione nel canvas verticalmente'],['canvas-left','Allinea al bordo sinistro della pagina'],['canvas-right','Allinea al bordo destro della pagina'],['canvas-top','Allinea al bordo alto della pagina'],['canvas-bottom','Allinea al bordo basso della pagina']] as [ArrangeMode,string][]).map(([mode,label])=><button key={mode} type="button" className="outline small" disabled={selectedWidgets.length<(mode.startsWith('canvas-')?1:mode.startsWith('distribute')||mode.startsWith('space')?3:2)} onClick={()=>arrangeSelected(mode)}>{label}</button>)}<button type="button" className="outline small" disabled={!selectedWidgets.length} onClick={()=>{setSelectedWidgets([]);setActive(null)}}>Deseleziona</button><div className="canvas-editor-tools" role="group" aria-label="Ordine e spostamento widget selezionati"><button type="button" className="outline small" disabled={!selectedWidgets.length} onClick={()=>layerSelected('front')}>Porta selezione davanti</button><button type="button" className="outline small" disabled={!selectedWidgets.length} onClick={()=>layerSelected('back')}>Porta selezione dietro</button><button type="button" className="outline small" disabled={!selectedWidgets.length} onClick={()=>layerSelected('forward')}>Un livello avanti</button><button type="button" className="outline small" disabled={!selectedWidgets.length} onClick={()=>layerSelected('backward')}>Un livello indietro</button><button type="button" className="outline small" disabled={!selectedWidgets.length} onClick={()=>nudgeSelected(-1,0)} aria-label="Sposta selezione a sinistra">←</button><button type="button" className="outline small" disabled={!selectedWidgets.length} onClick={()=>nudgeSelected(1,0)} aria-label="Sposta selezione a destra">→</button><button type="button" className="outline small" disabled={!selectedWidgets.length} onClick={()=>nudgeSelected(0,-1)} aria-label="Sposta selezione in alto">↑</button><button type="button" className="outline small" disabled={!selectedWidgets.length} onClick={()=>nudgeSelected(0,1)} aria-label="Sposta selezione in basso">↓</button></div></div><div className="canvas-with-rulers"><div className="canvas-ruler-horizontal" aria-hidden="true">{Array.from({length:11},(_,i)=><span key={i}>{i*10}</span>)}</div><div className="canvas-ruler-vertical" aria-hidden="true">{Array.from({length:11},(_,i)=><span key={i}>{i*10}</span>)}</div><div className="widget-canvas" ref={ref} role="group" aria-label="Canvas grafico widget" style={{"--editor-page-background":backgroundAssetId&&sessionId?`url(/api/sessions/${sessionId}/assets/${backgroundAssetId})`:"none"} as React.CSSProperties} onClick={e=>{if(e.target===e.currentTarget){setSelectedWidgets([]);setActive(null);setEditing(null);setContextWidget(null)}}} onContextMenuCapture={handleCanvasContext} onPointerDownCapture={e=>{
   contextPointer.current=null;
   if(e.button!==2)return;
   const canvas=e.currentTarget;
@@ -1228,19 +1240,21 @@ useLive(entry?.session?.id,(s)=>{
 async function refreshAssets(){if(!selected)return;try{const [files,library]=await Promise.all([request<any[]>(`/sessions/${selected}/assets`),request<any[]>(`/sessions/${selected}/backgrounds`)]);setAssets(files);setBackgrounds(library)}catch(e){notify(e)}}
 useEffect(()=>{if(selected){void refreshAssets()}else{setAssets([]);setBackgrounds([])}},[selected]);
 async function uploadAsset(file:File|undefined){if(!file||!selected)return;setAssetBusy(true);try{
- const allowed=['image/png','image/jpeg','image/gif','image/webp','application/pdf','video/mp4','video/webm'];
- if(!allowed.includes(file.type))throw Error('Formato non supportato');
- // The server enforces the administrator's configured size limit.
- const res=await fetch(`/api/sessions/${selected}/assets`,{method:'POST',credentials:'include',headers:{'Content-Type':file.type},body:file});
+ const mime=mediaUploadMime(file,'asset');
+ if(!mime)throw Error('Formato non supportato: JPG, PNG, GIF, WebP, PDF, MP4 o WebM.');
+ // Use the same extension fallback as Logo and page backgrounds; the server
+ // independently validates actual file bytes and the administrator's limit.
+ const res=await fetch(`/api/sessions/${selected}/assets`,{method:'POST',credentials:'include',headers:{'Content-Type':mime},body:file});
  if(!res.ok)throw Error(`Upload HTTP ${res.status}: ${await res.text()}`);
  await refreshAssets();setNotice(lang==='it'?'File caricato':'Asset uploaded');
  }catch(e){notify(e)}finally{setAssetBusy(false)}}
 async function uploadWidgetFillImage(widgetId:string,file:File|undefined){
  if(!file||!selected)return;
- if(!['image/png','image/jpeg','image/gif','image/webp'].includes(file.type)){setNotice('Il riempimento richiede PNG, JPEG, GIF o WebP.');return}
+ const mime=mediaUploadMime(file,'image');
+ if(!mime){setNotice('Il riempimento richiede PNG, JPEG, GIF o WebP.');return}
  setAssetBusy(true);
  try{
-  const r=await fetch(`/api/sessions/${selected}/assets`,{method:'POST',credentials:'include',headers:{'Content-Type':file.type},body:file});
+  const r=await fetch(`/api/sessions/${selected}/assets`,{method:'POST',credentials:'include',headers:{'Content-Type':mime},body:file});
   if(!r.ok)throw Error(`Upload riempimento HTTP ${r.status}`);
   const saved=await r.json();
   setPageWidgets(old=>old.map(w=>w.id===widgetId?{...w,style:{...w.style,fillMode:'image',fillNone:false,fillImageAssetId:saved.id}}:w));
@@ -1265,8 +1279,8 @@ async function selectLibraryBackground(id:string,forResults:boolean){
  }catch(e){notify(e)}finally{setAssetBusy(false)}
 }
 async function uploadBackground(file:File|undefined,forResults:boolean):Promise<boolean>{if(!file||!selected)return false;
- const mime=['image/png','image/jpeg','image/gif','image/webp'].includes(file.type)?file.type:(/\.jpe?g$/i.test(file.name)?'image/jpeg':/\.png$/i.test(file.name)?'image/png':/\.gif$/i.test(file.name)?'image/gif':/\.webp$/i.test(file.name)?'image/webp':'');
- if(!['image/png','image/jpeg','image/gif','image/webp'].includes(mime)){setNotice('Formato sfondo non supportato: usa JPG, PNG, GIF o WebP.');return false}
+ const mime=mediaUploadMime(file,'image');
+ if(!mime){setNotice('Formato sfondo non supportato: usa JPG, PNG, GIF o WebP.');return false}
  setAssetBusy(true);
  try{
   const r=await fetch(`/api/sessions/${selected}/backgrounds`,{method:'POST',credentials:'include',headers:{'Content-Type':mime},body:file});
@@ -1646,8 +1660,9 @@ async function importPresentationFile(file:File|undefined){
  }catch(e){notify(e)}finally{setAssetBusy(false)}
 }
 async function importSlideImages(files:FileList|null){if(!files?.length||!selected)return;if(files.length>100){setError('Massimo 100 immagini per importazione');return}setAssetBusy(true);try{let created=0;for(const [index,file] of Array.from(files).entries()){
-if(!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>100*1024*1024)throw Error(`Formato o dimensione non validi: ${file.name}`);
-const r=await fetch(`/api/sessions/${selected}/assets`,{method:'POST',credentials:'include',headers:{'Content-Type':file.type},body:file});
+const mime=mediaUploadMime(file,'image');
+if(!mime||!['image/png','image/jpeg','image/webp'].includes(mime)||file.size>100*1024*1024)throw Error(`Formato o dimensione non validi: ${file.name}`);
+const r=await fetch(`/api/sessions/${selected}/assets`,{method:'POST',credentials:'include',headers:{'Content-Type':mime},body:file});
 if(!r.ok)throw Error(`Upload pagina ${index+1}: HTTP ${r.status}`);
 const asset=await r.json();const title=file.name.replace(/\.[^.]+$/,'').slice(0,240)||`Slide ${index+1}`;
 await request(`/sessions/${selected}/slides`,'POST',{asset_id:asset.id,title});created++;

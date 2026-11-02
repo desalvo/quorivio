@@ -1702,3 +1702,23 @@ body > .rehearsal-backdrop {
 
 /* RC121: local page export errors must remain readable inside the open thumbnail menu. */
 .page-editor-thumb-menu .page-editor-export-error{margin:4px 8px;padding:6px 8px;max-width:240px;white-space:normal;overflow-wrap:anywhere;color:#ffd6d6;background:#581f2a;border:1px solid #f19da6;border-radius:6px;font-size:12px;line-height:1.4}
+
+/* RC124: transient PowerPoint-style magnetic guides. These are never part of
+ * the saved page and never intercept canvas, resizing or context-menu input. */
+.editor-ux-v2 .widget-canvas > .widget-alignment-guides,
+.slide-scheme-workspace .widget-canvas > .widget-alignment-guides{
+ position:absolute;inset:0;z-index:10;pointer-events:none;overflow:visible;
+}
+.widget-alignment-guide{position:absolute;display:block;pointer-events:none;border-color:#dc2772;filter:drop-shadow(0 0 1px #fff);}
+.widget-alignment-guide.axis-x{top:0;bottom:0;border-left:1px dashed #dc2772;transform:translateX(-.5px)}
+.widget-alignment-guide.axis-y{left:0;right:0;border-top:1px dashed #dc2772;transform:translateY(-.5px)}
+.widget-alignment-guide[data-guide-source="canvas"]{border-style:solid;border-color:#008dba}
+@media(prefers-contrast:more){.widget-alignment-guide{border-width:2px!important;filter:none}}
+
+.editor-ux-v2 .widget-canvas > .widget-snap-grid,
+.slide-scheme-workspace .widget-canvas > .widget-snap-grid{
+ position:absolute;inset:0;z-index:0;pointer-events:none;
+ background-image:linear-gradient(to right,rgba(8,132,168,.28) 1px,transparent 1px),linear-gradient(to bottom,rgba(8,132,168,.28) 1px,transparent 1px);
+ background-size:5% 5%;
+}
+@media(prefers-contrast:more){.widget-snap-grid{background-image:linear-gradient(to right,#00586b88 2px,transparent 2px),linear-gradient(to bottom,#00586b88 2px,transparent 2px)!important}}

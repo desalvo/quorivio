@@ -15,17 +15,60 @@ export function overlapsOtherWidgets<T extends Widget>(widgets:readonly T[],movi
 export function rejectWidgetCollisions<T extends Widget>(original:readonly T[],proposed:T[],movingIds:readonly string[]):T[]{
  return overlapsOtherWidgets(proposed,movingIds)?[...original]:proposed;
 }
-export function magneticSnapWidget<T extends Widget>(candidate:T,others:readonly T[],threshold=1.5):T{
- const box=rect(candidate);let bestX=box.x,bestY=box.y,dx=threshold+1,dy=threshold+1;
- for(const w of others){if(w.id===candidate.id)continue;const b=rect(w);
-  for(const x of [b.x,b.x+b.width,b.x-box.width,b.x+b.width-box.width]){
-   const d=Math.abs(x-box.x);if(d<=threshold&&d<dx){bestX=x;dx=d}
-  }
-  for(const y of [b.y,b.y+b.height,b.y-box.height,b.y+b.height-box.height]){
-   const d=Math.abs(y-box.y);if(d<=threshold&&d<dy){bestY=y;dy=d}
-  }
+/** Snap the actual selected bounding-box origin to slide grid coordinates.
+ * Rounding only the pointer delta left widgets permanently off-grid when they
+ * started at a non-grid position (e.g. 13% + 5% = 18%). */
+export function snapWidgetGroupDelta<T extends Widget>(widgets:readonly T[],ids:readonly string[],dx:number,dy:number,step=5):{dx:number;dy:number}{
+ if(!Number.isFinite(dx)||!Number.isFinite(dy)||!Number.isFinite(step)||step<=0)return {dx:0,dy:0};
+ const chosen=new Set(ids);const positions=widgets.filter(w=>chosen.has(w.id)).map(rect);
+ if(!positions.length)return {dx:0,dy:0};
+ const left=Math.min(...positions.map(p=>p.x)),top=Math.min(...positions.map(p=>p.y));
+ const right=Math.max(...positions.map(p=>p.x+p.width)),bottom=Math.max(...positions.map(p=>p.y+p.height));
+ if(![left,top,right,bottom].every(Number.isFinite))return {dx:0,dy:0};
+ return {dx:+(Math.max(-left,Math.min(100-right,Math.round((left+dx)/step)*step-left))).toFixed(4),
+         dy:+(Math.max(-top,Math.min(100-bottom,Math.round((top+dy)/step)*step-top))).toFixed(4)};
+}
+export type AlignmentGuide={axis:'x'|'y';at:number;source:'canvas'|'widget'};
+/** PowerPoint-like non-persistent alignment guides, computed with the snap itself.
+ * Each axis is chosen independently using a stable smallest-distance rule.
+ * Guides must never be stored in session JSON or affect undo history.
+ */
+export function magneticSnapWithGuides<T extends Widget>(candidate:T,others:readonly T[],threshold=1.5):{widget:T;guides:AlignmentGuide[]}{
+ if(candidate.position&&Object.values(candidate.position).some(v=>typeof v==='number'&&!Number.isFinite(v)))
+  return {widget:candidate,guides:[]};
+ const box=rect(candidate);
+ if(![box.x,box.y,box.width,box.height,threshold].every(Number.isFinite)||box.width<=0||box.height<=0||threshold<0)
+  return {widget:candidate,guides:[]};
+ type Match={delta:number;distance:number;guide:AlignmentGuide;priority:number};
+ const targetsX:[number,'canvas'|'widget'][]=[[0,'canvas'],[50,'canvas'],[100,'canvas']];
+ const targetsY:[number,'canvas'|'widget'][]=[[0,'canvas'],[50,'canvas'],[100,'canvas']];
+ // Compare only rectangles with meaningful dimensions, and never candidate itself.
+ for(const other of others){if(other.id===candidate.id)continue;const b=rect(other);
+  if(![b.x,b.y,b.width,b.height].every(Number.isFinite)||b.width<=0||b.height<=0)continue;
+  targetsX.push([b.x,'widget'],[b.x+b.width/2,'widget'],[b.x+b.width,'widget']);
+  targetsY.push([b.y,'widget'],[b.y+b.height/2,'widget'],[b.y+b.height,'widget']);
  }
- return {...candidate,position:{...candidate.position,x:Math.max(0,Math.min(100-box.width,bestX)),y:Math.max(0,Math.min(100-box.height,bestY))}} as T;
+ const match=(axis:'x'|'y',targets:[number,'canvas'|'widget'][],start:number,extent:number):Match|undefined=>{
+  const origin:[number,number][]=[[start,0],[start+extent/2,1],[start+extent,2]];
+  let best:Match|undefined;
+  for(const [target,source] of targets)for(const [edge,priority] of origin){const delta=target-edge,distance=Math.abs(delta);
+   if(distance>threshold||start+delta<-.0001||start+extent+delta>100.0001)continue;
+   const candidateMatch={delta,distance,guide:{axis,at:target,source} as AlignmentGuide,priority};
+   // Prefer exact boundaries, then centers, then existing widgets. Stable on ties.
+   if(!best||distance<best.distance-1e-8||(Math.abs(distance-best.distance)<1e-8&&
+       (priority<best.priority||(priority===best.priority&&source==='widget'&&best.guide.source==='canvas'))))best=candidateMatch;
+  }
+  return best;
+ };
+ const x=match('x',targetsX,box.x,box.width),y=match('y',targetsY,box.y,box.height);
+ if(!x&&!y&&box.x>=0&&box.x+box.width<=100&&box.y>=0&&box.y+box.height<=100)return {widget:candidate,guides:[]};
+ return {widget:{...candidate,position:{...candidate.position,
+  x:+Math.max(0,Math.min(100-box.width,box.x+(x?.delta||0))).toFixed(4),
+  y:+Math.max(0,Math.min(100-box.height,box.y+(y?.delta||0))).toFixed(4)}} as T,
+  guides:[...(x?[x.guide]:[]),...(y?[y.guide]:[])]};
+}
+export function magneticSnapWidget<T extends Widget>(candidate:T,others:readonly T[],threshold=1.5):T{
+ return magneticSnapWithGuides(candidate,others,threshold).widget;
 }
 /** Choose a free area, preferring the requested drop point, then nearby cells.
  * Return null if the slide has no free rectangle of the requested size. */

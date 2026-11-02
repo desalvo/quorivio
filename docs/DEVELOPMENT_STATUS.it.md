@@ -1,3 +1,37 @@
+# Quorivio 0.1.0-dev — RC125 — Pubblicazione Docker nativa senza QEMU (2 novembre 2026)
+
+**Diagnosi:** nel log del job Docker Hub `41361426087/attempts/2`, ARM64 tramite QEMU si blocca durante `npm install` con `Illegal instruction`, mentre AMD64 termina correttamente. **Intervento:** build separate su runner nativi `ubuntu-24.04` e `ubuntu-24.04-arm`, push per digest, verifica preliminare di entrambe le architetture e solo dopo creazione del manifest e aggiornamento dei tag. Timeout di 35+10 minuti, nessuna pubblicazione in `[full-ci]`; tutte le autorizzazioni e i gate precedenti restano obbligatori. Vedere `docs/RC_CYCLE125_NATIVE_DOCKER_PUBLISH.it.md`.
+
+**Stato:** test statici e di errore simulato locali; runner GitHub ARM64, vero Docker push e manifest remoto **ancora non verificati**. La certificazione resta **85,25%** (43 gate accettati / 17 parziali su 60); stima locale RC124 **85,75%** provvisoria, senza promozione del registro. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/pubblicazione.
+
+**Commit cumulativo da RC122 (RC123–RC125):** `Fix native multiarch Docker publication and improve editor media uploads and magnetic grid guides [full-ci]`.
+
+---
+
+# Quorivio 0.1.0-dev — RC124 — Guide magnetiche e griglia assoluta (2 novembre 2026)
+
+**Baseline CI:** RC122 (run `41350047731`), 11/11 controlli automatici riusciti; run finale cancellata a causa della pubblicazione Docker bloccata. La RC123 cumulativa non è stata ancora committata.
+
+**Sviluppo RC124:** chiusura tecnica locale dell’allineamento visuale nell'editor di pagine e schemi: guide magnetiche ad assi indipendenti e griglia 5% reale, allineamento assoluto delle selezioni multiple, collisioni respinte, guide non persistenti e senza intercettazione di puntatore. Vedere `docs/RC_CYCLE124_SMART_GUIDES_AND_GRID.it.md`.
+
+**Completamento certificato: 85,25%**, 43 gate accettati e 17 parziali su 60. **Stima locale di sviluppo: 85,75% (+0,50 provvisorio)**, subordinata alla full CI e all'accettazione formale del sotto-gate A1-SMART-GUIDES; non modifica il ledger certificato. `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+**Commit cumulativo RC123–RC124:** `Unify safe editor image uploads, bound Docker publication, and add PowerPoint-like alignment guides with absolute grid snapping [full-ci]`. Nessun commit, push o rilascio effettuato dall'assistente.
+
+---
+
+# Quorivio 0.1.0-dev — RC123 — Media dell'editor e timeout pubblicazione Docker (2 novembre 2026)
+
+**Baseline:** run `41350047731`, commit `a97b80b8d09ebd1a6054111bf88326581e2cc80f`: **11/11 job della campagna RC riusciti**, ma la run finale risulta cancellata per il job di pubblicazione Docker rimasto bloccato. Il risultato CI automatico è verificato, non la pubblicazione Docker Hub.
+
+**RC123:** unificato il fallback MIME sicuro di tutti e cinque i flussi media dell'editor (Logo, sfondi, libreria, riempimento e importazione immagini). Nuova prova integrata dei selettori file JPG di browser/OS con PostgreSQL reale e verifica di persistenza; il nuovo test non è ancora passato nella CI GitHub. Aggiunto `timeout-minutes: 45` al solo job `publish-on-commit`, mantenendo l'autorizzazione esplicita `[publish-docker]` e la separazione da `[full-ci]`. Vedere `docs/RC_CYCLE123_MEDIA_PICKER_AND_PUBLISH_BOUNDARY.it.md`.
+
+**Completamento certificato:** **85,25%**; 43 accettati / 17 parziali su 60. Nessun nuovo gate attribuito prima della full CI; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit, push o pubblicazione effettuati dall'assistente.
+
+**Commit suggerito da RC122:** `Unify safe editor image uploads and bound authorized multiarch Docker publication [full-ci]`.
+
+---
+
 # Quorivio 0.1.0-dev — RC122 — Allineamento contratti storici CI (1 novembre 2026)
 
 **Full CI precedente:** GitHub Actions `41347115255`, commit `993189dd67cd555825afdbbf77e7352e5148cde4`: compilazione frontend, test Chromium/PostgreSQL ed esportazione JSON superati. Il job integrativo Python ha fallito in due test storici: richiedevano due comandi browser adiacenti e la percentuale nei primi 1.300 caratteri dell'handoff inglese.

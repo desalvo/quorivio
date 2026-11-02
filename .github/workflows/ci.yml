@@ -148,6 +148,12 @@ jobs:
         run: python3 -m unittest tools.tests.test_rc_cycle79_inventory_closure -q
       - name: RC122 historical browser ordering and dynamic release score preflight before npm
         run: PYTHONPATH=tools python3 -m unittest tools.tests.test_rc_cycle122_historical_preflight tools.tests.test_ci_browser_editor_readonly_title tools.tests.test_live_heartbeat_cycle56 -q
+      - name: RC124 editor smart guides and absolute grid snapping preflight
+        run: python3 -m unittest tools.tests.test_rc124_smart_guides -q
+      - name: RC125 native OCI publication safety and fail-closed digest tests before npm
+        run: PYTHONPATH=tools python3 -m unittest tools.tests.test_rc125_native_docker_publish -q
+      - name: RC123 media lifecycle and bounded explicit Docker publication preflight
+        run: python3 -m unittest tools.tests.test_rc_cycle123_media_publish -q
       - name: RC121 JSON backup export and visible errors preflight before npm
         run: python3 -m unittest tools.tests.test_rc_cycle121_json_export -q
       - name: RC120 always-visible autosave conflict regression before npm
@@ -244,6 +250,8 @@ jobs:
       - name: Strict release-candidate gate (manual opt-in)
         if: github.event_name == 'workflow_dispatch' && inputs.rc_strict && !inputs.rc_acceptance_suite
         run: python3 tools/rc_release_preflight.py --strict
+      - name: RC124 smart alignment and absolute grid geometry Node regression
+        run: node --experimental-strip-types --test apps/web/test/rc124-smart-guides.test.ts
       - name: RC113 graphical overlays, media upload, inline editing and content fit regressions
         run: node --experimental-strip-types --test apps/web/test/rc113-graphics-upload-fit.test.ts
       - name: RC112 scheme editor ribbon and footer source contracts
@@ -298,6 +306,8 @@ jobs:
           # Verify production HTML advertises fingerprinted JS and CSS, not
           # a dev-only /src/main.tsx module or /@vite/client HMR bootstrap.
           python3 tools/ci_built_frontend_asset_probe.py
+          # RC124: actual Chromium alignment-guide geometry/pointer safety, desktop and mobile.
+          python3 tools/ci_rc124_alignment_guides_chromium.py
           # RC119: selected resize handles may inflate outer scrollHeight, but never content auto-fit.
           python3 tools/ci_rc119_autofit_handles_chromium.py
           # Real browser CSS preflight: catch hidden nested actions before UI acceptance.
@@ -456,6 +466,13 @@ jobs:
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
           QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
         run: python3 tools/ci_background_library_postgres.py
+      - name: Real Chromium JPG background and Logo upload/persistence acceptance
+        timeout-minutes: 3
+        env:
+          QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
+          QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
+          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
+        run: python3 tools/ci_browser_media_picker_postgres.py
       - name: PostgreSQL RC71 session reset and one-shot timer lifecycle acceptance
         env:
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
@@ -823,7 +840,10 @@ jobs:
           python3 tools/verify_rc_cycle119_inventory.py --historical
           python3 tools/verify_rc_cycle120_inventory.py --historical
           python3 tools/verify_rc_cycle121_inventory.py --historical
-          python3 tools/verify_rc_cycle122_inventory.py
+          python3 tools/verify_rc_cycle122_inventory.py --historical
+          python3 tools/verify_rc_cycle123_inventory.py --historical
+          python3 tools/verify_rc_cycle124_inventory.py --historical
+          python3 tools/verify_rc_cycle125_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:
@@ -1163,57 +1183,141 @@ jobs:
         env:
           RC_CAMPAIGN_NEEDS_JSON: ${{ toJSON(needs) }}
         run: python3 tools/rc_campaign_result_gate.py
-  publish:
-    name: Production publication
-    if: github.event_name == 'workflow_dispatch' && inputs.publish_image == true && !inputs.rc_acceptance_suite && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
-    needs: [validate, image-build]
-    runs-on: ubuntu-latest
+  publish-platform:
+    name: Native OCI image (${{ matrix.arch }})
+    # An amd64 runner using QEMU can stall in npm install for arm64 after
+    # `qemu: uncaught target signal 4`. Never emulate the publication build.
+    if: >-
+      ${{ always() && github.repository == 'desalvo/quorivio' &&
+          ((github.event_name == 'workflow_dispatch' && inputs.publish_image == true &&
+            !inputs.rc_acceptance_suite &&
+            (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) &&
+            needs.validate.result == 'success' && needs.image-build.result == 'success') ||
+           (github.event_name == 'push' && github.ref == 'refs/heads/main' &&
+            contains(github.event.head_commit.message, '[publish-docker]') &&
+            needs.validate.result == 'success' && needs.image-build.result == 'success' &&
+            needs.rc-campaign-conclusion.result == 'success')) }}
+    needs: [validate, image-build, rc-campaign-conclusion]
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - {arch: amd64, platform: linux/amd64, runner: ubuntu-24.04}
+          - {arch: arm64, platform: linux/arm64, runner: ubuntu-24.04-arm}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 35
     environment: production
     permissions: {contents: read}
     steps:
       - uses: actions/checkout@v4
         with: {persist-credentials: false}
-      - name: Verify publisher repository
-        shell: bash
-        run: test "$GITHUB_REPOSITORY" = 'desalvo/quorivio'
-      - uses: docker/setup-qemu-action@v3
-      - uses: docker/setup-buildx-action@v3
-      - name: Resolve and validate manual publication labels
-        id: label
-        shell: bash
+      - name: Verify authorized native publishing runner
         env:
-          QUORIVIO_PUBLISH_TAG: ${{ inputs.publish_tag }}
-          QUORIVIO_PUBLISH_LATEST: ${{ inputs.publish_latest }}
+          EXPECTED_ARCH: ${{ matrix.arch }}
+          QUORIVIO_COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          QUORIVIO_CAMPAIGN_CONCLUSION: ${{ needs.rc-campaign-conclusion.result }}
           QUORIVIO_PUBLISH_IMAGE: ${{ inputs.publish_image }}
           QUORIVIO_RC_ACCEPTANCE_SUITE: ${{ inputs.rc_acceptance_suite }}
-        run: bash tools/resolve_image_tags.sh
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = 'desalvo/quorivio'
+          test "$(uname -m)" = "$([ "$EXPECTED_ARCH" = arm64 ] && echo aarch64 || echo x86_64)"
+          if [ "$GITHUB_EVENT_NAME" = push ]; then
+            test "$QUORIVIO_CAMPAIGN_CONCLUSION" = success
+            [[ "$QUORIVIO_COMMIT_MESSAGE" == *'[publish-docker]'* ]]
+          else
+            test "$GITHUB_EVENT_NAME" = workflow_dispatch
+            test "$QUORIVIO_PUBLISH_IMAGE" = true
+            test "$QUORIVIO_RC_ACCEPTANCE_SUITE" != true
+          fi
+      - uses: docker/setup-buildx-action@v3
       - name: Docker Hub authentication
         uses: docker/login-action@v3
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Publish approved image to Docker Hub
+      - name: Push a single native architecture by immutable digest only
+        id: native-build
         uses: docker/build-push-action@v6
         with:
           context: .
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ${{ steps.label.outputs.tags }}
+          platforms: ${{ matrix.platform }}
+          outputs: type=image,name=desalvo/quorivio,push-by-digest=true,name-canonical=true,push=true
           sbom: true
           provenance: mode=max
           labels: |
             org.opencontainers.image.source=https://github.com/desalvo/quorivio
             org.opencontainers.image.licenses=EUPL-1.2
             org.opencontainers.image.revision=${{ github.sha }}
+      - name: Record validated native image digest
+        env:
+          IMAGE_DIGEST: ${{ steps.native-build.outputs.digest }}
+          ARCH: ${{ matrix.arch }}
+        run: |
+          set -euo pipefail
+          [[ "$IMAGE_DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]] || { echo 'Invalid OCI image digest'; exit 1; }
+          mkdir -p digests
+          printf '%s\n' "$IMAGE_DIGEST" > "digests/$ARCH.digest"
+      - name: Transfer digest for atomic multiarch manifest publication
+        uses: actions/upload-artifact@v4
+        with:
+          name: quorivio-native-${{ matrix.arch }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: digests/${{ matrix.arch }}.digest
+          if-no-files-found: error
+          retention-days: 1
+
+  publish:
+    name: Verified multiarch Docker Hub publication (manual)
+    if: >-
+      ${{ always() && github.event_name == 'workflow_dispatch' && inputs.publish_image == true &&
+          !inputs.rc_acceptance_suite &&
+          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) &&
+          needs.validate.result == 'success' && needs.image-build.result == 'success' &&
+          needs.publish-platform.result == 'success' }}
+    needs: [validate, image-build, publish-platform]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    environment: production
+    permissions: {contents: read}
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - name: Verify publisher repository
+        run: test "$GITHUB_REPOSITORY" = 'desalvo/quorivio'
+      - name: Resolve and validate manual publication labels
+        id: label
+        env:
+          QUORIVIO_PUBLISH_TAG: ${{ inputs.publish_tag }}
+          QUORIVIO_PUBLISH_LATEST: ${{ inputs.publish_latest }}
+          QUORIVIO_PUBLISH_IMAGE: ${{ inputs.publish_image }}
+          QUORIVIO_RC_ACCEPTANCE_SUITE: ${{ inputs.rc_acceptance_suite }}
+        run: bash tools/resolve_image_tags.sh
+      - uses: docker/setup-buildx-action@v3
+      - name: Docker Hub authentication
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: quorivio-native-*-${{ github.run_id }}-${{ github.run_attempt }}
+          merge-multiple: true
+          path: digests
+      - name: Assemble and verify both native images before tagging
+        env:
+          QUORIVIO_IMAGE_TAGS: ${{ steps.label.outputs.tags }}
+          QUORIVIO_DIGEST_DIR: digests
+        run: bash tools/publish_multiarch_manifest.sh
 
   publish-on-commit:
-    name: Production publication requested by commit
+    name: Verified multiarch Docker Hub publication (explicit commit)
+    timeout-minutes: 10
     if: >-
       ${{ always() && github.event_name == 'push' && github.ref == 'refs/heads/main' &&
           contains(github.event.head_commit.message, '[publish-docker]') &&
           needs.validate.result == 'success' && needs.image-build.result == 'success' &&
-          needs.rc-campaign-conclusion.result == 'success' }}
-    needs: [validate, image-build, rc-campaign-conclusion]
+          needs.rc-campaign-conclusion.result == 'success' && needs.publish-platform.result == 'success' }}
+    needs: [validate, image-build, rc-campaign-conclusion, publish-platform]
     runs-on: ubuntu-24.04
     environment: production
     permissions: {contents: read}
@@ -1221,7 +1325,6 @@ jobs:
       - uses: actions/checkout@v4
         with: {persist-credentials: false}
       - name: Verify publisher repository
-        shell: bash
         run: test "$GITHUB_REPOSITORY" = 'desalvo/quorivio'
       - name: Verify explicit commit publication authorization and full gate result
         id: label
@@ -1229,23 +1332,19 @@ jobs:
           QUORIVIO_COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
           QUORIVIO_CAMPAIGN_CONCLUSION: ${{ needs.rc-campaign-conclusion.result }}
         run: bash tools/resolve_commit_image_tags.sh
-      - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
       - name: Docker Hub authentication
         uses: docker/login-action@v3
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Publish approved commit image to Docker Hub
-        uses: docker/build-push-action@v6
+      - uses: actions/download-artifact@v4
         with:
-          context: .
-          platforms: linux/amd64,linux/arm64
-          push: true
-          tags: ${{ steps.label.outputs.tags }}
-          sbom: true
-          provenance: mode=max
-          labels: |
-            org.opencontainers.image.source=https://github.com/desalvo/quorivio
-            org.opencontainers.image.licenses=EUPL-1.2
-            org.opencontainers.image.revision=${{ github.sha }}
+          pattern: quorivio-native-*-${{ github.run_id }}-${{ github.run_attempt }}
+          merge-multiple: true
+          path: digests
+      - name: Assemble and verify both native images before tagging
+        env:
+          QUORIVIO_IMAGE_TAGS: ${{ steps.label.outputs.tags }}
+          QUORIVIO_DIGEST_DIR: digests
+        run: bash tools/publish_multiarch_manifest.sh

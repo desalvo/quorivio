@@ -37,10 +37,18 @@ def campaign_audit(root: Path = ROOT) -> dict:
  # The campaign must not be able to activate publication or strict sign-off.
  # An RC campaign cannot trigger publishing or strict sign-off even if
  # GitHub persists a previously selected checkbox in workflow_dispatch.
- publish_guard = "if: github.event_name == 'workflow_dispatch' && inputs.publish_image == true && !inputs.rc_acceptance_suite &&"
+ # Each publishing entry point (native build AND final manifest) must
+ # independently reject the RC campaign even if dispatch inputs are mixed.
+ for job_name in ('publish-platform', 'publish'):
+  match = re.search(r'^  '+re.escape(job_name)+r':\s*$(.*?)(?=^  [a-z][a-z0-9-]*:\s*$|\Z)',workflow,re.M|re.S)
+  if match is None: raise ValueError('missing publisher job: '+job_name)
+  guard_match = re.search(r'^    if: >-\s*$(.*?)(?=^    [a-z][a-z-]*:|\Z)',match.group(1),re.M|re.S)
+  guard = guard_match.group(1) if guard_match else ''
+  if not all(part in guard for part in (
+      "github.event_name == 'workflow_dispatch'", 'inputs.publish_image == true',
+      '!inputs.rc_acceptance_suite')):
+   raise ValueError('publishing guard must exclude the RC campaign: '+job_name)
  strict_guard = "if: github.event_name == 'workflow_dispatch' && inputs.rc_strict && !inputs.rc_acceptance_suite"
- if publish_guard not in workflow:
-  raise ValueError('publishing guard must exclude the RC campaign')
  if strict_guard not in workflow:
   raise ValueError('strict release gate must exclude the RC campaign')
  if "RC_CAMPAIGN_PUBLISH: 'false'" not in workflow or "RC_CAMPAIGN_STRICT: 'false'" not in workflow:

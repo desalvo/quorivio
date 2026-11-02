@@ -1,0 +1,18 @@
+{
+  "version": "0.1.0-dev",
+  "certified_score": 85.25,
+  "provisional_local_engineering_score": 85.75,
+  "provisional_delta": 0.5,
+  "review_required": true,
+  "main_gate_ledger_status_unchanged": true,
+  "candidate_scope": "A1-SMART-GUIDES, 1 point carved from partial A1; after formal approval of the new technical subgate only",
+  "local_tests": [
+    "apps/web/test/rc124-smart-guides.test.ts",
+    "tools/tests/test_rc124_smart_guides.py",
+    "tools/ci_rc124_alignment_guides_chromium.py"
+  ],
+  "acceptance_gap": [
+    "Full CI Github compiled React editor input test",
+    "Independent operator/physical device signoff remains in parent gate"
+  ]
+}
