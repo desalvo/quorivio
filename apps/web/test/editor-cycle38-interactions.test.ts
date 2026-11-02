@@ -10,8 +10,14 @@ const css=readFileSync(new URL('../src/style.css',import.meta.url),'utf8');
 const server=readFileSync(new URL('../../api/src/server.ts',import.meta.url),'utf8');
 
 test('presenter rehearsal uses neutral projection components, never shared draft controls',()=>{
- for(const kind of ['question','reactions','rating'])assert.match(source,new RegExp(`kind===['"]${kind}['"].*viewer===['"]presenter['"]`));
- assert.match(source,/kind==='timed-quiz'\)\&\&viewer==='presenter'/);
+ for(const kind of ['reactions','rating'])assert.match(source,new RegExp(`kind===['"]${kind}['"].*viewer===['"]presenter['"]`));
+ // RC128: the question and its submit control have the same structure in both
+ // previews, but the presenter cannot alter or submit simulated answers.
+ assert.match(source,/\(kind==='question'\|\|kind==='timed-quiz'\)\?<div className="projection-question-group"/);
+ assert.match(source,/const canInteract=viewer==='participant'\&\&!pageExpired/);
+ assert.match(source,/disabled=\{!canInteract\|\|!canSubmitRehearsalAnswer\(answerMode,current\)\}/);
+ assert.match(source,/viewer==='presenter'\?'Invia risposta':'Invia risposta di prova'/);
+ assert.match(source,/kind==='timed-quiz'\&\&<PageTimer/);
  assert.match(source,/kind==='results-button'\?<LinkedResultChart/);
  assert.match(source,/sampleStatisticRows\(source,seed,submittedAnswers/);
  assert.match(source,/rehearsalFreeTextRows\(source,submittedAnswers/);

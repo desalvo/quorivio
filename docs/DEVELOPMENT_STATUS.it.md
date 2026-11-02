@@ -1,3 +1,19 @@
+# Quorivio 0.1.0-dev — RC128 — Uniformità anteprime, ripristino e collisioni (2 novembre 2026)
+
+**Correzioni rispetto a RC127:** eliminata la lista di risposte simulate errata dentro il widget domanda presentatore; layout della domanda condiviso con pulsante disabilitato per il presentatore; proporzioni e tipografia fedeli alle impostazioni dell'editor, incluse anteprime affiancate, titolo e footer; maniglia per l'altezza indipendente della casella di risposta; righello superiore; ripristino autenticato dopo reload della sessione e pagina; arresto del trascinamento al limite di collisione, senza attraversamenti. Nuovi test Node e Python RC128, aggiornato test storico, preflight CI. Dettagli: `docs/RC_CYCLE128_EDITOR_PREVIEW_RECOVERY.it.md`.
+
+**Evidenza locale:** 185/185 test Node e 5/5 test Python RC128 riusciti; parsing TypeScript verificato. Installazione npm, build Vite, screenshot Chromium e CI GitHub restano da verificare. La pipeline runtime nativa RC127 è mantenuta. **Completamento certificato 85,25%** (43 gate accettati / 17 parziali su 60); stima locale 85,75% non certificata. RC stretta non raggiunta; `rc_strict=false`, `publish_image=false`; nessun commit/push/rilascio. **Commit cumulativo da RC126:** `Add native OCI runtime gates and fix editor-preview parity, reload recovery and collision boundaries [full-ci]`.
+
+---
+
+# Quorivio 0.1.0-dev — RC127 — Runtime ARM64 realmente nativo e piano per RC (2 novembre 2026)
+
+**Baseline GitHub confermata:** run `41377221623`, commit `d5cff85367a8e906d6e0d59a41ecf82477245b99`: campagna RC126 COMPLETAMENTE VERDE, incluse build native AMD64/ARM64, tag Docker Hub `latest` e `sha-d5cff85367a8`. **Sviluppo RC127:** la prova runtime ARM64 non usa più QEMU ma un runner ARM64 nativo, separato da AMD64, con PostgreSQL 18, verifica architettura, UID non-root e HTTP/CSP reali. Generato piano deterministico per i 17 gate esterni, senza approvazioni fittizie. Vedere `docs/RC_CYCLE127_NATIVE_RUNTIME_AND_EXTERNAL_ACCEPTANCE.it.md`. **Verifica locale RC127:** suite Python completa 1.661 test eseguiti, **OK con 1 saltato** (comando `PYTHONPATH=tools python3 -m unittest discover -s tools/tests -p test_*.py -q`). Inventory e ZIP verificati. Build nativa Docker, UI Node/TS e job GitHub RC127 ancora da eseguire. Queste modifiche sono locali, da verificare nella prossima full CI.
+
+**Completamento certificato: 85,25%** (43 accettati / 17 parziali, 60 gate), non aumentato automaticamente; stima locale 85,75% provvisoria. **RC stretta non raggiunta** senza collaudi indipendenti e approvazioni. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit, push o rilascio effettuato. **Commit suggerito dopo RC126:** `Run native ARM64 and AMD64 OCI runtime acceptance and track external RC approvals [full-ci]`.
+
+---
+
 # Quorivio 0.1.0-dev — RC126 — Correzione test storici CI e pubblicazione multiarch nativa (2 novembre 2026)
 
 **Esito reale GitHub:** run `41371521619`, commit `d0aa86bd9efe12180e418344aabd9255e5056a3a`: **fallita**. Compilazione TypeScript/Vite, verifiche PostgreSQL/Chromium e ClamAV riuscite; il test tardivo Kubernetes wizard/worker ha trovato 8 asserzioni obsolete su 1.656 (1.648 riuscite). Il riepilogo della campagna RC è fallito per dipendenza; le build native e la pubblicazione Docker sono state saltate. Nessun nuovo blocco QEMU dimostrato.

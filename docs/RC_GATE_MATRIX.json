@@ -1773,5 +1773,21 @@
     },
     "scoring_policy": "Proposal is NOT an accepted gate. The certified 60-gate ledger remains unchanged until test review and Github success.",
     "commit_status": "Uncommitted local cycle; no publication."
+  },
+  "rc127_native_runtime_local_20261102": {
+    "verified_upstream_run_id": 41377221623,
+    "verified_commit_sha": "d5cff85367a8e906d6e0d59a41ecf82477245b99",
+    "upstream_complete_ci": "success",
+    "upstream_native_amd64_publish": "success",
+    "upstream_native_arm64_publish": "success",
+    "upstream_multiarch_manifest_publish": "success",
+    "native_oci_application_runtime_amd64_verified_for_rc127": false,
+    "native_oci_application_runtime_arm64_verified_for_rc127": false,
+    "external_operator_review_count": 0,
+    "external_operator_reviews_pending": 17,
+    "score_before": 85.25,
+    "score_after": 85.25,
+    "strict_rc_ready": false,
+    "note": "The 2026-11-02 run proved native image build/publish. New native PostgreSQL runtime acceptance must pass in future CI. The 17 partial gates require independent proof."
   }
 }

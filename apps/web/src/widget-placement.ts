@@ -1,3 +1,4 @@
+import {moveWidgetGroup} from './widget-group.ts';
 /** Magnetic alignment for the 0..100 percentage slide geometry.
  * A collision is rejected rather than persisted; rotations use their saved
  * unrotated bounding rectangles, a conservative placement rule. */
@@ -80,4 +81,41 @@ export function freeWidgetPosition<T extends Widget>(items:readonly T[],preferre
  for(let y=0;y<=100-height;y+=2)for(let x=0;x<=100-width;x+=2)cells.push({x,y,width,height});
  cells.sort((a,b)=>Math.abs(a.x-first.x)+Math.abs(a.y-first.y)-Math.abs(b.x-first.x)-Math.abs(b.y-first.y));
  return cells.find(available)||null;
+}
+
+/** Sweep the whole dragged group from its initial position to the pointer target.
+ * Stop at the first blocking boundary instead of teleporting back to origin.
+ * Bisection never permits the group to pass through another widget at high pointer speed. */
+export function moveWidgetsToCollisionLimit<T extends Widget>(original:T[],ids:readonly string[],dx:number,dy:number):T[]{
+ if(!Number.isFinite(dx)||!Number.isFinite(dy)||!ids.length)return original;
+ const target=moveWidgetGroup(original,ids,dx,dy);
+ if(!overlapsOtherWidgets(target,ids)){
+  // A straight move can cross a thin widget even if the final position is clear.
+  // Check successive substeps using the smallest relevant slide dimension.
+  const extents=original.filter(w=>ids.includes(w.id)).map(rect);
+  const fixed=original.filter(w=>!ids.includes(w.id)&&!isFreeGraphic(w.kind)).map(rect);
+  const smallest=Math.min(5,...extents.map(b=>Math.min(b.width,b.height)),...fixed.map(b=>Math.min(b.width,b.height)));
+  const segments=Math.min(400,Math.max(1,Math.ceil(Math.hypot(dx,dy)/Math.max(.2,smallest/3))));
+  let safe=0;
+  for(let i=1;i<=segments;i++){const t=i/segments;if(overlapsOtherWidgets(moveWidgetGroup(original,ids,dx*t,dy*t),ids)){
+    let high=t,low=safe;
+    for(let k=0;k<24;k++){const mid=(high+low)/2;if(overlapsOtherWidgets(moveWidgetGroup(original,ids,dx*mid,dy*mid),ids))high=mid;else low=mid}
+    return moveWidgetGroup(original,ids,dx*low,dy*low);
+   }safe=t}
+  return target;
+ }
+ // Blocking geometry may occur before the target. Probe along the path,
+ // then refine the first collision to sub-pixel slide precision.
+ let safe=0;
+ const segments=Math.min(400,Math.max(8,Math.ceil(Math.hypot(dx,dy)/.5)));
+ for(let i=1;i<=segments;i++){
+  const t=i/segments;
+  if(overlapsOtherWidgets(moveWidgetGroup(original,ids,dx*t,dy*t),ids)){
+   let lo=safe,hi=t;
+   for(let k=0;k<24;k++){const mid=(lo+hi)/2;if(overlapsOtherWidgets(moveWidgetGroup(original,ids,dx*mid,dy*mid),ids))hi=mid;else lo=mid}
+   return moveWidgetGroup(original,ids,dx*lo,dy*lo);
+  }
+  safe=t;
+ }
+ return original;
 }

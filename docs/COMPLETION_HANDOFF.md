@@ -1,3 +1,17 @@
+# Quorivio RC128 — handoff: editor/preview parity and session recovery
+
+Source cumulative includes RC127 native OCI runtime and 17 external gate acceptance checklist. New RC128 fixes: presenter's free-text preview shows the disabled real submit button, not simulated answers; shared logical slide geometry/fonts in single and split rehearsal; a draggable free-text field-height handle in editor; full horizontal ruler; per-tab authenticated workspace/session/page recovery; collision-constrained widget dragging with first-contact stopping. Tests: 185/185 frontend Node pass, 5/5 RC128 Python pass. Syntax checked; npm/Vite build, live Chromium visual checks and RC128 GitHub CI not yet validated. See `docs/RC_CYCLE128_EDITOR_PREVIEW_RECOVERY.en.md`. Certified release gate remains 85.25% (43/60 accepted, 17 partial); strict RC not accepted. No push/publication. Suggested cumulative commit since confirmed RC126: `Add native OCI runtime gates and fix editor-preview parity, reload recovery and collision boundaries [full-ci]`.
+
+---
+
+# Quorivio 0.1.0-dev — RC127 — Real native ARM64 runtime and external RC acceptance plan (2 November 2026)
+
+**Verified GitHub baseline:** run `41377221623`, commit `d5cff85367a8e906d6e0d59a41ecf82477245b99`: all RC126 full CI jobs completed successfully, including separate native AMD64/ARM64 builds and Docker Hub `latest`/`sha-d5cff85367a8` publication. **RC127 local development:** replace the QEMU-based ARM64 OCI *runtime* test with independent native ARM64 and AMD64 runners, disposable PostgreSQL 18, CPU/UID/runtime and HTTP/CSP probes. Added a deterministic action plan for the 17 outstanding external gate approvals. No operator evidence is fabricated. **Local RC127 Python suite: 1,661 tests passed (1 skipped)**; source/archive inventories verified. Native Docker runtime/Node/TS/GitHub CI for RC127 still require the next run. See `docs/RC_CYCLE127_NATIVE_RUNTIME_AND_EXTERNAL_ACCEPTANCE.en.md`.
+
+**Certified completion: 85.25%** (43 accepted / 17 partial, 60 gates); provisional local estimate 85.75%. **Strict RC not ready** without independent review. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit, push or release performed. **Suggested commit after RC126:** `Run native ARM64 and AMD64 OCI runtime acceptance and track external RC approvals [full-ci]`.
+
+---
+
 # Quorivio 0.1.0-dev — RC126 — CI regression compatibility with native Docker pipeline (2 November 2026)
 
 **Actual GitHub result:** run `41371521619` at commit `d0aa86bd9efe12180e418344aabd9255e5056a3a` completed **failure**. Production quality gate passed TypeScript/Vite build, real PostgreSQL/Chromium checks and ClamAV, then failed in the late Kubernetes wizard/worker Python suite: 8 obsolete CI-workflow assertions out of 1,656 tests (1,648 passing). The final RC campaign summary failed as a consequence; Docker native image jobs were skipped (not executed). This is not evidence of a repeat QEMU hang or a completed Docker Hub publication.

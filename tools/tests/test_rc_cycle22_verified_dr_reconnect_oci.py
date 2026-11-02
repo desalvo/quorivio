@@ -55,12 +55,16 @@ class Cycle22RemoteReconciliation(unittest.TestCase):
     def test_runtime_job_only_manual_no_publish_or_credit(self):
         body=(ROOT/'.github/workflows/ci.yml').read_text()
         script=(ROOT/'tools/ci_oci_runtime_smoke.sh').read_text()
-        for needle in ("inputs.runtime_arch_test",'if: github.event_name == \'workflow_dispatch\' && inputs.runtime_arch_test',
-                       'docker/setup-qemu-action@v3','platforms: linux/arm64','platforms: linux/amd64',
-                       'bash tools/ci_oci_runtime_smoke.sh quorivio:ci-oci-arm64 arm64',
-                       'bash tools/ci_oci_runtime_smoke.sh quorivio:ci-oci-amd64 amd64',
-                       'push: false'):
-            self.assertIn(needle,body)
+        import yaml
+        jobs = yaml.safe_load(body)['jobs']
+        runtime = jobs['runtime-architecture']
+        self.assertIn("inputs.runtime_arch_test", runtime['if'])
+        self.assertEqual(runtime['permissions'], {'contents': 'read'})
+        self.assertEqual({m['arch']: (m['platform'], m['runner']) for m in runtime['strategy']['matrix']['include']},
+                         {'amd64': ('linux/amd64','ubuntu-24.04'), 'arm64': ('linux/arm64','ubuntu-24.04-arm')})
+        self.assertNotIn('setup-qemu-action', str(runtime))
+        self.assertIn('push: false', body)
+        self.assertTrue(any('ci_oci_runtime_smoke.sh' in step.get('run','') for step in runtime['steps']))
         for needle in ('docker network create --internal','--platform "linux/$target"',
                        'process.arch','process.getuid()===0','postgres:18-alpine',
                        '/api/health/ready','/api/health/live','apps/web/dist/index.html',

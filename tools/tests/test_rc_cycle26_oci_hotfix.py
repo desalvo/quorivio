@@ -36,8 +36,9 @@ class Cycle26RC(unittest.TestCase):
         self.assertIn('python3 tools/verify_rc_cycle41_inventory.py',wf)
         self.assertLess(wf.index('verify_rc_cycle25_inventory.py --historical'),wf.index('verify_rc_cycle26_inventory.py'))
         self.assertLess(wf.index('verify_rc_cycle41_inventory.py'),wf.index('Detect credential leaks'))
-        self.assertIn('bash tools/ci_oci_runtime_smoke.sh quorivio:ci-oci-amd64 amd64',wf)
-        self.assertIn('bash tools/ci_oci_runtime_smoke.sh quorivio:ci-oci-arm64 arm64',wf)
+        self.assertIn('bash tools/ci_oci_runtime_smoke.sh "quorivio:ci-oci-$TARGET_ARCH" "$TARGET_ARCH"',wf)
+        self.assertIn('ubuntu-24.04-arm',wf)
+        self.assertNotIn('docker/setup-qemu-action@v3', wf)
         self.assertIn('push: false',wf)
 
 if __name__=='__main__': unittest.main()

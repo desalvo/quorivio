@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Disposable multi-architecture OCI runtime acceptance. Requires Docker and QEMU
-# (for ARM64 on x86_64); never pushes any image or retains test credentials.
+# Disposable native OCI runtime acceptance on matching CPU architecture.
+# Does not use QEMU, push an image, or retain credentials.
 set -Eeuo pipefail
 
 if [[ $# -ne 2 ]]; then

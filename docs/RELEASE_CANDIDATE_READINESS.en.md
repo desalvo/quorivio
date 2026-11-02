@@ -1,3 +1,5 @@
+**RC127 update (2 November 2026):** RC126 full CI 41377221623 passed and Docker Hub publishes both AMD64/ARM64. The RC127 native ARM64 *runtime* proof is pending a new GitHub CI run. All 17 external operator reviews remain outstanding in `docs/validation/RC127_OPERATOR_ACCEPTANCE_PLAN_20261102.json`. Strict RC remains blocked.
+
 # Quorivio 0.1.0-dev — Release candidate readiness gate
 
 **Status: RC BLOCKED pending CI and operational acceptance.** This document is a reproducible handoff, not a declaration of production readiness. Do not create a tag or change the application version before these gates succeed.

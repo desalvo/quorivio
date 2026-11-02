@@ -1,3 +1,5 @@
+**Aggiornamento RC127 (2 novembre 2026):** la full CI RC126 41377221623 è verde e Docker Hub ha il manifest AMD64/ARM64. La prova nativa ARM64 di *runtime* RC127 è ancora da eseguire su GitHub. I 17 gate esterni e le approvazioni mancanti sono elencati in `docs/validation/RC127_OPERATOR_ACCEPTANCE_PLAN_20261102.json`. La RC stretta resta bloccata.
+
 # Quorivio 0.1.0-dev — Verifiche necessarie per la release candidate
 
 **Stato: RC BLOCCATA fino a CI e collaudi operativi.** Questo documento registra i controlli disponibili e gli interventi da eseguire; non dichiara il prodotto pronto per la produzione. Non creare tag né modificare la versione prima della verifica dei gate.

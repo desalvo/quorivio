@@ -1722,3 +1722,24 @@ body > .rehearsal-backdrop {
  background-size:5% 5%;
 }
 @media(prefers-contrast:more){.widget-snap-grid{background-image:linear-gradient(to right,#00586b88 2px,transparent 2px),linear-gradient(to bottom,#00586b88 2px,transparent 2px)!important}}
+
+/* RC128: all preview panes retain saved percent geometry and author styling.
+ * cqw is relative to the slide, not to the resized widget or modal. */
+.rehearsal-pane>.rehearsal-slide>.rehearsal-widgets{container-type:inline-size;}
+.rehearsal-pane .rehearsal-widget{font-size:var(--authored-widget-font-size,1.25cqw)!important;}
+.rehearsal-pane .rehearsal-widget .projection-slide-title,
+.rehearsal-pane .rehearsal-widget .projection-slide-footer{font-family:inherit;font-size:inherit;font-weight:inherit;font-style:inherit;color:inherit;text-decoration:inherit;line-height:inherit;}
+.rehearsal-pane .rehearsal-widget .projection-slide-footer>.slide-footer-center{font-family:inherit!important;font-size:inherit!important;font-weight:inherit!important;font-style:inherit!important;color:inherit!important;text-decoration:inherit!important;}
+.widget-answer-field-editor{position:relative;width:100%;min-width:0;max-width:100%;pointer-events:auto;}
+.widget-answer-field-editor>.widget-free-answer-field{max-width:100%;pointer-events:none!important;resize:none!important;}
+.widget-answer-height-handle{position:absolute;right:0;bottom:0;min-width:19px;min-height:19px;z-index:8;display:grid;place-items:center;padding:0!important;line-height:1;cursor:ns-resize!important;color:#134777;background:#e6f0ff;border:1px solid #6592c0;border-radius:4px;touch-action:none;pointer-events:auto!important;}
+.editor-ux-v2 .canvas-with-rulers{overflow:visible!important;min-width:0;width:100%;}
+.editor-ux-v2 .canvas-ruler-horizontal{visibility:visible!important;overflow:visible!important;width:100%!important;min-width:0!important;box-sizing:border-box;z-index:2;}
+.editor-ux-v2 .canvas-ruler-horizontal>span{flex:0 0 auto;min-width:0;}
+
+/* RC128: the master title/footer label shares its authored font and alignment
+ * with the presenter and participant stage; editor must not force bold/left. */
+.editor-ux-v2 .widget-canvas-item[data-widget-kind="footer"] .widget-fit-content>.widget-rich-inline{font-family:inherit!important;font-size:inherit!important;font-weight:inherit!important;font-style:inherit!important;text-align:center!important;}
+.editor-ux-v2 .widget-canvas-item[data-widget-kind="title"] .widget-fit-content>.widget-rich-inline{font-family:inherit!important;font-size:inherit!important;font-weight:inherit!important;font-style:inherit!important;text-align:center!important;}
+/* Logical 10px right/bottom offset, scaled with the 1280-wide slide. */
+.slide-canvas-page-number:not([data-custom-number="true"]){right:.78125cqw!important;bottom:.78125cqw!important;}

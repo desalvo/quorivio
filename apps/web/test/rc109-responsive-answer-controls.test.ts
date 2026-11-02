@@ -8,10 +8,10 @@ import {validWidgetTextStyle,validPageDesign} from '../../api/src/domain.ts';
 test('answer entry and submit styles are independent, bounded and accessible',()=>{
  const w={fontSize:30,answerFontFamily:'Georgia',answerFontSize:22,answerColor:'#225588',answerBold:true,answerItalic:true,submitButtonSize:25,answerFillColor:'#fef9ee'} as const;
  const input=answerInputStyle(w),submit=answerSubmitStyle(w);
- assert.equal(input.fontFamily,'Georgia');assert.equal(input.fontSize,'22px');assert.equal(input.color,'#225588');
+ assert.equal(input.fontFamily,'Georgia');assert.equal(input.fontSize,'1.71875cqw');assert.equal(input.color,'#225588');
  assert.equal(input.fontWeight,'700');assert.equal(input.fontStyle,'italic');assert.equal(input.backgroundColor,'#fef9ee');
- assert.equal(submit.fontSize,'25px');assert.ok(Number.parseInt(submit.minHeight)>=44);
- assert.equal(answerInputStyle({}).fontSize,'16px');
+ assert.equal(submit.fontSize,'1.95313cqw');assert.ok(Number.parseFloat(submit.minHeight)*12.8>=44);
+ assert.equal(answerInputStyle({}).fontSize,'1.25000cqw');
  assert.ok(requiresAnswerSubmit('question'));assert.ok(requiresAnswerSubmit('timed-quiz'));assert.ok(requiresAnswerSubmit('topic-question'));assert.ok(!requiresAnswerSubmit('title'));
 });
 

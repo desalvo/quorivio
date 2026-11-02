@@ -18,8 +18,8 @@ test('word clouds rank by frequency, color only the first five independently, th
 
 test('free-text entry width and height apply without changing submit button',()=>{
  const fields=answerInputStyle({answerFieldWidth:65,answerFieldHeight:180,answerColor:'#224466',answerFontSize:21});
- assert.equal(fields.width,'65%');assert.equal(fields.height,'180px');assert.equal(fields.color,'#224466');
- assert.equal(answerInputStyle({}).width,'100%');assert.equal(answerInputStyle({}).height,'96px');
+ assert.equal(fields.width,'65%');assert.equal(fields.height,'14.06250cqw');assert.equal(fields.color,'#224466');
+ assert.equal(answerInputStyle({}).width,'100%');assert.equal(answerInputStyle({}).height,'7.50000cqw');
 });
 
 test('API rejects out-of-bounds response field sizes, noninteger values and CSS payloads',()=>{

@@ -1,0 +1,16 @@
+{
+  "version": "0.1.0-dev",
+  "cycle": 127,
+  "run_date": "2026-11-02",
+  "scope": "LOCAL_ONLY",
+  "command": "PYTHONPATH=tools python3 -m unittest discover -s tools/tests -p test_*.py -q",
+  "result": "OK",
+  "tests_run": 1661,
+  "skipped": 1,
+  "github_rc127_verified": false,
+  "docker_native_amd64_runtime_verified": false,
+  "docker_native_arm64_runtime_verified": false,
+  "rc_strict_ready": false,
+  "operator_approvals": 0,
+  "note": "Test suite does not grant external acceptance or release approval."
+}

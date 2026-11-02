@@ -1,6 +1,6 @@
 {
   "release_candidate_ready": false,
-  "score": 84.75,
+  "score": 85.25,
   "missing_required_files": [],
   "unaccepted_gates": [
     {
@@ -13,7 +13,7 @@
       "id": "A2",
       "area": "A-editor",
       "status": "partial",
-      "remaining": "Independent pixel-accurate thumbnail/page comparisons, Firefox/WebKit native page drag-and-drop, physical touchscreen and operator acceptance still required. Bounded Chromium filmstrip/keyboard actions are credited in A2-ORDER, while the separately observed browser-downloaded page JSON artifact is credited in A2-PAGE-JSON. RC69 lost-response reorder reconciliation and cross-engine DnD acceptance remain unverified until new CI."
+      "remaining": "Independent pixel-accurate thumbnail/page comparison on a representative slide corpus, physical iOS/Android touchscreen and human operator accessibility/visual acceptance. Cross-engine automated DnD with lost acknowledgment, rejected writes and keyboard fallback is credited independently as A2-NATIVE-DND; no physical device, independent PostgreSQL multi-editor deployment or manual approval was exercised."
     },
     {
       "id": "A3",
@@ -106,7 +106,7 @@
       "remaining": "Independent GDPR/legal and AGID assessment, encrypted backup and key rotation operational reviews, retention/erasure audit and RWX storage sign-off."
     }
   ],
-  "gate_count": 59,
-  "accepted_gates": 42,
+  "gate_count": 60,
+  "accepted_gates": 43,
   "policy": "RC requires every gate accepted with reviewed evidence; local tests alone never promote gates."
 }
