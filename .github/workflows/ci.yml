@@ -920,7 +920,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: {persist-credentials: false}
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
       - name: Build without publishing
         uses: docker/build-push-action@v6
         with:
@@ -1132,7 +1132,7 @@ jobs:
           set -euo pipefail
           expected="$( [ "$TARGET_ARCH" = arm64 ] && echo aarch64 || echo x86_64 )"
           test "$(uname -m)" = "$expected" || { echo 'Wrong CPU for native OCI runtime test'; exit 1; }
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
       - name: Compile native OCI without publication
         uses: docker/build-push-action@v6
         with:
@@ -1262,7 +1262,7 @@ jobs:
             test "$QUORIVIO_PUBLISH_IMAGE" = true
             test "$QUORIVIO_RC_ACCEPTANCE_SUITE" != true
           fi
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
       - name: Docker Hub authentication
         uses: docker/login-action@v3
         with:
@@ -1324,7 +1324,7 @@ jobs:
           QUORIVIO_PUBLISH_IMAGE: ${{ inputs.publish_image }}
           QUORIVIO_RC_ACCEPTANCE_SUITE: ${{ inputs.rc_acceptance_suite }}
         run: bash tools/resolve_image_tags.sh
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
       - name: Docker Hub authentication
         uses: docker/login-action@v3
         with:
@@ -1364,7 +1364,7 @@ jobs:
           QUORIVIO_COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
           QUORIVIO_CAMPAIGN_CONCLUSION: ${{ needs.rc-campaign-conclusion.result }}
         run: bash tools/resolve_commit_image_tags.sh
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
       - name: Docker Hub authentication
         uses: docker/login-action@v3
         with:
