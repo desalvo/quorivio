@@ -31,9 +31,10 @@ class RC124SmartGuides(unittest.TestCase):
   self.assertIn('onChange(accepted);return;',MAIN)
   # Geometry must stop at the first obstacle even when the pointer leaps
   # beyond a narrow widget. Do not weaken these guards to make CI green.
-  self.assertIn('overlapsOtherWidgets(moveWidgetGroup(original,ids,dx*t,dy*t),ids)',PLACE)
-  self.assertIn('return moveWidgetGroup(original,ids,dx*low,dy*low)',PLACE)
-  self.assertIn('return moveWidgetGroup(original,ids,dx*lo,dy*lo)',PLACE)
+  self.assertIn('function sweptContact(a:Box,b:Box,dx:number,dy:number)',PLACE)
+  self.assertIn('firstContact=Math.min(firstContact,contact)',PLACE)
+  self.assertIn('const stopped=moveWidgetGroup(original,ids,actualX*safe,actualY*safe)',PLACE)
+  self.assertIn('return overlapsOtherWidgets(stopped,ids)?original:stopped',PLACE)
   self.assertIn('apps/web/test/rc128-preview-recovery-collision.test.ts',WORKFLOW)
   self.assertIn('onEndGesture?.()',MAIN)
   self.assertIn('widget-alignment-guide.axis-x',CSS)

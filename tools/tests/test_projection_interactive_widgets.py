@@ -10,7 +10,9 @@ class ProjectionInteractiveWidgetTests(unittest.TestCase):
         self.assertIn("if(kind==='question'||kind==='timed-quiz')", SRC)
         self.assertIn('function ProjectedQuestionPart(', SRC)
         self.assertIn('(widget.questions||[]).map(', SRC)
-        self.assertIn('projection-interactive-options', SRC)
+        self.assertIn('role="group" aria-label="Opzioni di risposta"', SRC)
+        self.assertIn('projection-readonly-submit', SRC)
+        self.assertIn('data-readonly-preview="true"', SRC)
         self.assertIn('(part.options||[]).map((option:any)', SRC)
     def test_correct_options_are_not_marked_on_projection(self):
         body = SRC.split("function ProjectedQuestionPart(")[1].split("function ProjectionWidgetContent(")[0]

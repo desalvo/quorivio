@@ -1,6 +1,6 @@
 /** Pure multi-selection commands used by pointer, keyboard and accessible toolbar. */
-import {moveWidgetGroup,pasteWidgetGroup,widgetRect} from './widget-group.ts';
-import {overlapsOtherWidgets} from './widget-placement.ts';
+import {pasteWidgetGroup,widgetRect} from './widget-group.ts';
+import {overlapsOtherWidgets,moveWidgetsToCollisionLimit} from './widget-placement.ts';
 type Widget={id:string;kind:string;position?:{x?:number;y?:number;width?:number;height?:number;rotation?:number}};
 export function existingWidgetIds<T extends {id:string}>(widgets:readonly T[],ids:readonly string[]):string[]{
  const available=new Set(widgets.map(w=>w.id));return [...new Set(ids)].filter(id=>available.has(id));
@@ -17,7 +17,7 @@ export function duplicateWidgetSelection<T extends Widget>(widgets:readonly T[],
  return {widgets:[...widgets,...copies],selected:copies.map(w=>w.id)};
 }
 export function nudgeWidgetSelection<T extends Widget>(widgets:T[],ids:readonly string[],dx:number,dy:number):T[]{
- return moveWidgetGroup(widgets,existingWidgetIds(widgets,ids),dx,dy);
+ return moveWidgetsToCollisionLimit(widgets,existingWidgetIds(widgets,ids),dx,dy);
 }
 
 /** Find a collision-free translation for copies of a selected group.

@@ -163,6 +163,14 @@ jobs:
         run: python3 -m unittest tools.tests.test_rc129_browser_reload_restoration -q
       - name: RC130 authenticated browser editor reentry and real media picker preflight
         run: python3 -m unittest tools.tests.test_rc130_browser_reentry -q
+      - name: RC134 presenter question and answer control parity preflight
+        run: python3 -m unittest tools.tests.test_rc134_presenter_answer_parity -q
+      - name: RC133 collision-safe resize and keyboard parity preflight
+        run: python3 -m unittest tools.tests.test_rc133_resize_boundary -q
+      - name: RC132 keyboard collision limits and response field accessibility preflight
+        run: python3 -m unittest tools.tests.test_rc132_keyboard_accessibility -q
+      - name: RC131 continuous collision and participant authored font preflight
+        run: python3 -m unittest tools.tests.test_rc131_stage_collision_contract -q
       - name: RC128 screenshot parity, workspace reload and collision boundary preflight
         run: python3 -m unittest tools.tests.test_rc128_rehearsal_parity_contract -q
 
@@ -277,6 +285,12 @@ jobs:
         run: python3 tools/rc_release_preflight.py --strict
       - name: RC128 preview parity, workspace recovery and collision sweep regression
         run: node --experimental-strip-types --test apps/web/test/rc128-preview-recovery-collision.test.ts
+      - name: RC133 pointer and keyboard resize first-contact Node regression
+        run: node --experimental-strip-types --test apps/web/test/rc133-resize-limit.test.ts
+      - name: RC132 keyboard-safe movement and response resizing Node regression
+        run: node --experimental-strip-types --test apps/web/test/rc132-keyboard-geometry.test.ts
+      - name: RC131 continuous collision sweep and font parity Node regression
+        run: node --experimental-strip-types --test apps/web/test/rc131-continuous-collision.test.ts
       - name: RC124 smart alignment and absolute grid geometry Node regression
         run: node --experimental-strip-types --test apps/web/test/rc124-smart-guides.test.ts
       - name: RC113 graphical overlays, media upload, inline editing and content fit regressions
@@ -335,6 +349,10 @@ jobs:
           python3 tools/ci_built_frontend_asset_probe.py
           # RC124: actual Chromium alignment-guide geometry/pointer safety, desktop and mobile.
           python3 tools/ci_rc124_alignment_guides_chromium.py
+          # RC134: real projection and presenter rehearsal share readonly answer controls.
+          python3 tools/ci_rc134_projection_answer_chromium.py
+          # RC131: authored coordinates and title/footer fonts are identical across four stages.
+          python3 tools/ci_rc131_stage_fidelity_chromium.py
           # RC119: selected resize handles may inflate outer scrollHeight, but never content auto-fit.
           python3 tools/ci_rc119_autofit_handles_chromium.py
           # Real browser CSS preflight: catch hidden nested actions before UI acceptance.
@@ -875,7 +893,11 @@ jobs:
           python3 tools/verify_rc_cycle127_inventory.py --historical
           python3 tools/verify_rc_cycle128_inventory.py --historical
           python3 tools/verify_rc_cycle129_inventory.py --historical
-          python3 tools/verify_rc_cycle130_inventory.py
+          python3 tools/verify_rc_cycle130_inventory.py --historical
+          python3 tools/verify_rc_cycle131_inventory.py --historical
+          python3 tools/verify_rc_cycle132_inventory.py --historical
+          python3 tools/verify_rc_cycle133_inventory.py --historical
+          python3 tools/verify_rc_cycle134_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

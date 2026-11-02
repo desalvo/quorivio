@@ -29,6 +29,52 @@ export function snapWidgetGroupDelta<T extends Widget>(widgets:readonly T[],ids:
  return {dx:+(Math.max(-left,Math.min(100-right,Math.round((left+dx)/step)*step-left))).toFixed(4),
          dy:+(Math.max(-top,Math.min(100-bottom,Math.round((top+dy)/step)*step-top))).toFixed(4)};
 }
+/** Resize an interactive widget towards a proposed rectangle until its first
+ * collision. Resizing is monotone from its saved starting rectangle: it cannot
+ * jump across a narrow neighbour or undo an entire gesture when one edge hits.
+ * Graphics keep the intentional overlay policy; invalid geometries fail shut.
+ * Use the pointer-down base for every move, not the preceding intermediate box.
+ */
+export function resizeWidgetToCollisionLimit<T extends Widget>(
+ original:readonly T[],id:string,proposed:Box
+):T[]{
+ const source=original.find(item=>item.id===id);
+ if(!source||!source.position)return [...original];
+ const base=rect(source);
+ const values=[...Object.values(base),...Object.values(proposed)];
+ if(!values.every(Number.isFinite)||proposed.width<.01||proposed.height<.01||
+    proposed.x<0||proposed.y<0||proposed.x+proposed.width>100.0001||
+    proposed.y+proposed.height>100.0001)return [...original];
+ const withBox=(box:Box):T[]=>original.map(w=>w.id===id?{
+  ...w,position:{...w.position,...box},autoFit:false
+ } as T:w);
+ if(isFreeGraphic(source.kind))return withBox(proposed);
+ const fixed=original.filter(w=>w.id!==id&&!isFreeGraphic(w.kind));
+ if(fixed.some(w=>hit(base,rect(w))))return [...original];
+ if(!fixed.some(w=>hit(proposed,rect(w))))return withBox(proposed);
+ const interpolated=(t:number):Box=>({
+  x:base.x+(proposed.x-base.x)*t,y:base.y+(proposed.y-base.y)*t,
+  width:base.width+(proposed.width-base.width)*t,
+  height:base.height+(proposed.height-base.height)*t
+ });
+ // Along an edge/corner resize the occupied rectangle can only grow or shrink
+ // on each affected side. Collision occupancy is monotonic for these gestures.
+ let low=0,high=1;
+ for(let n=0;n<36;n++){
+  const mid=(low+high)/2;
+  if(fixed.some(w=>hit(interpolated(mid),rect(w))))high=mid;
+  else low=mid;
+ }
+ const maxDelta=Math.max(...Object.keys(base).map(k=>Math.abs(proposed[k as keyof Box]-base[k as keyof Box])));
+ const inset=maxDelta?Math.min(low,.0003/maxDelta):0;
+ const safe=Math.max(0,low-inset);
+ // Match the page's serialized four-decimal geometry. Round-trip quantization
+ // must never introduce a tiny overlap that the analytical sweep had avoided.
+ let candidate:Box=interpolated(safe);
+ candidate={x:+candidate.x.toFixed(4),y:+candidate.y.toFixed(4),width:+candidate.width.toFixed(4),height:+candidate.height.toFixed(4)};
+ return fixed.some(w=>hit(candidate,rect(w)))?[...original]:withBox(candidate);
+}
+
 export type AlignmentGuide={axis:'x'|'y';at:number;source:'canvas'|'widget'};
 /** PowerPoint-like non-persistent alignment guides, computed with the snap itself.
  * Each axis is chosen independently using a stable smallest-distance rule.
@@ -83,39 +129,52 @@ export function freeWidgetPosition<T extends Widget>(items:readonly T[],preferre
  return cells.find(available)||null;
 }
 
-/** Sweep the whole dragged group from its initial position to the pointer target.
- * Stop at the first blocking boundary instead of teleporting back to origin.
- * Bisection never permits the group to pass through another widget at high pointer speed. */
+/** Continuous swept AABB collision test for a rigid translated widget group.
+ * Sampling the pointer path can tunnel through thin obstacles when the browser
+ * coalesces pointer events; calculate the FIRST contact time analytically.
+ * Both axes use the same fraction, so diagonal drags do not skew the group.
+ * Graphics (shapes and lines) remain freely overlayable by design. */
+function sweptContact(a:Box,b:Box,dx:number,dy:number):number|null{
+ const axis=(a0:number,a1:number,b0:number,b1:number,d:number):[number,number]|null=>{
+  if(d===0)return a0<b1-.0001&&a1>b0+.0001?[-Infinity,Infinity]:null;
+  const t0=(b0-a1)/d,t1=(b1-a0)/d;
+  return [Math.min(t0,t1),Math.max(t0,t1)];
+ };
+ const x=axis(a.x,a.x+a.width,b.x,b.x+b.width,dx);
+ const y=axis(a.y,a.y+a.height,b.y,b.y+b.height,dy);
+ if(!x||!y)return null;
+ const enter=Math.max(x[0],y[0]),leave=Math.min(x[1],y[1]);
+ if(enter>=leave||leave<=0||enter>1)return null;
+ return Math.max(0,enter);
+}
+/** Stop at the first physical boundary, independently of pointer speed or
+ * obstacle thickness. The canvas clamp from moveWidgetGroup is honored before
+ * the sweep, and all selected widgets retain their original relative offsets. */
 export function moveWidgetsToCollisionLimit<T extends Widget>(original:T[],ids:readonly string[],dx:number,dy:number):T[]{
  if(!Number.isFinite(dx)||!Number.isFinite(dy)||!ids.length)return original;
+ const chosen=new Set(ids);
+ const moving=original.filter(w=>chosen.has(w.id)&&!isFreeGraphic(w.kind));
+ if(!original.some(w=>chosen.has(w.id)))return original;
  const target=moveWidgetGroup(original,ids,dx,dy);
- if(!overlapsOtherWidgets(target,ids)){
-  // A straight move can cross a thin widget even if the final position is clear.
-  // Check successive substeps using the smallest relevant slide dimension.
-  const extents=original.filter(w=>ids.includes(w.id)).map(rect);
-  const fixed=original.filter(w=>!ids.includes(w.id)&&!isFreeGraphic(w.kind)).map(rect);
-  const smallest=Math.min(5,...extents.map(b=>Math.min(b.width,b.height)),...fixed.map(b=>Math.min(b.width,b.height)));
-  const segments=Math.min(400,Math.max(1,Math.ceil(Math.hypot(dx,dy)/Math.max(.2,smallest/3))));
-  let safe=0;
-  for(let i=1;i<=segments;i++){const t=i/segments;if(overlapsOtherWidgets(moveWidgetGroup(original,ids,dx*t,dy*t),ids)){
-    let high=t,low=safe;
-    for(let k=0;k<24;k++){const mid=(high+low)/2;if(overlapsOtherWidgets(moveWidgetGroup(original,ids,dx*mid,dy*mid),ids))high=mid;else low=mid}
-    return moveWidgetGroup(original,ids,dx*low,dy*low);
-   }safe=t}
-  return target;
+ const first=original.find(w=>chosen.has(w.id))!;
+ const final=target.find(w=>w.id===first.id)!;
+ // Account for the common group clamp and 4-decimal stage rounding.
+ const actualX=number(final.position?.x,0)-number(first.position?.x,0);
+ const actualY=number(final.position?.y,0)-number(first.position?.y,0);
+ if(!actualX&&!actualY)return original;
+ const fixed=original.filter(w=>!chosen.has(w.id)&&!isFreeGraphic(w.kind));
+ // Starting in an invalid overlapping state must never generate an additional
+ // overlap; independent repair belongs to the explicit layout recovery path.
+ if(moving.some(a=>fixed.some(b=>hit(rect(a),rect(b)))))return original;
+ let firstContact=1;
+ for(const a of moving)for(const b of fixed){
+  const contact=sweptContact(rect(a),rect(b),actualX,actualY);
+  if(contact!==null)firstContact=Math.min(firstContact,contact);
  }
- // Blocking geometry may occur before the target. Probe along the path,
- // then refine the first collision to sub-pixel slide precision.
- let safe=0;
- const segments=Math.min(400,Math.max(8,Math.ceil(Math.hypot(dx,dy)/.5)));
- for(let i=1;i<=segments;i++){
-  const t=i/segments;
-  if(overlapsOtherWidgets(moveWidgetGroup(original,ids,dx*t,dy*t),ids)){
-   let lo=safe,hi=t;
-   for(let k=0;k<24;k++){const mid=(lo+hi)/2;if(overlapsOtherWidgets(moveWidgetGroup(original,ids,dx*mid,dy*mid),ids))hi=mid;else lo=mid}
-   return moveWidgetGroup(original,ids,dx*lo,dy*lo);
-  }
-  safe=t;
- }
- return original;
+ if(firstContact>=1)return target;
+ // Keep the saved four-decimal rectangles strictly outside their neighbors.
+ const inset=Math.min(firstContact,.0002/Math.max(Math.abs(actualX),Math.abs(actualY)));
+ const safe=Math.max(0,firstContact-inset);
+ const stopped=moveWidgetGroup(original,ids,actualX*safe,actualY*safe);
+ return overlapsOtherWidgets(stopped,ids)?original:stopped;
 }
