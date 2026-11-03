@@ -115,10 +115,14 @@ export function formatSelectedOrEntireField(marks:TextMark[],field:string,text:s
  * including independent subquestions and response-option marks. */
 export function applyAllWidgetTypeface(widget:{style?:Record<string,unknown>;textMarks?:TextMark[]},change:InlineStyle){
  const style={...(widget.style||{}),...change};
- if(change.fontFamily!==undefined)style.answerFontFamily=change.fontFamily;
- if(change.color!==undefined)style.answerColor=change.color;
- if(change.bold!==undefined)style.answerBold=change.bold;
- if(change.italic!==undefined)style.answerItalic=change.italic;
+  // Keep answer-option typography synchronized with the widget-wide style.
+  // Object.assign retains the inferred return type while adding the valid
+  // optional answer fields supported by the saved widget schema.
+  Object.assign(style,
+    change.fontFamily!==undefined?{answerFontFamily:change.fontFamily}:{},
+    change.color!==undefined?{answerColor:change.color}:{},
+    change.bold!==undefined?{answerBold:change.bold}:{},
+    change.italic!==undefined?{answerItalic:change.italic}:{});
  const marks=(widget.textMarks||[]).map(mark=>({...mark,style:{...mark.style,...change}}));
  return {style,textMarks:marks};
 }
