@@ -26,7 +26,8 @@ test('properties permit native mid-text caret and text drag selection',()=>{
 });
 test('closing format widget does not clear active widget selection',()=>{
  assert.match(ui,/onClick=\{\(\)=>setRibbonDismissed\(true\)\}/);
- assert.match(ui,/active&&!ribbonDismissed&&widgets.some/);
+ assert.match(ui,/active&&!ribbonDismissed&&!suspendFormattingRibbon&&widgets\.some/);
+ assert.match(ui,/suspendFormattingRibbon=\{pageConflict\}/);
 });
 test('scale content is not transformed while editing text',()=>{
  assert.match(ui,/allowScale=\{!mobileMode&&editing!==w.id&&/);
