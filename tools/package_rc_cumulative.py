@@ -21,7 +21,9 @@ import sys
 import zipfile
 from pathlib import Path
 
-from rc_inventory_closure import check_inventory_closure, required_inventory_files
+from rc_inventory_closure import (
+    check_inventory_closure, is_ephemeral_source_path, required_inventory_files,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -40,6 +42,9 @@ def assemble_paths(root: Path, previous: str, current: str, extra: list[str]) ->
     deps = required_inventory_files(lambda name: (root / name).read_text(encoding='utf8'))
     paths |= deps - {current}
     paths.discard(current)
+    # A historical inventory can contain an ignored local bytecode artifact;
+    # do not carry it forward or let its existence influence source closure.
+    paths = {name for name in paths if not is_ephemeral_source_path(name)}
     for name in paths:
         p = root / name
         if p.is_symlink() or not p.is_file() or p.resolve().is_relative_to(root.resolve()) is False:
@@ -55,6 +60,8 @@ def build(cycle: int, previous_cycle: int, day: str, output: Path, extra: list[s
         # Prevent silent mutation of an existing acceptance receipt.
         raise ValueError('current receipt already exists; do not overwrite: ' + cur)
     names = assemble_paths(root, prev, cur, extra)
+    if any(is_ephemeral_source_path(name) for name in names):
+        raise ValueError('ephemeral generated file in package list')
     digests = {}
     for name in names:
         value = hashlib.sha256((root / name).read_bytes()).hexdigest()

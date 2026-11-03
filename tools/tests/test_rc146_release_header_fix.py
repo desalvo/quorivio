@@ -11,21 +11,24 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class ReleaseHeaderHotfixTests(unittest.TestCase):
-    def test_active_release_and_localized_percentages(self):
-        self.assertEqual(verify_headers(ROOT, 146), len(FILES))
+    def test_rc146_release_and_localized_percentages_survive_as_history(self):
+        # RC146 is immutable history after the next cycle. The active headers
+        # must follow the *current* inventory rather than always be RC146.
+        self.assertEqual(verify_headers(ROOT), len(FILES))
         for name in FILES:
-            current = (ROOT / 'docs' / name).read_text(encoding='utf8').split('\n---\n', 1)[0]
-            self.assertTrue(current.startswith('# Quorivio 0.1.0-dev — RC146 —'), name)
+            entire = (ROOT / 'docs' / name).read_text(encoding='utf8')
+            current = entire.split('\n---\n', 1)[0]
+            self.assertIn('RC146', entire, name)
             self.assertTrue(all(flag in current for flag in FLAGS), name)
             score = '85,25%' if name.endswith('.it.md') else '85.25%'
             self.assertIn(score, current, name)
 
-    def test_ci_uses_rc146_as_current_and_rc145_as_historical(self):
+    def test_ci_keeps_rc146_receipt_historical(self):
         workflow = (ROOT / '.github/workflows/ci.yml').read_text(encoding='utf8')
         self.assertIn('python3 tools/verify_rc_cycle145_inventory.py --historical', workflow)
-        self.assertIn('python3 tools/verify_rc_cycle146_inventory.py', workflow)
+        self.assertIn('python3 tools/verify_rc_cycle146_inventory.py --historical', workflow)
         self.assertIn('tools.tests.test_rc146_release_header_fix', workflow)
-        self.assertEqual(current_verifier_module().__name__, 'verify_rc_cycle146_inventory')
+        self.assertGreaterEqual(int(current_verifier_module().__name__.split('cycle')[1].split('_')[0]), 147)
 
     def test_earlier_mobile_fixes_and_archives_survive(self):
         docs = ROOT / 'docs'

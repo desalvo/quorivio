@@ -15,6 +15,29 @@ COMMAND = re.compile(r'^\s*python3 tools/(verify_rc_cycle\d+_inventory\.py)(?:\s
 MANIFEST = re.compile(r"^MANIFEST\s*=\s*'([^']+)'", re.M)
 
 
+
+
+# Compiler outputs, local caches, and generated build results must never be
+# dependencies of a cumulative source release. A prior inventory is untrusted
+# as a file selection source: older releases may have packaged ignored files.
+_EPHEMERAL_PARTS = frozenset({
+    '__pycache__', '.pytest_cache', '.mypy_cache', '.ruff_cache',
+    'node_modules', 'dist', 'coverage', '.git',
+})
+_EPHEMERAL_FILES = frozenset({'.DS_Store', '.env'})
+_EPHEMERAL_SUFFIXES = ('.pyc', '.pyo', '.pyd')
+
+
+def is_ephemeral_source_path(name: str) -> bool:
+    """Whether a manifest member represents nonportable generated data."""
+    if not isinstance(name, str) or not name or '\\' in name:
+        return True
+    parts = name.split('/')
+    return (any(p in _EPHEMERAL_PARTS for p in parts) or
+            parts[-1] in _EPHEMERAL_FILES or
+            parts[-1].endswith(_EPHEMERAL_SUFFIXES))
+
+
 def required_inventory_files(read_text: Callable[[str], str]) -> set[str]:
     """Return verifier/receipt paths required by the workflow itself."""
     workflow = read_text(WORKFLOW)

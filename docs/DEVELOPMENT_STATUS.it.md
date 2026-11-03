@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC147 — Hotfix inventario CI da checkout pulito
+
+**Cumulativo RC147 dopo RC146:** la run GitHub Actions `41678059398` è fallita perché RC146 includeva un file `.pyc` generato localmente in `__pycache__`, assente nei checkout Git. I cumulativi escludono ora i file generati; l'inventario corrente ne vieta la presenza, RC146 è storico e invariato, introdotti test di regressione e verifica dell'indice Git. **Completamento certificato sempre 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. CI completa, Docker e dispositivi reali da confermare. Dettagli: `docs/RC_CYCLE147_CI_INVENTORY_REPRODUCIBILITY.it.md`. Nessun commit/push/rilascio dell'assistente.
+
+---
+
 # Quorivio 0.1.0-dev — RC146 — Hotfix coerenza intestazioni e inventario CI
 
 **Cumulativo RC146 successivo a RC145:** la run GitHub Actions `41674561888` si è arrestata durante `Validate active RC release headers against the current inventory` perché `COMPLETION_HANDOFF.md` riportava ancora RC144 e `COMPLETION_HANDOFF.it.md` RC143 mentre l'inventario corrente era RC145. Sincronizzate a RC146 le quattro intestazioni IT/EN, preservati i blocchi storici e l'inventario RC145 immutabile, aggiunto test di regressione e trasformata la verifica RC145 in storica. **Completamento certificato invariato: 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Il controllo locale non sostituisce la CI completa, la pubblicazione Docker o il collaudo reale. Dettagli: `docs/RC_CYCLE146_CI_RELEASE_HEADER_FIX.it.md`. Nessun commit/push/rilascio da parte dell'assistente.

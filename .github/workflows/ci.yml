@@ -119,6 +119,7 @@ jobs:
         run: |
           PYTHONPATH=tools python3 tools/verify_rc_release_status.py
           PYTHONPATH=tools python3 -m unittest tools.tests.test_rc_cycle100_release_status_guard -q
+          PYTHONPATH=tools python3 -m unittest tools.tests.test_rc147_inventory_no_cache -q
       - name: Validate RC105 floating dialogs and selection-only resize geometry before npm
         run: python3 -m unittest tools.tests.test_rc105_editor_floating -q
       - name: Validate RC101 horizontal widget rail and visible editor stage before npm
@@ -933,7 +934,9 @@ jobs:
           python3 -m unittest tools.tests.test_rc145_mobile_background_font -q
           python3 tools/verify_rc_cycle145_inventory.py --historical
           python3 -m unittest tools.tests.test_rc146_release_header_fix -q
-          python3 tools/verify_rc_cycle146_inventory.py
+          python3 tools/verify_rc_cycle146_inventory.py --historical
+          python3 -m unittest tools.tests.test_rc147_inventory_no_cache -q
+          python3 tools/verify_rc_cycle147_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

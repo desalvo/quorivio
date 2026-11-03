@@ -1,0 +1,7 @@
+# RC147 — Inventario cumulativo riproducibile e checkout Git pulito
+
+**Incidente:** la run GitHub Actions `41678059398` (commit `3caceff`) è fallita nel job `Production quality gate`, passo `RC126 legacy Docker and Kubernetes CI contract reconciliation before npm`. Un test storico ha invocato il verificatore dell'inventario corrente: RC146 includeva per errore `tools/tests/__pycache__/test_rc145_mobile_background_font.cpython-313.pyc`, file generato localmente e ignorato da Git. Nel checkout GitHub il file non esisteva, producendo `ValueError: file missing or symlinked`. ClamAV ha superato il controllo; gli altri job sono stati saltati.
+
+**Correzione:** il generatore `tools/package_rc_cumulative.py` filtra cache e file di build temporanei, anche quando derivano dall'inventario precedente; il verificatore RC147 rifiuta percorsi generati nell'inventario corrente e verifica l'identità dell'elenco rispetto all'indice Git quando disponibile. RC146 resta storico e invariato. Aggiunti test per il file `.pyc` ereditato, per la policy, per inventari non validi e per la riproducibilità del checkout Git pulito. Le quattro intestazioni IT/EN ora indicano RC147; `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+**Evidenze:** i controlli locali Python e ZIP non sostituiscono la full CI GitHub. Percentuale certificata invariata: 85,25% (43 gate accettati, 17 parziali). Nessun commit/push/pubblicazione eseguito dall'assistente; eseguire la full CI dal nuovo commit RC147 prima di pubblicare.

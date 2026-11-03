@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC147 — Portable source archive and CI inventory handoff
+
+**Cumulative RC147 after RC146:** fix clean-checkout checksum failure from run `41678059398`: generated Python caches can no longer enter cumulative packages or active inventories; historical RC146 receipt preserved unchanged, four active headers synchronized, and verification now covers Git index parity and inherited bytecode. **Certified completion remains 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Details: `docs/RC_CYCLE147_CI_INVENTORY_REPRODUCIBILITY.en.md`. Full CI not yet confirmed, no assistant commit/push/release.
+
+---
+
 # Quorivio 0.1.0-dev — RC146 — Complete CI release metadata handoff
 
 **Cumulative RC146 after RC145:** exact fix for GitHub Actions `41674561888` release-header gate: synchronized active release headings and completion metadata in the four English/Italian status/handoff files; historical release notes and immutable RC145 receipt retained. Added a dedicated release-header regression test, made RC145 historical and RC146 current in CI. **Certified completion remains 85.25%** (43 accepted / 17 partial): `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Earlier RC145 mobile background and Arial changes are retained; no change to runtime behavior. Details: `docs/RC_CYCLE146_CI_RELEASE_HEADER_FIX.en.md`. Local validation only; full CI and external acceptance pending. No assistant commit/push/release.

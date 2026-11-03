@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC147 — Reproducible clean-checkout CI inventory hotfix
+
+**Cumulative RC147 after RC146:** GitHub Actions run `41678059398` failed because RC146 bundled a locally generated `.pyc` under `__pycache__` absent from clean Git checkouts. Excluded generated paths from future cumulative source archives and active inventory, kept the immutable RC146 manifest as historical, added fail-closed regression tests and verified Git index parity. **Certified completion remains 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full CI, Docker and real-device acceptance remain pending. Details: `docs/RC_CYCLE147_CI_INVENTORY_REPRODUCIBILITY.en.md`. No assistant commit/push/release.
+
+---
+
 # Quorivio 0.1.0-dev — RC146 — CI release-header consistency hotfix
 
 **RC146 cumulative after RC145:** GitHub Actions run `41674561888` stopped at `Validate active RC release headers against the current inventory` because `COMPLETION_HANDOFF.md` remained at RC144 and `COMPLETION_HANDOFF.it.md` at RC143 despite current inventory RC145. Updated all four IT/EN active status/handoff headings to the same RC146, preserved historical sections and immutable RC145 inventory, added explicit regression test and promoted RC145 receipt to historical verification. **Certified completion remains 85.25%** (43 accepted / 17 partial): `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Preflight and local packaging checks do not certify full GitHub CI, Docker publication or real-device acceptance. Details: `docs/RC_CYCLE146_CI_RELEASE_HEADER_FIX.en.md`. No assistant commit/push/release.
