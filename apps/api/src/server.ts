@@ -1012,7 +1012,7 @@ app.get('/api/sessions/:id/assets',requireAuth,async(req,res)=>{try{
 app.delete('/api/sessions/:id/assets/:assetId',requireAuth,async(req,res)=>{try{
  const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}
  if(s.status==='closed'){res.status(409).json({error:'session_closed'});return}
- const backgroundLink=await db.query("SELECT 1 FROM activities WHERE session_id=$1 AND (page_design->>'backgroundAssetId'=$2 OR result_design->>'backgroundAssetId'=$2) LIMIT 1",[s.id,req.params.assetId]);
+ const backgroundLink=await db.query("SELECT 1 FROM activities WHERE session_id=$1 AND (page_design->>'backgroundAssetId'=$2 OR result_design->>'backgroundAssetId'=$2 OR page_design->'mobile'->>'backgroundAssetId'=$2) LIMIT 1",[s.id,req.params.assetId]);
  if(backgroundLink.rowCount){res.status(409).json({error:'asset_in_use_by_background'});return}
  const widgetLink=await db.query("SELECT 1 FROM activities WHERE session_id=$1 AND page_design->'widgets' @> $2::jsonb LIMIT 1",[s.id,JSON.stringify([{assetId:req.params.assetId}])]);
  if(widgetLink.rowCount){res.status(409).json({error:'asset_in_use_by_widget'});return}
@@ -1141,7 +1141,7 @@ app.patch('/api/sessions/:id/activities/:aid/design',requireAuth,async(req,res)=
   await cx.query('ROLLBACK');res.status(409).json({error:'design_revision_conflict',current_design_revision:a.rows[0].design_revision});return;
  }
  // Page background assets use the same ownership boundary as embedded widgets.
- for(const design of [req.body.page_design,req.body.result_design]){
+ for(const design of [req.body.page_design,req.body.result_design,req.body.page_design.mobile||{}]){
   if(design.backgroundAssetId){
    const background=await cx.query('SELECT mime_type FROM session_assets WHERE id=$1 AND session_id=$2 AND participant_id IS NULL',[design.backgroundAssetId,s.id]);
    if(!['image/png','image/jpeg','image/gif','image/webp'].includes(background.rows[0]?.mime_type)){await cx.query('ROLLBACK');res.status(400).json({error:'invalid_background_asset'});return}
@@ -1404,7 +1404,7 @@ app.get('/api/join/:code/activities/:aid/media/:assetId',async(req,res)=>{try{
  const s=await publicSession(req.params.code);
  if(!s||s.status!=='active'||s.current_activity_id!==req.params.aid){res.status(404).end();return}
  const a=await db.query('SELECT page_design FROM activities WHERE id=$1 AND session_id=$2 AND status=$3',[req.params.aid,s.id,'open']);
- if(!a.rowCount||!(a.rows[0].page_design?.backgroundAssetId===req.params.assetId||(a.rows[0].page_design?.widgets||[]).some((w:any)=>(['image','video','logo','pdf'].includes(w.kind)&&w.assetId===req.params.assetId||w.style?.fillMode==='image'&&w.style?.fillImageAssetId===req.params.assetId)))){res.status(404).end();return}
+ if(!a.rowCount||!(a.rows[0].page_design?.backgroundAssetId===req.params.assetId||a.rows[0].page_design?.mobile?.backgroundAssetId===req.params.assetId||(a.rows[0].page_design?.widgets||[]).some((w:any)=>(['image','video','logo','pdf'].includes(w.kind)&&w.assetId===req.params.assetId||w.style?.fillMode==='image'&&w.style?.fillImageAssetId===req.params.assetId)))){res.status(404).end();return}
  const r=await db.query('SELECT mime_type FROM session_assets WHERE id=$1 AND session_id=$2',[req.params.assetId,s.id]);
  if(!r.rowCount||!['image/png','image/jpeg','image/gif','image/webp','video/mp4','video/webm','application/pdf'].includes(r.rows[0].mime_type)){res.status(404).end();return}
  res.setHeader('Cache-Control','private, no-store');res.setHeader('X-Content-Type-Options','nosniff');res.type(r.rows[0].mime_type);
@@ -1590,7 +1590,7 @@ app.post('/api/join/:code/ratings',async(req,res)=>{try{
  const token=cookies(req.headers.cookie)[`q_part_${s.id}`];const part=token?await db.query('SELECT id FROM participants WHERE session_id=$1 AND token_hash=$2',[s.id,hash(token)]):null;
  if(!part?.rowCount){res.status(401).json({error:'join_first'});return}
  const aid=req.body?.activity_id,score=req.body?.score,widgetId=req.body?.widget_id;const comment=req.body?.comment; if(comment!==undefined&&(typeof comment!=='string'||comment.length>1000||/[\x00-\x08\x0b\x0c\x0e-\x1f]/.test(comment))){res.status(400).json({error:'invalid_rating_comment'});return}
- if(!Number.isInteger(score)||score<0||score>10){res.status(400).json({error:'rating_out_of_range'});return}
+ if(!Number.isInteger(score)||score<0||score>9){res.status(400).json({error:'rating_out_of_range'});return}
  if(aid!==s.current_activity_id){res.status(409).json({error:'page_not_current'});return}
  const a=await db.query("SELECT page_design FROM activities WHERE id=$1 AND session_id=$2 AND status='open'",[aid,s.id]);
  const widgets=a.rows[0]?.page_design?.widgets||[];

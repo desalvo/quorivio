@@ -1969,3 +1969,158 @@ body > .rehearsal-backdrop {
    Default top alignment keeps the previously authored layout unchanged. */
 :is(.widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-vertical-align="middle"]:not([data-widget-kind="footer"]){display:flex!important;flex-direction:column!important;justify-content:center!important;}
 :is(.widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-vertical-align="bottom"]:not([data-widget-kind="footer"]){display:flex!important;flex-direction:column!important;justify-content:flex-end!important;}
+
+/* RC143: the formatting window never clips the dismiss button or right-side controls.
+ * Groups wrap into additional rows and scroll vertically inside a viewport-safe panel. */
+body .editor-floating-panel.widget-selection-palette{
+ display:flex!important;flex-direction:column!important;
+ max-width:calc(100vw - 16px)!important;max-height:calc(100dvh - 16px)!important;
+ overflow:hidden!important;
+}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-head{
+ position:relative!important;display:flex!important;flex:none!important;
+ width:100%!important;min-width:0!important;box-sizing:border-box!important;
+}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-head .palette-widget-label{
+ flex:0 1 175px!important;min-width:0!important;
+}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-selection{
+ flex:1 1 auto!important;min-width:0!important;white-space:normal!important;
+}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-dismiss{
+ flex:0 0 31px!important;margin-left:auto!important;position:relative!important;
+ z-index:3!important;visibility:visible!important;display:inline-flex!important;
+}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-groups{
+ display:flex!important;flex-wrap:wrap!important;align-content:flex-start!important;
+ flex:1 1 auto!important;min-height:0!important;max-height:calc(100dvh - 70px)!important;
+ width:100%!important;min-width:0!important;overflow-x:hidden!important;overflow-y:auto!important;
+ gap:6px!important;scrollbar-width:auto!important;
+}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-group{
+ flex:0 1 auto!important;min-width:0!important;max-width:100%!important;
+}
+/* RC143: a result label may wrap, but its last word and count stay together. */
+.linked-results .linked-results-row .linked-result-pair{
+ display:block!important;white-space:normal!important;min-width:0!important;
+ max-width:100%!important;overflow-wrap:anywhere!important;
+}
+.linked-results .linked-results-row .linked-result-pair>.linked-result-label{
+ display:inline!important;white-space:pre-wrap!important;min-width:0!important;
+ max-width:100%!important;overflow-wrap:anywhere!important;
+}
+.linked-results .linked-results-row .linked-result-pair>.linked-result-final{
+ display:inline-flex!important;white-space:nowrap!important;align-items:baseline!important;
+ gap:.25em!important;max-width:none!important;overflow:visible!important;
+}
+.linked-results .linked-results-row .linked-result-final>output{
+ display:inline!important;white-space:nowrap!important;font:inherit;
+}
+.result-view-cloud .linked-results-items{display:flex!important;flex-direction:column!important;gap:.3em!important;}
+.result-view-cloud .linked-results-row{
+ display:block!important;max-width:100%!important;width:100%!important;min-width:0!important;
+}
+/* RC144 smartphone: own portrait-stage geometry, independent from desktop. */
+.rehearsal-pane-phone{flex:0 1 420px;align-items:center;min-width:260px;}
+.rehearsal-phone-frame{width:min(390px,100%);height:min(720px,70dvh);border:9px solid #1f2937;
+ border-radius:27px;background:white;box-shadow:0 15px 35px #101a2d40;
+ overflow:auto;box-sizing:border-box;}
+.rehearsal-phone-stage-sizer{position:relative;width:100%;overflow:visible;}
+.rehearsal-phone-stage{position:absolute;left:0;top:0;transform-origin:top left;overflow:hidden;}
+.rehearsal-phone-stage>.rehearsal-slide{
+ display:block!important;position:relative!important;width:1280px!important;height:720px!important;
+ min-height:720px!important;aspect-ratio:16/9!important;box-sizing:border-box!important;
+ padding:0!important;margin:0!important;border:0!important;overflow:hidden!important;
+
+}
+.rehearsal-phone-stage .rehearsal-widgets{
+ position:absolute!important;inset:0!important;display:block!important;width:100%!important;
+ height:100%!important;max-height:none!important;min-height:0!important;
+ container-type:inline-size!important;overflow:hidden!important;padding:0!important;
+}
+.rehearsal-phone-stage .rehearsal-widget{
+ position:absolute!important;left:var(--stage-x)!important;top:var(--stage-y)!important;
+ width:var(--stage-width)!important;height:var(--stage-height)!important;
+ min-height:0!important;max-height:none!important;max-width:none!important;
+ margin:0!important;padding:.7em!important;box-sizing:border-box!important;
+ overflow:hidden!important;transform-origin:center center;
+ font-size:var(--authored-widget-font-size,1.25cqw)!important;line-height:1.2;
+}
+.rehearsal-phone-stage .slide-canvas-page-number{position:absolute!important;right:5px!important;bottom:5px!important;}
+/* RC143: the five configured most frequent results take the full card width.
+ * Override the earlier intrinsic max-content rule when the content is scaled;
+ * the row can wrap at word boundaries, but the final word and count remain bound. */
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget)[data-widget-kind="results-button"]>.widget-fit-frame[data-fit-mode="scale"] .result-view-cloud .linked-results-row{
+ width:100%!important;min-width:0!important;max-width:100%!important;
+ flex:0 0 auto!important;align-self:stretch!important;
+}
+
+/* RC144: editor rich text must use the widget font, not a permanent bold
+   fallback. This is the same inherited family as projection/rehearsal. */
+.editor-ux-v2 .widget-canvas-item .widget-fit-content>.widget-rich-inline{
+ font-family:inherit!important;font-weight:inherit!important;font-style:inherit!important;
+}
+
+/* RC144: smartphone layout is a real portrait canvas, not the desktop slide
+ * reduced by 70%. Both editing and rehearsal use 390 logical pixels and can
+ * scroll vertically without losing form legibility. */
+.editor-ux-v2 .editor-device-switch{position:relative;display:flex;flex-wrap:wrap;align-self:stretch;align-items:center;justify-content:center;gap:6px;min-height:40px;z-index:3;}
+.editor-ux-v2 .editor-device-switch>button{padding:7px 12px;min-height:32px;border:1px solid #8ba6bb;border-radius:7px;color:#e6f4ff;background:#193149;cursor:pointer;}
+.editor-ux-v2 .editor-device-switch>button[aria-pressed="true"]{color:#102235;background:#daf2ff;border-color:#aee3fb;font-weight:700;}
+.editor-ux-v2 .editor-device-switch>small{color:#bdd8ef;font-size:11px;flex:1 1 100%;text-align:center;}
+.editor-ux-v2 .editor-stage[data-editor-device="phone"]{justify-content:flex-start!important;overflow:auto!important;}
+.editor-ux-v2 .editor-stage[data-editor-device="phone"] .editor-canvas-slot{max-width:460px!important;width:min(460px,100%)!important;align-self:center!important;flex-shrink:0;}
+.editor-ux-v2 .canvas-editor-group[data-canvas-device="phone"]{width:100%!important;max-width:430px!important;min-width:0!important;}
+.editor-ux-v2 .canvas-editor-group[data-canvas-device="phone"] .canvas-with-rulers{width:100%!important;}
+.editor-ux-v2 .canvas-editor-group[data-canvas-device="phone"] .canvas-with-rulers .widget-canvas{
+ width:100%!important;max-width:390px!important;aspect-ratio:var(--phone-stage-ratio)!important;
+ background-color:var(--editor-phone-background-color,#ffffff)!important;
+ background-image:var(--editor-page-background,none)!important;
+}
+.editor-ux-v2 .canvas-editor-group[data-canvas-device="phone"] .widget-canvas-item{font-size:var(--mobile-widget-font-size,16px)!important;}
+.rehearsal-phone-stage>.rehearsal-slide{
+ width:390px!important;height:100%!important;min-height:0!important;
+ aspect-ratio:auto!important;
+}
+.rehearsal-phone-stage .rehearsal-widget{
+ font-size:var(--mobile-widget-font-size,16px)!important;padding:10px!important;
+}
+.rehearsal-phone-stage .rehearsal-widget :is(textarea,input,button,select){font-size:inherit;}
+
+/* RC144: actual audience phone follows the same mobile geometry as editor and
+ * rehearsal. The viewport scrolls; desktop backgrounds are not inherited. */
+.audience-widget-layout.stage-phone{
+ position:relative!important;display:block!important;box-sizing:border-box!important;
+ width:390px!important;max-width:100%!important;min-height:720px!important;
+ background-repeat:no-repeat!important;overflow:visible!important;container-type:inline-size!important;
+}
+.audience-widget-layout.stage-phone>.page-widget{
+ position:absolute!important;left:var(--stage-x)!important;top:var(--stage-y)!important;
+ width:var(--stage-width)!important;height:var(--stage-height)!important;
+ min-height:0!important;max-height:none!important;max-width:none!important;
+ margin:0!important;padding:10px!important;box-sizing:border-box!important;
+ font-size:var(--mobile-widget-font-size,16px)!important;overflow:auto!important;
+}
+.audience-widget-layout.stage-phone>.page-widget :is(input,textarea,select,button){font-size:inherit;}
+.audience-widget-layout.stage-phone>.slide-canvas-page-number{right:10px!important;bottom:10px!important;}
+
+/* Phone-specific content never shrinks answer fields/buttons to make a crowded
+ * widget fit. It scrolls inside the independently authored mobile rectangle. */
+.editor-ux-v2 .canvas-editor-group[data-canvas-device="phone"] .widget-canvas-item>.widget-fit-frame,
+.rehearsal-phone-stage .rehearsal-widget>.widget-fit-frame,
+.audience-widget-layout.stage-phone>.page-widget>.widget-fit-frame{
+ overflow:auto!important;scrollbar-width:thin!important;
+}
+.editor-ux-v2 .canvas-editor-group[data-canvas-device="phone"] .widget-canvas-item>.widget-fit-frame .widget-fit-content,
+.rehearsal-phone-stage .rehearsal-widget>.widget-fit-frame .widget-fit-content,
+.audience-widget-layout.stage-phone>.page-widget>.widget-fit-frame .widget-fit-content{
+ transform:none!important;min-height:min-content!important;
+}
+
+/* RC145: authored widget typography must not inherit the application heading
+ * face (Outfit) from generic h1..h4 rules. The same inheritance boundary
+ * applies to editor, presenter, participant and rehearsal. Inline text marks
+ * remain free to override the authored widget face (for example Georgia). */
+:is(.editor-ux-v2 .widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)
+  :is(h1,h2,h3,h4){font-family:inherit;}
+.editor-ux-v2 .widget-canvas-item .widget-fit-content>.canvas-widget-body-preview{font-family:inherit;}

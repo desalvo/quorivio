@@ -64,7 +64,7 @@ export function widgetAppearanceStyle(style:WidgetAppearance|undefined,imageUrl?
 export function widgetTypographyStyle(style:WidgetTextStyle|undefined):Record<string,string|undefined>{
  const size=style?.fontSize??16;
  return {
-  fontFamily:style?.fontFamily||undefined,
+  fontFamily:style?.fontFamily||'Arial',
   fontSize:`${(size/1280*100).toFixed(5)}cqw`,
   color:style?.color||'#000000',
   fontWeight:style?.bold?'bold':undefined,

@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC145 — Sfondo smartphone isolato e Arial coerente
+
+**Cumulativo RC145 dopo RC144:** corretto il caricamento di nuove immagini di sfondo nella modalità smartphone, che impostava erroneamente lo sfondo desktop; la scelta del colore rivela ora il colore pieno mobile; eliminata duplicazione del ramo di selezione. Verificato Arial nel browser Chromium (stessa metrica di testo fra editor e preview) e protetti i titoli interni dei widget dallo stile generale Outfit. **Node 825/825 superati**; test Python e inventario finale da verificare. **Completamento certificato 85,25%** (43 gate accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. CI, browser autenticato e dispositivi reali ancora necessari. Dettagli: `docs/RC_CYCLE145_MOBILE_BACKGROUND_FONT_PARITY.it.md`. Nessun commit/push/rilascio da parte dell'assistente.
+
+---
+
+# Quorivio 0.1.0-dev — RC143 — Formato widget, risultati e smartphone coerente
+
+**Cumulativo RC143 dopo l'hotfix TypeScript RC142:** finestra di formattazione chiudibile e controlli completamente raggiungibili; widget Risultati con primi 5 (1–20 configurabile), testo a capo e conteggi solidali; prova smartphone con canvas desktop logico 1280×720 scalato uniformemente e senza immagine di sfondo. Dettagli `docs/RC_CYCLE143_RIBBON_CLOUD_MOBILE_PARITY.it.md`. Include l'hotfix RC142. **Completamento certificato 85,25%** (43 accettati / 17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. CI completa Vite e collaudo telefono reale da confermare, nessun commit/push/rilascio dell'assistente.
+
+---
+
 # Quorivio 0.1.0-dev — RC142 — Copia tra pagine, anteprima smartphone e footer
 
 **RC142 cumulativa dopo RC141:** copia dei widget fra pagine della stessa sessione, Backspace/Delete sulla selezione, allineamento verticale, formato e padding del numero pagina Footer separati (default 5 px), dimensioni dei pulsanti Reazioni e Gradimento, anteprima smartphone da dashboard/editor e selezione del dispositivo nella vista affiancata, righello superiore completamente visibile. Dettagli: `docs/RC_CYCLE142_EDITING_MOBILE_FOOTER.it.md`. **Completamento certificato 85,25%** (43 gate accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Verifica locale, non CI GitHub; nessun commit/push/rilascio dell'assistente.

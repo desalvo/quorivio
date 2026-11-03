@@ -9,7 +9,8 @@ test('one rating scale is shared in editor, real audience, and split rehearsal',
  assert.equal(ui.match(/<RatingChoices\b/g)?.length,3);
  assert.match(ui,/\['rating','reactions','results-button'\]\.includes\(w.kind\)\?\{\.\.\.w,showTitle:false\}:w/);
  assert.match(ui,/if\(kind==='rating'\).*widget.showTitle!==false/);
- assert.match(rating,/Array.from\(\{length:11\}/);
+ assert.match(rating,/RATING_VALUES\.map\(rating=>/);
+ assert.match(readFileSync(new URL('../src/rating-range.ts',import.meta.url),'utf8'),/RATING_MAX=9/);
  assert.match(rating,/readOnly\|\|disabled\|\|!onSelect/);
 });
 test('inline caret selection never starts dragging the containing widget',()=>{
@@ -28,6 +29,6 @@ test('closing format widget does not clear active widget selection',()=>{
  assert.match(ui,/active&&!ribbonDismissed&&widgets.some/);
 });
 test('scale content is not transformed while editing text',()=>{
- assert.match(ui,/allowScale=\{editing!==w.id&&/);
+ assert.match(ui,/allowScale=\{!mobileMode&&editing!==w.id&&/);
  assert.match(css,/\.widget-fit-content\{min-height:0\}/);
 });

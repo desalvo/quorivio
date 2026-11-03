@@ -1,5 +1,6 @@
 /** Explicit, non-persistent page draft transfer. Nothing is written to storage or server. */
 import {validDesignRevision,type EditablePageDraft} from './page-draft.ts';
+import {validMobilePageLayout} from '../../api/src/domain.ts';
 
 export type PageDraftBackup={format:'quorivio-local-draft-v1'|'quorivio-local-draft-v2';session_id:string;activity_id:string;base_revision:number;draft:EditablePageDraft;base_draft?:EditablePageDraft};
 const forbidden=new Set(['__proto__','prototype','constructor']);
@@ -26,6 +27,7 @@ export function validateEditablePageDraft(value:unknown):EditablePageDraft{
   if(typeof widget.kind!=='string'||!widget.kind||widget.kind.length>80)throw Error('invalid_page_widget_kind');
   ids.add(widget.id);
  }
+ if(value.mobile!==undefined&&!validMobilePageLayout(value.mobile,value.widgets))throw Error('invalid_mobile_page_layout');
  validateTree(value,0,{count:50_000});
  return value as EditablePageDraft;
 }

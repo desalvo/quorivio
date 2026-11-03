@@ -132,6 +132,15 @@ CREATE TABLE IF NOT EXISTS page_ratings(
  PRIMARY KEY(activity_id,participant_id)
 );
 CREATE INDEX IF NOT EXISTS idx_page_ratings_session ON page_ratings(session_id,activity_id);
+-- RC144: do not rewrite historical 10/10 votes. PostgreSQL NOT VALID allows
+-- legacy records to remain readable while enforcing the new 0..9 policy for
+-- every new INSERT or UPDATE (including direct SQL writes).
+DO $$
+BEGIN
+ IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conrelid='page_ratings'::regclass AND conname='page_ratings_score_zero_to_nine') THEN
+  ALTER TABLE page_ratings ADD CONSTRAINT page_ratings_score_zero_to_nine CHECK(score BETWEEN 0 AND 9) NOT VALID;
+ END IF;
+END $$;
 
 -- Interactive audience tools. A participant can contribute one word per page,
 -- submit moderated questions and vote once on each approved question.

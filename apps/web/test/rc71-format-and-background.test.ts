@@ -14,7 +14,9 @@ test('background file input outlives contextual menu unmount and routes uploaded
  assert.match(src,/ref=\{backgroundFileRef\}/);
  assert.match(src,/void onBackgroundUpload\(file\)/);
  assert.match(src,/setBackgroundMenu\(false\)/);
- assert.match(src,/await refreshAssets\(\);setNotice\('Immagine caricata nella libreria/);
+ assert.match(src,/await refreshAssets\(\);setNotice\(forMobile\?/);
+ assert.match(src,/Immagine caricata nella libreria e applicata alla pagina/);
+ assert.match(src,/Immagine caricata nella libreria e applicata soltanto allo sfondo smartphone/);
  assert.match(src,/setQuestionBackgroundAsset\(applied\.id\)/);
 });
 test('presenter custom text, reaction icon size, and enlarged artistic palette are configurable',()=>{

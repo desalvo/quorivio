@@ -51,5 +51,5 @@ test('RC141: participant can replace a rating without duplicate rows; concurrent
  assert.match(main,/setRatingPending\(old=>\[\.\.\.new Set/);
  assert.match(main,/ratingVotes\[entry\.activity\.id\+':'\+w\.id\]/);
  assert.match(main,/disabled=\{ratingPending\.includes\(w.id\)\}/);
- assert.match(rating,/aria-pressed=\{selected===String\(rating\)\}/);
+ assert.match(rating,/aria-pressed=\{current===String\(rating\)\}/);
 });

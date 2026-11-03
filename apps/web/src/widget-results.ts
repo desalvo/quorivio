@@ -26,7 +26,7 @@ export function topicQuestionRows(value:unknown):StatRow[]{
 export function sampleStatisticRows(source:StatisticalWidget,seed:number,choices:Record<string,string|string[]>={},questionId='',topicSubmissions:Record<string,number>={}):StatRow[]{
  const part=questionId?source.questions?.find(q=>q.id===questionId):source;
  if(!part)return [];
- const options=source.kind==='rating'?Array.from({length:11},(_,n)=>({id:String(n),label:String(n)})):
+ const options=source.kind==='rating'?Array.from({length:10},(_,n)=>({id:String(n),label:String(n)})):
  source.kind==='reactions'?REHEARSAL_EMOJIS.map(emoji=>({id:emoji,label:emoji})):
  (part.options?.length?part.options:[{id:'yes',label:'Sì'},{id:'no',label:'No'}]);
  let value=seed>>>0;

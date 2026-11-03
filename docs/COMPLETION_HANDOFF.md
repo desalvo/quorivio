@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC144 — Independent smartphone layouts and 0–9 rating parity
+
+**Cumulative RC144 after RC143:** ten-slot rating 0–9; portrait 390px phone editor, per-page mobile geometry and optional separate background; real participant and rehearsal parity without forced tiny scaling; mobile draft saved with collaborative CAS and secure active-slide asset access; explicit Arial default. **Local evidence:** 821/821 Node tests, 22/22 focused legacy Python cases, 6/6 RC144 Python contracts and Chromium CSS preflight at 1225px and 390px. **Certified completion remains 85.25%** (43 accepted / 17 partial): `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full Python sweep timed out; Vite production TypeScript compilation blocked by absent local `vite/client` package; GitHub CI, real devices and external approvals pending. No assistant commit/push/release. Details: `docs/RC_CYCLE144_INDEPENDENT_PHONE_RATING_FONT.en.md`.
+
+---
+
+# Quorivio 0.1.0-dev — RC143 — Formatting window, ranked results and scaled smartphone stage
+
+**Cumulative RC143 after RC142 TypeScript hotfix:** floating format window closes visibly and exposes all controls; linked Result widget shows a configurable stable top 5 (1–20) with wrapped labels and attached counts; smartphone rehearsal scales the 1280×720 desktop stage as one unit with no page background image. Details `docs/RC_CYCLE143_RIBBON_CLOUD_MOBILE_PARITY.en.md`. Existing RC142 hotfix retained. **Certified 85.25%** (43 accepted / 17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full npm/Vite CI and actual phone acceptance remain pending; no assistant commit/push/release.
+
+---
+
 # Quorivio 0.1.0-dev — RC142 — Cross-page clipboard, mobile preview and footer styling
 
 **RC142 cumulative after RC141:** copied widgets persist across page switches within the same session, Backspace/Delete works on selection, formatting supports vertical alignment and independent footer number styling/padding (default 5 px), reactions and rating button sizes, a responsive smartphone preview from dashboard/editor and a participant device toggle in side-by-side preview, and a fully visible top ruler. Details: `docs/RC_CYCLE142_EDITING_MOBILE_FOOTER.en.md`. **Certified 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. This is local validation, not a GitHub CI success; no assistant commit/push/release.

@@ -1,0 +1,35 @@
+{
+  "cycle": 145,
+  "date": "2026-11-03",
+  "source_baseline": "rc144-independent-mobile-rating-font-cumulative",
+  "node_suite": {
+    "passed": 825,
+    "failed": 0,
+    "command": "node --experimental-strip-types --test apps/web/test/*.test.ts apps/api/test/*.test.ts"
+  },
+  "python_rc145": {
+    "passed": 5,
+    "failed": 0,
+    "command": "python -m unittest tools.tests.test_rc145_mobile_background_font -q"
+  },
+  "chromium_css_preflight": {
+    "pass": true,
+    "uses_mock_fixture": true,
+    "font": "Arial",
+    "font_size_px": 24,
+    "editor_text_advance_px": 152.07421875,
+    "preview_text_advance_px": 152.07421875,
+    "phone_background_image": "none",
+    "phone_background_color": "#e0f8ff"
+  },
+  "background_upload_authenticated_end_to_end": "not_run_requires_real_session",
+  "vite_production_build": "not_run_missing_local_dev_dependencies",
+  "github_full_ci": "pending",
+  "real_mobile_device_acceptance": "pending",
+  "certified_completion_percent": 85.25,
+  "accepted_gates": 43,
+  "partial_gates": 17,
+  "rc_strict": false,
+  "publish_image": false,
+  "publish_latest": false
+}

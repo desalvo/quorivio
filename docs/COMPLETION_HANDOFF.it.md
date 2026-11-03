@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC143 — Formato widget, risultati e smartphone coerente
+
+**Cumulativo RC143 dopo l'hotfix TypeScript RC142:** finestra di formattazione chiudibile e controlli completamente raggiungibili; widget Risultati con primi 5 (1–20 configurabile), testo a capo e conteggi solidali; prova smartphone con canvas desktop logico 1280×720 scalato uniformemente e senza immagine di sfondo. Dettagli `docs/RC_CYCLE143_RIBBON_CLOUD_MOBILE_PARITY.it.md`. Include l'hotfix RC142. **Completamento certificato 85,25%** (43 accettati / 17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. CI completa Vite e collaudo telefono reale da confermare, nessun commit/push/rilascio dell'assistente.
+
+---
+
 # Quorivio 0.1.0-dev — RC142 — Copia tra pagine, anteprima smartphone e footer
 
 **RC142 cumulativa dopo RC141:** copia dei widget fra pagine della stessa sessione, Backspace/Delete sulla selezione, allineamento verticale, formato e padding del numero pagina Footer separati (default 5 px), dimensioni dei pulsanti Reazioni e Gradimento, anteprima smartphone da dashboard/editor e selezione del dispositivo nella vista affiancata, righello superiore completamente visibile. Dettagli: `docs/RC_CYCLE142_EDITING_MOBILE_FOOTER.it.md`. **Completamento certificato 85,25%** (43 gate accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Verifica locale, non CI GitHub; nessun commit/push/rilascio dell'assistente.

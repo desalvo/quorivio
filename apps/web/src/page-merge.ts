@@ -84,6 +84,8 @@ export function mergePageDrafts(base:EditablePageDraft,local:EditablePageDraft,r
  const out:Record<string,unknown>=Object.create(null);
  const fields:(keyof EditablePageDraft)[]=['questionHeader','resultHeader','questionBackground','resultBackground','questionBackgroundColor','resultBackgroundColor','questionBackgroundAsset','resultBackgroundAsset'];
  for(const field of fields)out[field]=value('/'+field,field,base[field],local[field],remote[field]);
+ const mobile=value('/mobile','Layout smartphone',base.mobile===undefined?MISSING:base.mobile,local.mobile===undefined?MISSING:local.mobile,remote.mobile===undefined?MISSING:remote.mobile);
+ if(mobile!==MISSING)out.mobile=mobile;
  out.widgets=ordered.map(id=>merged.get(id));
  return {draft:out as EditablePageDraft,conflicts};
 }

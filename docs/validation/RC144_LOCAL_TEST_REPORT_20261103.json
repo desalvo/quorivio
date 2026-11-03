@@ -1,0 +1,21 @@
+{
+  "cycle": 144,
+  "date": "2026-11-03",
+  "source_baseline": "rc143-ribbon-results-mobile-stage-cumulative",
+  "node_suite": {"passed": 821, "failed": 0},
+  "python_focused_legacy": {"passed": 22, "failed": 0},
+  "python_rc144": {"passed": 6, "failed": 0},
+  "chromium_css_preflight": {"pass": true, "viewport_widths": [1225, 390], "uses_mock_fixture": true},
+  "strict_core_typescript": {"pass": true, "files": ["apps/web/src/mobile-page-layout.ts", "apps/web/src/rating-range.ts", "apps/web/src/page-draft.ts", "apps/web/src/page-merge.ts", "apps/web/src/page-draft-recovery.ts", "apps/api/src/domain.ts"]},
+  "complete_python_suite": "timed_out_not_certified",
+  "web_vite_typescript": "blocked_missing_vite_client_types_offline",
+  "github_full_ci": "pending",
+  "real_mobile_device_acceptance": "pending",
+  "postgres_migration_integration": "pending",
+  "certified_completion_percent": 85.25,
+  "accepted_gates": 43,
+  "partial_gates": 17,
+  "rc_strict": false,
+  "publish_image": false,
+  "publish_latest": false
+}

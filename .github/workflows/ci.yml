@@ -365,6 +365,8 @@ jobs:
           python3 tools/ci_rc134_projection_answer_chromium.py
           # RC141: reaction buttons, native checkboxes and hidden titles across four stage shells.
           python3 tools/ci_rc141_widget_parity_chromium.py
+          # RC144: ribbon close visible, cloud wrapping and independent 390px phone preview.
+          python3 tools/ci_rc143_format_phone_chromium.py
           # RC131: authored coordinates and title/footer fonts are identical across four stages.
           python3 tools/ci_rc131_stage_fidelity_chromium.py
           # RC119: selected resize handles may inflate outer scrollHeight, but never content auto-fit.
@@ -923,7 +925,13 @@ jobs:
           python3 -m unittest tools.tests.test_rc141_stage_result_rating_contract -q
           python3 tools/verify_rc_cycle141_inventory.py --historical
           python3 -m unittest tools.tests.test_rc142_editor_clipboard_mobile_footer -q
-          python3 tools/verify_rc_cycle142_inventory.py
+          python3 tools/verify_rc_cycle142_inventory.py --historical
+          python3 -m unittest tools.tests.test_rc143_phone_result_ribbon -q
+          python3 tools/verify_rc_cycle143_inventory.py --historical
+          python3 -m unittest tools.tests.test_rc144_mobile_rating -q
+          python3 tools/verify_rc_cycle144_inventory.py --historical
+          python3 -m unittest tools.tests.test_rc145_mobile_background_font -q
+          python3 tools/verify_rc_cycle145_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:
