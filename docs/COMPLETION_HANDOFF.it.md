@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC151 — Passaggio di consegne dei controlli TypeScript
+
+**Cumulativo RC151 dopo il commit RC150:** corretto il preflight RC115 fallito nella run `41706075530`: le mutazioni negative operano ora sull’unione `Pick` reale e verificano che il sorgente venga realmente modificato. Test RC151 aggiunti, ricevuta storica RC150 conservata, CI e quattro intestazioni di rilascio sincronizzate; nessuna modifica funzionale. **Completamento certificato 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Build GitHub completa e accettazioni esterne da confermare. Nessun commit/push/rilascio dell’assistente.
+
+---
+
 # Quorivio 0.1.0-dev — RC150 — Hotfix compilazione TypeScript della cronologia widget
 
 **Cumulativo RC150 successivo al commit RC149:** risolti due errori TS2339 nella run GitHub Actions `41700222536`, includendo `position` e `resultTopCount` nel tipo `EditorWidgetPermissionFields` che attinge a `PageDesign.widgets`. Comportamento di Undo, sfondi mobile e risultati preservato. Aggiunti test, documentazione e inventario corrente; RC149 conservato storico. **Completamento certificato 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Compilazione npm completa e accettazioni di integrazione da confermare nella prossima CI. Nessun commit/push/rilascio dell’assistente.

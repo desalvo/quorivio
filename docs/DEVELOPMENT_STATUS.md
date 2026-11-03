@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC151 — Strict TypeScript mutation test and CI preflight hotfix
+
+**RC151 after committed RC150:** GitHub Actions run `41706075530` stopped at historical RC115 because its negative source mutation no longer matched the extended widget-permission union, producing a no-op rather than removing required fields. Updated the RC115 source contract to parse the actual `Pick` and assert each negative mutation really edits the source; added dedicated RC151 regressions, historical RC150 inventory continuity, synchronized release status. Editor runtime unchanged. **Certified 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Complete GitHub CI and browser acceptance pending. See `docs/RC_CYCLE151_STRICT_TYPE_MUTATION_CI_FIX.en.md`. No assistant commit/push/release.
+
+---
+
 # Quorivio 0.1.0-dev — RC150 — Frontend widget history type alignment
 
 **RC150 after committed RC149:** GitHub Actions run `41700222536` passed the early editor preflights and Node unit tests but failed the frontend TypeScript build (TS2339 at `src/main.tsx:1551` and `:2069`): editor widget history omitted the persisted `position` and `resultTopCount` keys. The canonical `PageDesign.widgets` model already declared both. The history intersection now selects these keys from the canonical domain type; four new regression tests and an early preflight enforce this. No functional changes to Undo, mobile layout, results, or backend. Historical RC149 inventory remains immutable. **Certified 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full GitHub build, browser and external acceptance are pending. No assistant commit/push/release.

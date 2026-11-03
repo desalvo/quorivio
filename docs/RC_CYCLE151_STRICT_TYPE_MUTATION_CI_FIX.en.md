@@ -1,0 +1,7 @@
+# RC151 — Stable strict TypeScript negative-mutation contracts (3 November 2026)
+
+GitHub Actions run [41706075530](https://github.com/desalvo/quorivio/actions/runs/41706075530) failed before dependency installation at the historical RC115 preflight, `test_negative_mutations_reject_original_compiler_errors`. The negative mutation used a literal Pick-union suffix ending at `resultsOnly`; RC150 correctly added `position` and `resultTopCount` afterward, so the string replacement became a no-op, falsely reporting that missing fields were accepted.
+
+The RC115 guard now extracts the real `EditorWidgetPermissionFields` `Pick` union and explicitly removes each required field independently, asserting that a mutation changed the source. The new RC151 regression confirms compatibility with additional future fields, catches missing `showTitle` and `autoFit`, verifies the canonical domain and retains strict `tsc --noEmit && vite build`. No changes to application/runtime/widget behavior. The historical RC150 inventory is unchanged, with RC151 promoted as the current clean-checkout inventory.
+
+Certification remains **85.25% (43 accepted / 17 partial)**, with `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Focused local preflight results are not a full GitHub build or operator/browser approval; do not publish Docker images before CI approval. No assistant commit, push or release.

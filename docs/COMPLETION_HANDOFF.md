@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC151 — Robust strict-type preflight handoff
+
+**RC151 cumulative after committed RC150:** fix the RC115 negative-mutation preflight failing in run `41706075530`: extracting the live `Pick` fields and verifying mutations are non-no-op guards against both missing permissions and append-only type changes. Added RC151 tests, preserved historical RC150 receipt, synchronized CI and four active release headers; no runtime edits. **Certified 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full GitHub build, browser and external approvals pending. No assistant commit/push/release.
+
+---
+
 # Quorivio 0.1.0-dev — RC150 — TypeScript build hotfix for widget history
 
 **RC150 cumulative after committed RC149:** fix two TypeScript TS2339 errors in GitHub Actions run `41700222536` by adding `position` and `resultTopCount` to editor history through a typed `Pick` from the canonical `PageDesign.widgets`. This preserves all saved widget state and operations. Added regression checks, synchronized status headers and generated a new inventory, while keeping RC149 history immutable. **Certified 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full npm build and integration CI still require the next GitHub run. No assistant commit/push/release.

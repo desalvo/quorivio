@@ -22,14 +22,55 @@ def autofit_types(source: str) -> bool:
     )) and 'const current=changes||widgets' not in block
 
 
+def editor_permission_fields(source: str) -> set[str] | None:
+    """Extract the actual Pick<> union instead of relying on old field order.
+
+    RC150 appended new persisted fields after ``resultsOnly``. A test based on
+    the previous exact suffix silently mutated nothing and falsely failed CI.
+    """
+    match=re.search(
+        r"type\s+EditorWidgetPermissionFields\s*=\s*"
+        r"Pick<NonNullable<PageDesign\['widgets'\]>\[number\],\s*([^;]+)>\s*;",
+        source,
+    )
+    if not match:
+        return None
+    declaration=match.group(1)
+    fields=re.findall(r"'([^']+)'",declaration)
+    # Disallow broadened unions or malformed content masquerading as a Pick.
+    if not fields or not re.fullmatch(r"\s*'[^']+'(?:\s*\|\s*'[^']+')*\s*",declaration):
+        return None
+    if len(fields)!=len(set(fields)):
+        return None
+    return set(fields)
+
+
 def editor_types(source: str, domain: str) -> bool:
-    marker='type EditorWidgetPermissionFields = Pick<NonNullable<PageDesign[\'widgets\']>[number],'
-    if marker not in source:return False
-    declaration=source[source.index(marker):source.index(';',source.index(marker))]
-    if not all(re.search(r"\b'"+name+r"'\b", declaration) or "'"+name+"'" in declaration for name in ('autoFit','showTitle')): return False
+    fields=editor_permission_fields(source)
+    if fields is None or not {'autoFit','showTitle'}.issubset(fields):
+        return False
+    if not re.search(r'newWidgetHistory<.*?&\s*EditorWidgetPermissionFields>\(',source,re.S):
+        return False
     for key in ('autoFit?:boolean','showTitle?:boolean'):
-        if key not in domain: return False
+        if key not in domain:
+            return False
     return True
+
+
+def remove_editor_permission(source: str, field: str) -> str:
+    """Delete a field from the real Pick union, whatever its neighbors."""
+    marker="type EditorWidgetPermissionFields = Pick<NonNullable<PageDesign['widgets']>[number],"
+    start=source.find(marker)
+    if start<0:
+        return source
+    end=source.find(';',start)
+    if end<0:
+        return source
+    original=source[start:end+1]
+    replacement=re.sub(r"\s*\|\s*'"+re.escape(field)+r"'",'',original,count=1)
+    if replacement==original:
+        replacement=re.sub(r"'"+re.escape(field)+r"'\s*\|\s*",'',original,count=1)
+    return source[:start]+replacement+source[end+1:]
 
 
 def graphic_type_narrowing(source: str, domain: str) -> bool:
@@ -49,7 +90,11 @@ class RC115StrictTypeContracts(unittest.TestCase):
         self.assertTrue(graphic_type_narrowing(UI,DOMAIN))
     def test_negative_mutations_reject_original_compiler_errors(self):
         self.assertFalse(autofit_types(UI.replace('const current: any[]=changes??widgets;','const current=changes||widgets;',1)))
-        self.assertFalse(editor_types(UI.replace(" | 'showTitle' | 'autoFit' | 'resultsOnly'>;", ">;",1),DOMAIN))
+        # Mutate the actual current union: RC150 extends it past resultsOnly.
+        for field in ('showTitle','autoFit'):
+            mutated=remove_editor_permission(UI,field)
+            self.assertNotEqual(mutated,UI,f'negative mutation did not remove {field}')
+            self.assertFalse(editor_types(mutated,DOMAIN),f'accepted missing {field}')
         self.assertFalse(graphic_type_narrowing(UI.replace("shapeType:e.target.value as WidgetTextStyle['shapeType']",'shapeType:e.target.value',1),DOMAIN))
         self.assertFalse(graphic_type_narrowing(UI.replace("lineDirection:e.target.value as WidgetTextStyle['lineDirection']",'lineDirection:e.target.value',1),DOMAIN))
         self.assertFalse(graphic_type_narrowing(UI.replace("strokeDash:e.target.value as WidgetTextStyle['strokeDash']",'strokeDash:e.target.value',1),DOMAIN))

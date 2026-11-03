@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC151 — Correzione CI dei controlli negativi TypeScript
+
+**RC151 dopo il commit RC150:** la run GitHub Actions `41706075530` si è fermata nel controllo storico RC115 perché la mutazione negativa non trovava la dichiarazione `Pick` estesa: il test non modificava il sorgente e falliva erroneamente. Il controllo ora analizza i campi effettivi, rimuove separatamente quelli obbligatori e verifica la mutazione; introdotti test RC151, conservato immutato l’inventario RC150 e sincronizzati CI e documenti di stato. Nessuna modifica al runtime dell’editor. **Completamento certificato 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. CI completa e collaudi browser ancora da verificare. Dettagli: `docs/RC_CYCLE151_STRICT_TYPE_MUTATION_CI_FIX.it.md`. Nessun commit/push/rilascio dell’assistente.
+
+---
+
 # Quorivio 0.1.0-dev — RC150 — Allineamento dei tipi della cronologia widget
 
 **RC150 dopo il commit RC149:** la run GitHub Actions `41700222536` ha superato i preflight precedenti e i test Node, ma la build TypeScript frontend si è fermata con due errori TS2339 (`position` e `resultTopCount`) nella tipizzazione locale della cronologia widget. Il modello canonico `PageDesign.widgets` contiene già questi campi: sono stati inclusi nel `Pick` dei tipi condivisi, senza modificare il comportamento dell’editor. Aggiunti quattro test di regressione e controllo anticipato nella CI. Inventario storico RC149 conservato immutato. **Completamento certificato 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Build GitHub completa, browser e accettazioni esterne ancora da verificare. Nessun commit/push/rilascio effettuato dall’assistente.
