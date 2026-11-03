@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC154 — Live test presence and opt-in Gravatar
+
+**RC154 after RC153:** the test presentation now includes connected-participant counters, two independent questions, 0–9 ratings, reactions and results. Added explicitly authorized reset/start, 500 independent widget answers and WebSocket presenter-observed peak validation to the Git-tracked CLI; optional opt-in Gravatar image import/refresh on successful login with local storage, antivirus and privacy safeguards; administrator manuals regenerated in IT/EN. The prior RC153 inventory remains immutable. **Certified 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full GitHub CI, authenticated browser/PostgreSQL and actual server 500-user rehearsal remain pending. No commit/push/deployment by assistant. See `docs/RC_CYCLE154_LIVE_LOAD_GRAVATAR.en.md`.
+
+---
+
+# Quorivio 0.1.0-dev — RC153 — Live 500-answer CLI and conflict-safe editor
+
+**RC153 after committed RC152:** GitHub CI run `41711064819` passed the build, 825 Node tests and preliminary Chromium checks but failed when the selected-widget floating ribbon intercepted an enabled revision-conflict recovery button. The ribbon is now suspended during a conflict without losing the draft. Added a private, idempotent 500-participant test presentation to new/existing accounts with automatic clean recreation after deletion, and a guarded operator-run CLI for 500 independently joined, server-confirmed votes on one fixed poll. Added regressions, documentation and current inventory; kept RC152 evidence immutable. **Certified 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full authenticated GitHub CI, production-like PostgreSQL and real 500-response test remain pending. No assistant commit/push/release.
+
+---
+
 # Quorivio 0.1.0-dev — RC152 — Chromium wrapped result-count parity hotfix
 
 **RC152 after committed RC151:** GitHub Actions run `41708756081` passed all 825 Node tests and frontend TypeScript/Vite build, then stopped at historical RC141 Chromium parity: its whole-label `white-space:nowrap` expectation contradicted RC143 long-row wrapping. The browser fixture now renders the real prefix + final-word/count grouping, tests actual multi-line wrapping and atomic `[28]` tail across editor/presenter/rehearsal/participant at 1440px and 390px, and sets the explicit authored widget font size to avoid a false 3.8px participant fallback. Dedicated RC152 negative-mutation browser tests reject either regression. No application runtime/CSS changes. Historical RC151 inventory is immutable; RC152 current receipt and CI synchronized. **Certified 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. GitHub full CI, database/browser integration and external acceptance still pending. No assistant commit/push/release.

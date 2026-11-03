@@ -685,6 +685,8 @@ jobs:
         run: |
           python3 -m pip install --disable-pip-version-check --break-system-packages 'aiohttp>=3.9,<4'
           python3 tools/ci_live_replicas.py
+          # RC153: authorized-answer simulation against a disposable mock API; no real load.
+          python3 -m unittest tools.tests.test_rc153_live_500_mock -q
       - name: Validate phase-independent quiet live snapshot test (post aiohttp installation)
         run: python3 -m unittest tools.tests.test_idle_live_postgres_cycle56 -q
       - name: PostgreSQL two-replica quiet live snapshot freshness (opt-in)
@@ -952,7 +954,13 @@ jobs:
           python3 tools/verify_rc_cycle150_inventory.py --historical
           python3 -m unittest tools.tests.test_rc151_strict_types_mutation -q
           python3 tools/verify_rc_cycle151_inventory.py --historical
-          python3 tools/verify_rc_cycle152_inventory.py
+          python3 tools/verify_rc_cycle152_inventory.py --historical
+          # RC153: conflict-safe floating ribbon and real 500-answer demo/CLI contracts.
+          python3 -m unittest tools.tests.test_rc153_load_demo_and_conflict -q
+          python3 tools/verify_rc_cycle153_inventory.py --historical
+          # RC154: fail-closed real presence and user-owned Gravatar controls.
+          python3 -m unittest tools.tests.test_rc154_load_gravatar tools.tests.test_rc153_live_500_mock -q
+          python3 tools/verify_rc_cycle154_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

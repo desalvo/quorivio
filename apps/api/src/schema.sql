@@ -174,6 +174,13 @@ CREATE TABLE IF NOT EXISTS audience_question_votes (
 -- Presenter identity and widget-scoped satisfaction: additive migration for existing databases.
 ALTER TABLE users ADD COLUMN IF NOT EXISTS display_name text;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS profile_photo_url text;
+-- Optional, user-controlled Gravatar synchronization. Never call third parties
+-- for accounts which have not explicitly opted in.
+ALTER TABLE users ADD COLUMN IF NOT EXISTS gravatar_enabled boolean NOT NULL DEFAULT false;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS profile_photo_source text NOT NULL DEFAULT 'manual';
+ALTER TABLE users ADD COLUMN IF NOT EXISTS gravatar_photo_sha256 text;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS gravatar_checked_at timestamptz;
+
 ALTER TABLE page_ratings ADD COLUMN IF NOT EXISTS widget_id text NOT NULL DEFAULT 'legacy-rating';
 ALTER TABLE page_ratings ADD COLUMN IF NOT EXISTS target_kind text NOT NULL DEFAULT 'question';
 ALTER TABLE page_ratings ADD COLUMN IF NOT EXISTS target_id uuid;
@@ -340,3 +347,9 @@ CREATE INDEX IF NOT EXISTS idx_email_mfa_enrollments_expiry ON email_mfa_enrollm
 
 CREATE TABLE IF NOT EXISTS live_connections(id uuid PRIMARY KEY,session_id uuid NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,participant_id uuid REFERENCES participants(id) ON DELETE CASCADE,last_seen timestamptz NOT NULL DEFAULT now());
 CREATE INDEX IF NOT EXISTS live_connections_recent_idx ON live_connections(session_id,last_seen);
+
+-- RC153: one private, unpublished 500-answer presentation per account.
+-- Unique marker survives owner-visible title editing; deletion allows lazy recreation.
+ALTER TABLE sessions ADD COLUMN IF NOT EXISTS demo_template_key text;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_sessions_owner_demo_template
+ ON sessions(owner_id,demo_template_key) WHERE demo_template_key IS NOT NULL;

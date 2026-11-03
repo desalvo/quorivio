@@ -1,0 +1,12 @@
+# RC154 — Prova reale 500 utenti, Gravatar per account e amministrazione
+
+## Interventi
+
+- La presentazione privata `load-500-v1`, ricreata automaticamente per ogni account, contiene widget `participant-count`, due domande indipendenti, gradimento 0–9, reazioni e risultati. Resta non pubblicata finché il presentatore non la avvia. Il reset standard cancella le risposte di prova e rinnova il codice di accesso; dopo la cancellazione della presentazione il normale provisioning ne ricrea una copia vuota.
+- Lo script `tools/live_500_answers.py` è incluso nel repository e nel cumulativo. Il collaudo CLI autorizzato può azzerare e avviare la domanda designata, generare 500 partecipanti sintetici, tenere aperti i loro WebSocket, osservare il contatore mediante il canale del presentatore e confrontare le risposte confermate con il totale sul server. Impone HTTPS fuori da loopback, conferma esatta dell'hostname, limiti di frequenza e report aggregato senza credenziali o identificativi. Un server fittizio testa il conteggio e il rifiuto delle incongruenze. Non utilizzare su servizi non autorizzati.
+- Gravatar è **facoltativo per ogni account**, disabilitato per impostazione predefinita. L'utente può aggiungere o modificare il ritratto sul sito Gravatar e attivarne l'importazione in Profilo. Al login il server consulta via HTTPS l'endpoint fisso identificato dall'hash SHA-256 dell'email, confronta l'hash dell'immagine e importa le modifiche nell'archivio privato dopo la validazione del formato e la scansione ClamAV. Un upload manuale disabilita Gravatar. Le interruzioni del servizio esterno non bloccano l'accesso; i vecchi file vengono accodati alla cancellazione. La pubblicazione *sul sito Gravatar* rimane una funzione esterna e Quorivio non richiede credenziali OAuth di Gravatar.
+- I manuali amministratore italiano e inglese contengono la procedura per avvio, monitoraggio, reset e ripetizione della prova di carico, oltre alle indicazioni su consenso e privacy per Gravatar.
+
+## Validazione e limiti
+
+Il server fittizio locale verifica 500 risposte widget e un test più piccolo di presenza WebSocket, ma nessuna prova è stata effettuata sul server di produzione. Compilazione TypeScript completa, browser autenticato/PostgreSQL e 500 socket reali simultanei restano da verificare via CI e prova autorizzata. Completamento **85,25%** (43 gate accettati / 17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/deploy/rilascio dell'assistente.

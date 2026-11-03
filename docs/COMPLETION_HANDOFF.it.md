@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC154 — Presenza live e Gravatar facoltativo
+
+**RC154 successiva a RC153:** la presentazione di prova include contatori utenti connessi, due domande indipendenti, gradimento 0–9, reazioni e risultati. Lo script CLI versionato in Git offre reset/avvio espliciti, 500 risposte indipendenti e verifica del picco di WebSocket visto dal presentatore; importazione/aggiornamento Gravatar facoltativi al login, con storage locale, antivirus e protezioni privacy; rigenerati i manuali amministratore IT/EN. Conservato intatto l’inventario storico RC153. **Completamento certificato 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. CI completa, browser autenticato/PostgreSQL e prova reale 500 utenti ancora da verificare. Nessun commit/push/deploy effettuato dall’assistente. Vedi `docs/RC_CYCLE154_LIVE_LOAD_GRAVATAR.it.md`.
+
+---
+
+# Quorivio 0.1.0-dev — RC153 — Handoff 500 risposte e riconciliazione editor
+
+**Cumulativo RC153 dopo il commit RC152:** CI `41711064819` arrivata al browser reale con PostgreSQL, ma fermata dalla barra flottante widget sovrapposta al pulsante di confronto/riallineamento. Il ribbon ora viene sospeso durante il conflitto senza perdere la bozza. Aggiunta presentazione privata di tre pagine per la prova di 500 partecipanti, provisioning idempotente per account nuovi/esistenti (chiave unica, ricreazione pulita dopo cancellazione) e CLI con conferma esplicita che confronta le 500 risposte con il conteggio nel database. Conservati integri gli inventari storici RC152. **Completamento certificato 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. CI completa e collaudo autorizzato server reale ancora da effettuare; nessun commit/push/rilascio dell’assistente.
+
+---
+
 # Quorivio 0.1.0-dev — RC152 — Passaggio di consegne test Chromium risultati
 
 **Cumulativo RC152 successivo al commit RC151:** corretto il test Chromium RC141 non più compatibile con la gestione delle etichette lunghe introdotta in RC143, senza ripristinare il vecchio comportamento. Le etichette possono andare a capo, mentre l’ultima parola e il conteggio tra parentesi quadre restano inseparabili. Lo stesso CSS di produzione viene verificato nelle quattro viste a 1440 e 390 px con fixture da 320 px e font salvato sul partecipante. Aggiunti test negativi per il ritorno al non-a-capo e per il distacco del conteggio; inventario RC151 storico invariato, inventario RC152 corrente e documentazione sincronizzati. Nessuna modifica al runtime. **Completamento certificato 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. CI completa GitHub e accettazioni esterne da confermare. Nessun commit/push/rilascio dell’assistente.

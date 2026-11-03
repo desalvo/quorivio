@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC154 — Presenza live e Gravatar facoltativo
+
+**RC154 successiva a RC153:** la presentazione di prova include contatori utenti connessi, due domande indipendenti, gradimento 0–9, reazioni e risultati. Lo script CLI versionato in Git offre reset/avvio espliciti, 500 risposte indipendenti e verifica del picco di WebSocket visto dal presentatore; importazione/aggiornamento Gravatar facoltativi al login, con storage locale, antivirus e protezioni privacy; rigenerati i manuali amministratore IT/EN. Conservato intatto l’inventario storico RC153. **Completamento certificato 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. CI completa, browser autenticato/PostgreSQL e prova reale 500 utenti ancora da verificare. Nessun commit/push/deploy effettuato dall’assistente. Vedi `docs/RC_CYCLE154_LIVE_LOAD_GRAVATAR.it.md`.
+
+---
+
+# Quorivio 0.1.0-dev — RC153 — Test reale di 500 risposte e dialogo conflitti editor
+
+**RC153 dopo il commit RC152:** la CI GitHub `41711064819` ha superato build, 825 test Node e test Chromium preliminari, ma si è interrotta perché il ribbon flottante intercettava il pulsante di riconciliazione durante un conflitto. La barra viene ora nascosta durante il conflitto, preservando la bozza. Aggiunta una presentazione privata per prova di 500 utenti, disponibile in modo idempotente per account nuovi/esistenti e ricreata vuota dopo eliminazione, e uno script CLI controllato per 500 risposte realmente confermate dal server alla stessa domanda. Aggiornati test, documentazione e inventario, conservando la RC152 storica. **Completamento certificato 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. CI completa autenticata, integrazione PostgreSQL e prova reale 500 risposte ancora da confermare. Nessun commit/push/rilascio dell’assistente.
+
+---
+
 # Quorivio 0.1.0-dev — RC152 — Correzione collaudo Chromium dei risultati a capo
 
 **RC152 successiva al commit RC151:** la run GitHub Actions `41708756081` ha superato tutti gli 825 test Node e la compilazione TypeScript/Vite, ma si è fermata sul test Chromium storico RC141: l’obbligo di `white-space:nowrap` sull’intera etichetta contraddiceva il ritorno a capo introdotto in RC143. La fixture del browser riproduce ora il raggruppamento reale fra prefisso ed ultima parola/conteggio, verifica il ritorno a capo e la coppia finale `[28]` indivisibile nelle quattro viste a 1440 e 390 px e imposta la dimensione salvata del font per evitare il fallback artificiale di 3,8 px sul partecipante. Nuovi test RC152 di mutazione negativa bloccano entrambe le regressioni. Nessuna modifica al CSS o runtime applicativo. Inventario RC151 storico immutato e inventario corrente RC152 sincronizzato con CI. **Completamento certificato 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. CI completa GitHub, integrazione con database e collaudi esterni ancora da confermare. Nessun commit/push/rilascio dell’assistente.

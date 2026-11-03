@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC154 — Live test presence and opt-in Gravatar
+
+**RC154 after RC153:** the test presentation now includes connected-participant counters, two independent questions, 0–9 ratings, reactions and results. Added explicitly authorized reset/start, 500 independent widget answers and WebSocket presenter-observed peak validation to the Git-tracked CLI; optional opt-in Gravatar image import/refresh on successful login with local storage, antivirus and privacy safeguards; administrator manuals regenerated in IT/EN. The prior RC153 inventory remains immutable. **Certified 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full GitHub CI, authenticated browser/PostgreSQL and actual server 500-user rehearsal remain pending. No commit/push/deployment by assistant. See `docs/RC_CYCLE154_LIVE_LOAD_GRAVATAR.en.md`.
+
+---
+
+# Quorivio 0.1.0-dev — RC153 — 500-answer test and conflict-safe editor handoff
+
+**RC153 cumulative after committed RC152:** CI `41711064819` reached real PostgreSQL-authenticated Chromium editor acceptance and failed because the floating widget ribbon intercepted the revision-conflict reconciliation button. Suppress the ribbon while the conflict UI is active, retaining recoverable edits. Add a 3-page owner-private, lazily and transactionally provisioned load-test presentation (unique marker, clean replacement after deletion), plus an explicitly confirmed 500-participant anonymous poll CLI measuring the actual database response delta. Keep all historical RC152 receipts immutable. **Certified 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full CI and authorized real-server testing pending; no assistant commit/push/release.
+
+---
+
 # Quorivio 0.1.0-dev — RC152 — Browser result wrapping acceptance handoff
 
 **RC152 cumulative after committed RC151:** fix RC141 Chromium acceptance mismatch seen in run `41708756081` without reverting RC143 product behavior. Long labels wrap within the widget; final word and square-bracket count remain together. The same production stylesheet is exercised in four authored widget shells at 1440/390px with a realistic fixed 320px sample and explicit participant-authored font size. Add mutation checks for a forced non-wrapping label and detached count; retain RC151 inventory as historical, promote RC152 as current and synchronize release docs. Runtime unchanged. **Certified 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full GitHub CI and external acceptance pending; no assistant commit/push/release.
