@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC152 — Passaggio di consegne test Chromium risultati
+
+**Cumulativo RC152 successivo al commit RC151:** corretto il test Chromium RC141 non più compatibile con la gestione delle etichette lunghe introdotta in RC143, senza ripristinare il vecchio comportamento. Le etichette possono andare a capo, mentre l’ultima parola e il conteggio tra parentesi quadre restano inseparabili. Lo stesso CSS di produzione viene verificato nelle quattro viste a 1440 e 390 px con fixture da 320 px e font salvato sul partecipante. Aggiunti test negativi per il ritorno al non-a-capo e per il distacco del conteggio; inventario RC151 storico invariato, inventario RC152 corrente e documentazione sincronizzati. Nessuna modifica al runtime. **Completamento certificato 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. CI completa GitHub e accettazioni esterne da confermare. Nessun commit/push/rilascio dell’assistente.
+
+---
+
 # Quorivio 0.1.0-dev — RC151 — Passaggio di consegne dei controlli TypeScript
 
 **Cumulativo RC151 dopo il commit RC150:** corretto il preflight RC115 fallito nella run `41706075530`: le mutazioni negative operano ora sull’unione `Pick` reale e verificano che il sorgente venga realmente modificato. Test RC151 aggiunti, ricevuta storica RC150 conservata, CI e quattro intestazioni di rilascio sincronizzate; nessuna modifica funzionale. **Completamento certificato 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Build GitHub completa e accettazioni esterne da confermare. Nessun commit/push/rilascio dell’assistente.

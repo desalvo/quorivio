@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC152 — Browser result wrapping acceptance handoff
+
+**RC152 cumulative after committed RC151:** fix RC141 Chromium acceptance mismatch seen in run `41708756081` without reverting RC143 product behavior. Long labels wrap within the widget; final word and square-bracket count remain together. The same production stylesheet is exercised in four authored widget shells at 1440/390px with a realistic fixed 320px sample and explicit participant-authored font size. Add mutation checks for a forced non-wrapping label and detached count; retain RC151 inventory as historical, promote RC152 as current and synchronize release docs. Runtime unchanged. **Certified 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full GitHub CI and external acceptance pending; no assistant commit/push/release.
+
+---
+
 # Quorivio 0.1.0-dev — RC151 — Robust strict-type preflight handoff
 
 **RC151 cumulative after committed RC150:** fix the RC115 negative-mutation preflight failing in run `41706075530`: extracting the live `Pick` fields and verifying mutations are non-no-op guards against both missing permissions and append-only type changes. Added RC151 tests, preserved historical RC150 receipt, synchronized CI and four active release headers; no runtime edits. **Certified 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full GitHub build, browser and external approvals pending. No assistant commit/push/release.

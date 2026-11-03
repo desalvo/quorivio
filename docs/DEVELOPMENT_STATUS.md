@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC152 — Chromium wrapped result-count parity hotfix
+
+**RC152 after committed RC151:** GitHub Actions run `41708756081` passed all 825 Node tests and frontend TypeScript/Vite build, then stopped at historical RC141 Chromium parity: its whole-label `white-space:nowrap` expectation contradicted RC143 long-row wrapping. The browser fixture now renders the real prefix + final-word/count grouping, tests actual multi-line wrapping and atomic `[28]` tail across editor/presenter/rehearsal/participant at 1440px and 390px, and sets the explicit authored widget font size to avoid a false 3.8px participant fallback. Dedicated RC152 negative-mutation browser tests reject either regression. No application runtime/CSS changes. Historical RC151 inventory is immutable; RC152 current receipt and CI synchronized. **Certified 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. GitHub full CI, database/browser integration and external acceptance still pending. No assistant commit/push/release.
+
+---
+
 # Quorivio 0.1.0-dev — RC151 — Strict TypeScript mutation test and CI preflight hotfix
 
 **RC151 after committed RC150:** GitHub Actions run `41706075530` stopped at historical RC115 because its negative source mutation no longer matched the extended widget-permission union, producing a no-op rather than removing required fields. Updated the RC115 source contract to parse the actual `Pick` and assert each negative mutation really edits the source; added dedicated RC151 regressions, historical RC150 inventory continuity, synchronized release status. Editor runtime unchanged. **Certified 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Complete GitHub CI and browser acceptance pending. See `docs/RC_CYCLE151_STRICT_TYPE_MUTATION_CI_FIX.en.md`. No assistant commit/push/release.

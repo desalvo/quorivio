@@ -370,6 +370,9 @@ jobs:
           python3 tools/ci_rc134_projection_answer_chromium.py
           # RC141: reaction buttons, native checkboxes and hidden titles across four stage shells.
           python3 tools/ci_rc141_widget_parity_chromium.py
+          # RC152: mutation-tested current long-label wrapping and attached [count]
+          # must stay consistent in editor, presenter, rehearsal and audience.
+          python3 -m unittest tools.tests.test_rc152_wrapped_result_parity -q
           # RC144: ribbon close visible, cloud wrapping and independent 390px phone preview.
           python3 tools/ci_rc143_format_phone_chromium.py
           # RC131: authored coordinates and title/footer fonts are identical across four stages.
@@ -948,7 +951,8 @@ jobs:
           python3 -m unittest tools.tests.test_rc150_widget_history_types -q
           python3 tools/verify_rc_cycle150_inventory.py --historical
           python3 -m unittest tools.tests.test_rc151_strict_types_mutation -q
-          python3 tools/verify_rc_cycle151_inventory.py
+          python3 tools/verify_rc_cycle151_inventory.py --historical
+          python3 tools/verify_rc_cycle152_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:
