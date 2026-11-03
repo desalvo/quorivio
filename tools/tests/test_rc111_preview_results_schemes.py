@@ -8,8 +8,10 @@ CSS=(ROOT/'apps/web/src/style.css').read_text()
 
 class PreviewAndResults(unittest.TestCase):
  def test_preview_openers_keep_modes_and_portal(self):
-  self.assertIn("(['presenter','participant','both'] as RehearsalMode[]).map",MAIN)
+  self.assertIn("(['presenter','participant','mobile','both'] as RehearsalMode[]).map",MAIN)
   self.assertIn('setRehearsalMode(m);setRehearsalOpen(true)',MAIN)
+  self.assertIn('Dispositivo partecipante',MAIN)
+  self.assertIn('Anteprima smartphone',MAIN)
   self.assertIn("return createPortal(<div className=\"rehearsal-backdrop\"",MAIN)
   self.assertIn('document.body);',MAIN)
   self.assertRegex(CSS,r'body\s*>\s*\.rehearsal-backdrop\s*\{[^}]*z-index:\s*15000',)

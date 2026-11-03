@@ -1853,3 +1853,119 @@ body > .rehearsal-backdrop {
 .widget-selection-palette .palette-ribbon-target select{max-width:160px;width:155px}
 .widget-selection-palette .palette-ribbon-scale{display:flex;gap:6px;align-items:center}
 .widget-selection-palette .palette-ribbon-scale button{min-width:53px;font-weight:700}
+
+/* RC141: identical controls on editor, presenter, rehearsal and participant
+   surfaces. Read-only buttons retain the same appearance; only clickability differs. */
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget) .reaction-choice-buttons{
+ display:flex!important;flex-wrap:wrap!important;align-items:flex-start!important;align-content:flex-start!important;
+ gap:.25em!important;width:100%;min-width:0;font-size:inherit;line-height:1.2;
+}
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget) .reaction-choice-buttons>button{
+ flex:0 0 auto!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;
+ width:1.52em!important;min-width:1.52em!important;height:1.52em!important;min-height:1.52em!important;
+ font-size:var(--reaction-size,32px)!important;font-family:inherit!important;
+ padding:.08em!important;margin:0!important;line-height:1!important;border:1px solid #b4c8de!important;
+ background:linear-gradient(160deg,#fff,#f3f8ff)!important;border-radius:.32em!important;
+ box-shadow:0 .08em .23em #2547691b!important;opacity:1!important;color:inherit!important;
+}
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget) .reaction-choice-buttons>button[aria-pressed="true"]{
+ background:#d6edff!important;border-color:#246dad!important;outline:2px solid #2764ab;
+}
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-show-title="false"] .projection-sample-reactions>strong{display:none!important}
+/* The editor uses the same real checkbox/radio geometry and typography as
+   rehearsal/participant rather than a tiny placeholder glyph. */
+.editor-ux-v2 .widget-canvas-item .canvas-widget-answer-preview[data-answer-mode]{
+ font-size:inherit!important;display:flex!important;flex-direction:column!important;gap:.25em!important;
+ padding:0!important;margin:.2em 0!important;max-height:none!important;overflow:visible!important;
+}
+.editor-ux-v2 .widget-canvas-item .canvas-widget-answer-preview .widget-answer-option,
+.editor-ux-v2 .widget-canvas-item .canvas-subquestion-option{
+ display:flex!important;flex-direction:row!important;align-items:flex-start!important;gap:.45em!important;
+ white-space:normal!important;min-width:0!important;max-width:100%;overflow:visible!important;
+ color:inherit;font:inherit;line-height:1.25;
+}
+.editor-ux-v2 .widget-canvas-item .canvas-widget-answer-preview .widget-answer-option>input,
+.editor-ux-v2 .widget-canvas-item .canvas-subquestion-option>input{
+ display:block!important;position:static!important;float:none!important;flex:0 0 1em!important;
+ width:1em!important;height:1em!important;min-width:1em!important;margin:.1em 0 0!important;
+ padding:0!important;accent-color:#2563eb;opacity:1!important;pointer-events:none!important;
+}
+.editor-ux-v2 .widget-canvas-item .canvas-widget-answer-preview .widget-answer-option .widget-rich-inline,
+.editor-ux-v2 .widget-canvas-item .canvas-subquestion-option .widget-rich-inline{
+ min-width:0!important;max-width:100%!important;flex:1 1 auto!important;
+ white-space:pre-wrap!important;overflow-wrap:anywhere!important;overflow:visible!important;
+}
+/* Automatically fitting linked results contain NO nested scrolling regions.
+   The shared widget-fit-frame owns proportional scaling even as live rows arrive.
+   Manual fit-off preserves the author's explicit crop/scroll mode. */
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget)[data-widget-kind="results-button"]>.widget-fit-frame[data-fit-mode="scale"] .widget-fit-content{
+ display:block!important;height:auto!important;min-height:0!important;max-height:none!important;
+ overflow:visible!important;
+}
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget)[data-widget-kind="results-button"]>.widget-fit-frame[data-fit-mode="scale"] :is(.canvas-widget-body-preview,.linked-results,.linked-results-items){
+ display:flex;flex-direction:column;flex:0 0 auto!important;height:auto!important;min-height:0!important;
+ max-height:none!important;overflow:visible!important;
+}
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget)[data-widget-kind="results-button"]>.widget-fit-frame[data-fit-mode="scale"] .linked-results-row{
+ width:max-content!important;max-width:none!important;min-width:max-content!important;align-self:flex-start!important;
+}
+/* A word/answer and its number are indivisible, also in the word cloud.
+   Horizontal intrinsic overflow is measured by WidgetContentFit and scaled. */
+.linked-results .linked-results-row .linked-result-pair{
+ display:inline-flex!important;flex:0 0 auto!important;align-items:baseline!important;
+ gap:.35em!important;white-space:nowrap!important;min-width:max-content!important;
+ max-width:none!important;overflow:visible!important;line-height:1.2;
+}
+.linked-results .linked-results-row .linked-result-pair>.linked-result-label,
+.linked-results .linked-results-row .linked-result-pair>output{
+ display:inline!important;flex:0 0 auto!important;max-width:none!important;min-width:max-content!important;
+ white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;
+ word-break:keep-all!important;overflow-wrap:normal!important;font:inherit;
+}
+.linked-results .linked-results-row .linked-results-track{width:100%;min-width:1px}
+.result-view-cloud .linked-results-items{display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;gap:.35em!important}
+.result-view-cloud .linked-results-row{flex:0 0 auto!important;display:inline-flex!important;margin:0!important}
+
+/* One canonical answer-option geometry regardless of surface and depth in DOM. */
+:is(.editor-ux-v2 .widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget,.widget-question) .widget-answer-option{
+ display:flex!important;flex-direction:row!important;align-items:flex-start!important;justify-content:flex-start!important;
+ flex-wrap:nowrap!important;gap:.45em!important;width:100%;max-width:100%;min-width:0;
+ padding:.2em 0!important;margin:0!important;text-align:left!important;white-space:normal!important;
+ line-height:1.25!important;direction:ltr!important;
+}
+:is(.editor-ux-v2 .widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget,.widget-question) .widget-answer-option>input:is([type=checkbox],[type=radio]){
+ display:block!important;position:static!important;order:-1!important;float:none!important;
+ flex:0 0 1em!important;width:1em!important;max-width:1em!important;min-width:1em!important;
+ height:1em!important;min-height:1em!important;max-height:1em!important;
+ margin:.1em 0 0!important;padding:0!important;opacity:1!important;accent-color:#277fd1;
+}
+:is(.editor-ux-v2 .widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget,.widget-question) .widget-answer-option>:not(input){
+ min-width:0!important;max-width:100%!important;flex:1 1 auto!important;overflow-wrap:anywhere!important;
+ white-space:pre-wrap!important;
+}
+:is(.editor-ux-v2 .widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget,.widget-question) .widget-answer-option>input:is([type=checkbox],[type=radio]){font-size:inherit!important;box-sizing:border-box!important}
+
+/* RC142: a full-height, unobscured top ruler. Do not let a floating toolbar clip it. */
+.editor-ux-v2 .canvas-with-rulers{grid-template-rows:29px minmax(0,auto)!important;overflow:visible!important;}
+.editor-ux-v2 .canvas-ruler-horizontal{height:29px!important;min-height:29px!important;align-items:center!important;line-height:1.2!important;padding:4px 8px!important;position:relative;z-index:10!important;visibility:visible!important;opacity:1!important;clip-path:none!important;}
+.editor-ux-v2 .canvas-ruler-vertical{grid-row:2!important;}
+@media(max-width:720px){.editor-ux-v2 .canvas-with-rulers{grid-template-rows:23px minmax(0,auto)!important}.editor-ux-v2 .canvas-ruler-horizontal{height:23px!important;min-height:23px!important;padding:2px 4px!important}}
+/* Position configured in logical 1280px canvas units and shared by all stage surfaces. */
+.slide-canvas-page-number:not([data-custom-number="true"]){right:var(--footer-pad-right,.390625cqw)!important;bottom:var(--footer-pad-bottom,.390625cqw)!important;}
+.rating-choice-buttons button{font-size:var(--rating-font-size,1em)!important;}
+/* Phone preview is a simulated 390px wide participant reading surface. */
+.rehearsal-pane-phone{flex:0 1 420px;align-items:center;min-width:260px;}
+.rehearsal-pane-phone .rehearsal-pane-heading{align-self:stretch}
+.rehearsal-phone-frame{width:min(390px,100%);height:min(720px,70dvh);border:9px solid #1f2937;border-radius:27px;background:#fff;box-shadow:0 15px 35px #101a2d40;overflow:auto;box-sizing:border-box;}
+.rehearsal-phone-frame>.rehearsal-slide{width:100%!important;height:auto!important;min-height:100%!important;aspect-ratio:auto!important;overflow:visible!important;box-sizing:border-box;border:0!important;border-radius:18px!important;}
+.rehearsal-phone-frame .rehearsal-widgets{position:relative!important;inset:auto!important;width:100%!important;height:auto!important;display:flex!important;flex-direction:column!important;gap:12px!important;padding:10px!important;box-sizing:border-box!important;overflow:visible!important;}
+.rehearsal-phone-frame .rehearsal-widget{position:relative!important;left:auto!important;top:auto!important;width:100%!important;height:auto!important;min-height:64px!important;max-height:none!important;transform:none!important;overflow:visible!important;font-size:14px!important;box-sizing:border-box;}
+.rehearsal-phone-frame .slide-canvas-page-number{position:static!important;display:block!important;margin:6px!important;}
+.rehearsal-device-switch{display:flex;gap:4px;align-items:center}
+.rehearsal-device-switch button{border:1px solid #7b91af;border-radius:6px;background:#f0f4fa;color:#263a59;padding:6px 8px;min-height:33px}
+.rehearsal-device-switch button[aria-pressed=true]{background:#144e6d;color:#fff}
+
+/* Opt-in vertical text placement, shared by editor, presentation and rehearsals.
+   Default top alignment keeps the previously authored layout unchanged. */
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-vertical-align="middle"]:not([data-widget-kind="footer"]){display:flex!important;flex-direction:column!important;justify-content:center!important;}
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-vertical-align="bottom"]:not([data-widget-kind="footer"]){display:flex!important;flex-direction:column!important;justify-content:flex-end!important;}

@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC142 — Copia tra pagine, anteprima smartphone e footer
+
+**RC142 cumulativa dopo RC141:** copia dei widget fra pagine della stessa sessione, Backspace/Delete sulla selezione, allineamento verticale, formato e padding del numero pagina Footer separati (default 5 px), dimensioni dei pulsanti Reazioni e Gradimento, anteprima smartphone da dashboard/editor e selezione del dispositivo nella vista affiancata, righello superiore completamente visibile. Dettagli: `docs/RC_CYCLE142_EDITING_MOBILE_FOOTER.it.md`. **Completamento certificato 85,25%** (43 gate accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Verifica locale, non CI GitHub; nessun commit/push/rilascio dell'assistente.
+
+---
+
+# Quorivio 0.1.0-dev — RC141 — Reazioni, risposte e statistiche coerenti
+
+**RC141 cumulativo successivo al commit RC140:** contiene il fix TypeScript RC140, voto 0–10 modificabile (un solo record nel database), opzione Solo risultati disattivata di default, conteggi solidali con le risposte, adattamento automatico delle statistiche live, reazioni condivise a otto emoji e checkbox/radio coerenti. Test locali da confermare nella CI e nell’installazione reale. Dettagli: `docs/RC_CYCLE141_WIDGET_RESULTS_RATING_PARITY.it.md`. **Completamento certificato 85,25%** (43 gate accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/rilascio dell’assistente.
+
+---
+
 # Quorivio 0.1.0-dev — RC140 handoff
 
 **RC140 committata** (commit `2612d704ac9ea886a3770e7eab9148a3f2186876`); CI GitHub `41501239826` fallita alla compilazione TypeScript per cinque accessi a `toolbarRange` potenzialmente nullo, un parametro di text mark senza tipo e quattro assegnazioni a proprietà degli stili delle risposte. Questo cumulativo correttivo conserva le funzionalità RC138–RC140 senza alterarne il comportamento e sistema i tipi compilati. La suite frontend Node completa (221 test) e la verifica rigorosa TypeScript isolata del modulo `widget-text-marks.ts` passano localmente. La build npm/Vite completa e i test browser devono ancora essere confermati su GitHub perché la cache npm locale offline è incompleta. Dettagli: `docs/RC_CYCLE140_FORMAT_SCOPE_PARITY.it.md`. **Completamento certificato 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/release.

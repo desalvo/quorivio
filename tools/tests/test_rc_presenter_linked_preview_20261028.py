@@ -20,7 +20,8 @@ class PresenterLinkedPreview(unittest.TestCase):
   self.assertIn('▣ Affiancate',SRC)
   self.assertIn('rehearsal-mode-both',CSS)
  def test_preview_reaction_local_state(self):
-  self.assertIn("onClick={()=>submitDemoDirect(w.id,'reactions',emoji)}",SRC)
+  self.assertIn("onSelect={emoji=>submitDemoDirect(w.id,'reactions',emoji)}",SRC)
+  self.assertIn("<ReactionChoices size={w.reactionIconSize||32}",SRC)
   self.assertIn("const pageKey=REHEARSAL_REACTION_PREFIX+activity.id",SRC)
   self.assertIn('changeRehearsalReaction(previous,pageKey,widgetId,value)',SRC)
   self.assertIn('Nessuna risposta di prova viene salvata',SRC)

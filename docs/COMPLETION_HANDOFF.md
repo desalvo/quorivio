@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC142 — Cross-page clipboard, mobile preview and footer styling
+
+**RC142 cumulative after RC141:** copied widgets persist across page switches within the same session, Backspace/Delete works on selection, formatting supports vertical alignment and independent footer number styling/padding (default 5 px), reactions and rating button sizes, a responsive smartphone preview from dashboard/editor and a participant device toggle in side-by-side preview, and a fully visible top ruler. Details: `docs/RC_CYCLE142_EDITING_MOBILE_FOOTER.en.md`. **Certified 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. This is local validation, not a GitHub CI success; no assistant commit/push/release.
+
+---
+
+# Quorivio 0.1.0-dev — RC141 — Shared reaction/choice visuals and resilient results
+
+**RC141 cumulative after committed RC140:** fixes RC140 TypeScript errors and adds replaceable 0–10 ratings (one DB row), a default-off results-only option, atomic result/count rows, automatic live-result fit, shared eight-emoji reactions, and aligned multiple-choice editor inputs. Local checks must still be corroborated by GitHub CI and a real deployment. Details: `docs/RC_CYCLE141_WIDGET_RESULTS_RATING_PARITY.en.md`. **Certified 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/release.
+
+---
+
 # Quorivio 0.1.0-dev — RC140 handoff
 
 **RC140 committed** (commit `2612d704ac9ea886a3770e7eab9148a3f2186876`); GitHub CI run `41501239826` failed at TypeScript build on five nullable `toolbarRange` accesses, one implicitly typed text mark and four answer-style property assignments. This corrective cumulative retains the RC138–RC140 widget and formatting changes and fixes those compile-time types without changing their behavior. The complete 221-test frontend Node suite and strict standalone TypeScript check for `widget-text-marks.ts` pass locally. Full npm/Vite build and browser acceptance still require GitHub CI because the local offline npm cache is incomplete. Details: `docs/RC_CYCLE140_FORMAT_SCOPE_PARITY.en.md`. **Certified 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/release.

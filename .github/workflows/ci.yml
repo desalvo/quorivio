@@ -363,6 +363,8 @@ jobs:
           python3 tools/ci_rc124_alignment_guides_chromium.py
           # RC134: real projection and presenter rehearsal share readonly answer controls.
           python3 tools/ci_rc134_projection_answer_chromium.py
+          # RC141: reaction buttons, native checkboxes and hidden titles across four stage shells.
+          python3 tools/ci_rc141_widget_parity_chromium.py
           # RC131: authored coordinates and title/footer fonts are identical across four stages.
           python3 tools/ci_rc131_stage_fidelity_chromium.py
           # RC119: selected resize handles may inflate outer scrollHeight, but never content auto-fit.
@@ -917,7 +919,11 @@ jobs:
           python3 -m unittest tools.tests.test_rc139_rating_text_selection -q
           python3 tools/verify_rc_cycle139_inventory.py --historical
           python3 -m unittest tools.tests.test_rc140_widget_format_scope -q
-          python3 tools/verify_rc_cycle140_inventory.py
+          python3 tools/verify_rc_cycle140_inventory.py --historical
+          python3 -m unittest tools.tests.test_rc141_stage_result_rating_contract -q
+          python3 tools/verify_rc_cycle141_inventory.py --historical
+          python3 -m unittest tools.tests.test_rc142_editor_clipboard_mobile_footer -q
+          python3 tools/verify_rc_cycle142_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

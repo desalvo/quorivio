@@ -18,8 +18,9 @@ export function widgetDisplay(w:SlideWidget,context:{pageTitle?:string;sessionTi
 export function footerPageNumber(widgets:ReadonlyArray<SlideWidget>,pageNumber:number){
  const footer=widgets.find(w=>w.kind==='footer');
  if(!footer||footer.footerShowPageNumber===false||!Number.isSafeInteger(pageNumber)||pageNumber<=0)return null;
- return {text:String(pageNumber),fontFamily:footer.style?.fontFamily||DEFAULT_FOOTER_STYLE.fontFamily,
-  fontSize:footer.style?.fontSize||DEFAULT_FOOTER_STYLE.fontSize,
-  color:footer.style?.color||DEFAULT_FOOTER_STYLE.color,
+ return {text:String(pageNumber),fontFamily:footer.style?.footerNumberFontFamily||footer.style?.fontFamily||DEFAULT_FOOTER_STYLE.fontFamily,
+  fontSize:footer.style?.footerNumberFontSize||footer.style?.fontSize||DEFAULT_FOOTER_STYLE.fontSize,
+  color:footer.style?.footerNumberColor||footer.style?.color||DEFAULT_FOOTER_STYLE.color,
+  paddingRight:footer.style?.footerNumberPaddingRight??5,paddingBottom:footer.style?.footerNumberPaddingBottom??5,
   ...(footer.footerNumberX!==undefined||footer.footerNumberY!==undefined?{x:(footer.position?.x??0)+((footer.position?.width??100)*(footer.footerNumberX??100))/100,y:(footer.position?.y??93)+((footer.position?.height??7)*(footer.footerNumberY??100))/100}:{} )};
 }

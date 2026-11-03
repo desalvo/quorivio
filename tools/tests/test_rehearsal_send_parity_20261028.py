@@ -18,7 +18,10 @@ class RehearsalSendParity(unittest.TestCase):
   self.assertIn('REHEARSAL_REACTION_PREFIX+activity.id', UI)
   self.assertIn('changeRehearsalReaction(previous,pageKey,widgetId,value)', UI)
   self.assertIn("kind==='reactions'&&viewer==='presenter'?<ProjectionWidgetContent",UI)
-  self.assertIn('aria-pressed={submittedAnswers[w.id]===emoji}',UI)
+  self.assertIn("<ReactionChoices size={w.reactionIconSize||32}",UI)
+  self.assertIn("selected={typeof submittedAnswers[w.id]==='string'?submittedAnswers[w.id] as string:undefined}",UI)
+  reactions=(ROOT/'apps/web/src/reaction-choices.tsx').read_text()
+  self.assertIn("aria-pressed={selected===emoji}",reactions)
  def test_own_draft_and_sent_state_and_restart(self):
   self.assertIn('const [responses,setResponses]=useState',UI)
   self.assertIn('const [submittedAnswers,setSubmittedAnswers]=useState',UI)

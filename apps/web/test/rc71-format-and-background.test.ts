@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 const src=readFileSync(new URL('../src/main.tsx',import.meta.url),'utf8');
 const css=readFileSync(new URL('../src/style.css',import.meta.url),'utf8');
+const reactions=readFileSync(new URL('../src/reaction-choices.tsx',import.meta.url),'utf8');
 test('cloud entries display counts in square brackets across all presentations',()=>{
  assert.match(src,/<small> \[\{count\}\]<\/small>/);
  assert.match(src,/chart==='cloud'\?`\[\$\{r\.count\}\]`/);
@@ -20,7 +21,7 @@ test('presenter custom text, reaction icon size, and enlarged artistic palette a
  assert.match(src,/Testo opzionale profilo presentatore/);
  assert.match(src,/Dimensione icone reazioni/);
  assert.match(src,/presenter-profile-custom-text/);
- assert.match(src,/--reaction-size/);
+ assert.match(reactions,/--reaction-size/);
  assert.match(css,/\.widget-selection-palette\{gap:9px!important/);
  assert.match(css,/\.widget-reactions-live button\{font-size:var\(--reaction-size/);
 });

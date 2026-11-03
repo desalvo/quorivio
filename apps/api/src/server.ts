@@ -1585,7 +1585,7 @@ app.post('/api/join/:code/reactions',async(req,res)=>{try{
  res.json({ok:true,already_reacted:!r.rowCount,changed:!!r.rowCount});
  }catch(e){sendError(res,e)}});
 app.post('/api/join/:code/ratings',async(req,res)=>{try{
- const s=await publicSession(req.params.code);if(!s){res.status(404).json({error:'session_unavailable'});return}
+ const s=await publicSession(req.params.code);if(!s||s.status!=='active'){res.status(404).json({error:'session_unavailable'});return}
  if(!s.allow_anonymous){res.json({joined:false});return}
  const token=cookies(req.headers.cookie)[`q_part_${s.id}`];const part=token?await db.query('SELECT id FROM participants WHERE session_id=$1 AND token_hash=$2',[s.id,hash(token)]):null;
  if(!part?.rowCount){res.status(401).json({error:'join_first'});return}
@@ -1598,8 +1598,17 @@ app.post('/api/join/:code/ratings',async(req,res)=>{try{
  if(!widget){res.status(409).json({error:'rating_widget_not_enabled'});return}
  const kind=widget.targetKind||'question';const target=widget.targetId||(kind==='session'?s.id:aid);
  if(kind==='presenter'&&!await db.query('SELECT 1 FROM users WHERE id=$1 AND (id=$2 OR id IN (SELECT user_id FROM session_presenters WHERE session_id=$3))',[target,s.owner_id,s.id]).then(r=>r.rowCount)){res.status(400).json({error:'invalid_presenter_target'});return}
- const result=await db.query('INSERT INTO page_ratings(session_id,activity_id,participant_id,widget_id,target_kind,target_id,score,comment_text) VALUES($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT(activity_id,participant_id,widget_id) DO NOTHING RETURNING score',[s.id,aid,part.rows[0].id,widget.id,kind,target,score,comment?.trim()||null]);
- if(result.rowCount)await broadcast(s.id);res.json({ok:true,already_rated:!result.rowCount});
+ // One rating row per participant/widget/page. A deliberate new vote replaces
+ // the previous value, never creates a second rating or increments the count.
+ const result=await db.query(`INSERT INTO page_ratings(session_id,activity_id,participant_id,widget_id,target_kind,target_id,score,comment_text)
+   VALUES($1,$2,$3,$4,$5,$6,$7,$8)
+   ON CONFLICT(activity_id,participant_id,widget_id) DO UPDATE SET
+      score=EXCLUDED.score,comment_text=EXCLUDED.comment_text
+   WHERE page_ratings.score IS DISTINCT FROM EXCLUDED.score
+      OR page_ratings.comment_text IS DISTINCT FROM EXCLUDED.comment_text
+   RETURNING score`,[s.id,aid,part.rows[0].id,widget.id,kind,target,score,comment?.trim()||null]);
+ if(result.rowCount)await broadcast(s.id);
+ res.json({ok:true,already_rated:!result.rowCount,changed:!!result.rowCount,score});
  }catch(e){sendError(res,e)}});
 app.get('/api/sessions/:id/ratings/stats',requireAuth,async(req,res)=>{try{
  const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}

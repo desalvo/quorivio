@@ -1,6 +1,6 @@
 /** Page-scoped presenter statistics; result controls never reference participants directly. */
 export const STATISTICAL_WIDGET_KINDS=['question','timed-quiz','rating','reactions','topic-question'] as const;
-export type StatisticalWidget={id:string;kind:string;label?:string;answerMode?:string;options?:{id:string;label:string}[];targetWidgetId?:string;targetQuestionId?:string;questions?:{id:string;label:string;answerMode?:string;options?:{id:string;label:string}[]}[];resultsView?:string};
+export type StatisticalWidget={id:string;kind:string;label?:string;answerMode?:string;options?:{id:string;label:string}[];targetWidgetId?:string;targetQuestionId?:string;questions?:{id:string;label:string;answerMode?:string;options?:{id:string;label:string}[]}[];resultsView?:string;resultsOnly?:boolean;showTitle?:boolean};
 export type StatRow={id:string;label:string;count:number};
 export function eligibleStatisticSources(widgets:StatisticalWidget[],excluding?:string):StatisticalWidget[]{
  return widgets.filter(w=>w.id!==excluding&&(STATISTICAL_WIDGET_KINDS as readonly string[]).includes(w.kind));

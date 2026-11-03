@@ -49,7 +49,7 @@ class RC115StrictTypeContracts(unittest.TestCase):
         self.assertTrue(graphic_type_narrowing(UI,DOMAIN))
     def test_negative_mutations_reject_original_compiler_errors(self):
         self.assertFalse(autofit_types(UI.replace('const current: any[]=changes??widgets;','const current=changes||widgets;',1)))
-        self.assertFalse(editor_types(UI.replace(" | 'showTitle' | 'autoFit'>;", ">;",1),DOMAIN))
+        self.assertFalse(editor_types(UI.replace(" | 'showTitle' | 'autoFit' | 'resultsOnly'>;", ">;",1),DOMAIN))
         self.assertFalse(graphic_type_narrowing(UI.replace("shapeType:e.target.value as WidgetTextStyle['shapeType']",'shapeType:e.target.value',1),DOMAIN))
         self.assertFalse(graphic_type_narrowing(UI.replace("lineDirection:e.target.value as WidgetTextStyle['lineDirection']",'lineDirection:e.target.value',1),DOMAIN))
         self.assertFalse(graphic_type_narrowing(UI.replace("strokeDash:e.target.value as WidgetTextStyle['strokeDash']",'strokeDash:e.target.value',1),DOMAIN))

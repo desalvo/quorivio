@@ -37,7 +37,7 @@ test('default master fonts are readable on a white slide and explicit widget sty
 test('numbering overlay is derived from the footer presence, not footer geometry',()=>{
  const footer={...newFooterWidget('foot'),position:{x:30,y:30,width:20,height:20,rotation:43},style:{color:'#092f42',fontSize:22}};
  const number=footerPageNumber([footer],7);
- assert.deepEqual(number,{text:'7',fontFamily:'Arial',fontSize:22,color:'#092f42'});
+ assert.deepEqual(number,{text:'7',fontFamily:'Arial',fontSize:22,color:'#092f42',paddingRight:5,paddingBottom:5});
  assert.equal(footerPageNumber([footer],0),null);
  assert.equal(footerPageNumber([{...footer,footerShowPageNumber:false}],5),null);
  assert.equal(footerPageNumber([],5),null);
@@ -52,4 +52,13 @@ test('footer numbering can be independently hidden and repositioned in footer sp
  assert.equal(number.x,50);
  assert.ok(Math.abs(number.y-96.15)<1e-5);
  assert.equal(footerPageNumber([{...custom,footerShowPageNumber:false}],9),null);
+});
+
+
+test('RC142: footer page number style and right/bottom padding are independently configurable',()=>{
+ const f=newFooterWidget('foot');
+ const custom={...f,style:{...f.style,fontSize:24,color:'#111111',footerNumberFontFamily:'Georgia',footerNumberFontSize:18,footerNumberColor:'#ff6600',footerNumberPaddingRight:2,footerNumberPaddingBottom:7}};
+ const num=footerPageNumber([custom],3)!;
+ assert.equal(num.fontFamily,'Georgia');assert.equal(num.fontSize,18);assert.equal(num.color,'#ff6600');
+ assert.equal(num.paddingRight,2);assert.equal(num.paddingBottom,7);
 });

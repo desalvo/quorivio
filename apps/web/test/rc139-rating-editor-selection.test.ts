@@ -7,7 +7,7 @@ const rating=readFileSync(new URL('../src/rating-choices.tsx',import.meta.url),'
 const css=readFileSync(new URL('../src/style.css',import.meta.url),'utf8');
 test('one rating scale is shared in editor, real audience, and split rehearsal',()=>{
  assert.equal(ui.match(/<RatingChoices\b/g)?.length,3);
- assert.match(ui,/w.kind==='rating'\?\{\.\.\.w,showTitle:false\}:w/);
+ assert.match(ui,/\['rating','reactions','results-button'\]\.includes\(w.kind\)\?\{\.\.\.w,showTitle:false\}:w/);
  assert.match(ui,/if\(kind==='rating'\).*widget.showTitle!==false/);
  assert.match(rating,/Array.from\(\{length:11\}/);
  assert.match(rating,/readOnly\|\|disabled\|\|!onSelect/);

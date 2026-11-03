@@ -47,3 +47,12 @@ test('reset is memory-only and produces no persistence calls',()=>{
  assert.equal(canSubmitRehearsalAnswer('rating','0'),true);
  assert.equal(canSubmitRehearsalAnswer('rating','10'),true);
 });
+
+test('rating can be revised in rehearsal without adding a duplicate vote',async()=>{
+ const {changeRehearsalRating}=await import('../src/rehearsal-responses.ts');
+ const first=changeRehearsalRating({},'rating1','3');
+ const revised=changeRehearsalRating(first,'rating1','9');
+ assert.deepEqual(revised,{rating1:'9'});
+ assert.equal(changeRehearsalRating(revised,'rating1','9'),revised);
+ assert.equal(changeRehearsalRating(revised,'rating1','11'),revised);
+});

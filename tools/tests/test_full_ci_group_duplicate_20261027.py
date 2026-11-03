@@ -12,7 +12,9 @@ class FullCIGroupDuplicateRegression(unittest.TestCase):
   self.assertIn('insertWidgetGroupInFreeSpace(widgets,selected,',UI)
   self.assertNotIn('rejectWidgetCollisions(widgets,result.widgets,result.selected)',UI)
  def test_clipboard_group_uses_same_placement_validation(self):
-  self.assertIn('insertWidgetGroupInFreeSpace(widgets,copiedWidgets,',UI)
+  self.assertIn('const source=readEditorWidgetClipboard(sessionId)',UI)
+  self.assertIn('insertWidgetGroupInFreeSpace(widgets,source,',UI)
+  self.assertIn('saveEditorWidgetClipboard(sessionId,items)',UI)
   self.assertIn('const copies=pasteWidgetGroup(source,newIds,preferredOffset)',PLACEMENT)
  def test_no_space_failure_is_reported_not_overlapped(self):
   self.assertIn("if(!result){window.alert('Impossibile duplicare i widget: controlla la geometria.');return}",UI)

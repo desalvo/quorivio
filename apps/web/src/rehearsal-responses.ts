@@ -25,3 +25,10 @@ export function changeRehearsalReaction<T extends Record<string,DemoAnswer>>(sta
  if(state[pageKey]===emoji&&state[widgetId]===emoji)return state;
  return {...state,[pageKey]:emoji,[widgetId]:emoji};
 }
+
+/** Rating votes can be replaced by the same participant while a page is open.
+ * This rehearsal mirrors the single-row PostgreSQL upsert: no double counting. */
+export function changeRehearsalRating<T extends Record<string,DemoAnswer>>(state:T,widgetId:string,score:string):T{
+ if(!widgetId||!/^([0-9]|10)$/.test(score)||state[widgetId]===score)return state;
+ return {...state,[widgetId]:score};
+}
