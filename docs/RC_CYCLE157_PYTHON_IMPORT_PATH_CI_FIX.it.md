@@ -1,0 +1,7 @@
+# RC157 — Import Python deterministici nella verifica delle ricevute di rilascio (03/11/2026)
+
+La run GitHub Actions `41723978345` della RC156 ha superato i controlli di qualità precedenti, inclusa la suite Python completa, ma si è fermata nella fase finale **Verify grouped SHA-256 evidence inventory**: `tools.tests.test_rc146_release_header_fix` importa `tools.verify_rc_release_status`, che importava `verify_rc_current_inventory` senza avere la cartella `tools` in `sys.path`. Si tratta di un errore di importazione, non di un checksum errato.
+
+La RC157 fa risolvere a `tools/verify_rc_release_status.py` il percorso assoluto della propria cartella di moduli sia quando viene importato dalla suite unittest sia quando viene eseguito come script. La fase delle ricevute imposta anche `PYTHONPATH: tools`; un test preventivo esegue l'import in sottoprocesso con `PYTHONPATH` assente, prima delle prove di integrazione lunghe. RC156 rimane storico e RC157 diviene l'inventario corrente. Nessuna modifica al runtime, a Gravatar, alla presentazione di test o allo script CLI dei 500 utenti.
+
+Validazione: import package/script senza variabili, intestazioni correnti, inventari storici, corrispondenza indice Git e ZIP. Punteggio invariato **85,25%**, 43 gate accettati / 17 parziali; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. CI completa e test reale autorizzato con 500 partecipanti ancora da verificare. Nessun commit, push o deploy da parte dell'assistente.

@@ -1,0 +1,7 @@
+# RC157 — Deterministic imports in release evidence validation (2026-11-03)
+
+GitHub Actions run `41723978345` on committed RC156 passed the prior quality steps, including the full Python suite, but failed the late **Verify grouped SHA-256 evidence inventory** stage: `tools.tests.test_rc146_release_header_fix` imported `tools.verify_rc_release_status`, which imported `verify_rc_current_inventory` as a sibling without `tools` on `sys.path`. This was an import-path error, not a SHA-256 mismatch.
+
+RC157 makes `tools/verify_rc_release_status.py` resolve its own deterministic absolute sibling directory when imported by the unittest package path **or** executed as a script. The grouped evidence step also explicitly sets `PYTHONPATH: tools`; an isolated subprocess regression with `PYTHONPATH` removed now runs early, before costly integration. RC156 is retained as historical and a new current RC157 inventory is generated. The application runtime, Gravatar, demo sessions and 500-person test script are unchanged.
+
+Validation: isolated unittest package/script imports, current release metadata, historical SHA-256 references and clean-index/ZIP parity. Gate ledger unchanged: **85.25%**, 43 accepted / 17 partial; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Independent GitHub full CI and authorized live 500-person load trial remain pending. No commit, push or deployment by the assistant.

@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC157 — Deterministic Python imports for grouped CI evidence
+
+**RC157 after committed RC156:** GitHub Actions `41723978345` passed quality checks through the full Python suite, but failed the late grouped SHA-256 evidence step because `tools.verify_rc_release_status` could not import its sibling `verify_rc_current_inventory` when invoked as a unittest package without `PYTHONPATH=tools`. Fixed both invocation contexts, set the grouped CI step's Python path and added an early clean-environment import regression. RC156 inventory preserved historically; RC157 current. **Certified 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full GitHub CI and real authorized 500-user run still pending; no assistant commit/push/deployment. See `docs/RC_CYCLE157_PYTHON_IMPORT_PATH_CI_FIX.en.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC156 — Full-suite legacy editor contracts synchronized
 
 **RC156 after committed RC155:** GitHub Actions `41720825704` passed Node/frontend build, Chromium and integration checks but its final 1,798 Python tests exposed three obsolete literal assertions for device-aware background upload, per-device WidgetCanvas identity and unsaved rehearsal snapshot. Updated the historic tests without changing runtime, added RC156 positive/negative regressions and moved the three contracts to early CI; RC155 inventory preserved as historical. **Certified 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full new CI and independent real 500-user validation still pending. No assistant commit/push/deployment. See `docs/RC_CYCLE156_LEGACY_EDITOR_CONTRACTS.en.md`.

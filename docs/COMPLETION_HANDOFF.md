@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC157 — Release evidence import safety handoff
+
+**RC157 after RC156:** GitHub run `41723978345` failed during grouped SHA-256 evidence checks because historical RC146 unittest package imports omitted the tools module path, despite passing the prior 1,802-test Python suite. The release status guard now resolves sibling modules in both script/package contexts, grouped CI sets `PYTHONPATH: tools` and an early no-PYTHONPATH regression reproduces the original invocation. RC156 remains historical, RC157 current. **Certified 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Runtime unchanged; full CI and real 500-user demonstration pending. No assistant commit/push/deployment.
+
+---
+
 # Quorivio 0.1.0-dev — RC156 — Full Python-suite editor contract handoff
 
 **RC156 after RC155:** the full integration workflow run `41720825704` failed with three obsolete source-snippet assertions among 1,798 Python tests. Tests now check device-aware uploads, page/device remount isolation and live unsaved rehearsal including mobile state, with negative mutations and early CI checks. Application unchanged; RC155 preserved historical; RC156 is the current checksum inventory. **Certified 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Re-run full GitHub CI; independent actual 500-user test and operator sign-off remain pending. No assistant commit/push/deployment.

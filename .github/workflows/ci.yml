@@ -129,6 +129,12 @@ jobs:
           # RC156: actual smartphone background routing, per-device canvas identity,
           # and unsaved editor rehearsal; run before npm and expensive integrations.
           python3 -m unittest tools.tests.test_canvas_background_native_context tools.tests.test_editor_page_isolation tools.tests.test_rc_rehearsal_unique_mount_20261028 tools.tests.test_rc156_editor_contracts -q
+      # RC157: do not spend minutes on PostgreSQL/browser/K8s before detecting
+      # Python import-path failures in the late grouped evidence step.
+      - name: RC157 isolated release imports and checksum preflight before npm
+        run: |
+          env -u PYTHONPATH python3 -m unittest tools.tests.test_rc146_release_header_fix tools.tests.test_rc157_release_import_paths -q
+          python3 tools/verify_rc_release_status.py
       - name: Validate RC105 floating dialogs and selection-only resize geometry before npm
         run: python3 -m unittest tools.tests.test_rc105_editor_floating -q
       - name: Validate RC101 horizontal widget rail and visible editor stage before npm
@@ -802,6 +808,8 @@ jobs:
           test -s docs/GDPR.en.md && test -s docs/GDPR.it.md
           for name in admin-guide user-guide; do for lang in en it; do test -s "docs/manuals/${name}.${lang}.pdf"; done; done
       - name: Verify grouped SHA-256 evidence inventory
+        env:
+          PYTHONPATH: tools
         run: |
           python3 tools/ci_inventory_reference_guard.py
           python3 tools/verify_rc_checksum_manifest.py
@@ -968,8 +976,10 @@ jobs:
           python3 tools/verify_rc_cycle154_inventory.py --historical
           # RC155: preserved, immutable historical inventory.
           python3 tools/verify_rc_cycle155_inventory.py --historical
-          # RC156: current source/ZIP parity must match a clean Git checkout.
-          python3 tools/verify_rc_cycle156_inventory.py
+          # RC156 is now immutable historical evidence.
+          python3 tools/verify_rc_cycle156_inventory.py --historical
+          # RC157 current inventory and ZIP parity for the tracked source tree.
+          python3 tools/verify_rc_cycle157_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

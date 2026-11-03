@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC157 — Import Python deterministici per le ricevute CI
+
+**RC157 dopo commit RC156:** la run GitHub Actions `41723978345` ha superato i controlli precedenti fino alla suite Python completa, ma ha fallito nella verifica finale SHA-256 per l'importazione del modulo fratello `verify_rc_current_inventory` senza `PYTHONPATH=tools`. Corrette entrambe le modalità d'avvio, impostato il percorso nello step CI e aggiunta regressione anticipata senza variabili d'ambiente. Inventario RC156 storico immutato, RC157 corrente. **Completamento certificato 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. CI completa e prova reale autorizzata con 500 utenti ancora da confermare; nessun commit/push/deploy. Dettagli: `docs/RC_CYCLE157_PYTHON_IMPORT_PATH_CI_FIX.it.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC156 — Controlli storici dell’editor aggiornati
 
 **RC156 dopo RC155 confermata su GitHub:** run `41720825704` superata fino alla suite Python finale da 1.798 test, nella quale tre confronti letterali obsoleti non riconoscevano sfondo smartphone indipendente, identità canvas per dispositivo e anteprima da bozza non salvata. Aggiornati i test senza modificare il runtime, aggiunti casi negativi RC156, e anticipati i controlli nella CI; inventario RC155 storico immutato. **Completamento certificato 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nuova CI completa e prova reale 500 utenti ancora necessarie. Nessun commit/push/deploy dell’assistente. Vedi `docs/RC_CYCLE156_LEGACY_EDITOR_CONTRACTS.it.md`.

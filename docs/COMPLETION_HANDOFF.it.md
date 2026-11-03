@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC157 — Passaggio di consegne sulla sicurezza degli import CI
+
+**RC157 dopo RC156:** la run GitHub `41723978345` è fallita durante le ricevute SHA-256 per la mancata risoluzione degli import Python del test storico RC146, pur avendo superato i test precedenti. Il verificatore ora riconosce la propria cartella sia in modalità script sia package; lo step CI usa `PYTHONPATH: tools` e la regressione preventiva riproduce l'import senza variabili. RC156 storico, RC157 corrente. **Completamento certificato 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Runtime immutato, CI completa e collaudo reale 500 utenti ancora da verificare. Nessun commit/push/deploy.
+
+---
+
 # Quorivio 0.1.0-dev — RC156 — Handoff test della suite Python completa
 
 **RC156 dopo RC155:** CI GitHub `41720825704` fermata da tre test letterali obsoleti su 1.798 test Python. Aggiornati i controlli per upload differenziato smartphone/desktop, identità canvas pagina/dispositivo e anteprima bozza locale con layout mobile; aggiunte mutazioni negative e controllo anticipato CI. Runtime immutato, RC155 storico, RC156 inventario corrente. **Completamento certificato 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Da rieseguire CI completa; test reale 500 utenti e approvazione operatore ancora aperti. Nessun commit/push/deploy.

@@ -7,7 +7,15 @@ must also be executed against the freshly extracted final release ZIP.
 from __future__ import annotations
 
 import re
+import sys
 from pathlib import Path
+
+# The same release guard is imported as tools.verify_rc_release_status by
+# `python -m unittest`, but executed as tools/verify_rc_release_status.py by
+# the release preflight. Make sibling imports deterministic in both cases.
+_TOOLS = str(Path(__file__).resolve().parent)
+if _TOOLS not in sys.path:
+    sys.path.insert(0, _TOOLS)
 from verify_rc_current_inventory import current_verifier_module
 from rc_gate_audit import audit
 
