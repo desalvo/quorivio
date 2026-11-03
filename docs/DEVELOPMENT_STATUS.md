@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC149 — Device-aware background contract CI regression
+
+RC149 after committed RC148: GitHub Actions run `41690976927` stopped in the historical RC110 background upload contract. That contract matched only the older unconditional desktop `backgroundAssetId` binding and two-argument upload call, while current editor intentionally routes phone background selection and upload independently. RC110 checks now require the desktop fallback and isolated phone branch, with negative regression mutations. Runtime editor code is unchanged. RC148 historical manifest remains immutable. Local CI validation does not substitute for npm, browser or external acceptance. **Certified 85.25%** (43 accepted / 17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/release.
+
+---
+
 # Quorivio 0.1.0-dev — RC148 — Phone-aware atomic Undo CI preflight fix
 
 **RC148 cumulative after committed RC147:** GitHub Actions run `41688028731` stopped at the historical RC117 source contract because the desktop-only auto-fit callback is now disabled in phone mode. Corrected the stale test to verify phone-aware wiring *and* unchanged atomic Undo semantics, added RC148 regression/CI preflight, and retained immutable RC147 inventory. **Certified completion remains 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full GitHub CI and browser acceptance remain pending. See `docs/RC_CYCLE148_ATOMIC_UNDO_CI_PRECHECK.en.md`. No assistant commit/push/release.

@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC149 — Correzione CI del contratto sfondi desktop/smartphone
+
+RC149 dopo il commit RC148: GitHub Actions `41690976927` si è fermata nel controllo storico RC110 perché cercava il vecchio binding desktop non condizionale e la funzione upload con due parametri. L’editor attuale instrada correttamente selezione e caricamento del background smartphone in un layout indipendente; il test RC110 ora verifica entrambe le modalità e la regressione RC149 include casi negativi. Nessuna modifica al runtime dell’editor. L’inventario RC148 rimane storico e immutabile; CI completa, browser e accettazioni esterne ancora da confermare. **Completamento certificato 85,25%** (43 accettati / 17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/rilascio dell’assistente.
+
+---
+
 # Quorivio 0.1.0-dev — RC148 — Consegna CI Undo atomico per smartphone
 
 **RC148 dopo il commit RC147:** errore della run `41688028731` nel controllo storico RC117 che richiedeva l'auto-fit desktop anche sullo smartphone. Nuovo controllo con isolamento mobile, Undo atomico e protezioni dagli effetti stantii; aggiunto preflight RC148 con inventario corrente. Nessuna modifica al runtime dell'editor; inventario RC147 storico immutato. **Completamento certificato invariato: 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full CI/accettazione browser da verificare. Dettagli `docs/RC_CYCLE148_ATOMIC_UNDO_CI_PRECHECK.it.md`. Nessun commit/push/rilascio dell'assistente.

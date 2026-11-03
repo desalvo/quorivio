@@ -7,6 +7,34 @@ API=(R/'apps/api/src/server.ts').read_text()
 DOMAIN=(R/'apps/api/src/domain.ts').read_text()
 CSS=(R/'apps/web/src/style.css').read_text()
 
+
+
+def mobile_background_routing_contract(source: str) -> bool:
+ """Validate independently selected/uploaded canvas backgrounds.
+
+ This intentionally checks both the desktop fallback and the phone branch;
+ accepting the older unconditional desktop binding would be a regression.
+ """
+ import re
+ stage = source.split('data-editor-device={canvasDevice}', 1)
+ if len(stage) != 2 or '<WidgetCanvas key=' not in stage[1]:
+  return False
+ canvas = stage[1].split('<WidgetCanvas key=', 1)[1].split('/>', 1)[0]
+ asset_route = re.search(
+  r"backgroundAssetId=\{\s*canvasDevice\s*===\s*'phone'\s*\?\s*mobileLayoutDraft\.backgroundAssetId\s*\|\|\s*''\s*:\s*questionBackgroundAsset\s*\}",
+  canvas,
+ )
+ upload_route = re.search(
+  r"onBackgroundUpload=\{file\s*=>\s*uploadBackground\(file,\s*false,\s*canvasDevice\s*===\s*'phone'\)\}",
+  canvas,
+ )
+ selection_route = ("selectLibraryBackground(id,false,true)" in canvas and
+                    "selectLibraryBackground(id,false)" in canvas)
+ mobile_section = source.split('async function uploadBackground(',1)[-1].split('async function deleteAsset(',1)[0]
+ mobile_write = ('if(forMobile){setMobileLayoutDraft(old=>({...old,backgroundAssetId:applied.id}));}' in mobile_section)
+ desktop_write = ("else{setQuestionBackgroundAsset(applied.id);setQuestionBackground('')}" in mobile_section)
+ return bool(asset_route and upload_route and selection_route and mobile_write and desktop_write)
+
 class BackgroundUploadAndFormatting(unittest.TestCase):
  def test_background_upload_only_dismisses_after_success(self):
   self.assertIn('onBackgroundUpload(file).then(applied=>{if(applied)',M)
@@ -22,8 +50,10 @@ class BackgroundUploadAndFormatting(unittest.TestCase):
   self.assertIn("res.status(201).json(applied)",API)
   self.assertIn("app.get('/api/sessions/:id/backgrounds'",API)
   self.assertIn("'image/jpeg'",API)
-  self.assertIn('backgroundAssetId={questionBackgroundAsset}',M)
-  self.assertIn('onBackgroundUpload={file=>uploadBackground(file,false)}',M)
+  # RC149: the desktop background remains the fallback ONLY for the
+  # desktop canvas. Phone mode must use an independent asset, defaulting
+  # to no image; its upload must not call the desktop route.
+  self.assertTrue(mobile_background_routing_contract(M))
   self.assertIn('backgroundSize:"cover"',M)
  def test_field_size_persisted_validated_and_rendered(self):
   for name in ['answerFieldWidth','answerFieldHeight']:
