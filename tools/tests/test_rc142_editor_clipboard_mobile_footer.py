@@ -25,6 +25,12 @@ class RC142EditorFeatures(unittest.TestCase):
    self.assertIn(mark,DOMAIN)
   self.assertIn("'--footer-pad-right'",MAIN)
   self.assertIn('grid-template-rows:29px',STYLE)
+ def test_hotfix_typescript_footer_properties_and_reactive_shared_clipboard(self):
+  self.assertIn('as React.CSSProperties}>{item.text}',MAIN)
+  self.assertIn('setClipboardAvailable(true)',MAIN)
+  self.assertIn('disabled={!clipboardAvailable}',MAIN)
+  self.assertNotIn('copiedWidgets',MAIN)
+  self.assertIn('readEditorWidgetClipboard(sessionId)',MAIN)
  def test_closing_format_does_not_erase_widget_selection(self):
   self.assertIn('setRibbonDismissed(true)',MAIN)
   self.assertIn('Chiudi Formato widget',MAIN)

@@ -2,6 +2,8 @@
 
 **RC142 cumulativa dopo RC141:** copia dei widget fra pagine della stessa sessione, Backspace/Delete sulla selezione, allineamento verticale, formato e padding del numero pagina Footer separati (default 5 px), dimensioni dei pulsanti Reazioni e Gradimento, anteprima smartphone da dashboard/editor e selezione del dispositivo nella vista affiancata, righello superiore completamente visibile. Dettagli: `docs/RC_CYCLE142_EDITING_MOBILE_FOOTER.it.md`. **Completamento certificato 85,25%** (43 gate accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Verifica locale, non CI GitHub; nessun commit/push/rilascio dell'assistente.
 
+**Correzione CI:** la run `41624931068` falliva su `tsc` (`TS2353` e `TS2304`); hotfix RC142 per CSSProperties del Footer e pulsante Incolla collegato alla clipboard condivisa. CI completa da riconfermare.
+
 ---
 
 # Quorivio 0.1.0-dev — RC141 — Reazioni, risposte e statistiche coerenti

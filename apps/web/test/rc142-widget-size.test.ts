@@ -16,3 +16,13 @@ test('RC142: palette, vertical alignment, shortcut keys and phone preview retain
  assert.ok(css.includes('.rehearsal-phone-frame'));
  assert.ok(css.includes('grid-template-rows:29px'));
 });
+
+
+test('RC142 hotfix: footer custom CSS properties are typed and cross-page paste stays enabled after copy',()=>{
+ const main=fs.readFileSync(new URL('../src/main.tsx',import.meta.url),'utf8');
+ assert.ok(main.includes("'--footer-pad-right'"));
+ assert.ok(main.includes('as React.CSSProperties}>{item.text}'), 'custom CSS properties must use React CSSProperties assertion');
+ assert.ok(main.includes('setClipboardAvailable(true)'), 'copy/cut must trigger clipboard state change');
+ assert.ok(main.includes('disabled={!clipboardAvailable}'), 'paste action must use current clipboard state');
+ assert.ok(!main.includes('copiedWidgets'), 'old page-local clipboard state must not return');
+});

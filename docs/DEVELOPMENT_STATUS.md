@@ -2,6 +2,8 @@
 
 **RC142 cumulative after RC141:** copied widgets persist across page switches within the same session, Backspace/Delete works on selection, formatting supports vertical alignment and independent footer number styling/padding (default 5 px), reactions and rating button sizes, a responsive smartphone preview from dashboard/editor and a participant device toggle in side-by-side preview, and a fully visible top ruler. Details: `docs/RC_CYCLE142_EDITING_MOBILE_FOOTER.en.md`. **Certified 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. This is local validation, not a GitHub CI success; no assistant commit/push/release.
 
+**CI correction:** Run `41624931068` failed at frontend `tsc` (`TS2353` and `TS2304`); RC142 hotfix corrects Footer CSSProperties and shared clipboard paste button. Full CI pending.
+
 ---
 
 # Quorivio 0.1.0-dev — RC141 — Shared reaction/choice visuals and resilient results
