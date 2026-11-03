@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC148 — Device-aware Undo history and CI handoff
+
+**RC148 after committed RC147:** address CI run `41688028731`: the RC117 preflight incorrectly required the desktop-only callback in phone mode. New source contract enforces phone isolation, atomic Undo and stale-fit protections; additional RC148 preflight and current inventory. No editor runtime changes; RC147 immutable historical receipt maintained. **Certified completion remains 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full GitHub CI/browser acceptance pending. See `docs/RC_CYCLE148_ATOMIC_UNDO_CI_PRECHECK.en.md`. No assistant commit/push/release.
+
+---
+
 # Quorivio 0.1.0-dev — RC147 — Portable source archive and CI inventory handoff
 
 **Cumulative RC147 after RC146:** fix clean-checkout checksum failure from run `41678059398`: generated Python caches can no longer enter cumulative packages or active inventories; historical RC146 receipt preserved unchanged, four active headers synchronized, and verification now covers Git index parity and inherited bytecode. **Certified completion remains 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Details: `docs/RC_CYCLE147_CI_INVENTORY_REPRODUCIBILITY.en.md`. Full CI not yet confirmed, no assistant commit/push/release.

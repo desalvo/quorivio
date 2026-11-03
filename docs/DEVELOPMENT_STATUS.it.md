@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC148 — Correzione CI Undo atomico smartphone
+
+**Cumulativo RC148 dopo il commit RC147:** la run GitHub `41688028731` si è bloccata nel test storico RC117, che ignorava la disattivazione voluta dell'auto-fit desktop nella vista smartphone. Aggiornato il test senza perdere le verifiche di Undo atomico e degli effetti stantii; introdotto il preflight RC148 e mantenuto invariato l'inventario RC147. **Completamento certificato 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full CI e prove browser ancora necessarie. Dettagli: `docs/RC_CYCLE148_ATOMIC_UNDO_CI_PRECHECK.it.md`. Nessun commit/push/rilascio dell'assistente.
+
+---
+
 # Quorivio 0.1.0-dev — RC147 — Hotfix inventario CI da checkout pulito
 
 **Cumulativo RC147 dopo RC146:** la run GitHub Actions `41678059398` è fallita perché RC146 includeva un file `.pyc` generato localmente in `__pycache__`, assente nei checkout Git. I cumulativi escludono ora i file generati; l'inventario corrente ne vieta la presenza, RC146 è storico e invariato, introdotti test di regressione e verifica dell'indice Git. **Completamento certificato sempre 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. CI completa, Docker e dispositivi reali da confermare. Dettagli: `docs/RC_CYCLE147_CI_INVENTORY_REPRODUCIBILITY.it.md`. Nessun commit/push/rilascio dell'assistente.

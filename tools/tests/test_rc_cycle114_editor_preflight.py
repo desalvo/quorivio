@@ -41,7 +41,9 @@ class RC114EditorPreflight(unittest.TestCase):
     def test_upload_success_closes_failure_stays_open(self):
         self.assertTrue(background_contract(MAIN))
         self.assertIn('setBackgroundMenu(true);setBackgroundUploading(true)',MAIN)
-        self.assertIn('onBackgroundUpload={file=>uploadBackground(file,false)}',MAIN)
+        self.assertIn("onBackgroundUpload={file=>uploadBackground(file,false,canvasDevice==='phone')}", MAIN)
+        self.assertIn('if(forMobile){setMobileLayoutDraft(old=>({...old,backgroundAssetId:applied.id}));}', MAIN)
+        self.assertIn("else{setQuestionBackgroundAsset(applied.id);setQuestionBackground('')}", MAIN)
         self.assertIn('setQuestionBackgroundAsset(applied.id)',MAIN)
 
     def test_must_fail_closed_if_errors_are_silently_dismissed(self):

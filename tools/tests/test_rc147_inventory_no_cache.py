@@ -36,7 +36,7 @@ class InventoryNoCacheTests(unittest.TestCase):
     def test_old_cumulative_cache_cannot_be_carried_forward(self):
         prior = json.loads((ROOT / PREVIOUS).read_text(encoding='utf-8'))
         self.assertIn('tools/tests/__pycache__/test_rc145_mobile_background_font.cpython-313.pyc', prior['files_sha256_hex_groups'])
-        files = assemble_paths(ROOT, PREVIOUS, CURRENT, [
+        files = assemble_paths(ROOT, PREVIOUS, current_verifier_module().MANIFEST, [
             'tools/tests/test_rc147_inventory_no_cache.py',
             'tools/verify_rc_cycle147_inventory.py',
         ])
@@ -46,11 +46,15 @@ class InventoryNoCacheTests(unittest.TestCase):
 
     def test_current_inventory_excludes_generated_data_and_is_current(self):
         active = current_verifier_module()
-        self.assertEqual(active.MANIFEST, CURRENT)
+        self.assertGreaterEqual(int(active.MANIFEST.split('CYCLE')[1].split('_')[0]), 148)
+        self.assertTrue((ROOT / CURRENT).is_file())
         contents = active.load_inventory()
         self.assertTrue(contents)
         self.assertFalse(any(is_ephemeral_source_path(name) for name in contents))
         self.assertEqual(active.verify_source(), len(contents))
+        # The earlier RC147 receipt remains valid as immutable historical data.
+        from tools.verify_rc_cycle147_inventory import load_inventory as historic_receipt
+        self.assertTrue(historic_receipt(ROOT / CURRENT))
 
     def test_current_manifest_refuses_generated_file_even_if_it_exists(self):
         active = current_verifier_module()

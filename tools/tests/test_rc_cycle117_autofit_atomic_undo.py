@@ -1,5 +1,6 @@
 """RC117 non-invasive source contracts for auto-fit/undo atomicity and browser acceptance."""
 from pathlib import Path
+import re
 import unittest
 
 ROOT=Path(__file__).resolve().parents[2]
@@ -19,8 +20,10 @@ def preserves_atomic_undo(history, editor):
     )) and all(s in editor for s in (
       'onAutoFit?:(base:any[],fitted:any[])=>void',
       'if(onAutoFit)onAutoFit(widgets,changes);else onChange(changes)',
-      'onAutoFit={reconcilePageAutoFit}',
       'setWidgetHistory(h=>reconcileWidgetAutoFit(h,base,fitted))',
+    )) and bool(re.search(
+      r'''onAutoFit\s*=\s*\{\s*canvasDevice\s*===\s*['"]phone['"]\s*\?\s*undefined\s*:\s*reconcilePageAutoFit\s*\}''',
+      editor,
     ))
 
 
@@ -32,6 +35,19 @@ class RC117AtomicUndo(unittest.TestCase):
         self.assertFalse(preserves_atomic_undo(HISTORY,EDITOR.replace('if(onAutoFit)onAutoFit(widgets,changes);else onChange(changes)','onChange(changes)')))
         self.assertFalse(preserves_atomic_undo(HISTORY.replace('!same(state.present, base)','false'),EDITOR))
         self.assertFalse(preserves_atomic_undo(HISTORY.replace('return {...state, present: fitted}','return editWidgets(state,fitted)'),EDITOR))
+
+    def test_phone_does_not_inherit_desktop_autofit_and_history_remains_atomic(self):
+        self.assertTrue(preserves_atomic_undo(HISTORY, EDITOR))
+        self.assertFalse(preserves_atomic_undo(HISTORY, EDITOR.replace(
+            "onAutoFit={canvasDevice==='phone'?undefined:reconcilePageAutoFit}",
+            "onAutoFit={reconcilePageAutoFit}")))
+        self.assertFalse(preserves_atomic_undo(HISTORY, EDITOR.replace(
+            "onAutoFit={canvasDevice==='phone'?undefined:reconcilePageAutoFit}",
+            "onAutoFit={canvasDevice==='phone'?reconcilePageAutoFit:undefined}")))
+        # Weak source checks must not accept automatic fit as an additional
+        # independent history edit, or the derived result as an outdated edit.
+        self.assertFalse(preserves_atomic_undo(HISTORY.replace(
+            'return {...state, present: fitted}', 'return editWidgets(state,fitted)'), EDITOR))
 
     def test_chromium_still_requires_single_undo_and_exact_result(self):
         self.assertIn("await click_canvas_tool(page,'Duplica selezione')",BROWSER)

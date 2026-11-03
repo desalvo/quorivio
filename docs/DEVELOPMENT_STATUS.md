@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC148 — Phone-aware atomic Undo CI preflight fix
+
+**RC148 cumulative after committed RC147:** GitHub Actions run `41688028731` stopped at the historical RC117 source contract because the desktop-only auto-fit callback is now disabled in phone mode. Corrected the stale test to verify phone-aware wiring *and* unchanged atomic Undo semantics, added RC148 regression/CI preflight, and retained immutable RC147 inventory. **Certified completion remains 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full GitHub CI and browser acceptance remain pending. See `docs/RC_CYCLE148_ATOMIC_UNDO_CI_PRECHECK.en.md`. No assistant commit/push/release.
+
+---
+
 # Quorivio 0.1.0-dev — RC147 — Reproducible clean-checkout CI inventory hotfix
 
 **Cumulative RC147 after RC146:** GitHub Actions run `41678059398` failed because RC146 bundled a locally generated `.pyc` under `__pycache__` absent from clean Git checkouts. Excluded generated paths from future cumulative source archives and active inventory, kept the immutable RC146 manifest as historical, added fail-closed regression tests and verified Git index parity. **Certified completion remains 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full CI, Docker and real-device acceptance remain pending. Details: `docs/RC_CYCLE147_CI_INVENTORY_REPRODUCIBILITY.en.md`. No assistant commit/push/release.

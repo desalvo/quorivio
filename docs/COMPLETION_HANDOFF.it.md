@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC148 — Consegna CI Undo atomico per smartphone
+
+**RC148 dopo il commit RC147:** errore della run `41688028731` nel controllo storico RC117 che richiedeva l'auto-fit desktop anche sullo smartphone. Nuovo controllo con isolamento mobile, Undo atomico e protezioni dagli effetti stantii; aggiunto preflight RC148 con inventario corrente. Nessuna modifica al runtime dell'editor; inventario RC147 storico immutato. **Completamento certificato invariato: 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full CI/accettazione browser da verificare. Dettagli `docs/RC_CYCLE148_ATOMIC_UNDO_CI_PRECHECK.it.md`. Nessun commit/push/rilascio dell'assistente.
+
+---
+
 # Quorivio 0.1.0-dev — RC147 — Consegna archivio portabile e inventario CI
 
 **Cumulativo RC147 dopo RC146:** risolto l'errore hash della run `41678059398` causato da una cache Python assente nel checkout Git; generatore e inventario corrente escludono i file temporanei, conservando RC146 storico. Quattro intestazioni aggiornate e controllo di parità con indice Git e test su bytecode ereditato. **Completamento certificato invariato: 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Dettagli: `docs/RC_CYCLE147_CI_INVENTORY_REPRODUCIBILITY.it.md`. Full CI da verificare, nessun commit/push/rilascio dell'assistente.
