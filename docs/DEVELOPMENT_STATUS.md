@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC150 — Frontend widget history type alignment
+
+**RC150 after committed RC149:** GitHub Actions run `41700222536` passed the early editor preflights and Node unit tests but failed the frontend TypeScript build (TS2339 at `src/main.tsx:1551` and `:2069`): editor widget history omitted the persisted `position` and `resultTopCount` keys. The canonical `PageDesign.widgets` model already declared both. The history intersection now selects these keys from the canonical domain type; four new regression tests and an early preflight enforce this. No functional changes to Undo, mobile layout, results, or backend. Historical RC149 inventory remains immutable. **Certified 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full GitHub build, browser and external acceptance are pending. No assistant commit/push/release.
+
+---
+
 # Quorivio 0.1.0-dev — RC149 — Device-aware background contract CI regression
 
 RC149 after committed RC148: GitHub Actions run `41690976927` stopped in the historical RC110 background upload contract. That contract matched only the older unconditional desktop `backgroundAssetId` binding and two-argument upload call, while current editor intentionally routes phone background selection and upload independently. RC110 checks now require the desktop fallback and isolated phone branch, with negative regression mutations. Runtime editor code is unchanged. RC148 historical manifest remains immutable. Local CI validation does not substitute for npm, browser or external acceptance. **Certified 85.25%** (43 accepted / 17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/release.

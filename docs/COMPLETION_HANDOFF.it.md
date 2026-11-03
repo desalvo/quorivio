@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC150 — Hotfix compilazione TypeScript della cronologia widget
+
+**Cumulativo RC150 successivo al commit RC149:** risolti due errori TS2339 nella run GitHub Actions `41700222536`, includendo `position` e `resultTopCount` nel tipo `EditorWidgetPermissionFields` che attinge a `PageDesign.widgets`. Comportamento di Undo, sfondi mobile e risultati preservato. Aggiunti test, documentazione e inventario corrente; RC149 conservato storico. **Completamento certificato 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Compilazione npm completa e accettazioni di integrazione da confermare nella prossima CI. Nessun commit/push/rilascio dell’assistente.
+
+---
+
 # Quorivio 0.1.0-dev — RC149 — Correzione CI del contratto sfondi desktop/smartphone
 
 RC149 dopo il commit RC148: GitHub Actions `41690976927` si è fermata nel controllo storico RC110 perché cercava il vecchio binding desktop non condizionale e la funzione upload con due parametri. L’editor attuale instrada correttamente selezione e caricamento del background smartphone in un layout indipendente; il test RC110 ora verifica entrambe le modalità e la regressione RC149 include casi negativi. Nessuna modifica al runtime dell’editor. L’inventario RC148 rimane storico e immutabile; CI completa, browser e accettazioni esterne ancora da confermare. **Completamento certificato 85,25%** (43 accettati / 17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/rilascio dell’assistente.

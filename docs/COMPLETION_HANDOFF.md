@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC150 — TypeScript build hotfix for widget history
+
+**RC150 cumulative after committed RC149:** fix two TypeScript TS2339 errors in GitHub Actions run `41700222536` by adding `position` and `resultTopCount` to editor history through a typed `Pick` from the canonical `PageDesign.widgets`. This preserves all saved widget state and operations. Added regression checks, synchronized status headers and generated a new inventory, while keeping RC149 history immutable. **Certified 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full npm build and integration CI still require the next GitHub run. No assistant commit/push/release.
+
+---
+
 # Quorivio 0.1.0-dev — RC149 — Device-aware background contract CI regression
 
 RC149 after committed RC148: GitHub Actions run `41690976927` stopped in the historical RC110 background upload contract. That contract matched only the older unconditional desktop `backgroundAssetId` binding and two-argument upload call, while current editor intentionally routes phone background selection and upload independently. RC110 checks now require the desktop fallback and isolated phone branch, with negative regression mutations. Runtime editor code is unchanged. RC148 historical manifest remains immutable. Local CI validation does not substitute for npm, browser or external acceptance. **Certified 85.25%** (43 accepted / 17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/release.
