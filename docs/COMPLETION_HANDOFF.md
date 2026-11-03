@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC146 — Complete CI release metadata handoff
+
+**Cumulative RC146 after RC145:** exact fix for GitHub Actions `41674561888` release-header gate: synchronized active release headings and completion metadata in the four English/Italian status/handoff files; historical release notes and immutable RC145 receipt retained. Added a dedicated release-header regression test, made RC145 historical and RC146 current in CI. **Certified completion remains 85.25%** (43 accepted / 17 partial): `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Earlier RC145 mobile background and Arial changes are retained; no change to runtime behavior. Details: `docs/RC_CYCLE146_CI_RELEASE_HEADER_FIX.en.md`. Local validation only; full CI and external acceptance pending. No assistant commit/push/release.
+
+---
+
 # Quorivio 0.1.0-dev — RC144 — Independent smartphone layouts and 0–9 rating parity
 
 **Cumulative RC144 after RC143:** ten-slot rating 0–9; portrait 390px phone editor, per-page mobile geometry and optional separate background; real participant and rehearsal parity without forced tiny scaling; mobile draft saved with collaborative CAS and secure active-slide asset access; explicit Arial default. **Local evidence:** 821/821 Node tests, 22/22 focused legacy Python cases, 6/6 RC144 Python contracts and Chromium CSS preflight at 1225px and 390px. **Certified completion remains 85.25%** (43 accepted / 17 partial): `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full Python sweep timed out; Vite production TypeScript compilation blocked by absent local `vite/client` package; GitHub CI, real devices and external approvals pending. No assistant commit/push/release. Details: `docs/RC_CYCLE144_INDEPENDENT_PHONE_RATING_FONT.en.md`.

@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC146 — Passaggio di consegne CI coerente
+
+**Cumulativo RC146 dopo RC145:** correzione dell'errore nella run GitHub Actions `41674561888`: sincronizzate le intestazioni attive dei quattro documenti di stato/consegna IT/EN, mantenendo la cronologia e l'inventario RC145 storico immutato; aggiunto test di regressione, marcato RC145 come storico e RC146 come corrente nella CI. **Completamento certificato invariato: 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Sono conservati tutti gli interventi RC145 su sfondo mobile e Arial; nessuna modifica funzionale. Dettagli: `docs/RC_CYCLE146_CI_RELEASE_HEADER_FIX.it.md`. In attesa di CI e accettazione esterna. Nessun commit/push/rilascio da parte dell'assistente.
+
+---
+
 # Quorivio 0.1.0-dev — RC143 — Formato widget, risultati e smartphone coerente
 
 **Cumulativo RC143 dopo l'hotfix TypeScript RC142:** finestra di formattazione chiudibile e controlli completamente raggiungibili; widget Risultati con primi 5 (1–20 configurabile), testo a capo e conteggi solidali; prova smartphone con canvas desktop logico 1280×720 scalato uniformemente e senza immagine di sfondo. Dettagli `docs/RC_CYCLE143_RIBBON_CLOUD_MOBILE_PARITY.it.md`. Include l'hotfix RC142. **Completamento certificato 85,25%** (43 accettati / 17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. CI completa Vite e collaudo telefono reale da confermare, nessun commit/push/rilascio dell'assistente.

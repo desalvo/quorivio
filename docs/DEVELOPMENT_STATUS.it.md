@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC146 — Hotfix coerenza intestazioni e inventario CI
+
+**Cumulativo RC146 successivo a RC145:** la run GitHub Actions `41674561888` si è arrestata durante `Validate active RC release headers against the current inventory` perché `COMPLETION_HANDOFF.md` riportava ancora RC144 e `COMPLETION_HANDOFF.it.md` RC143 mentre l'inventario corrente era RC145. Sincronizzate a RC146 le quattro intestazioni IT/EN, preservati i blocchi storici e l'inventario RC145 immutabile, aggiunto test di regressione e trasformata la verifica RC145 in storica. **Completamento certificato invariato: 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Il controllo locale non sostituisce la CI completa, la pubblicazione Docker o il collaudo reale. Dettagli: `docs/RC_CYCLE146_CI_RELEASE_HEADER_FIX.it.md`. Nessun commit/push/rilascio da parte dell'assistente.
+
+---
+
 # Quorivio 0.1.0-dev — RC145 — Sfondo smartphone isolato e Arial coerente
 
 **Cumulativo RC145 dopo RC144:** corretto il caricamento di nuove immagini di sfondo nella modalità smartphone, che impostava erroneamente lo sfondo desktop; la scelta del colore rivela ora il colore pieno mobile; eliminata duplicazione del ramo di selezione. Verificato Arial nel browser Chromium (stessa metrica di testo fra editor e preview) e protetti i titoli interni dei widget dallo stile generale Outfit. **Node 825/825 superati**; test Python e inventario finale da verificare. **Completamento certificato 85,25%** (43 gate accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. CI, browser autenticato e dispositivi reali ancora necessari. Dettagli: `docs/RC_CYCLE145_MOBILE_BACKGROUND_FONT_PARITY.it.md`. Nessun commit/push/rilascio da parte dell'assistente.

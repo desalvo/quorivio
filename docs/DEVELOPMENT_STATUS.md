@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC146 — CI release-header consistency hotfix
+
+**RC146 cumulative after RC145:** GitHub Actions run `41674561888` stopped at `Validate active RC release headers against the current inventory` because `COMPLETION_HANDOFF.md` remained at RC144 and `COMPLETION_HANDOFF.it.md` at RC143 despite current inventory RC145. Updated all four IT/EN active status/handoff headings to the same RC146, preserved historical sections and immutable RC145 inventory, added explicit regression test and promoted RC145 receipt to historical verification. **Certified completion remains 85.25%** (43 accepted / 17 partial): `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Preflight and local packaging checks do not certify full GitHub CI, Docker publication or real-device acceptance. Details: `docs/RC_CYCLE146_CI_RELEASE_HEADER_FIX.en.md`. No assistant commit/push/release.
+
+---
+
 # Quorivio 0.1.0-dev — RC145 — Smartphone background isolation and Arial fidelity
 
 **RC145 cumulative after RC144:** fix new-image uploads from phone canvas context menu targeting the wrong desktop background; color choice now reveals its solid mobile backdrop; remove duplicated phone-library routing condition. Verify Arial computed font metrics in native Chromium and guard widget headings from global Outfit styles. Node suite **825/825 PASS**; focused Python and fresh package integrity to be verified separately. **Certified 85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No external acceptance promotion; CI and real-device upload remain pending. Details: `docs/RC_CYCLE145_MOBILE_BACKGROUND_FONT_PARITY.en.md`. No assistant commit/push/release.
