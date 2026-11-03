@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC156 — Handoff test della suite Python completa
+
+**RC156 dopo RC155:** CI GitHub `41720825704` fermata da tre test letterali obsoleti su 1.798 test Python. Aggiornati i controlli per upload differenziato smartphone/desktop, identità canvas pagina/dispositivo e anteprima bozza locale con layout mobile; aggiunte mutazioni negative e controllo anticipato CI. Runtime immutato, RC155 storico, RC156 inventario corrente. **Completamento certificato 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Da rieseguire CI completa; test reale 500 utenti e approvazione operatore ancora aperti. Nessun commit/push/deploy.
+
+---
+
 # Quorivio 0.1.0-dev — RC155 — Correzione test CI barra e conflitti di revisione
 
 **RC155 successiva alla RC154 confermata su GitHub:** la run `41719228484` ha superato i preflight iniziali ma si è fermata nei test Node dell'editor perché la verifica storica RC139 cercava ancora `active&&!ribbonDismissed&&widgets.some`. Il codice applicativo RC153 include correttamente `!suspendFormattingRibbon`, che nasconde la barra dei widget durante i conflitti e permette di usare «Confronta e riconcilia le modifiche». Aggiornato il test RC139 per verificare anche il collegamento `suspendFormattingRibbon={pageConflict}` e aggiunti quattro test Node e quattro Python RC155, compresi casi negativi per mancata sospensione, collegamento rimosso e cancellazione accidentale della selezione. Anticipato il controllo Python nella CI prima di npm; inventario RC154 preservato come storico. **Completamento certificato 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. CI GitHub completa, browser Chromium/PostgreSQL autenticato e prova reale 500 utenti ancora da verificare. Nessun commit/push/deploy dell'assistente. Vedi `docs/RC_CYCLE155_RIBBON_CONFLICT_CI_FIX.it.md`.

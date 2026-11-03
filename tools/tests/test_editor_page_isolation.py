@@ -7,7 +7,11 @@ SOURCE = (ROOT / 'apps/web/src/main.tsx').read_text()
 
 class EditorPageIsolationTests(unittest.TestCase):
     def test_canvas_has_page_identity(self):
-        self.assertIn('<WidgetCanvas key={`${selected}:${designActivity}`}', SOURCE)
+        # The selected page AND device must remount independently. A common
+        # desktop/mobile key leaks selection and inspector state across views.
+        self.assertIn('<WidgetCanvas key={`${selected}:${designActivity}:${canvasDevice}`}', SOURCE)
+        self.assertIn("widgets={canvasDevice==='phone'?mobilePageWidgets(pageWidgets,mobileLayoutDraft):pageWidgets}", SOURCE)
+        self.assertIn("mobileMode={canvasDevice==='phone'}", SOURCE)
 
     def test_inspector_cleared_for_removed_widgets(self):
         self.assertIn('if(active&&!widgets.some(w=>w.id===active))setActive(null)', SOURCE)

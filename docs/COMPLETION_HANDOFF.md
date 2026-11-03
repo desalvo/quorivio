@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC156 — Full Python-suite editor contract handoff
+
+**RC156 after RC155:** the full integration workflow run `41720825704` failed with three obsolete source-snippet assertions among 1,798 Python tests. Tests now check device-aware uploads, page/device remount isolation and live unsaved rehearsal including mobile state, with negative mutations and early CI checks. Application unchanged; RC155 preserved historical; RC156 is the current checksum inventory. **Certified 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Re-run full GitHub CI; independent actual 500-user test and operator sign-off remain pending. No assistant commit/push/deployment.
+
+---
+
 # Quorivio 0.1.0-dev — RC155 — Revision-conflict ribbon regression CI fix
 
 **RC155 after committed RC154:** GitHub Actions run `41719228484` passed early inventory and CI preflight, but failed the frontend Node editor autosave suite: the historical RC139 source-contract test still matched `active&&!ribbonDismissed&&widgets.some`, while the RC153 runtime correctly added `!suspendFormattingRibbon` to prevent a selected-widget toolbar from intercepting the revision-conflict reconciliation button. Updated the historical RC139 assertion to check both the suspend flag and the parent `suspendFormattingRibbon={pageConflict}` binding. Added four Node and four Python RC155 checks, including negative mutations for the missing guard, broken wiring and accidental loss of active selection. Added an early CI Python guard ahead of npm and preserved RC154 as immutable historical evidence. **Certified 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full GitHub CI, authenticated Chromium/PostgreSQL and real 500-person load test still require independent confirmation. No assistant commit/push/deployment. See `docs/RC_CYCLE155_RIBBON_CONFLICT_CI_FIX.en.md`.

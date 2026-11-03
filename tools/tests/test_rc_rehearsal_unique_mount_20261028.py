@@ -39,8 +39,12 @@ class RehearsalUniqueMount(unittest.TestCase):
         self.assertIn('header.rehearsal-toolbar{height:auto',css)
 
     def test_editor_preview_uses_unsaved_canvas_not_dashboard_snapshot(self):
-        self.assertIn('widgets:pageWidgets,backgroundColor:questionBackgroundColor', UI)
+        # The editor rehearsal must consume the live, unsaved widget list
+        # plus the independent smartphone layout, not the persisted snapshot.
+        self.assertIn('widgets:pageWidgets,mobile:mobileLayoutDraft,backgroundColor:questionBackgroundColor', UI)
         self.assertIn('initialPageId={designActivity}', UI)
+        self.assertIn('activities:snap.activities.map(a=>a.id===designActivity?', UI)
+        self.assertIn('backgroundAssetId:questionBackgroundAsset', UI)
     def test_dashboard_preview_keeps_original_session_snapshot(self):
         self.assertIn('initialMode={rehearsalMode} snapshot={snap}', UI)
 

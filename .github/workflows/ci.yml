@@ -126,6 +126,9 @@ jobs:
           PYTHONPATH=tools python3 -m unittest tools.tests.test_rc151_strict_types_mutation -q
           # RC155: selected-widget toolbar must not occlude revision-conflict recovery.
           python3 -m unittest tools.tests.test_rc155_conflict_ribbon -q
+          # RC156: actual smartphone background routing, per-device canvas identity,
+          # and unsaved editor rehearsal; run before npm and expensive integrations.
+          python3 -m unittest tools.tests.test_canvas_background_native_context tools.tests.test_editor_page_isolation tools.tests.test_rc_rehearsal_unique_mount_20261028 tools.tests.test_rc156_editor_contracts -q
       - name: Validate RC105 floating dialogs and selection-only resize geometry before npm
         run: python3 -m unittest tools.tests.test_rc105_editor_floating -q
       - name: Validate RC101 horizontal widget rail and visible editor stage before npm
@@ -963,8 +966,10 @@ jobs:
           # RC154: fail-closed real presence and user-owned Gravatar controls.
           python3 -m unittest tools.tests.test_rc154_load_gravatar tools.tests.test_rc153_live_500_mock -q
           python3 tools/verify_rc_cycle154_inventory.py --historical
-          # RC155: source/ZIP parity must remain portable to clean Git checkouts.
-          python3 tools/verify_rc_cycle155_inventory.py
+          # RC155: preserved, immutable historical inventory.
+          python3 tools/verify_rc_cycle155_inventory.py --historical
+          # RC156: current source/ZIP parity must match a clean Git checkout.
+          python3 tools/verify_rc_cycle156_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:
