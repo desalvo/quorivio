@@ -158,6 +158,8 @@ jobs:
         run: python3 -m unittest tools.tests.test_rc164_graphic_palette_chromium_contract -q
       - name: RC165 authored 16:9 participant widgets and PostgreSQL browser fixture preflight
         run: python3 -m unittest tools.tests.test_participant_browser_acceptance tools.tests.test_audience_moderation_delivery tools.tests.test_rc165_authored_participant_chromium -q
+      - name: RC177 reconciled historical three-mode live and phone preflight
+        run: python3 -m unittest tools.tests.test_rc177_historical_live_preflight tools.tests.test_rc144_mobile_rating -q
       - name: RC167 real-audience graphics, presenter-only widget isolation and secret-safe browser evidence
         run: python3 -m unittest tools.tests.test_rc167_live_preview_fidelity -q
       - name: RC168 public smartphone footer parity and no hidden presenter-widget gaps
@@ -1062,7 +1064,8 @@ jobs:
           python3 tools/verify_rc_cycle173_inventory.py --historical
           python3 tools/verify_rc_cycle174_inventory.py --historical
           python3 tools/verify_rc_cycle175_inventory.py --historical
-          python3 tools/verify_rc_cycle176_inventory.py
+          python3 tools/verify_rc_cycle176_inventory.py --historical
+          python3 tools/verify_rc_cycle177_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

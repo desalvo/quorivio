@@ -31,7 +31,8 @@ class RC168PhoneParity(unittest.TestCase):
     def test_real_participant_uses_one_layout_for_height_and_contents(self):
         self.assertIn('const audiencePhoneLayout=participantPhoneLayout(audienceAuthoredWidgets', UI)
         self.assertIn('height:audiencePhoneLayout.height', UI)
-        self.assertIn('audiencePortrait?audiencePhoneLayout.widgets:audienceVisibleWidgets', UI)
+        self.assertIn('audiencePortrait?audiencePhoneLayout.widgets:participantReadingMode?audienceReadingWidgets:audienceVisibleWidgets', UI)
+        self.assertIn('const audienceReadingWidgets=participantReadingWidgets(audienceAuthoredWidgets)', UI)
         self.assertNotIn('height:mobileStageHeight(resolveSlideMasterWidgets(', UI)
         self.assertNotIn('participantVisibleWidgets(audiencePortrait?mobilePageWidgets(', UI)
 
@@ -42,7 +43,7 @@ class RC168PhoneParity(unittest.TestCase):
 
     def test_real_postgresql_fixture_checks_footer_and_drops_phantom_height(self):
         ast.parse(BROWSER)
-        for marker in ('FOOTER_WIDGET', "'kind':'footer'", 'geometry[\'height\']-1174',
+        for marker in ('FOOTER_WIDGET', "'kind':'footer'", 'geometry[\'height\']-998',
                        "geometry['footerOffset']", "'.audience-widget-layout.stage-phone'",
                        'stage-reading', 'stage-fidelity', "'results-button','participant-count'"):
             self.assertIn(marker, BROWSER)

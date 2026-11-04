@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC177 — Passaggio di consegne CI storica presentazione
+
+**RC177:** riprodotto il fallimento GitHub Actions `41865155281` nel contratto storico RC167. Riconciliati i preflight RC144/167/168/169 con le tre modalità della RC176 e la fixture pubblica smartphone da 998px. Aggiunti test negativi e preflight anticipato, inventario corrente spostato alla RC177 mantenendo immutabili quelli precedenti. Nessuna modifica funzionale al runtime e **85,25% (43 accettati / 17 parziali)**. 589 test preflight superati (1 saltato), 313 web e 588 API; integrità ZIP da 1770 file verificata. Build e browser autenticato CI ancora aperti. `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag/deploy. Vedi `docs/RC_CYCLE177_HISTORICAL_LIVE_CI_RECONCILIATION.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC176 — Accessibilità DOM e modalità partecipante
 
 **RC176 cumulativa dopo RC175:** corretto l’ordine DOM/Tab della lettura accessibile (footer ultimo, forme decorative e risultati privati esclusi), senza modificare il canvas grafico 16:9. Riparata la prova browser autenticata che confondeva smartphone e lettura; aggiunte verifiche delle tre modalità, delle coordinate 16:9 desktop/smartphone e prove Chromium con l’helper TS reale. **313/313 Web Node, 588/588 API, 25/25 Python selezionati e Chromium CSS PASS.** Build Vite/React+PostgreSQL e CI GitHub attuale ancora aperte. **85,25% certificato (43 gate accettati, 17 parziali)**, `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag/deploy. Dettagli: `docs/RC_CYCLE176_ACCESSIBLE_DOM_AND_MODE_PARITY.it.md`.

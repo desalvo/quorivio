@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC177 — Live presentation historical CI contracts
+
+**RC177 after RC176:** fixed the first failure in CI run `41865155281` (RC167 two-mode live selector assertion) and reconciled RC144/168/169 historical checks with the true RC176 three-mode participant selector and 998px phone fixture. No runtime changes: live stage privacy/accessibility contracts remain verified. Added an early regression gate and new cumulative integrity receipt. **85.25% certified (43 accepted, 17 partial)**. Local: 589/589 preflight tests (one skipped), 313/313 web tests, 588/588 API tests; 1770-file ZIP checksum verified. TypeScript/Vite/React/PostgreSQL authenticated and post-commit GitHub CI remain pending. `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag/deploy. Details: `docs/RC_CYCLE177_HISTORICAL_LIVE_CI_RECONCILIATION.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC176 — Accessible DOM order and participant modes
 
 **RC176 after RC175:** corrected actual keyboard/screen-reader DOM order in public accessible reading (footer last, no decorative graphic or presenter-only widgets), with the authored 16:9 stage unchanged. Fixed the authenticated Chromium fixture that conflated phone and accessible views; independently assert all three display modes and desktop/mobile normalized slide geometry. Shipped real TypeScript policy + Chromium CSS checks. **313/313 Web Node, 588/588 API, 25/25 targeted Python and Chromium CSS PASS.** Current Vite/React+PostgreSQL/CI not yet run. **85.25% certified (43 accepted, 17 partial)**, `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag/deploy. See `docs/RC_CYCLE176_ACCESSIBLE_DOM_AND_MODE_PARITY.en.md`.

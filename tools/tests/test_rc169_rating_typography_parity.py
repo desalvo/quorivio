@@ -52,7 +52,7 @@ class RC169RatingTypographyParity(unittest.TestCase):
         self.assertEqual(ratings[0]['style']['ratingButtonSize'],24)
         self.assertIn('textarea.rating-comment-input',BROWSER)
         self.assertIn("get_by_role('button',name='Vota 9 su 9')",BROWSER)
-        self.assertIn("geometry['height']-1174",BROWSER)
+        self.assertIn("geometry['height']-998",BROWSER)
         self.assertLess(next(i for i,c in enumerate(calls) if c[0]=='PATCH'),next(i for i,c in enumerate(calls) if c[1].endswith('/status')))
 
     def test_local_real_chromium_checks_two_viewports_and_white_comment(self):

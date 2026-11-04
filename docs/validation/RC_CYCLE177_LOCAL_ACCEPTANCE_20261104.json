@@ -1,0 +1,63 @@
+{
+  "version": "0.1.0-dev",
+  "cycle": 177,
+  "date": "2026-11-04",
+  "base": "RC176",
+  "ci_run_analyzed": "41865155281",
+  "ci_job_analyzed": "126697411992",
+  "first_failure": "tools.tests.test_rc167_live_preview_fidelity.RC167LivePreviewFidelity.test_shared_policy_is_used_in_all_projection_surfaces",
+  "root_cause": "stale two-mode source assertion after the third accessible reading mode was introduced",
+  "additional_preemptive_corrections": [
+    "RC144 selector",
+    "RC168 selector",
+    "RC168 old 1174px fixture",
+    "RC169 old 1174px fixture"
+  ],
+  "local_evidence_before_new_inventory": {
+    "targeted_python": {
+      "passed": 65,
+      "failed": 0
+    },
+    "preflight_python": {
+      "ran": 579,
+      "unexpected_failures": 0,
+      "expected_old_inventory_mismatches": 4
+    },
+    "rc177_negative_tests": {
+      "passed": 4,
+      "failed": 0
+    }
+  },
+  "not_executed_in_this_cycle": [
+    "npm TypeScript/Vite project build",
+    "authenticated real PostgreSQL Chromium end-to-end",
+    "post-commit GitHub Actions workflow",
+    "independent external operator acceptance"
+  ],
+  "acceptance_credit": 0,
+  "certified_score": 85.25,
+  "accepted_gates": 43,
+  "partial_gates": 17,
+  "rc_strict": false,
+  "publish_image": false,
+  "publish_latest": false,
+  "local_evidence_after_inventory": {
+    "early_ci_python_preflight": {
+      "ran": 589,
+      "failed": 0,
+      "skipped": 1
+    },
+    "web_node": {
+      "passed": 313,
+      "failed": 0
+    },
+    "api_node": {
+      "passed": 588,
+      "failed": 0
+    },
+    "release_metadata_headers": "passed",
+    "source_inventory_files_excluding_manifest": 1769,
+    "zip_members_including_manifest": 1770,
+    "package_zip_integrity": "passed"
+  }
+}

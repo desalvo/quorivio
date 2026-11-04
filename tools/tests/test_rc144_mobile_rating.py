@@ -18,7 +18,7 @@ class MobileRatingContracts(unittest.TestCase):
   self.assertIn('data-editor-device={canvasDevice}',ui)
   self.assertIn('mobilePageWidgets(pageWidgets,mobileLayoutDraft)',ui)
   self.assertIn('position:original.position',ui)
-  self.assertIn('audiencePortrait?audiencePhoneLayout.widgets:audienceVisibleWidgets',ui)
+  self.assertIn('audiencePortrait?audiencePhoneLayout.widgets:participantReadingMode?audienceReadingWidgets:audienceVisibleWidgets',ui)
   self.assertIn('height:audiencePhoneLayout.height',ui)
   self.assertIn('mobile?{backgroundImage:activity?.page_design?.mobile?.backgroundAssetId?',ui)
  def test_phone_controls_do_not_downscale_fonts(self):

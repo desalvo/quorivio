@@ -33,7 +33,12 @@ class RC167LivePreviewFidelity(unittest.TestCase):
   self.assertIn("'line', 'shape'",POLICY)
   self.assertIn("if (widget.kind === 'qr') return widget.showTitle === true",POLICY)
   self.assertEqual(UI.count('data-show-title={widgetTitleVisible(w)}'),4)
-  self.assertIn('(audiencePortrait?audiencePhoneLayout.widgets:audienceVisibleWidgets)',UI)
+  # RC176 introduced a third, accessible DOM-reading mode. The older two-way
+  # phone/desktop selector must never regress to discarding reading-mode widgets.
+  mode_selector='(audiencePortrait?audiencePhoneLayout.widgets:participantReadingMode?audienceReadingWidgets:audienceVisibleWidgets)'
+  self.assertIn(mode_selector,UI)
+  self.assertIn('const audienceVisibleWidgets=participantVisibleWidgets(audienceAuthoredWidgets)',UI)
+  self.assertIn('const audienceReadingWidgets=participantReadingWidgets(audienceAuthoredWidgets)',UI)
   self.assertIn('const audiencePhoneLayout=participantPhoneLayout(audienceAuthoredWidgets',UI)
   self.assertIn('mobile?participantPhoneLayout(widgets,activity?.page_design?.mobile).widgets:participantVisibleWidgets(widgets)',UI)
   self.assertIn("(w.kind==='shape'||w.kind==='line')?null:",UI)
@@ -45,6 +50,13 @@ class RC167LivePreviewFidelity(unittest.TestCase):
   broken=POLICY.replace("if (LABELLESS_GRAPHICS.has(widget.kind)) return false;", "if (LABELLESS_GRAPHICS.has(widget.kind)) return true;",1)
   self.assertNotIn('if (LABELLESS_GRAPHICS.has(widget.kind)) return false;',broken)
   self.assertNotIn("(w.kind==='shape'||w.kind==='line')?(w.showTitle===false?null:",UI)
+  selector='(audiencePortrait?audiencePhoneLayout.widgets:participantReadingMode?audienceReadingWidgets:audienceVisibleWidgets)'
+  self.assertIn(selector,UI)
+  # Mutating out the accessible mode is a contract violation even when the
+  # obsolete two-way phone selector still renders something on screen.
+  without_reading=UI.replace(selector,'(audiencePortrait?audiencePhoneLayout.widgets:audienceVisibleWidgets)',1)
+  self.assertNotIn(selector,without_reading)
+  self.assertIn('participantReadingMode?audienceReadingWidgets:',selector)
 
  def test_real_disposable_chromium_owns_graphics_and_privacy(self):
   for marker in ('GRAPHIC_LINE=', 'GRAPHIC_SHAPE=', 'PRESENTER_CHART=', 'PRESENTER_COUNT=',
