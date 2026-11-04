@@ -7,6 +7,7 @@ PLACEMENT=(ROOT/'apps/web/src/widget-placement.ts').read_text(encoding='utf8')
 CSS=(ROOT/'apps/web/src/style.css').read_text(encoding='utf8')
 APP=(ROOT/'apps/web/src/main.tsx').read_text(encoding='utf8')
 WORKFLOW=(ROOT/'.github/workflows/ci.yml').read_text(encoding='utf8')
+TYPO=(ROOT/'apps/web/src/stage-widget-typography.ts').read_text(encoding='utf8')
 
 class RC131StageAndCollision(unittest.TestCase):
  def test_free_overlap_with_canvas_boundary_and_nonmutating_pointers(self):
@@ -19,8 +20,9 @@ class RC131StageAndCollision(unittest.TestCase):
   # RC159: title typography resolves the page/master style first; all other
   # widgets continue using their own saved style. The legacy literal check
   # silently assumed every kind had the same source fields.
-  self.assertIn("'--authored-widget-font-size':widgetTypographyStyle(w.kind==='title'?widgetDisplay(w,{pageTitle:entry.activity.title,masterTitleStyle:entry.theme?.master?.titleStyle}).style:w.style).fontSize",APP)
-  self.assertIn("...widgetTypographyStyle(w.kind==='title'?widgetDisplay(w,{pageTitle:entry.activity.title,masterTitleStyle:entry.theme?.master?.titleStyle}).style:w.style)",APP)
+  self.assertIn('stageWidgetTypography(w,{pageTitle:entry.activity.title,masterTitleStyle:entry.theme?.master?.titleStyle},audiencePortrait)',APP)
+  self.assertIn("const resolved=widget.kind==='title'?widgetDisplay(widget,context).style:widget.style",TYPO)
+  self.assertIn("'--authored-widget-font-size':typography.fontSize",TYPO)
   self.assertIn('.audience-widget-layout.stage-fidelity>.page-widget{font-size:var(--authored-widget-font-size,1.25cqw)!important;}',CSS)
   self.assertIn('stage-reading>.page-widget',CSS)
   self.assertIn('font-size:1rem!important',CSS)

@@ -24,10 +24,11 @@ def controls_ok(ui, css):
 
 def rating_ok(ui, rating, css):
  return all(t in ui for t in (
-  'canvas-rating-preview"><RatingCommentField readOnly/>',
-  'widget.style?.ratingButtonSize} readOnly/></div>;',
-  'demoRatingComments[w.id]',
-  "value={ratingComments[w.id]||''} onChange={value=>setRatingComments",
+  'function RatingStageContent(',
+  'size={widget.style?.ratingButtonSize}',
+  'comment={demoRatingComments[w.id]',
+  'comment={ratingComments[w.id]',
+  'RatingCommentField value={comment}',
   '>Invia risposta</button>',
  )) and 'Invia risposta al widget' not in ui and all(t in rating for t in (
   'export function RatingCommentField(', 'maxLength={1000}',
@@ -55,7 +56,7 @@ class RC159PresenterControls(unittest.TestCase):
   self.assertFalse(controls_ok(UI.replace("changeStatus('closed')","changeStatus('paused')",1),CSS))
   self.assertFalse(controls_ok(UI,CSS.replace('background:#ad2939','background:#bbff22',1)))
  def test_negative_comment_visibility(self):
-  self.assertFalse(rating_ok(UI.replace('canvas-rating-preview"><RatingCommentField readOnly/>','canvas-rating-preview">',1),RATING,CSS))
+  self.assertFalse(rating_ok(UI.replace('RatingCommentField value={comment}','div data-broken-comment',1),RATING,CSS))
   self.assertFalse(rating_ok(UI,RATING.replace('readOnly={readOnly||!onChange}','readOnly={false}',1),CSS))
   self.assertFalse(rating_ok(UI,RATING,CSS.replace('background:#ffffff!important;color:#142b44!important','background:black;color:white',1)))
  def test_negative_rate_guard(self):

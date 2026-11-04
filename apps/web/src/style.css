@@ -2088,7 +2088,7 @@ body .editor-floating-panel.widget-selection-palette .palette-ribbon-group{
  aspect-ratio:auto!important;
 }
 .rehearsal-phone-stage .rehearsal-widget{
- font-size:var(--mobile-widget-font-size,16px)!important;padding:10px!important;
+ font-size:var(--mobile-widget-font-size,16px)!important;padding:10px!important;overflow:auto!important;
 }
 .rehearsal-phone-stage .rehearsal-widget :is(textarea,input,button,select){font-size:inherit;}
 
@@ -2226,3 +2226,153 @@ main.participant-live-view .audience-widget-layout.stage-fidelity{
 .editor-ux-v2 .editor-device-slider input:checked+.editor-device-slider-track .editor-device-slider-thumb{transform:translateX(30px);}
 .editor-ux-v2 .editor-device-slider input:focus-visible+.editor-device-slider-track{outline:3px solid #facc15;outline-offset:3px;}
 @media(prefers-reduced-motion:reduce){.editor-ux-v2 .editor-device-slider-thumb,.editor-ux-v2 .editor-device-slider-track{transition:none;}}
+
+/* RC170: footer number follows one logical phone specification in editor,
+ * rehearsal and the authenticated participant stage. Desktop/projection keep
+ * authored container-relative (cqw) typography. A user-specified number anchor
+ * must not be overwritten by the older fixed 5px/10px inset rules. */
+:is(.editor-ux-v2 .canvas-editor-group[data-canvas-device="phone"],
+    .rehearsal-phone-stage,.audience-widget-layout.stage-phone)
+    .slide-canvas-page-number{
+ font-size:var(--phone-footer-number-font-size,14px)!important;
+}
+:is(.editor-ux-v2 .canvas-editor-group[data-canvas-device="phone"],
+    .rehearsal-phone-stage,.audience-widget-layout.stage-phone)
+    .slide-canvas-page-number:not([data-custom-number="true"]){
+ right:var(--phone-footer-pad-right,5px)!important;
+ bottom:var(--phone-footer-pad-bottom,5px)!important;
+}
+:is(.editor-ux-v2 .canvas-editor-group[data-canvas-device="phone"],
+    .rehearsal-phone-stage,.audience-widget-layout.stage-phone)
+    .slide-canvas-page-number[data-custom-number="true"]{
+ left:var(--footer-number-x,auto)!important;
+ top:var(--footer-number-y,auto)!important;
+ right:auto!important;
+ bottom:auto!important;
+ transform:translate(-100%,-100%)!important;
+}
+
+/* RC171: visible top-bar desktop/phone switch, also on narrow editor windows. */
+.editor-ux-v2 .editor-mock-header{flex-wrap:wrap!important;align-content:center;column-gap:12px;row-gap:3px;padding-top:6px;padding-bottom:6px;min-width:0}
+.editor-ux-v2 .editor-mock-brand{flex:1 1 150px!important;max-width:340px}
+.editor-ux-v2 .editor-mock-header>.editor-device-switch{flex:0 1 auto;display:flex!important;align-items:center;justify-content:center;gap:6px!important;min-width:160px;min-height:36px!important;align-self:center!important;z-index:160!important}
+.editor-ux-v2 .editor-mock-header>.editor-device-switch>.device-label{font-size:12px;white-space:nowrap}
+.editor-ux-v2 .editor-mock-header>.editor-device-switch>small{display:none}
+.editor-ux-v2 .editor-mock-header>.editor-device-switch .editor-mobile-reset{font-size:11px;padding:5px 8px;white-space:nowrap}
+.editor-ux-v2 .editor-mock-actions{flex:1 1 auto!important;justify-content:flex-end;flex-wrap:wrap;gap:5px!important;min-width:0}
+.editor-ux-v2 .editor-autosave-indicator{max-width:140px!important;min-width:100px!important}
+@media(max-width:1200px){
+ .editor-ux-v2,.editor-ux-v2:fullscreen{grid-template-rows:minmax(100px,auto) auto minmax(0,1fr)!important}
+ .editor-ux-v2 .editor-mock-brand{flex:1 1 180px!important}
+ .editor-ux-v2 .editor-mock-header>.editor-device-switch{order:2;flex:1 1 100%!important;max-height:40px!important}
+ .editor-ux-v2 .editor-mock-actions{order:1;flex:1 1 50%!important}
+}
+@media(max-width:750px){
+ .editor-ux-v2,.editor-ux-v2:fullscreen{grid-template-rows:minmax(130px,auto) auto minmax(0,1fr)!important}
+ .editor-ux-v2 .editor-mock-actions .editor-preview-open{font-size:11px;padding:4px!important;min-height:28px!important}
+ .editor-ux-v2 .editor-mock-header>.editor-device-switch{order:2!important;flex-basis:100%!important}
+}
+/* RC171: graphic triggers require the SAME bounded wrapper as ordinary widgets.
+ * No 100%-width direct child of the horizontal palette is permitted. */
+.editor-ux-v2 .editor-widget-grid{display:flex!important;flex-wrap:wrap!important;align-content:start!important;justify-content:flex-start!important;gap:4px!important;height:auto!important;max-height:min(30dvh,198px)!important;overflow-x:hidden!important;overflow-y:auto!important;box-sizing:border-box!important;scrollbar-width:thin!important}
+.editor-ux-v2 .editor-widget-rail{height:auto!important;max-height:min(30dvh,198px)!important;min-height:72px!important;overflow:hidden!important}
+.editor-ux-v2 .editor-widget-grid .editor-graphic-wrapper{position:relative;flex:0 0 64px!important;width:64px!important;min-width:58px!important;max-width:72px!important;height:68px!important;display:inline-flex!important;min-inline-size:0}
+.editor-ux-v2 .editor-widget-grid .editor-graphic-wrapper>.editor-icon-tool{width:100%!important;height:68px!important;max-width:100%!important;min-width:0!important;min-height:0!important;box-sizing:border-box!important;flex:0 0 auto!important}
+.editor-ux-v2 .editor-widget-grid .editor-graphic-wrapper>.editor-icon-tool svg{width:24px!important;height:24px!important}
+.editor-ux-v2 .editor-graphic-options{position:absolute!important;right:1px!important;bottom:1px!important;z-index:2!important;display:grid!important;place-items:center!important;border:1px solid #81dbe8!important;border-radius:5px!important;background:#166282!important;color:white!important;font-size:17px!important;line-height:1!important;width:23px!important;height:21px!important;min-width:0!important;min-height:0!important;padding:0!important;cursor:pointer!important}
+.editor-ux-v2 .editor-graphic-options:hover,.editor-ux-v2 .editor-graphic-options:focus-visible{outline:2px solid #ffde6c!important;outline-offset:1px!important}
+@media(max-width:760px){.editor-ux-v2 .editor-widget-grid .editor-graphic-wrapper{flex-basis:55px!important;width:55px!important;min-width:55px!important}}
+/* Keep the portal's menu usable on small portrait/touch viewports. */
+.graphic-preset-popup{max-height:min(80dvh,570px)!important;overscroll-behavior:contain!important;touch-action:pan-y!important}
+
+/* RC171: direct graphic properties on the existing canvas widget's context menu. */
+.canvas-context-menu:has(.canvas-context-graphic-options){max-height:min(430px,calc(100dvh - 20px))!important;overflow-y:auto!important;overscroll-behavior:contain!important;}
+.canvas-context-graphic-options{display:grid;gap:7px;min-width:220px;max-width:min(320px,calc(100vw - 24px));padding:9px;border:1px solid #8cb4d1;border-radius:7px;background:#edf6ff;color:#142b44;font:12px Arial,sans-serif;}
+.canvas-context-graphic-options label{display:grid;gap:3px;align-items:center;color:#142b44!important;}
+.canvas-context-graphic-options :is(input,select){width:100%;min-height:30px;background:#fff!important;color:#162a41!important;border:1px solid #91abc6;border-radius:5px;}
+.canvas-context-graphic-options input[type=checkbox]{width:auto;min-height:auto;}
+
+/* RC173 live parity: paint the slide background only on the stage, never on
+   the public page wrapper. Accessible reading is deliberately a clean document. */
+main.participant-live-view{background-image:none!important;background-color:transparent!important}
+main.participant-live-view .audience-widget-layout.stage-reading{
+  background:#fff!important;background-image:none!important;background-attachment:initial!important;
+  border:0!important;box-shadow:none!important;
+}
+/* Decorative slide graphics are not reading-order content. They remain visible
+   in the faithful 16:9 slide, where their geometry is intentionally preserved. */
+main.participant-live-view .audience-widget-layout.stage-reading>.page-widget:is([data-widget-kind="shape"],[data-widget-kind="line"]){display:none!important}
+/* The faithful 16:9 slide is always the authored desktop coordinate system.
+   Narrow viewport accessibility rules for stacked forms must NOT resize the
+   child widgets: accessible reading provides 44px controls separately. */
+@media(max-width:700px){
+ main.participant-live-view .audience-widget-layout.stage-fidelity>.page-widget{
+  position:absolute!important;left:var(--stage-x)!important;top:var(--stage-y)!important;
+  width:var(--stage-width)!important;height:var(--stage-height)!important;
+  min-height:0!important;max-height:none!important;max-width:none!important;
+  transform:rotate(var(--stage-rotation,0deg))!important;
+ }
+ main.participant-live-view .audience-widget-layout.stage-fidelity :is(button,select,input,textarea){
+  min-width:0!important;min-height:0!important;font-size:inherit!important;
+  max-width:100%!important;box-sizing:border-box!important;
+ }
+ main.participant-live-view .audience-widget-layout.stage-fidelity label{line-height:inherit!important}
+}
+
+/* RC174: The join/consent screen may use session logos and a large title,
+   but a connected participant must see exactly one authored slide. Hide the
+   redundant session heading visually, not from assistive technologies. */
+main.participant-live-view.participant-slide-active .participant-session-heading-offscreen{
+ position:absolute!important;width:1px!important;height:1px!important;
+ padding:0!important;margin:-1px!important;overflow:hidden!important;
+ clip:rect(0,0,0,0)!important;white-space:nowrap!important;
+ clip-path:inset(50%)!important;border:0!important;
+}
+main.participant-live-view.participant-slide-active>.panel{
+ background:transparent!important;box-shadow:none!important;border:0!important;
+ padding:0!important;border-radius:0!important;
+}
+/* Keep the viewing controls separate from the 16:9 painting surface. */
+main.participant-live-view.participant-slide-active .audience-stage-scroll{
+ background:transparent!important;border:0!important;box-shadow:none!important;
+}
+
+/* RC174: Generic form styles previously kept a fixed 13px label and 12px
+   textarea padding even on a 320px 16:9 slide. The widget rect shrank but
+   its controls did not (a two-row textarea stayed ~57px at every viewport).
+   Match desktop CSS in 1280-unit stage coordinates; only the faithful slide
+   uses tiny controls. Reading mode keeps full-size accessible targets. */
+@media(max-width:700px){
+ main.participant-live-view .audience-widget-layout.stage-fidelity>.page-widget label{
+  font-size:1.015625cqw!important;line-height:1.2!important;
+  gap:.703125cqw!important;margin-bottom:1.40625cqw!important;
+ }
+ main.participant-live-view .audience-widget-layout.stage-fidelity>.page-widget :is(textarea,input,select){
+  font-size:1.015625cqw!important;line-height:1.2!important;
+  padding:.9375cqw 1.09375cqw!important;
+  border-radius:.78125cqw!important;border-width:.078125cqw!important;
+  min-height:0!important;
+ }
+ main.participant-live-view .audience-widget-layout.stage-fidelity>.page-widget button:not(.rating-choice-buttons > button){
+  padding:.78125cqw 1.09375cqw!important;
+  border-radius:.78125cqw!important;
+  min-height:0!important;
+ }
+}
+
+/* RC175: The generic mobile img/video rule (height:auto) changed the geometry
+   of media placed inside an authored 16:9 widget. Keep its image/video box
+   exactly as large as the widget's fit-frame on all viewport sizes. The image
+   itself retains object-fit:contain, so there is no distortion. The accessible
+   reading flow intentionally keeps natural media proportions. */
+:is(.audience-widget-layout.stage-fidelity,.audience-widget-layout.stage-phone)
+  >.page-widget .widget-fit-content > :is(img.projection-media,video.projection-media){
+ width:100%!important;height:100%!important;max-height:100%!important;
+ max-width:100%!important;object-fit:contain!important;
+}
+/* Media-only widgets have no text to establish a block height. Without a
+   definite fit-content height, their 100%-height media collapses to its
+   intrinsic ratio (or video defaults to 150px), breaking authored geometry. */
+:is(.audience-widget-layout.stage-fidelity,.audience-widget-layout.stage-phone)
+  >.page-widget:is([data-widget-kind="image"],[data-widget-kind="logo"],[data-widget-kind="video"])
+  >.widget-fit-frame>.widget-fit-content{height:100%!important;min-height:0!important;}

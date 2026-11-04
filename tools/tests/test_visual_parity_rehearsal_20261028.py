@@ -4,6 +4,7 @@ import unittest
 R=Path(__file__).resolve().parents[2]
 UI=(R/'apps/web/src/main.tsx').read_text()
 CSS=(R/'apps/web/src/style.css').read_text()
+TYPO=(R/'apps/web/src/stage-widget-typography.ts').read_text()
 
 class VisualParity20261028(unittest.TestCase):
  def test_editor_can_preview_live_unsaved_draft_without_exiting(self):
@@ -27,7 +28,9 @@ class VisualParity20261028(unittest.TestCase):
  def test_text_styles_reach_api_and_all_visual_contexts(self):
   self.assertIn('validWidgetInlineMarks(w.textMarks)',(R/'apps/api/src/domain.ts').read_text())
   self.assertIn('WidgetStyledText',UI)
-  self.assertIn("widgetTypographyStyle(w.kind==='title'?widgetDisplay(w,{pageTitle:entry.activity.title,masterTitleStyle:entry.theme?.master?.titleStyle}).style:w.style)",UI)
+  self.assertIn('stageWidgetTypography(w,{pageTitle:entry.activity.title,masterTitleStyle:entry.theme?.master?.titleStyle},audiencePortrait)',UI)
+  self.assertIn("widget.kind==='title'?widgetDisplay(widget,context).style:widget.style",TYPO)
+  self.assertIn('widgetTypographyStyle(resolved)',TYPO)
   self.assertIn('masterTitleStyle={entry.theme?.master?.titleStyle}',UI)
   self.assertIn("onSelection={r=>recordTextSelection(w.id,'label',r)}",UI)
   self.assertIn('textSelection.current=next',UI)

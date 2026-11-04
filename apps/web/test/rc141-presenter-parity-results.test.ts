@@ -34,7 +34,7 @@ test('RC141: editor, presenter and audience share reaction controls',()=>{
  assert.match(reaction,/readOnly\|\|disabled\|\|!onSelect/);
  assert.equal(main.match(/<ReactionChoices\b/g)?.length,3);
  assert.match(main,/w.showTitle!==false&&<strong><WidgetStyledText text=\{w.label\|\|'Reazioni'\}/);
- assert.match(main,/\['rating','reactions','results-button'\]\.includes\(w.kind\)/);
+ assert.match(main,/\['reactions','results-button'\]\.includes\(w.kind\)/);
  assert.match(css,/\.reaction-choice-buttons>button\{/);
 });
 test('RC141: editor uses the same native inputs as presenter and participant for multiple choice',()=>{

@@ -1,3 +1,48 @@
+# Quorivio 0.1.0-dev — RC176 — Accessible DOM order and participant modes
+
+**RC176 after RC175:** corrected actual keyboard/screen-reader DOM order in public accessible reading (footer last, no decorative graphic or presenter-only widgets), with the authored 16:9 stage unchanged. Fixed the authenticated Chromium fixture that conflated phone and accessible views; independently assert all three display modes and desktop/mobile normalized slide geometry. Shipped real TypeScript policy + Chromium CSS checks. **313/313 Web Node, 588/588 API, 25/25 targeted Python and Chromium CSS PASS.** Current Vite/React+PostgreSQL/CI not yet run. **85.25% certified (43 accepted, 17 partial)**, `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag/deploy. See `docs/RC_CYCLE176_ACCESSIBLE_DOM_AND_MODE_PARITY.en.md`.
+
+---
+# Quorivio 0.1.0-dev — RC175 — Public 16:9 media fidelity handoff
+
+**RC175 cumulative after RC174:** fixed a measured Chromium discrepancy where an image or video in an authored live participant widget reverted to intrinsic/default height on a narrow viewport instead of following its 16:9 widget frame. Media-only fit containers now have definite height; public videos use the projection-media class and stage-fidelity/stage-phone CSS preserves object-fit without distorting media. Browser CSS acceptance at 1280/390/320 px passes for image, video, and source-cropped image, with neutral accessible reading unchanged. **309/309 frontend Node + 588/588 API Node tests pass.** Full Vite build, authenticated React/PostgreSQL and physical-device screenshots still need independent CI validation. **85.25% certified (43 accepted / 17 partial).** `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag/deployment. See `docs/RC_CYCLE175_PARTICIPANT_MEDIA_FIDELITY.en.md`.
+
+---
+# Quorivio 0.1.0-dev — RC174 — Single-stage participant handoff
+
+**RC174 cumulative after RC173:** active participant pages no longer render duplicate session logos/titles or legacy media outside authored widgets, and 16:9 on narrow phones scales label/textarea padding and text with the slide. Chromium DOM/CSS checks at 1280/390/320 px and 307 web Node + 588 API Node + 23 targeted Python checks pass. Authenticated React/PostgreSQL, real-device validation and Vite build in CI are still pending. **85.25% certified (43 accepted / 17 partial).** `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag/deploy. See `docs/RC_CYCLE174_PARTICIPANT_SINGLE_STAGE.en.md`.
+
+---
+# Quorivio 0.1.0-dev — RC172 — Mixed phone authoring handoff
+
+**RC172 cumulative after RC171:** manually placed phone widgets reserve space, automatic widgets adapt without avoidable overlap, and editor/public phone stage heights agree. Compact automatically keeps authored phone text and color styles. **296 web Node tests pass**; Python preflight included, full Vite CI and authenticated browser/device checks still pending. **85.25% certified (43 accepted / 17 partial)**. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag/deploy. See `docs/RC_CYCLE172_PHONE_MIXED_AUTHORING.en.md`.
+
+---
+# Quorivio 0.1.0-dev — RC171 — Mobile editor/palette handoff
+
+**RC171 cumulative after RC170:** top-header phone editor toggle, compact automatic phone stage preserving explicit overrides, properly sized line/shape icons and right-click/long-press/keyboard/ellipsis preset access. Local tests and inventory in the package; authenticated real-browser and full Vite CI still required. **85,25% certificato / 85.25% certified (43 accepted / 17 partial)**. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag/deploy. Vedi / See `docs/RC_CYCLE171_EDITOR_PHONE_PALETTE.it.md`.
+
+---
+# Quorivio 0.1.0-dev — RC170 — Master-aware phone footer numbering parity
+
+**RC170:** fixed unreadably small phone page numbers and conflicting 5px/10px preview/live margins; editor, preview and public phone use authored logical pixel sizes and independent padding, including manual number anchors, while 16:9 desktop sizing is unchanged. The standard page editor displays the inherited master footer number without materializing the master widget into the page draft. Node/Python and local Chromium 390/1440 checks added; authenticated Chromium/PostgreSQL validation awaits CI. **85.25% certified (43 accepted / 17 partial gates)**. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. See `docs/RC_CYCLE170_PHONE_FOOTER_NUMBER_PARITY.en.md`. No commit/push/tag/deploy.
+
+---
+# Quorivio 0.1.0-dev — RC169 — Rating and phone font handoff
+
+**Cumulative RC169 after RC168:** one rating rendering component and master-aware mobile title size, expanded disposable real-browser/PostgreSQL acceptance for rating controls and footer; new GitHub CI not yet confirmed. Preserve historical manifests; **85.25% (43 accepted / 17 partial)**, `rc_strict=false`, `publish_image=false`, `publish_latest=false`, no commit/push/tag/deploy. See `docs/RC_CYCLE169_RATING_PHONE_RENDER_PARITY.en.md`.
+
+---
+# Quorivio 0.1.0-dev — RC168 — Participant phone visual fidelity handoff
+
+**RC168:** filter presenter-only widgets before mobile stage size and layout generation in both participant preview and live rendering. Adds Chromium 390/1440px layout and PostgreSQL-authenticated widget/footer acceptance, preserving mobile overrides, master inheritance and 16:9. Independently reviewed physical-device A3 remains pending; certified completion **85.25% (43 accepted / 17 partial)**. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. See `docs/RC_CYCLE168_PHONE_VISIBLE_GEOMETRY.en.md`. Do not automatically commit/push/tag/deploy.
+
+---
+# Quorivio 0.1.0-dev — RC167 — Live presentation fidelity handoff
+
+**RC167:** RC166 passed GitHub run 41808754419 including verified multiarch publication. Shared title/graphics/QR policy and participant-only widget filtering eliminate live/preview differences. Disposable PostgreSQL Chromium now asserts no legacy line/shape captions or presenter-only shells; test targets and failure artifacts are hardened to prevent token leaks. GitGuardian's prior incident was marked «ignore» by the operator, scanners remain enabled. **Certified completion 85.25% (43 accepted / 17 partial)**; independently reviewed A3 remains pending. No commit/push/deploy; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. See `docs/RC_CYCLE167_LIVE_PREVIEW_FIDELITY.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC166 — Ephemeral CI credentials and GitGuardian triage
 
 **RC166:** full RC165 GitHub run `41802327982` passed. Preventive hardening for external GitGuardian "Generic Password" report: remove fixed credentials in primary CI; use ephemeral run-scoped values. **The actual incident still requires its file/line from the GitGuardian portal**; do not classify it without evidence. Certified completion 85.25% (43 accepted / 17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`. See `docs/RC_CYCLE166_GITGUARDIAN_TRIAGE.en.md`.

@@ -9,8 +9,11 @@ CSS=(ROOT/'apps/web/src/style.css').read_text()
 
 class RC139RatingTextSelection(unittest.TestCase):
  def test_shared_rating_no_duplicate_editor_heading(self):
-  self.assertEqual(UI.count('<RatingChoices'),4)
-  self.assertIn('canvas-rating-preview"><RatingCommentField readOnly/><RatingChoices',UI)
+  self.assertEqual(UI.count('<RatingChoices'),1,'rating choices must be authored once')
+  self.assertEqual(UI.count('<RatingCommentField'),1,'comment must not be duplicated')
+  self.assertEqual(UI.count('<RatingStageContent'),3,'editor via projection plus live and rehearsal use the shared component')
+  self.assertIn('function RatingStageContent(',UI)
+  self.assertNotIn('canvas-rating-preview',UI)
   self.assertIn("['rating','reactions','results-button'].includes(w.kind)?{...w,showTitle:false}:w",UI)
   self.assertIn('widget.showTitle!==false',UI)
   self.assertIn('readOnly||disabled||!onSelect',SCALE)

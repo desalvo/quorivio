@@ -1,0 +1,9 @@
+# RC171 — Selettore smartphone, impaginazione automatica e palette grafica
+
+Base RC170 cumulativa. In editor standard il selettore **Desktop 16:9 / Smartphone 390 px** è ora nella barra superiore e rimane disponibile anche a finestre strette. La disposizione smartphone automatica riduce interspazi, preservando le dimensioni necessarie per domande, gradimento 0–9 e contenuti interattivi; l’altezza aumenta solo per contenuti complessi. L’utente può fare «Ricompatta automaticamente» per rimuovere vecchie posizioni memorizzate, mentre tutte le personalizzazioni esplicite di posizione/stile sono rispettate fino a quell’azione.
+
+**Linee/Forme:** i pulsanti usano ora lo stesso wrapper a larghezza vincolata degli altri widget, evitando il pulsante gigante e permettendo alla palette di andare a capo su finestre strette; la scrollbar verticale compare solo se necessaria. Il menu dei preset è richiamabile con tasto destro, pressione prolungata, Shift+F10 o il pulsante visibile «⋯». Permette di scegliere tipo, frecce, spessore, colori e riempimento. Le proprietà continuano a essere modificabili in «Formato widget».
+
+**Prove:** unit test Node e Python, Chromium CSS 1440/960/620, inventario cumulativo. La vera compilazione Vite e le prove React/autenticate su dispositivo reale vanno ripetute in GitHub CI. Non modificare il regime di rilascio o pubblicare: **85,25% certificato (43/17), `rc_strict=false`, `publish_image=false`, `publish_latest=false`**. Nessun commit, push o deploy.
+
+**Canvas context / Menu contestuale dei widget inseriti:** nel widget Linee/Forme già presente è possibile selezionare direttamente preset, spessore, colore e (per le forme) riempimento tramite menu contestuale, mantenendo anche le proprietà complete nel pannello di formato. / Already inserted graphic widgets expose preset, stroke, color and shape fill directly in their right-click menu; full formatting remains available.

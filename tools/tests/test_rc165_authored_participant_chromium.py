@@ -39,7 +39,11 @@ def run_fixture(text: str=BROWSER):
         'os':SimpleNamespace(environ={'QUORIVIO_CI_ADMIN_EMAIL':'ci@example.invalid','QUORIVIO_CI_NEW_PASSWORD':('X'*24)}),
         'http':SimpleNamespace(cookiejar=SimpleNamespace(CookieJar=lambda:object())),
         'HTTPCookieProcessor':lambda x:x,'build_opener':lambda x:object(),
-        'api':api,'QUESTION_WIDGET':'ci-browser-question','TOPIC_WIDGET':'ci-browser-topic'}
+        'api':api,'QUESTION_WIDGET':'ci-browser-question','RATING_WIDGET':'ci-browser-rating','TOPIC_WIDGET':'ci-browser-topic',
+        'GRAPHIC_LINE':'ci-browser-line','GRAPHIC_SHAPE':'ci-browser-shape',
+        'PRESENTER_CHART':'ci-browser-presenter-result','PRESENTER_COUNT':'ci-browser-presenter-count',
+        'FOOTER_WIDGET':'ci-browser-footer',
+        'validate_disposable_origin':lambda value:value}
     exec(compile(ast.Module(body=[prepare],type_ignores=[]),str(ROOT/'tools/ci_browser_participant.py'),'exec'),ns)
     result=ns['prepare']()
     patch=next((payload for method,path,payload,_ in calls if method=='PATCH' and path.endswith('/design')),None)
@@ -53,10 +57,10 @@ class RC165AuthoredParticipantChromium(unittest.TestCase):
         self.assertIsInstance(patch,dict)
         self.assertEqual(patch['expected_design_revision'],1)
         widgets=patch['page_design']['widgets']
-        self.assertEqual([w['kind'] for w in widgets],['title','question','topic-question'])
+        self.assertEqual([w['kind'] for w in widgets],['title','question','rating','topic-question','line','shape','results-button','participant-count','footer'])
         self.assertEqual(widgets[1]['answerMode'],'single')
         self.assertEqual([x['id'] for x in widgets[1]['options']],['yes','no'])
-        self.assertEqual([x['id'] for x in widgets],['page-title','ci-browser-question','ci-browser-topic'])
+        self.assertEqual([x['id'] for x in widgets],['page-title','ci-browser-question','ci-browser-rating','ci-browser-topic','ci-browser-line','ci-browser-shape','ci-browser-presenter-result','ci-browser-presenter-count','ci-browser-footer'])
         design_index=next(i for i,x in enumerate(calls) if x[0]=='PATCH')
         active_index=next(i for i,x in enumerate(calls) if x[1].endswith('/status'))
         self.assertLess(design_index,active_index)

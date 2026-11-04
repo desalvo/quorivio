@@ -1,0 +1,28 @@
+{
+  "version": "0.1.0-dev",
+  "cycle": 176,
+  "date": "2026-11-04",
+  "base": "RC175",
+  "local_verified": {
+    "web_node": {"passed": 313, "failed": 0},
+    "api_node": {"passed": 588, "failed": 0},
+    "targeted_python": {"passed": 25, "failed": 0},
+    "chromium_css_viewports_px": [1280, 390, 320],
+    "chromium_css_checks": ["rc174-16x9", "rc175-media", "rc176-ts-policy-dom-reading"],
+    "typescript_syntax_transpile": "passed"
+  },
+  "not_executed": [
+    "npm TypeScript/Vite project build",
+    "authenticated current React/PostgreSQL Chromium end-to-end",
+    "GitHub CI on current RC176 sources",
+    "physical iOS/Android and independent assistive technology audit",
+    "independent visual operator and AGID/WCAG acceptance"
+  ],
+  "acceptance_credit": 0,
+  "certified_score": 85.25,
+  "accepted_gates": 43,
+  "partial_gates": 17,
+  "rc_strict": false,
+  "publish_image": false,
+  "publish_latest": false
+}

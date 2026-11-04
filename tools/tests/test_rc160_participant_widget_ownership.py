@@ -10,7 +10,7 @@ RATING=(ROOT/'apps/web/src/rating-choices.tsx').read_text(encoding='utf8')
 CI=(ROOT/'.github/workflows/ci.yml').read_text(encoding='utf8')
 
 def participant_view(ui: str)->str:
-    a=ui.find('{joinPath?<main id="main-content" className="narrow participant-live-view"')
+    a=ui.find('{joinPath?<main id="main-content"')
     b=ui.find('publicPath?<PresenterLiveScreen',a)
     return ui[a:b] if a>=0 and b>a else ''
 
@@ -39,19 +39,20 @@ class ParticipantWidgetOwnership(unittest.TestCase):
         # RC162: visual-order phone stacking, footer still last and bottom-aligned.
         self.assertIn("if(a.w.kind==='footer')return b.w.kind==='footer'?a.index-b.index:1;",MOBILE)
         self.assertIn("if(b.w.kind==='footer')return -1;",MOBILE)
-        self.assertIn('for(const {w} of ordered)',MOBILE)
-        self.assertIn('const ay=a.w.position?.y',MOBILE)
+        self.assertIn('for(const w of ordered)',MOBILE)
+        self.assertIn('return (a.w.position?.y',MOBILE)
         # Negative mutation rejects removing the footer precedence.
         self.assertNotIn("if(b.w.kind==='footer')return -1;",MOBILE.replace("if(b.w.kind==='footer')return -1;",''))
-        self.assertIn("Math.max(top,stageHeight-24-size)",MOBILE)
+        self.assertIn("Math.max(top,height-MOBILE_BOTTOM_MARGIN-size)",MOBILE)
         self.assertIn("case 'rating':return 230",MOBILE)
         self.assertIn('order:9999!important',CSS)
         self.assertIn('order:10000!important',CSS)
     def test_rating_comment_rendered_and_white_on_every_surface(self):
         view=participant_view(UI)
-        self.assertIn('<RatingCommentField value={ratingComments[w.id]',view)
-        self.assertIn('canvas-rating-preview"><RatingCommentField readOnly',UI)
-        self.assertIn('<RatingCommentField readOnly={viewer===',UI)
+        self.assertIn('<RatingStageContent widget={w} comment={ratingComments[w.id]',view)
+        self.assertIn('function RatingStageContent(',UI)
+        self.assertEqual(UI.count('<RatingCommentField'),1)
+        self.assertIn("<RatingStageContent widget={w} readOnly={viewer==='presenter'}",UI)
         self.assertIn('className="rating-comment-input"',RATING)
         self.assertIn('background-color:#ffffff!important;color:#142b44!important',CSS)
         self.assertIn('color-scheme:light!important',CSS)

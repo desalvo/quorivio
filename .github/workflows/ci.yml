@@ -158,6 +158,24 @@ jobs:
         run: python3 -m unittest tools.tests.test_rc164_graphic_palette_chromium_contract -q
       - name: RC165 authored 16:9 participant widgets and PostgreSQL browser fixture preflight
         run: python3 -m unittest tools.tests.test_participant_browser_acceptance tools.tests.test_audience_moderation_delivery tools.tests.test_rc165_authored_participant_chromium -q
+      - name: RC167 real-audience graphics, presenter-only widget isolation and secret-safe browser evidence
+        run: python3 -m unittest tools.tests.test_rc167_live_preview_fidelity -q
+      - name: RC168 public smartphone footer parity and no hidden presenter-widget gaps
+        run: python3 -m unittest tools.tests.test_rc168_phone_preview_parity -q
+      - name: RC169 rating body and master-aware phone fonts parity preflight
+        run: python3 -m unittest tools.tests.test_rc169_rating_typography_parity -q
+      - name: RC171 visible device switch, compact phone layout and graphic palette preflight
+        run: python3 -m unittest tools.tests.test_rc171_editor_phone_palette -q
+      - name: RC172 manual phone geometry and non-destructive compacting preflight
+        run: python3 -m unittest tools.tests.test_rc172_phone_mixed_authoring -q
+      - name: RC174 one live slide, branded join isolation and proportional 16:9 controls preflight
+        run: python3 -m unittest tools.tests.test_rc174_public_single_stage -q
+      - name: RC175 faithful public media geometry at desktop and phone sizes preflight
+        run: python3 -m unittest tools.tests.test_rc175_media_geometry -q
+      - name: RC176 three-mode accessibility and real participant geometry preflight before npm
+        run: python3 -m unittest tools.tests.test_rc176_accessible_stage_modes -q
+      - name: RC170 schema-owned footer number and phone preview/live parity preflight
+        run: python3 -m unittest tools.tests.test_rc170_phone_footer_number_parity -q
       - name: Validate RC105 floating dialogs and selection-only resize geometry before npm
         run: python3 -m unittest tools.tests.test_rc105_editor_floating -q
       - name: Validate RC101 horizontal widget rail and visible editor stage before npm
@@ -409,6 +427,19 @@ jobs:
           python3 tools/ci_rc159_live_preview_parity_chromium.py
           # RC160: computed accessible reading order, phone footer and rating contrast.
           python3 tools/ci_rc160_participant_layout_chromium.py
+          # RC174: real Chromium checks one 16:9 stage at three widths,
+          # proportionally sized form controls and clean accessible reading.
+          python3 tools/rc174_browser_geometry.py
+          # RC175: photo/video and cropped media preserve authored rectangles.
+          python3 tools/rc175_browser_media_geometry.py
+          # RC176: actual TypeScript public visibility + accessible DOM ordering with Chromium CSS.
+          python3 tools/rc176_browser_reading_order.py
+          python3 tools/ci_rc168_phone_footer_chromium.py
+          python3 tools/ci_rc169_rating_typography_chromium.py
+          # RC170: authored phone footer numbering must match editor, rehearsal and public rendering.
+          python3 tools/ci_rc170_phone_footer_number_chromium.py
+          # RC171: visible editor phone switch, graphic menu triggers and wrapping icon rail.
+          python3 tools/ci_rc171_editor_palette_chromium.py
           # RC162: compact QR URL must remain visible when resized; no URL row when hidden.
           python3 tools/ci_rc162_qr_resizing_chromium.py
           # RC152: mutation-tested current long-label wrapping and attached [count]
@@ -1021,7 +1052,17 @@ jobs:
           python3 tools/verify_rc_cycle164_inventory.py --historical
           python3 -m unittest tools.tests.test_rc165_authored_participant_chromium -q
           python3 tools/verify_rc_cycle165_inventory.py --historical
-          python3 tools/verify_rc_cycle166_inventory.py
+          python3 tools/verify_rc_cycle166_inventory.py --historical
+          python3 tools/verify_rc_cycle167_inventory.py --historical
+          python3 tools/verify_rc_cycle168_inventory.py --historical
+          python3 tools/verify_rc_cycle169_inventory.py --historical
+          python3 tools/verify_rc_cycle170_inventory.py --historical
+          python3 tools/verify_rc_cycle171_inventory.py --historical
+          python3 tools/verify_rc_cycle172_inventory.py --historical
+          python3 tools/verify_rc_cycle173_inventory.py --historical
+          python3 tools/verify_rc_cycle174_inventory.py --historical
+          python3 tools/verify_rc_cycle175_inventory.py --historical
+          python3 tools/verify_rc_cycle176_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

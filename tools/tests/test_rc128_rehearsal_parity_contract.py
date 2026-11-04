@@ -4,6 +4,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
 JSX=(ROOT/'apps/web/src/main.tsx').read_text()
 CSS=(ROOT/'apps/web/src/style.css').read_text()
+TYPO=(ROOT/'apps/web/src/stage-widget-typography.ts').read_text()
 
 class RehearsalParityContracts(unittest.TestCase):
  def test_no_presenter_free_text_demo_under_question(self):
@@ -13,7 +14,9 @@ class RehearsalParityContracts(unittest.TestCase):
   self.assertIn('demoResultsVisible&&<section id="rehearsal-simulated-results"',JSX)
  def test_preview_preserves_authored_geometry_and_fonts(self):
   self.assertIn("'--stage-width':`${w.position?.width??45}%`",JSX)
-  self.assertIn("'--authored-widget-font-size':widgetTypographyStyle",JSX)
+  self.assertIn('stageWidgetTypography(w,{pageTitle:activity.title,masterTitleStyle:snapshot.session.theme?.master?.titleStyle},mobile)',JSX)
+  self.assertIn("'--authored-widget-font-size':typography.fontSize",TYPO)
+  self.assertIn('widgetTypographyStyle(resolved)',TYPO)
   self.assertIn('font-size:var(--authored-widget-font-size,1.25cqw)!important;',CSS)
   self.assertNotIn('style={display.style as React.CSSProperties}',JSX)
  def test_resize_input_and_no_reflow_for_dual_preview(self):

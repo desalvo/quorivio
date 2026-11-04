@@ -14,7 +14,8 @@ class ParticipantBrowserAcceptance(unittest.TestCase):
 
  def test_real_browser_fixture_compiles_and_requires_loopback(self):
   ast.parse(self.script)
-  self.assertIn("assert BASE.startswith('http://127.0.0.1:')",self.script)
+  self.assertIn('validate_disposable_origin(BASE)',self.script)
+  self.assertIn("parsed.hostname not in ('localhost','127.0.0.1')",self.script)
   self.assertIn("WEB=os.environ.get('QUORIVIO_WEB_URL',BASE)",self.script)
   self.assertIn("browser.new_context",self.script)
 

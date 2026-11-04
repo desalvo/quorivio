@@ -1,3 +1,43 @@
+# Quorivio 0.1.0-dev — RC176 — Accessibilità DOM e modalità partecipante
+
+**RC176 cumulativa dopo RC175:** corretto l’ordine DOM/Tab della lettura accessibile (footer ultimo, forme decorative e risultati privati esclusi), senza modificare il canvas grafico 16:9. Riparata la prova browser autenticata che confondeva smartphone e lettura; aggiunte verifiche delle tre modalità, delle coordinate 16:9 desktop/smartphone e prove Chromium con l’helper TS reale. **313/313 Web Node, 588/588 API, 25/25 Python selezionati e Chromium CSS PASS.** Build Vite/React+PostgreSQL e CI GitHub attuale ancora aperte. **85,25% certificato (43 gate accettati, 17 parziali)**, `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag/deploy. Dettagli: `docs/RC_CYCLE176_ACCESSIBLE_DOM_AND_MODE_PARITY.it.md`.
+
+---
+# Quorivio 0.1.0-dev — RC174 — Presentazione partecipante unica e controllo scala 16:9
+
+**RC174:** rimossi loghi/titolo duplicati dalla diapositiva partecipante e media legacy ripetuti; controlli HTML 16:9 su smartphone ora si riducono proporzionalmente secondo la geometria salvata. Chromium su fixture DOM/CSS a 1280/390/320 px, 307 test Web, 588 API e 23 Python mirati verdi. Build Vite e prova reale autenticata ancora aperte; **85,25% certificato (43 accettati / 17 parziali)**. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag/deploy. Vedi `docs/RC_CYCLE174_PARTICIPANT_SINGLE_STAGE.it.md`.
+
+---
+# Quorivio 0.1.0-dev — RC172 — Layout smartphone misto senza sovrapposizioni
+
+**RC172:** aree riservate per i widget smartphone a posizione manuale, riposizionamento degli altri widget senza sovrapposizioni evitabili e altezza del canvas coerente fra editor e pubblico. Il pulsante di ricompattazione conserva font e colori smartphone. **296 test Node Web superati**; preflight Python incluso; build Vite completa e prove Chromium/autenticate da confermare. **85,25% certificato (43 accettati / 17 parziali)**. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag/deploy. Vedi `docs/RC_CYCLE172_PHONE_MIXED_AUTHORING.it.md`.
+
+---
+# Quorivio 0.1.0-dev — RC171 — Editor smartphone visibile e palette compatta
+
+**RC171:** selettore Desktop/Smartphone spostato nella barra superiore dell’editor; layout mobile automatico compattato con altezze basate sui contenuti, mantenendo posizioni manuali. Palette Linee/Forme uniformata agli altri pulsanti, adattiva alla larghezza, con menu preset accessibile da tasto destro, pressione lunga e tasto «⋯». Test Node/Python/Chromium locale e inventario; CI completa ancora da confermare. **85,25% certificato / 85.25% certified (43 accepted / 17 partial)**. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag/deploy. Vedi / See `docs/RC_CYCLE171_EDITOR_PHONE_PALETTE.it.md`.
+
+---
+# Quorivio 0.1.0-dev — RC170 — Numero footer smartphone coerente e derivazione dallo schema
+
+**RC170:** rimosso il mismatch del numero pagina fra editor smartphone, anteprima e URL reale: font e margini ora rispettano i pixel logici 390 px, compresi posizionamenti personalizzati; il desktop 16:9 conserva la scala originaria. L'editor standard mostra la numerazione ereditata dal footer dello schema senza duplicare widget nella pagina. Test Node/Python, Chromium 390/1440 e browser PostgreSQL in CI; CI integrale ancora da confermare. **85,25% certificato (43 accettati / 17 parziali)**. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Vedi `docs/RC_CYCLE170_PHONE_FOOTER_NUMBER_PARITY.it.md`. Nessun commit/push/tag/deploy.
+
+---
+# Quorivio 0.1.0-dev — RC169 — Gradimento unificato e font smartphone derivati dallo schema
+
+**RC169:** eliminata la doppia casella commento nell'editor; gradimento condiviso tra editor, proiezione, anteprima e URL partecipante (titolo, descrizione, commento bianco, scala 0–9 e dimensione pulsanti). Tipografia smartphone del titolo risolta dallo schema prima del fallback; prova Chromium/PostgreSQL ampliata con un gradimento reale. CI e confronto indipendente su dispositivi ancora da confermare. **85,25% certificato (43 gate accettati / 17 parziali)**. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Vedi `docs/RC_CYCLE169_RATING_PHONE_RENDER_PARITY.it.md`. Nessun commit/push/tag/deploy.
+
+---
+# Quorivio 0.1.0-dev — RC168 — Layout smartphone partecipante senza spazi fantasma
+
+**RC168:** rimossa una discrepanza reale tra anteprima e presentazione partecipante smartphone: widget riservati al presentatore venivano esclusi dal DOM *dopo* essere stati inclusi nel conteggio dell’altezza e degli slot. La geometria condivisa ora filtra prima, rispettando schemi e override mobili; Chromium e PostgreSQL verificano footer a fondo pagina, 16:9, lettura accessibile e sicurezza dei diagnostici. Certificazione invariata **85,25% (43 accettati / 17 parziali)** in attesa di CI e confronto indipendente sui dispositivi reali. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Vedi `docs/RC_CYCLE168_PHONE_VISIBLE_GEOMETRY.it.md`. Nessun commit/push/tag/deploy.
+
+---
+# Quorivio 0.1.0-dev — RC167 — Parità grafica reale/anteprima e prove browser sicure
+
+**RC167:** la run GitHub 41808754419 della RC166 è completamente verde, inclusa pubblicazione Docker Hub multiarch. GitGuardian «Generic Password» è stato chiuso con «ignore» dall'operatore (non equivale a dimostrare falso positivo). Corrette differenze funzionali: nessuna etichetta nelle Linee/Forme reali, nessun contenitore invisibile di widget riservati al presentatore nella pagina partecipante; criteri condivisi tra editor, anteprima e proiezione. Esteso Chromium/PostgreSQL con widget legacy; CI fixture limitata al vero loopback e artifact senza token di sessione. Test RC167 e contratto in CI; confronto visivo fisico ancora da verificare. **Completamento certificato 85,25% (43 accettati / 17 parziali).** `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Vedi `docs/RC_CYCLE167_LIVE_PREVIEW_FIDELITY.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC166 — Hardening delle credenziali CI e triage GitGuardian
 
 **RC166:** CI RC165 `41802327982` completamente verde. Analisi preventiva della segnalazione GitGuardian «Generic Password»: le password fisse del job CI principale sono state sostituite da credenziali effimere; test e documentazione per il triage. **L’incidente specifico non è identificabile senza il percorso del portale GitGuardian**; non chiudere come falso positivo senza prova. Completamento certificato 85,25% (43 accettati / 17 parziali), `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Vedi `docs/RC_CYCLE166_GITGUARDIAN_TRIAGE.it.md`.
@@ -3060,3 +3100,9 @@ Baseline confermata tramite commit: RC95. RC96–RC99 sono cumulativi non ancora
 Dai log `logs_111821227952.zip`: build TypeScript e test Node/PostgreSQL superati; nello step finale 1.527 test Python, 7 fallimenti di contratti frontend con vecchie asserzioni su frammenti JSX e 1 errore di esportazione PowerPoint. Aggiornati i controlli al comportamento corrente, mantenendo i gate. Corretta l'importazione dei bordi PowerPoint con colore RGB esplicito e spessore ereditato: ora resta visibile nell'esportazione a 1 pt, senza modificare il default 0 dei widget creati in Quorivio. Test di regressione per contorni visibili e assenti.
 
 Verifiche locali: **55/55 test mirati OK**; suite Python locale completa interrotta per timeout; build npm completa non verificabile a causa di dipendenze offline incomplete. CI standard ed estesa RC99 da rieseguire. Completamento certificato **84,75% (42 gate accettati, 17 parziali)**, invariato.
+
+## 04/11/2026 — RC173: correzione delle cinque anomalie partecipante/gradimento
+
+**Sorgenti:** RC172 cumulativa, versione `0.1.0-dev` EUPL-1.2 invariate. Presentazione reale: il duplicato dello sfondo della slide sotto al canvas pubblico è stato eliminato; modalità 16:9 / smartphone / lettura accessibile separate. La lettura accessibile ora usa fondo bianco, un layout lineare e nasconde forme e linee decorative. Il 16:9 rimane geometrico anche su smartphone, senza i 44px minimi che alteravano il layout. Editor: titolo gradimento non duplicato tra campo editabile e corpo del widget. Vista pubblica: rimossi eventuali fondi forma non etichettati che coincidono con risultati esclusivamente per presentatore e il fallback statistico senza widget.
+
+**Verifica locale:** 302/302 test Node web PASS; TypeScript/Vite non disponibile per dipendenze offline (`vite/client` non installato). Controlli browser autenticati/CI GitHub e smartphone reali ancora aperti. **85,25% invariato**, 43 gate accettati, 17 parziali. Nessun commit/push/tag; documenti `docs/RC_CYCLE173_PUBLIC_SLIDE_FIDELITY.it.md` e `.en.md`.

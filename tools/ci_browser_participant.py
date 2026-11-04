@@ -10,6 +10,7 @@ import json
 import os
 from pathlib import Path
 from urllib.request import Request, HTTPCookieProcessor, build_opener
+from urllib.parse import urlsplit
 from urllib.error import HTTPError
 from playwright.async_api import async_playwright, expect
 
@@ -20,7 +21,13 @@ ARTIFACTS=Path(os.environ.get('QUORIVIO_BROWSER_ARTIFACT_DIR','/tmp/quorivio-bro
 # A newly created legacy poll contains only the default Title widget; it does
 # not (and must not) synthesize participant controls outside the authored canvas.
 QUESTION_WIDGET='ci-browser-question'
+RATING_WIDGET='ci-browser-rating'
 TOPIC_WIDGET='ci-browser-topic'
+GRAPHIC_LINE='ci-browser-line'
+GRAPHIC_SHAPE='ci-browser-shape'
+PRESENTER_CHART='ci-browser-presenter-result'
+PRESENTER_COUNT='ci-browser-presenter-count'
+FOOTER_WIDGET='ci-browser-footer'
 
 
 
@@ -34,14 +41,29 @@ def api(opener,method,path,body=None,expected=200):
  except HTTPError as e:
   status=e.code
   payload=e.read()
- assert status==expected,(method,path,status,expected,payload[:300])
+ assert status==expected, f'disposable API {method}: HTTP {status}, expected {expected}; paths and response payload intentionally suppressed'
  return json.loads(payload) if payload else None
 
 
+def validate_disposable_origin(value):
+ # Prefix tests are unsafe: http://127.0.0.1:8080@external.example/ also
+ # starts with the literal loopback prefix, but its actual host is external.
+ try:
+  parsed=urlsplit(value)
+  port=parsed.port
+ except (TypeError,ValueError) as exc:
+  raise ValueError('CI browser fixture requires a well-formed loopback origin') from exc
+ if (parsed.scheme!='http' or parsed.hostname not in ('localhost','127.0.0.1')
+     or port is None or not (1<=port<=65535) or parsed.username or parsed.password
+     or parsed.path not in ('','/') or parsed.query or parsed.fragment):
+  raise ValueError('CI browser fixture is restricted to disposable loopback origins')
+ return f'http://{parsed.hostname}:{port}'
+
+
 def prepare():
- # Do not silently point this destructive fixture at a remote/production API.
- assert BASE.startswith('http://127.0.0.1:') or BASE.startswith('http://localhost:'),BASE
- assert WEB.startswith('http://127.0.0.1:') or WEB.startswith('http://localhost:'),WEB
+ # Validate the parsed hostname before ANY mutating API request.
+ validate_disposable_origin(BASE)
+ validate_disposable_origin(WEB)
  admin=build_opener(HTTPCookieProcessor(http.cookiejar.CookieJar()))
  api(admin,'POST','/api/auth/login',{'email':os.environ['QUORIVIO_CI_ADMIN_EMAIL'],'password':os.environ['QUORIVIO_CI_NEW_PASSWORD']})
  session=api(admin,'POST','/api/sessions',{'title':'CI Chromium real audience acceptance'},201)
@@ -58,9 +80,34 @@ def prepare():
    'options':[{'id':'yes','label':'Yes'},{'id':'no','label':'No'}],
    'style':{'fontFamily':'Arial','fontSize':18,'fillNone':True},
    'position':{'x':10,'y':20,'width':72,'height':29,'rotation':0}},
+  # A real, customized rating must match editor/rehearsal: exactly one
+  # comment textarea, authored description, ten buttons and a 24px choice size.
+  {'id':RATING_WIDGET,'kind':'rating','label':'Gradimento CI','description':'Descrizione del gradimento CI',
+   'style':{'fontFamily':'Arial','fontSize':20,'ratingButtonSize':24,'fillNone':True},
+   'position':{'x':81,'y':48,'width':18,'height':34,'rotation':0}},
   {'id':TOPIC_WIDGET,'kind':'topic-question','label':'Domande sul tema',
    'style':{'fontFamily':'Arial','fontSize':16,'fillNone':True},
-   'position':{'x':10,'y':60,'width':72,'height':27,'rotation':0}}]
+   'position':{'x':10,'y':60,'width':72,'height':27,'rotation':0}},
+  # Deliberately include legacy graphic labels/showTitle=True.  The real
+  # participant must render only SVG, just like preview and the editor.
+  {'id':GRAPHIC_LINE,'kind':'line','label':'CI_PRIVATE_LINE_CAPTION','showTitle':True,
+   'style':{'strokeColor':'#334155','strokeWidth':3,'strokeDash':'dash'},
+   'position':{'x':10,'y':51,'width':72,'height':4,'rotation':0}},
+  {'id':GRAPHIC_SHAPE,'kind':'shape','label':'CI_PRIVATE_SHAPE_CAPTION','showTitle':True,
+   'style':{'shapeType':'circle','fillColor':'#dbeafe','strokeWidth':2},
+   'position':{'x':86,'y':65,'width':12,'height':12,'rotation':0}},
+  # Presenter-only widgets must not leave even blank background rectangles in
+  # the participant DOM; rehearsal uses the exact same visibility policy.
+  {'id':PRESENTER_CHART,'kind':'results-button','label':'Presenter chart','targetWidgetId':QUESTION_WIDGET,
+   'position':{'x':86,'y':10,'width':12,'height':10,'rotation':0}},
+  {'id':PRESENTER_COUNT,'kind':'participant-count','label':'Presenter count',
+   'position':{'x':86,'y':35,'width':12,'height':10,'rotation':0}},
+  # The mobile footer must occupy the actual bottom of the *visible* document,
+  # not the bottom of a taller document that reserves presenter-only tools.
+  {'id':FOOTER_WIDGET,'kind':'footer','label':'',
+   'footerShowSessionTitle':True,'footerShowPageNumber':True,
+   'style':{'fontFamily':'Arial','fontSize':14,'fillNone':True},
+   'position':{'x':0,'y':93,'width':100,'height':7,'rotation':0}}]
  assert all(w['kind']!='question' for w in page['page_design'].get('widgets',[])), 'CI fixture already has a question widget'
  api(admin,'PATCH',f'/api/sessions/{sid}/activities/{aid}/design',
      {'page_design':{**page['page_design'],'widgets':widgets},
@@ -85,7 +132,33 @@ async def enter(page,secret,name):
  await expect(page.get_by_role('button',name='Diapositiva 16:9')).to_have_attribute('aria-pressed','true')
  await expect(page.locator('[data-widget-kind="question"]')).to_have_count(1)
  await expect(page.locator('[data-widget-kind="topic-question"]')).to_have_count(1)
+ await expect(page.locator('[data-widget-kind="rating"]')).to_have_count(1)
+ rating=page.locator('[data-widget-kind="rating"]')
+ await expect(rating.locator('textarea.rating-comment-input')).to_have_count(1)
+ await expect(rating.get_by_text('Descrizione del gradimento CI')).to_be_visible()
+ await expect(rating.get_by_role('button',name='Vota 9 su 9')).to_have_count(1)
+ assert await rating.locator('.rating-choice-buttons>button').count()==10, 'the authored 0–9 scale differs from the preview'
+ rating_view=await rating.evaluate('''el=>{
+   const comment=el.querySelector('textarea.rating-comment-input');
+   const appearance=getComputedStyle(comment);
+   return {background:appearance.backgroundColor,color:appearance.color,
+           title:getComputedStyle(el).fontSize,
+           buttonSize:el.querySelector('.rating-choice-buttons').style.getPropertyValue('--rating-font-size')};
+ }''')
+ assert rating_view['background']=='rgb(255, 255, 255)' and rating_view['color']=='rgb(20, 43, 68)', 'rating comment contrast differs from editor'
+ assert rating_view['buttonSize']=='1.5em', 'rating buttons ignored the authored size'
+
+ # Both graphic SVGs must survive, without a textual label even for old
+ # authored widgets whose saved showTitle flag was true.
+ await expect(page.locator('[data-widget-kind="line"] svg.widget-graphic-line')).to_have_count(1)
+ await expect(page.locator('[data-widget-kind="shape"] svg.widget-graphic-shape')).to_have_count(1)
+ assert await page.get_by_text('CI_PRIVATE_LINE_CAPTION').count()==0, 'graphic line caption leaked'
+ assert await page.get_by_text('CI_PRIVATE_SHAPE_CAPTION').count()==0, 'graphic shape caption leaked'
+ await expect(page.locator('[data-widget-kind="line"]')).to_have_attribute('data-show-title','false')
+ await expect(page.locator('[data-widget-kind="shape"]')).to_have_attribute('data-show-title','false')
+ assert not await page.locator('[data-widget-kind="results-button"], [data-widget-kind="participant-count"]').count(), 'presenter-only widget shell visible to audience'
  assert await page.get_by_role('region',name='Strumenti interattivi').count()==0, 'unsolicited audience Q&A panel returned'
+ await expect(page.locator('[data-widget-kind="footer"]')).to_have_count(1)
  await expect(page.locator('[data-widget-kind="question"]').get_by_role('button',name='Invia risposta',exact=True)).to_be_disabled()
 
 
@@ -103,9 +176,14 @@ async def vote(page,choice,confirmation='Risposta registrata'):
 async def capture(page,tag,errors):
  ARTIFACTS.mkdir(parents=True,exist_ok=True)
  try:
-  await page.screenshot(path=str(ARTIFACTS/(tag+'.png')),full_page=True,timeout=5000)
-  (ARTIFACTS/(tag+'.html')).write_text(await page.content(),encoding='utf-8')
-  (ARTIFACTS/(tag+'.txt')).write_text('URL: '+page.url+'\nErrors: '+repr(errors)+'\n',encoding='utf-8')
+  await page.screenshot(path=str(ARTIFACTS/(tag+'.png')),full_page=True,timeout=5000,
+                        mask=[page.locator('.participant-access-qr')])
+  # Authenticated URLs contain a bearer join token.  A full DOM or raw
+  # browser error may also contain session cookies or private Q&A contents.
+  # Retain only counts and a fixed scenario label in downloadable CI artifacts.
+  (ARTIFACTS/(tag+'.txt')).write_text(
+      f'Fixture: disposable participant browser\nPage errors (count only): {len(errors)}\n',
+      encoding='utf-8')
  except Exception as e:print('Browser diagnostics unavailable:',e)
 
 
@@ -152,6 +230,84 @@ async def run():
    button=p2.locator('[data-widget-kind="question"]').get_by_role('radio',name='Yes',exact=True)
    bounds=await button.bounding_box()
    assert bounds and bounds['x']>=0 and bounds['x']+bounds['width']<=392,bounds
+   # RC176: Faithful 16:9 is the exact same authored coordinate system,
+   # regardless of browser width. Test the real joined React pages at desktop
+   # and 390px before switching modes (not merely a static stylesheet).
+   async def normalized_slide_geometry(page):
+    return await page.locator('.audience-widget-layout.stage-fidelity').evaluate('''stage=>{
+      const canvas=stage.getBoundingClientRect();
+      const result={width:canvas.width,height:canvas.height,widgets:{}};
+      for(const kind of ['question','rating','topic-question','footer']){
+       const widget=stage.querySelector(`[data-widget-kind="${kind}"]`);
+       if(!widget)continue;
+       const box=widget.getBoundingClientRect();
+       result.widgets[kind]=[(box.left-canvas.left)/canvas.width,
+         (box.top-canvas.top)/canvas.height,box.width/canvas.width,box.height/canvas.height];
+      }
+      const field=stage.querySelector('[data-widget-kind="rating"] textarea.rating-comment-input');
+      result.commentHeight=field?.getBoundingClientRect().height ?? 0;
+      return result;
+    }''')
+   desktop_slide=await normalized_slide_geometry(p1)
+   mobile_slide=await normalized_slide_geometry(p2)
+   assert abs(desktop_slide['width']/desktop_slide['height']-16/9)<.025
+   assert abs(mobile_slide['width']/mobile_slide['height']-16/9)<.025
+   assert desktop_slide['widgets'].keys()==mobile_slide['widgets'].keys()
+   for kind,dimensions in desktop_slide['widgets'].items():
+    other=mobile_slide['widgets'][kind]
+    assert all(abs(a-b)<.025 for a,b in zip(dimensions,other)), f'16:9 {kind} coordinates drift at 390px'
+   assert desktop_slide['commentHeight']>0 and mobile_slide['commentHeight']>0
+   # The tiny faithful controls can only be considered accessible in the
+   # separate reading mode. Never force a 44px minimum on the faithful slide.
+   assert mobile_slide['commentHeight']<desktop_slide['commentHeight']*.65, '16:9 response field did not scale'
+
+   # RC176: the three views are different products. Phone is the authored
+   # 390 logical-pixel document; reading mode is a neutral-flow document.
+   # Previous RC165--175 fixture wrongly clicked "Lettura accessibile" and
+   # expected stage-phone, so it could not certify either of the two modes.
+   await p2.get_by_role('button',name='Layout smartphone').click()
+   await expect(p2.locator('.audience-widget-layout.stage-phone')).to_have_count(1)
+   geometry=await p2.locator('.audience-widget-layout.stage-phone').evaluate('''stage=>{
+     const sr=stage.getBoundingClientRect(),footer=stage.querySelector('[data-widget-kind="footer"]');
+     const fr=footer?.getBoundingClientRect();
+     const kinds=[...stage.querySelectorAll(':scope>.page-widget')].map(w=>w.dataset.widgetKind);
+     return {height:sr.height,footerOffset:fr?sr.bottom-fr.bottom:null,kinds};
+   }''')
+   # 7 public widgets: title(68)+question(248)+rating(230)+topic(190)+
+   # line(64)+shape(64)+footer(54)+six 8px gaps+32px margins = 998px.
+   # The two presenter-only result/count widgets must not add 190+145px.
+   assert abs(geometry['height']-998)<2, 'public phone stage reserves invisible presenter widgets'
+   assert 10<=geometry['footerOffset']<=20, 'footer does not finish the public phone document'
+   assert geometry['kinds'].count('footer')==1
+   assert not {'results-button','participant-count'}.intersection(geometry['kinds'])
+   number=await p2.locator('.stage-phone .slide-canvas-page-number').evaluate('''el=>{
+     const stage=el.closest('.stage-phone'),r=el.getBoundingClientRect(),box=stage.getBoundingClientRect();
+     return {font:parseFloat(getComputedStyle(el).fontSize),right:box.right-r.right,bottom:box.bottom-r.bottom};
+   }''')
+   assert abs(number['font']-14)<.5 and abs(number['right']-5)<1.2 and abs(number['bottom']-5)<1.2, 'phone footer-number typography/insets diverged'
+
+   await p2.get_by_role('button',name='Lettura accessibile').click()
+   await expect(p2.locator('.audience-widget-layout.stage-reading')).to_have_count(1)
+   reading=await p2.locator('.audience-widget-layout.stage-reading').evaluate('''stage=>{
+     const kinds=[...stage.querySelectorAll(':scope>.page-widget')].map(w=>w.dataset.widgetKind);
+     const background=getComputedStyle(stage);
+     const field=stage.querySelector('[data-widget-kind="rating"] textarea.rating-comment-input');
+     const fieldStyle=field?getComputedStyle(field):null;
+     return {kinds,backgroundImage:background.backgroundImage,backgroundColor:background.backgroundColor,
+       fieldMinHeight:fieldStyle?.minHeight,fieldHeight:field?.getBoundingClientRect().height ?? 0};
+   }''')
+   assert reading['backgroundImage']=='none' and reading['backgroundColor']=='rgb(255, 255, 255)', 'accessible document inherited the slide background'
+   assert reading['kinds'][-1]=='footer', 'footer must be last in the DOM reading order'
+   assert not {'shape','line','results-button','participant-count'}.intersection(reading['kinds']), 'decorative/private widgets leaked into accessible reading order'
+   assert reading['fieldHeight']>=44, 'accessible response field must remain usable at phone width'
+   await p2.get_by_role('button',name='Diapositiva 16:9').click()
+   await expect(p2.locator('.audience-widget-layout.stage-fidelity')).to_have_count(1)
+
+   await p1.get_by_role('button',name='Lettura accessibile').click()
+   await expect(p1.locator('.audience-widget-layout.stage-reading')).to_have_count(1)
+   kinds=await p1.locator('.stage-reading>.page-widget').evaluate_all('(items)=>items.map(w=>w.dataset.widgetKind)')
+   assert kinds[-1]=='footer' and kinds.index('question')<kinds.index('topic-question'), 'desktop accessible DOM reading order diverged'
+   await p1.get_by_role('button',name='Diapositiva 16:9').click()
    # 7. Explicit Topic Question widget: no unsolicited moderation panel or
    #    global Q&A is mounted.  Questions are private to the presenter.
    topic=p1.locator('[data-widget-kind="topic-question"]')
@@ -173,7 +329,7 @@ async def run():
    api(admin,'POST',f'/api/sessions/{sid}/status',{'status':'closed'})
    assert (await p1.request.get(WEB+f'/api/join/{secret}')).status==404
    assert (await p2.request.get(WEB+f'/api/join/{code}/participation')).status==404
-   assert not errors,errors
+   assert not errors, f'{len(errors)} browser page error(s) (details intentionally suppressed)'
   except Exception:
    await capture(p1,'participant-desktop-failure',errors)
    await capture(p2,'participant-mobile-failure',errors)

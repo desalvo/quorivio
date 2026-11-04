@@ -6,52 +6,101 @@ export const MOBILE_PAGE_WIDTH = 390;
 export const MOBILE_PAGE_MIN_HEIGHT = 720;
 export type MobileWidget={id:string;kind:string;position?:{x:number;y:number;width:number;height?:number;rotation?:number};options?:unknown[];questions?:unknown[];description?:string;style?:WidgetTextStyle};
 
+/** Automatically compact phone slides while leaving every answer usable.
+ * Heights are measured in 390px *logical* pixels, not scaled desktop pixels.
+ * A page only grows beyond 720px if its actual interactive content needs it.
+ * User-authored mobile positions are never rewritten by the automatic plan. */
 export function mobileWidgetHeight(widget:MobileWidget):number {
  const optionCount=Array.isArray(widget.options)?widget.options.length:0;
  const subquestionCount=Array.isArray(widget.questions)?widget.questions.length:0;
+ const textLength=(widget.description||'').length;
  switch(widget.kind){
-  case 'question':case 'timed-quiz':return Math.min(470,200+optionCount*30+subquestionCount*85);
-  case 'topic-question':return 210;
-  case 'rating':return 230; // Includes optional comment and the full 0–9 rating row.
-  case 'reactions':return 145;
-  case 'results-button':return 205;
-  case 'title':return 90;
-  case 'footer':return 64;
-  case 'shape':case 'line':return 80;
-  case 'text':case 'postit':return widget.description&&widget.description.length>120?180:130;
-  default:return 165;
+  case 'question':case 'timed-quiz':return Math.min(540,190+optionCount*29+subquestionCount*82+Math.min(70,Math.ceil(textLength/90)*20));
+  case 'topic-question':return 190;
+  case 'rating':return 230; // Comment and all ten 0–9 choices remain usable.
+  case 'reactions':return 125;
+  case 'results-button':return 190;
+  case 'title':return 68;
+  case 'footer':return 54;
+  case 'shape':case 'line':return 64;
+  case 'text':case 'postit':return textLength>120?Math.min(220,130+Math.ceil((textLength-120)/90)*25):110;
+  case 'qr':return 164;
+  default:return 145;
  }
 }
-export function mobileStageHeight(widgets:readonly MobileWidget[]):number {
- return Math.max(MOBILE_PAGE_MIN_HEIGHT,24+widgets.reduce((height,w)=>height+mobileWidgetHeight(w)+16,0)+24);
-}
-export function mobilePageWidgets<T extends MobileWidget>(widgets:readonly T[],mobile?:MobilePageLayout):T[]{
- const stageHeight=mobileStageHeight(widgets);
- // The footer is the end of the mobile document, irrespective of the
- // order the presenter used when inserting widgets on the desktop canvas.
- // Explicit smartphone placements remain under the presenter's control.
- let top=24;
- const defaults=new Map<string,MobileWidget['position']>();
- // Reading order follows the desktop canvas top-to-bottom and left-to-right,
- // rather than the time a widget was inserted. Footer is always last.
- const ordered=widgets.map((w,index)=>({w,index})).sort((a,b)=>{
+
+const MOBILE_TOP_MARGIN=16;
+const MOBILE_GAP=8;
+const MOBILE_BOTTOM_MARGIN=16;
+function mobileOrderedWidgets<T extends MobileWidget>(widgets:readonly T[]):T[]{
+ return widgets.map((w,index)=>({w,index})).sort((a,b)=>{
   if(a.w.kind==='footer')return b.w.kind==='footer'?a.index-b.index:1;
   if(b.w.kind==='footer')return -1;
-  const ay=a.w.position?.y??a.index*10,by=b.w.position?.y??b.index*10;
-  return ay-by||(a.w.position?.x??0)-(b.w.position?.x??0)||a.index-b.index;
- });
- for(const {w} of ordered){
-  const size=mobileWidgetHeight(w);
-  // Reserve the final bottom margin even on short pages (720px minimum).
-  // Without this, a footer can appear halfway down an otherwise empty phone slide.
-  if(w.kind==='footer')top=Math.max(top,stageHeight-24-size);
-  defaults.set(w.id,{
-   x:4,y:Number((top/stageHeight*100).toFixed(4)),width:92,
-   height:Number((size/stageHeight*100).toFixed(4)),rotation:0
-  });
-  top+=size+16;
+  return (a.w.position?.y??a.index*10)-(b.w.position?.y??b.index*10)
+   ||(a.w.position?.x??0)-(b.w.position?.x??0)||a.index-b.index;
+ }).map(item=>item.w);
+}
+/** Shared phone planner. Manual widget placements are reserved vertical slots;
+ * later automatic widgets must not overlap the authored phone coordinates.
+ * The conservative full-width reservation keeps interactive controls usable.
+ */
+function mobileLayoutPlan(widgets:readonly MobileWidget[],mobile?:MobilePageLayout):{
+ height:number;defaults:Map<string,NonNullable<MobileWidget['position']>>
+}{
+ const ordered=mobileOrderedWidgets(widgets);
+ const total=ordered.reduce((height,w)=>height+mobileWidgetHeight(w),0);
+ const baseline=Math.max(MOBILE_PAGE_MIN_HEIGHT,MOBILE_TOP_MARGIN+total+Math.max(0,ordered.length-1)*MOBILE_GAP+MOBILE_BOTTOM_MARGIN);
+ const fixed=ordered.filter(w=>mobile?.positions?.[w.id]);
+ const place=(height:number)=>{
+  const reservations=fixed.map(w=>{
+   const p=mobile!.positions![w.id];
+   const start=Math.max(0,p.y*height/100);
+   const end=start+(p.height===undefined?mobileWidgetHeight(w):Math.max(0,p.height)*height/100);
+   return {start,end};
+  }).sort((a,b)=>a.start-b.start);
+  const defaults=new Map<string,NonNullable<MobileWidget['position']>>();
+  let top=MOBILE_TOP_MARGIN;
+  const findFree=(candidate:number,size:number)=>{
+   for(let tries=0;tries<=reservations.length;tries++){
+    const clash=reservations.find(r=>candidate<r.end+MOBILE_GAP&&candidate+size+MOBILE_GAP>r.start);
+    if(!clash)break;
+    candidate=clash.end+MOBILE_GAP;
+   }
+   return candidate;
+  };
+  for(const w of ordered){
+   if(mobile?.positions?.[w.id])continue;
+   const size=mobileWidgetHeight(w);
+   let y=w.kind==='footer'?findFree(Math.max(top,height-MOBILE_BOTTOM_MARGIN-size),size):findFree(top,size);
+   if(w.kind==='footer'&&y+size>height-MOBILE_BOTTOM_MARGIN){
+    const earlier=findFree(top,size);
+    if(earlier+size<=height-MOBILE_BOTTOM_MARGIN)y=earlier;
+   }
+   defaults.set(w.id,{x:4,y:Number((y/height*100).toFixed(4)),width:92,
+    height:Number((size/height*100).toFixed(4)),rotation:0});
+   top=y+size+MOBILE_GAP;
+  }
+  return {defaults,required:top-MOBILE_GAP+MOBILE_BOTTOM_MARGIN};
+ };
+ if(!fixed.length)return {height:baseline,defaults:place(baseline).defaults};
+ let height=baseline;
+ for(let iteration=0;iteration<16;iteration++){
+  const candidate=place(height);
+  if(candidate.required<=height+0.01)return {height,defaults:candidate.defaults};
+  // Authored positions use percentages. Allow them to move as the stage grows.
+  height=Math.min(30000,Math.max(height+64,Math.ceil(height*1.25),Math.ceil(candidate.required)));
+  if(height===30000)break;
  }
- return widgets.map(w=>({...w,position:mobile?.positions?.[w.id]??defaults.get(w.id),...(mobile?.styles?.[w.id]?{style:{...w.style,...mobile.styles[w.id]}}:{})}));
+ // A manually placed widget covering the entire page has no collision-free
+ // solution; avoid an unbounded layout loop and retain its exact coordinates.
+ return {height,defaults:place(height).defaults};
+}
+export function mobileStageHeight(widgets:readonly MobileWidget[],mobile?:MobilePageLayout):number {
+ return mobileLayoutPlan(widgets,mobile).height;
+}
+export function mobilePageWidgets<T extends MobileWidget>(widgets:readonly T[],mobile?:MobilePageLayout):T[]{
+ const layout=mobileLayoutPlan(widgets,mobile);
+ return widgets.map(w=>({...w,position:mobile?.positions?.[w.id]??layout.defaults.get(w.id),...(mobile?.styles?.[w.id]?{style:{...w.style,...mobile.styles[w.id]}}:{})}));
 }
 export function captureMobilePositions(widgets:readonly MobileWidget[]):NonNullable<MobilePageLayout['positions']>{
  return Object.fromEntries(widgets.filter(w=>!!w.position).map(w=>[w.id,w.position!]));

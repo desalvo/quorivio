@@ -6,11 +6,18 @@ const editor=readFileSync(new URL('../src/widget-rich-editor.tsx',import.meta.ur
 const rating=readFileSync(new URL('../src/rating-choices.tsx',import.meta.url),'utf8');
 const css=readFileSync(new URL('../src/style.css',import.meta.url),'utf8');
 test('one rating scale is shared in editor, real audience, and split rehearsal',()=>{
- assert.equal(ui.match(/<RatingChoices\b/g)?.length,4);
- assert.match(ui,/canvas-rating-preview"><RatingCommentField readOnly\/><RatingChoices/);
- assert.match(ui,/<RatingCommentField readOnly\/><RatingChoices view=\{widget\.style\?\.ratingView\}/);
- assert.match(ui,/\['rating','reactions','results-button'\]\.includes\(w.kind\)\?\{\.\.\.w,showTitle:false\}:w/);
- assert.match(ui,/if\(kind==='rating'\).*widget.showTitle!==false/);
+ // One component supplies the ten voting choices and one comment field.
+ // Canvas mounts this read-only component through ProjectionWidgetContent,
+ // rather than duplicating a second comment outside the widget body.
+ assert.equal(ui.match(/<RatingChoices\b/g)?.length,1);
+ assert.equal(ui.match(/<RatingCommentField\b/g)?.length,1);
+ assert.match(ui,/function RatingStageContent\(/);
+ assert.match(ui,/if\(kind==='rating'\)return <RatingStageContent widget=\{widget\} readOnly\/>/);
+ assert.match(ui,/kind==='rating'\?<RatingStageContent widget=\{w\} readOnly=\{viewer==='presenter'\}/);
+ assert.match(ui,/w.kind==='rating'\?<RatingStageContent widget=\{w\} comment=\{ratingComments\[w.id\]/);
+ assert.doesNotMatch(ui,/canvas-rating-preview/);
+ assert.match(ui,/w.kind==='rating'\?\{\.\.\.w,showTitle:editing===w.id\?false:w.showTitle\}/);
+ assert.match(ui,/widgetTitleVisible\(widget\)/);
  assert.match(rating,/RATING_VALUES\.map\(rating=>/);
  assert.match(readFileSync(new URL('../src/rating-range.ts',import.meta.url),'utf8'),/RATING_MAX=9/);
  assert.match(rating,/readOnly\|\|disabled\|\|!onSelect/);

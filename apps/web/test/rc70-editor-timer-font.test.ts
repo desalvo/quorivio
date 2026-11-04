@@ -44,8 +44,8 @@ test('one deadline gates every action; changing preview modes cannot reset expir
 });
 test('participant count is private and rehearsal uses labelled simulated value',()=>{
  assert.match(source,/data-simulated-participants/);
- assert.match(source,/w\.kind!=='participant-count'/);
- assert.match(source,/viewer==='presenter'\|\|!\['results-button','participant-count'\]/);
+ assert.match(source,/audiencePortrait\?audiencePhoneLayout\.widgets:participantReadingMode\?audienceReadingWidgets:audienceVisibleWidgets/);
+ assert.match(source,/viewer==='presenter'\?.*?:\(mobile\?participantPhoneLayout\(widgets/);
 });
 test('free-text presenter rehearsal includes committed answer while retaining fixtures',()=>{
  const sourceWidget={id:'freeText',kind:'question',answerMode:'text'};

@@ -1,3 +1,43 @@
+# Quorivio 0.1.0-dev — RC176 — Accessibilità DOM e modalità partecipante
+
+**RC176 cumulativa dopo RC175:** corretto l’ordine DOM/Tab della lettura accessibile (footer ultimo, forme decorative e risultati privati esclusi), senza modificare il canvas grafico 16:9. Riparata la prova browser autenticata che confondeva smartphone e lettura; aggiunte verifiche delle tre modalità, delle coordinate 16:9 desktop/smartphone e prove Chromium con l’helper TS reale. **313/313 Web Node, 588/588 API, 25/25 Python selezionati e Chromium CSS PASS.** Build Vite/React+PostgreSQL e CI GitHub attuale ancora aperte. **85,25% certificato (43 gate accettati, 17 parziali)**, `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag/deploy. Dettagli: `docs/RC_CYCLE176_ACCESSIBLE_DOM_AND_MODE_PARITY.it.md`.
+
+---
+# Quorivio 0.1.0-dev — RC174 — Handoff presentazione partecipante unificata
+
+**RC174 cumulativa dopo RC173:** rimossi loghi/titolo di sessione e media legacy duplicati sopra il canvas partecipante; nella vista 16:9 stretta input e padding vengono scalati con la diapositiva. Chromium DOM/CSS a 1280/390/320 px, 307 test Node Web, 588 API e 23 Python mirati verdi. Restano da eseguire la build Vite in CI, le prove React/PostgreSQL autenticate e i dispositivi reali. **85,25% certificato (43 accettati / 17 parziali).** `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag/deploy. Vedi `docs/RC_CYCLE174_PARTICIPANT_SINGLE_STAGE.it.md`.
+
+---
+# Quorivio 0.1.0-dev — RC172 — Passaggio di consegne layout misto smartphone
+
+**RC172 cumulativa dopo RC171:** il layout smartphone misto manuale/automatico riserva le posizioni esplicite e adegua l’altezza della pagina in editor e pubblico, evitando sovrapposizioni evitabili. «Ricompatta automaticamente» non cancella più gli stili smartphone. **296 test Node Web superati**; Python preflight previsto, Vite/Chromium autenticato e dispositivi reali ancora da confermare. **85,25% certificato (43 accettati / 17 parziali)**. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag/deploy. Vedi `docs/RC_CYCLE172_PHONE_MIXED_AUTHORING.it.md`.
+
+---
+# Quorivio 0.1.0-dev — RC171 — Handoff editor smartphone/palette
+
+**RC171 cumulativa dopo RC170:** editor smartphone sempre selezionabile dall’header; autocompattazione senza spazi enormi e senza modificare override espliciti; palette grafica uniformata e preset richiamabili anche con tasto «⋯». Verifiche locali e inventario in package; CI React/Vite e prove dispositivi reali ancora da confermare. **85,25% certificato / 85.25% certified (43 accepted / 17 partial)**. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag/deploy. Vedi / See `docs/RC_CYCLE171_EDITOR_PHONE_PALETTE.it.md`.
+
+---
+# Quorivio 0.1.0-dev — RC170 — Numero footer smartphone coerente e derivazione dallo schema
+
+**RC170:** rimosso il mismatch del numero pagina fra editor smartphone, anteprima e URL reale: font e margini ora rispettano i pixel logici 390 px, compresi posizionamenti personalizzati; il desktop 16:9 conserva la scala originaria. L'editor standard mostra la numerazione ereditata dal footer dello schema senza duplicare widget nella pagina. Test Node/Python, Chromium 390/1440 e browser PostgreSQL in CI; CI integrale ancora da confermare. **85,25% certificato (43 accettati / 17 parziali)**. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Vedi `docs/RC_CYCLE170_PHONE_FOOTER_NUMBER_PARITY.it.md`. Nessun commit/push/tag/deploy.
+
+---
+# Quorivio 0.1.0-dev — RC169 — Handoff gradimento e tipografia live
+
+**RC169 cumulativa dopo RC168:** renderer unico del Gradimento e titolo smartphone con font da schema, fixture browser PostgreSQL aumentata per commento/scala e footer; le prove della nuova CI non sono ancora confermate. Conservare gli storici immutabili; **85,25% (43/17)**, `rc_strict=false`, `publish_image=false`, `publish_latest=false`, nessun commit/push/tag/deploy. Vedi `docs/RC_CYCLE169_RATING_PHONE_RENDER_PARITY.it.md`.
+
+---
+# Quorivio 0.1.0-dev — RC168 — Handoff per parità smartphone partecipante
+
+**RC168:** correzione della geometria partecipante, filtrando i widget del presentatore prima di creare posizioni e altezza del canvas smartphone; lo stesso helper è usato nelle anteprime e nella sessione live. Aggiunte prove Chromium su footer/16:9 e fixture PostgreSQL con widget grafici, domande, footer e controlli riservati. Non dichiarare chiuso A3 senza confronto visivo indipendente sul server/dispositivi reali; certificazione **85,25% (43 accettati / 17 parziali)**. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Vedi `docs/RC_CYCLE168_PHONE_VISIBLE_GEOMETRY.it.md`. Non fare commit/push/tag/deploy automaticamente.
+
+---
+# Quorivio 0.1.0-dev — RC167 — Handoff parità presentazioni e diagnostica sicura
+
+**RC167:** base RC166 approvata dalla CI 41808754419 con pubblicazione Docker multiarch. Nuova policy condivisa per grafica senza titoli, QR opt-in e widget riservati al presentatore assenti sul pubblico. Browser reale in CI allargato a Linee/Forme con titoli legacy e alle superfici riservate; fixture protetta da confusione degli host loopback e artifact senza HTML/token. GitGuardian chiuso come «ignore» dall'operatore senza disabilitare scanner. **85,25% certificato (43 accettati / 17 parziali)**, verifiche indipendenti A3 ancora aperte. Nessun commit/push/deploy; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Vedi `docs/RC_CYCLE167_LIVE_PREVIEW_FIDELITY.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC166 — Hardening delle credenziali CI e triage GitGuardian
 
 **RC166:** CI RC165 `41802327982` completamente verde. Analisi preventiva della segnalazione GitGuardian «Generic Password»: le password fisse del job CI principale sono state sostituite da credenziali effimere; test e documentazione per il triage. **L’incidente specifico non è identificabile senza il percorso del portale GitGuardian**; non chiudere come falso positivo senza prova. Completamento certificato 85,25% (43 accettati / 17 parziali), `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Vedi `docs/RC_CYCLE166_GITGUARDIAN_TRIAGE.it.md`.

@@ -71,7 +71,8 @@ test('RC144 invalid mobile layout backups fail closed and phone backdrop never i
  const source=all('../src/main.tsx');const css=all('../src/style.css');
  assert.match(source,/data-editor-device=\{canvasDevice\}/);
  assert.match(source,/mobilePageWidgets\(pageWidgets,mobileLayoutDraft\)/);
- assert.match(source,/audiencePortrait\?mobilePageWidgets/);
+ assert.match(source,/audiencePortrait\?audiencePhoneLayout\.widgets:participantReadingMode\?audienceReadingWidgets:audienceVisibleWidgets/);
+ assert.match(source,/const audiencePhoneLayout=participantPhoneLayout\(audienceAuthoredWidgets/);
  assert.match(source,/onBackgroundColorChange=\{color=>setMobileLayoutDraft/);
  assert.match(css,/\.audience-widget-layout\.stage-phone/);
  assert.match(css,/background-color:var\(--editor-phone-background-color,#ffffff\)!important/);

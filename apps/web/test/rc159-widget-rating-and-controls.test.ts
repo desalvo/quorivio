@@ -16,10 +16,13 @@ test('session lifecycle buttons carry distinct semantic classes',()=>{
 });
 test('shared optional rating comment is rendered in editor, presenter, rehearsal and real participant',()=>{
  assert.match(main,/import \{RatingChoices,RatingCommentField\} from '\.\/rating-choices\.js'/);
- assert.match(main,/canvas-rating-preview"><RatingCommentField readOnly\/>/);
- assert.match(main,/projection-sample-rating"\>\{widget\.showTitle.*<RatingCommentField readOnly\/>/);
+ assert.doesNotMatch(main,/canvas-rating-preview/);
+ assert.match(main,/function RatingStageContent\(/);
+ assert.match(main,/if\(kind==='rating'\)return <RatingStageContent widget=\{widget\} readOnly\/>/);
+ assert.match(main,/widgetTitleVisible\(widget\).*WidgetStyledText text=\{widget.label\|\|'Gradimento'\}/);
  assert.match(main,/demoRatingComments\[w\.id\]/);
- assert.match(main,/value=\{ratingComments\[w\.id\]\|\|''\} onChange=\{value=>setRatingComments/);
+ assert.match(main,/comment=\{ratingComments\[w\.id\]\|\|''\} disabled=\{ratingPending.includes\(w.id\)\}/);
+ assert.match(main,/RatingCommentField value=\{comment\}/);
  assert.match(rating,/maxLength=\{1000\}/);
  assert.match(rating,/readOnly=\{readOnly\|\|!onChange\}/);
  assert.match(rating,/aria-label="Commento facoltativo"/);

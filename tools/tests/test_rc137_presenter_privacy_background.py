@@ -25,7 +25,12 @@ class RC137PresenterPrivacyAndBackground(unittest.TestCase):
   self.assertIn("const current=viewer==='participant'?responses[key]:undefined",rehearsal)
   self.assertIn("const sent=viewer==='participant'&&submittedAnswers[key]!==undefined",rehearsal)
   self.assertIn('<LinkedResultChart widget={w} widgets={widgets}',rehearsal)
-  self.assertIn("viewer==='presenter'||!['results-button'",rehearsal)
+  # RC167: presenter-only widgets are filtered from the participant pane by a
+  # shared policy; presenter pane retains them, without sharing draft answers.
+  self.assertIn("viewer==='presenter'?(mobile?mobilePageWidgets",rehearsal)
+  self.assertIn("mobile?participantPhoneLayout(widgets,activity?.page_design?.mobile).widgets:participantVisibleWidgets(widgets)",rehearsal)
+  self.assertIn("height={participantPhoneLayout(widgets,activity?.page_design?.mobile).height}",rehearsal)
+  self.assertNotIn("viewer==='presenter'||!['results-button'",rehearsal)
   self.assertIn('demoResultsVisible&&<section id="rehearsal-simulated-results"',rehearsal)
   self.assertIn('setDemoResultsVisible(false)',rehearsal)
  def test_real_projection_question_parts_remain_read_only(self):

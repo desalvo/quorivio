@@ -7,7 +7,7 @@ const ui=fs.readFileSync(new URL('../src/main.tsx',import.meta.url),'utf8');
 const css=fs.readFileSync(new URL('../src/style.css',import.meta.url),'utf8');
 const ratings=fs.readFileSync(new URL('../src/rating-choices.tsx',import.meta.url),'utf8');
 function participantView(s:string){
- const start=s.indexOf('{joinPath?<main id="main-content" className="narrow participant-live-view"');
+ const start=s.indexOf('{joinPath?<main id="main-content"');
  const end=s.indexOf('publicPath?<PresenterLiveScreen',start);
  assert.ok(start>=0&&end>start,'participant route is present');
  return s.slice(start,end);
@@ -24,9 +24,11 @@ test('RC160 the live participant slide mounts only authored question/reaction wi
 });
 test('RC160 optional rating comment is the same shared component in editor, previews and live',()=>{
  const view=participantView(ui);
- assert.match(view,/<RatingCommentField value=\{ratingComments\[w\.id\]/);
- assert.match(ui,/canvas-rating-preview"><RatingCommentField readOnly\s*\/>/);
- assert.match(ui,/projection-sample-rating">\{widget\.showTitle[^\n]*<RatingCommentField readOnly\s*\/>/);
+ assert.match(view,/<RatingStageContent widget=\{w\} comment=\{ratingComments\[w\.id\]/);
+ assert.match(ui,/if\(kind==='rating'\)return <RatingStageContent widget=\{widget\} readOnly\/>/);
+ assert.match(ui,/function RatingStageContent\(/);
+ assert.match(ui,/RatingCommentField value=\{comment\}/);
+ assert.doesNotMatch(ui,/canvas-rating-preview/);
  assert.match(ui,/demoRatingComments\[w\.id\]/);
  assert.match(ratings,/className="rating-comment-input"/);
  assert.match(css,/textarea\.rating-comment-input\{[\s\S]*?background-color:#ffffff!important/);
