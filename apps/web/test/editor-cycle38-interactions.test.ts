@@ -69,7 +69,12 @@ test('live reactions replace choice in PostgreSQL and refresh authenticated aggr
  assert.match(server,/ON CONFLICT\(activity_id,participant_id\) DO UPDATE SET emoji=EXCLUDED\.emoji/);
  assert.match(server,/page_reactions\.emoji IS DISTINCT FROM EXCLUDED\.emoji/);
  assert.match(server,/if\(r\.rowCount\)await broadcast\(s\.id\)/);
- assert.match(source,/aria-pressed=\{selectedReaction===emoji\}/);
+ // RC160 reactions are authored widgets only: no unconditional reaction bar
+ // after the slide. The shared widget still sends a selected emoji.
+ assert.match(source,/w\.kind==='reactions'\?<div className="projection-sample-reactions"/);
+ assert.match(source,/selected=\{selectedReaction\} onSelect=\{emoji=>void react\(emoji\)\}/);
+ const participant=source.slice(source.indexOf('{joinPath?<main'),source.indexOf('publicPath?<PresenterLiveScreen'));
+ assert.doesNotMatch(participant,/className="reaction-bar"/);
 });
 
 test('profile previews show authenticated name/photo and public email only when opted in',()=>{

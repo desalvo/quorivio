@@ -1,3 +1,31 @@
+# Quorivio 0.1.0-dev — RC162 — Handoff editor smartphone e QR ridimensionabile
+
+**RC162 dopo RC161:** selettore scorrevole Desktop/Smartphone nell’editor delle pagine, personalizzazione della geometria smartphone soltanto quando modificata con ripristino automatico per widget o pagina, senza alterare il desktop. QR con titolo nascosto per default e URL facoltativa, con righe adattive quando ridimensionato. Validazione backend dell’opzione URL. Test di regressione e prova Chromium con fixture; CI GitHub e accettazione autentica ancora necessarie. **Completamento certificato 85,25%** (43 accettati / 17 parziali); nessun commit, push o deploy. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Vedi `docs/RC_CYCLE162_SMARTPHONE_QR.it.md`.
+
+---
+# Quorivio 0.1.0-dev — RC161 — Handoff schemi e forme
+
+**RC161 dopo RC160:** font Arial di default, sfondo immagine persistente dello schema disponibile in pagine/proiezioni con protezione allegati e import/export, preset grafici contestuali mouse/mobile e controlli modificabili. Font personalizzati e background specifici smartphone rispettati. CI GitHub e sessioni reali da verificare; non eseguire commit/push/deploy senza richiesta. **85,25% certificato**, 43 gate accettati e 17 parziali. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Vedi `docs/RC_CYCLE161_MASTER_GRAPHIC_PRESETS.it.md`.
+
+---
+# Quorivio 0.1.0-dev — RC160 — Partecipazione su widget, footer e commento
+
+**RC160 dopo RC159:** risolte le regressioni mostrate nelle schermate partecipante: rimossa la sezione libera sempre visibile con domande/parole, eliminata la barra reazioni automatica; le interazioni restano solo nei widget. Footer in fondo alla vista accessibile e al layout smartphone di default, con posizioni esplicite conservate. Visibilità del commento del gradimento e contrasto bianco confermati nella fixture Chromium. Da validare CI completa e sessione reale. **Completamento certificato 85,25%** (43 accettati / 17 parziali). Non eseguire commit/push/deploy senza autorizzazione. Vedi `docs/RC_CYCLE160_WIDGET_OWNERSHIP_FOOTER.it.md`. `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+---
+
+# Quorivio 0.1.0-dev — RC159 — Parità rendering reale e anteprima, limiti presentatore
+
+**RC159 (dopo RC158):** confermate verdi le run `41730792802` e `41739841860` sul commit RC157, inclusa la pubblicazione Docker multiarch della seconda. Corrette divergenze di grafica: participant URL 16:9 e titolo dentro canvas, dimensione titolo presentatore allineata a quella master/anteprima, sfondi; azioni sessione colorate, gradimento con commento bianco coerente, «Invia risposta» e rate limit separati/sempre applicati. Verificati localmente Node e test di contratto/Chromium CSS; screenshot end-to-end e nuova CI ancora necessari. RC158 è inventario storico, RC159 corrente. **Completamento certificato 85,25%** (43 accettati / 17 parziali); nessun commit/push/deploy. Dettagli: `docs/RC_CYCLE159_LIVE_PREVIEW_UI_RATE_PARITY.it.md`. `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+---
+
+# Quorivio 0.1.0-dev — RC158 — Handoff dipendenze browser Docker manuale
+
+**RC158 dopo RC157:** nella run manuale `41737243981` il collaudo JPG/Logo Chromium/PostgreSQL obbligatorio si è interrotto per mancanza di Playwright, installato solo quando `browser_test` era attivo. Passati 582+251 test Node e build npm; image-build è stato saltato, non è fallito. RC158 prepara Playwright e verifica il percorso Chromium immediatamente prima del test obbligatorio senza saltarlo, aggiungendo regressione CI anticipata e mantenendo la pubblicazione volontaria. Inventario RC157 storico immutato. **Completamento certificato 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. CI completa, build Docker e prova reale 500 utenti ancora da eseguire. Nessun commit/push/deploy.
+
+---
+
 # Quorivio 0.1.0-dev — RC157 — Passaggio di consegne sulla sicurezza degli import CI
 
 **RC157 dopo RC156:** la run GitHub `41723978345` è fallita durante le ricevute SHA-256 per la mancata risoluzione degli import Python del test storico RC146, pur avendo superato i test precedenti. Il verificatore ora riconosce la propria cartella sia in modalità script sia package; lo step CI usa `PYTHONPATH: tools` e la regressione preventiva riproduce l'import senza variabili. RC156 storico, RC157 corrente. **Completamento certificato 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Runtime immutato, CI completa e collaudo reale 500 utenti ancora da verificare. Nessun commit/push/deploy.

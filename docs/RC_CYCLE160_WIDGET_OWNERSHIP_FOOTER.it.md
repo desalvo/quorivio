@@ -1,0 +1,9 @@
+# RC160 — Partecipazione soltanto tramite widget e footer accessibile
+
+La schermata partecipante pubblica solamente gli elementi esplicitamente inseriti dal presentatore nella pagina. Rimosso il montaggio del vecchio pannello autonomo «Nuvola di parole e domande dal pubblico» e della barra reazioni automatica esterna al canvas. Le domande, le reazioni e la moderazione restano disponibili tramite i rispettivi widget `question`, `topic-question`, `reactions` e, per compatibilità, tramite eventuali attività quiz legacy senza widget di pagina. Gli endpoint storici rimangono presenti per compatibilità: la modifica riguarda la UI partecipante.
+
+**Footer:** in lettura accessibile (layout a elenco) il footer e il numero pagina vengono dopo gli altri widget. Il posizionamento automatico del footer smartphone usa la parte inferiore del documento, anche quando il footer è stato creato prima degli altri componenti; gli override smartphone deliberatamente impostati dall'utente rimangono invariati. Altezza predefinita del gradimento smartphone aumentata per contenere commento facoltativo e pulsanti 0–9.
+
+**Gradimento:** `RatingCommentField` è già condiviso da editor, anteprime e sessioni reali; il nuovo CSS assicura che il campo sia visibile, bianco e leggibile anche quando è applicato il tema scuro dell'applicazione. Test di geometria Chromium a 1440/390 px, test Node e contratti Python impediscono regressioni. La verifica completa con sessione autenticata e screenshot reali è ancora da effettuare.
+
+**Sicurezza e consegna:** nessuna modifica ad autenticazione, permessi, database, billing o pipeline della prova da 500 utenti. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Stato certificato **85,25%** (43 gate accettati, 17 parziali), invariato fino a nuove evidenze CI/autorizzazioni.

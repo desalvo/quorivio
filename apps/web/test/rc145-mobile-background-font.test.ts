@@ -14,7 +14,8 @@ test('RC145 newly uploaded smartphone backdrop affects mobile state only',()=>{
  assert.match(upload,/else if\(forResults\)\{setResultBackgroundAsset\(applied\.id\)/);
  assert.match(upload,/else\{setQuestionBackgroundAsset\(applied\.id\)/);
  assert.match(source,/onBackgroundUpload=\{file=>uploadBackground\(file,false,canvasDevice==='phone'\)\}/);
- assert.match(source,/backgroundAssetId=\{canvasDevice==='phone'\?mobileLayoutDraft\.backgroundAssetId\|\|'':questionBackgroundAsset\}/);
+ assert.match(source,/backgroundAssetId=\{canvasDevice==='phone'\?mobileLayoutDraft\.backgroundAssetId\|\|'':slideBackground\(/);
+ assert.match(source,/slideBackground\(\{backgroundAssetId:questionBackgroundAsset\|\|undefined,backgroundUrl:questionBackground\|\|undefined\},snap\.session\.theme\)/);
 });
 
 test('RC145 choosing a phone-only solid color replaces its image, never touches desktop background',()=>{

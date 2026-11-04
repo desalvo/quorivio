@@ -111,7 +111,9 @@ class Cycle62CiRateIsolation(unittest.TestCase):
             self.assertIn('QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}', section)
         self.assertIn('LOAD_TEST_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}', flow)
         self.assertIn("process.env.NODE_ENV!=='production'", api)
-        self.assertIn('if(Number(r.rows[0].hits)>100)', api)
+        self.assertIn('if(Number(r.rows[0].hits)>limit)', api)
+        self.assertIn('apiRateBudget(rateClass)', api)
+        self.assertIn('apiRateClass(req.method,req.path,uid)', api)
         self.assertIn('timingSafeEqual(a,b)', api)
 
 

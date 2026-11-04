@@ -792,7 +792,7 @@
 .rehearsal-widget p{margin:.25em 0}
 .rehearsal-widget .projection-text-widget{width:100%;height:100%}
 .rehearsal-widget .projection-media{width:100%;height:100%;object-fit:contain}
-.rehearsal-widget .projection-sample-qr img{display:block;max-width:80%;max-height:75%;object-fit:contain}
+.rehearsal-widget .projection-sample-qr img{display:block;max-width:100%;max-height:100%;object-fit:contain}
 .rehearsal-shell:fullscreen .rehearsal-stage>.rehearsal-slide{width:min(100%,calc((100dvh - 140px)*16/9))}
 .editor-ux-v2 .widget-canvas-item>.canvas-widget-body-preview{height:calc(100% - 1.6em);min-height:0;max-width:100%;overflow:hidden;pointer-events:none;line-height:1.2;white-space:normal}
 .editor-ux-v2 .widget-canvas-item>.canvas-widget-body-preview :is(p,div){margin:.2em 0}
@@ -1241,11 +1241,16 @@ header.rehearsal-toolbar{height:auto;min-height:0;flex:0 0 auto;position:relativ
 @media(prefers-reduced-motion:reduce){.presenter-nav-arrow{transition:none}}
 
 /* RC93: QR + the exact participant URL, consistently inside small widgets and on screens. */
-.participant-access-qr{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(3px,.5vw,9px);width:100%;height:100%;min-width:0;min-height:0;overflow:hidden;text-align:center}
-.participant-access-qr>strong{max-width:100%;overflow-wrap:anywhere;line-height:1.2}
-.participant-access-qr>img{display:block;width:auto;height:auto;max-height:min(72%,260px);max-width:min(90%,260px);aspect-ratio:1;object-fit:contain;background:white;padding:3px;border-radius:4px;flex:0 1 auto;min-height:0}
-.participant-access-qr .participant-qr-url{display:block;width:100%;min-width:0;max-height:30%;overflow-wrap:anywhere;word-break:break-word;overflow:auto;font-size:clamp(10px,.8em,17px);line-height:1.25;color:inherit;user-select:text}
-.participant-access-qr .participant-qr-unavailable{font-size:12px;overflow-wrap:anywhere}
+/* RC162: QR always reserves an actual text row when the URL is enabled.
+   The QR image may shrink on small widgets; the destination must not disappear. */
+.participant-access-qr{display:grid;grid-template-rows:minmax(0,1fr) minmax(1.3em,auto);align-items:center;justify-items:center;gap:clamp(2px,.35vw,7px);width:100%;height:100%;min-width:0;min-height:0;overflow:hidden;text-align:center;}
+.participant-access-qr[data-qr-show-title="true"]{grid-template-rows:auto minmax(0,1fr) minmax(1.3em,auto);}
+.participant-access-qr[data-qr-show-url="false"]{grid-template-rows:minmax(0,1fr);}
+.participant-access-qr[data-qr-show-title="true"][data-qr-show-url="false"]{grid-template-rows:auto minmax(0,1fr);}
+.participant-access-qr>strong{max-width:100%;min-width:0;overflow-wrap:anywhere;line-height:1.15;}
+.participant-access-qr>img{display:block;box-sizing:border-box;width:auto;height:auto;max-height:100%;max-width:100%;aspect-ratio:1;object-fit:contain;background:white;padding:2px;border-radius:4px;min-height:0;min-width:0;}
+.participant-access-qr .participant-qr-url{display:block;box-sizing:border-box;min-width:0;width:100%;min-height:1.3em;max-height:min(38%,3.6em);overflow-wrap:anywhere;word-break:break-word;overflow:auto;font-size:clamp(10px,.82em,17px);line-height:1.2;color:inherit;user-select:text;}
+.participant-access-qr .participant-qr-unavailable{font-size:12px;overflow-wrap:anywhere;}
 
 /* RC94: SVG vectors follow the actual clipped polygon contours. A normal CSS
    border is rectangular and clip-path removes its edges on these shapes. */
@@ -2124,3 +2129,100 @@ body .editor-floating-panel.widget-selection-palette .palette-ribbon-group{
 :is(.editor-ux-v2 .widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)
   :is(h1,h2,h3,h4){font-family:inherit;}
 .editor-ux-v2 .widget-canvas-item .widget-fit-content>.canvas-widget-body-preview{font-family:inherit;}
+
+/* RC159: session lifecycle actions are deliberately distinct even on the dark dashboard. */
+button.session-action-terminate{background:#ad2939;color:#ffffff;border:1px solid #ef7683;font-weight:700;}
+button.session-action-terminate:hover{background:#8e2030;}
+button.session-action-pause{background:#b9f4ce;color:#10452b;border:1px solid #4aab78;font-weight:700;}
+button.session-action-pause:hover{background:#9ae5b5;}
+button.session-action-reset{background:#b5e9ff;color:#164d71;border:1px solid #51aed6;font-weight:700;}
+button.session-action-reset:hover{background:#91d7f6;}
+/* The rating comment is white and legible on every surface, independent of the dark theme. */
+.rating-comment-field{display:flex;flex-direction:column;align-items:stretch;gap:.3em;min-width:0;max-width:100%;width:100%;margin:.35em 0;color:inherit;font-size:.82em;line-height:1.3;}
+.rating-comment-field .rating-comment-input{display:block;box-sizing:border-box;width:100%;min-width:0;min-height:3em;padding:.4em .55em;border-radius:7px;border:1px solid #93a8c5;background:#ffffff!important;color:#142b44!important;caret-color:#142b44;resize:vertical;line-height:1.25;font-family:inherit;font-size:1em;}
+.rating-comment-field .rating-comment-input::placeholder{color:#566b80;opacity:1;}
+.rating-comment-field .rating-comment-input:focus-visible{outline:2px solid #2563eb;outline-offset:1px;}
+.rating-comment-field .rating-comment-input:read-only{opacity:1;}
+.rating-comment-field .rating-comment-input:disabled{opacity:.85;color:#142b44!important;}
+
+/* RC159 live/preview visual parity: public participant slides are NOT login forms.
+   The original .narrow max-width:640px silently squeezed authored 16:9 pages
+   and used separate markup for the slide title. Preserve a single stage. */
+main.participant-live-view{width:min(1280px,96vw)!important;max-width:none!important;margin:24px auto!important;min-width:0}
+main.participant-live-view .audience-stage-scroll{width:100%;overflow-x:auto;scrollbar-gutter:auto}
+main.participant-live-view .audience-widget-layout.stage-fidelity{
+  width:100%!important;max-width:100%!important;min-width:0!important;
+  height:auto!important;aspect-ratio:16/9!important;
+}
+/* Browser-wide .projection h2 formerly overrode the 24px authored title
+   inside the real presenter, but not the rehearsal or authoring surfaces. */
+.projection-page-content .projection-widget .projection-slide-title,
+.rehearsal-widgets .rehearsal-widget .projection-slide-title,
+.audience-widget-layout.stage-fidelity .page-widget .projection-slide-title{
+  font:inherit!important;line-height:inherit!important;margin:0!important;
+  color:inherit!important;text-align:inherit!important;
+}
+/* The genuine participant widget uses the same saved 16:9 geometry as the
+   rehearsal, not an unbounded list with forced 16px heading text. */
+.audience-widget-layout.stage-fidelity>.page-widget{
+  font-size:1.25cqw;line-height:1.2!important;
+  padding:.55em!important;box-sizing:border-box!important;
+}
+.audience-widget-layout.stage-fidelity>.page-widget[data-widget-kind="footer"]{padding:0 2%!important}
+@media(max-width:700px){
+ main.participant-live-view{width:100%!important;margin:8px auto!important;padding:0 8px!important}
+ main.participant-live-view .audience-widget-layout.stage-fidelity{min-width:0!important;width:100%!important}
+}
+
+/* RC160: the accessible reading order follows the authored content; the
+   footer is always the last document widget even when inserted earlier. */
+.audience-widget-layout.stage-reading>.page-widget[data-widget-kind="footer"]{
+ order:9999!important;grid-column:1/-1!important;align-self:end!important;
+ margin-top:16px!important;min-height:64px!important;
+}
+.audience-widget-layout.stage-reading>.slide-canvas-page-number{
+ order:10000!important;grid-column:1/-1!important;justify-self:end!important;
+}
+/* Authoring, rehearsal, presenter and participant must show the same optional
+   rating field, even with the application's default dark input theme. */
+:is(.widget-canvas-item,.rehearsal-widget,.projection-widget,.audience-widget-layout>.page-widget)
+ label.rating-comment-field{display:flex!important;flex-direction:column!important;visibility:visible!important;opacity:1!important;}
+:is(.widget-canvas-item,.rehearsal-widget,.projection-widget,.audience-widget-layout>.page-widget)
+ textarea.rating-comment-input{
+ display:block!important;visibility:visible!important;opacity:1!important;
+ background-color:#ffffff!important;color:#142b44!important;-webkit-text-fill-color:#142b44!important;
+ color-scheme:light!important;border:1px solid #93a8c5!important;
+ min-height:3em!important;
+}
+
+/* RC161: the master and both widget editors inherit a real Arial baseline.
+   Explicit per-widget faces remain authoritative. */
+:is(.slide-scheme-workspace,.powerpoint-editor) .widget-canvas-item{font-family:Arial,sans-serif}
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-widget-kind="line"] .widget-rich-inline,
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-widget-kind="shape"] .widget-rich-inline{display:none!important}
+.graphic-preset-popup{position:fixed;z-index:3000;width:min(340px,calc(100vw - 16px));max-height:min(80vh,570px);overflow:auto;background:#f4f7fe;color:#14243c;border:1px solid #7788a5;border-radius:12px;box-shadow:0 12px 36px #08142988;padding:12px;display:grid;gap:8px;font:14px/1.35 Arial,sans-serif}
+.graphic-preset-popup header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0;background:transparent;color:inherit}
+.graphic-preset-popup label{display:flex;align-items:center;gap:8px;justify-content:space-between;min-height:28px}
+.graphic-preset-popup label input[type="number"]{width:80px}
+.graphic-preset-popup label input[type="color"]{width:56px;min-height:30px}
+.graphic-preset-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.graphic-preset-choices button{font:13px Arial,sans-serif;text-align:left;color:#14243c;background:#e7f0ff;border:1px solid #95afd5;padding:8px;border-radius:7px;min-height:37px}
+.graphic-preset-choices button:hover,.graphic-preset-choices button:focus-visible{background:#bddafc;outline:2px solid #2b6eb7}
+.slide-scheme-background-controls{min-width:220px}
+.slide-scheme-background-controls select{max-width:240px}
+.slide-scheme-background-upload{display:flex;align-items:center;gap:5px}
+.slide-scheme-background-upload input{max-width:185px;font-size:12px}
+.slide-scheme-graphic-trigger{display:inline-flex;align-items:center;gap:6px;min-height:42px}
+
+/* RC162 desktop / smartphone editor slider: intentional visible thumb movement. */
+.editor-ux-v2 .editor-device-switch{display:flex;flex-wrap:wrap;align-self:stretch;align-items:center;justify-content:center;gap:10px;min-height:56px;}
+.editor-ux-v2 .editor-device-switch .device-label{color:#b6cadc;font-size:13px;font-weight:600;white-space:nowrap;}
+.editor-ux-v2 .editor-device-switch .device-label.is-active{color:#f5fbff;font-weight:800;}
+.editor-ux-v2 .editor-device-slider{position:relative;display:inline-flex;align-items:center;justify-content:center;min-width:64px;height:32px;cursor:pointer;}
+.editor-ux-v2 .editor-device-slider input{position:absolute;inset:0;width:100%;height:100%;opacity:0;z-index:1;cursor:pointer;}
+.editor-ux-v2 .editor-device-slider-track{display:block;position:relative;width:64px;height:32px;background:#50677c;border:2px solid #8fa8c0;border-radius:99px;transition:background-color .15s ease;}
+.editor-ux-v2 .editor-device-slider-thumb{position:absolute;left:3px;top:3px;width:22px;height:22px;background:#f5fbff;border-radius:50%;box-shadow:0 1px 3px #0005;transition:transform .15s ease;}
+.editor-ux-v2 .editor-device-slider input:checked+.editor-device-slider-track{background:#1387b0;border-color:#81dcff;}
+.editor-ux-v2 .editor-device-slider input:checked+.editor-device-slider-track .editor-device-slider-thumb{transform:translateX(30px);}
+.editor-ux-v2 .editor-device-slider input:focus-visible+.editor-device-slider-track{outline:3px solid #facc15;outline-offset:3px;}
+@media(prefers-reduced-motion:reduce){.editor-ux-v2 .editor-device-slider-thumb,.editor-ux-v2 .editor-device-slider-track{transition:none;}}

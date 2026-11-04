@@ -1,3 +1,31 @@
+# Quorivio 0.1.0-dev — RC162 — Smartphone editor and responsive QR handoff
+
+**RC162 after RC161:** a sliding Desktop/Smartphone editor switch, editable phone geometry with automatic defaults and explicit resets, and QR visibility flags (title off by default, URL optional) with compact responsive styling. Mobile edits cannot freeze untouched auto positions or replace canonical desktop geometry. Backend validates QR-only URL option. Regression tests and Chromium compact QR fixture added; full GitHub CI plus authenticated preview/live parity still pending. **Certified completion 85.25%** (43 accepted / 17 partial); no assistant commit, push or deploy. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. See `docs/RC_CYCLE162_SMARTPHONE_QR.en.md`.
+
+---
+# Quorivio 0.1.0-dev — RC161 — Master and graphic presets handoff
+
+**RC161 after RC160:** Arial default, inherited and secured master picture backgrounds, portable archive image remapping, graphics-only lines and shapes with mouse/right-click, mobile long-touch and keyboard presets. Presets remain editable in shared properties and custom font/phone backdrops are preserved. Full GitHub CI and live authenticated acceptance still pending. **Certified completion 85.25%** (43 accepted / 17 partial). No assistant commit/push/deploy. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. See `docs/RC_CYCLE161_MASTER_GRAPHIC_PRESETS.en.md`.
+
+---
+# Quorivio 0.1.0-dev — RC160 — Authored interaction and mobile footer parity
+
+**RC160 after RC159:** removed always-on participant word/question and reaction controls outside the canvas; kept authored widget interaction. The footer is last in accessible reading and at the bottom of the automatic smartphone layout, with explicit phone edits unchanged. The optional rating comment is visibly white in Chromium fixtures across surfaces. Full CI and real authenticated presenter/participant acceptance remain open. **Certified completion 85.25%** (43 accepted / 17 partial). No assistant commit/push/deploy. See `docs/RC_CYCLE160_WIDGET_OWNERSHIP_FOOTER.en.md`. `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+---
+
+# Quorivio 0.1.0-dev — RC159 — Live/preview parity and presenter rate limits
+
+**RC159 after RC158:** GitHub runs `41730792802` and `41739841860` against RC157 are confirmed successful, including multiarch Docker Hub publication in the second run. Implemented distinct lifecycle colors, optional white rating comment parity, exact submit text, shared fail-closed presenter-specific rate buckets, and live participant 16:9 canvas/title/background parity plus master-aware presenter title sizing. Local Node, Python and Chromium CSS fixture tests pass; new full CI and authenticated screenshot comparison are still required. RC158 historical inventory immutable; RC159 current. **Certified 85.25%** (43 accepted / 17 partial); no assistant commit/push/deploy. See `docs/RC_CYCLE159_LIVE_PREVIEW_UI_RATE_PARITY.en.md`. `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+---
+
+# Quorivio 0.1.0-dev — RC158 — Manual Docker browser dependency handoff
+
+**RC158 after RC157:** manual workflow `41737243981` stopped at mandatory real Chromium JPG/Logo PostgreSQL acceptance with missing Python `playwright`, because the earlier Playwright install was conditional on `browser_test`. Node 582+251 and npm build passed; image-build was skipped, not failed. RC158 provisions missing Python browser deps immediately before this unconditional test and smoke-tests the preinstalled Chromium binary when not already exported; never bypasses the acceptance. An early CI regression enforces ordering and opt-in publishing security. RC157 historical manifest immutable. **Certified 85.25%** (43 accepted / 17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`. New full CI and real container build required; 500-user trial pending. No assistant commit/push/deployment.
+
+---
+
 # Quorivio 0.1.0-dev — RC157 — Release evidence import safety handoff
 
 **RC157 after RC156:** GitHub run `41723978345` failed during grouped SHA-256 evidence checks because historical RC146 unittest package imports omitted the tools module path, despite passing the prior 1,802-test Python suite. The release status guard now resolves sibling modules in both script/package contexts, grouped CI sets `PYTHONPATH: tools` and an early no-PYTHONPATH regression reproduces the original invocation. RC156 remains historical, RC157 current. **Certified 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Runtime unchanged; full CI and real 500-user demonstration pending. No assistant commit/push/deployment.

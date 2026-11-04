@@ -135,6 +135,18 @@ jobs:
         run: |
           env -u PYTHONPATH python3 -m unittest tools.tests.test_rc146_release_header_fix tools.tests.test_rc157_release_import_paths -q
           python3 tools/verify_rc_release_status.py
+      - name: RC158 required Chromium media dependencies and manual Docker safety preflight
+        run: python3 -m unittest tools.tests.test_rc158_browser_media_bootstrap -q
+      - name: RC159 rate-limit, session controls and rating parity preflight before npm
+        run: python3 -m unittest tools.tests.test_rc159_presenter_controls -q
+      - name: RC159 live participant 16:9 and presenter title parity preflight before npm
+        run: python3 -m unittest tools.tests.test_rc159_live_preview_parity -q
+      - name: RC160 participant widget-only rendering, rating comment and footer preflight
+        run: python3 -m unittest tools.tests.test_rc160_participant_widget_ownership -q
+      - name: RC161 master image, Arial and graphics presets contracts before npm
+        run: python3 -m unittest tools.tests.test_rc161_master_background_graphics -q
+      - name: RC162 smartphone editor slider, independent positions and QR title/URL contracts
+        run: python3 -m unittest tools.tests.test_rc162_mobile_qr_contracts -q
       - name: Validate RC105 floating dialogs and selection-only resize geometry before npm
         run: python3 -m unittest tools.tests.test_rc105_editor_floating -q
       - name: Validate RC101 horizontal widget rail and visible editor stage before npm
@@ -381,6 +393,13 @@ jobs:
           python3 tools/ci_rc134_projection_answer_chromium.py
           # RC141: reaction buttons, native checkboxes and hidden titles across four stage shells.
           python3 tools/ci_rc141_widget_parity_chromium.py
+          # RC159: browser-computed lifecycle colors and readable rating comment fields.
+          python3 tools/ci_rc159_presenter_visual_chromium.py
+          python3 tools/ci_rc159_live_preview_parity_chromium.py
+          # RC160: computed accessible reading order, phone footer and rating contrast.
+          python3 tools/ci_rc160_participant_layout_chromium.py
+          # RC162: compact QR URL must remain visible when resized; no URL row when hidden.
+          python3 tools/ci_rc162_qr_resizing_chromium.py
           # RC152: mutation-tested current long-label wrapping and attached [count]
           # must stay consistent in editor, presenter, rehearsal and audience.
           python3 -m unittest tools.tests.test_rc152_wrapped_result_parity -q
@@ -546,6 +565,20 @@ jobs:
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
           QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
         run: python3 tools/ci_background_library_postgres.py
+      # RC158: the media-picker/Pg acceptance below is a REQUIRED gate, but
+      # the earlier Chromium suite is optional on manual workflow_dispatch.
+      # Install/smoke dependencies here independently so a manual Docker build
+      # can reach the actual container build gate without opting into every
+      # optional browser test. Never silently skip the mandatory JPG/Logo test.
+      - name: RC158 prepare Chromium for mandatory JPG and Logo persistence
+        timeout-minutes: 3
+        run: |
+          if ! python3 -c 'from playwright.async_api import async_playwright' >/dev/null 2>&1; then
+            python3 -m pip install --disable-pip-version-check --break-system-packages 'playwright>=1.50,<2'
+          fi
+          if [ -z "${QUORIVIO_CHROMIUM_PATH:-}" ]; then
+            python3 tools/ci_browser_bootstrap.py --smoke --github-env "$GITHUB_ENV"
+          fi
       - name: Real Chromium JPG background and Logo upload/persistence acceptance
         timeout-minutes: 3
         env:
@@ -979,7 +1012,13 @@ jobs:
           # RC156 is now immutable historical evidence.
           python3 tools/verify_rc_cycle156_inventory.py --historical
           # RC157 current inventory and ZIP parity for the tracked source tree.
-          python3 tools/verify_rc_cycle157_inventory.py
+          python3 tools/verify_rc_cycle157_inventory.py --historical
+          # RC158 and RC159 remain immutable; RC160 is the current source inventory.
+          python3 tools/verify_rc_cycle158_inventory.py --historical
+          python3 tools/verify_rc_cycle159_inventory.py --historical
+          python3 tools/verify_rc_cycle160_inventory.py --historical
+          python3 tools/verify_rc_cycle161_inventory.py --historical
+          python3 tools/verify_rc_cycle162_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

@@ -9,7 +9,8 @@ CSS=(ROOT/'apps/web/src/style.css').read_text()
 
 class RC139RatingTextSelection(unittest.TestCase):
  def test_shared_rating_no_duplicate_editor_heading(self):
-  self.assertEqual(UI.count('<RatingChoices'),3)
+  self.assertEqual(UI.count('<RatingChoices'),4)
+  self.assertIn('canvas-rating-preview"><RatingCommentField readOnly/><RatingChoices',UI)
   self.assertIn("['rating','reactions','results-button'].includes(w.kind)?{...w,showTitle:false}:w",UI)
   self.assertIn('widget.showTitle!==false',UI)
   self.assertIn('readOnly||disabled||!onSelect',SCALE)

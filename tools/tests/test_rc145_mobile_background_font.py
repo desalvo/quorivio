@@ -31,7 +31,7 @@ class MobileBackgroundFontParity(unittest.TestCase):
     def test_solid_mobile_background_replaces_mobile_image_not_desktop(self):
         self.assertIn('onBackgroundColorChange={color=>setMobileLayoutDraft(old=>({...old,backgroundColor:color,backgroundAssetId:undefined}))}', self.ui)
         self.assertIn('mobileMode&&<label>Colore di sfondo smartphone', self.ui)
-        self.assertIn('mobileLayoutDraft.backgroundAssetId||\'\':questionBackgroundAsset', self.ui)
+        self.assertIn('mobileLayoutDraft.backgroundAssetId||\'\':slideBackground({backgroundAssetId:questionBackgroundAsset||undefined,backgroundUrl:questionBackground||undefined},snap.session.theme).assetId||\'\'', self.ui)
         self.assertIn('background-image:var(--editor-page-background,none)!important;', self.css)
         self.assertIn("backgroundImage:activity?.page_design?.mobile?.backgroundAssetId?", self.ui)
 

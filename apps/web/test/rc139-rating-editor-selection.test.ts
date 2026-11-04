@@ -6,7 +6,9 @@ const editor=readFileSync(new URL('../src/widget-rich-editor.tsx',import.meta.ur
 const rating=readFileSync(new URL('../src/rating-choices.tsx',import.meta.url),'utf8');
 const css=readFileSync(new URL('../src/style.css',import.meta.url),'utf8');
 test('one rating scale is shared in editor, real audience, and split rehearsal',()=>{
- assert.equal(ui.match(/<RatingChoices\b/g)?.length,3);
+ assert.equal(ui.match(/<RatingChoices\b/g)?.length,4);
+ assert.match(ui,/canvas-rating-preview"><RatingCommentField readOnly\/><RatingChoices/);
+ assert.match(ui,/<RatingCommentField readOnly\/><RatingChoices view=\{widget\.style\?\.ratingView\}/);
  assert.match(ui,/\['rating','reactions','results-button'\]\.includes\(w.kind\)\?\{\.\.\.w,showTitle:false\}:w/);
  assert.match(ui,/if\(kind==='rating'\).*widget.showTitle!==false/);
  assert.match(rating,/RATING_VALUES\.map\(rating=>/);

@@ -12,7 +12,10 @@ BROWSER = (ROOT/'tools/ci_browser_editor.py').read_text(encoding='utf-8')
 
 class ContextualEditorUX(unittest.TestCase):
     def test_widget_palette_only_icons_with_accessible_names(self):
-        self.assertIn('editorWidgetKinds.map(k=><EditorIconTool', WEB)
+        self.assertIn("editorWidgetKinds.map(k=>k==='shape'||k==='line'?<GraphicInsertTool", WEB)
+        self.assertIn(':<EditorIconTool key={k}', WEB)
+        # Both graphic choices and ordinary tools stay inside the same palette.
+        self.assertIn('kind={k} disabled={pageWidgets.length>=16}', WEB)
         self.assertIn('label={`Aggiungi widget: ${editorWidgetNames[k]}`}', WEB)
         self.assertIn('<EditorWidgetIcon kind={k}/>', WEB)
         self.assertNotIn('className="widget-palette"', WEB)

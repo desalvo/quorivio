@@ -17,7 +17,7 @@ class CanvasBackgroundNativeContext(unittest.TestCase):
   # The menu still calls the existing upload handler, passing the active
   # device so a smartphone image cannot replace the desktop background.
   self.assertIn("onBackgroundUpload={file=>uploadBackground(file,false,canvasDevice==='phone')}",SOURCE)
-  self.assertIn("backgroundAssetId={canvasDevice==='phone'?mobileLayoutDraft.backgroundAssetId||'':questionBackgroundAsset}",SOURCE)
+  self.assertIn("backgroundAssetId={canvasDevice==='phone'?mobileLayoutDraft.backgroundAssetId||'':slideBackground({backgroundAssetId:questionBackgroundAsset||undefined,backgroundUrl:questionBackground||undefined},snap.session.theme).assetId||''}",SOURCE)
   self.assertIn('if(forMobile){setMobileLayoutDraft(old=>({...old,backgroundAssetId:applied.id}));}',SOURCE)
   self.assertIn("else{setQuestionBackgroundAsset(applied.id);setQuestionBackground('')}",SOURCE)
   self.assertIn('onBackgroundSelect("")',SOURCE)

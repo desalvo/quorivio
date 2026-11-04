@@ -5,6 +5,7 @@ import type {WidgetTextStyle} from '../../api/src/domain';
  * Graphics never intercept events used to select other widgets. */
 export function WidgetGraphic({kind,style}:{kind:string;style?:WidgetTextStyle}){
  const gradientId=useId().replace(/:/g,'');
+ const startArrowId=gradientId+'-start',endArrowId=gradientId+'-end';
  if(kind!=='line'&&kind!=='shape')return null;
  const stroke=style?.strokeColor||'#334155';
  const width=Math.max(0,style?.strokeNone?0:(style?.strokeWidth??2));
@@ -13,7 +14,11 @@ export function WidgetGraphic({kind,style}:{kind:string;style?:WidgetTextStyle})
   const direction=style?.lineDirection||'horizontal';
   const coords:Record<string,[number,number,number,number]>={horizontal:[0,50,100,50],vertical:[50,0,50,100],diagonal:[0,0,100,100],reverse:[100,0,0,100]};
   const [x1,y1,x2,y2]=coords[direction]||coords.horizontal;
-  return <svg className="widget-graphic-line" viewBox="0 0 100 100" preserveAspectRatio="none" role="img" aria-label="Linea grafica"><line x1={x1} y1={y1} x2={x2} y2={y2} stroke={stroke} strokeWidth={width} strokeDasharray={dash} vectorEffect="non-scaling-stroke" strokeLinecap="round"/></svg>;
+  const arrow=width>0?(style?.lineArrow||'none'):'none';
+  return <svg className="widget-graphic-line" viewBox="0 0 100 100" preserveAspectRatio="none" role="img" aria-label="Linea grafica">
+   <defs><marker id={startArrowId} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9" fill="none" stroke={stroke} strokeWidth="2"/></marker><marker id={endArrowId} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M1 1 L9 5 L1 9" fill="none" stroke={stroke} strokeWidth="2"/></marker></defs>
+   <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={stroke} strokeWidth={width} strokeDasharray={dash} vectorEffect="non-scaling-stroke" strokeLinecap="round" markerStart={arrow==='start'||arrow==='both'?`url(#${startArrowId})`:undefined} markerEnd={arrow==='end'||arrow==='both'?`url(#${endArrowId})`:undefined}/>
+  </svg>;
  }
  const shape=style?.shapeType||'rectangle';
  const paths:Record<string,string>={

@@ -1,3 +1,31 @@
+# Quorivio 0.1.0-dev — RC162 — Editor smartphone e opzioni Codice QR
+
+**RC162:** nell’editor standard il selettore scorrevole accessibile permette di passare dal layout desktop 16:9 alla versione smartphone da 390 px modificabile. Le posizioni smartphone sono automatiche finché non sono veramente modificate; font, dimensione e colore del testo possono essere personalizzati per smartphone; ripristino globale o per widget, senza alterare il desktop. Il QR non mostra il titolo per default (anche nei progetti storici), permette di nascondere l’URL nelle proprietà e, quando visibile, riserva spazio al testo anche dopo il ridimensionamento. Validazione server dedicata. Test locali mirati Node/Python e prova Chromium su fixture; CI completa e prova autenticata da confermare. **85,25% certificato** (43 accettati / 17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Vedi `docs/RC_CYCLE162_SMARTPHONE_QR.it.md`.
+
+---
+# Quorivio 0.1.0-dev — RC161 — Arial, sfondo globale schemi e preset Linee/Forme
+
+**RC161:** impostato Arial come font effettivo predefinito in editor standard desktop/smartphone e schemi (conservando i font personalizzati); sfondo immagine dello schema ereditato nelle diapositive desktop e nei preview, caricato tramite la pipeline sicura e incluso negli archivi portabili. Linee/Forme prive di titolo visibile; menu tasto destro/pressione lunga/tastiera con frecce, tratteggi, forme comuni, riempimento e spessore, modificabili successivamente nel formato widget. La vista smartphone conserva lo sfondo indipendente dal desktop. Nuove regressioni e verifiche locali; CI completa e sessioni autenticate da confermare. **85,25% certificato** (43 accettati / 17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Vedi `docs/RC_CYCLE161_MASTER_GRAPHIC_PRESETS.it.md`.
+
+---
+# Quorivio 0.1.0-dev — RC160 — Widget partecipante, footer accessibile e gradimento
+
+**RC160:** eliminata dalla pagina partecipante la sezione automatica per parole/domande del pubblico e la barra reazioni esterna; solo i widget esplicitamente inseriti generano interazioni. Footer ultimo in lettura accessibile e ancorato in fondo al layout smartphone automatico; commento gradimento comune a editor, anteprime e sessioni con sfondo bianco e testo scuro. Contratti, test Node e fixture Chromium locali; resta da verificare su browser autentico/server reale e nuova CI. Inventario RC159 storico immutato. **85,25% certificato** (43 accettati / 17 parziali). Vedi `docs/RC_CYCLE160_WIDGET_OWNERSHIP_FOOTER.it.md`. `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+---
+
+# Quorivio 0.1.0-dev — RC159 — Parità UI presentazioni reali e anteprime
+
+**RC159:** run `41730792802` e `41739841860` sul commit RC157 verdi (la seconda pubblica Docker multiarch). Correzioni a colori dei tasti sessione, commento gradimento, dicitura di invio, limiti presentatore su DB e parità di canvas 16:9, sfondo e titolo per partecipanti/presentatore rispetto all’anteprima. Node, regressioni e Chromium CSS superati localmente; build completa nuova, confronto browser autentico e test 500 utenti ancora da confermare. RC158 storico immutato. **85,25% certificato** (43 accettati / 17 parziali). Vedi `docs/RC_CYCLE159_LIVE_PREVIEW_UI_RATE_PARITY.it.md`. `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+---
+
+# Quorivio 0.1.0-dev — RC158 — Riparazione prerequisiti Chromium per Docker manuale
+
+**RC158 dopo RC157:** la run manuale GitHub `41737243981` ha superato 833 test Node e la build TypeScript/Vite, ma è fallita nel test obbligatorio JPG/Logo Chromium/PostgreSQL perché Playwright veniva installato soltanto nello step browser facoltativo. La build Docker non è partita; nessun errore Dockerfile. Aggiunto bootstrap obbligatorio indipendente da browser_test e regressione anticipata. Inventario storico RC157 immutato, RC158 corrente. **Completamento certificato 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. CI completa, build reale Docker e prova server 500 utenti ancora aperte. Nessun commit/push/deploy. Vedi `docs/RC_CYCLE158_MANUAL_DOCKER_BROWSER_DEPENDENCY.it.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC157 — Import Python deterministici per le ricevute CI
 
 **RC157 dopo commit RC156:** la run GitHub Actions `41723978345` ha superato i controlli precedenti fino alla suite Python completa, ma ha fallito nella verifica finale SHA-256 per l'importazione del modulo fratello `verify_rc_current_inventory` senza `PYTHONPATH=tools`. Corrette entrambe le modalità d'avvio, impostato il percorso nello step CI e aggiunta regressione anticipata senza variabili d'ambiente. Inventario RC156 storico immutato, RC157 corrente. **Completamento certificato 85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. CI completa e prova reale autorizzata con 500 utenti ancora da confermare; nessun commit/push/deploy. Dettagli: `docs/RC_CYCLE157_PYTHON_IMPORT_PATH_CI_FIX.it.md`.

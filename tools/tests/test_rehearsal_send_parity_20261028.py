@@ -7,7 +7,8 @@ MODULE=(ROOT/'apps/web/src/rehearsal-responses.ts').read_text()
 CI=(ROOT/'.github/workflows/ci.yml').read_text()
 class RehearsalSendParity(unittest.TestCase):
  def test_real_and_rehearsal_requires_submit(self):
-  self.assertIn('Invia risposta al widget', UI)
+  self.assertNotIn('Invia risposta al widget', UI)
+  self.assertIn('>Invia risposta</button>', UI)
   self.assertIn('Invia risposta di prova', UI)
   self.assertIn('submitDemoAnswer(key,answerMode,timedSeconds)', UI)
   self.assertIn('disabled={!canInteract||!canSubmitRehearsalAnswer(answerMode,current)}',UI)

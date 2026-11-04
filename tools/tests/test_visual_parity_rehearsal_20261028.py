@@ -27,7 +27,8 @@ class VisualParity20261028(unittest.TestCase):
  def test_text_styles_reach_api_and_all_visual_contexts(self):
   self.assertIn('validWidgetInlineMarks(w.textMarks)',(R/'apps/api/src/domain.ts').read_text())
   self.assertIn('WidgetStyledText',UI)
-  self.assertIn('widgetTypographyStyle(w.style)',UI)
+  self.assertIn("widgetTypographyStyle(w.kind==='title'?widgetDisplay(w,{pageTitle:entry.activity.title,masterTitleStyle:entry.theme?.master?.titleStyle}).style:w.style)",UI)
+  self.assertIn('masterTitleStyle={entry.theme?.master?.titleStyle}',UI)
   self.assertIn("onSelection={r=>recordTextSelection(w.id,'label',r)}",UI)
   self.assertIn('textSelection.current=next',UI)
  def test_real_mobile_stage_retains_coordinates(self):

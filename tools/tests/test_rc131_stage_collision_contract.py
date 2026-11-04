@@ -16,7 +16,11 @@ class RC131StageAndCollision(unittest.TestCase):
   self.assertIn('return proposed;',PLACEMENT)
   self.assertNotIn('const segments=Math.min(400',PLACEMENT)
  def test_audience_fidelity_respects_explicit_font_at_all_widths(self):
-  self.assertIn("'--authored-widget-font-size':widgetTypographyStyle(w.style).fontSize",APP)
+  # RC159: title typography resolves the page/master style first; all other
+  # widgets continue using their own saved style. The legacy literal check
+  # silently assumed every kind had the same source fields.
+  self.assertIn("'--authored-widget-font-size':widgetTypographyStyle(w.kind==='title'?widgetDisplay(w,{pageTitle:entry.activity.title,masterTitleStyle:entry.theme?.master?.titleStyle}).style:w.style).fontSize",APP)
+  self.assertIn("...widgetTypographyStyle(w.kind==='title'?widgetDisplay(w,{pageTitle:entry.activity.title,masterTitleStyle:entry.theme?.master?.titleStyle}).style:w.style)",APP)
   self.assertIn('.audience-widget-layout.stage-fidelity>.page-widget{font-size:var(--authored-widget-font-size,1.25cqw)!important;}',CSS)
   self.assertIn('stage-reading>.page-widget',CSS)
   self.assertIn('font-size:1rem!important',CSS)

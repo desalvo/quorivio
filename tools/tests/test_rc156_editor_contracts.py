@@ -14,7 +14,7 @@ WORKFLOW=(ROOT/'.github/workflows/ci.yml').read_text(encoding='utf8')
 def device_background_contract(source: str) -> bool:
     return all(x in source for x in (
         "onBackgroundUpload={file=>uploadBackground(file,false,canvasDevice==='phone')}",
-        "backgroundAssetId={canvasDevice==='phone'?mobileLayoutDraft.backgroundAssetId||'':questionBackgroundAsset}",
+        "backgroundAssetId={canvasDevice==='phone'?mobileLayoutDraft.backgroundAssetId||'':slideBackground({backgroundAssetId:questionBackgroundAsset||undefined,backgroundUrl:questionBackground||undefined},snap.session.theme).assetId||''}",
         "if(forMobile){setMobileLayoutDraft(old=>({...old,backgroundAssetId:applied.id}));}",
         "else{setQuestionBackgroundAsset(applied.id);setQuestionBackground('')}",
     ))
@@ -42,7 +42,7 @@ class RC156Regression(unittest.TestCase):
     def test_background_mutations_fail_closed(self):
         for original,changed in (
             ("uploadBackground(file,false,canvasDevice==='phone')",'uploadBackground(file,false)'),
-            ("canvasDevice==='phone'?mobileLayoutDraft.backgroundAssetId||'':questionBackgroundAsset", 'questionBackgroundAsset'),
+            ("canvasDevice==='phone'?mobileLayoutDraft.backgroundAssetId||'':slideBackground({backgroundAssetId:questionBackgroundAsset||undefined,backgroundUrl:questionBackground||undefined},snap.session.theme).assetId||''", 'questionBackgroundAsset'),
             ('if(forMobile){setMobileLayoutDraft(old=>({...old,backgroundAssetId:applied.id}));}', 'if(forMobile){}'),
         ):
             self.assertIn(original,SOURCE)

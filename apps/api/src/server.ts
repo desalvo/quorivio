@@ -1,3 +1,4 @@
+import {apiRateClass,apiRateBudget} from './api-rate-policy.js';
 import {timedDeadline} from './timed-deadline.js';
 import {livePageTimerExpired} from './page-timer.js';
 import {withBootstrapLock} from './bootstrap-lock.js';
@@ -54,10 +55,13 @@ async function throttle(req:express.Request,res:express.Response,next:express.Ne
   if(a.length===b.length&&timingSafeEqual(a,b)){next();return}
  }
 
- const key=hash(req.ip||'unknown'),bucket=Math.floor(Date.now()/60000);
+ const uid=auth(req);
+ const rateClass=apiRateClass(req.method,req.path,uid);
+ const limit=apiRateBudget(rateClass);
+ const key=hash(rateClass==='default'?'ip:'+String(req.ip||'unknown'):`${rateClass}:${uid}:${req.ip||'unknown'}`),bucket=Math.floor(Date.now()/60000);
  const r=await db.query(`INSERT INTO api_rate_windows(client_hash,bucket,hits) VALUES($1,$2,1)
  ON CONFLICT(client_hash,bucket) DO UPDATE SET hits=api_rate_windows.hits+1 RETURNING hits`,[key,bucket]);
- if(Number(r.rows[0].hits)>100){res.setHeader('Retry-After',String(60-Math.floor(Date.now()/1000)%60));res.status(429).json({error:'rate_limited'});return}next();
+ if(Number(r.rows[0].hits)>limit){res.setHeader('Retry-After',String(60-Math.floor(Date.now()/1000)%60));res.status(429).json({error:'rate_limited'});return}next();
  }catch(e){console.error('rate limiter unavailable',e instanceof Error?e.message:'unknown');res.status(503).json({error:'rate_limiter_unavailable'})}}
 app.use('/api',throttle);
 // Page countdowns are authoritative in PostgreSQL, not just a disabled browser
@@ -1125,6 +1129,8 @@ app.get('/api/sessions/:id/assets',requireAuth,async(req,res)=>{try{
 app.delete('/api/sessions/:id/assets/:assetId',requireAuth,async(req,res)=>{try{
  const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}
  if(s.status==='closed'){res.status(409).json({error:'session_closed'});return}
+ // RC161: an image inherited by every slide is an in-use background as well.
+ if(s.theme?.master?.backgroundAssetId===req.params.assetId){res.status(409).json({error:'asset_in_use_by_background'});return}
  const backgroundLink=await db.query("SELECT 1 FROM activities WHERE session_id=$1 AND (page_design->>'backgroundAssetId'=$2 OR result_design->>'backgroundAssetId'=$2 OR page_design->'mobile'->>'backgroundAssetId'=$2) LIMIT 1",[s.id,req.params.assetId]);
  if(backgroundLink.rowCount){res.status(409).json({error:'asset_in_use_by_background'});return}
  const widgetLink=await db.query("SELECT 1 FROM activities WHERE session_id=$1 AND page_design->'widgets' @> $2::jsonb LIMIT 1",[s.id,JSON.stringify([{assetId:req.params.assetId}])]);
@@ -1517,7 +1523,7 @@ app.get('/api/join/:code/activities/:aid/media/:assetId',async(req,res)=>{try{
  const s=await publicSession(req.params.code);
  if(!s||s.status!=='active'||s.current_activity_id!==req.params.aid){res.status(404).end();return}
  const a=await db.query('SELECT page_design FROM activities WHERE id=$1 AND session_id=$2 AND status=$3',[req.params.aid,s.id,'open']);
- if(!a.rowCount||!(a.rows[0].page_design?.backgroundAssetId===req.params.assetId||a.rows[0].page_design?.mobile?.backgroundAssetId===req.params.assetId||(a.rows[0].page_design?.widgets||[]).some((w:any)=>(['image','video','logo','pdf'].includes(w.kind)&&w.assetId===req.params.assetId||w.style?.fillMode==='image'&&w.style?.fillImageAssetId===req.params.assetId)))){res.status(404).end();return}
+ if(!a.rowCount||!(a.rows[0].page_design?.backgroundAssetId===req.params.assetId||s.theme?.master?.backgroundAssetId===req.params.assetId||a.rows[0].page_design?.mobile?.backgroundAssetId===req.params.assetId||(a.rows[0].page_design?.widgets||[]).some((w:any)=>(['image','video','logo','pdf'].includes(w.kind)&&w.assetId===req.params.assetId||w.style?.fillMode==='image'&&w.style?.fillImageAssetId===req.params.assetId)))){res.status(404).end();return}
  const r=await db.query('SELECT mime_type FROM session_assets WHERE id=$1 AND session_id=$2',[req.params.assetId,s.id]);
  if(!r.rowCount||!['image/png','image/jpeg','image/gif','image/webp','video/mp4','video/webm','application/pdf'].includes(r.rows[0].mime_type)){res.status(404).end();return}
  res.setHeader('Cache-Control','private, no-store');res.setHeader('X-Content-Type-Options','nosniff');res.type(r.rows[0].mime_type);

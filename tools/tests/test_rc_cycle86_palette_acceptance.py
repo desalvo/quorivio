@@ -21,7 +21,12 @@ class RC86WidgetPalette(unittest.TestCase):
   self.assertGreaterEqual(len(kinds),19)
   for required in ('text','question','reactions','participant-count','title','footer'):
    self.assertIn(required,kinds)
-  self.assertIn('editorWidgetKinds.map(k=><EditorIconTool',UI)
+  # Shape/line tools use a contextual-preset inserter; other tools keep
+  # accessible palette buttons, including title and footer.
+  self.assertIn("editorWidgetKinds.map(k=>k==='shape'||k==='line'?<GraphicInsertTool",UI)
+  self.assertIn(':<EditorIconTool key={k}',UI)
+  self.assertIn('kind={k} disabled={pageWidgets.length>=16}',UI)
+  self.assertIn('label={`Aggiungi widget: ${editorWidgetNames[k]}`}',UI)
  def test_browser_uses_real_widget_kinds_not_obsolete_fixed_count(self):
   self.assertNotIn('buttons.count()==17',PROBE)
   self.assertIn('els.map(e=>e.dataset.widgetKind)',PROBE)

@@ -1,3 +1,31 @@
+# Quorivio 0.1.0-dev — RC162 — Smartphone editing slider and QR display preferences
+
+**RC162:** the standard page editor exposes a keyboard-accessible sliding switch between desktop 16:9 and editable 390px smartphone layouts. Phone positions remain generated automatically until a widget is deliberately moved/resized; independent phone typography (font, size, color) can be customized in widget properties, with per-widget and whole-page reset; desktop positions and shared content are preserved. QR defaults to no title (including legacy QR widgets), supports an opt-out destination URL property and uses responsive grid rows to keep enabled URL visible when resized. Data validation refuses QR-only settings on other widgets. Local source, runtime Node, and Chromium fixture checks; full GitHub CI and authenticated QR rendering still pending. **85.25% certified** (43 accepted / 17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. See `docs/RC_CYCLE162_SMARTPHONE_QR.en.md`.
+
+---
+# Quorivio 0.1.0-dev — RC161 — Arial defaults, master background and graphic presets
+
+**RC161:** Arial is the effective default across master/standard desktop and phone editors without replacing explicit typography. Master image backdrops are inherited by desktop slides and previews, uploaded through authenticated media, protected from deletion and preserved by portable exports. Lines and shapes render without captions and offer right-click/long-touch/keyboard insertion presets with stroke, dashes, arrowheads, shapes and fill, still editable in properties. Independently authored phone backdrops remain isolated. Local regression tests performed; full CI and authenticated live browser acceptance pending. **85.25% certified** (43 accepted / 17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. See `docs/RC_CYCLE161_MASTER_GRAPHIC_PRESETS.en.md`.
+
+---
+# Quorivio 0.1.0-dev — RC160 — Authored audience widgets, accessible footer and rating
+
+**RC160:** the participant page no longer mounts automatic word/question and reaction controls outside the authored slide; widgets remain interactive. Accessible footer is last and default smartphone footer is bottom-aligned; the shared rating comment is visible with white background on editor, previews and live views. Local Node, source contracts and computed Chromium fixture validated; full new CI and authenticated server screenshots pending. RC159 inventory frozen as historical. **85.25% certified** (43 accepted / 17 partial). See `docs/RC_CYCLE160_WIDGET_OWNERSHIP_FOOTER.en.md`. `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+---
+
+# Quorivio 0.1.0-dev — RC159 — Live presentation UI and visual parity
+
+**RC159:** GitHub runs `41730792802` and `41739841860` succeeded against RC157 (latter published multiarch images). Implemented session action colors, common optional rating comment, standardized answer submission, database-backed presenter read/navigation rate budgets, and authored 16:9 live participant slide plus title/background parity with the preview; presenter title respects saved master typography. Local Node and focused Chromium/Python checks pass; complete new CI, authenticated live screenshots and 500-user server acceptance pending. RC158 immutable historic. **85.25% certified** (43 accepted / 17 partial). See `docs/RC_CYCLE159_LIVE_PREVIEW_UI_RATE_PARITY.en.md`. `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+---
+
+# Quorivio 0.1.0-dev — RC158 — Manual Docker Chromium prerequisite repair
+
+**RC158 after RC157:** manual GitHub workflow `41737243981` passed 833 Node tests and TypeScript/Vite build, but failed mandatory Chromium JPG/Logo PostgreSQL acceptance because `playwright` had only been installed by an optional browser stage. The image build was skipped; the Dockerfile did not fail. Introduced mandatory Playwright/Chromium smoke immediately before JPG/Logo acceptance and a fast early regression guard. Historical RC157 inventory remains immutable; RC158 current. **Certified 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full CI, actual container build and 500-user server load remain pending. No assistant commit/push/deployment. See `docs/RC_CYCLE158_MANUAL_DOCKER_BROWSER_DEPENDENCY.en.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC157 — Deterministic Python imports for grouped CI evidence
 
 **RC157 after committed RC156:** GitHub Actions `41723978345` passed quality checks through the full Python suite, but failed the late grouped SHA-256 evidence step because `tools.verify_rc_release_status` could not import its sibling `verify_rc_current_inventory` when invoked as a unittest package without `PYTHONPATH=tools`. Fixed both invocation contexts, set the grouped CI step's Python path and added an early clean-environment import regression. RC156 inventory preserved historically; RC157 current. **Certified 85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full GitHub CI and real authorized 500-user run still pending; no assistant commit/push/deployment. See `docs/RC_CYCLE157_PYTHON_IMPORT_PATH_CI_FIX.en.md`.

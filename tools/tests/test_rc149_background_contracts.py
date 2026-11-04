@@ -15,7 +15,7 @@ class RC149BackgroundContracts(unittest.TestCase):
 
     def test_unconditional_desktop_asset_is_rejected(self):
         wrong = MAIN.replace(
-            "backgroundAssetId={canvasDevice==='phone'?mobileLayoutDraft.backgroundAssetId||'':questionBackgroundAsset}",
+            "backgroundAssetId={canvasDevice==='phone'?mobileLayoutDraft.backgroundAssetId||'':slideBackground({backgroundAssetId:questionBackgroundAsset||undefined,backgroundUrl:questionBackground||undefined},snap.session.theme).assetId||''}",
             'backgroundAssetId={questionBackgroundAsset}', 1)
         self.assertNotEqual(wrong, MAIN)
         self.assertFalse(mobile_background_routing_contract(wrong))

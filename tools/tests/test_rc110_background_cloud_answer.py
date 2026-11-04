@@ -20,10 +20,7 @@ def mobile_background_routing_contract(source: str) -> bool:
  if len(stage) != 2 or '<WidgetCanvas key=' not in stage[1]:
   return False
  canvas = stage[1].split('<WidgetCanvas key=', 1)[1].split('/>', 1)[0]
- asset_route = re.search(
-  r"backgroundAssetId=\{\s*canvasDevice\s*===\s*'phone'\s*\?\s*mobileLayoutDraft\.backgroundAssetId\s*\|\|\s*''\s*:\s*questionBackgroundAsset\s*\}",
-  canvas,
- )
+ asset_route = ("backgroundAssetId={canvasDevice==='phone'?mobileLayoutDraft.backgroundAssetId||'':slideBackground({backgroundAssetId:questionBackgroundAsset||undefined,backgroundUrl:questionBackground||undefined},snap.session.theme).assetId||''}" in canvas)
  upload_route = re.search(
   r"onBackgroundUpload=\{file\s*=>\s*uploadBackground\(file,\s*false,\s*canvasDevice\s*===\s*'phone'\)\}",
   canvas,
