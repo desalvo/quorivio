@@ -149,6 +149,8 @@ jobs:
         run: python3 -m unittest tools.tests.test_rc162_mobile_qr_contracts -q
       - name: RC163 widget history TypeScript and narrowed graphic rail preflight before npm
         run: python3 -m unittest tools.tests.test_rc163_frontend_typescript_build -q
+      - name: RC164 browser widget rail catalog and real graphic context menus preflight
+        run: python3 -m unittest tools.tests.test_rc164_graphic_palette_chromium_contract -q
       - name: Validate RC105 floating dialogs and selection-only resize geometry before npm
         run: python3 -m unittest tools.tests.test_rc105_editor_floating -q
       - name: Validate RC101 horizontal widget rail and visible editor stage before npm
@@ -1022,7 +1024,9 @@ jobs:
           python3 tools/verify_rc_cycle161_inventory.py --historical
           python3 -m unittest tools.tests.test_rc163_frontend_typescript_build -q
           python3 tools/verify_rc_cycle162_inventory.py --historical
-          python3 tools/verify_rc_cycle163_inventory.py
+          python3 tools/verify_rc_cycle163_inventory.py --historical
+          python3 -m unittest tools.tests.test_rc164_graphic_palette_chromium_contract -q
+          python3 tools/verify_rc_cycle164_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC164 — Chromium palette CI handoff
+
+**RC164 after RC163:** adapt actual Chromium editor rail acceptance to RC161 graphic insert triggers (`data-graphic-palette`) and exercise right-click dialogs for Linee/Forme. Preserve icon-label uniqueness and current runtime; new negative-mutation preflight. Full GitHub CI and authenticated integration remain pending. **Certified completion 85.25%** (43 accepted, 17 partial). No assistant commit/push/deploy; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. See `docs/RC_CYCLE164_GRAPHIC_PALETTE_CHROMIUM.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC163 — TypeScript build handoff
 
 **RC163 after RC162:** fix missing `showQrUrl` editor history declaration and unreachable checks for shape/line in the non-graphic insert path, matching the TS2339/TS2367 errors reported in GitHub run `41756050958`. Early preflight with negative mutations. RC162 history preserved; next step run full CI, then real editor/mobile QR and Docker acceptance. **Certified completion 85.25%** (43 accepted / 17 partial). No assistant commit, push or deploy. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. See `docs/RC_CYCLE163_TYPESCRIPT_BUILD_HOTFIX.en.md`.

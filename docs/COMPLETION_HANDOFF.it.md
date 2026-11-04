@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC164 — Handoff collaudo Chromium della palette
+
+**RC164 dopo RC163:** il collaudo reale del rail Chromium riconosce i pulsanti Linee e Forme tramite `data-graphic-palette`, conserva i controlli di unicità e testa i menu contestuali con tasto destro. Nessuna modifica al runtime; preflight con mutazioni negative. CI GitHub e prove autenticate ancora da confermare. **Completamento certificato 85,25%** (43 accettati / 17 parziali). Nessun commit/push/deploy; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Vedi `docs/RC_CYCLE164_GRAPHIC_PALETTE_CHROMIUM.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC163 — Handoff correzione build TypeScript
 
 **RC163 dopo RC162:** corretti il tipo locale che ometteva `showQrUrl` e i confronti irraggiungibili con `shape`/`line` nella palette non grafica (errori TS2339/TS2367 della run GitHub `41756050958`). Aggiunto preflight anticipato con mutazioni negative. Cronologia RC162 invariata; successivamente eseguire la CI completa e i test reali di editor, QR e Docker. **Completamento certificato 85,25%** (43 accettati / 17 parziali). Nessun commit, push o deploy. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Vedi `docs/RC_CYCLE163_TYPESCRIPT_BUILD_HOTFIX.it.md`.

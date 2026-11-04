@@ -29,7 +29,8 @@ class RC86WidgetPalette(unittest.TestCase):
   self.assertIn('label={`Aggiungi widget: ${editorWidgetNames[k]}`}',UI)
  def test_browser_uses_real_widget_kinds_not_obsolete_fixed_count(self):
   self.assertNotIn('buttons.count()==17',PROBE)
-  self.assertIn('els.map(e=>e.dataset.widgetKind)',PROBE)
+  self.assertIn('els.map(e=>e.dataset.widgetKind || e.dataset.graphicPalette)',PROBE)
+  self.assertIn("graphics=palette.locator('button.editor-icon-tool[data-graphic-palette]')",PROBE)
   self.assertIn('required<=set(kinds)',PROBE)
   self.assertIn('len(kinds)==len(set(kinds))',PROBE)
   self.assertIn("'title','footer'",PROBE)

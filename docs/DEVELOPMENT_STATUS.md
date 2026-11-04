@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC164 — Chromium graphic rail catalog repair
+
+**RC164:** GitHub run `41760453415` exposed an outdated browser palette assertion: graphic insert triggers use `data-graphic-palette` while ordinary widget icons use `data-widget-kind`. Chromium acceptance now enumerates both and checks the Linee/Forme right-click preset menus without inserting a widget. Runtime unchanged, RC163 inventory immutable. **85.25% certified** (43 accepted / 17 partial). Full new CI remains pending; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. See `docs/RC_CYCLE164_GRAPHIC_PALETTE_CHROMIUM.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC163 — TypeScript widget history and graphic rail build fix
 
 **RC163:** fixed four GitHub TypeScript build errors (run `41756050958`): the local editor history type now includes the persisted `showQrUrl` option; unreachable shape/line comparisons were removed from the non-graphic widget rail, preserving the dedicated graphic preset branch. Added early negative-mutation CI checks. Local regressions verified; complete GitHub TypeScript/Vite build, authenticated browser checks and Docker still pending. **85.25% certified** (43 accepted / 17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. See `docs/RC_CYCLE163_TYPESCRIPT_BUILD_HOTFIX.en.md`.

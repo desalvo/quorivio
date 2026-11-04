@@ -314,7 +314,7 @@ async def main():
    # prevented the browser gate from testing the actual palette semantics.
    # Require every supported kind, one tool per kind, unique icons and
    # accessible names, while allowing future widget families to be added.
-   kinds=await buttons.evaluate_all('(els)=>els.map(e=>e.dataset.widgetKind)')
+   kinds=await buttons.evaluate_all('(els)=>els.map(e=>e.dataset.widgetKind || e.dataset.graphicPalette)')
    required={'rating','reactions','text','shape','line','timer','qr','profile',
              'question','postit','image','video','logo','pdf','topic-question',
              'timed-quiz','results-button','participant-count','title','footer'}
@@ -326,7 +326,20 @@ async def main():
    assert len(labels)==len(set(labels)),f'Duplicate widget palette labels: {labels}'
    names=await buttons.evaluate_all('(els)=>els.map(e=>e.querySelector("svg")?.getAttribute("class"))')
    assert all(names) and len(set(names))==len(names),names
-   assert await buttons.evaluate_all('(els)=>els.every(e=>!e.hasAttribute("title"))')
+   # Regular rail tools use a custom floating tooltip; dedicated graphics tools
+   # intentionally advertise right-click / long-press via their native hint.
+   assert await buttons.evaluate_all('(els)=>els.every(e=>e.dataset.graphicPalette || !e.hasAttribute("title"))')
+   graphics=palette.locator('button.editor-icon-tool[data-graphic-palette]')
+   assert await graphics.count()==2, 'Linee and Forme must remain distinct graphic rail tools'
+   for kind,label in [('line','Linee'),('shape','Forme')]:
+    graphic=palette.locator(f'button.editor-icon-tool[data-graphic-palette="{kind}"]')
+    await expect(graphic).to_have_attribute('aria-label',f'Aggiungi widget: {label}')
+    await graphic.click(button='right')
+    popup=page.get_by_role('dialog',name=f'Scegli {label.lower()} da inserire')
+    await expect(popup).to_be_visible()
+    assert await popup.locator('.graphic-preset-choices button').count()>=2, f'{label} preset choices absent'
+    await page.keyboard.press('Escape')
+    await expect(popup).to_have_count(0)
    state['drop_before']=True;state['drop_after']=True
    await page.get_by_role('button',name='Aggiungi widget: Testo').click()
    await expect(page.locator('.widget-canvas-item')).to_have_count(4)

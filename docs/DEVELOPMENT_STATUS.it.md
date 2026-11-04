@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC164 — Correzione collaudo della palette grafica
+
+**RC164:** la run `41760453415` ha evidenziato un controllo Chromium obsoleto: le icone standard usano `data-widget-kind`, Linee e Forme usano `data-graphic-palette`. Il collaudo ora identifica entrambe e verifica l’apertura dei menu col tasto destro senza inserimento. Runtime invariato e inventario RC163 storico immutato. **Completamento certificato 85,25%** (43 accettati / 17 parziali). CI completa ancora da confermare; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Vedi `docs/RC_CYCLE164_GRAPHIC_PALETTE_CHROMIUM.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC163 — Correzione compilazione TypeScript QR e palette grafica
 
 **RC163:** corretti i quattro errori TypeScript della CI GitHub `41756050958`: il tipo locale della cronologia widget ora comprende `showQrUrl`, mentre il ramo non grafico della palette non esegue controlli irraggiungibili su forme e linee; i preset grafici dedicati restano invariati. Inserito un preflight CI anticipato con mutazioni negative. Regressioni locali verificate; build GitHub TypeScript/Vite, browser autenticato e Docker ancora da confermare. **85,25% certificato** (43 accettati / 17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Vedi `docs/RC_CYCLE163_TYPESCRIPT_BUILD_HOTFIX.it.md`.
