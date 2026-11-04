@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC180 — passaggio consegne palette e strumenti contestuali
+
+**RC180:** la CI `41913987787` ha confermato la RC179 sui comandi di selezione, ma l'overlay fisso di allineamento impediva il clic su «Linee» nella palette. I pannelli sono ora disposti in un'area dello stage con scorrimento, sotto la palette, senza sovrapposizioni causate dallo `z-index`. Test Chromium con clic reali alternati Duplica → Linee → Allinea → Linee senza chiudere gli strumenti, a 1440/960/390 px: rosso con la RC179, verde con RC180. Check CI preventivo aggiunto, ricevute SHA-256 storiche preservate. **85,25% certificato (43 accettati / 17 parziali)**, `rc_strict=false`, `publish_image=false`, `publish_latest=false`. CI completa ancora da verificare dopo commit utente; nessun commit/push/tag/deploy. Vedi `docs/RC_CYCLE180_EDITOR_TOOLBAR_RAIL_POINTERS.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC179 — passaggio consegne blocco click editor
 
 **RC179:** risolto il problema CI `41878608401`: la palette RC178 con `z-index:13` copriva il pannello contestuale nello stage con `z-index:1`, impedendo un click nativo su «Duplica selezione». Lo stage viene ora portato sopra la palette **solo** quando gli strumenti di selezione sono aperti. Test Chromium con click reali a 1440×900, 960×800 e 390×844 e test strutturale anticipato; ancora da verificare l'intera CI React/PostgreSQL dopo commit utente. **85,25% certificato (43 gate accettati / 17 parziali)**. `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag/deploy dell'assistente. Vedi `docs/RC_CYCLE179_EDITOR_SELECTION_STACKING_CI.it.md`.

@@ -2407,3 +2407,39 @@ main.participant-live-view.participant-slide-active .audience-stage-scroll{
 .editor-ux-v2 .editor-stage:has(.canvas-editor-group[data-tools-open="true"]){
   z-index:70!important;
 }
+
+/* RC180 — real Chromium editor run 41913987787:
+ * RC179 raised the entire stage above the wrapped widget rail so selection
+ * buttons could be clicked. That made the formerly fixed selection ribbon
+ * cover the rail (notably "Linee") while it was open. A larger z-index on
+ * either sibling just reverses the broken click target.
+ *
+ * Dock selection/arrangement tools in normal flow ABOVE the artboard but
+ * BELOW the insertion rail, instead of making them viewport-fixed. Both
+ * panels remain scrollable and the artboard can scroll in its own stage.
+ * This is also safe when the header grows in the mobile breakpoint: no
+ * hard-coded top offsets depend on the palette's variable wrapped height.
+ */
+.editor-ux-v2 .editor-stage:has(.canvas-editor-group[data-tools-open="true"]){
+  z-index:1!important;
+  justify-content:flex-start!important;
+  align-items:stretch!important;
+}
+.editor-ux-v2 .canvas-editor-group[data-tools-open="true"]>.canvas-editor-tools,
+.editor-ux-v2 .canvas-editor-group[data-tools-open="true"]>.canvas-editor-tools+.canvas-editor-tools{
+  position:relative!important;
+  inset:auto!important;
+  top:auto!important;
+  left:auto!important;
+  right:auto!important;
+  bottom:auto!important;
+  transform:none!important;
+  flex:0 0 auto;
+  width:100%!important;
+  max-width:100%!important;
+  max-height:min(126px,23dvh)!important;
+  overflow:auto!important;
+  box-sizing:border-box;
+  margin:0 0 8px!important;
+  z-index:2!important;
+}

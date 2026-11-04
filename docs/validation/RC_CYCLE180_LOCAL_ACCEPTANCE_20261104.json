@@ -1,0 +1,61 @@
+{
+  "version": "0.1.0-dev",
+  "cycle": 180,
+  "date": "2026-11-04",
+  "base": "RC179",
+  "ci_run_analyzed": "41913987787",
+  "ci_job_analyzed": "126868661600",
+  "head_sha": "a5d3981719e1bb3dff03e3812d2c8da0ec429913",
+  "failed_step": "Chromium editor UI acceptance (opt-in)",
+  "first_failure": "playwright Locator.click timeout on button.editor-icon-tool[data-graphic-palette=\"line\"]; canvas-editor-tools intercepted pointer",
+  "root_cause": "RC179 made stage selection controls clickable by elevating stage above insert palette; fixed selection controls now intercept graphic insert rail",
+  "fix": "Contextual selection and alignment controls dock in flow inside editor stage beneath adaptive insertion rail, with individual scroll support and without overlapping stacking contexts",
+  "native_browser_red_before_fix": "1440x940: document.elementFromPoint at Linee center resolves canvas-editor-tools, not Linee button",
+  "local_evidence": {
+    "rc180_native_chromium_green_after_fix": [
+      "1440x940",
+      "960x800",
+      "390x844"
+    ],
+    "rc179_regression_chromium": [
+      "1440x900",
+      "960x800",
+      "390x844"
+    ],
+    "rc171_palette_chromium": [
+      "1440x900",
+      "960x760",
+      "620x740"
+    ],
+    "header_context_chromium": "desktop+mobile pass",
+    "canvas_hit_target_chromium": "desktop+touch pass",
+    "frontend_node_tests": {
+      "passed": 313,
+      "failed": 0
+    },
+    "api_node_tests": {
+      "passed": 588,
+      "failed": 0
+    },
+    "preflight_python_tests": {
+      "passed": 29,
+      "failed": 0,
+      "scope": "RC180/179/178/171, RC101, RC105, RC164 focused contracts"
+    },
+    "full_vite_build": "not run locally: npm ci offline ENOTCACHED; online install timed out. Prior RC179 GitHub compilation succeeded, RC180 build still unverified",
+    "real_react_postgresql_full_e2e": "not run locally; GitHub postcommit required",
+    "python_discovery_suite": "not counted: independent long-running integration tests exceeded local execution budget"
+  },
+  "certified_score": 85.25,
+  "accepted_gates": 43,
+  "partial_gates": 17,
+  "acceptance_credit": 0,
+  "rc_strict": false,
+  "publish_image": false,
+  "publish_latest": false,
+  "pending": [
+    "GitHub full CI after new commit",
+    "authenticated React/PostgreSQL participant/editor acceptance",
+    "physical device and independent accessibility/operator review"
+  ]
+}

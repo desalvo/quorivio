@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC180 — editor palette/context handoff
+
+**RC180:** GitHub `41913987787` confirmed RC179 selection controls work but exposed the opposite pointer obstruction: the fixed arrangement panel blocked the `Linee` insert button in the wrapped palette. The latest cumulative moves contextual selection/arrangement panels into a bounded, scrollable dock inside the stage, after the insert rail; it does not need z-index escalation. Red-before/green-after native Chromium pointer testing alternates Duplicate → Linee → Align → Linee without closing the selection tools, at 1440/960/390 widths. Historical inventory receipts preserved; CI checks added before authenticated editor E2E. **85.25% certified / 43 accepted / 17 partial**, `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full GitHub CI pending user commit. No assistant commit/push/tag/deploy. See `docs/RC_CYCLE180_EDITOR_TOOLBAR_RAIL_POINTERS.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC179 — Editor contextual pointer handoff
 
 **RC179:** fixed real Chromium editor click obstruction from CI `41878608401`: RC178's multirow palette (z13) covered the stage (z1) floating `Duplica selezione` tool despite its child z48. CSS lifts the stage only while selection tools are open, preserving header and palette behavior. Verified a red-before/green-after native Chromium click at 1440×900, 960×800 and 390×844 plus early Python regression. Re-run full GitHub CI after user commit to confirm the remaining authenticated React/PostgreSQL browser checks. **85.25% certified / 43 accepted / 17 partial**. `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no assistant commit/push/tag/deploy. See `docs/RC_CYCLE179_EDITOR_SELECTION_STACKING_CI.en.md`.
