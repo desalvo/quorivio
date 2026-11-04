@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC178 — editor palette/Chromium CI handoff
+
+**RC178 after RC177:** analyzed run `41871700136` where Chromium editor mock failed on legacy x-scroll assertion after successful npm installation, Node unit tests and frontend/backend compilation. Fixed a real CSS clipping bug: wrapped catalog now receives an automatically sized, vertically scrollable row rather than fixed 80px; bounded 16:9 canvas remains visible. Updated the browser assertion and added mutation-tested RC178 preflight. Certified completion **85.25% (43 accepted / 17 partial)**; authenticated/physical-device acceptance pending. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag/deploy. See `docs/RC_CYCLE178_EDITOR_PALETTE_CI.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC177 — CI handoff on historical live selectors
 
 **RC177:** reproduced GitHub Actions `41865155281` failure in RC167 historical contract. Reconciled historical RC144/167/168/169 preflights to reflect RC176's separate phone, reading and faithful 16:9 modes plus the 998px public phone fixture. Added negative regression and CI early test, rotated immutable current inventory to RC177, kept RC176 and earlier checksums unchanged. No runtime functional modification and **85.25% (43 accepted / 17 partial)**. 589 preflight tests now pass (one skipped), plus 313 web and 588 API tests; 1770-file cumulative ZIP integrity verified. Build and authenticated browser CI pending. `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag/deploy. See `docs/RC_CYCLE177_HISTORICAL_LIVE_CI_RECONCILIATION.en.md`.

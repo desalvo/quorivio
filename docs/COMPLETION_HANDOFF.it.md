@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC178 — passaggio consegne CI palette editor
+
+**RC178 dopo RC177:** analizzata la run `41871700136`: installazione npm, unit test e compilazione frontend/backend superati; test Chromium RC101 fallito per vecchia asserzione sullo scorrimento orizzontale. Corretto anche il difetto CSS reale: palette ora a righe adattive con scroll verticale e canvas 16:9 visibile. Aggiornato test Chromium e introdotto preflight RC178 con mutazione negativa. **85,25% certificato (43 accettati / 17 parziali)**; resta il collaudo React/PostgreSQL e su dispositivi fisici. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag/deploy. Vedi `docs/RC_CYCLE178_EDITOR_PALETTE_CI.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC177 — Passaggio di consegne CI storica presentazione
 
 **RC177:** riprodotto il fallimento GitHub Actions `41865155281` nel contratto storico RC167. Riconciliati i preflight RC144/167/168/169 con le tre modalità della RC176 e la fixture pubblica smartphone da 998px. Aggiunti test negativi e preflight anticipato, inventario corrente spostato alla RC177 mantenendo immutabili quelli precedenti. Nessuna modifica funzionale al runtime e **85,25% (43 accettati / 17 parziali)**. 589 test preflight superati (1 saltato), 313 web e 588 API; integrità ZIP da 1770 file verificata. Build e browser autenticato CI ancora aperti. `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag/deploy. Vedi `docs/RC_CYCLE177_HISTORICAL_LIVE_CI_RECONCILIATION.it.md`.

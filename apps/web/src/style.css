@@ -2282,6 +2282,27 @@ main.participant-live-view .audience-widget-layout.stage-fidelity{
 .editor-ux-v2 .editor-graphic-options{position:absolute!important;right:1px!important;bottom:1px!important;z-index:2!important;display:grid!important;place-items:center!important;border:1px solid #81dbe8!important;border-radius:5px!important;background:#166282!important;color:white!important;font-size:17px!important;line-height:1!important;width:23px!important;height:21px!important;min-width:0!important;min-height:0!important;padding:0!important;cursor:pointer!important}
 .editor-ux-v2 .editor-graphic-options:hover,.editor-ux-v2 .editor-graphic-options:focus-visible{outline:2px solid #ffde6c!important;outline-offset:1px!important}
 @media(max-width:760px){.editor-ux-v2 .editor-widget-grid .editor-graphic-wrapper{flex-basis:55px!important;width:55px!important;min-width:55px!important}}
+/* RC178: let the palette row follow its real, bounded wrapped content.
+ * RC101's fixed 80px grid track clipped the second row on desktop when
+ * RC171 switched the catalog from x-scroll to vertically scrollable wrapping.
+ * Preserve the canvas as the remaining flexible row, with a capped palette. */
+.editor-ux-v2,.editor-ux-v2:fullscreen{
+  grid-template-rows:78px minmax(72px,auto) minmax(0,1fr)!important;
+}
+@media(max-width:1200px){
+  .editor-ux-v2,.editor-ux-v2:fullscreen{
+    grid-template-rows:minmax(100px,auto) minmax(72px,auto) minmax(0,1fr)!important;
+  }
+}
+@media(max-width:750px){
+  .editor-ux-v2,.editor-ux-v2:fullscreen{
+    grid-template-rows:minmax(130px,auto) minmax(72px,auto) minmax(0,1fr)!important;
+  }
+}
+/* Preserve the complete 16:9 edit canvas after the toolbar grows to multiple rows. */
+@media(min-width:1201px){
+  .editor-ux-v2 .editor-canvas-slot{max-width:min(100%,calc((100dvh - 240px)*16/9))!important}
+}
 /* Keep the portal's menu usable on small portrait/touch viewports. */
 .graphic-preset-popup{max-height:min(80dvh,570px)!important;overscroll-behavior:contain!important;touch-action:pan-y!important}
 

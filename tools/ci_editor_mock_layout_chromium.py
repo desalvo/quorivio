@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""No-network Chromium layout preflight for RC89+ horizontal-palette editor layout."""
+"""No-network Chromium editor layout acceptance: RC178 wrapped, scrollable palette."""
 import asyncio
 import base64
 import os
@@ -33,16 +33,30 @@ async def verify(browser,width,height,mobile):
   assert rb['y']+rb['height']<=sb['y']+3,(rb,sb)
   assert sb['y']>=hb['y']+hb['height']-2,(hb,sb)
   assert sb['y']+min(sb['height'],60)<=height+3,(sb,height)
-  assert rb['height']>=65 and rb['height']<=95,(rb,height)
+  assert rb['height']>=72 and rb['height']<=min(height*.30,198)+3,(rb,height)
   grid=editor.locator('.editor-widget-grid')
-  assert await grid.evaluate('(e)=>getComputedStyle(e).overflowX')=='auto'
-  assert await grid.evaluate('(e)=>e.clientHeight')<=95
-  # The actual toolbar has icon wrappers, and at narrow viewports its last
-  # entry must remain reachable through horizontal scrolling.
-  overflow=await grid.evaluate('(e)=>({scrollWidth:e.scrollWidth,clientWidth:e.clientWidth})')
-  assert overflow['scrollWidth']>overflow['clientWidth']+100,overflow
-  await grid.evaluate('(e)=>{e.scrollLeft=e.scrollWidth}')
-  assert await grid.evaluate('(e)=>e.scrollLeft')>100,overflow
+  overflow=await grid.evaluate('''(e)=>({overflowX:getComputedStyle(e).overflowX,overflowY:getComputedStyle(e).overflowY,
+     scrollWidth:e.scrollWidth,clientWidth:e.clientWidth,scrollHeight:e.scrollHeight,
+     clientHeight:e.clientHeight,flexWrap:getComputedStyle(e).flexWrap})''')
+  # RC171+: compact icons wrap into rows, with bounded vertical scrolling,
+  # instead of spilling into a fixed-height (80px) or x-scrolling rail.
+  assert overflow['overflowX']=='hidden' and overflow['overflowY']=='auto',overflow
+  assert overflow['flexWrap']=='wrap',overflow
+  assert overflow['scrollWidth']<=overflow['clientWidth']+3,overflow
+  assert overflow['clientHeight']<=min(height*.30,198)+3,overflow
+  gb=await grid.bounding_box()
+  assert gb and gb['y']>=rb['y']-1 and gb['y']+gb['height']<=rb['y']+rb['height']+2,(gb,rb)
+  icons=grid.locator('.editor-icon-wrapper')
+  assert await icons.count()==20
+  first=await icons.first.bounding_box()
+  assert first and 40<=first['width']<=75,first
+  if overflow['scrollHeight']>overflow['clientHeight']+2:
+   # No catalog element may be trapped below the clipped outer rail.
+   await grid.evaluate('(e)=>{e.scrollTop=e.scrollHeight}')
+   assert await grid.evaluate('(e)=>e.scrollTop')>0,overflow
+  last=await icons.last.bounding_box()
+  gb=await grid.bounding_box()
+  assert last and gb and last['y']>=gb['y']-2 and last['y']+last['height']<=gb['y']+gb['height']+2,(last,gb,overflow)
   assert cb['y']>=sb['y']-1 and cb['y']+cb['height']<=sb['y']+sb['height']+1,(cb,sb)
   assert cb['width']>=sb['width']*.60,(cb,sb)
   assert abs(cb['width']/cb['height']-16/9)<.035,(cb,width,height)
@@ -62,5 +76,5 @@ async def main():
    await verify(browser,1440,900,False)
    await verify(browser,390,844,True)
   finally:await browser.close()
- print('PASS RC101 editor: header, left thumbnails, horizontal widget rail above visible 16:9 canvas, Exit; desktop and mobile Chromium')
+ print('PASS RC178 editor: unclipped wrapped widget catalog, bounded vertical scrolling, visible 16:9 canvas and Exit; desktop and mobile Chromium')
 if __name__=='__main__':asyncio.run(main())

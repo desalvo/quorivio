@@ -1,4 +1,4 @@
-"""RC101: horizontal widget palette must not push slide outside the viewport."""
+"""RC101/RC178: responsive widget palette must not clip buttons or hide the slide."""
 import re
 import unittest
 from pathlib import Path
@@ -10,18 +10,20 @@ CI = (ROOT / '.github/workflows/ci.yml').read_text(encoding='utf-8')
 
 
 class HorizontalEditorGridRegression(unittest.TestCase):
-    def test_fixed_middle_row_and_remaining_slide_height(self):
-        self.assertRegex(CSS, r'grid-template-rows:78px 80px minmax\(0,1fr\)!important')
-        self.assertRegex(CSS, r'grid-template-rows:64px 80px minmax\(0,1fr\)!important')
-        self.assertIn('height:80px!important;max-height:80px!important', CSS)
-        self.assertIn('height:80px!important;max-height:80px!important;', CSS)
+    def test_bounded_auto_palette_track_preserves_remaining_slide_height(self):
+        self.assertRegex(CSS, r'grid-template-rows:78px minmax\(72px,auto\) minmax\(0,1fr\)!important')
+        self.assertRegex(CSS, r'grid-template-rows:minmax\(130px,auto\) minmax\(72px,auto\) minmax\(0,1fr\)!important')
+        self.assertIn('max-height:min(30dvh,198px)!important', CSS)
+        self.assertIn('overflow-x:hidden!important;overflow-y:auto!important', CSS)
 
-    def test_browser_acceptance_checks_real_current_layout(self):
+    def test_browser_acceptance_checks_actual_wrapping_and_last_icon_reachability(self):
         self.assertIn('name="viewport"', TEST)
         self.assertIn("rb['y']+rb['height']<=sb['y']+3", TEST)
         self.assertIn("cb['y']+cb['height']<=sb['y']+sb['height']+1", TEST)
-        self.assertIn("overflow['scrollWidth']>overflow['clientWidth']+100", TEST)
-        self.assertNotIn("sb['x']+sb['width']<=rb['x']+5", TEST)
+        self.assertIn("overflow['flexWrap']=='wrap'", TEST)
+        self.assertIn("overflow['scrollWidth']<=overflow['clientWidth']+3", TEST)
+        self.assertIn("last['y']+last['height']<=gb['y']+gb['height']+2", TEST)
+        self.assertNotIn('scrollLeft', TEST)
 
     def test_browser_step_remains_mandatory_in_opt_in_campaign(self):
         self.assertIn('python3 tools/ci_editor_mock_layout_chromium.py', CI)

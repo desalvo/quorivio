@@ -176,11 +176,13 @@ jobs:
         run: python3 -m unittest tools.tests.test_rc175_media_geometry -q
       - name: RC176 three-mode accessibility and real participant geometry preflight before npm
         run: python3 -m unittest tools.tests.test_rc176_accessible_stage_modes -q
+      - name: RC178 responsive widget palette and unclipped canvas preflight
+        run: python3 -m unittest tools.tests.test_rc178_palette_clipping -q
       - name: RC170 schema-owned footer number and phone preview/live parity preflight
         run: python3 -m unittest tools.tests.test_rc170_phone_footer_number_parity -q
       - name: Validate RC105 floating dialogs and selection-only resize geometry before npm
         run: python3 -m unittest tools.tests.test_rc105_editor_floating -q
-      - name: Validate RC101 horizontal widget rail and visible editor stage before npm
+      - name: Validate RC101/RC178 responsive widget catalog and visible editor stage before npm
         run: |
           python3 -m unittest tools.tests.test_rc_cycle101_horizontal_editor_layout -q
       - name: Validate historical documentation acceptance early
@@ -1065,7 +1067,8 @@ jobs:
           python3 tools/verify_rc_cycle174_inventory.py --historical
           python3 tools/verify_rc_cycle175_inventory.py --historical
           python3 tools/verify_rc_cycle176_inventory.py --historical
-          python3 tools/verify_rc_cycle177_inventory.py
+          python3 tools/verify_rc_cycle177_inventory.py --historical
+          python3 tools/verify_rc_cycle178_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

@@ -1,0 +1,52 @@
+{
+  "version": "0.1.0-dev",
+  "cycle": 178,
+  "date": "2026-11-04",
+  "base": "RC177",
+  "ci_run_analyzed": "41871700136",
+  "ci_job_analyzed": "126720219254",
+  "first_failure": "tools/ci_editor_mock_layout_chromium.py:38, legacy overflowX auto assertion",
+  "root_cause": "RC171 wrapped vertical catalog superseded horizontal scroll; RC101 fixed 80px desktop track clips extra rows",
+  "changes": [
+    "bounded responsive grid row",
+    "desktop 16:9 canvas cap",
+    "true wrapped catalog Chromium acceptance",
+    "RC178 negative mutation and early CI preflight"
+  ],
+  "ci_previous_attempt": {
+    "npm_install": "success",
+    "unit_tests": "success",
+    "frontend_backend_compile": "success",
+    "chromium_editor": "failed_at_old_assertion"
+  },
+  "local_evidence": {
+    "chromium_editor_rc178": [
+      "1440x900",
+      "390x844"
+    ],
+    "chromium_rc171": [
+      "1440x900",
+      "960x760",
+      "620x740"
+    ],
+    "chromium_downstream_scripts_passed": 7,
+    "python_targeted_tests": 6,
+    "early_ci_python_modules": {
+      "tests_run": 584,
+      "failed": 0,
+      "skipped": 1
+    }
+  },
+  "acceptance_credit": 0,
+  "certified_score": 85.25,
+  "accepted_gates": 43,
+  "partial_gates": 17,
+  "rc_strict": false,
+  "publish_image": false,
+  "publish_latest": false,
+  "pending": [
+    "postcommit GitHub CI rerun",
+    "authenticated React and PostgreSQL browser flows",
+    "physical device/operator independent acceptance"
+  ]
+}

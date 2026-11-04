@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC178 — Palette editor responsiva e canvas visibile
+
+**RC178 dopo RC177:** la run GitHub `41871700136` supera installazione npm, unit test e build frontend/backend, ma fallisce sulla vecchia asserzione RC101 di Chromium (`overflowX=auto`). Confermato anche un difetto reale: la palette RC171 a più righe è tagliata dalla riga desktop fissa di 80px. La griglia ora si adatta entro un limite, scorre in verticale e il canvas 16:9 resta visibile. Aggiornate le prove Chromium e inserito un preflight RC178 negativo. **85,25% certificato (43 accettati / 17 parziali)**, senza promuovere gate non accettati. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag/deploy. Dettagli `docs/RC_CYCLE178_EDITOR_PALETTE_CI.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC177 — Riconciliazione contratti CI della presentazione reale
 
 **RC177 dopo RC176:** corretta la prima causa del fallimento CI `41865155281` (asserzione RC167 sul vecchio selettore a due modalità) e riallineati RC144/168/169 al selettore partecipante a tre modalità e all'altezza pubblica 998px della fixture RC176. Nessuna modifica al runtime; preservate privacy e accessibilità. Aggiunto preflight e inventario cumulativo. **85,25% certificato (43 accettati, 17 parziali)**. Test locali: 589/589 preflight (1 saltato), 313/313 web, 588/588 API; integrità ZIP di 1770 file verificata. Vite/React/PostgreSQL e CI sul commit successivo ancora da verificare. `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag/deploy. Dettagli: `docs/RC_CYCLE177_HISTORICAL_LIVE_CI_RECONCILIATION.it.md`.

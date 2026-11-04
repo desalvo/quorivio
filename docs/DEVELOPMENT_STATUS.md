@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC178 — Chromium editor palette and canvas visibility
+
+**RC178 after RC177:** GitHub run `41871700136` passed npm installation, unit tests and frontend/backend compilation but failed in legacy RC101 Chromium assertion (`overflowX=auto`). Confirmed real RC171 wrapped catalog was clipped by the fixed 80px desktop rail; replaced the effective grid row with bounded auto sizing, preserved vertical scroll and recapped the 16:9 desktop canvas. Updated actual Chromium check and added negative RC178 CI preflight. **85.25% certified (43 accepted / 17 partial)**, no independent gate promotion. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag/deploy. Details `docs/RC_CYCLE178_EDITOR_PALETTE_CI.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC177 — Live presentation historical CI contracts
 
 **RC177 after RC176:** fixed the first failure in CI run `41865155281` (RC167 two-mode live selector assertion) and reconciled RC144/168/169 historical checks with the true RC176 three-mode participant selector and 998px phone fixture. No runtime changes: live stage privacy/accessibility contracts remain verified. Added an early regression gate and new cumulative integrity receipt. **85.25% certified (43 accepted, 17 partial)**. Local: 589/589 preflight tests (one skipped), 313/313 web tests, 588/588 API tests; 1770-file ZIP checksum verified. TypeScript/Vite/React/PostgreSQL authenticated and post-commit GitHub CI remain pending. `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag/deploy. Details: `docs/RC_CYCLE177_HISTORICAL_LIVE_CI_RECONCILIATION.en.md`.
