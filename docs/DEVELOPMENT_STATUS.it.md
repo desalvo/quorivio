@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC179 — sovrapposizione palette e strumenti contestuali CI
+
+**RC179 dopo RC178:** analizzata la CI `41878608401`: la palette a più righe intercettava il click reale sul comando «Duplica selezione» perché lo stage aveva uno stacking context inferiore. Elevato il livello dello stage solo quando gli strumenti contestuali sono aperti; palette utilizzabile alla chiusura. Prove Chromium con click nativi a 1440/960/390px, test negativo precedente alla modifica e preflight Python aggiunto alla CI. Installazione npm, test unitari e build TypeScript/Vite erano già riusciti nella CI segnalata; la nuova CI completa resta da eseguire dopo il commit. **85,25% certificato (43 accettati / 17 parziali)**. `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag/deploy. Vedi `docs/RC_CYCLE179_EDITOR_SELECTION_STACKING_CI.it.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC178 — Palette editor responsiva e canvas visibile
 
 **RC178 dopo RC177:** la run GitHub `41871700136` supera installazione npm, unit test e build frontend/backend, ma fallisce sulla vecchia asserzione RC101 di Chromium (`overflowX=auto`). Confermato anche un difetto reale: la palette RC171 a più righe è tagliata dalla riga desktop fissa di 80px. La griglia ora si adatta entro un limite, scorre in verticale e il canvas 16:9 resta visibile. Aggiornate le prove Chromium e inserito un preflight RC178 negativo. **85,25% certificato (43 accettati / 17 parziali)**, senza promuovere gate non accettati. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag/deploy. Dettagli `docs/RC_CYCLE178_EDITOR_PALETTE_CI.it.md`.

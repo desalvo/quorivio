@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC179 — passaggio consegne blocco click editor
+
+**RC179:** risolto il problema CI `41878608401`: la palette RC178 con `z-index:13` copriva il pannello contestuale nello stage con `z-index:1`, impedendo un click nativo su «Duplica selezione». Lo stage viene ora portato sopra la palette **solo** quando gli strumenti di selezione sono aperti. Test Chromium con click reali a 1440×900, 960×800 e 390×844 e test strutturale anticipato; ancora da verificare l'intera CI React/PostgreSQL dopo commit utente. **85,25% certificato (43 gate accettati / 17 parziali)**. `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag/deploy dell'assistente. Vedi `docs/RC_CYCLE179_EDITOR_SELECTION_STACKING_CI.it.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC178 — passaggio consegne CI palette editor
 
 **RC178 dopo RC177:** analizzata la run `41871700136`: installazione npm, unit test e compilazione frontend/backend superati; test Chromium RC101 fallito per vecchia asserzione sullo scorrimento orizzontale. Corretto anche il difetto CSS reale: palette ora a righe adattive con scroll verticale e canvas 16:9 visibile. Aggiornato test Chromium e introdotto preflight RC178 con mutazione negativa. **85,25% certificato (43 accettati / 17 parziali)**; resta il collaudo React/PostgreSQL e su dispositivi fisici. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag/deploy. Vedi `docs/RC_CYCLE178_EDITOR_PALETTE_CI.it.md`.

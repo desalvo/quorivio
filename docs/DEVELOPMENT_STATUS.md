@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC179 — contextual editor pointer and CI
+
+**RC179 after RC178:** diagnosed GitHub Actions `41878608401` editor Chromium timeout: wrapped insertion palette captured native clicks on the visible `Duplica selezione` action because `.editor-stage` had a lower stacking context. Raised stage z-index only while contextual selection tools are open; kept the normal insertion rail usable afterward. Added actual Chromium pointer hit-testing and native duplicate/alignment clicks at 1440/960/390px, plus early CI structural preflight. Previous run passed npm installation, unit tests and TypeScript/Vite build before this browser failure; postcommit full CI remains pending. **85.25% certified (43 accepted, 17 partial)**. `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no assistant commit/push/tag/deploy. See `docs/RC_CYCLE179_EDITOR_SELECTION_STACKING_CI.en.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC178 — Chromium editor palette and canvas visibility
 
 **RC178 after RC177:** GitHub run `41871700136` passed npm installation, unit tests and frontend/backend compilation but failed in legacy RC101 Chromium assertion (`overflowX=auto`). Confirmed real RC171 wrapped catalog was clipped by the fixed 80px desktop rail; replaced the effective grid row with bounded auto sizing, preserved vertical scroll and recapped the 16:9 desktop canvas. Updated actual Chromium check and added negative RC178 CI preflight. **85.25% certified (43 accepted / 17 partial)**, no independent gate promotion. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag/deploy. Details `docs/RC_CYCLE178_EDITOR_PALETTE_CI.en.md`.

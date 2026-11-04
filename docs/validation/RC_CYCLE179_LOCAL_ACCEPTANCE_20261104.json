@@ -1,0 +1,34 @@
+{
+  "version": "0.1.0-dev",
+  "cycle": 179,
+  "date": "2026-11-04",
+  "base": "RC178",
+  "ci_run_analyzed": "41878608401",
+  "ci_job_analyzed": "126744879605",
+  "head_sha": "88d0cbb842b131a5315e92a093e7c2e60349424b",
+  "first_failure": "Chromium editor UI acceptance: native click Duplica selezione intercepted by editor-widget-grid",
+  "root_cause": "The wrapped palette has stacking context z-index 13; fixed canvas tools are descendants of editor-stage z-index 1",
+  "fix": "Raise editor-stage stacking context to 70 only while canvas-editor-group[data-tools-open=true] is present",
+  "native_chromium_red_before_fix": "1440x900: document.elementFromPoint hit owner palette",
+  "local_evidence": {
+    "native_chromium_green_after_fix": ["1440x900", "960x800", "390x844"],
+    "rc178_editor_mock": ["1440x900", "390x844"],
+    "rc171_responsive_palette": ["1440x900", "960x760", "620x740"],
+    "editor_header_context": "pass desktop+mobile",
+    "frontend_node_tests": {"passed": 313, "failed": 0},
+    "python_targeted_unit_tests": {"passed": 9, "failed": 0},
+    "api_node_tests": "not counted: local run exceeded execution limit",
+    "npm_build": "previous RC178 CI completed successfully; RC179 build pending"
+  },
+  "acceptance_credit": 0,
+  "certified_score": 85.25,
+  "accepted_gates": 43,
+  "partial_gates": 17,
+  "rc_strict": false,
+  "publish_image": false,
+  "publish_latest": false,
+  "pending": [
+    "postcommit GitHub CI run with full React/PostgreSQL authentication acceptance",
+    "physical device/operator independent acceptance"
+  ]
+}

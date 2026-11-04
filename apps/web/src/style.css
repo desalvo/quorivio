@@ -2397,3 +2397,13 @@ main.participant-live-view.participant-slide-active .audience-stage-scroll{
 :is(.audience-widget-layout.stage-fidelity,.audience-widget-layout.stage-phone)
   >.page-widget:is([data-widget-kind="image"],[data-widget-kind="logo"],[data-widget-kind="video"])
   >.widget-fit-frame>.widget-fit-content{height:100%!important;min-height:0!important;}
+
+/* RC179: the wrapped insertion palette is visually above the artboard in its
+ * own grid row, but contextual selection controls are position:fixed within
+ * the editor-stage stacking context. As soon as those controls open, raise the
+ * *stage stacking context* above the palette/sidebar, not just its children.
+ * Otherwise the rail intercepts native clicks on 'Duplica selezione'.
+ * Keep the ordinary palette above the stage when the controls are closed. */
+.editor-ux-v2 .editor-stage:has(.canvas-editor-group[data-tools-open="true"]){
+  z-index:70!important;
+}

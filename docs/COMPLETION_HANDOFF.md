@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC179 — Editor contextual pointer handoff
+
+**RC179:** fixed real Chromium editor click obstruction from CI `41878608401`: RC178's multirow palette (z13) covered the stage (z1) floating `Duplica selezione` tool despite its child z48. CSS lifts the stage only while selection tools are open, preserving header and palette behavior. Verified a red-before/green-after native Chromium click at 1440×900, 960×800 and 390×844 plus early Python regression. Re-run full GitHub CI after user commit to confirm the remaining authenticated React/PostgreSQL browser checks. **85.25% certified / 43 accepted / 17 partial**. `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no assistant commit/push/tag/deploy. See `docs/RC_CYCLE179_EDITOR_SELECTION_STACKING_CI.en.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC178 — editor palette/Chromium CI handoff
 
 **RC178 after RC177:** analyzed run `41871700136` where Chromium editor mock failed on legacy x-scroll assertion after successful npm installation, Node unit tests and frontend/backend compilation. Fixed a real CSS clipping bug: wrapped catalog now receives an automatically sized, vertically scrollable row rather than fixed 80px; bounded 16:9 canvas remains visible. Updated the browser assertion and added mutation-tested RC178 preflight. Certified completion **85.25% (43 accepted / 17 partial)**; authenticated/physical-device acceptance pending. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag/deploy. See `docs/RC_CYCLE178_EDITOR_PALETTE_CI.en.md`.
