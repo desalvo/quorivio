@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC163 — TypeScript build handoff
+
+**RC163 after RC162:** fix missing `showQrUrl` editor history declaration and unreachable checks for shape/line in the non-graphic insert path, matching the TS2339/TS2367 errors reported in GitHub run `41756050958`. Early preflight with negative mutations. RC162 history preserved; next step run full CI, then real editor/mobile QR and Docker acceptance. **Certified completion 85.25%** (43 accepted / 17 partial). No assistant commit, push or deploy. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. See `docs/RC_CYCLE163_TYPESCRIPT_BUILD_HOTFIX.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC162 — Smartphone editor and responsive QR handoff
 
 **RC162 after RC161:** a sliding Desktop/Smartphone editor switch, editable phone geometry with automatic defaults and explicit resets, and QR visibility flags (title off by default, URL optional) with compact responsive styling. Mobile edits cannot freeze untouched auto positions or replace canonical desktop geometry. Backend validates QR-only URL option. Regression tests and Chromium compact QR fixture added; full GitHub CI plus authenticated preview/live parity still pending. **Certified completion 85.25%** (43 accepted / 17 partial); no assistant commit, push or deploy. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. See `docs/RC_CYCLE162_SMARTPHONE_QR.en.md`.

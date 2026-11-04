@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC163 — Handoff correzione build TypeScript
+
+**RC163 dopo RC162:** corretti il tipo locale che ometteva `showQrUrl` e i confronti irraggiungibili con `shape`/`line` nella palette non grafica (errori TS2339/TS2367 della run GitHub `41756050958`). Aggiunto preflight anticipato con mutazioni negative. Cronologia RC162 invariata; successivamente eseguire la CI completa e i test reali di editor, QR e Docker. **Completamento certificato 85,25%** (43 accettati / 17 parziali). Nessun commit, push o deploy. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Vedi `docs/RC_CYCLE163_TYPESCRIPT_BUILD_HOTFIX.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC162 — Handoff editor smartphone e QR ridimensionabile
 
 **RC162 dopo RC161:** selettore scorrevole Desktop/Smartphone nell’editor delle pagine, personalizzazione della geometria smartphone soltanto quando modificata con ripristino automatico per widget o pagina, senza alterare il desktop. QR con titolo nascosto per default e URL facoltativa, con righe adattive quando ridimensionato. Validazione backend dell’opzione URL. Test di regressione e prova Chromium con fixture; CI GitHub e accettazione autentica ancora necessarie. **Completamento certificato 85,25%** (43 accettati / 17 parziali); nessun commit, push o deploy. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Vedi `docs/RC_CYCLE162_SMARTPHONE_QR.it.md`.

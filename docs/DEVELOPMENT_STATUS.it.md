@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC163 — Correzione compilazione TypeScript QR e palette grafica
+
+**RC163:** corretti i quattro errori TypeScript della CI GitHub `41756050958`: il tipo locale della cronologia widget ora comprende `showQrUrl`, mentre il ramo non grafico della palette non esegue controlli irraggiungibili su forme e linee; i preset grafici dedicati restano invariati. Inserito un preflight CI anticipato con mutazioni negative. Regressioni locali verificate; build GitHub TypeScript/Vite, browser autenticato e Docker ancora da confermare. **85,25% certificato** (43 accettati / 17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Vedi `docs/RC_CYCLE163_TYPESCRIPT_BUILD_HOTFIX.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC162 — Editor smartphone e opzioni Codice QR
 
 **RC162:** nell’editor standard il selettore scorrevole accessibile permette di passare dal layout desktop 16:9 alla versione smartphone da 390 px modificabile. Le posizioni smartphone sono automatiche finché non sono veramente modificate; font, dimensione e colore del testo possono essere personalizzati per smartphone; ripristino globale o per widget, senza alterare il desktop. Il QR non mostra il titolo per default (anche nei progetti storici), permette di nascondere l’URL nelle proprietà e, quando visibile, riserva spazio al testo anche dopo il ridimensionamento. Validazione server dedicata. Test locali mirati Node/Python e prova Chromium su fixture; CI completa e prova autenticata da confermare. **85,25% certificato** (43 accettati / 17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Vedi `docs/RC_CYCLE162_SMARTPHONE_QR.it.md`.

@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC163 — TypeScript widget history and graphic rail build fix
+
+**RC163:** fixed four GitHub TypeScript build errors (run `41756050958`): the local editor history type now includes the persisted `showQrUrl` option; unreachable shape/line comparisons were removed from the non-graphic widget rail, preserving the dedicated graphic preset branch. Added early negative-mutation CI checks. Local regressions verified; complete GitHub TypeScript/Vite build, authenticated browser checks and Docker still pending. **85.25% certified** (43 accepted / 17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. See `docs/RC_CYCLE163_TYPESCRIPT_BUILD_HOTFIX.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC162 — Smartphone editing slider and QR display preferences
 
 **RC162:** the standard page editor exposes a keyboard-accessible sliding switch between desktop 16:9 and editable 390px smartphone layouts. Phone positions remain generated automatically until a widget is deliberately moved/resized; independent phone typography (font, size, color) can be customized in widget properties, with per-widget and whole-page reset; desktop positions and shared content are preserved. QR defaults to no title (including legacy QR widgets), supports an opt-out destination URL property and uses responsive grid rows to keep enabled URL visible when resized. Data validation refuses QR-only settings on other widgets. Local source, runtime Node, and Chromium fixture checks; full GitHub CI and authenticated QR rendering still pending. **85.25% certified** (43 accepted / 17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. See `docs/RC_CYCLE162_SMARTPHONE_QR.en.md`.
