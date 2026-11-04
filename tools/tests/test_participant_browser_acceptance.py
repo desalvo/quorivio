@@ -26,7 +26,7 @@ class ParticipantBrowserAcceptance(unittest.TestCase):
   self.assertIn('same-origin CSRF/WebSocket policy',self.workflow)
 
  def test_isolated_participants_privacy_idempotency_and_mobile(self):
-  for token in ['browser.new_context(viewport={\'width\':390','two isolated','await vote(p1,\'Yes\')',"await vote(p2,'No')",'await p1.reload','row[\'valid\']==2',"/report.json')).status==401",'/participation']:
+  for token in ['browser.new_context(viewport={\'width\':390','two isolated','await vote(p1,\'Yes\')',"await vote(p2,'No')",'await p1.reload','row[\'responses\']==2',"/report.json')).status==401",'/participation']:
    self.assertIn(token,self.script)
 
  def test_real_http_smoke_recovers_cookie_without_pii(self):

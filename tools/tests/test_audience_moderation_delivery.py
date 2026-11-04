@@ -112,9 +112,16 @@ class AudienceModerationDelivery(unittest.TestCase):
             if s=='question_limit_reached':continue
             self.assertIn(s,CI)
 
-    def test_browser_acceptance_includes_pending_approval_and_revocation(self):
+    def test_legacy_moderation_remains_covered_without_unrequested_participant_panel(self):
+        # RC160 intentionally removed unconditional word/Q&A controls from the
+        # public 16:9 page.  Legacy moderation still has independent real-DB
+        # acceptance, while the real browser tests authored Topic Questions.
         browser=(ROOT/'tools/ci_browser_participant.py').read_text()
-        for val in ('Invia per moderazione','Domanda inviata per approvazione',"{'status':'approved'}","{'status':'rejected'}",'Voto registrato'):
+        moderation=(ROOT/'tools/ci_audience_moderation_postgres.py').read_text()
+        for val in ("{'status':'approved'}", "{'status':'rejected'}",'already_voted','pending_moderation'):
+            self.assertIn(val,moderation)
+        for val in ('TOPIC_WIDGET', 'topic-widgets/', 'Strumenti interattivi', 'widget-answers'):
             self.assertIn(val,browser)
+        self.assertNotIn("get_by_role('button',name='Invia per moderazione')",browser)
 
 if __name__=='__main__':unittest.main()

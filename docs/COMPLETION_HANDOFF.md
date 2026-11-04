@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC165 — Participant/CI handoff
+
+**RC165 after RC164:** fix stale disposable Chromium participant acceptance by writing explicit editable question and topic-question widgets on the legacy Title-only page before activation. Confirm native controls, widget answers and presenter-only topic data; preserve independent legacy moderation coverage and omit standalone Q&A UI. No runtime changes. GitHub full CI and authenticated browser still pending. **85.25% certified** (43 accepted / 17 partial). No assistant commit, push or deploy. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. See `docs/RC_CYCLE165_AUTHORED_PARTICIPANT_BROWSER.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC164 — Chromium palette CI handoff
 
 **RC164 after RC163:** adapt actual Chromium editor rail acceptance to RC161 graphic insert triggers (`data-graphic-palette`) and exercise right-click dialogs for Linee/Forme. Preserve icon-label uniqueness and current runtime; new negative-mutation preflight. Full GitHub CI and authenticated integration remain pending. **Certified completion 85.25%** (43 accepted, 17 partial). No assistant commit/push/deploy; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. See `docs/RC_CYCLE164_GRAPHIC_PALETTE_CHROMIUM.en.md`.

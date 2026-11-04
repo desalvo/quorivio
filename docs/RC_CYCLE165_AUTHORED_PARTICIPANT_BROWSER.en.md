@@ -1,0 +1,9 @@
+# RC165 — Authored participant widget acceptance and legacy Q&A separation
+
+GitHub Actions run `41764378267`, job `126359189722`, successfully compiled RC164 and passed the earlier Chromium editor acceptance. It then failed the participant/PostgreSQL browser test because that fixture created a legacy poll whose page contains only an automatically generated **Title** widget. After RC160 removed unsolicited standalone participant Q&A/answer controls, an answer button outside the authored canvas is not expected and the old test was invalid.
+
+The disposable, loopback-only acceptance now first saves an authored **Question** widget (single-choice Yes/No) and an explicit **Topic Question** widget through the normal page-design PATCH, guarded by `expected_design_revision`, **before** activating the session. Chromium checks both desktop and 390px mobile, default 16:9 mode, native radio controls, response submission, cookie-based reload recovery, idempotent re-submission, and presenter-only PostgreSQL `widget-answers`. It tests a topic question through the dedicated widget and verifies that no unconditional public `AudienceExtensions` panel has returned. Viewer access to presenter reports remains forbidden.
+
+The independent `tools/ci_audience_moderation_postgres.py` retains full historical queue approval/rejection, upvotes, quota, pagination, race and privacy acceptance for the legacy API; this is not a license to reintroduce participant Q&A controls outside author-selected widgets. Regression tests exercise the fixture's actual preparation function using a fake API, including negative mutations, before npm and before the expensive real browser jobs. No production application runtime changed.
+
+Local acceptance is not a substitute for the next GitHub Chromium/PostgreSQL run. Certified completion stays **85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit, push or deployment.

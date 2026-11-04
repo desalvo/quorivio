@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC165 — Authored participant browser acceptance
+
+**RC165:** GitHub `41764378267` failed at authenticated participant Chromium/PostgreSQL because the old fixture expected standalone voting UI on a Title-only legacy poll. The disposable browser acceptance now provisions explicit Question and Topic Question widgets, verifies actual widget answers and topic privacy, and preserves independent legacy moderation acceptance. Runtime unchanged; real CI confirmation pending. **85.25% certified** (43 accepted / 17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. See `docs/RC_CYCLE165_AUTHORED_PARTICIPANT_BROWSER.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC164 — Chromium graphic rail catalog repair
 
 **RC164:** GitHub run `41760453415` exposed an outdated browser palette assertion: graphic insert triggers use `data-graphic-palette` while ordinary widget icons use `data-widget-kind`. Chromium acceptance now enumerates both and checks the Linee/Forme right-click preset menus without inserting a widget. Runtime unchanged, RC163 inventory immutable. **85.25% certified** (43 accepted / 17 partial). Full new CI remains pending; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. See `docs/RC_CYCLE164_GRAPHIC_PALETTE_CHROMIUM.en.md`.

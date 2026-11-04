@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC165 — Handoff test partecipanti
+
+**RC165 dopo RC164:** aggiornata la prova Chromium su sessione locale: aggiunge widget Domanda e Domande sul tema prima dell’avvio, anziché aspettarsi un modulo legacy automatico in pagina con solo Titolo. Verifica risposte al widget e privacy; conserva il test separato di moderazione legacy. Nessuna modifica al runtime. CI GitHub e browser autenticato da confermare. **85,25% certificato** (43 accettati / 17 parziali). Nessun commit, push o deploy. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Vedi `docs/RC_CYCLE165_AUTHORED_PARTICIPANT_BROWSER.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC164 — Handoff collaudo Chromium della palette
 
 **RC164 dopo RC163:** il collaudo reale del rail Chromium riconosce i pulsanti Linee e Forme tramite `data-graphic-palette`, conserva i controlli di unicità e testa i menu contestuali con tasto destro. Nessuna modifica al runtime; preflight con mutazioni negative. CI GitHub e prove autenticate ancora da confermare. **Completamento certificato 85,25%** (43 accettati / 17 parziali). Nessun commit/push/deploy; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Vedi `docs/RC_CYCLE164_GRAPHIC_PALETTE_CHROMIUM.it.md`.

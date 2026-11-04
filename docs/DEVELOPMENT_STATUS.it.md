@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC165 — Collaudo partecipante con widget espliciti
+
+**RC165:** la run GitHub `41764378267` ha fallito nel test Chromium/PostgreSQL perché cercava una risposta automatica in un sondaggio legacy con solo Titolo. Ora la fixture crea widget Domanda e Domande sul tema, valida risposte e privacy e conserva il test autonomo della moderazione legacy. Runtime invariato; nuova CI da confermare. **Completamento certificato 85,25%** (43 accettati / 17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Vedi `docs/RC_CYCLE165_AUTHORED_PARTICIPANT_BROWSER.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC164 — Correzione collaudo della palette grafica
 
 **RC164:** la run `41760453415` ha evidenziato un controllo Chromium obsoleto: le icone standard usano `data-widget-kind`, Linee e Forme usano `data-graphic-palette`. Il collaudo ora identifica entrambe e verifica l’apertura dei menu col tasto destro senza inserimento. Runtime invariato e inventario RC163 storico immutato. **Completamento certificato 85,25%** (43 accettati / 17 parziali). CI completa ancora da confermare; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Vedi `docs/RC_CYCLE164_GRAPHIC_PALETTE_CHROMIUM.it.md`.
