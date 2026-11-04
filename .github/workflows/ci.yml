@@ -88,13 +88,16 @@ jobs:
     name: Production quality gate
     runs-on: ubuntu-24.04
     timeout-minutes: 25
+    # Run-scoped, disposable PostgreSQL credential. This is not a production secret.
+    env:
+      QUORIVIO_CI_DB_PASSWORD: ${{ format('ci-{0}-{1}-{2}', github.run_id, github.run_attempt, github.sha) }}
     services:
       postgres:
         image: postgres:18-alpine
         env:
           POSTGRES_DB: quorivio
           POSTGRES_USER: quorivio
-          POSTGRES_PASSWORD: ci-only-secret
+          POSTGRES_PASSWORD: ${{ format('ci-{0}-{1}-{2}', github.run_id, github.run_attempt, github.sha) }}
         ports:
           - 5432:5432
         options: >-
@@ -107,6 +110,8 @@ jobs:
         with: {persist-credentials: false}
       # Fail before dependency installation / database integration if the
       # cumulative archive has silently dropped an immutable receipt.
+      - name: RC166 disposable CI credential policy and GitGuardian preflight
+        run: python3 -m unittest tools.tests.test_rc166_ci_credentials -q
       - name: Validate historical RC inventory references early
         run: python3 tools/ci_inventory_reference_guard.py
       - name: Validate RC campaign dispatch isolation before dependencies
@@ -482,10 +487,18 @@ jobs:
         run: |
           load_token="$(openssl rand -hex 32)"
           smtp_password="$(openssl rand -hex 32)"
-          echo "::add-mask::$load_token"
-          echo "::add-mask::$smtp_password"
+          admin_password="$(openssl rand -hex 24)"
+          changed_password="$(openssl rand -hex 24)"
+          auth_secret="$(openssl rand -hex 32)"
+          for value in "$load_token" "$smtp_password" "$admin_password" "$changed_password" "$auth_secret"; do
+            echo "::add-mask::$value"
+          done
           echo "QUORIVIO_CI_LOAD_TOKEN=$load_token" >> "$GITHUB_ENV"
           echo "QUORIVIO_CI_SMTP_PASSWORD=$smtp_password" >> "$GITHUB_ENV"
+          echo "QUORIVIO_CI_ADMIN_PASSWORD=$admin_password" >> "$GITHUB_ENV"
+          echo "QUORIVIO_CI_NEW_PASSWORD=$changed_password" >> "$GITHUB_ENV"
+          echo "ADMIN_PASSWORD=$admin_password" >> "$GITHUB_ENV"
+          echo "AUTH_SECRET=$auth_secret" >> "$GITHUB_ENV"
       - name: Start disposable loopback SMTPS for real email MFA acceptance
         shell: bash
         run: |
@@ -513,10 +526,8 @@ jobs:
         run: python3 tools/ci_concurrent_bootstrap_postgres.py
       - name: Start API against real PostgreSQL
         env:
-          DATABASE_URL: postgres://quorivio:ci-only-secret@127.0.0.1:5432/quorivio
-          AUTH_SECRET: ci-only-integration-secret-must-be-long-enough-123
+          DATABASE_URL: ${{ format('postgres://quorivio:ci-{0}-{1}-{2}@127.0.0.1:5432/quorivio', github.run_id, github.run_attempt, github.sha) }}
           ADMIN_EMAIL: admin@example.com
-          ADMIN_PASSWORD: ci-only-administrator-password-123
           PUBLIC_BASE_URL: http://127.0.0.1:8080
           PORT: '8080'
           QUORIVIO_ASSET_DIR: /tmp/quorivio-ci-assets
@@ -543,33 +554,30 @@ jobs:
           grep -qi 'html' /tmp/quorivio-ci-home.html
       - name: Assert database bootstrapping and baseline auth
         env:
-          PGPASSWORD: ci-only-secret
+          PGPASSWORD: ${{ env.QUORIVIO_CI_DB_PASSWORD }}
         run: |
           test "$(psql -h 127.0.0.1 -U quorivio -d quorivio -Atc 'SELECT count(*) FROM users')" = '1'
           test "$(psql -h 127.0.0.1 -U quorivio -d quorivio -Atc "SELECT count(*) FROM information_schema.tables WHERE table_schema='public' AND table_name IN ('auth_flows','api_rate_windows','widget_answers')")" = '3'
           test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8080/api/auth/me)" = '401'
       - name: PostgreSQL federated identity link and revocation acceptance
         env:
-          DATABASE_URL: postgres://quorivio:ci-only-secret@127.0.0.1:5432/quorivio
+          DATABASE_URL: ${{ format('postgres://quorivio:ci-{0}-{1}-{2}@127.0.0.1:5432/quorivio', github.run_id, github.run_attempt, github.sha) }}
           QUORIVIO_CI_FEDERATED_LINK_TEST: '1'
         run: node tools/ci_federated_link_postgres.mjs
       - name: PostgreSQL federated identity management HTTP acceptance
         env:
-          DATABASE_URL: postgres://quorivio:ci-only-secret@127.0.0.1:5432/quorivio
+          DATABASE_URL: ${{ format('postgres://quorivio:ci-{0}-{1}-{2}@127.0.0.1:5432/quorivio', github.run_id, github.run_attempt, github.sha) }}
           QUORIVIO_CI_FEDERATED_IDENTITIES_TEST: '1'
         run: node tools/ci_federated_identity_management_pg.mjs
       - name: PostgreSQL-backed portable and profile lifecycle E2E
         env:
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
-          QUORIVIO_CI_ADMIN_PASSWORD: ci-only-administrator-password-123
-          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
         run: python3 tools/ci_portable_http.py
       - name: PostgreSQL-backed private presenter background library and collaborator copy-on-use
         env:
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
-          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
         run: python3 tools/ci_background_library_postgres.py
       # RC158: the media-picker/Pg acceptance below is a REQUIRED gate, but
       # the earlier Chromium suite is optional on manual workflow_dispatch.
@@ -590,84 +598,74 @@ jobs:
         env:
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
-          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
         run: python3 tools/ci_browser_media_picker_postgres.py
       - name: PostgreSQL RC71 session reset and one-shot timer lifecycle acceptance
         env:
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
-          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
         run: python3 tools/ci_rc71_lifecycle_postgres.py
       - name: PostgreSQL and real TLS SMTP email MFA lifecycle acceptance
         env:
           # This shared, disposable test IP exceeds 100 requests/min across suites.
           # The server accepts the token only when NODE_ENV is not production.
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
-          DATABASE_URL: postgres://quorivio:ci-only-secret@127.0.0.1:5432/quorivio
+          DATABASE_URL: ${{ format('postgres://quorivio:ci-{0}-{1}-{2}@127.0.0.1:5432/quorivio', github.run_id, github.run_attempt, github.sha) }}
           QUORIVIO_CI_MFA_TEST: '1'
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
-          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
           QUORIVIO_CI_SMTP_CAPTURE: /tmp/quorivio-ci-smtps/mail.jsonl
         run: python3 tools/ci_email_mfa_postgres.py
       - name: PostgreSQL TLS SMTP password recovery and session revocation acceptance
         env:
           QUORIVIO_CI_RECOVERY_TEST: '1'
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
-          DATABASE_URL: postgres://quorivio:ci-only-secret@127.0.0.1:5432/quorivio
+          DATABASE_URL: ${{ format('postgres://quorivio:ci-{0}-{1}-{2}@127.0.0.1:5432/quorivio', github.run_id, github.run_attempt, github.sha) }}
           QUORIVIO_CI_SMTP_CAPTURE: /tmp/quorivio-ci-smtps/mail.jsonl
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
-          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
         run: python3 tools/ci_password_recovery_postgres.py
       - name: PostgreSQL session retention and durable erasure outbox acceptance
         env:
-          DATABASE_URL: postgres://quorivio:ci-only-secret@127.0.0.1:5432/quorivio
+          DATABASE_URL: ${{ format('postgres://quorivio:ci-{0}-{1}-{2}@127.0.0.1:5432/quorivio', github.run_id, github.run_attempt, github.sha) }}
           QUORIVIO_CI_RETENTION_TEST: '1'
         run: node tools/ci_retention_postgres.mjs
       - name: PostgreSQL-backed concurrent live lifecycle E2E
         env:
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
-          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
         run: python3 tools/ci_live_http.py
       - name: PostgreSQL audience Q&A concurrency, moderation, privacy and pagination
         env:
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
-          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
           QUORIVIO_CI_MODERATION_TEST: '1'
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
         run: python3 tools/ci_audience_moderation_postgres.py
       - name: PostgreSQL timed-widget fairness, retry and topic concurrency acceptance
         env:
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
-          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
           QUORIVIO_CI_TIMED_TEST: '1'
-          DATABASE_URL: postgres://quorivio:ci-only-secret@127.0.0.1:5432/quorivio
+          DATABASE_URL: ${{ format('postgres://quorivio:ci-{0}-{1}-{2}@127.0.0.1:5432/quorivio', github.run_id, github.run_attempt, github.sha) }}
         run: python3 tools/ci_timed_widgets_postgres.py
 
       - name: PostgreSQL editor concurrent authoring and conflict E2E
         env:
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
-          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
         run: python3 tools/ci_editor_postgres.py
       - name: PostgreSQL 18 legacy widget-answer migration (disposable transactional schema)
         env:
           QUORIVIO_CI_MULTI_QUESTION_TEST: '1'
-          DATABASE_URL: postgres://quorivio:ci-only-secret@127.0.0.1:5432/quorivio
+          DATABASE_URL: ${{ format('postgres://quorivio:ci-{0}-{1}-{2}@127.0.0.1:5432/quorivio', github.run_id, github.run_attempt, github.sha) }}
         run: python3 tools/ci_question_schema_migration_postgres.py
       - name: PostgreSQL independent multi-question widget E2E
         env:
           QUORIVIO_CI_MULTI_QUESTION_TEST: '1'
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
-          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
         run: python3 tools/ci_independent_widget_questions_postgres.py
       - name: Chromium participant UI and PostgreSQL lifecycle (opt-in)
         if: github.event_name == 'workflow_dispatch' && inputs.browser_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite) || (github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[full-ci]') || contains(github.event.head_commit.message, '[publish-docker]')))
         timeout-minutes: 5
         env:
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
-          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
         run: |
           # Test the actual production frontend served by the API, not Vite.
@@ -679,7 +677,6 @@ jobs:
         timeout-minutes: 5
         env:
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
-          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
         run: |
           python3 tools/ci_widget_title_menu.py
@@ -690,7 +687,6 @@ jobs:
         timeout-minutes: 5
         env:
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
-          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
         run: python3 tools/ci_browser_profile.py
       - name: Upload Chromium real editor failure diagnostics
@@ -711,8 +707,7 @@ jobs:
           retention-days: 3
       - name: Start second API replica against shared PostgreSQL 18
         env:
-          DATABASE_URL: postgres://quorivio:ci-only-secret@127.0.0.1:5432/quorivio
-          AUTH_SECRET: ci-only-integration-secret-must-be-long-enough-123
+          DATABASE_URL: ${{ format('postgres://quorivio:ci-{0}-{1}-{2}@127.0.0.1:5432/quorivio', github.run_id, github.run_attempt, github.sha) }}
           PUBLIC_BASE_URL: http://127.0.0.1:8080
           PORT: '8081'
           QUORIVIO_ASSET_DIR: /tmp/quorivio-ci-assets
@@ -731,7 +726,6 @@ jobs:
         env:
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
-          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
         run: |
           python3 -m pip install --disable-pip-version-check --break-system-packages 'aiohttp>=3.9,<4'
           python3 tools/ci_live_replicas.py
@@ -745,7 +739,6 @@ jobs:
         env:
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
-          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
         run: python3 tools/ci_live_idle_snapshots.py
       - name: Optional 500-participant PostgreSQL/WebSocket acceptance
         if: github.event_name == 'workflow_dispatch' && inputs.capacity_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite) || (github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[full-ci]') || contains(github.event.head_commit.message, '[publish-docker]')))
@@ -753,7 +746,6 @@ jobs:
         env:
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
-          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
         run: python3 tools/ci_capacity_500.py
       - name: Optional sustained 500-participant global-latency SLO acceptance
         if: github.event_name == 'workflow_dispatch' && inputs.capacity_slo_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite) || (github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[full-ci]') || contains(github.event.head_commit.message, '[publish-docker]')))
@@ -761,13 +753,11 @@ jobs:
         env:
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
-          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
         run: python3 tools/ci_capacity_500.py --strict-slo
       - name: PostgreSQL two-replica graceful rolling SIGTERM acceptance
         env:
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
-          QUORIVIO_CI_NEW_PASSWORD: ci-only-changed-admin-password-123
         run: python3 tools/ci_graceful_shutdown.py
       - name: Diagnose graceful SIGTERM failure without private session data
         if: failure()
@@ -781,7 +771,7 @@ jobs:
         # Fail closed rather than silently skipping the authenticated encryption
         # and key-rotation portion of the disposable restore test.
         env:
-          DATABASE_URL: postgres://quorivio:ci-only-secret@127.0.0.1:5432/quorivio
+          DATABASE_URL: ${{ format('postgres://quorivio:ci-{0}-{1}-{2}@127.0.0.1:5432/quorivio', github.run_id, github.run_attempt, github.sha) }}
           QUORIVIO_ASSET_DIR: /tmp/quorivio-ci-assets
         run: |
           python3 -m pip install --disable-pip-version-check --break-system-packages 'cryptography>=43,<47'
@@ -1030,7 +1020,8 @@ jobs:
           python3 -m unittest tools.tests.test_rc164_graphic_palette_chromium_contract -q
           python3 tools/verify_rc_cycle164_inventory.py --historical
           python3 -m unittest tools.tests.test_rc165_authored_participant_chromium -q
-          python3 tools/verify_rc_cycle165_inventory.py
+          python3 tools/verify_rc_cycle165_inventory.py --historical
+          python3 tools/verify_rc_cycle166_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

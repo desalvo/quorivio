@@ -36,7 +36,7 @@ def run_fixture(text: str=BROWSER):
             return {'activities':[page]}
         return {'ok':True}
     ns={'BASE':'http://127.0.0.1:8080','WEB':'http://127.0.0.1:8080',
-        'os':SimpleNamespace(environ={'QUORIVIO_CI_ADMIN_EMAIL':'ci@example.invalid','QUORIVIO_CI_NEW_PASSWORD':'ci-only'}),
+        'os':SimpleNamespace(environ={'QUORIVIO_CI_ADMIN_EMAIL':'ci@example.invalid','QUORIVIO_CI_NEW_PASSWORD':('X'*24)}),
         'http':SimpleNamespace(cookiejar=SimpleNamespace(CookieJar=lambda:object())),
         'HTTPCookieProcessor':lambda x:x,'build_opener':lambda x:object(),
         'api':api,'QUESTION_WIDGET':'ci-browser-question','TOPIC_WIDGET':'ci-browser-topic'}

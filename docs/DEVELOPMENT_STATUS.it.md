@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC166 — Hardening delle credenziali CI e triage GitGuardian
+
+**RC166:** CI RC165 `41802327982` completamente verde. Analisi preventiva della segnalazione GitGuardian «Generic Password»: le password fisse del job CI principale sono state sostituite da credenziali effimere; test e documentazione per il triage. **L’incidente specifico non è identificabile senza il percorso del portale GitGuardian**; non chiudere come falso positivo senza prova. Completamento certificato 85,25% (43 accettati / 17 parziali), `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Vedi `docs/RC_CYCLE166_GITGUARDIAN_TRIAGE.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC165 — Collaudo partecipante con widget espliciti
 
 **RC165:** la run GitHub `41764378267` ha fallito nel test Chromium/PostgreSQL perché cercava una risposta automatica in un sondaggio legacy con solo Titolo. Ora la fixture crea widget Domanda e Domande sul tema, valida risposte e privacy e conserva il test autonomo della moderazione legacy. Runtime invariato; nuova CI da confermare. **Completamento certificato 85,25%** (43 accettati / 17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Vedi `docs/RC_CYCLE165_AUTHORED_PARTICIPANT_BROWSER.it.md`.

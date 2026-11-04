@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC166 — Ephemeral CI credentials and GitGuardian triage
+
+**RC166:** full RC165 GitHub run `41802327982` passed. Preventive hardening for external GitGuardian "Generic Password" report: remove fixed credentials in primary CI; use ephemeral run-scoped values. **The actual incident still requires its file/line from the GitGuardian portal**; do not classify it without evidence. Certified completion 85.25% (43 accepted / 17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`. See `docs/RC_CYCLE166_GITGUARDIAN_TRIAGE.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC165 — Authored participant browser acceptance
 
 **RC165:** GitHub `41764378267` failed at authenticated participant Chromium/PostgreSQL because the old fixture expected standalone voting UI on a Title-only legacy poll. The disposable browser acceptance now provisions explicit Question and Topic Question widgets, verifies actual widget answers and topic privacy, and preserves independent legacy moderation acceptance. Runtime unchanged; real CI confirmation pending. **85.25% certified** (43 accepted / 17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. See `docs/RC_CYCLE165_AUTHORED_PARTICIPANT_BROWSER.en.md`.

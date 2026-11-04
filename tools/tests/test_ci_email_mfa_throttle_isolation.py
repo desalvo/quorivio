@@ -82,8 +82,10 @@ class MfaThrottleIsolationTests(unittest.TestCase):
         self.assertIn('if(Number(r.rows[0].hits)>limit)',code)
         self.assertIn('apiRateBudget(rateClass)',code)
         self.assertIn('apiRateClass(req.method,req.path,uid)',code)
-        self.assertIn('::add-mask::$load_token',workflow)
-        self.assertIn('::add-mask::$smtp_password',workflow)
+        # The RC166 policy masks all five run-generated credentials in a
+        # single loop, rather than masking only load-token and SMTP separately.
+        self.assertIn('for value in "$load_token" "$smtp_password" "$admin_password" "$changed_password" "$auth_secret"; do',workflow)
+        self.assertIn('echo "::add-mask::$value"',workflow)
         self.assertIn('QUORIVIO_CI_SMTP_PASSWORD="$QUORIVIO_CI_SMTP_PASSWORD"',workflow)
         step=workflow.split('      - name: PostgreSQL and real TLS SMTP email MFA lifecycle acceptance',1)[1].split('      - name:',1)[0]
         self.assertIn('QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}',step)

@@ -7,6 +7,8 @@ No secrets or raw application/PostgreSQL logs are printed.
 """
 from __future__ import annotations
 import os
+import secrets
+from urllib.parse import quote
 import signal
 import subprocess
 import sys
@@ -18,10 +20,19 @@ from pathlib import Path
 
 DB = 'quorivio_bootstrap_ci'
 PORTS = (19081, 19082)
-BASE = 'postgresql://quorivio:ci-only-secret@127.0.0.1:5432/'
+def ci_database_password() -> str:
+    value = os.environ.get('QUORIVIO_CI_DB_PASSWORD', '')
+    if not value or not os.environ.get('GITHUB_RUN_ID', '').isdigit():
+        raise RuntimeError('Requires a run-scoped disposable CI database credential')
+    return value
+
+
+def ci_database_base() -> str:
+    return 'postgresql://quorivio:' + quote(ci_database_password(), safe='') + '@127.0.0.1:5432/'
+
 
 def psql(statement: str, database: str = 'postgres') -> str:
-    env = {**os.environ, 'PGPASSWORD': 'ci-only-secret', 'PGCONNECT_TIMEOUT': '5'}
+    env = {**os.environ, 'PGPASSWORD': ci_database_password(), 'PGCONNECT_TIMEOUT': '5'}
     try:
         proc = subprocess.run(['psql', '-X', '-v', 'ON_ERROR_STOP=1', '-h', '127.0.0.1',
                                '-U', 'quorivio', '-d', database, '-A', '-t', '-c', statement],
@@ -56,11 +67,11 @@ def execute() -> None:
                 logfile = path.open('w+', encoding='utf8')
                 logs.append(logfile)
                 env = {**os.environ,
-                    'DATABASE_URL': BASE + DB, 'NODE_ENV': 'production',
+                    'DATABASE_URL': ci_database_base() + DB, 'NODE_ENV': 'production',
                     'PORT': str(port), 'PUBLIC_BASE_URL': f'http://127.0.0.1:{port}',
-                    'AUTH_SECRET': 'ci-only-bootstrap-lock-secret-long-enough-2026',
+                    'AUTH_SECRET': secrets.token_urlsafe(48),
                     'ADMIN_EMAIL': 'bootstrap-ci@example.invalid',
-                    'ADMIN_PASSWORD': 'bootstrap-ci-admin-password-long-123',
+                    'ADMIN_PASSWORD': secrets.token_urlsafe(32),
                     'QUORIVIO_ASSET_DIR': str(Path(tmp)/'assets'),
                     'QUORIVIO_CONVERSION_DIR': str(Path(tmp)/'conversions')}
                 processes.append(subprocess.Popen(['node', 'apps/api/dist/server.js'],

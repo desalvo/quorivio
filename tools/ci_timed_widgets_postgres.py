@@ -9,6 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 from copy import copy
 import http.cookiejar
 import os
+from urllib.parse import quote
 from datetime import datetime, timezone
 import subprocess
 import time
@@ -111,14 +112,16 @@ def run():
     request(second,'POST',widget,{'option_id':'yes'})
     request(third,'POST',widget,{'option_id':'yes'})
     pg_url=os.environ.get('DATABASE_URL','')
-    if not pg_url.startswith('postgres://quorivio:ci-only-secret@127.0.0.1:5432/'):
+    db_password=os.environ.get('QUORIVIO_CI_DB_PASSWORD','')
+    allowed='postgres://quorivio:'+quote(db_password,safe='')+'@127.0.0.1:5432/quorivio'
+    if not db_password or pg_url!=allowed or not os.environ.get('GITHUB_RUN_ID','').isdigit():
         raise RuntimeError('Refusing to rewrite ranking times outside disposable CI database')
     sql=("UPDATE widget_answers SET elapsed_ms=CASE "
          "WHEN participant_id=(SELECT id FROM participants WHERE pseudonym='Q&A test participant 502' AND session_id='"+sid+"') THEN 1000 "
          "WHEN participant_id=(SELECT id FROM participants WHERE pseudonym='Q&A test participant 503' AND session_id='"+sid+"') THEN 1000 "
          "ELSE 2000 END "
          "WHERE session_id='"+sid+"' AND activity_id='"+aid+"' AND widget_id='timed1'")
-    pg_env={**os.environ,'PGPASSWORD':'ci-only-secret'}
+    pg_env={**os.environ,'PGPASSWORD':db_password}
     subprocess.run(['psql','-X','-v','ON_ERROR_STOP=1','-h','127.0.0.1','-U','quorivio','-d','quorivio','-c',sql],
                    env=pg_env,capture_output=True,text=True,check=True)
     ranks=request(admin,'GET',f'/api/sessions/{sid}/activities/{aid}/widgets/timed1/timed-leaderboard')['ranking']

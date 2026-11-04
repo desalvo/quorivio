@@ -3,7 +3,7 @@
  * disposable PostgreSQL 18. No external provider and no production credentials.
  */
 import assert from 'node:assert/strict';
-import {randomUUID} from 'node:crypto';
+import {randomUUID,randomBytes} from 'node:crypto';
 import bcrypt from 'bcryptjs';
 import pg from 'pg';
 
@@ -13,7 +13,7 @@ assert.match(process.env.GITHUB_RUN_ID||'',/^\d+$/,'requires GitHub disposable C
 assert.ok(['localhost','127.0.0.1'].includes(url.hostname)&&url.pathname==='/quorivio','disposable loopback database only');
 const base='http://127.0.0.1:8080';
 const db=new pg.Client({connectionString:url.toString()});
-const first=randomUUID(),other=randomUUID(),password='ci-only-federated-password-123';
+const first=randomUUID(),other=randomUUID(),password=randomBytes(24).toString('hex');
 const subject='cycle61-'+randomUUID();
 let created=false;
 async function api(path,method='GET',body,token=''){

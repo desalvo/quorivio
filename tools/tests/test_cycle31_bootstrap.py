@@ -26,7 +26,9 @@ class BootstrapRegression(unittest.TestCase):
     def test_bounded_bootstrap_wait(self):
         self.assertIn("SET lock_timeout = '120s'",HELPER)
     def test_actual_two_process_ci_acceptance(self):
-        self.assertIn('postgresql://quorivio:ci-only-secret@127.0.0.1:5432/',SCRIPT)
+        self.assertIn('QUORIVIO_CI_DB_PASSWORD',SCRIPT)
+        self.assertIn('ci_database_base() + DB',SCRIPT)
+        self.assertNotIn("'PGPASSWORD': 'ci-",SCRIPT)
         self.assertIn('PORTS = (19081, 19082)',SCRIPT)
         self.assertIn('1:1:1',SCRIPT)
         self.assertIn('both processes',SCRIPT)
