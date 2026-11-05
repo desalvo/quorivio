@@ -1,0 +1,55 @@
+{
+  "version": "0.1.0-dev",
+  "cycle": 186,
+  "date": "2026-11-05",
+  "baseline": {
+    "cycle": 185,
+    "last_confirmed_full_green_ci_run": 41993094578,
+    "last_confirmed_full_green_cycle": 184
+  },
+  "feature": {
+    "enter_totp_login": "native form submit with six-digit validation",
+    "email_mfa_enter": true,
+    "recovery_code_enter": true,
+    "verify_button_preserved": true,
+    "duplicate_post_guard": "synchronous useRef lock and busy indicator",
+    "auth_endpoints_changed": false
+  },
+  "local_tests": {
+    "node_frontend": {
+      "passed": 319,
+      "failed": 0
+    },
+    "node_api": {
+      "passed": 593,
+      "failed": 0
+    },
+    "python_targeted": {
+      "passed": 26,
+      "failed": 0
+    },
+    "native_chromium_form_semantics": {
+      "viewports": [
+        "1440x900",
+        "390x844"
+      ],
+      "passed": 2
+    },
+    "main_tsx_syntax": "passed"
+  },
+  "not_yet_verified": [
+    "Production React Chromium login with mocked API (new CI fixture requires Vite bundle)",
+    "New GitHub Actions run for the cumulative RC185+RC186 changes",
+    "Real SMTP or authenticator device MFA integration",
+    "Independent external release signoffs"
+  ],
+  "certified_gate_score": 85.25,
+  "accepted_gates": 43,
+  "partial_gates": 17,
+  "rc_strict": false,
+  "publish_image": false,
+  "publish_latest": false,
+  "assistant_committed": false,
+  "assistant_pushed": false,
+  "assistant_tagged": false
+}

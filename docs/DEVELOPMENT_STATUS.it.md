@@ -1,3 +1,19 @@
+# Quorivio 0.1.0-dev — RC187 — Risposte vere/false facoltative
+
+**RC187:** introdotta chiave vero/falso opzionale per ogni risposta delle domande a scelta singola/multipla, incluse le domande indipendenti, modificabile dalle proprietà e dal menu contestuale del canvas. Il riscontro viene restituito privatamente solo dopo il salvataggio della risposta, senza esporre le soluzioni alla pagina pubblica. Le modifiche aggiornano le revisioni e i retry utilizzano la risposta già salvata. Baseline RC186; ultima CI completamente verde RC184 `41993094578`. Completamento certificato **85,25%** (43 accettati, 17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag eseguito. Vedere `docs/RC_CYCLE187_QUESTION_ANSWER_KEYS.it.md`.
+
+---
+
+# Quorivio 0.1.0-dev — RC186 — Invio per verificare il TOTP
+
+**RC186:** trasformata la sfida MFA in form con invio tramite Enter sul TOTP e anche sui codici Email/recupero, guardia anti-doppio invio e pulsanti di cambio metodo non-submit. Test Python anticipati e Playwright sul React compilato nel workflow CI. Baseline RC185 ancora in attesa della propria CI; ultima campagna completa verde RC184 `41993094578`. Completamento certificato **85,25%** (43 gate accettati, 17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Vedi `docs/RC_CYCLE186_MFA_ENTER.it.md`.
+
+---
+# Quorivio 0.1.0-dev — RC185 — proiezione indipendente e risultati tra pagine
+
+**RC185:** baseline CI verde RC184 run `41993094578` (14 job superati). Implementati schermi indipendenti per presentatore/partecipanti, scelta della pagina pubblica e salto nella navigazione da menu contestuale, widget Risultati da pagine diverse con API autenticate, transazioni sicure e controllo dei riferimenti, salvataggio collaborativo, import/export con rimappatura ID. Nuovi test Node/Python e preflight anticipato. **85,25% certificato (43 gate accettati/17 parziali)**; ancora da validare la nuova CI completa e i collaudi indipendenti. Nessun commit/push/tag. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Vedi `docs/RC_CYCLE185_DUAL_PROJECTION.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC184 — aggiornamento APT di sicurezza nel convertitore
 
 **RC184:** GitHub Actions run `41988947593` ha superato Production quality gate, Chromium/PostgreSQL, ClamAV e le prove Kubernetes/Podman/OCI; blocco residuo in Trivy sull'immagine converter: `apt`/`libapt-pkg7.0` 3.0.3 vulnerabili a CVE-2026-109518 (corretti in 3.0.4). Aggiunto upgrade anticipato *fail-closed* nel Dockerfile, verifica versione installata e preflight security/Trivy prima dei test costosi, lasciando il controllo HIGH/CRITICAL bloccante. Stato **85,25% certificato (43 accettati / 17 parziali)**; `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nuova scansione Trivy in CI necessaria. Nessun commit/push/tag. Vedi `docs/RC_CYCLE184_CONVERTER_APT_SECURITY.it.md`.

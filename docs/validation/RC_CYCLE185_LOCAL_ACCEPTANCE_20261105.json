@@ -1,0 +1,55 @@
+{
+  "version": "0.1.0-dev",
+  "cycle": 185,
+  "date": "2026-11-05",
+  "baseline": {
+    "cycle": 184,
+    "github_run_id": 41993094578,
+    "github_conclusion": "success",
+    "commit": "45f76e57b4c9e7a2acd3687893040d2d6d6658e6"
+  },
+  "implementation": {
+    "presenter_activity": "session.presenter_activity_id",
+    "audience_activity": "session.current_activity_id",
+    "editor_menu": "per-page audience target and skip presenter",
+    "result_widget": "authenticated cross-page targetActivityId and targetWidgetId",
+    "session_reference_guard": "same-session server validation and transactional lock",
+    "portable": "new IDs and remapped cross-page references",
+    "collaboration": "autosave, three-way merge, JSON recovery"
+  },
+  "local_tests": {
+    "node_api_full": {
+      "pass": 593,
+      "fail": 0
+    },
+    "node_web_full": {
+      "pass": 319,
+      "fail": 0
+    },
+    "python_targeted_rc185_and_historical": {
+      "pass": 31,
+      "fail": 0
+    },
+    "typescript_syntax_transpile": {
+      "files": 9,
+      "errors": 0
+    },
+    "negative_validation": "out-of-session, malformed and dangling links rejected"
+  },
+  "not_verified_here": [
+    "Real Vite/TypeScript typecheck build (npm dependency installation unavailable offline)",
+    "Real authenticated React+PostgreSQL dual-page browser end-to-end",
+    "WebSocket multi-replica propagation of independent page pointers",
+    "Full Python integration suite and new GitHub Actions run",
+    "Independent RC signoffs for physical devices, public TLS, GDPR/AGID and disaster recovery"
+  ],
+  "certified_gate_score": 85.25,
+  "accepted_gates": 43,
+  "partial_gates": 17,
+  "rc_strict": false,
+  "publish_image": false,
+  "publish_latest": false,
+  "assistant_committed": false,
+  "assistant_pushed": false,
+  "assistant_tagged": false
+}

@@ -198,6 +198,22 @@ jobs:
         run: |
           python3 tools/ci_converter_apt_security.py
           python3 -m unittest tools.tests.test_rc184_converter_apt_security -q
+      # RC185: independent presenter/audience routing, same-session result links
+      # and portable ID remapping are checked before npm and PostgreSQL.
+      - name: RC185 cross-page live presentation and scoped results preflight
+        run: |
+          python3 -m unittest tools.tests.test_rc185_cross_page_projection -q
+          node --experimental-strip-types --test apps/api/test/rc185-dual-projection.test.ts apps/web/test/rc185-projection-navigation.test.ts
+      # RC186: Enter in the second-factor input must submit the same validated
+      # form as the visible button, without triggering duplicate MFA requests.
+      - name: RC186 TOTP Enter and secure second-factor form preflight
+        run: python3 -m unittest tools.tests.test_rc186_totp_keyboard -q
+      # RC187: grading must remain opt-in, scoped to each answer revision and
+      # disclosed only to the participant after the server commits the response.
+      - name: RC187 optional true-false question keys and private post-submit feedback
+        run: |
+          python3 -m unittest tools.tests.test_rc187_answer_key_contracts -q
+          node --experimental-strip-types --test apps/api/test/widget-answer-key.test.ts apps/web/test/widget-answer-key-ui.test.ts
       - name: RC170 schema-owned footer number and phone preview/live parity preflight
         run: python3 -m unittest tools.tests.test_rc170_phone_footer_number_parity -q
       - name: Validate RC105 floating dialogs and selection-only resize geometry before npm
@@ -515,6 +531,9 @@ jobs:
           python3 tools/ci_rehearsal_singleton_offline_chromium.py
           # Real built React: one-time account recovery bearer never lingers in URL/history.
           python3 tools/ci_recovery_url_chromium.py
+          # RC186: the compiled React login form accepts Enter on TOTP,
+          # email and recovery code inputs; repeated Enter cannot replay MFA.
+          python3 tools/ci_rc186_mfa_enter_chromium.py
           # Native modal must be acknowledged before querying page controls.
           python3 tools/ci_cookie_modal_order_chromium.py
           # Verify native hit-testing against the real stylesheet before the
@@ -1100,7 +1119,10 @@ jobs:
           python3 tools/verify_rc_cycle181_inventory.py --historical
           python3 tools/verify_rc_cycle182_inventory.py --historical
           python3 tools/verify_rc_cycle183_inventory.py --historical
-          python3 tools/verify_rc_cycle184_inventory.py
+          python3 tools/verify_rc_cycle184_inventory.py --historical
+          python3 tools/verify_rc_cycle185_inventory.py --historical
+          python3 tools/verify_rc_cycle186_inventory.py --historical
+          python3 tools/verify_rc_cycle187_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

@@ -2461,3 +2461,15 @@ main.participant-live-view.participant-slide-active .audience-stage-scroll{
   overflow:visible!important;
   text-overflow:clip!important;
 }
+/* RC187 – answer-key editing and post-submission assessment. Keys never appear
+   in the public slide; the feedback panel is populated by the response API. */
+.widget-truth-properties,.widget-truth-context{display:grid;gap:.45rem;min-width:0;padding:.65rem;border:1px solid #94a3b8;border-radius:8px;max-width:100%}
+.widget-truth-properties label,.widget-truth-context label{display:flex;align-items:center;justify-content:space-between;gap:.5rem;min-width:0;flex-wrap:wrap}
+.widget-truth-properties select,.widget-truth-context select{min-width:5.6rem;max-width:100%;background:#fff;color:#0f172a}
+.widget-truth-context{font-size:.85rem;max-width:min(260px,85vw)}
+.widget-truth-context small{font-size:.75rem;overflow-wrap:anywhere}
+.widget-answer-feedback{margin-top:.65rem;padding:.65rem .8rem;border:1px solid #64748b;border-radius:9px;background:#f1f5f9;color:#0f172a;max-width:100%;overflow-wrap:anywhere}
+.widget-answer-feedback[data-answer-correct="true"]{border-color:#15803d;background:#f0fdf4}
+.widget-answer-feedback[data-answer-correct="false"]{border-color:#b91c1c;background:#fef2f2}
+.widget-answer-feedback ul{margin:.4rem 0 .1rem;padding-left:1.35rem}
+.widget-answer-feedback li{padding:.15rem 0}

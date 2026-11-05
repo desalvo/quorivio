@@ -15,3 +15,7 @@ export function presenterKeyboardDirection(event:{key:string;altKey?:boolean;ctr
  if(event.key==='ArrowRight'||event.key==='ArrowDown'||event.key==='PageDown')return 1;
  return null;
 }
+/** Pages hidden from the presenter stay available to the audience and results. */
+export function presenterVisiblePages<T extends PresenterPage & {page_design?:{presenterHidden?:boolean}|null}>(activities:readonly T[]):T[]{
+ return activities.filter(page=>page.page_design?.presenterHidden!==true);
+}

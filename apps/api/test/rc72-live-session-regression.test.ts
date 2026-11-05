@@ -9,7 +9,7 @@ test('restarting a page timer requires an explicit preservation choice',()=>{
 });
 test('starting a scheduled session renews expired attendee access and keeps cookie-scoped URLs',()=>{
  assert.match(src,/GREATEST\(expires_at,now\(\)\+interval '24 hours'\)/);
- assert.match(src,/SET current_activity_id=\$1,expires_at=GREATEST/);
+ assert.match(src,/SET current_activity_id=\$1,presenter_activity_id=\$3,expires_at=GREATEST/);
  assert.match(src,/join_url:`\/join\/\$\{s\.join_secret\}`/);
  assert.match(src,/allowedLiveOrigin\(origin,publicBase\)/);
 });

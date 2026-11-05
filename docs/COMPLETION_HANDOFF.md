@@ -1,3 +1,22 @@
+# RC187 — Optional true/false answer keys handoff
+
+RC187 extends the uncommitted cumulative RC186 baseline with optional single/multiple-choice grading, independent question answer keys, widget properties and canvas contextual editor selectors, default-False behavior, full reset, and private post-submission answer feedback. Answer keys stay hidden from public snapshots, revisions isolate changes and duplicate requests reference stored submissions. Local Node/Python regressions pass; full GitHub CI with TypeScript/Vite and authenticated React/PostgreSQL still pending. Last fully green GitHub run RC184 `41993094578`. Certified **85.25%** (43 accepted, 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. See `docs/RC_CYCLE187_QUESTION_ANSWER_KEYS.en.md`.
+
+---
+
+# RC186 — TOTP Enter keyboard handoff
+
+RC185 remains the cumulative uncommitted functional baseline in this conversation. RC186 makes the TOTP field submit on Enter through a real form, with validation and a one-request-at-a-time guard while preserving the email and recovery MFA paths. Added early source contracts and a built React Chromium CI fixture. GitHub build/browser acceptance must be checked after the next commit. Last confirmed full green RC184 run `41993094578`. Certified **85.25%** (43 accepted, 17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no assistant commit/push/tag. See `docs/RC_CYCLE186_MFA_ENTER.en.md`.
+
+---
+# RC185 — Dual projection and cross-page results handoff
+
+Baseline: RC184 user-committed, GitHub Actions `41993094578` success (14 successful jobs). New source provides two independent projection pointers, canvas routing and presenter navigation skipping, cross-page live results through existing authenticated APIs, server-side scope/identity checks, portable archive remap and autosave/three-way merge support. See `docs/RC_CYCLE185_DUAL_PROJECTION.en.md` and validation receipt. No commit/push/tag done. Certified completion stays **85.25% / 43 accepted + 17 partial**. After user commit, verify migrations/real PostgreSQL with question page hidden from presenter, results-only presenter page mapping to public questions, WebSocket and native browsers, portable roundtrip and full CI with no publication.
+
+
+Release flags: `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+---
 # Quorivio 0.1.0-dev — RC184 — converter APT security update
 
 **RC184:** GitHub Actions run `41988947593` passed Production quality gate, Chromium/PostgreSQL, ClamAV and Kubernetes/Podman/OCI checks; the only RC failure was the converter Trivy scan: `apt`/`libapt-pkg7.0` 3.0.3 vulnerable to CVE-2026-109518 (fixed in 3.0.4). Added early fail-closed APT upgrade and installed-version check in the Dockerfile, plus a security/Trivy preflight before expensive tests, preserving the blocking HIGH/CRITICAL scan. **85.25% certified (43 accepted/17 partial)**; `rc_strict=false`, `publish_image=false`, `publish_latest=false`; the next CI must validate the actual Trivy scan. No assistant commit/push/tag. See `docs/RC_CYCLE184_CONVERTER_APT_SECURITY.en.md`.

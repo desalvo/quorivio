@@ -353,3 +353,6 @@ CREATE INDEX IF NOT EXISTS live_connections_recent_idx ON live_connections(sessi
 ALTER TABLE sessions ADD COLUMN IF NOT EXISTS demo_template_key text;
 CREATE UNIQUE INDEX IF NOT EXISTS uq_sessions_owner_demo_template
  ON sessions(owner_id,demo_template_key) WHERE demo_template_key IS NOT NULL;
+
+-- RC185: independent presenter and audience projection pointers.
+ALTER TABLE sessions ADD COLUMN IF NOT EXISTS presenter_activity_id uuid;

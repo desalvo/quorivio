@@ -1,12 +1,17 @@
 /** Page-scoped presenter statistics; result controls never reference participants directly. */
 export const STATISTICAL_WIDGET_KINDS=['question','timed-quiz','rating','reactions','topic-question'] as const;
-export type StatisticalWidget={id:string;kind:string;label?:string;answerMode?:string;options?:{id:string;label:string}[];targetWidgetId?:string;targetQuestionId?:string;questions?:{id:string;label:string;answerMode?:string;options?:{id:string;label:string}[]}[];resultsView?:string;resultsOnly?:boolean;showTitle?:boolean};
+export type StatisticalWidget={id:string;kind:string;label?:string;answerMode?:string;options?:{id:string;label:string}[];targetWidgetId?:string;targetActivityId?:string;targetQuestionId?:string;questions?:{id:string;label:string;answerMode?:string;options?:{id:string;label:string}[]}[];resultsView?:string;resultsOnly?:boolean;showTitle?:boolean};
 export type StatRow={id:string;label:string;count:number};
 export function eligibleStatisticSources(widgets:StatisticalWidget[],excluding?:string):StatisticalWidget[]{
  return widgets.filter(w=>w.id!==excluding&&(STATISTICAL_WIDGET_KINDS as readonly string[]).includes(w.kind));
 }
 export function linkedStatisticSource(widget:StatisticalWidget,widgets:StatisticalWidget[]):StatisticalWidget|undefined{
  return eligibleStatisticSources(widgets,widget.id).find(w=>w.id===widget.targetWidgetId);
+}
+/** Strictly resolve results against an activity from the same authenticated
+ * owner snapshot. No public participant snapshot contains other pages. */
+export function linkedStatisticActivity<T extends {id:string;page_design?:{widgets?:StatisticalWidget[]}}>(widget:StatisticalWidget,current:T,activities:readonly T[]):T|undefined{
+ return widget.targetActivityId?activities.find(activity=>activity.id===widget.targetActivityId):current;
 }
 export type ResultView='bars'|'pie'|'table'|'cloud';
 /** The source question/quiz/poll controls the appearance; result widgets cannot override it. */

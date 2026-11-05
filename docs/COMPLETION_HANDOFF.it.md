@@ -1,3 +1,22 @@
+# RC187 — Handoff risposte vere/false opzionali
+
+RC187 estende la RC186 cumulativa non ancora committata con valutazione facoltativa vero/falso per opzioni singole/multiple e domande indipendenti, controlli nelle proprietà e nel menu contestuale della widget, opzioni inizialmente false e reset completo. Il server comunica la correzione solo dopo il salvataggio della risposta, senza esporre le chiavi nelle proiezioni pubbliche; le revisioni isolano le modifiche e i retry fanno riferimento alla risposta realmente salvata. Test Node/Python locali superati; build TypeScript/Vite e collaudi React/PostgreSQL nella prossima CI ancora da verificare. Ultima CI completamente verde RC184 `41993094578`. Completamento certificato **85,25%** (43 gate accettati, 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag eseguito. Vedere `docs/RC_CYCLE187_QUESTION_ANSWER_KEYS.it.md`.
+
+---
+
+# RC186 — Handoff conferma TOTP con Invio
+
+RC185 è la baseline cumulativa non ancora committata in questa chat. RC186 corregge l’impossibilità di premere Enter sul TOTP: vero form con submit, campo numerico da sei cifre, protezione contro POST MFA ripetuti, stessi flussi Email e codici di recupero. Test sorgente anticipati e Playwright su React compilato nella CI. Restano da verificare build e browser su GitHub e successivamente l’accettazione indipendente. CI completamente verde confermata per RC184, run `41993094578`. **85,25%** certificato (43/17). `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Vedi `docs/RC_CYCLE186_MFA_ENTER.it.md`.
+
+---
+# RC185 — Handoff doppia proiezione e risultati tra pagine
+
+Baseline RC184 committata, CI GitHub Actions `41993094578` verde (14 job superati). Sviluppati due puntatori di proiezione indipendenti, configurazione dal menu contestuale, salto delle pagine nello schermo presentatore, risultati live da pagine differenti, protezione server e remapping negli archivi portabili, autosalvataggio e merge. Vedi `docs/RC_CYCLE185_DUAL_PROJECTION.it.md`. Nessun commit/push/tag da parte dell'assistente. Punteggio **85,25% (43 gate accettati e 17 parziali)**. Dopo il commit verificare migrazione e test PostgreSQL reali con domanda nascosta al presentatore, proiezione dei soli risultati e stessa domanda pubblica, WebSocket, browser reali, import/export e intera CI, senza pubblicazione.
+
+
+Release flags: `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+---
 # Quorivio 0.1.0-dev — RC184 — aggiornamento APT di sicurezza nel convertitore
 
 **RC184:** GitHub Actions run `41988947593` ha superato Production quality gate, Chromium/PostgreSQL, ClamAV e le prove Kubernetes/Podman/OCI; blocco residuo in Trivy sull'immagine converter: `apt`/`libapt-pkg7.0` 3.0.3 vulnerabili a CVE-2026-109518 (corretti in 3.0.4). Aggiunto upgrade anticipato *fail-closed* nel Dockerfile, verifica versione installata e preflight security/Trivy prima dei test costosi, lasciando il controllo HIGH/CRITICAL bloccante. Stato **85,25% certificato (43 accettati / 17 parziali)**; `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nuova scansione Trivy in CI necessaria. Nessun commit/push/tag. Vedi `docs/RC_CYCLE184_CONVERTER_APT_SECURITY.it.md`.

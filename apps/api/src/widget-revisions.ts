@@ -5,8 +5,9 @@ export function widgetAnswerShapeChanged(old:any,next:any):boolean {
   const mode=timed?(w.answerMode==='multiple'?'multiple':'single'):(w.answerMode||'text');
   const options=w.options||[];
   const base:any={answerMode:mode,required:w.required!==false,options,questions:w.questions??null};
-  if(timed){
-   base.durationSeconds=w.durationSeconds??30;
+  if(timed||w.answerKeyEnabled===true){
+   base.answerKeyEnabled=timed?'timed':true;
+   if(timed)base.durationSeconds=w.durationSeconds??30;
    // Match the scorer's precedence: the legacy single-answer key wins over
    // an empty or stale array, while multiple-answer quizzes use the array.
    if(mode==='multiple')base.correctOptionIds=Array.isArray(w.correctOptionIds)?w.correctOptionIds:[];
@@ -95,7 +96,8 @@ export function questionRevisionAtHistory(
    answerMode:timed?(part.answerMode==='multiple'?'multiple':'single'):(part.answerMode||'text'),
    required:part.required!==false,options:part.options||[],
    // The timer is shared by the visual widget: a duration change affects every question.
-   ...(timed?{durationSeconds:widget.durationSeconds??30,
+   ...(timed||part.answerKeyEnabled===true?{answerKeyEnabled:timed?'timed':true,
+    ...(timed?{durationSeconds:widget.durationSeconds??30}:{}),
     correctIds:part.answerMode==='multiple'?(part.correctOptionIds||[]):
       typeof part.correctOptionId==='string'&&part.correctOptionId
       ?[part.correctOptionId]:Array.isArray(part.correctOptionIds)&&part.correctOptionIds.length===1

@@ -27,6 +27,8 @@ export function validateEditablePageDraft(value:unknown):EditablePageDraft{
   if(typeof widget.kind!=='string'||!widget.kind||widget.kind.length>80)throw Error('invalid_page_widget_kind');
   ids.add(widget.id);
  }
+ if(value.audiencePageId!==undefined&&(typeof value.audiencePageId!=='string'||!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value.audiencePageId)))throw Error('invalid_audience_page');
+ if(value.presenterHidden!==undefined&&typeof value.presenterHidden!=='boolean')throw Error('invalid_presenter_visibility');
  if(value.mobile!==undefined&&!validMobilePageLayout(value.mobile,value.widgets))throw Error('invalid_mobile_page_layout');
  validateTree(value,0,{count:50_000});
  return value as EditablePageDraft;

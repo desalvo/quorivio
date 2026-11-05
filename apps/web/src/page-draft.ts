@@ -1,9 +1,9 @@
 import type {MobilePageLayout} from '../../api/src/domain';
 /** Deterministic dirty-state signature for the complete editable page draft. */
-export type EditablePageDraft={mobile?:MobilePageLayout;widgets:unknown[];questionHeader:string;resultHeader:string;questionBackground:string;resultBackground:string;questionBackgroundColor:string;resultBackgroundColor:string;questionBackgroundAsset:string;resultBackgroundAsset:string};
+export type EditablePageDraft={audiencePageId?:string;presenterHidden?:boolean;mobile?:MobilePageLayout;widgets:unknown[];questionHeader:string;resultHeader:string;questionBackground:string;resultBackground:string;questionBackgroundColor:string;resultBackgroundColor:string;questionBackgroundAsset:string;resultBackgroundAsset:string};
 export function pageDraftSignature(d:EditablePageDraft):string{return JSON.stringify(d)}
 export function pageDraftFromActivity(a:{page_design?:any;result_design?:any}):EditablePageDraft{
  const q=a.page_design||{},r=a.result_design||{};
- return {...(q.mobile?{mobile:q.mobile}:{}),widgets:q.widgets||[],questionHeader:q.header||'',resultHeader:r.header||'',questionBackground:q.backgroundUrl||'',resultBackground:r.backgroundUrl||'',questionBackgroundColor:q.backgroundColor||'',resultBackgroundColor:r.backgroundColor||'',questionBackgroundAsset:q.backgroundAssetId||'',resultBackgroundAsset:r.backgroundAssetId||''};
+ return {...(q.audiencePageId?{audiencePageId:q.audiencePageId}:{}),...(q.presenterHidden===true?{presenterHidden:true}:{}),widgets:q.widgets||[],questionHeader:q.header||'',resultHeader:r.header||'',questionBackground:q.backgroundUrl||'',resultBackground:r.backgroundUrl||'',questionBackgroundColor:q.backgroundColor||'',resultBackgroundColor:r.backgroundColor||'',questionBackgroundAsset:q.backgroundAssetId||'',resultBackgroundAsset:r.backgroundAssetId||'',...(q.mobile?{mobile:q.mobile}:{})};
 }
 export function validDesignRevision(value:unknown):value is number{return typeof value==='number'&&Number.isSafeInteger(value)&&value>=1}

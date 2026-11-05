@@ -12,6 +12,7 @@ import {ASSET_DELETE_WITH_CLEANUP_SQL,drainAssetErasureJobs,PROFILE_ERASURE_ENQU
 import {profilePhotoId,publicPresenterProfiles} from './profile-photo.js';
 import {inspectProfileImage} from './profile-image.js';
 import {authCookieIssuedAt,presenterAuthActive} from './live-auth.js';
+import {firstPresenterPage,audienceForPresenter,validAudienceMapping,PAGE_UUID,validPortablePageRouting,remapPortablePageRouting} from './presentation-routing.js';
 import {SESSION_CHANNEL,startSessionBus} from './session-bus.js';
 import {boundedFederatedJson} from './federated-response.js';
 import {FEDERATED_LINK_ELIGIBLE_SQL,FEDERATED_LINK_INSERT_SQL,validFederatedLinkIssuedAt} from './federated-link.js';
@@ -27,9 +28,10 @@ import {smtpConfigFromEnv,sendTestEmail,sendPasswordResetEmail,sendEmailOtp} fro
 import {createEmailOtp,emailOtpDigest,matchesEmailOtp,validEmailOtp} from './email-otp.js';
 import {sealSmtpConfig,openSmtpConfig,validateSmtpInput,publicSmtpConfig} from './smtp-store.js';
 import {widgetAnswerShapeChanged,aggregateWidgetAnswerRevisions,aggregateShortTextAnswers,liveTimedWidgetMutation,questionRevisionAtHistory} from './widget-revisions.js';
+import {answerKeyIds,gradeChoiceAnswer} from './widget-answer-key.js';
 import {normalizeWord,validateQuestion,moderationStatus,safeFrequency,parseModerationQueueQuery,parseModerationBulk} from './audience-tools.js';
 import {validPageOrder} from './page-sequence.js';
-import express from 'express';import helmet from 'helmet';import pg from 'pg';import bcrypt from 'bcryptjs';import QRCode from 'qrcode';import {WebSocketServer,WebSocket} from 'ws';import {liveSessionActive,livePresenterAuthorized,liveParticipantAuthorized} from './live-socket-policy.js';import {createLiveSnapshotQueue} from './live-snapshot-queue.js';import {createLivePeriodicRefresh} from './live-periodic-refresh.js';import {deliverLiveSnapshot} from './live-broadcast.js';import {shouldDropSlowSocket} from './live-delivery-policy.js';import {createServer} from 'node:http';import {randomUUID,randomBytes,createHash,createHmac,timingSafeEqual} from 'node:crypto';import {readFileSync,existsSync} from 'node:fs';import {mkdir,writeFile,readFile,unlink,rm,copyFile} from 'node:fs/promises';import {validAsset} from './asset-policy.js';import {receiveAssetStream} from './stream-upload.js';import {scanUploadedFile} from './malware-scan.js';import {classifyBackgroundUploadFailure,backgroundUploadLog,type BackgroundUploadPhase} from './background-upload-failure.js';import {readdir,stat} from 'node:fs/promises';import path from 'node:path';import {fileURLToPath} from 'node:url';import {validTransition,validateOptions,checkAnswer,publicActivity,escapeCsvCell,validRetentionDays,validPageDesign,validPseudonym,validAnswerMode,validateSubmittedAnswer,validReaction,type Activity,type SessionStatus} from './domain.js';
+import express from 'express';import helmet from 'helmet';import pg from 'pg';import bcrypt from 'bcryptjs';import QRCode from 'qrcode';import {WebSocketServer,WebSocket} from 'ws';import {liveSessionActive,livePresenterAuthorized,liveParticipantAuthorized} from './live-socket-policy.js';import {createLiveSnapshotQueue} from './live-snapshot-queue.js';import {createLivePeriodicRefresh} from './live-periodic-refresh.js';import {deliverLiveSnapshot} from './live-broadcast.js';import {shouldDropSlowSocket} from './live-delivery-policy.js';import {createServer} from 'node:http';import {randomUUID,randomBytes,createHash,createHmac,timingSafeEqual} from 'node:crypto';import {readFileSync,existsSync} from 'node:fs';import {mkdir,writeFile,readFile,unlink,rm,copyFile} from 'node:fs/promises';import {validAsset} from './asset-policy.js';import {receiveAssetStream} from './stream-upload.js';import {scanUploadedFile} from './malware-scan.js';import {classifyBackgroundUploadFailure,backgroundUploadLog,type BackgroundUploadPhase} from './background-upload-failure.js';import {readdir,stat} from 'node:fs/promises';import path from 'node:path';import {fileURLToPath} from 'node:url';import {validTransition,validateOptions,checkAnswer,publicActivity,publicTheme,escapeCsvCell,validRetentionDays,validPageDesign,validPseudonym,validAnswerMode,validateSubmittedAnswer,validReaction,type Activity,type SessionStatus} from './domain.js';
 const db=new pg.Pool({connectionString:process.env.DATABASE_URL});const secret=process.env.AUTH_SECRET||'';if(secret.length<32)throw new Error('AUTH_SECRET must have >= 32 characters');
 const base=process.env.PUBLIC_BASE_URL||'http://localhost:8080';let publicBase=base;const app=express();app.disable('x-powered-by');
 // Vite HMR is used only in development; production serves precompiled local assets.
@@ -82,7 +84,7 @@ app.use('/api/join/:code',async(req,res,next)=>{
 });
 async function owner(id:string,uid:string){const r=await db.query('SELECT s.* FROM sessions s WHERE s.id=$1 AND (s.owner_id=$2 OR EXISTS (SELECT 1 FROM session_presenters sp WHERE sp.session_id=s.id AND sp.user_id=$2))',[id,uid]);return r.rows[0] as (Record<string,any>|undefined)}
 const validDate=(x:string)=>/^\d{4}-\d{2}-\d{2}$/.test(x)&&!Number.isNaN(Date.parse(x));
-const strip=(s:any)=>({access_role:s.access_role||'owner',id:s.id,title:s.title,reference_date:s.reference_date,join_code:s.join_code,status:s.status,expires_at:s.expires_at,current_activity_id:s.current_activity_id,allow_anonymous:s.allow_anonymous,show_results:s.show_results,theme:s.theme,retention_days:s.retention_days,demo_template_key:s.demo_template_key||null,join_url:`/join/${s.join_secret}`});
+const strip=(s:any)=>({access_role:s.access_role||'owner',id:s.id,title:s.title,reference_date:s.reference_date,join_code:s.join_code,status:s.status,expires_at:s.expires_at,current_activity_id:s.current_activity_id,presenter_activity_id:s.presenter_activity_id||s.current_activity_id,allow_anonymous:s.allow_anonymous,show_results:s.show_results,theme:s.theme,retention_days:s.retention_days,demo_template_key:s.demo_template_key||null,join_url:`/join/${s.join_secret}`});
 async function snapshot(sid:string){const s=(await db.query('SELECT * FROM sessions WHERE id=$1',[sid])).rows[0];if(!s)return null;const acts=(await db.query('SELECT * FROM activities WHERE session_id=$1 ORDER BY position',[sid])).rows as Activity[];const counts=(await db.query('SELECT a.id AS activity_id,r.option_id,count(*)::int AS count FROM activities a JOIN responses r ON r.activity_id=a.id AND r.invalidated_at IS NULL WHERE a.session_id=$1 GROUP BY a.id,r.option_id',[sid])).rows;const totals=(await db.query('SELECT activity_id,count(*)::int AS count FROM responses WHERE invalidated_at IS NULL AND activity_id IN (SELECT id FROM activities WHERE session_id=$1) GROUP BY activity_id',[sid])).rows;const reactions=(await db.query('SELECT activity_id,emoji,count(*)::int AS count FROM page_reactions WHERE session_id=$1 GROUP BY activity_id,emoji',[sid])).rows;return {session:strip(s),activities:acts,results:counts,totals,reactions,connected_participants:await connectedParticipants(sid)};}
 const sockets=new Map<string,Set<WebSocket>>();
 const liveSocketIds=new WeakMap<WebSocket,string>();
@@ -958,8 +960,8 @@ app.get('/api/sessions',requireAuth,requirePresenter,async(req,res)=>{try{
 app.post('/api/sessions',requireAuth,requirePresenter,async(req,res)=>{try{const title=String(req.body?.title||'').trim();const referenceDate=String(req.body?.reference_date||new Date().toISOString().slice(0,10));if(!title||title.length>160||!validDate(referenceDate)){res.status(400).json({error:'invalid_title'});return}const uid=auth(req)!;const u=(await db.query('SELECT organization_id FROM users WHERE id=$1',[uid])).rows[0];if(!u){res.status(401).end();return}const id=randomUUID(),code=randomBytes(5).toString('hex').toUpperCase(),joinSecret=randomBytes(20).toString('base64url');const r=await db.query(`INSERT INTO sessions(id,organization_id,owner_id,title,join_code,join_secret,expires_at,reference_date,retention_days) VALUES($1,$2,$3,$4,$5,$6,now()+interval '1 day',$7,${SESSION_RETENTION_DEFAULT_SQL}) RETURNING *`,[id,u.organization_id,uid,title,code,joinSecret,referenceDate]);res.status(201).json(strip(r.rows[0]))}catch(e){sendError(res,e)}});
 
 // Portable definition exports intentionally omit participant data and join credentials.
-async function portableSession(id:string){const session=(await db.query('SELECT title,reference_date::text AS reference_date,theme,allow_anonymous,show_results FROM sessions WHERE id=$1',[id])).rows[0];const activities=(await db.query('SELECT type,title,options,correct_option_id,correct_option_ids,answer_mode,answer_required,duration_seconds,page_design,result_design FROM activities WHERE session_id=$1 ORDER BY position',[id])).rows;return {format:'quorivio-session',version:1,session,activities}}
-function validPortable(x:any){return x?.format==='quorivio-session'&&x.version===1&&typeof x.session?.title==='string'&&x.session.title.trim().length>0&&x.session.title.length<=160&&validDate(String(x.session.reference_date))&&validPageDesign(x.session.theme)&&typeof x.session.allow_anonymous==='boolean'&&typeof x.session.show_results==='boolean'&&Array.isArray(x.activities)&&x.activities.length<=200&&x.activities.every((a:any)=>['slide','poll','quiz','timed_quiz'].includes(a.type)&&typeof a.title==='string'&&a.title.trim().length>0&&a.title.length<=240&&(a.type==='slide'?Array.isArray(a.options)&&a.options.length===0:validateOptions(a.options))&&validAnswerMode(a.answer_mode||'single')&&typeof (a.answer_required??true)==='boolean'&& (a.correct_option_ids===undefined||Array.isArray(a.correct_option_ids)&&a.correct_option_ids.every((v:any)=>typeof v==='string'&&a.options.some((o:any)=>o.id===v)))&&validPageDesign(a.page_design)&&validPageDesign(a.result_design)&&(!['quiz','timed_quiz'].includes(a.type)||!['single','multiple'].includes(a.answer_mode||'single')||(a.answer_mode==='multiple'?Array.isArray(a.correct_option_ids)&&a.correct_option_ids.length>0:a.options.some((o:any)=>o.id===a.correct_option_id)))&&(a.type!=='timed_quiz'||['single','multiple'].includes(a.answer_mode||'single')&&Number.isInteger(a.duration_seconds)&&a.duration_seconds>=5&&a.duration_seconds<=600)&&(a.duration_seconds==null||Number.isInteger(a.duration_seconds)&&a.duration_seconds>=5&&a.duration_seconds<=600));}
+async function portableSession(id:string){const session=(await db.query('SELECT title,reference_date::text AS reference_date,theme,allow_anonymous,show_results FROM sessions WHERE id=$1',[id])).rows[0];const activities=(await db.query('SELECT id AS portable_id,type,title,options,correct_option_id,correct_option_ids,answer_mode,answer_required,duration_seconds,page_design,result_design FROM activities WHERE session_id=$1 ORDER BY position',[id])).rows;return {format:'quorivio-session',version:1,session,activities}}
+function validPortable(x:any){return x?.format==='quorivio-session'&&x.version===1&&typeof x.session?.title==='string'&&x.session.title.trim().length>0&&x.session.title.length<=160&&validDate(String(x.session.reference_date))&&validPageDesign(x.session.theme)&&typeof x.session.allow_anonymous==='boolean'&&typeof x.session.show_results==='boolean'&&Array.isArray(x.activities)&&x.activities.length<=200&&validPortablePageRouting(x.activities)&&x.activities.every((a:any)=>['slide','poll','quiz','timed_quiz'].includes(a.type)&&typeof a.title==='string'&&a.title.trim().length>0&&a.title.length<=240&&(a.type==='slide'?Array.isArray(a.options)&&a.options.length===0:validateOptions(a.options))&&validAnswerMode(a.answer_mode||'single')&&typeof (a.answer_required??true)==='boolean'&& (a.correct_option_ids===undefined||Array.isArray(a.correct_option_ids)&&a.correct_option_ids.every((v:any)=>typeof v==='string'&&a.options.some((o:any)=>o.id===v)))&&(a.portable_id===undefined||typeof a.portable_id==='string'&&PAGE_UUID.test(a.portable_id))&&validPageDesign(a.page_design)&&validPageDesign(a.result_design)&&(!['quiz','timed_quiz'].includes(a.type)||!['single','multiple'].includes(a.answer_mode||'single')||(a.answer_mode==='multiple'?Array.isArray(a.correct_option_ids)&&a.correct_option_ids.length>0:a.options.some((o:any)=>o.id===a.correct_option_id)))&&(a.type!=='timed_quiz'||['single','multiple'].includes(a.answer_mode||'single')&&Number.isInteger(a.duration_seconds)&&a.duration_seconds>=5&&a.duration_seconds<=600)&&(a.duration_seconds==null||Number.isInteger(a.duration_seconds)&&a.duration_seconds>=5&&a.duration_seconds<=600));}
 async function createFromPortable(data:any,uid:string,importMediaDir?:string,bundleMode=false){
  const imported=importMediaDir?remapPortableAssets(data,(data.import_assets||[]).map((a:any)=>a?.id)):null;
  const definition=imported?.definition||data;
@@ -969,9 +971,15 @@ async function createFromPortable(data:any,uid:string,importMediaDir?:string,bun
   const u=(await cx.query('SELECT organization_id FROM users WHERE id=$1',[uid])).rows[0];
   if(!u)throw Error('missing_user');
   await cx.query(`INSERT INTO sessions(id,organization_id,owner_id,title,reference_date,join_code,join_secret,expires_at,theme,allow_anonymous,show_results,retention_days) VALUES($1,$2,$3,$4,$5,$6,$7,now()+interval '1 day',$8,$9,$10,${SESSION_RETENTION_DEFAULT_SQL})`,[sid,u.organization_id,uid,definition.session.title,definition.session.reference_date,randomBytes(5).toString('hex').toUpperCase(),randomBytes(20).toString('base64url'),JSON.stringify(definition.session.theme),definition.session.allow_anonymous,definition.session.show_results]);
+  // Portable page links must be remapped as a group. Never retain an ID
+  // pointing into the original session when a session is imported/copied.
+  const importedIds=definition.activities.map((a:any)=>a.portable_id).filter((id:unknown)=>typeof id==='string');
+  if(new Set(importedIds).size!==importedIds.length)throw Error('duplicate_portable_page_id');
+  const newIds=definition.activities.map(()=>randomUUID());
+  const pageMap=new Map(definition.activities.map((a:any,i:number)=>[a.portable_id,newIds[i]]));
   for(let i=0;i<definition.activities.length;i++){
    const a=definition.activities[i];
-   await cx.query('INSERT INTO activities(id,session_id,type,title,options,correct_option_id,duration_seconds,page_design,result_design,position,answer_mode,answer_required,correct_option_ids) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)',[randomUUID(),sid,a.type,a.title,JSON.stringify(a.options),['quiz','timed_quiz'].includes(a.type)?a.correct_option_id:null,a.duration_seconds,JSON.stringify(a.page_design),JSON.stringify(a.result_design),i,a.answer_mode||'single',a.answer_required??true,JSON.stringify(a.correct_option_ids||[])]);
+   await cx.query('INSERT INTO activities(id,session_id,type,title,options,correct_option_id,duration_seconds,page_design,result_design,position,answer_mode,answer_required,correct_option_ids) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)',[newIds[i],sid,a.type,a.title,JSON.stringify(a.options),['quiz','timed_quiz'].includes(a.type)?a.correct_option_id:null,a.duration_seconds,JSON.stringify(remapPortablePageRouting(a.page_design,pageMap)),JSON.stringify(remapPortablePageRouting(a.result_design,pageMap)),i,a.answer_mode||'single',a.answer_required??true,JSON.stringify(a.correct_option_ids||[])]);
   }
   if(importMediaDir){
    const assets=data.import_assets;
@@ -1248,6 +1256,13 @@ app.patch('/api/sessions/:id/activities/:aid/design',requireAuth,async(req,res)=
  if(s.status==='closed'){res.status(409).json({error:'session_closed'});return}
  if(!validPageDesign(req.body?.page_design)||!validPageDesign(req.body?.result_design)){res.status(400).json({error:'invalid_page_design'});return}
  await cx.query('BEGIN');
+ // All page-routing edits and page deletions must acquire the session lock in
+ // the same order. Otherwise a simultaneous delete can pass its reference
+ // check and remove a target before this design commits a dangling link.
+ const locked=await cx.query('SELECT status FROM sessions WHERE id=$1 FOR UPDATE',[s.id]);
+ if(!locked.rowCount||locked.rows[0].status==='closed'){
+  await cx.query('ROLLBACK');res.status(409).json({error:'session_closed'});return;
+ }
  const a=await cx.query('SELECT page_design,result_design,status,design_revision FROM activities WHERE id=$1 AND session_id=$2 FOR UPDATE',[req.params.aid,s.id]);
  if(!a.rowCount){await cx.query('ROLLBACK');res.status(404).end();return}
  // Optimistic concurrency: never overwrite a collaborator's newer layout.
@@ -1258,6 +1273,21 @@ app.patch('/api/sessions/:id/activities/:aid/design',requireAuth,async(req,res)=
  }
  if(expected!==undefined&&expected!==a.rows[0].design_revision){
   await cx.query('ROLLBACK');res.status(409).json({error:'design_revision_conflict',current_design_revision:a.rows[0].design_revision});return;
+ }
+ // Link references are always scoped to the authenticated session, never to a
+ // client-provided external session. No dangling audience pages or result sources.
+ const linkedPages=(await cx.query('SELECT id,page_design FROM activities WHERE session_id=$1',[s.id])).rows;
+ if(!validAudienceMapping(linkedPages,{id:req.params.aid,page_design:req.body.page_design})){
+  await cx.query('ROLLBACK');res.status(400).json({error:'audience_page_not_in_session'});return;
+ }
+ for(const w of [...(req.body.page_design.widgets||[]),...(req.body.result_design.widgets||[])]){
+  if(w.kind!=='results-button'||!w.targetActivityId||!w.targetWidgetId)continue;
+  const target=linkedPages.find((page:any)=>page.id===w.targetActivityId);
+  const source=target?.page_design?.widgets?.find((item:any)=>item.id===w.targetWidgetId);
+  if(!source||!['question','timed-quiz','rating','reactions','topic-question'].includes(source.kind)||
+    (w.targetQuestionId&&(!['question','timed-quiz'].includes(source.kind)||!source.questions?.some((q:any)=>q.id===w.targetQuestionId)))){
+   await cx.query('ROLLBACK');res.status(400).json({error:'result_source_not_in_session'});return;
+  }
  }
  // Page background assets use the same ownership boundary as embedded widgets.
  for(const design of [req.body.page_design,req.body.result_design,req.body.page_design.mobile||{}]){
@@ -1344,7 +1374,13 @@ app.delete('/api/sessions/:id/pages/:aid',requireAuth,async(req,res)=>{
   const page=await cx.query('SELECT id FROM activities WHERE id=$1 AND session_id=$2 FOR UPDATE',[req.params.aid,req.params.id]);
   if(!page.rowCount){await cx.query('ROLLBACK');begun=false;res.status(404).end();return}
   // Remove dependent rows through their existing ON DELETE CASCADE references.
-  if(session.rows[0].current_activity_id===req.params.aid)await cx.query('UPDATE sessions SET current_activity_id=NULL WHERE id=$1',[req.params.id]);
+  const references=await cx.query(`SELECT id FROM activities WHERE session_id=$1 AND id<>$2 AND (
+    page_design->>'audiencePageId'=$2 OR EXISTS (
+      SELECT 1 FROM jsonb_array_elements(coalesce(page_design->'widgets','[]'::jsonb)) w
+      WHERE w->>'targetActivityId'=$2) OR EXISTS (SELECT 1 FROM jsonb_array_elements(coalesce(result_design->'widgets','[]'::jsonb)) w WHERE w->>'targetActivityId'=$2)) LIMIT 1`,[req.params.id,req.params.aid]);
+  if(references.rowCount){await cx.query('ROLLBACK');begun=false;res.status(409).json({error:'page_referenced_by_session'});return}
+  if(session.rows[0].current_activity_id===req.params.aid)await cx.query('UPDATE sessions SET current_activity_id=NULL,presenter_activity_id=NULL WHERE id=$1',[req.params.id]);
+  else await cx.query('UPDATE sessions SET presenter_activity_id=NULL WHERE id=$1 AND presenter_activity_id=$2',[req.params.id,req.params.aid]);
   await cx.query('DELETE FROM activities WHERE id=$1 AND session_id=$2',[req.params.aid,req.params.id]);
   // Avoid transient UNIQUE(session_id,position) collisions when compacting gaps.
   await cx.query('UPDATE activities SET position= -position-1 WHERE session_id=$1',[req.params.id]);
@@ -1556,17 +1592,43 @@ app.post('/api/sessions/:id/presentation/ensure-first-page',requireAuth,async(re
    await cx.query('ROLLBACK');begun=false;res.status(409).json({error:'session_not_ready_for_projection'});return;
   }
   if(session.current_activity_id){await cx.query('COMMIT');begun=false;res.json({ok:true,activity_id:session.current_activity_id,changed:false});return}
-  const first=await cx.query('SELECT id FROM activities WHERE session_id=$1 ORDER BY position,id LIMIT 1',[req.params.id]);
-  if(!first.rowCount){await cx.query('COMMIT');begun=false;res.json({ok:true,activity_id:null,changed:false});return}
-  const aid=first.rows[0].id;
+  const pages=(await cx.query('SELECT id,page_design FROM activities WHERE session_id=$1 ORDER BY position,id',[req.params.id])).rows;
+  const presenter=firstPresenterPage(pages);
+  if(!presenter){await cx.query('COMMIT');begun=false;res.json({ok:true,activity_id:null,changed:false});return}
+  const audience=audienceForPresenter(pages,presenter);
+  if(!audience){await cx.query('ROLLBACK');begun=false;res.status(409).json({error:'audience_page_missing'});return}
+  const aid=audience.id;
   await cx.query("UPDATE activities SET status='closed' WHERE session_id=$1 AND status='open'",[req.params.id]);
   await cx.query("UPDATE activities SET status='open',opened_at=COALESCE(opened_at,now()) WHERE id=$1",[aid]);
-  await cx.query("UPDATE sessions SET status='active',current_activity_id=$1,expires_at=GREATEST(expires_at,now()+interval '24 hours') WHERE id=$2",[aid,req.params.id]);
+  await cx.query("UPDATE sessions SET status='active',current_activity_id=$1,presenter_activity_id=$3,expires_at=GREATEST(expires_at,now()+interval '24 hours') WHERE id=$2",[aid,req.params.id,presenter.id]);
   await cx.query('COMMIT');begun=false;await broadcast(req.params.id);
   res.json({ok:true,activity_id:aid,changed:true});
  }catch(e){if(begun)await cx.query('ROLLBACK').catch(()=>{});sendError(res,e)}finally{cx.release()}
 });
-app.post('/api/sessions/:id/activities/:aid/open',requireAuth,async(req,res)=>{const cx=await db.connect();try{await cx.query('BEGIN');const s=await cx.query('SELECT * FROM sessions WHERE id=$1 AND (owner_id=$2 OR EXISTS (SELECT 1 FROM session_presenters WHERE session_id=$1 AND user_id=$2)) FOR UPDATE',[req.params.id,auth(req)]);if(!s.rowCount||s.rows[0].status!=='active'){await cx.query('ROLLBACK');res.status(409).json({error:'session_not_active'});return}if(Object.prototype.hasOwnProperty.call(req.body||{},'expected_current_activity_id')&&req.body.expected_current_activity_id!==s.rows[0].current_activity_id){await cx.query('ROLLBACK');res.status(409).json({error:'page_changed_by_another_presenter'});return}const a=await cx.query('SELECT id FROM activities WHERE id=$1 AND session_id=$2',[req.params.aid,req.params.id]);if(!a.rowCount){await cx.query('ROLLBACK');res.status(404).end();return}await cx.query("UPDATE activities SET status='closed' WHERE session_id=$1 AND status='open'",[req.params.id]);await cx.query("UPDATE activities SET status='open',opened_at=COALESCE(opened_at,now()) WHERE id=$1",[req.params.aid]);await cx.query("UPDATE sessions SET current_activity_id=$1,expires_at=GREATEST(expires_at,now()+interval '24 hours') WHERE id=$2",[req.params.aid,req.params.id]);await cx.query('COMMIT');await broadcast(req.params.id);res.json({ok:true})}catch(e){await cx.query('ROLLBACK');sendError(res,e)}finally{cx.release()}});
+app.post('/api/sessions/:id/activities/:aid/open',requireAuth,async(req,res)=>{
+ const cx=await db.connect();let begun=false;
+ try{
+  await cx.query('BEGIN');begun=true;
+  const row=await cx.query('SELECT * FROM sessions WHERE id=$1 AND (owner_id=$2 OR EXISTS (SELECT 1 FROM session_presenters WHERE session_id=$1 AND user_id=$2)) FOR UPDATE',[req.params.id,auth(req)]);
+  if(!row.rowCount||row.rows[0].status!=='active'){await cx.query('ROLLBACK');begun=false;res.status(409).json({error:'session_not_active'});return}
+  const session=row.rows[0];
+  if(Object.prototype.hasOwnProperty.call(req.body||{},'expected_current_activity_id')&&req.body.expected_current_activity_id!==session.current_activity_id ||
+     Object.prototype.hasOwnProperty.call(req.body||{},'expected_presenter_activity_id')&&req.body.expected_presenter_activity_id!==(session.presenter_activity_id||session.current_activity_id)){
+   await cx.query('ROLLBACK');begun=false;res.status(409).json({error:'page_changed_by_another_presenter'});return;
+  }
+  const pages=(await cx.query('SELECT id,page_design FROM activities WHERE session_id=$1 ORDER BY position,id',[req.params.id])).rows;
+  const presenter=pages.find((page:any)=>page.id===req.params.aid);
+  if(!presenter){await cx.query('ROLLBACK');begun=false;res.status(404).end();return}
+  if(presenter.page_design?.presenterHidden){await cx.query('ROLLBACK');begun=false;res.status(409).json({error:'page_hidden_from_presenter'});return}
+  const audience=audienceForPresenter(pages,presenter);
+  if(!audience){await cx.query('ROLLBACK');begun=false;res.status(409).json({error:'audience_page_missing'});return}
+  await cx.query("UPDATE activities SET status='closed' WHERE session_id=$1 AND status='open' AND id<>$2",[req.params.id,audience.id]);
+  await cx.query("UPDATE activities SET status='open',opened_at=COALESCE(opened_at,now()) WHERE id=$1",[audience.id]);
+  await cx.query("UPDATE sessions SET current_activity_id=$1,presenter_activity_id=$3,expires_at=GREATEST(expires_at,now()+interval '24 hours') WHERE id=$2",[audience.id,req.params.id,presenter.id]);
+  await cx.query('COMMIT');begun=false;await broadcast(req.params.id);
+  res.json({ok:true,presenter_activity_id:presenter.id,current_activity_id:audience.id});
+ }catch(e){if(begun)await cx.query('ROLLBACK').catch(()=>{});sendError(res,e)}finally{cx.release()}
+});
 // A page timer starts at the FIRST time its page becomes visible. Revisiting the
 // page preserves its deadline; only this explicit, authorized action restarts it.
 // Answers from the previous timed round are removed atomically with the new clock.
@@ -1626,13 +1688,13 @@ app.post('/api/sessions/:id/reset-to-ready',requireAuth,async(req,res)=>{
   }
   await cx.query('DELETE FROM live_connections WHERE session_id=$1',[req.params.id]);
   await cx.query("UPDATE activities SET status='pending',opened_at=NULL WHERE session_id=$1",[req.params.id]);
-  await cx.query("UPDATE sessions SET status='ready',current_activity_id=NULL,closed_at=NULL,join_code=$2,join_secret=$3 WHERE id=$1",[req.params.id,randomBytes(5).toString('hex').toUpperCase(),randomBytes(20).toString('base64url')]);
+  await cx.query("UPDATE sessions SET status='ready',current_activity_id=NULL,presenter_activity_id=NULL,closed_at=NULL,join_code=$2,join_secret=$3 WHERE id=$1",[req.params.id,randomBytes(5).toString('hex').toUpperCase(),randomBytes(20).toString('base64url')]);
   await cx.query('COMMIT');begun=false;
   for(const ws of sockets.get(req.params.id)||[])ws.close(1008,'session reset');
   await broadcast(req.params.id);res.json({ok:true,status:'ready'});
  }catch(e){if(begun)await cx.query('ROLLBACK').catch(()=>{});sendError(res,e)}finally{cx.release()}
 });
-app.post('/api/sessions/:id/activities/:aid/close',requireAuth,async(req,res)=>{const cx=await db.connect();try{await cx.query('BEGIN');const s=await cx.query('SELECT * FROM sessions WHERE id=$1 AND (owner_id=$2 OR EXISTS (SELECT 1 FROM session_presenters WHERE session_id=$1 AND user_id=$2)) FOR UPDATE',[req.params.id,auth(req)]);if(!s.rowCount){await cx.query('ROLLBACK');res.status(404).end();return}const a=await cx.query('SELECT id FROM activities WHERE id=$1 AND session_id=$2',[req.params.aid,req.params.id]);if(!a.rowCount){await cx.query('ROLLBACK');res.status(404).end();return}await cx.query("UPDATE activities SET status='closed' WHERE id=$1 AND session_id=$2 AND status='open'",[req.params.aid,req.params.id]);await cx.query('UPDATE sessions SET current_activity_id=NULL WHERE id=$1 AND current_activity_id=$2',[req.params.id,req.params.aid]);await cx.query('COMMIT');await broadcast(req.params.id);res.json({ok:true})}catch(e){await cx.query('ROLLBACK');sendError(res,e)}finally{cx.release()}});
+app.post('/api/sessions/:id/activities/:aid/close',requireAuth,async(req,res)=>{const cx=await db.connect();try{await cx.query('BEGIN');const s=await cx.query('SELECT * FROM sessions WHERE id=$1 AND (owner_id=$2 OR EXISTS (SELECT 1 FROM session_presenters WHERE session_id=$1 AND user_id=$2)) FOR UPDATE',[req.params.id,auth(req)]);if(!s.rowCount){await cx.query('ROLLBACK');res.status(404).end();return}const a=await cx.query('SELECT id FROM activities WHERE id=$1 AND session_id=$2',[req.params.aid,req.params.id]);if(!a.rowCount){await cx.query('ROLLBACK');res.status(404).end();return}await cx.query("UPDATE activities SET status='closed' WHERE id=$1 AND session_id=$2 AND status='open'",[req.params.aid,req.params.id]);await cx.query('UPDATE sessions SET current_activity_id=NULL,presenter_activity_id=NULL WHERE id=$1 AND current_activity_id=$2',[req.params.id,req.params.aid]);await cx.query('COMMIT');await broadcast(req.params.id);res.json({ok:true})}catch(e){await cx.query('ROLLBACK');sendError(res,e)}finally{cx.release()}});
 app.get('/api/sessions/:id/qr',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}const url=`${qrBrowserOrigin(publicBase,req.headers.referer,req.headers.host,(typeof req.headers['sec-fetch-site']==='string'?req.headers['sec-fetch-site']:undefined))}/join/${s.join_secret}`;const type=req.query.format==='svg'?'svg':req.query.format==='json'?'json':'png';res.setHeader('Cache-Control','private, no-store');if(type==='json'){res.json({url});return}res.setHeader('Content-Disposition',`attachment; filename="quorivio-${s.join_code}.${type}"`);if(type==='svg'){res.type('image/svg+xml').send(await QRCode.toString(url,{type:'svg',margin:2}))}else{res.type('png').send(await QRCode.toBuffer(url,{width:800,margin:2}))}}catch(e){sendError(res,e)}});
 // Presenter QR links to the authenticated screen route. It is not an access token.
 app.get('/api/sessions/:id/presenter-qr',requireAuth,async(req,res)=>{try{
@@ -1667,7 +1729,7 @@ async function purgeExpiredSessions(){
 }
 app.get('/api/sessions/:id/export.csv',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}const r=await db.query('SELECT a.title,a.type,r.option_id,r.correct,r.submitted_at FROM responses r JOIN activities a ON a.id=r.activity_id WHERE a.session_id=$1 AND r.invalidated_at IS NULL ORDER BY r.submitted_at',[s.id]);const esc=escapeCsvCell;res.setHeader('Content-Type','text/csv; charset=utf-8');res.setHeader('Content-Disposition',`attachment; filename="quorivio-${s.join_code}.csv"`);res.send('\uFEFF' + [['activity','type','option_id','correct','submitted_at'],...r.rows.map(x=>[x.title,x.type,x.option_id,x.correct,x.submitted_at.toISOString()])].map(row=>row.map(esc).join(',')).join('\r\n'))}catch(e){sendError(res,e)}});
 async function publicSession(secretOrCode:string){const r=await db.query('SELECT * FROM sessions WHERE (join_secret=$1 OR join_code=$1) AND status=$2 AND expires_at>now()',[secretOrCode,'active']);return r.rows[0]}
-app.get('/api/join/:code',async(req,res)=>{try{const s=await publicSession(req.params.code);if(!s){res.status(404).json({error:'session_unavailable'});return}const a=s.current_activity_id?(await db.query('SELECT * FROM activities WHERE id=$1',[s.current_activity_id])).rows[0]:null;res.json({session:{id:s.id,title:s.title,status:s.status},activity:a?publicActivity(a):null,allow_anonymous:s.allow_anonymous,show_results:s.show_results,theme:s.theme})}catch(e){sendError(res,e)}});
+app.get('/api/join/:code',async(req,res)=>{try{const s=await publicSession(req.params.code);if(!s){res.status(404).json({error:'session_unavailable'});return}const a=s.current_activity_id?(await db.query('SELECT * FROM activities WHERE id=$1',[s.current_activity_id])).rows[0]:null;res.json({session:{id:s.id,title:s.title,status:s.status},activity:a?publicActivity(a):null,allow_anonymous:s.allow_anonymous,show_results:s.show_results,theme:publicTheme(s.theme)})}catch(e){sendError(res,e)}});
 // Read-only QR endpoint; embeds only the public participant URL, never access privileges.
 app.get('/api/join/:code/qr.svg',async(req,res)=>{try{const s=await publicSession(req.params.code);if(!s){res.status(404).end();return}const url=`${publicBase}/join/${s.join_secret}`;res.setHeader('Cache-Control','no-store');res.type('image/svg+xml').send(await QRCode.toString(url,{type:'svg',margin:2}))}catch(e){sendError(res,e)}});
 // Public QR text and image use the identical canonical participant URL.
@@ -1732,7 +1794,7 @@ app.post('/api/join/:code/ratings',async(req,res)=>{try{
 app.get('/api/sessions/:id/ratings/stats',requireAuth,async(req,res)=>{try{
  const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}
  const byPage=(await db.query('SELECT a.id AS activity_id,a.title,count(pr.score)::int AS responses,round(avg(pr.score)::numeric,2) AS mean FROM activities a LEFT JOIN page_ratings pr ON pr.activity_id=a.id WHERE a.session_id=$1 GROUP BY a.id,a.title,a.position ORDER BY a.position',[s.id])).rows;
- const byWidget=(await db.query('SELECT widget_id,target_kind,target_id,count(*)::int AS responses,round(avg(score)::numeric,2) AS mean FROM page_ratings WHERE session_id=$1 GROUP BY widget_id,target_kind,target_id ORDER BY target_kind,widget_id',[s.id])).rows;
+ const byWidget=(await db.query('SELECT activity_id,widget_id,target_kind,target_id,count(*)::int AS responses,round(avg(score)::numeric,2) AS mean FROM page_ratings WHERE session_id=$1 GROUP BY activity_id,widget_id,target_kind,target_id ORDER BY target_kind,widget_id',[s.id])).rows;
  const distribution=(await db.query('SELECT score,count(*)::int AS count FROM page_ratings WHERE session_id=$1 GROUP BY score ORDER BY score',[s.id])).rows;
  const overall=(await db.query('SELECT count(*)::int AS responses,round(avg(score)::numeric,2) AS mean FROM page_ratings WHERE session_id=$1',[s.id])).rows[0];
  res.json({overall,by_page:byPage,by_widget:byWidget,distribution});
@@ -1785,12 +1847,7 @@ app.get('/api/sessions/:id/activities/:aid/topic-widgets/:wid/stats',requireAuth
 // Resolve the correct answer consistently for both historic single-answer widgets and
 // new multi-answer widgets. An empty correctOptionIds array must not mask the
 // legacy correctOptionId; malformed / duplicate ids must never award points.
-function widgetCorrectOptionIds(widget:any):string[]{
- const multi=widget.answerMode==='multiple';
- if(multi)return Array.isArray(widget.correctOptionIds)?widget.correctOptionIds:[];
- if(typeof widget.correctOptionId==='string'&&widget.correctOptionId)return [widget.correctOptionId];
- return Array.isArray(widget.correctOptionIds)&&widget.correctOptionIds.length===1?widget.correctOptionIds:[];
-}
+function widgetCorrectOptionIds(widget:any):string[]{return answerKeyIds(widget)}
 // Question widgets have independent submissions; an activity's primary answer is unaffected.
 app.post('/api/join/:code/activities/:aid/widgets/:wid/respond',async(req,res)=>{let cx:pg.PoolClient|undefined;try{
  const who=await audienceIdentity(req,req.params.code,req.params.aid);
@@ -1829,10 +1886,10 @@ app.post('/api/join/:code/activities/:aid/widgets/:wid/respond',async(req,res)=>
  const revision=questionRevisionAtHistory(rev.rows,questionId);
  // A retry of a committed answer remains idempotent even when the timer has
  // subsequently expired. Never overwrite the first answer or change its score.
- const existing=await cx.query('SELECT id FROM widget_answers WHERE activity_id=$1 AND participant_id=$2 AND widget_id=$3 AND question_id=$4 AND revision=$5 FOR UPDATE',[req.params.aid,who.participantId,req.params.wid,questionId,revision]);
- if(existing.rowCount&&part.allowAnswerChange!==true){await cx.query('COMMIT');res.json({ok:true,already_submitted:true,question_id:questionId,revision});return}
- const correctIds=timed?widgetCorrectOptionIds(part):[];
- const correct=timed&&answer.optionIds.length===correctIds.length&&answer.optionIds.every((id:string)=>correctIds.includes(id));
+ const existing=await cx.query('SELECT id,answer_payload FROM widget_answers WHERE activity_id=$1 AND participant_id=$2 AND widget_id=$3 AND question_id=$4 AND revision=$5 FOR UPDATE',[req.params.aid,who.participantId,req.params.wid,questionId,revision]);
+ if(existing.rowCount&&part.allowAnswerChange!==true){const feedback=gradeChoiceAnswer(part,widget.kind,existing.rows[0].answer_payload?.optionIds);await cx.query('COMMIT');res.json({ok:true,already_submitted:true,question_id:questionId,revision,...(feedback?{feedback}:{})});return}
+ const feedback=gradeChoiceAnswer(part,widget.kind,answer.optionIds);
+ const correct=feedback?.is_correct??false;
  // Read PostgreSQL's wall clock immediately before the write, not at the start of
  // the transaction: validation and attachment lookups can take time. All replicas
  // therefore agree on the deadline and on the elapsed time reported to rankings.
@@ -1845,12 +1902,16 @@ app.post('/api/join/:code/activities/:aid/widgets/:wid/respond',async(req,res)=>
  }
  if(existing.rowCount){
   await cx.query('UPDATE widget_answers SET answer_mode=$2,answer_payload=$3,correct=$4,elapsed_ms=$5 WHERE id=$1',
-    [existing.rows[0].id,mode,JSON.stringify(answer),timed?correct:null,elapsed]);
+    [existing.rows[0].id,mode,JSON.stringify(answer),feedback?correct:null,elapsed]);
   await cx.query('COMMIT');cx.release();cx=undefined;
-  await notifyAudience(who.sessionId);res.json({ok:true,changed:true,already_submitted:false,question_id:questionId,revision});return;
+  await notifyAudience(who.sessionId);res.json({ok:true,changed:true,already_submitted:false,question_id:questionId,revision,...(feedback?{feedback}:{})});return;
  }
- const r=await cx.query('INSERT INTO widget_answers(id,session_id,activity_id,participant_id,widget_id,question_id,answer_mode,answer_payload,revision,correct,elapsed_ms) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) ON CONFLICT(activity_id,participant_id,widget_id,question_id,revision) DO NOTHING RETURNING id',[randomUUID(),who.sessionId,req.params.aid,who.participantId,req.params.wid,questionId,mode,JSON.stringify(answer),revision,timed?correct:null,elapsed]);
- await cx.query('COMMIT');cx.release();cx=undefined;if(r.rowCount)await notifyAudience(who.sessionId);res.json({ok:true,already_submitted:!r.rowCount,question_id:questionId,revision});
+ const r=await cx.query('INSERT INTO widget_answers(id,session_id,activity_id,participant_id,widget_id,question_id,answer_mode,answer_payload,revision,correct,elapsed_ms) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) ON CONFLICT(activity_id,participant_id,widget_id,question_id,revision) DO NOTHING RETURNING id',[randomUUID(),who.sessionId,req.params.aid,who.participantId,req.params.wid,questionId,mode,JSON.stringify(answer),revision,feedback?correct:null,elapsed]);
+ await cx.query('COMMIT');cx.release();cx=undefined;if(r.rowCount)await notifyAudience(who.sessionId);// In a concurrent retry only disclose the feedback for the answer actually saved,
+ // not for a different guess in the losing request.
+ const stored=r.rowCount?answer.optionIds:(await db.query('SELECT answer_payload FROM widget_answers WHERE activity_id=$1 AND participant_id=$2 AND widget_id=$3 AND question_id=$4 AND revision=$5',[req.params.aid,who.participantId,req.params.wid,questionId,revision])).rows[0]?.answer_payload?.optionIds;
+ const submittedFeedback=gradeChoiceAnswer(part,widget.kind,stored);
+ res.json({ok:true,already_submitted:!r.rowCount,question_id:questionId,revision,...(submittedFeedback?{feedback:submittedFeedback}:{})});
  }catch(e){if(cx)try{await cx.query('ROLLBACK')}catch{}sendError(res,e)}finally{cx?.release()}});
 app.get('/api/sessions/:id/widget-answers',requireAuth,async(req,res)=>{try{
  const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}

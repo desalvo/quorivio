@@ -1,3 +1,19 @@
+# Quorivio 0.1.0-dev — RC187 — Optional true/false answer keys
+
+**RC187:** Added per-choice opt-in True/False answer keys for ordinary single/multiple choice questions and independent subquestions, with controls in widget properties and canvas context menu. The grading response is returned only after a successful participant submission; keyed answers are excluded from public snapshots. Keys participate in answer revisions, and idempotent retries use stored answers. Based on RC186; latest GitHub-green baseline RC184 `41993094578`. Certified **85.25%** (43 accepted, 17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. See `docs/RC_CYCLE187_QUESTION_ANSWER_KEYS.en.md`.
+
+---
+
+# Quorivio 0.1.0-dev — RC186 — Keyboard TOTP confirmation
+
+**RC186:** replaced the second-factor panel with a native form: Enter submits TOTP/email/recovery via the same handler as Verify, non-submit method buttons remain safe, and in-flight verification is guarded against duplicates. Added early Python and compiled React Chromium CI checks. RC185 cumulative baseline still needs its CI; latest verified fully green campaign RC184 `41993094578`. Certified completion **85.25%** (43 accepted, 17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. See `docs/RC_CYCLE186_MFA_ENTER.en.md`.
+
+---
+# Quorivio 0.1.0-dev — RC185 — independent presenter/audience routing
+
+**RC185:** Based on GitHub-green RC184 run `41993094578` (14 successful jobs). Implemented independent presenter/audience live page pointers, per-page audience destination and presenter navigation skip from canvas menu, cross-page authenticated Results widget, same-session server validation, CAS-safe navigation, portable source-ID remapping and editor autosave/merge. New Node/Python regressions and early CI guard. **85.25% certified (43 accepted/17 partial)**; this functional development does not promote independent gate signoffs. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. See `docs/RC_CYCLE185_DUAL_PROJECTION.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC184 — converter APT security update
 
 **RC184:** GitHub Actions run `41988947593` passed Production quality gate, Chromium/PostgreSQL, ClamAV and Kubernetes/Podman/OCI checks; the only RC failure was the converter Trivy scan: `apt`/`libapt-pkg7.0` 3.0.3 vulnerable to CVE-2026-109518 (fixed in 3.0.4). Added early fail-closed APT upgrade and installed-version check in the Dockerfile, plus a security/Trivy preflight before expensive tests, preserving the blocking HIGH/CRITICAL scan. **85.25% certified (43 accepted/17 partial)**; `rc_strict=false`, `publish_image=false`, `publish_latest=false`; the next CI must validate the actual Trivy scan. No assistant commit/push/tag. See `docs/RC_CYCLE184_CONVERTER_APT_SECURITY.en.md`.

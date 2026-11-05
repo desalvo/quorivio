@@ -1,0 +1,47 @@
+{
+  "version": "0.1.0-dev",
+  "cycle": 187,
+  "date": "2026-11-05",
+  "based_on_cycle": 186,
+  "last_confirmed_green_ci": {
+    "cycle": 184,
+    "run_id": 41993094578
+  },
+  "features": {
+    "ordinary_choice_question_answer_key_optional": true,
+    "false_is_implicit_default_when_enabled": true,
+    "single_choice_maximum_true": 1,
+    "multiple_choice_requires_exact_true_set": true,
+    "widget_properties_and_canvas_context_menu": true,
+    "independent_subquestion_support": true,
+    "reset_disables_grading_for_ordinary_questions": true,
+    "timed_quiz_existing_mandatory_key_preserved": true,
+    "feedback_released_only_after_persisted_submission": true,
+    "idempotent_retry_grades_stored_submission": true,
+    "public_page_result_and_master_key_redaction": true,
+    "answer_definition_revision_isolation": true,
+    "database_migration_required": false
+  },
+  "local_validation": {
+    "api_node_tests_passed": 599,
+    "frontend_node_tests_passed": 321,
+    "python_targeted_tests_passed": 37,
+    "typescript_parse_checked_files": 7,
+    "python_rc187_contracts_passed": 9
+  },
+  "pending_validation": [
+    "TypeScript typecheck and Vite build with installed workspace dependencies",
+    "Authenticated React+PostgreSQL E2E of answer grading and revisions",
+    "GitHub Actions CI for the cumulative RC185-RC187 changes",
+    "External operator and accessibility signoffs"
+  ],
+  "certified_gate_score": 85.25,
+  "accepted_gates": 43,
+  "partial_gates": 17,
+  "rc_strict": false,
+  "publish_image": false,
+  "publish_latest": false,
+  "assistant_committed": false,
+  "assistant_pushed": false,
+  "assistant_tagged": false
+}
