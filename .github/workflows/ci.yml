@@ -336,6 +336,10 @@ jobs:
         run: python3 -m unittest tools.tests.test_rc_cycle99_ci_contract -q
       - name: Validate RC98 presenter and scheme TypeScript fixes before npm
         run: python3 -m unittest tools.tests.test_rc_cycle98_web_compile -q
+      # RC190: the compiled MFA browser fixture runs on an opaque origin, so
+      # cookie/localStorage mocks must exist before the JS module mounts.
+      - name: RC190 MFA built-React fixture safety preflight before npm
+        run: python3 -m unittest tools.tests.test_rc190_mfa_fixture_reconciliation -q
       # RC189: inspect the portable Map<string,string> contract and reject
       # the old Map<unknown,unknown> inferred by TypeScript in RC188.
       - name: RC189 portable page remapping type and TS2345 regression preflight
@@ -546,6 +550,7 @@ jobs:
           python3 tools/ci_recovery_url_chromium.py
           # RC186: the compiled React login form accepts Enter on TOTP,
           # email and recovery code inputs; repeated Enter cannot replay MFA.
+          python3 tools/ci_rc190_mfa_fixture_chromium.py
           python3 tools/ci_rc186_mfa_enter_chromium.py
           # Native modal must be acknowledged before querying page controls.
           python3 tools/ci_cookie_modal_order_chromium.py
@@ -1137,7 +1142,8 @@ jobs:
           python3 tools/verify_rc_cycle186_inventory.py --historical
           python3 tools/verify_rc_cycle187_inventory.py --historical
           python3 tools/verify_rc_cycle188_inventory.py --historical
-          python3 tools/verify_rc_cycle189_inventory.py
+          python3 tools/verify_rc_cycle189_inventory.py --historical
+          python3 tools/verify_rc_cycle190_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

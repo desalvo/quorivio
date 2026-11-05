@@ -13,6 +13,26 @@ from playwright.async_api import async_playwright, expect
 ROOT = Path(__file__).resolve().parents[1]
 HTML = '<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head><body><div id="root"></div></body></html>'
 API = r"""() => {
+  // This fixture is mounted on about:blank (opaque origin). Without explicit
+  // storage and cookie mocks React crashes before its cookie dialog mounts;
+  // none of the MFA interaction assertions would run. Reuse the established
+  // recovery/preview fixture model, before injecting the compiled bundle.
+  const cookies = new Map();
+  Object.defineProperty(document, 'cookie', {configurable:true,
+    get:()=>Array.from(cookies,([k,v])=>k+'='+v).join('; '),
+    set: raw => { const [part] = String(raw).split(';');
+      const at = part.indexOf('='); if(at>=0) cookies.set(part.slice(0,at).trim(),part.slice(at+1).trim()); }});
+  const local = new Map(), session = new Map();
+  const memoryStorage = map => ({
+    getItem:k=>map.has(String(k))?map.get(String(k)):null,
+    setItem:(k,v)=>map.set(String(k),String(v)),
+    removeItem:k=>map.delete(String(k)),
+    clear:()=>map.clear(),
+    key:i=>Array.from(map.keys())[i]??null,
+    get length(){return map.size;}
+  });
+  Object.defineProperty(window,'localStorage',{configurable:true,get:()=>memoryStorage(local)});
+  Object.defineProperty(window,'sessionStorage',{configurable:true,get:()=>memoryStorage(session)});
   window.mfaProbe = {calls: [], signedIn: false, failOnce: false};
   window.fetch = async (url, options={}) => {
     const path = new URL(String(url), 'https://fixture.invalid').pathname;
@@ -44,10 +64,24 @@ async def prepare(browser, js, css, width, height):
     page.on('pageerror', lambda e: errors.append(str(e)))
     await page.set_content(HTML)
     await page.evaluate(API)
+    # Preflight the exact browser state required by the React bundle. A
+    # missing storage fixture must fail before we wait for a modal that cannot mount.
+    state = await page.evaluate('''() => ({
+      cookie: document.cookie,
+      pseudonym: localStorage.getItem('quorivio_pseudonym'),
+      session: sessionStorage.getItem('quorivio_fixture_probe')
+    })''')
+    assert state == {'cookie':'','pseudonym':None,'session':None}, state
     await page.add_style_tag(content=css.read_text(encoding='utf-8'))
     await page.add_script_tag(content=js.read_text(encoding='utf-8'),type='module')
     cookie=page.get_by_role('dialog',name='Informativa cookie funzionali')
-    await expect(cookie).to_be_visible(timeout=10000)
+    try:
+        await expect(cookie).to_be_visible(timeout=10000)
+    except AssertionError as exc:
+        raise AssertionError(
+            f'Built React MFA fixture failed to mount cookie notice at {width}px; '
+            f'page errors={errors!r}, body excerpt={(await page.locator("body").inner_text())[:350]!r}'
+        ) from exc
     await cookie.get_by_role('button',name='Ho capito').click()
     await expect(cookie).not_to_be_visible()
     await page.get_by_label('Email o nickname').fill('fixture@example.invalid')

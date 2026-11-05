@@ -1,0 +1,50 @@
+{
+  "version": "0.1.0-dev",
+  "cycle": 190,
+  "date": "2026-11-05",
+  "based_on_cycle": 189,
+  "failed_ci": {
+    "run_id": 42023471301,
+    "job_id": 127231773092,
+    "commit": "ac985eedbb3c42da36b81f91e553a9f06f0dbc4d",
+    "step": "Chromium editor UI acceptance (opt-in)",
+    "script": "tools/ci_rc186_mfa_enter_chromium.py",
+    "symptom": "Functional cookie modal missing before MFA interactions",
+    "cause": "Opaque-origin about:blank missing localStorage/sessionStorage/document.cookie fixture"
+  },
+  "last_fully_green_ci": {
+    "cycle": 184,
+    "run_id": 41993094578
+  },
+  "scope": {
+    "in_memory_cookie_fixture": true,
+    "in_memory_storage_fixture": true,
+    "browser_mount_preflight": true,
+    "pageerror_diagnostics": true,
+    "chrome_fixture_smoke_widths": [
+      1440,
+      390
+    ],
+    "early_python_contract": true,
+    "mfa_application_logic_unchanged": true,
+    "production_cookie_consent_unchanged": true,
+    "historical_inventories_unchanged": true
+  },
+  "local_validation": {
+    "rc190_python_tests_passed": 4,
+    "rc186_python_tests_passed": 5,
+    "isolated_chromium_viewports_passed": 2,
+    "compiled_react_mfa_e2e": "pending CI; npm registry EAI_AGAIN",
+    "source_inventory_verified": false,
+    "zip_integrity_verified": false
+  },
+  "certified_gate_score": 85.25,
+  "accepted_gates": 43,
+  "partial_gates": 17,
+  "rc_strict": false,
+  "publish_image": false,
+  "publish_latest": false,
+  "assistant_committed": false,
+  "assistant_pushed": false,
+  "assistant_tagged": false
+}
