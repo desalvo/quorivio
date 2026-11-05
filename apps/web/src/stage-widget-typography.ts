@@ -6,13 +6,14 @@
 import type {WidgetTextStyle} from '../../api/src/domain';
 import {widgetDisplay,type SlideWidget} from './slide-master.ts';
 import {widgetTypographyStyle} from './widget-appearance.ts';
+import {widgetTextDefaults} from './widget-typography-defaults.ts';
 
 export function stageWidgetTypography(
  widget:SlideWidget,
  context:{pageTitle?:string;masterTitleStyle?:WidgetTextStyle},
  phone=false
 ):Record<string,string|undefined>{
- const resolved=widget.kind==='title'?widgetDisplay(widget,context).style:widget.style;
+ const resolved=widget.kind==='title'?widgetDisplay(widget,context).style:widgetTextDefaults(widget.kind,widget.style);
  const typography=widgetTypographyStyle(resolved);
  const base={...typography,'--authored-widget-font-size':typography.fontSize};
  if(!phone)return base;

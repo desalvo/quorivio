@@ -2473,3 +2473,54 @@ main.participant-live-view.participant-slide-active .audience-stage-scroll{
 .widget-answer-feedback[data-answer-correct="false"]{border-color:#b91c1c;background:#fef2f2}
 .widget-answer-feedback ul{margin:.4rem 0 .1rem;padding-left:1.35rem}
 .widget-answer-feedback li{padding:.15rem 0}
+
+/* RC192: optional read-only source question occupies intrinsic height above chart rows.
+ * Keep author typography/inline marks; never clip options before result totals. */
+.linked-results>.linked-source-question{flex:0 0 auto;min-width:0;max-width:100%;height:auto;padding:.3em 0;overflow-wrap:anywhere;white-space:normal;border-bottom:1px solid #a9b3c77d}
+.linked-source-question-title{display:block;margin-bottom:.25em;white-space:pre-wrap;overflow-wrap:anywhere}
+.linked-source-question>p{margin:.1em 0 .35em;white-space:pre-wrap;overflow-wrap:anywhere}
+.linked-source-answers{display:flex;flex-direction:column;gap:.2em;min-width:0;max-width:100%}
+.linked-source-answer.widget-answer-option{display:block;max-width:100%;min-width:0;white-space:pre-wrap;overflow-wrap:anywhere;font:inherit}
+
+/* RC193: authoritative Arial (unless explicitly customized), same for whole-widget
+ * typography, answer options and independent questions. Override legacy
+ * font:inherit !important which discarded author-specified answer styles. */
+.editor-ux-v2 .widget-canvas-item .canvas-widget-answer-preview[data-answer-mode]{
+ font-family:var(--q-answer-font-family,Arial)!important;
+ font-size:var(--q-answer-font-size,inherit)!important;
+}
+.editor-ux-v2 .widget-canvas-item .canvas-widget-answer-preview .widget-answer-option,
+.editor-ux-v2 .widget-canvas-item .canvas-subquestion-option{
+ font-family:var(--q-answer-font-family,Arial)!important;
+ font-size:var(--q-answer-font-size,inherit)!important;
+}
+/* Explicit stepper is visible in Chromium, Firefox, Windows, macOS and mobile.
+ * No dependency on user-agent numeric spinner rendering. */
+.widget-selection-palette .palette-ribbon-font-size{display:inline-flex;align-items:stretch;flex:none;min-width:86px;height:30px}
+.widget-selection-palette .palette-ribbon-font-picker .palette-ribbon-font-size input[type=number]{width:60px;min-width:60px;max-width:60px;height:30px;appearance:textfield;-moz-appearance:textfield;text-align:center;padding:3px 4px}
+.widget-selection-palette .palette-ribbon-font-size input::-webkit-inner-spin-button,
+.widget-selection-palette .palette-ribbon-font-size input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.widget-selection-palette .palette-ribbon-font-stepper{display:flex;flex-direction:column;gap:1px;width:25px;flex:none}
+.widget-selection-palette .palette-ribbon-font-stepper button{display:flex!important;align-items:center;justify-content:center;flex:1!important;min-height:14px!important;height:14px!important;line-height:1!important;min-width:25px!important;padding:0!important;font-size:9px!important;border-radius:3px!important}
+.widget-selection-palette .palette-ribbon-font-picker{flex-wrap:wrap;max-width:100%}
+
+/* RC194: long answers wrap without clipping on every surface; never truncate
+ * a multi-line choice to a single row in the canvas editor. */
+.editor-ux-v2 .widget-canvas-item .canvas-widget-answer-preview .widget-answer-option,
+.editor-ux-v2 .widget-canvas-item .canvas-subquestion-option,
+:is(.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget) .widget-answer-option{
+ white-space:normal!important;overflow-wrap:anywhere!important;word-break:normal;
+ height:auto!important;min-height:0!important;overflow:visible!important;
+}
+.editor-ux-v2 .widget-canvas-item .canvas-widget-answer-preview .widget-rich-inline,
+.editor-ux-v2 .widget-canvas-item .canvas-subquestion-option .widget-rich-inline,
+:is(.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget) .widget-answer-option>:not(input){
+ white-space:pre-wrap!important;overflow-wrap:anywhere!important;min-width:0!important;
+}
+/* RC194: a legacy "font:inherit!important" shorthand must never discard
+ * the explicitly selected whole-widget font family for answer controls. */
+:is(.editor-ux-v2 .widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget) .widget-answer-option,
+.editor-ux-v2 .widget-canvas-item .canvas-subquestion-option{
+ font-family:var(--q-answer-font-family,inherit)!important;
+ font-size:var(--q-answer-font-size,inherit)!important;
+}

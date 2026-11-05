@@ -1,3 +1,27 @@
+# Quorivio 0.1.0-dev — RC194 handoff — Font e selezione testo
+
+**RC194 handoff:** Nuovi default condivisi domanda/risposta con Arial, titolo grassetto 22 e opzioni normali 16; ritorno a capo delle opzioni lunghe; correzione CSS che sovrascriveva la famiglia dei font applicata a «Widget intero». L’inserimento in testo formattato eredita lo stile del carattere precedente anche fra marcature Unicode e la selezione resta evidenziata dopo la formattazione. Nuovi controlli preflight Node/Python/Chromium e manifesto SHA-256 cumulativo. Test locali 342 frontend e 603 API verdi; CI integrata ancora da confermare. Baseline pubblicata RC190 `42027634427`/`42032833536`. Certificato **85,25%**, nessun commit/push/tag. `docs/RC_CYCLE194_QUESTION_TEXT_TYPOGRAPHY.it.md`.
+
+## Ciclo precedente RC193
+
+# Quorivio 0.1.0-dev — RC193 — Focus intermittente e tipografia delle risposte
+
+**RC193:** RC193 handoff: il rich-text ripristina il cursore soltanto nella casella realmente attiva, cancella la selezione ricordata al blur e non ricostruisce inutilmente caselle sorelle. Ripristinato il campo numerico della dimensione con frecce sempre visibili in «Formato widget», modificabile anche da tastiera e nei diversi ambiti. Risposte e sottodomande ereditano Arial per default e lo stile del widget intero, senza override dei CSS legacy. Aggiunto test Chromium reale con PostgreSQL e digitazione continua senza reload. Cumulativo RC192 preservato; integrazione CI da verificare. Certificato **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag dell’assistente. `docs/RC_CYCLE193_EDITOR_FOCUS_FONT.it.md`.
+
+## Ciclo precedente RC192
+
+# Quorivio 0.1.0-dev — RC192 — Opzione domanda sorgente e cancellazione pagine
+
+**RC192 handoff:** dal cumulativo RC191, aggiunta `showSourceQuestion` per titolo e risposte originali della domanda sopra le statistiche in anteprima/proiezione, con font e marcatori originali, anche per sottodomande. Correzione DELETE /pages/:aid con scollegamento transazionale dei riferimenti del pubblico e delle statistiche, revisione incrementata, conferma e ricarica nell'editor. Ultima full CI GitHub verde RC190 `42027634427` e publish `42032833536`; CI RC192 da confermare. **85,25%** certificato (43 accettati/17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. `docs/RC_CYCLE192_SOURCE_RESULTS_AND_DELETE.it.md`.
+
+## Ciclo precedente RC191
+
+# Quorivio 0.1.0-dev — RC191 — Risultati tra pagine e anteprima affiancata indipendente
+
+**RC191:** Partendo dalla RC190 pubblicata, CI completa verde `42027634427` e publish Docker Hub multiarchitettura riuscito `42032833536` (commit `bb80a3ce`), corretto il widget Risultati in anteprima che cercava la sorgente soltanto nella propria pagina. Il nuovo risolutore condiviso con la vista live usa l'ID della pagina sorgente. Risolto anche l'annullamento ripetuto delle richieste HTTP di statistiche durante votazioni frequenti (aggiornamento ogni 3 secondi). Le anteprime «Affiancate», «Presentatore», «Partecipante» e «Smartphone» rispettano le pagine escluse al presentatore, la pagina scelta per il pubblico e il layout autonomo smartphone. Aggiornati i test storici e inserito un preflight anticipato nella CI. Test locali: 326/326 frontend Node, 599/599 API Node, regressioni Python mirate superate. La nuova CI React/Chromium/PostgreSQL RC191 resta da verificare dopo il commit. Completamento certificato **85,25%** (43 gate accettati e 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit, push o tag dall'assistente. Dettagli: `docs/RC_CYCLE191_CROSS_PAGE_RESULTS_REHEARSAL.it.md`.
+
+## Ciclo precedente RC190
+
 # Quorivio 0.1.0-dev — RC190 — Correzione fixture MFA del React compilato
 
 **RC190:** la run GitHub `42023471301` (job `127231773092`) ha superato la compilazione RC189, ma si è fermata nel test `tools/ci_rc186_mfa_enter_chromium.py`: mancava il dialogo «Informativa cookie funzionali». La causa è la fixture eseguita su `about:blank`, un'origine opaca: a differenza dei test recupero password e anteprima, non simulava in memoria `localStorage`, `sessionStorage` e `document.cookie`. Il React compilato accede allo storage durante il montaggio e non poteva avviare il dialogo. RC190 installa queste dipendenze in memoria prima del bundle, senza alterare i cookie di produzione, il consenso o il codice MFA. La prova Chromium isolata su 1440/390 px e le suite Python di regressione sono superate. Il test E2E del React compilato e l'intera CI su RC190 restano da verificare con GitHub (npm non disponibile offline in questo ambiente). Ultima CI interamente verde: RC184, run `41993094578`. Completamento certificato **85,25%** (43 gate accettati, 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Non sono stati eseguiti commit, push o tag. Vedi `docs/RC_CYCLE190_MFA_FIXTURE_CHROMIUM.it.md`.

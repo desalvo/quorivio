@@ -48,7 +48,7 @@ test('RC169 rating content has one shared implementation in all four rendering r
 });
 
 test('RC169 both real and rehearsal stages use the same master-aware typography, and phone previews allow widget overflow',()=>{
- assert.match(ui,/stageWidgetTypography\(w,\{pageTitle:activity.title,masterTitleStyle:snapshot.session.theme\?\.master\?\.titleStyle\},mobile\)/);
+ assert.match(ui,/stageWidgetTypography\(w,\{pageTitle:viewActivity.title,masterTitleStyle:snapshot.session.theme\?\.master\?\.titleStyle\},mobile\)/);
  assert.match(ui,/stageWidgetTypography\(w,\{pageTitle:entry.activity.title,masterTitleStyle:entry.theme\?\.master\?\.titleStyle\},audiencePortrait\)/);
  assert.doesNotMatch(ui,/mobile\?\{fontSize:`\$\{w.style\?\.fontSize\|\|16\}px`/);
  assert.match(css,/\.rehearsal-phone-stage \.rehearsal-widget\{\s*font-size:var\(--mobile-widget-font-size,16px\)!important;padding:10px!important;overflow:auto!important;/);

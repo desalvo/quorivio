@@ -28,7 +28,7 @@ class TopicLinkedResultsRC(unittest.TestCase):
   self.assertIn('Invia domanda di prova',block)
   # Rehearsal now prioritizes authored free-text responses, then falls
   # back to safe synthetic statistics. The presenter never writes to APIs.
-  self.assertIn('linkedStatisticSource(w,widgets)',block)
+  self.assertIn('linkedStatisticContext(w,viewActivity,activities,viewWidgets)',block)
   self.assertIn('rehearsalFreeTextRows(source,submittedAnswers',block)
   self.assertIn('rows.length?rows:sampleStatisticRows(source,seed,submittedAnswers',block)
   self.assertIn('demoResultsVisible&&<section',block)

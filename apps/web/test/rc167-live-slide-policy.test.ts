@@ -30,7 +30,7 @@ test('RC167 lines/forms never expose captions, QR caption is opt-in, content tit
 test('RC167 all three stage roots apply the shared visibility policy and public graphics have no caption JSX',()=>{
  assert.match(ui,/import \{participantVisibleWidgets,participantPhoneLayout,widgetTitleVisible\} from '\.\/live-slide-policy'/);
  assert.equal((ui.match(/data-show-title=\{widgetTitleVisible\(w\)\}/g)||[]).length,4);
- assert.match(ui,/viewer==='presenter'\?.*?:\(mobile\?participantPhoneLayout\(widgets/);
+ assert.match(ui,/viewer==='presenter'\?.*?:\(mobile\?participantPhoneLayout\(viewWidgets/);
  assert.match(ui,/audiencePortrait\?audiencePhoneLayout\.widgets:participantReadingMode\?audienceReadingWidgets:audienceVisibleWidgets/);
  assert.match(ui,/\(w\.kind==='shape'\|\|w\.kind==='line'\)\?null:/);
  assert.doesNotMatch(ui,/\(w\.kind==='shape'\|\|w\.kind==='line'\)\?\(w\.showTitle===false\?null:/);

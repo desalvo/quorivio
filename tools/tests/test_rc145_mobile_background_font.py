@@ -33,14 +33,14 @@ class MobileBackgroundFontParity(unittest.TestCase):
         self.assertIn('mobileMode&&<label>Colore di sfondo smartphone', self.ui)
         self.assertIn('mobileLayoutDraft.backgroundAssetId||\'\':slideBackground({backgroundAssetId:questionBackgroundAsset||undefined,backgroundUrl:questionBackground||undefined},snap.session.theme).assetId||\'\'', self.ui)
         self.assertIn('background-image:var(--editor-page-background,none)!important;', self.css)
-        self.assertIn("backgroundImage:activity?.page_design?.mobile?.backgroundAssetId?", self.ui)
+        self.assertIn("backgroundImage:viewActivity?.page_design?.mobile?.backgroundAssetId?", self.ui)
 
     def test_editor_projection_arial_heading_and_rich_text_parity(self):
         typography = read('apps/web/src/widget-appearance.ts')
         self.assertIn("fontFamily:style?.fontFamily||'Arial'", typography)
         self.assertIn('font-family:inherit!important;font-weight:inherit!important;', self.css)
         self.assertIn(' :is(h1,h2,h3,h4){font-family:inherit;}', self.css)
-        self.assertIn("...widgetTypographyStyle(w.kind==='title'?widgetDisplay(w,{pageTitle,masterTitleStyle}).style:w.style)", self.ui)
+        self.assertIn("...widgetTypographyStyle(w.kind==='title'?widgetDisplay(w,{pageTitle,masterTitleStyle}).style:widgetTextDefaults(w.kind,w.style))", self.ui)
 
     def test_release_gate_remains_unchanged(self):
         self.assertIn('85.25%', read('docs/RC_CYCLE145_MOBILE_BACKGROUND_FONT_PARITY.en.md'))

@@ -1,7 +1,18 @@
 /** Page-scoped presenter statistics; result controls never reference participants directly. */
 export const STATISTICAL_WIDGET_KINDS=['question','timed-quiz','rating','reactions','topic-question'] as const;
-export type StatisticalWidget={id:string;kind:string;label?:string;answerMode?:string;options?:{id:string;label:string}[];targetWidgetId?:string;targetActivityId?:string;targetQuestionId?:string;questions?:{id:string;label:string;answerMode?:string;options?:{id:string;label:string}[]}[];resultsView?:string;resultsOnly?:boolean;showTitle?:boolean};
+export type StatisticalWidget={id:string;kind:string;label?:string;description?:string;answerMode?:string;options?:{id:string;label:string}[];targetWidgetId?:string;targetActivityId?:string;targetQuestionId?:string;questions?:{id:string;label:string;description?:string;answerMode?:string;options?:{id:string;label:string}[]}[];resultsView?:string;resultsOnly?:boolean;showTitle?:boolean;showSourceQuestion?:boolean};
 export type StatRow={id:string;label:string;count:number};
+export type SourceQuestionPart={id?:string;label:string;description?:string;answerMode?:string;options?:{id:string;label:string}[]};
+/** The author may reveal a read-only copy of the SOURCE question above the
+ * aggregated results. Never infer grading keys or send the source to viewers. */
+export function linkedResultQuestion(result:StatisticalWidget,source:StatisticalWidget):{part:SourceQuestionPart;questionId:string}|undefined{
+ if(result.showSourceQuestion!==true)return undefined;
+ const questionId=result.targetQuestionId||'';
+ const part=questionId?source.questions?.find(q=>q.id===questionId):source;
+ if(!part)return undefined;
+ return {part:{id:questionId||undefined,label:part.label||'',description:part.description,answerMode:part.answerMode,options:part.options},questionId};
+}
+
 export function eligibleStatisticSources(widgets:StatisticalWidget[],excluding?:string):StatisticalWidget[]{
  return widgets.filter(w=>w.id!==excluding&&(STATISTICAL_WIDGET_KINDS as readonly string[]).includes(w.kind));
 }
@@ -12,6 +23,18 @@ export function linkedStatisticSource(widget:StatisticalWidget,widgets:Statistic
  * owner snapshot. No public participant snapshot contains other pages. */
 export function linkedStatisticActivity<T extends {id:string;page_design?:{widgets?:StatisticalWidget[]}}>(widget:StatisticalWidget,current:T,activities:readonly T[]):T|undefined{
  return widget.targetActivityId?activities.find(activity=>activity.id===widget.targetActivityId):current;
+}
+/** Unified result source for real presenter projection and both rehearsal
+ * panes. The activity id is ALWAYS the source activity id, not the current
+ * presenter page id; its widgets supply the option labels and chart format. */
+export function linkedStatisticContext<T extends {id:string;page_design?:{widgets?:StatisticalWidget[]}}>(
+ widget:StatisticalWidget,current:T,activities:readonly T[],localWidgets?:StatisticalWidget[]
+):{activity:T;widgets:StatisticalWidget[];source:StatisticalWidget}|undefined{
+ const activity=linkedStatisticActivity(widget,current,activities);
+ if(!activity)return undefined;
+ const widgets=(activity.id===current.id&&localWidgets)||activity.page_design?.widgets||[];
+ const source=linkedStatisticSource(widget,widgets);
+ return source?{activity,widgets,source}:undefined;
 }
 export type ResultView='bars'|'pie'|'table'|'cloud';
 /** The source question/quiz/poll controls the appearance; result widgets cannot override it. */

@@ -24,12 +24,13 @@ class RC137PresenterPrivacyAndBackground(unittest.TestCase):
   self.assertIn("const answer=viewer==='participant'?responses[w.id]:undefined",rehearsal)
   self.assertIn("const current=viewer==='participant'?responses[key]:undefined",rehearsal)
   self.assertIn("const sent=viewer==='participant'&&submittedAnswers[key]!==undefined",rehearsal)
-  self.assertIn('<LinkedResultChart widget={w} widgets={widgets}',rehearsal)
+  self.assertIn('<LinkedResultChart widget={w} widgets={sourceWidgets}',rehearsal)
+  self.assertIn('linkedStatisticContext(w,viewActivity,activities,viewWidgets)',rehearsal)
   # RC167: presenter-only widgets are filtered from the participant pane by a
   # shared policy; presenter pane retains them, without sharing draft answers.
   self.assertIn("viewer==='presenter'?(mobile?mobilePageWidgets",rehearsal)
-  self.assertIn("mobile?participantPhoneLayout(widgets,activity?.page_design?.mobile).widgets:participantVisibleWidgets(widgets)",rehearsal)
-  self.assertIn("height={participantPhoneLayout(widgets,activity?.page_design?.mobile).height}",rehearsal)
+  self.assertIn("mobile?participantPhoneLayout(viewWidgets,viewActivity?.page_design?.mobile).widgets:participantVisibleWidgets(viewWidgets)",rehearsal)
+  self.assertIn("height={participantPhoneLayout(widgets,audienceActivity?.page_design?.mobile).height}",rehearsal)
   self.assertNotIn("viewer==='presenter'||!['results-button'",rehearsal)
   self.assertIn('demoResultsVisible&&<section id="rehearsal-simulated-results"',rehearsal)
   self.assertIn('setDemoResultsVisible(false)',rehearsal)

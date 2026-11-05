@@ -1,3 +1,27 @@
+# Quorivio 0.1.0-dev — RC194 — Question defaults, long choices and text continuity
+
+**RC194:** Fixed question/quiz Arial default with bold 22 title vs regular 16 choices, long-answer multi-line wrap in all surfaces, whole-widget font family propagation through answer and independent-question runs, preserved highlighted DOM selection after formatting, and inherited previous-character typography on subsequent insertion. Frontend 342/342 and API 603/603 Node tests green; Chromium computed-style proof at 1440/390 px. Post-commit integrated React/PostgreSQL CI pending. Last fully green and published source remains RC190 (runs `42027634427` and `42032833536`). Certified **85.25%** (43 accepted, 17 partial); no commit/push/tag. See `docs/RC_CYCLE194_QUESTION_TEXT_TYPOGRAPHY.en.md`.
+
+## Previous cycle RC193
+
+# Quorivio 0.1.0-dev — RC193 — Resilient editor focus and whole-widget font fidelity
+
+**RC193:** RC193 fixes intermittent input focus jumps without requiring browser reload: a rich-text field only restores its own selection while focused, clears old caret positions on blur, and skips unnecessary DOM replacement on sibling edits. Widget Format now offers a directly editable numeric font size (10–96) with explicit up/down arrows in all scopes; answer options and independent questions honor the authored Arial default and whole-widget font styles despite legacy CSS overrides. Frontend/API Node and targeted Python regressions green; real compiled React/PostgreSQL/Chromium focus acceptance runs in CI, not certified locally. RC192 cumulatively retained, last full green RC190 run `42027634427`, Docker Hub publish run `42032833536`. Certified **85.25%** (43 accepted, 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. See `docs/RC_CYCLE193_EDITOR_FOCUS_FONT.en.md`.
+
+## Previous cycle RC192
+
+# Quorivio 0.1.0-dev — RC192 — Optional source question in Results and confirmed page deletion
+
+**RC192:** Implemented optional source title/answers above a Results chart using source formatting and cross-page/subquestion references. Fixed confirmed Delete Page when referenced by another slide: atomically detach audience and result links, revision-bump, cascade delete and reload the editor. Starting from RC191 cumulative (CI not yet verified); the last complete green GitHub Actions is RC190 run `42027634427`, with multiarch Docker Hub publish run `42032833536`. Local suites and RC192 preflight; React/Chromium/PostgreSQL CI pending. Certified **85.25%** (43 accepted, 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. See `docs/RC_CYCLE192_SOURCE_RESULTS_AND_DELETE.en.md`.
+
+## Previous cycle RC191
+
+# Quorivio 0.1.0-dev — RC191 — Cross-page result routing and split-screen rehearsal parity
+
+**RC191:** Based on published RC190, full green GitHub Actions run `42027634427` and successful Docker Hub multiarch publish run `42032833536` (commit `bb80a3ce`). Fixed cross-page Results widgets in rehearsal with a source-activity resolver shared with the live presenter view, removed full-WebSocket-snapshot cancellation of HTTP statistics requests (3s polling), and aligned side-by-side/participant/mobile rehearsal with hidden presenter pages and per-page audience routing. Updated historical assertions and added dependency-free CI regression preflight. Local frontend Node 326/326, API Node 599/599, targeted Python checks PASS. Full post-commit React/Chromium/PostgreSQL CI for RC191 pending. Certified completion **85.25%** (43 accepted gates, 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit, push, or tag. Details: `docs/RC_CYCLE191_CROSS_PAGE_RESULTS_REHEARSAL.en.md`.
+
+## Previous cycle RC190
+
 # Quorivio 0.1.0-dev — RC190 — Chromium MFA fixture and cookie dialog
 
 **RC190:** GitHub run `42023471301` (job `127231773092`) passed the RC189 TypeScript build but stopped inside `tools/ci_rc186_mfa_enter_chromium.py`: the “Informativa cookie funzionali” dialog never appeared. The test mounted compiled React on `about:blank`, an opaque origin, without the in-memory `localStorage`, `sessionStorage`, and `document.cookie` fixtures already used in recovery and preview tests. React reads storage while mounting and could not render the initial dialog. RC190 installs those isolated mocks before loading the compiled bundle, with no change to production cookies, consent, or MFA behavior. The isolated Chromium fixture passed at 1440/390px and Python regression checks passed. The compiled-React E2E and whole RC190 CI must still run on GitHub (npm dependencies unavailable offline here). Last fully green CI: RC184 run `41993094578`. Certified readiness **85.25%** (43 accepted gates, 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit, push, or tag. See `docs/RC_CYCLE190_MFA_FIXTURE_CHROMIUM.en.md`.

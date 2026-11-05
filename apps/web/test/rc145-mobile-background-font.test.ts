@@ -24,7 +24,7 @@ test('RC145 choosing a phone-only solid color replaces its image, never touches 
  assert.match(css,/\.canvas-editor-group\[data-canvas-device="phone"\] \.canvas-with-rulers \.widget-canvas\{/);
  assert.match(css,/background-color:var\(--editor-phone-background-color,#ffffff\)!important/);
  assert.match(source,/\"--editor-page-background\":backgroundAssetId&&sessionId\?/);
- assert.match(source,/backgroundImage:activity\?\.page_design\?\.mobile\?\.backgroundAssetId\?/);
+ assert.match(source,/backgroundImage:viewActivity\?\.page_design\?\.mobile\?\.backgroundAssetId\?/);
 });
 
 test('RC145 selecting library image uses the smartphone target without unreachable duplicate branch',()=>{
@@ -41,6 +41,6 @@ test('RC145 Arial default, whole-widget overrides and rich-text marks use the sa
  assert.equal(inlineMarkCss({fontFamily:'Arial'}).fontFamily,'Arial');
  const parts=styledSegments('Arial Georgia',[{field:'label',start:6,end:13,style:{fontFamily:'Georgia'}}],'label');
  assert.deepEqual(parts.map(x=>x.style.fontFamily),[undefined,'Georgia']);
- assert.match(source,/\.\.\.widgetTypographyStyle\(w\.kind==='title'\?widgetDisplay\(w,\{pageTitle,masterTitleStyle\}\)\.style:w\.style\)/);
+ assert.match(source,/\.\.\.widgetTypographyStyle\(w\.kind==='title'\?widgetDisplay\(w,\{pageTitle,masterTitleStyle\}\)\.style:widgetTextDefaults\(w.kind,w.style\)\)/);
  assert.match(css,/\.editor-ux-v2 \.widget-canvas-item \.widget-fit-content>\.widget-rich-inline\{\s*font-family:inherit!important;/);
 });

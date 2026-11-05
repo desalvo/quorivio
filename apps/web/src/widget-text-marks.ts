@@ -10,12 +10,26 @@ export function formatTextRange(marks:TextMark[],field:string,start:number,end:n
  if(start<0||end<=start||end>500||marks.length>=64)return marks;
  return [...marks,{field,start,end,style}];
 }
+/** The insertion style must come from the glyph *before* the caret, even
+ * when that glyph belongs to the second or later styled segment. */
+export function styleOfPreviousCharacter(text:string,marks:TextMark[],field:string,at:number):InlineStyle{
+ if(!text)return {} as InlineStyle;
+ const position=Math.max(0,Math.min(text.length-1,at-1));
+ let offset=0;
+ for(const part of styledSegments(text,marks,field)){
+  offset+=part.text.length;
+  if(position<offset)return part.style;
+ }
+ return {} as InlineStyle;
+}
 /** Preserve marks across edits, expanding on inserted characters within a marked run. */
 export function remapMarks(marks:TextMark[],field:string,oldText:string,newText:string):TextMark[]{
  let first=0;while(first<Math.min(oldText.length,newText.length)&&oldText[first]===newText[first])first++;
  let suffix=0;while(suffix<Math.min(oldText.length-first,newText.length-first)&&oldText[oldText.length-1-suffix]===newText[newText.length-1-suffix])suffix++;
  const endOld=oldText.length-suffix,endNew=newText.length-suffix,delta=endNew-endOld;
- return marks.flatMap(mark=>{
+ const inherited=delta>0&&endOld===first&&oldText.length>0?
+  styleOfPreviousCharacter(oldText,marks,field,first):null;
+ const shifted=marks.flatMap(mark=>{
   if(mark.field!==field)return [mark];
   if(mark.end<=first)return [mark];
   if(mark.start>=endOld)return [{...mark,start:mark.start+delta,end:mark.end+delta}];
@@ -23,6 +37,14 @@ export function remapMarks(marks:TextMark[],field:string,oldText:string,newText:
   const end=Math.max(first,mark.end+delta);
   return end>start?[{...mark,start,end}]:[];
  }).filter(m=>m.field!==field||(m.start>=0&&m.end<=newText.length&&m.end>m.start));
+ // A keyboard insertion at a formatting boundary inherits the character
+ // immediately BEFORE the caret, not the run following it. This includes
+ // font face, size, weight and underline. Preserve IME and UTF-16 positions.
+ if(inherited&&Object.keys(inherited).length&&first<endNew){
+  const next=applySelectionInlineStyle(shifted,field,newText,first,endNew,inherited);
+  return next;
+ }
+ return shifted;
 }
 export function styledSegments(text:string,marks:TextMark[]|undefined,field:string):{text:string;style:InlineStyle}[]{
  if(!text)return [];

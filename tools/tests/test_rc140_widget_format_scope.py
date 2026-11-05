@@ -24,7 +24,8 @@ class RC140ScopeParity(unittest.TestCase):
   self.assertIn('style={answerOptionStyle(w.style)}',UI)
   self.assertIn('answerOptionStyle(marks.style)',UI)
   self.assertIn('answerFontFamily: e.target.value', UI.replace('answerFontFamily:e.target.value','answerFontFamily: e.target.value'))
-  self.assertIn('fontSize:`${((style?.answerFontSize',ANSWER)
+  self.assertIn('const size=`${((style?.answerFontSize',ANSWER)
+  self.assertIn('fontSize:size',ANSWER)
   self.assertIn('onKeyDownCapture={e=>',UI)
  def test_editor_and_preview_shared_text_wrapping(self):
   self.assertIn('canvas-widget-answer-preview[data-answer-mode]',CSS)

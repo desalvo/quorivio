@@ -336,6 +336,29 @@ jobs:
         run: python3 -m unittest tools.tests.test_rc_cycle99_ci_contract -q
       - name: Validate RC98 presenter and scheme TypeScript fixes before npm
         run: python3 -m unittest tools.tests.test_rc_cycle98_web_compile -q
+      # RC191: cross-page result widgets must resolve the hidden source page;
+      # the side-by-side rehearsal uses presenter-visible navigation and the
+      # mapped audience page independently. Run dependency-free tests first.
+      # RC193: keep focus inside the genuine edited field, not a stale sibling;
+      # reinstate font size typing/steppers and consistent answer typography.
+      # RC194: default Arial/bold question hierarchy, multi-line answer wrap,
+      # whole-widget font family and inserted-text font inheritance.
+      - name: RC194 question typography and rich-selection preflight before npm
+        run: |
+          PYTHONPATH=tools python3 -m unittest tools.tests.test_rc194_question_typography -q
+          node --experimental-strip-types --test apps/web/test/rc194-question-typography.test.ts apps/web/test/widget-rich-editor-ime.test.ts
+      - name: RC193 editor focus ownership and font controls before npm
+        run: |
+          PYTHONPATH=tools python3 -m unittest tools.tests.test_rc193_focus_and_font -q
+          node --experimental-strip-types --test apps/web/test/rc193-font-focus.test.ts apps/web/test/widget-rich-editor-ime.test.ts
+      - name: RC192 source question formatting and confirmed page deletion preflight before npm
+        run: |
+          PYTHONPATH=tools python3 -m unittest tools.tests.test_rc192_source_and_delete tools.tests.test_rc185_cross_page_projection -q
+          node --experimental-strip-types --test apps/api/test/page-deletion.test.ts apps/web/test/rc192-linked-question.test.ts apps/api/test/widgets.test.ts
+      - name: RC191 cross-page results and independent rehearsal routing preflight
+        run: |
+          python3 -m unittest tools.tests.test_rc191_crosspage_live_rehearsal -q
+          node --experimental-strip-types --test apps/web/test/rc191-cross-page-preview.test.ts
       # RC190: the compiled MFA browser fixture runs on an opaque origin, so
       # cookie/localStorage mocks must exist before the JS module mounts.
       - name: RC190 MFA built-React fixture safety preflight before npm
@@ -780,6 +803,8 @@ jobs:
           python3 tools/ci_widget_title_menu.py
           python3 tools/ci_browser_editor_conflict_visibility.py
           python3 tools/ci_browser_editor_postgres.py
+          python3 tools/ci_rc193_editor_focus_chromium.py
+          python3 tools/ci_rc194_answer_typography_chromium.py
       - name: Chromium presenter profile upload and anonymous avatar acceptance (opt-in)
         if: github.event_name == 'workflow_dispatch' && inputs.browser_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite) || (github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[full-ci]') || contains(github.event.head_commit.message, '[publish-docker]')))
         timeout-minutes: 5
@@ -1143,7 +1168,11 @@ jobs:
           python3 tools/verify_rc_cycle187_inventory.py --historical
           python3 tools/verify_rc_cycle188_inventory.py --historical
           python3 tools/verify_rc_cycle189_inventory.py --historical
-          python3 tools/verify_rc_cycle190_inventory.py
+          python3 tools/verify_rc_cycle190_inventory.py --historical
+          python3 tools/verify_rc_cycle191_inventory.py --historical
+          python3 tools/verify_rc_cycle192_inventory.py --historical
+          python3 tools/verify_rc_cycle193_inventory.py --historical
+          python3 tools/verify_rc_cycle194_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

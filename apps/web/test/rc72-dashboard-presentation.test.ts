@@ -10,7 +10,7 @@ test('transparent and square new widget defaults preserve explicit effects',()=>
  assert.equal(widgetAppearanceStyle({shapeType:'rectangle',rounded:true}).borderRadius,0);
  assert.equal(widgetArtData(undefined)['data-art-theme'],'plain');
  assert.equal(widgetArtData({artTheme:'glass',artEffect:'glow'})['data-art-effect'],'glow');
- assert.match(web,/style:\{fontFamily:'Arial',\.\.\.\(k==='footer'\?newFooterWidget\('new'\)\.style:\{\}\),fillNone:true,shapeType:'rectangle'/);
+ assert.match(web,/style:\{\.\.\.initialWidgetTextStyle\(k\),\.\.\.\(k==='footer'\?newFooterWidget\('new'\)\.style:\{\}\),fillNone:true,shapeType:'rectangle'/);
  assert.match(web,/k==='shape'\|\|k==='line'\?<GraphicInsertTool/);
  assert.match(web,/style:graphicStyle\(k,preset,options\)/);
  assert.match(css,/quorivio-floating-shadow/);

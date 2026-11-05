@@ -37,5 +37,5 @@ test('RC138: presenter-owned results are aggregate only and never include answer
  const chart=rowsFromWidgetAnswerDetail({id:'q',kind:'question',answerMode:'text'} as any,{revisions:[{texts:3}],text_counts:groups});
  assert.deepEqual(chart,[{id:'text:machine learning',label:'machine learning',count:2}]);
  assert.match(main,/<PresenterLinkedResult sessionId=\{sessionId\}/);
- assert.match(main,/<LinkedResultChart widget=\{w\} widgets=\{widgets\}/);
+ assert.match(main,/<LinkedResultChart widget=\{w\} widgets=\{sourceWidgets\}/);
 });

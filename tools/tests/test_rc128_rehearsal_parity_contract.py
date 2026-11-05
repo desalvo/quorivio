@@ -10,11 +10,12 @@ class RehearsalParityContracts(unittest.TestCase):
  def test_no_presenter_free_text_demo_under_question(self):
   self.assertNotIn('rehearsal-presenter-free-text" aria-label="Risposte libere nella simulazione',JSX)
   self.assertIn("viewer==='presenter'?'Invia risposta':'Invia risposta di prova'",JSX)
-  self.assertIn('kind===\'results-button\'?<LinkedResultChart widget={w}',JSX)
+  self.assertIn("kind==='results-button'?(()=>{",JSX)
+  self.assertIn('linkedStatisticContext(w,viewActivity,activities,viewWidgets)',JSX)
   self.assertIn('demoResultsVisible&&<section id="rehearsal-simulated-results"',JSX)
  def test_preview_preserves_authored_geometry_and_fonts(self):
   self.assertIn("'--stage-width':`${w.position?.width??45}%`",JSX)
-  self.assertIn('stageWidgetTypography(w,{pageTitle:activity.title,masterTitleStyle:snapshot.session.theme?.master?.titleStyle},mobile)',JSX)
+  self.assertIn('stageWidgetTypography(w,{pageTitle:viewActivity.title,masterTitleStyle:snapshot.session.theme?.master?.titleStyle},mobile)',JSX)
   self.assertIn("'--authored-widget-font-size':typography.fontSize",TYPO)
   self.assertIn('widgetTypographyStyle(resolved)',TYPO)
   self.assertIn('font-size:var(--authored-widget-font-size,1.25cqw)!important;',CSS)

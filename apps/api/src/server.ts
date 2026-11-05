@@ -1,3 +1,4 @@
+import {unlinkDeletedPage} from './page-deletion.js';
 import {apiRateClass,apiRateBudget} from './api-rate-policy.js';
 import {timedDeadline} from './timed-deadline.js';
 import {livePageTimerExpired} from './page-timer.js';
@@ -1380,11 +1381,19 @@ app.delete('/api/sessions/:id/pages/:aid',requireAuth,async(req,res)=>{
   const page=await cx.query('SELECT id FROM activities WHERE id=$1 AND session_id=$2 FOR UPDATE',[req.params.aid,req.params.id]);
   if(!page.rowCount){await cx.query('ROLLBACK');begun=false;res.status(404).end();return}
   // Remove dependent rows through their existing ON DELETE CASCADE references.
-  const references=await cx.query(`SELECT id FROM activities WHERE session_id=$1 AND id<>$2 AND (
-    page_design->>'audiencePageId'=$2 OR EXISTS (
-      SELECT 1 FROM jsonb_array_elements(coalesce(page_design->'widgets','[]'::jsonb)) w
-      WHERE w->>'targetActivityId'=$2) OR EXISTS (SELECT 1 FROM jsonb_array_elements(coalesce(result_design->'widgets','[]'::jsonb)) w WHERE w->>'targetActivityId'=$2)) LIMIT 1`,[req.params.id,req.params.aid]);
-  if(references.rowCount){await cx.query('ROLLBACK');begun=false;res.status(409).json({error:'page_referenced_by_session'});return}
+  // Deletion is an explicit, confirmed editor action. Detach audience routes and
+  // result-source links before deleting, instead of rejecting the user action.
+  // Lock pages in stable order so concurrent design saves cannot reintroduce
+  // references. Bump revisions to expose modifications to other editors.
+  const references=await cx.query('SELECT id,page_design,result_design FROM activities WHERE session_id=$1 AND id<>$2 ORDER BY id FOR UPDATE',[req.params.id,req.params.aid]);
+  let detachedPages=0;
+  for(const reference of references.rows){
+   const page=unlinkDeletedPage(reference.page_design,req.params.aid);
+   const result=unlinkDeletedPage(reference.result_design,req.params.aid);
+   if(!page.changed&&!result.changed)continue;
+   await cx.query('UPDATE activities SET page_design=$3::jsonb,result_design=$4::jsonb,design_revision=design_revision+1 WHERE session_id=$1 AND id=$2',[req.params.id,reference.id,JSON.stringify(page.design),JSON.stringify(result.design)]);
+   detachedPages++;
+  }
   if(session.rows[0].current_activity_id===req.params.aid)await cx.query('UPDATE sessions SET current_activity_id=NULL,presenter_activity_id=NULL WHERE id=$1',[req.params.id]);
   else await cx.query('UPDATE sessions SET presenter_activity_id=NULL WHERE id=$1 AND presenter_activity_id=$2',[req.params.id,req.params.aid]);
   await cx.query('DELETE FROM activities WHERE id=$1 AND session_id=$2',[req.params.aid,req.params.id]);
@@ -1392,7 +1401,7 @@ app.delete('/api/sessions/:id/pages/:aid',requireAuth,async(req,res)=>{
   await cx.query('UPDATE activities SET position= -position-1 WHERE session_id=$1',[req.params.id]);
   const remaining=await cx.query('SELECT id FROM activities WHERE session_id=$1 ORDER BY position DESC,id',[req.params.id]);
   for(let i=0;i<remaining.rows.length;i++)await cx.query('UPDATE activities SET position=$3 WHERE id=$1 AND session_id=$2',[remaining.rows[i].id,req.params.id,i]);
-  await cx.query('COMMIT');begun=false;await broadcast(req.params.id);res.json({ok:true});
+  await cx.query('COMMIT');begun=false;await broadcast(req.params.id);res.json({ok:true,detached_pages:detachedPages});
  }catch(e){if(begun)await cx.query('ROLLBACK').catch(()=>{});sendError(res,e)}finally{cx.release()}
 });
 // Canvas-first pages: no activity form or media upload is required to compose a slide.

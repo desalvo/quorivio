@@ -5,7 +5,10 @@ export function answerInputStyle(style?:WidgetTextStyle){
  return {...answerOptionStyle(style),'--answer-color':style?.answerColor||'#152236',width:`${style?.answerFieldWidth??100}%`,height:`${((style?.answerFieldHeight??96)/12.8).toFixed(5)}cqw`,backgroundColor:style?.answerFillColor||(!style?.fillNone?style?.fillColor||'#ffffff':'#ffffff')};
 }
 export function answerOptionStyle(style?:WidgetTextStyle){
- return {fontFamily:style?.answerFontFamily||style?.fontFamily||'Arial',fontSize:`${((style?.answerFontSize||style?.fontSize||16)/12.8).toFixed(5)}cqw`,fontWeight:style?.answerBold?'700':'400',fontStyle:style?.answerItalic?'italic':'normal',color:style?.answerColor||'#152236'};
+ const family=style?.answerFontFamily||style?.fontFamily||'Arial';
+ const size=`${((style?.answerFontSize||style?.fontSize||16)/12.8).toFixed(5)}cqw`;
+ return {fontFamily:family,fontSize:size,'--q-answer-font-family':family,'--q-answer-font-size':size,
+  fontWeight:style?.answerBold?'700':'400',fontStyle:style?.answerItalic?'italic':'normal',color:style?.answerColor||'#152236'};
 }
 export function answerSubmitStyle(style?:WidgetTextStyle){
  const size=style?.submitButtonSize||DEFAULT_SUBMIT_SIZE;

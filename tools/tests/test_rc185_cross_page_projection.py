@@ -55,11 +55,13 @@ class IndependentLivePages(unittest.TestCase):
         self.assertIn('setPagePresenterHidden', UI)
 
     def test_private_results_and_portable_ids(self):
-        self.assertIn('linkedStatisticActivity(widget,activity,activities)', UI)
+        self.assertIn('linkedStatisticContext(widget,activity,activities,widgets)', UI)
+        self.assertIn('linkedStatisticActivity(widget,current,activities)', (ROOT/'apps/web/src/widget-results.ts').read_text())
         self.assertIn('sourceActivityId', UI)
         self.assertIn('SELECT id AS portable_id', API)
         self.assertIn('remapPortablePageRouting', API)
-        self.assertIn('page_referenced_by_session', API)
+        self.assertIn('unlinkDeletedPage(reference.page_design,req.params.aid)', API)
+        self.assertIn('design_revision=design_revision+1', API)
 
 
 if __name__ == '__main__':

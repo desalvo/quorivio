@@ -15,7 +15,8 @@ test('Unicode UTF-16 selection offsets remain consistent through formatting and 
  assert.deepEqual(styledSegments(text,marks,'label').map(x=>[x.text,x.style.bold??false]),[['A',false],['😀',true],['B',false]]);
  const expanded=remapMarks(marks,'label','A😀B','A😀!B');
  assert.equal(expanded[0].start,1);
- assert.equal(expanded[0].end,3);
+ assert.equal(expanded[0].end,4); // the inserted glyph inherits the preceding styled emoji
+ assert.equal(styledSegments('A😀!B',expanded,'label').find(p=>p.text.includes('!'))?.style.bold,true);
 });
 test('different independent question fields never inherit marks from another question',()=>{
  const marks=[{field:'question:q1:label',start:0,end:4,style:{color:'#ff0000'}},

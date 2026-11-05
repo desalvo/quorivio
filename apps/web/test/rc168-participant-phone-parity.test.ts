@@ -57,7 +57,7 @@ test('RC168 both public and rehearsal stages consume the same filtered phone lay
  assert.match(ui,/const audiencePhoneLayout=participantPhoneLayout\(audienceAuthoredWidgets/);
  assert.match(ui,/height:audiencePhoneLayout\.height/);
  assert.match(ui,/audiencePortrait\?audiencePhoneLayout\.widgets:participantReadingMode\?audienceReadingWidgets:audienceVisibleWidgets/);
- assert.match(ui,/mobile\?participantPhoneLayout\(widgets,activity\?\.page_design\?\.mobile\)\.widgets:participantVisibleWidgets\(widgets\)/);
- assert.match(ui,/PhoneRehearsalStage height=\{participantPhoneLayout\(widgets,activity\?\.page_design\?\.mobile\)\.height\}/);
+ assert.match(ui,/mobile\?participantPhoneLayout\(viewWidgets,viewActivity\?\.page_design\?\.mobile\)\.widgets:participantVisibleWidgets\(viewWidgets\)/);
+ assert.match(ui,/PhoneRehearsalStage height=\{participantPhoneLayout\(widgets,audienceActivity\?\.page_design\?\.mobile\)\.height\}/);
  assert.doesNotMatch(ui,/participantVisibleWidgets\(mobilePageWidgets\(/);
 });

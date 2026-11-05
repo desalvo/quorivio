@@ -28,6 +28,7 @@ export function restoreDomTextRange(root:HTMLElement,selection:TextRange):void{
 export function RichWidgetText({value,marks,field,active,onChange,onSelection,onFinish,ariaLabel,maxLength=240}:{value:string;marks?:TextMark[];field:string;active:boolean;onChange:(next:string)=>void;onSelection:(range:TextRange)=>void;onFinish?:()=>void;ariaLabel:string;maxLength?:number}){
  const root=useRef<HTMLDivElement>(null);
  const remembered=useRef<TextRange|null>(null);
+ const renderedSignature=useRef<string|null>(null);
  const lock=useRef(false);
  const composing=useRef(false);
  const capture=()=>{if(!root.current)return;const range=domTextRange(root.current);if(range){remembered.current=range;onSelection(range)}};
@@ -37,19 +38,28 @@ export function RichWidgetText({value,marks,field,active,onChange,onSelection,on
  // Own ONLY the text DOM; still derive every span from validated plain text + marks.
  useLayoutEffect(()=>{
   const el=root.current;if(!el||composing.current)return;
-  const selection=remembered.current;
+  // Every answer field stays mounted while its siblings change. Previously
+  // each field with a *stale* remembered range restored the global selection,
+  // so editing the first option could move the caret into the last option.
+  // This also explains why a reload (which clears remembered ranges) helped.
+  const focused=active&&document.activeElement===el;
+  const selection=focused?(domTextRange(el)||remembered.current):null;
+  const parts=styledSegments(value,marks,field);
+  const signature=JSON.stringify(parts);
+  if(renderedSignature.current===signature&&el.textContent===value)return;
   const fragment=document.createDocumentFragment();
-  for(const part of styledSegments(value,marks,field)){
+  for(const part of parts){
    const span=document.createElement('span');span.textContent=part.text;
    Object.assign(span.style,inlineMarkCss(part.style));fragment.appendChild(span);
   }
   lock.current=true;
   el.replaceChildren(fragment);
+  renderedSignature.current=signature;
   lock.current=false;
-  if(active&&selection)restoreDomTextRange(el,selection);
+  if(focused&&selection){remembered.current=selection;restoreDomTextRange(el,selection)}
  },[value,marks,field,active]);
  return <div ref={root} data-widget-text-field={field} className={'widget-rich-inline '+(active?'widget-rich-editing':'widget-rich-display')} role={active?'textbox':undefined} aria-label={ariaLabel} aria-multiline="false" tabIndex={active?0:undefined} contentEditable={active} suppressContentEditableWarning spellCheck={active}
-  onFocus={capture} onKeyUp={capture} onMouseUp={capture} onPointerUp={capture}
+  onFocus={capture} onBlur={()=>{remembered.current=null}} onKeyUp={capture} onMouseUp={capture} onPointerUp={capture}
   onPointerDown={e=>{if(active)e.stopPropagation()}} onDoubleClick={e=>{if(active){e.stopPropagation();capture()}}}
   onBeforeInput={e=>{const evt=e.nativeEvent as InputEvent;if(evt.inputType==='insertParagraph'||evt.inputType==='insertLineBreak')e.preventDefault()}}
   onPaste={e=>{e.preventDefault();const plain=e.clipboardData.getData('text/plain').replace(/[\r\n]+/g,' ');const selection=window.getSelection();if(!selection||!selection.rangeCount)return;const range=selection.getRangeAt(0);const old=root.current?.textContent||'';const selected=domTextRange(root.current!);if(!selected)return;const available=maxLength-(old.length-(selected.end-selected.start));const safe=plain.slice(0,Math.max(0,available));range.deleteContents();const node=document.createTextNode(safe);range.insertNode(node);range.setStartAfter(node);range.collapse(true);selection.removeAllRanges();selection.addRange(range);remembered.current={start:selected.start+safe.length,end:selected.start+safe.length};onSelection(remembered.current);onChange(root.current?.textContent?.slice(0,maxLength)||'')}}

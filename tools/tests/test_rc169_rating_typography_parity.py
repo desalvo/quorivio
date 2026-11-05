@@ -29,7 +29,7 @@ class RC169RatingTypographyParity(unittest.TestCase):
         self.assertIn("widget.kind==='title'?widgetDisplay(widget,context).style:widget.style",TYPO)
         self.assertIn("const px=",TYPO)
         self.assertIn('resolved?.fontSize??16',TYPO)
-        self.assertIn('stageWidgetTypography(w,{pageTitle:activity.title',UI)
+        self.assertIn('stageWidgetTypography(w,{pageTitle:viewActivity.title',UI)
         self.assertIn('stageWidgetTypography(w,{pageTitle:entry.activity.title',UI)
         self.assertEqual(UI.count('stageWidgetTypography(w,{pageTitle:'),2)
 
