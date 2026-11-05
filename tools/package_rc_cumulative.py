@@ -53,8 +53,8 @@ def assemble_paths(root: Path, previous: str, current: str, extra: list[str]) ->
     return sorted(paths)
 
 
-def build(cycle: int, previous_cycle: int, day: str, output: Path, extra: list[str], root: Path = ROOT) -> tuple[int, str]:
-    prev = manifest_path(previous_cycle, day)
+def build(cycle: int, previous_cycle: int, day: str, output: Path, extra: list[str], root: Path = ROOT, previous_day: str | None = None) -> tuple[int, str]:
+    prev = manifest_path(previous_cycle, previous_day or day)
     cur = manifest_path(cycle, day)
     if (root / cur).exists():
         # Prevent silent mutation of an existing acceptance receipt.
@@ -85,8 +85,9 @@ if __name__ == '__main__':
     parser.add_argument('--cycle', type=int, required=True)
     parser.add_argument('--previous', type=int, required=True)
     parser.add_argument('--day', default='20261031')
+    parser.add_argument('--previous-day', default=None, help='date of previous immutable inventory, when crossing midnight')
     parser.add_argument('--add', action='append', default=[])
     parser.add_argument('--output', required=True, type=Path)
     args = parser.parse_args()
-    count, digest = build(args.cycle, args.previous, args.day, args.output, args.add)
+    count, digest = build(args.cycle, args.previous, args.day, args.output, args.add, previous_day=args.previous_day)
     print(f'PASS cumulative archive: {count} files, sha256={digest}')

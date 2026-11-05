@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC181 — Handoff test Chromium accessibilità
+
+**RC181 dopo RC180 committata dall’utente:** nella CI `41931287829` passano i controlli precedenti, ma `ci_accessible_disclosure_chromium.py` impone ancora una sovrapposizione tra toolbar e riepilogo accessibile eliminata dalla RC180. Aggiornato il test Chromium e il relativo contratto storico; nuova regressione CI anticipata garantisce assenza di sovrapposizione, hit test reale e comandi accessibili funzionanti su smartphone e desktop. Nessuna modifica al runtime. Nuovo inventario immutabile; CI completa ancora da confermare. **85,25% certificato (43/17)**, `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag/deploy. Vedi `docs/RC_CYCLE181_ACCESSIBLE_DISCLOSURE_DOCK_CI.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC180 — passaggio consegne palette e strumenti contestuali
 
 **RC180:** la CI `41913987787` ha confermato la RC179 sui comandi di selezione, ma l'overlay fisso di allineamento impediva il clic su «Linee» nella palette. I pannelli sono ora disposti in un'area dello stage con scorrimento, sotto la palette, senza sovrapposizioni causate dallo `z-index`. Test Chromium con clic reali alternati Duplica → Linee → Allinea → Linee senza chiudere gli strumenti, a 1440/960/390 px: rosso con la RC179, verde con RC180. Check CI preventivo aggiunto, ricevute SHA-256 storiche preservate. **85,25% certificato (43 accettati / 17 parziali)**, `rc_strict=false`, `publish_image=false`, `publish_latest=false`. CI completa ancora da verificare dopo commit utente; nessun commit/push/tag/deploy. Vedi `docs/RC_CYCLE180_EDITOR_TOOLBAR_RAIL_POINTERS.it.md`.

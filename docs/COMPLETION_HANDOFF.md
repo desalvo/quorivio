@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC181 — Chromium accessible disclosure dock CI handoff
+
+**RC181 after user-committed RC180:** GitHub `41931287829` passed earlier checks but `ci_accessible_disclosure_chromium.py` failed because its historical fixture required a toolbar/disclosure overlap removed by the RC180 dock. Reconciled the browser assertion and its historical unittest; early CI regression now enforces no overlap, genuine pointer hit-test and working accessible controls in touch/desktop Chromium. No runtime behavior changed. New immutable source receipt; CI acceptance remains pending. **Certified 85.25% (43 accepted/17 partial).** `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no assistant commit/push/tag/deploy. See `docs/RC_CYCLE181_ACCESSIBLE_DISCLOSURE_DOCK_CI.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC180 — editor palette/context handoff
 
 **RC180:** GitHub `41913987787` confirmed RC179 selection controls work but exposed the opposite pointer obstruction: the fixed arrangement panel blocked the `Linee` insert button in the wrapped palette. The latest cumulative moves contextual selection/arrangement panels into a bounded, scrollable dock inside the stage, after the insert rail; it does not need z-index escalation. Red-before/green-after native Chromium pointer testing alternates Duplicate → Linee → Align → Linee without closing the selection tools, at 1440/960/390 widths. Historical inventory receipts preserved; CI checks added before authenticated editor E2E. **85.25% certified / 43 accepted / 17 partial**, `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full GitHub CI pending user commit. No assistant commit/push/tag/deploy. See `docs/RC_CYCLE180_EDITOR_TOOLBAR_RAIL_POINTERS.en.md`.

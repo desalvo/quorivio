@@ -33,9 +33,10 @@ class MobileDisclosureOverlapRegression(unittest.TestCase):
         self.assertIn("await expect(editor.get_by_text('Conflitto di revisione'))",self.real)
         self.assertNotIn('force=True',self.real)
 
-    def test_preflight_uses_actual_css_and_reproduces_overlap(self):
+    def test_preflight_uses_actual_css_and_rejects_reintroduced_overlap(self):
         self.assertIn("apps/web/src/style.css",self.preflight)
-        self.assertIn('assert overlap',self.preflight)
+        self.assertIn('assert not overlap',self.preflight)
+        self.assertNotIn("assert overlap, 'Fixture must intentionally reproduce",self.preflight)
         self.assertIn('elementFromPoint',self.preflight)
         self.assertIn('await check.check()',self.preflight)
         self.assertIn("QUORIVIO_CHROMIUM_PATH",self.preflight)

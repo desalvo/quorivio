@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""Offline real-Chromium regression: canvas context popup must not block mobile disclosure.
+"""Real Chromium: accessible disclosure and selection tools must remain operable.
 
-CI 40510491774: the open alignment popup extended beyond the 16:9 artboard
-and intercepted clicks intended for the alternative keyboard/touch disclosure.
-Use the application's actual CSS; never force clicks or mutate pointer handling.
+The historical overlay regression (CI 40510491774) was corrected by a
+non-overlapping contextual dock in RC180. Assert the current non-overlap
+geometry and genuine pointer accessibility at mobile/desktop sizes. A test
+that REQUIRES the old overlap is now an invalid acceptance condition.
+Use application CSS; never force clicks or mutate pointer handling.
 """
 import asyncio
 import os
@@ -44,14 +46,16 @@ async def verify(browser, width, height, touch):
         summary=page.locator('.canvas-accessible-controls > summary')
         await (toggle.tap() if touch else toggle.click())
         await expect(group).to_be_visible()
-        # The exact overlap from the failed CI: the second floating toolbar
-        # extends across the collapsed accessible summary at narrow widths.
+        # RC181: both contextual panels are docked in document flow. The
+        # accessible summary must not be obscured or physically overlapped.
+        # This catches CSS regressions that accidentally restore a fixed
+        # overlay, without insisting on the defect we deliberately removed.
         overlap=await page.evaluate('''() => {
           const toolbar=document.querySelectorAll('.canvas-editor-group > .canvas-editor-tools')[1].getBoundingClientRect();
           const summary=document.querySelector('.canvas-accessible-controls > summary').getBoundingClientRect();
           return toolbar.top < summary.bottom && toolbar.bottom > summary.top;
         }''')
-        assert overlap, 'Fixture must intentionally reproduce the mobile toolbar/disclosure overlap'
+        assert not overlap, f'Contextual toolbar overlaps accessible disclosure at {width}px'
         hit=await summary.evaluate('''el=>{
           const r=el.getBoundingClientRect(), h=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);
           return h===el || el.contains(h);
@@ -81,7 +85,7 @@ async def main():
             await verify(browser,1440,1000,False)
         finally:
             await browser.close()
-    print('PASS real Chromium: overlapping mobile/desktop contextual toolbar, accessible disclosure opens, closes popup and remains interactive')
+    print('PASS real Chromium: no mobile/desktop toolbar/disclosure overlap; accessible controls and contextual actions remain interactive')
 
 if __name__=='__main__':
     asyncio.run(main())
