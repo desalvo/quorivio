@@ -1,3 +1,14 @@
+# Quorivio 0.1.0-dev — RC201 — Sincronizzazione live URL/QRCode
+
+**RC201:** Dal cumulativo RC200, QR e link partecipanti sincronizzati dopo rotazione dell'URL della sessione: socket dei presentatori preservati al reset, partecipanti invalidati disconnessi, aggiornamento dashboard/widget tramite URL canonico, controllo ogni 12 secondi e al ritorno del focus/rete, immagini revisionate e invalidazione fail-closed. Impostazione di origine URL condivisa fra repliche. Test locali: 4 test di stato e 21 contratti Python superati. Full CI RC200/RC201 da verificare; ultima verde RC199 `42096705867`. **85,25%** certificato (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Vedi `docs/RC_CYCLE201_LIVE_QR_SYNC.it.md`.
+
+---
+# Quorivio 0.1.0-dev — RC200 — Import/export editor e portabilità sessione
+
+**RC200:** Dalla RC199 con full CI GitHub verde (run [42096705867](https://github.com/desalvo/quorivio/actions/runs/42096705867)), nome della presentazione e proprietario primario sotto i comandi, eliminato il tasto schemi duplicato, aggiunta importazione PDF/PPTX dalle miniature dopo la pagina selezionata, completato il bundle `.quorivio` tra proprietari anche per immagini delle slide, esportazione PDF e statistiche CSV/XLSX con anonimizzazione esplicita. Controlli locali mirati superati; CI integrata RC200 da verificare. **85,25%** certificato (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag dell’assistente. Vedi `docs/RC_CYCLE200_EDITOR_PORTABILITY.it.md`. 
+
+---
+
 # Quorivio 0.1.0-dev — RC199 — Verifica preventiva intestazioni release e package cumulativo
 
 **RC199:** la CI [#299](https://github.com/desalvo/quorivio/actions/runs/42094437419), job `127480690817`, si è arrestata nel controllo preventivo delle intestazioni: nei riepiloghi RC198 italiano/inglese dello stato di sviluppo mancavano i tre flag espliciti di sicurezza. Ripristinati nelle quattro intestazioni attive della RC199, mantenuta la RC198 come storico, aggiunto un test di regressione che riproduce l’omissione e un controllo delle intestazioni contenute nello ZIP prima della consegna. Nessuna modifica al runtime; CI GitHub completa da confermare. **85,25%** certificato (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag dell’assistente. `docs/RC_CYCLE199_RELEASE_HEADER_CI_FIX.it.md`.

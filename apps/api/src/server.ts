@@ -6,6 +6,7 @@ import {withBootstrapLock} from './bootstrap-lock.js';
 import {allowedWriteOrigin,allowedLiveOrigin,allowedSameHostBrowserOrigin,qrBrowserOrigin} from './origin-policy.js';
 import {productionCspDirectives,quorivioPermissionsPolicy} from './security-headers.js';
 import {encodeBundle,decodeBundle,referencedAssets,remapPortableAssets,BUNDLE_MIME,MAX_BUNDLE_BYTES,type BundleAsset,type BundleManifest} from './portable-bundle.js';
+import {exportStatisticRows,statisticsCsv,statisticsXlsx,type StatisticRecord} from './statistics-export.js';
 import {parseLeaderboardPage} from './pagination-policy.js';
 import {validateSettingsPatch} from './platform-settings.js';
 import {SESSION_RETENTION_DEFAULT_SQL, SESSION_RETENTION_PURGE_SQL, SESSION_DELETE_WITH_CLEANUP_SQL, SESSION_CLEANUP_CLAIM_SQL} from './session-retention.js';
@@ -85,6 +86,14 @@ app.use('/api/join/:code',async(req,res,next)=>{
 });
 async function owner(id:string,uid:string){const r=await db.query('SELECT s.* FROM sessions s WHERE s.id=$1 AND (s.owner_id=$2 OR EXISTS (SELECT 1 FROM session_presenters sp WHERE sp.session_id=s.id AND sp.user_id=$2))',[id,uid]);return r.rows[0] as (Record<string,any>|undefined)}
 const validDate=(x:string)=>/^\d{4}-\d{2}-\d{2}$/.test(x)&&!Number.isNaN(Date.parse(x));
+/** Read the QR origin from authoritative PostgreSQL configuration per request.
+ * A public URL change must reach every API replica, not only the pod that
+ * handled the administrator's settings update. Database errors fail closed. */
+async function configuredQrPublicBase():Promise<string>{
+ const result=await db.query("SELECT value FROM platform_settings WHERE key='public_base_url'");
+ const value=result.rows[0]?.value;
+ return typeof value==='string'&&/^https?:\/\//.test(value)?value:publicBase;
+}
 const strip=(s:any)=>({access_role:s.access_role||'owner',id:s.id,title:s.title,reference_date:s.reference_date,join_code:s.join_code,status:s.status,expires_at:s.expires_at,current_activity_id:s.current_activity_id,presenter_activity_id:s.presenter_activity_id||s.current_activity_id,allow_anonymous:s.allow_anonymous,show_results:s.show_results,theme:s.theme,retention_days:s.retention_days,demo_template_key:s.demo_template_key||null,join_url:`/join/${s.join_secret}`});
 async function snapshot(sid:string){const s=(await db.query('SELECT * FROM sessions WHERE id=$1',[sid])).rows[0];if(!s)return null;const acts=(await db.query('SELECT * FROM activities WHERE session_id=$1 ORDER BY position',[sid])).rows as Activity[];const counts=(await db.query('SELECT a.id AS activity_id,r.option_id,count(*)::int AS count FROM activities a JOIN responses r ON r.activity_id=a.id AND r.invalidated_at IS NULL WHERE a.session_id=$1 GROUP BY a.id,r.option_id',[sid])).rows;const totals=(await db.query('SELECT activity_id,count(*)::int AS count FROM responses WHERE invalidated_at IS NULL AND activity_id IN (SELECT id FROM activities WHERE session_id=$1) GROUP BY activity_id',[sid])).rows;const reactions=(await db.query('SELECT activity_id,emoji,count(*)::int AS count FROM page_reactions WHERE session_id=$1 GROUP BY activity_id,emoji',[sid])).rows;return {session:strip(s),activities:acts,results:counts,totals,reactions,connected_participants:await connectedParticipants(sid)};}
 const sockets=new Map<string,Set<WebSocket>>();
@@ -961,8 +970,24 @@ app.get('/api/sessions',requireAuth,requirePresenter,async(req,res)=>{try{
 app.post('/api/sessions',requireAuth,requirePresenter,async(req,res)=>{try{const title=String(req.body?.title||'').trim();const referenceDate=String(req.body?.reference_date||new Date().toISOString().slice(0,10));if(!title||title.length>160||!validDate(referenceDate)){res.status(400).json({error:'invalid_title'});return}const uid=auth(req)!;const u=(await db.query('SELECT organization_id FROM users WHERE id=$1',[uid])).rows[0];if(!u){res.status(401).end();return}const id=randomUUID(),code=randomBytes(5).toString('hex').toUpperCase(),joinSecret=randomBytes(20).toString('base64url');const r=await db.query(`INSERT INTO sessions(id,organization_id,owner_id,title,join_code,join_secret,expires_at,reference_date,retention_days) VALUES($1,$2,$3,$4,$5,$6,now()+interval '1 day',$7,${SESSION_RETENTION_DEFAULT_SQL}) RETURNING *`,[id,u.organization_id,uid,title,code,joinSecret,referenceDate]);res.status(201).json(strip(r.rows[0]))}catch(e){sendError(res,e)}});
 
 // Portable definition exports intentionally omit participant data and join credentials.
-async function portableSession(id:string){const session=(await db.query('SELECT title,reference_date::text AS reference_date,theme,allow_anonymous,show_results FROM sessions WHERE id=$1',[id])).rows[0];const activities=(await db.query('SELECT id AS portable_id,type,title,options,correct_option_id,correct_option_ids,answer_mode,answer_required,duration_seconds,page_design,result_design FROM activities WHERE session_id=$1 ORDER BY position',[id])).rows;return {format:'quorivio-session',version:1,session,activities}}
-function validPortable(x:any){return x?.format==='quorivio-session'&&x.version===1&&typeof x.session?.title==='string'&&x.session.title.trim().length>0&&x.session.title.length<=160&&validDate(String(x.session.reference_date))&&validPageDesign(x.session.theme)&&typeof x.session.allow_anonymous==='boolean'&&typeof x.session.show_results==='boolean'&&Array.isArray(x.activities)&&x.activities.length<=200&&validPortablePageRouting(x.activities)&&x.activities.every((a:any)=>['slide','poll','quiz','timed_quiz'].includes(a.type)&&typeof a.title==='string'&&a.title.trim().length>0&&a.title.length<=240&&(a.type==='slide'?Array.isArray(a.options)&&a.options.length===0:validateOptions(a.options))&&validAnswerMode(a.answer_mode||'single')&&typeof (a.answer_required??true)==='boolean'&& (a.correct_option_ids===undefined||Array.isArray(a.correct_option_ids)&&a.correct_option_ids.every((v:any)=>typeof v==='string'&&a.options.some((o:any)=>o.id===v)))&&(a.portable_id===undefined||typeof a.portable_id==='string'&&PAGE_UUID.test(a.portable_id))&&validPageDesign(a.page_design)&&validPageDesign(a.result_design)&&(!['quiz','timed_quiz'].includes(a.type)||!['single','multiple'].includes(a.answer_mode||'single')||(a.answer_mode==='multiple'?Array.isArray(a.correct_option_ids)&&a.correct_option_ids.length>0:a.options.some((o:any)=>o.id===a.correct_option_id)))&&(a.type!=='timed_quiz'||['single','multiple'].includes(a.answer_mode||'single')&&Number.isInteger(a.duration_seconds)&&a.duration_seconds>=5&&a.duration_seconds<=600)&&(a.duration_seconds==null||Number.isInteger(a.duration_seconds)&&a.duration_seconds>=5&&a.duration_seconds<=600));}
+async function portableSession(id:string){
+ const session=(await db.query('SELECT title,reference_date::text AS reference_date,theme,allow_anonymous,show_results FROM sessions WHERE id=$1',[id])).rows[0];
+ const activities=(await db.query(`SELECT a.id AS portable_id,a.type,a.title,a.options,a.correct_option_id,a.correct_option_ids,
+ a.answer_mode,a.answer_required,a.duration_seconds,a.page_design,a.result_design,psa.asset_id AS slide_asset_id
+ FROM activities a LEFT JOIN presentation_slide_assets psa ON psa.activity_id=a.id
+ WHERE a.session_id=$1 ORDER BY a.position`,[id])).rows;
+ // Avoid exporting the former session's participant join bearer in image-slide URLs.
+ for(const activity of activities){
+  if(!activity.slide_asset_id)delete activity.slide_asset_id;
+  if(activity.slide_asset_id){const layout=structuredClone(activity.page_design||{});
+   if(Array.isArray(layout.media))layout.media=layout.media.map((m:any)=>m.kind==='image'?{...m,url:'https://quorivio.invalid/portable-slide'}:m);
+   activity.page_design=layout;
+  }
+  for(const design of [activity.page_design,activity.result_design])for(const widget of design?.widgets||[]){if(widget.kind==='profile')delete widget.presenterId;}
+ }
+ return {format:'quorivio-session',version:1,session,activities};
+}
+function validPortable(x:any){return x?.format==='quorivio-session'&&x.version===1&&typeof x.session?.title==='string'&&x.session.title.trim().length>0&&x.session.title.length<=160&&validDate(String(x.session.reference_date))&&validPageDesign(x.session.theme)&&typeof x.session.allow_anonymous==='boolean'&&typeof x.session.show_results==='boolean'&&Array.isArray(x.activities)&&x.activities.length<=200&&validPortablePageRouting(x.activities)&&x.activities.every((a:any)=>['slide','poll','quiz','timed_quiz'].includes(a.type)&&typeof a.title==='string'&&a.title.trim().length>0&&a.title.length<=240&&(a.type==='slide'?Array.isArray(a.options)&&a.options.length===0:validateOptions(a.options))&&validAnswerMode(a.answer_mode||'single')&&typeof (a.answer_required??true)==='boolean'&& (a.correct_option_ids===undefined||Array.isArray(a.correct_option_ids)&&a.correct_option_ids.every((v:any)=>typeof v==='string'&&a.options.some((o:any)=>o.id===v)))&&(a.portable_id===undefined||typeof a.portable_id==='string'&&PAGE_UUID.test(a.portable_id))&&(a.slide_asset_id===undefined||a.type==='slide'&&typeof a.slide_asset_id==='string'&&PAGE_UUID.test(a.slide_asset_id))&&validPageDesign(a.page_design)&&validPageDesign(a.result_design)&&(!['quiz','timed_quiz'].includes(a.type)||!['single','multiple'].includes(a.answer_mode||'single')||(a.answer_mode==='multiple'?Array.isArray(a.correct_option_ids)&&a.correct_option_ids.length>0:a.options.some((o:any)=>o.id===a.correct_option_id)))&&(a.type!=='timed_quiz'||['single','multiple'].includes(a.answer_mode||'single')&&Number.isInteger(a.duration_seconds)&&a.duration_seconds>=5&&a.duration_seconds<=600)&&(a.duration_seconds==null||Number.isInteger(a.duration_seconds)&&a.duration_seconds>=5&&a.duration_seconds<=600));}
 async function createFromPortable(data:any,uid:string,importMediaDir?:string,bundleMode=false){
  const imported=importMediaDir?remapPortableAssets(data,(data.import_assets||[]).map((a:any)=>a?.id)):null;
  const definition=imported?.definition||data;
@@ -971,7 +996,8 @@ async function createFromPortable(data:any,uid:string,importMediaDir?:string,bun
   await cx.query('BEGIN');
   const u=(await cx.query('SELECT organization_id FROM users WHERE id=$1',[uid])).rows[0];
   if(!u)throw Error('missing_user');
-  await cx.query(`INSERT INTO sessions(id,organization_id,owner_id,title,reference_date,join_code,join_secret,expires_at,theme,allow_anonymous,show_results,retention_days) VALUES($1,$2,$3,$4,$5,$6,$7,now()+interval '1 day',$8,$9,$10,${SESSION_RETENTION_DEFAULT_SQL})`,[sid,u.organization_id,uid,definition.session.title,definition.session.reference_date,randomBytes(5).toString('hex').toUpperCase(),randomBytes(20).toString('base64url'),JSON.stringify(definition.session.theme),definition.session.allow_anonymous,definition.session.show_results]);
+  const importedJoinSecret=randomBytes(20).toString('base64url');
+  await cx.query(`INSERT INTO sessions(id,organization_id,owner_id,title,reference_date,join_code,join_secret,expires_at,theme,allow_anonymous,show_results,retention_days) VALUES($1,$2,$3,$4,$5,$6,$7,now()+interval '1 day',$8,$9,$10,${SESSION_RETENTION_DEFAULT_SQL})`,[sid,u.organization_id,uid,definition.session.title,definition.session.reference_date,randomBytes(5).toString('hex').toUpperCase(),importedJoinSecret,JSON.stringify(definition.session.theme),definition.session.allow_anonymous,definition.session.show_results]);
   // Portable page links must be remapped as a group. Never retain an ID
   // pointing into the original session when a session is imported/copied.
   const importedIds=definition.activities.map((a:any)=>a.portable_id).filter((id:unknown)=>typeof id==='string');
@@ -986,7 +1012,11 @@ async function createFromPortable(data:any,uid:string,importMediaDir?:string,bun
   }
   for(let i=0;i<definition.activities.length;i++){
    const a=definition.activities[i];
-   await cx.query('INSERT INTO activities(id,session_id,type,title,options,correct_option_id,duration_seconds,page_design,result_design,position,answer_mode,answer_required,correct_option_ids) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)',[newIds[i],sid,a.type,a.title,JSON.stringify(a.options),['quiz','timed_quiz'].includes(a.type)?a.correct_option_id:null,a.duration_seconds,JSON.stringify(remapPortablePageRouting(a.page_design,pageMap)),JSON.stringify(remapPortablePageRouting(a.result_design,pageMap)),i,a.answer_mode||'single',a.answer_required??true,JSON.stringify(a.correct_option_ids||[])]);
+   const pageDesign=remapPortablePageRouting(a.page_design,pageMap);
+   if(a.slide_asset_id&&Array.isArray(pageDesign.media)){
+    pageDesign.media=pageDesign.media.map((media:any)=>media.kind==='image'?{...media,url:`/api/join/${importedJoinSecret}/slides/${newIds[i]}/image`}:media);
+   }
+   await cx.query('INSERT INTO activities(id,session_id,type,title,options,correct_option_id,duration_seconds,page_design,result_design,position,answer_mode,answer_required,correct_option_ids) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)',[newIds[i],sid,a.type,a.title,JSON.stringify(a.options),['quiz','timed_quiz'].includes(a.type)?a.correct_option_id:null,a.duration_seconds,JSON.stringify(pageDesign),JSON.stringify(remapPortablePageRouting(a.result_design,pageMap)),i,a.answer_mode||'single',a.answer_required??true,JSON.stringify(a.correct_option_ids||[])]);
   }
   if(importMediaDir){
    const assets=data.import_assets;
@@ -1001,6 +1031,13 @@ async function createFromPortable(data:any,uid:string,importMediaDir?:string,bun
     const freshId=imported!.ids.get(asset.id)!;
     await writeFile(path.join(folder,freshId),contents,{flag:'wx',mode:0o600});
     await cx.query('INSERT INTO session_assets(id,session_id,uploaded_by,mime_type,byte_size,sha256) VALUES($1,$2,$3,$4,$5,$6)',[freshId,sid,uid,asset.mime,asset.bytes,asset.sha256]);
+   }
+  }
+  for(let i=0;i<definition.activities.length;i++){
+   const slideAsset=definition.activities[i].slide_asset_id;
+   if(slideAsset){
+    if(!importMediaDir||!imported||![...imported.ids.values()].includes(slideAsset))throw Error('invalid_portable_slide_asset');
+    await cx.query('INSERT INTO presentation_slide_assets(activity_id,asset_id) VALUES($1,$2)',[newIds[i],slideAsset]);
    }
   }
   await cx.query('COMMIT');return sid;
@@ -1520,7 +1557,7 @@ app.post('/api/presentations/import-editable',requireAuth,requirePresenter,async
   res.status(201).json({id,pages:portable.activities.length,warning:'partial_pptx_fidelity',fidelity});
  }catch(e){sendError(res,e)}finally{await rm(scratch,{recursive:true,force:true}).catch(()=>{})}
 });
-app.get('/api/sessions/:id/export.pptx',requireAuth,async(req,res)=>{
+async function servePresentationExport(req:express.Request,res:express.Response,format:'pptx'|'pdf'){
  try{
   const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}
   if(process.env.QUORIVIO_ENABLE_CONVERTER!=='true'){res.status(503).json({error:'conversion_worker_not_configured'});return}
@@ -1536,14 +1573,17 @@ app.get('/api/sessions/:id/export.pptx',requireAuth,async(req,res)=>{
    const exportHasQr=pptxDefinition.activities.some((a:any)=>(a.page_design?.widgets||[]).some((w:any)=>w.kind==='qr'));
    if(exportHasQr){
     if(!s.join_secret)throw Error('participant_qr_link_unavailable');
-    pptxDefinition.session.participant_join_url=`${publicBase}/join/${s.join_secret}`;
+    pptxDefinition.session.participant_join_url=`${await configuredQrPublicBase()}/join/${s.join_secret}`;
    }
    const portable=JSON.stringify(pptxDefinition);
    if(Buffer.byteLength(portable)>2*1024*1024){res.status(413).json({error:'session_too_large_for_pptx'});return}
    await writeFile(path.join(scratch,'portable.json'),portable,{flag:'wx',mode:0o600});
    // Stage only referenced, session-owned image assets for the isolated PPTX worker.
    const definition=JSON.parse(portable);
-   const imageIds=[...new Set<string>(definition.activities.flatMap((a:any)=>(a.page_design?.widgets||[]).filter((w:any)=>['image','logo'].includes(w.kind)).map((w:any)=>w.assetId)))];
+   const imageIds=[...new Set<string>(definition.activities.flatMap((a:any)=>[
+    ...(a.page_design?.widgets||[]).filter((w:any)=>['image','logo'].includes(w.kind)).map((w:any)=>w.assetId),
+    ...(a.slide_asset_id?[a.slide_asset_id]:[])
+   ]))];
    if(imageIds.length>200)throw Error('pptx_export_too_many_images');
    if(imageIds.length){
     const registered=await db.query('SELECT id,mime_type,byte_size,sha256 FROM session_assets WHERE session_id=$1 AND participant_id IS NULL AND id=ANY($2::uuid[])',[s.id,imageIds]);
@@ -1559,16 +1599,18 @@ app.get('/api/sessions/:id/export.pptx',requireAuth,async(req,res)=>{
     }
    }
    const controller=new AbortController(),deadline=setTimeout(()=>controller.abort(),240000);
-   try{const r=await fetch(`${workerUrl}/portable-export`,{method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({job:path.basename(scratch)}),signal:controller.signal});if(!r.ok)throw Error('editable_export_failed')}
+   try{const r=await fetch(`${workerUrl}/${format==='pdf'?'portable-export-pdf':'portable-export'}`,{method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({job:path.basename(scratch)}),signal:controller.signal});if(!r.ok)throw Error('editable_export_failed')}
    finally{clearTimeout(deadline)}
-   const output=await readFile(path.join(scratch,'presentation.pptx'));
-   if(output.length>50*1024*1024)throw Error('pptx_export_too_large');
-   res.setHeader('Content-Type','application/vnd.openxmlformats-officedocument.presentationml.presentation');
-   res.setHeader('Content-Disposition','attachment; filename="quorivio-session.pptx"');
+   const output=await readFile(path.join(scratch,format==='pdf'?'presentation.pdf':'presentation.pptx'));
+   if(output.length>50*1024*1024||format==='pdf'&&!output.subarray(0,5).equals(Buffer.from('%PDF-')))throw Error('presentation_export_invalid');
+   res.setHeader('Content-Type',format==='pdf'?'application/pdf':'application/vnd.openxmlformats-officedocument.presentationml.presentation');
+   res.setHeader('Content-Disposition',`attachment; filename="quorivio-session.${format}"`);
    res.setHeader('Cache-Control','private, no-store');res.send(output);
   }finally{await rm(scratch,{recursive:true,force:true}).catch(()=>{})}
  }catch(e){sendError(res,e)}
-});
+}
+app.get('/api/sessions/:id/export.pptx',requireAuth,(req,res)=>void servePresentationExport(req,res,'pptx'));
+app.get('/api/sessions/:id/export.pdf',requireAuth,(req,res)=>void servePresentationExport(req,res,'pdf'));
 // Uploaded media is never public by asset ID alone: it must appear on the active slide.
 app.get('/api/join/:code/activities/:aid/media/:assetId',async(req,res)=>{try{
  const s=await publicSession(req.params.code);
@@ -1705,16 +1747,19 @@ app.post('/api/sessions/:id/reset-to-ready',requireAuth,async(req,res)=>{
   await cx.query("UPDATE activities SET status='pending',opened_at=NULL WHERE session_id=$1",[req.params.id]);
   await cx.query("UPDATE sessions SET status='ready',current_activity_id=NULL,presenter_activity_id=NULL,closed_at=NULL,join_code=$2,join_secret=$3 WHERE id=$1",[req.params.id,randomBytes(5).toString('hex').toUpperCase(),randomBytes(20).toString('base64url')]);
   await cx.query('COMMIT');begun=false;
-  for(const ws of sockets.get(req.params.id)||[])ws.close(1008,'session reset');
+  // A reset rotates the public token, not presenter authorization. Keep owner
+  // sockets connected so their dashboards and projected QRs receive the new
+  // snapshot immediately; invalidate only deleted participant identities.
+  for(const ws of sockets.get(req.params.id)||[])if((ws as any).view!=='owner')ws.close(1008,'session reset');
   await broadcast(req.params.id);res.json({ok:true,status:'ready'});
  }catch(e){if(begun)await cx.query('ROLLBACK').catch(()=>{});sendError(res,e)}finally{cx.release()}
 });
 app.post('/api/sessions/:id/activities/:aid/close',requireAuth,async(req,res)=>{const cx=await db.connect();try{await cx.query('BEGIN');const s=await cx.query('SELECT * FROM sessions WHERE id=$1 AND (owner_id=$2 OR EXISTS (SELECT 1 FROM session_presenters WHERE session_id=$1 AND user_id=$2)) FOR UPDATE',[req.params.id,auth(req)]);if(!s.rowCount){await cx.query('ROLLBACK');res.status(404).end();return}const a=await cx.query('SELECT id FROM activities WHERE id=$1 AND session_id=$2',[req.params.aid,req.params.id]);if(!a.rowCount){await cx.query('ROLLBACK');res.status(404).end();return}await cx.query("UPDATE activities SET status='closed' WHERE id=$1 AND session_id=$2 AND status='open'",[req.params.aid,req.params.id]);await cx.query('UPDATE sessions SET current_activity_id=NULL,presenter_activity_id=NULL WHERE id=$1 AND current_activity_id=$2',[req.params.id,req.params.aid]);await cx.query('COMMIT');await broadcast(req.params.id);res.json({ok:true})}catch(e){await cx.query('ROLLBACK');sendError(res,e)}finally{cx.release()}});
-app.get('/api/sessions/:id/qr',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}const url=`${qrBrowserOrigin(publicBase,req.headers.referer,req.headers.host,(typeof req.headers['sec-fetch-site']==='string'?req.headers['sec-fetch-site']:undefined))}/join/${s.join_secret}`;const type=req.query.format==='svg'?'svg':req.query.format==='json'?'json':'png';res.setHeader('Cache-Control','private, no-store');if(type==='json'){res.json({url});return}res.setHeader('Content-Disposition',`attachment; filename="quorivio-${s.join_code}.${type}"`);if(type==='svg'){res.type('image/svg+xml').send(await QRCode.toString(url,{type:'svg',margin:2}))}else{res.type('png').send(await QRCode.toBuffer(url,{width:800,margin:2}))}}catch(e){sendError(res,e)}});
+app.get('/api/sessions/:id/qr',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}const url=`${qrBrowserOrigin(await configuredQrPublicBase(),req.headers.referer,req.headers.host,(typeof req.headers['sec-fetch-site']==='string'?req.headers['sec-fetch-site']:undefined))}/join/${s.join_secret}`;const type=req.query.format==='svg'?'svg':req.query.format==='json'?'json':'png';res.setHeader('Cache-Control','private, no-store');if(type==='json'){res.json({url});return}res.setHeader('Content-Disposition',`attachment; filename="quorivio-${s.join_code}.${type}"`);if(type==='svg'){res.type('image/svg+xml').send(await QRCode.toString(url,{type:'svg',margin:2}))}else{res.type('png').send(await QRCode.toBuffer(url,{width:800,margin:2}))}}catch(e){sendError(res,e)}});
 // Presenter QR links to the authenticated screen route. It is not an access token.
 app.get('/api/sessions/:id/presenter-qr',requireAuth,async(req,res)=>{try{
  const session=await owner(req.params.id,auth(req)!);if(!session){res.status(404).end();return}
- const url=`${qrBrowserOrigin(publicBase,req.headers.referer,req.headers.host,(typeof req.headers['sec-fetch-site']==='string'?req.headers['sec-fetch-site']:undefined))}/screen/${encodeURIComponent(session.id)}`;
+ const url=`${qrBrowserOrigin(await configuredQrPublicBase(),req.headers.referer,req.headers.host,(typeof req.headers['sec-fetch-site']==='string'?req.headers['sec-fetch-site']:undefined))}/screen/${encodeURIComponent(session.id)}`;
  res.setHeader('Cache-Control','private, no-store');res.type('image/svg+xml').send(await QRCode.toString(url,{type:'svg',margin:2}));
 }catch(e){sendError(res,e)}});
 // GDPR data lifecycle: only the session owner can revoke access, set retention or erase a session.
@@ -1742,16 +1787,70 @@ async function purgeExpiredSessions(){
  await drainAssetErasureJobs(db,assetRoot);
  await drainProfileErasureJobs(db,assetRoot);
 }
-app.get('/api/sessions/:id/export.csv',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}const r=await db.query('SELECT a.title,a.type,r.option_id,r.correct,r.submitted_at FROM responses r JOIN activities a ON a.id=r.activity_id WHERE a.session_id=$1 AND r.invalidated_at IS NULL ORDER BY r.submitted_at',[s.id]);const esc=escapeCsvCell;res.setHeader('Content-Type','text/csv; charset=utf-8');res.setHeader('Content-Disposition',`attachment; filename="quorivio-${s.join_code}.csv"`);res.send('\uFEFF' + [['activity','type','option_id','correct','submitted_at'],...r.rows.map(x=>[x.title,x.type,x.option_id,x.correct,x.submitted_at.toISOString()])].map(row=>row.map(esc).join(',')).join('\r\n'))}catch(e){sendError(res,e)}});
+// GDPR-aware export: anonymous totals by default; identifiable rows require the primary owner.
+// This covers both classic votes and independently versioned widget answers.
+async function exportSessionStatistics(req:express.Request,res:express.Response,format:'csv'|'xlsx'){
+ try{
+  const session=await owner(req.params.id,auth(req)!);if(!session){res.status(404).end();return}
+  const requested=req.query.anonymize;
+  if(requested!==undefined&&requested!=='1'&&requested!=='0'){res.status(400).json({error:'invalid_anonymization_option'});return}
+  const anonymize=requested!=='0';
+  if(!anonymize&&session.owner_id!==auth(req)){res.status(403).json({error:'primary_owner_required_for_identifiable_export'});return}
+  const [classical,widgets,ratings,reactions]=await Promise.all([
+   db.query(`SELECT a.title AS page,a.options,a.answer_mode AS mode,r.option_id,r.answer_payload,r.correct,r.submitted_at,p.id::text AS participant_id,p.pseudonym
+     FROM responses r JOIN activities a ON a.id=r.activity_id JOIN participants p ON p.id=r.participant_id
+     WHERE a.session_id=$1 AND r.invalidated_at IS NULL ORDER BY r.submitted_at,r.id LIMIT 50001`,[session.id]),
+   db.query(`SELECT a.title AS page,a.page_design,w.widget_id,w.question_id,w.answer_mode AS mode,w.answer_payload,w.correct,w.submitted_at,p.id::text AS participant_id,p.pseudonym
+     FROM widget_answers w JOIN activities a ON a.id=w.activity_id JOIN participants p ON p.id=w.participant_id
+     WHERE w.session_id=$1 ORDER BY w.submitted_at,w.id LIMIT 50001`,[session.id]),
+   db.query(`SELECT a.title AS page,r.widget_id,r.score,r.comment_text,r.created_at AS submitted_at,p.id::text AS participant_id,p.pseudonym
+     FROM page_ratings r JOIN activities a ON a.id=r.activity_id JOIN participants p ON p.id=r.participant_id
+     WHERE r.session_id=$1 ORDER BY r.created_at,r.activity_id LIMIT 50001`,[session.id]),
+   db.query(`SELECT a.title AS page,r.emoji,r.created_at AS submitted_at,p.id::text AS participant_id,p.pseudonym
+     FROM page_reactions r JOIN activities a ON a.id=r.activity_id JOIN participants p ON p.id=r.participant_id
+     WHERE r.session_id=$1 ORDER BY r.created_at,r.activity_id LIMIT 50001`,[session.id])
+  ]);
+  const total=classical.rows.length+widgets.rows.length+ratings.rows.length+reactions.rows.length;
+  if(total>50000){res.status(413).json({error:'statistics_export_row_limit'});return}
+  const records:StatisticRecord[]=[];
+  const time=(row:any)=>row.submitted_at instanceof Date?row.submitted_at.toISOString():String(row.submitted_at||'');
+  const person=(row:any)=>({participantId:String(row.participant_id||''),pseudonym:String(row.pseudonym||''),submittedAt:time(row)});
+  const textAnswer=(payload:any,mode:string,ids:string,choices:any[]):string=>{
+   if(mode==='file')return String(payload?.assetId||ids||'');
+   if(mode==='text')return String(payload?.text||ids||'');
+   const selected=Array.isArray(payload?.optionIds)?payload.optionIds:String(ids||'').split(',').filter(Boolean);
+   return selected.map((id:string)=>choices.find((o:any)=>o.id===id)?.label||id).join(' | ');
+  };
+  for(const row of classical.rows){const choices=Array.isArray(row.options)?row.options:[];
+   records.push({kind:'Risposta',page:row.page,question:row.page,answer:textAnswer(row.answer_payload,row.mode,row.option_id,choices),correct:row.correct===null?'':String(row.correct),isFreeText:['text','file'].includes(row.mode),...person(row)});
+  }
+  for(const row of widgets.rows){const widget=(row.page_design?.widgets||[]).find((w:any)=>w.id===row.widget_id);
+   const question=widget?.questions?.find((q:any)=>q.id===row.question_id)||widget;
+   records.push({kind:'Risposta widget',page:row.page,question:String(question?.label||question?.title||row.question_id||row.widget_id),answer:textAnswer(row.answer_payload,row.mode,'',question?.options||[]),correct:row.correct===null?'':String(row.correct),isFreeText:['text','file'].includes(row.mode),...person(row)});
+  }
+  for(const row of ratings.rows){records.push({kind:'Gradimento',page:row.page,question:String(row.widget_id||'Gradimento'),answer:String(row.score),correct:'',...person(row)});
+   if(row.comment_text)records.push({kind:'Commento gradimento',page:row.page,question:String(row.widget_id||'Gradimento'),answer:String(row.comment_text),correct:'',isFreeText:true,...person(row)});
+  }
+  for(const row of reactions.rows)records.push({kind:'Reazione',page:row.page,question:'Reazioni',answer:String(row.emoji),correct:'',...person(row)});
+  if(records.length>50000){res.status(413).json({error:'statistics_export_row_limit'});return}
+  const rows=exportStatisticRows(records,anonymize);
+  res.setHeader('Cache-Control','private, no-store');res.setHeader('X-Content-Type-Options','nosniff');
+  res.setHeader('Content-Disposition',`attachment; filename="quorivio-${session.join_code}-${anonymize?'anonimo':'nominativo'}.${format}"`);
+  if(format==='xlsx'){res.type('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');res.send(statisticsXlsx(rows))}
+  else{res.setHeader('Content-Type','text/csv; charset=utf-8');res.send(statisticsCsv(rows))}
+ }catch(e){sendError(res,e)}
+}
+app.get('/api/sessions/:id/export.csv',requireAuth,(req,res)=>void exportSessionStatistics(req,res,'csv'));
+app.get('/api/sessions/:id/export.xlsx',requireAuth,(req,res)=>void exportSessionStatistics(req,res,'xlsx'));
 async function publicSession(secretOrCode:string){const r=await db.query('SELECT * FROM sessions WHERE (join_secret=$1 OR join_code=$1) AND status=$2 AND expires_at>now()',[secretOrCode,'active']);return r.rows[0]}
 app.get('/api/join/:code',async(req,res)=>{try{const s=await publicSession(req.params.code);if(!s){res.status(404).json({error:'session_unavailable'});return}const a=s.current_activity_id?(await db.query('SELECT * FROM activities WHERE id=$1',[s.current_activity_id])).rows[0]:null;res.json({session:{id:s.id,title:s.title,status:s.status},activity:a?publicActivity(a):null,allow_anonymous:s.allow_anonymous,show_results:s.show_results,theme:publicTheme(s.theme)})}catch(e){sendError(res,e)}});
 // Read-only QR endpoint; embeds only the public participant URL, never access privileges.
-app.get('/api/join/:code/qr.svg',async(req,res)=>{try{const s=await publicSession(req.params.code);if(!s){res.status(404).end();return}const url=`${publicBase}/join/${s.join_secret}`;res.setHeader('Cache-Control','no-store');res.type('image/svg+xml').send(await QRCode.toString(url,{type:'svg',margin:2}))}catch(e){sendError(res,e)}});
+app.get('/api/join/:code/qr.svg',async(req,res)=>{try{const s=await publicSession(req.params.code);if(!s){res.status(404).end();return}const url=`${await configuredQrPublicBase()}/join/${s.join_secret}`;res.setHeader('Cache-Control','no-store');res.type('image/svg+xml').send(await QRCode.toString(url,{type:'svg',margin:2}))}catch(e){sendError(res,e)}});
 // Public QR text and image use the identical canonical participant URL.
 // Only active, non-expired sessions are disclosed, as for the QR SVG itself.
 app.get('/api/join/:code/qr-url',async(req,res)=>{try{
  const s=await publicSession(req.params.code);if(!s){res.status(404).end();return}
- res.setHeader('Cache-Control','no-store');res.json({url:`${publicBase}/join/${s.join_secret}`});
+ res.setHeader('Cache-Control','no-store');res.json({url:`${await configuredQrPublicBase()}/join/${s.join_secret}`});
 }catch(e){sendError(res,e)}});
 // Read-only participation recovery: returns only a boolean, never a token or pseudonym.
 // A browser reload can recover its existing HttpOnly participant cookie without

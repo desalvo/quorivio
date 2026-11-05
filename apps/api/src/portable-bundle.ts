@@ -26,7 +26,7 @@ export type BundleManifest={format:'quorivio-bundle';version:1;definition:any;as
 export function referencedAssets(definition:any):Set<string>{
  const out=new Set<string>();const add=(v:any)=>{if(typeof v==='string'&&v)out.add(v)};
  const scan=(x:any)=>{if(!x||typeof x!=='object')return;add(x.backgroundAssetId);if(Array.isArray(x.widgets))for(const w of x.widgets){if(['image','logo','video','pdf'].includes(w?.kind))add(w.assetId);if(w?.style?.fillMode==='image')add(w.style.fillImageAssetId)}};
- scan(definition?.session?.theme);scan(definition?.session?.theme?.master);for(const a of definition?.activities||[]){scan(a.page_design);scan(a.result_design)}return out;
+ scan(definition?.session?.theme);scan(definition?.session?.theme?.master);for(const a of definition?.activities||[]){scan(a.page_design);scan(a.result_design);add(a.slide_asset_id)}return out;
 }
 /** Give every imported asset a fresh instance-global ID, preserving shared references
  * across session theme, page layouts and result layouts. Never mutate caller input. */
@@ -46,7 +46,7 @@ export function remapPortableAssets(definition:any,sourceAssetIds:string[]):{def
   }
  };
  rewrite(copy.session?.theme);rewrite(copy.session?.theme?.master);
- if(Array.isArray(copy.activities))for(const activity of copy.activities){rewrite(activity.page_design);rewrite(activity.result_design)}
+ if(Array.isArray(copy.activities))for(const activity of copy.activities){rewrite(activity.page_design);rewrite(activity.result_design);if(typeof activity.slide_asset_id==='string')activity.slide_asset_id=ids.get(activity.slide_asset_id)}
  return {definition:copy,ids};
 }
 export function validateBundleManifest(m:any):m is BundleManifest{

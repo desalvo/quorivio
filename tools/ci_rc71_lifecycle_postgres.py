@@ -28,6 +28,8 @@ def run():
         {'id':'profile71','kind':'profile','label':'Presenter','description':'Example biography'}]}
     req(admin,'PATCH',f'/api/sessions/{sid}/activities/{aid}/design',{
         'page_design':page,'result_design':{},'expected_design_revision':1})
+    initial_participant_url = req(admin,'GET',f'/api/sessions/{sid}/qr?format=json')['url']
+    assert initial_participant_url.endswith('/join/'+created['join_url'].rsplit('/',1)[-1])
     qr = req(admin,'GET',f'/api/sessions/{sid}/presenter-qr')
     assert isinstance(qr,bytes) and b'<svg' in qr and b'<svg' not in code.encode()
     req(admin,'POST',f'/api/sessions/{sid}/status',{'status':'active'})
@@ -64,6 +66,9 @@ def run():
     reset=req(admin,'GET',f'/api/sessions/{sid}')
     assert reset['session']['status']=='ready' and reset['session']['current_activity_id'] is None
     assert reset['session']['join_code']!=code
+    rotated_participant_url = req(admin,'GET',f'/api/sessions/{sid}/qr?format=json')['url']
+    assert rotated_participant_url!=initial_participant_url
+    assert rotated_participant_url.endswith('/join/'+reset['session']['join_url'].rsplit('/',1)[-1])
     assert reset['results']==[] and all(a['status']=='pending' and a['opened_at'] is None for a in reset['activities'])
     assert next(a for a in reset['activities'] if a['id']==aid)['page_design']['widgets']==page['widgets']
     req(audience,'POST',f'/api/join/{code}/respond',{'activity_id':aid,'option_id':'yes'},expected=404)

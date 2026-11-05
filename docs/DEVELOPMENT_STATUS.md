@@ -1,3 +1,14 @@
+# Quorivio 0.1.0-dev — RC201 — Live QR synchronization
+
+**RC201:** From RC200 cumulative, fixed automatic participant QR/link refresh after session URL rotation: owner live sockets survive reset, invalid public sockets close, dashboard and widgets fetch canonical URLs with 12-second polling, focus/online refresh, revisioned images and fail-closed behavior; shared configured origins stay consistent across replicas. Local 4 executable QR state tests and 21 QR/lifecycle Python checks green. RC200/RC201 integrated CI pending; last verified full green RC199 `42096705867`. **85.25%** certified (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. See `docs/RC_CYCLE201_LIVE_QR_SYNC.en.md`.
+
+---
+# Quorivio 0.1.0-dev — RC200 — Editor import/export and portable session
+
+**RC200:** Starting from RC199 (full GitHub Actions CI green, run [42096705867](https://github.com/desalvo/quorivio/actions/runs/42096705867)), reorganized the editor title and primary owner beneath the action row, removed the duplicate scheme button, added thumbnail-menu PPTX/PDF insertion after selected page, improved standalone cross-owner `.quorivio` including raster slide assets, introduced PDF export and privacy-scoped CSV/XLSX statistics. Focused Node/Python checks passed; RC200 integrated CI pending. **85.25%** certified (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. See `docs/RC_CYCLE200_EDITOR_PORTABILITY.en.md`. 
+
+---
+
 # Quorivio 0.1.0-dev — RC199 — Early release-header and cumulative package preflight
 
 **RC199:** CI run [#299](https://github.com/desalvo/quorivio/actions/runs/42094437419), job `127480690817`, stopped at the early active release-header check: RC198 English and Italian development-status summaries omitted explicit release safety flags. Restored the required flags in all four RC199 active bilingual headers, preserved RC198 as historical text, added an early regression fixture for exactly this omission, and made the RC199 ZIP verifier reject an archive whose embedded headers are stale/incomplete. Source and ZIP checks are required before uploading. No application/runtime behavior changed; full GitHub CI pending. Certified **85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. See `docs/RC_CYCLE199_RELEASE_HEADER_CI_FIX.en.md`.

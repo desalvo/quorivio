@@ -17,7 +17,8 @@ class ParticipantQrContract(unittest.TestCase):
 
     def test_url_is_supplied_by_server_not_guessed_from_code(self):
         self.assertIn("const endpoint=publicAccess?`${base}/qr-url`:`${base}/qr?format=json`", WEB)
-        self.assertIn('setUrl(value.url)', WEB)
+        self.assertIn('updateQrTarget(old,sourceKey,value.url)', WEB)
+        self.assertIn("cache:'no-store'", WEB)
         self.assertNotIn('location.origin}/join/${joinCode}', WEB)
 
     def test_editor_rehearsal_presenter_and_participants_share_widget(self):
@@ -38,16 +39,19 @@ class ParticipantQrContract(unittest.TestCase):
         qr = API[API.index("app.get('/api/join/:code/qr.svg'"):API.index('// Read-only participation recovery:')]
         self.assertIn("app.get('/api/join/:code/qr-url'", qr)
         self.assertEqual(qr.count('await publicSession(req.params.code)'), 2)
-        self.assertEqual(qr.count('${publicBase}/join/${s.join_secret}'), 2)
+        self.assertEqual(qr.count('${await configuredQrPublicBase()}/join/${s.join_secret}'), 2)
+        self.assertIn("SELECT value FROM platform_settings WHERE key='public_base_url'", API)
         self.assertIn("res.setHeader('Cache-Control','no-store')", qr)
         self.assertIn('QRCode.toString(url', qr)
 
     def test_display_under_scannable_image_with_wrapping(self):
         block = WEB[WEB.index('function ParticipantAccessQr('):WEB.index('function ProjectionWidgetContent(')]
-        self.assertLess(block.index('<img src={imageSrc}'), block.index('className="participant-qr-url"'))
+        self.assertLess(block.index('<img key={revision} src={imageSrc}'), block.index('className="participant-qr-url"'))
         self.assertIn('overflow-wrap:anywhere', CSS)
         self.assertIn('.participant-access-qr', CSS)
-        self.assertIn('if(!controller.signal.aborted)', block)
+        sync = WEB[WEB.index('function useSynchronizedParticipantQr('):WEB.index('function ParticipantAccessQr(')]
+        self.assertIn('if(!controller.signal.aborted)', sync)
+        self.assertIn('controller.abort()', sync)
 
 
 if __name__ == '__main__':

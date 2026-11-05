@@ -117,3 +117,17 @@ test('portable bundle rejects aggregate declared ZIP size before media inflation
  zip.writeUInt32LE(84*1024*1024,central+24);
  assert.throws(()=>decodeBundle(zip),/unsafe_bundle_entry/);
 });
+
+test('RC200 embedded presentation slide images are mandatory, bundled and assigned new IDs per imported owner',()=>{
+ const portable={format:'quorivio-session',version:1,session:{theme:{}},activities:[{type:'slide',slide_asset_id:id,page_design:{media:[{kind:'image',url:'https://quorivio.invalid/portable-slide'}]},result_design:{}}]};
+ assert.deepEqual(referencedAssets(portable),new Set([id]));
+ const bundle={...manifest,definition:portable};
+ const archive=encodeBundle(bundle,new Map([[id,bytes]]));
+ const parsed=decodeBundle(archive);
+ assert.equal(parsed.media.get(id)?.length,bytes.length);
+ const other=remapPortableAssets(parsed.manifest.definition,[id]);
+ assert.notEqual(other.definition.activities[0].slide_asset_id,id);
+ assert.equal(other.definition.activities[0].slide_asset_id,other.ids.get(id));
+ assert.deepEqual(referencedAssets(other.definition),new Set([other.ids.get(id)]));
+ assert.throws(()=>encodeBundle({...bundle,assets:[]},new Map()),/invalid_bundle_manifest/);
+});

@@ -32,9 +32,13 @@ def compile_with_tsc(source: str) -> subprocess.CompletedProcess[str]:
     with tempfile.TemporaryDirectory(prefix='quorivio-rc189-') as d:
         file = Path(d) / 'portable-map.ts'
         file.write_text(source, encoding='utf-8')
+        # The isolated map fixture must not import ambient types from partially
+        # installed workspace packages; the full API typecheck runs after npm.
+        isolated_types = Path(d) / 'types'
+        isolated_types.mkdir()
         return subprocess.run(
             ['tsc', '--strict', '--noEmit', '--target', 'ES2022', '--module', 'NodeNext',
-             '--moduleResolution', 'NodeNext', '--skipLibCheck', str(file)],
+             '--moduleResolution', 'NodeNext', '--skipLibCheck', '--typeRoots', str(isolated_types), str(file)],
             cwd=ROOT, text=True, capture_output=True, timeout=20, check=False)
 
 

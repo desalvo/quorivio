@@ -2524,3 +2524,16 @@ main.participant-live-view.participant-slide-active .audience-stage-scroll{
  font-family:var(--q-answer-font-family,inherit)!important;
  font-size:var(--q-answer-font-size,inherit)!important;
 }
+
+/* RC200: title and primary owner are a secondary, compact row BELOW Schemi / preview actions. */
+.editor-ux-v2,.editor-ux-v2:fullscreen{grid-template-rows:minmax(88px,auto) minmax(0,1fr)!important}
+.editor-ux-v2 .editor-mock-header{min-height:88px!important;align-items:center!important}
+.editor-ux-v2 .editor-mock-brand{flex:0 1 156px!important;max-width:156px!important}
+.editor-ux-v2 .editor-mock-actions{display:flex!important;flex-direction:column!important;align-items:flex-end!important;justify-content:center!important;gap:3px!important;flex:1 1 420px!important}
+.editor-ux-v2 .editor-mock-action-buttons{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:5px;max-width:100%}
+.editor-ux-v2 .editor-mock-meta{display:flex;gap:8px;justify-content:flex-end;align-items:center;flex-wrap:wrap;max-width:100%;min-width:0;font-size:11px;line-height:1.35;color:#c2d4e7}
+.editor-ux-v2 .editor-session-title{display:block;max-width:min(38vw,330px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600;font-size:11px;color:#e1eefa}
+.editor-ux-v2 .editor-mock-meta .editor-presenter-identities{display:flex;flex-wrap:wrap;max-width:min(48vw,520px);gap:4px;overflow:hidden;align-items:center}
+.editor-ux-v2 .editor-mock-meta .editor-presenter-identities>span{padding:2px 7px;font-size:10px;max-width:205px}
+@media(max-width:1200px){.editor-ux-v2,.editor-ux-v2:fullscreen{grid-template-rows:minmax(118px,auto) auto minmax(0,1fr)!important}.editor-ux-v2 .editor-mock-actions{order:1!important;flex:1 1 60%!important}.editor-ux-v2 .editor-mock-header>.editor-device-switch{order:2!important;flex:1 1 100%!important}}
+@media(max-width:750px){.editor-ux-v2,.editor-ux-v2:fullscreen{grid-template-rows:minmax(158px,auto) auto minmax(0,1fr)!important}.editor-ux-v2 .editor-mock-brand{flex:0 1 95px!important}.editor-ux-v2 .editor-mock-meta{justify-content:flex-start!important}.editor-ux-v2 .editor-mock-meta .editor-presenter-identities{max-width:100%}.editor-ux-v2 .editor-session-title{max-width:90vw}}

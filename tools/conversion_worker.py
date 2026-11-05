@@ -2,6 +2,7 @@
 """Private conversion worker. Only opaque job IDs, no filesystem paths over HTTP."""
 import hmac
 import hashlib
+import subprocess
 import stat
 import json
 import os
@@ -97,7 +98,7 @@ def _source_digest(path):
 def execute_portable_job(job, mode):
     """Run bounded portable conversion in the isolated worker; opaque job IDs only."""
     workspace = _workspace(job)
-    if mode not in ('import', 'export'):
+    if mode not in ('import', 'export', 'export-pdf'):
         raise ValueError('invalid portable mode')
     reservation = workspace / '.conversion-lock'
     with _ACTIVE_LOCK:
@@ -165,6 +166,21 @@ def execute_portable_job(job, mode):
         size = staged_file.stat().st_size
         _publish_file_exclusive(staged_file, destination)
         staged_file = None
+        if mode == 'export-pdf':
+            # The PPTX is generated from a validated portable definition. Convert
+            # it only in this isolated worker, never in the API process.
+            profile = workspace / '.lo-export-profile'
+            result = subprocess.run(['libreoffice', '-env:UserInstallation=file://' + str(profile),
+                                     '--headless', '--convert-to', 'pdf:impress_pdf_Export',
+                                     '--outdir', str(workspace), str(destination)],
+                                    stdin=subprocess.DEVNULL, capture_output=True, timeout=120, check=False)
+            output = workspace / 'presentation.pdf'
+            if result.returncode or output.is_symlink() or not output.is_file():
+                raise ValueError('pdf conversion failed')
+            if not 8 <= output.stat().st_size <= 50*1024*1024 or output.open('rb').read(5) != b'%PDF-':
+                raise ValueError('invalid exported PDF')
+            output.chmod(0o600)
+            return {'bytes': output.stat().st_size}
         return {'bytes': size}
     finally:
         if staged_file is not None:
@@ -187,7 +203,7 @@ class Handler(BaseHTTPRequestHandler):
         return self.reply(200 if ready else 503, {'ready': ready})
 
     def do_POST(self):
-        if self.path not in ('/convert', '/portable-import', '/portable-export'):
+        if self.path not in ('/convert', '/portable-import', '/portable-export', '/portable-export-pdf'):
             return self.reply(404, {'error': 'not_found'})
         auth_headers = self.headers.get_all('Authorization', [])
         auth = auth_headers[0] if len(auth_headers) == 1 else ''
@@ -212,7 +228,7 @@ class Handler(BaseHTTPRequestHandler):
                                  parse_constant=_reject_nonfinite)
             if not isinstance(request, dict) or set(request) != {'job'} or not isinstance(request['job'], str):
                 return self.reply(400, {'error': 'invalid_request'})
-            return self.reply(200, execute_job(request['job']) if self.path == '/convert' else execute_portable_job(request['job'], 'import' if self.path == '/portable-import' else 'export'))
+            return self.reply(200, execute_job(request['job']) if self.path == '/convert' else execute_portable_job(request['job'], 'import' if self.path == '/portable-import' else 'export-pdf' if self.path == '/portable-export-pdf' else 'export'))
         except (ValueError, OSError, RuntimeError, TimeoutError, json.JSONDecodeError) as exc:
             self.log_error('conversion rejected: %s', type(exc).__name__)
             return self.reply(422, {'error': 'conversion_failed'})

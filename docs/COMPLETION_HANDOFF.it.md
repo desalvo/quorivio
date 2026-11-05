@@ -1,3 +1,14 @@
+# Quorivio 0.1.0-dev — RC201 — Handoff sincronizzazione QR
+
+**RC201 handoff:** Continuare da questo cumulativo, conservando tutte le modifiche RC200; ultima full CI verde RC199 `42096705867`. QRCode e link del pubblico aggiornati nelle dashboard e nei widget senza reload: broadcast su socket presentatore preservato al reset, verifica canonica ogni 12 secondi e a focus/rete/visibilità, immagini sostituite per revisione, nessun vecchio URL mostrato in caso di errore, configurazione dell'origine letta dal database comune tra repliche. Socket dei partecipanti invalidati chiusi. Test locali: 4/4 stato QR e 21/21 Python; CI integrata React/PostgreSQL/Kubernetes da verificare. **85,25%** certificato (43 gate accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Vedi `docs/RC_CYCLE201_LIVE_QR_SYNC.it.md`.
+
+---
+# Quorivio 0.1.0-dev — RC200 — Handoff editor e sessioni portatili
+
+**RC200 handoff:** CI completa RC199 verde (`42096705867`). Metadati editor più compatti sotto la barra dei comandi, nessun «Modifica schemi» duplicato nella sidebar; menu miniature con import PDF/PPTX dopo la pagina corrente; `.quorivio` reimportabile da altro proprietario con asset rimappati e immagini delle slide conservate; export PPTX/PDF con slide raster preservate; statistiche CSV/XLSX aggregate anonime predefinite o nominative riservate al proprietario primario. Test locali mirati superati; CI integrata RC200 ancora da verificare. **85,25%** certificato (43 accettati, 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. `docs/RC_CYCLE200_EDITOR_PORTABILITY.it.md`. 
+
+---
+
 # Quorivio 0.1.0-dev — RC199 — Correzione intestazioni release in CI #299
 
 **RC199:** dalla RC198 committata dall’utente (`0375877`), la CI #299 si è fermata al controllo `Validate active RC release headers against the current inventory` per i flag mancanti nei due riepiloghi di sviluppo RC198. Sincronizzate le quattro intestazioni RC199, introdotti test preventivi e controllo delle intestazioni effettive nello ZIP; inventario storico RC198 e note precedenti preservati. Nessuna modifica al runtime; CI completa GitHub da confermare. **85,25%** certificato (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag dell’assistente. `docs/RC_CYCLE199_RELEASE_HEADER_CI_FIX.it.md`.

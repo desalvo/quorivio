@@ -58,7 +58,8 @@ class IndependentLivePages(unittest.TestCase):
         self.assertIn('linkedStatisticContext(widget,activity,activities,widgets)', UI)
         self.assertIn('linkedStatisticActivity(widget,current,activities)', (ROOT/'apps/web/src/widget-results.ts').read_text())
         self.assertIn('sourceActivityId', UI)
-        self.assertIn('SELECT id AS portable_id', API)
+        # RC200: slide image assets require a LEFT JOIN, so the page id is qualified.
+        self.assertIn('SELECT a.id AS portable_id', API)
         self.assertIn('remapPortablePageRouting', API)
         self.assertIn('unlinkDeletedPage(reference.page_design,req.params.aid)', API)
         self.assertIn('design_revision=design_revision+1', API)

@@ -1,3 +1,14 @@
+# Quorivio 0.1.0-dev — RC201 — Live QR handoff
+
+**RC201 handoff:** Resume from this cumulative. RC200 import/export work retained; RC199 last full CI success `42096705867`. Canonical QR URLs now auto-refresh in dashboard/widgets, update immediately from live owner snapshots after a rotated join code, poll every 12 seconds to catch public-origin changes, refresh on focus/online/visibility, remove stale QR pixels on revoke or fetch error, and use the shared DB-configured public origin across replicas. Reset keeps owner WebSockets but disconnects deleted participants. Local QR state 4/4, focused Python 21/21; full React/PostgreSQL/Kubernetes CI pending. Certified **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag. Read `docs/RC_CYCLE201_LIVE_QR_SYNC.en.md`.
+
+---
+# Quorivio 0.1.0-dev — RC200 — Editor portability handoff
+
+**RC200 handoff:** RC199 has full green CI (run `42096705867`). New compact editor title/owner row, no duplicate sidebar scheme command; thumbnail menu can insert PDF/PPTX after selected slide using the isolated worker; transferable `.quorivio` now includes referenced slide snapshots with owner-independent asset remapping; native PPTX/PDF export preserves imported raster slides; owner-only identifiable statistics or default anonymized aggregated CSV/XLSX. Local targeted tests pass; CI of RC200 pending. Certified **85.25%** (43 accepted, 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag. `docs/RC_CYCLE200_EDITOR_PORTABILITY.en.md`. 
+
+---
+
 # Quorivio 0.1.0-dev — RC199 — GitHub #299 active release-header regression fix
 
 **RC199:** starts from maintainer-committed RC198 (`0375877`), GitHub Actions #299 production quality gate failed at `Validate active RC release headers against the current inventory` because RC198 status summaries lacked explicit flags in their current (pre-divider) sections. Synchronized all four RC199 headings/flag declarations; added early regression tests and a ZIP-contained-header preflight; retained immutable RC198 inventory and historical entries. No runtime edits, no claim of full GitHub CI pass. **85.25%** certified (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. `docs/RC_CYCLE199_RELEASE_HEADER_CI_FIX.en.md`.

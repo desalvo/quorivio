@@ -125,6 +125,8 @@ jobs:
           PYTHONPATH=tools python3 tools/verify_rc_release_status.py
           PYTHONPATH=tools python3 -m unittest tools.tests.test_rc_cycle100_release_status_guard -q
           PYTHONPATH=tools python3 -m unittest tools.tests.test_rc199_release_headers -q
+          PYTHONPATH=tools python3 -m unittest tools.tests.test_rc200_editor_portability -q
+          PYTHONPATH=tools python3 -m unittest tools.tests.test_rc201_live_qr_refresh -q
           PYTHONPATH=tools python3 -m unittest tools.tests.test_rc147_inventory_no_cache -q
           PYTHONPATH=tools python3 -m unittest tools.tests.test_rc148_phone_atomic_undo -q
           PYTHONPATH=tools python3 -m unittest tools.tests.test_rc149_background_contracts -q
@@ -445,6 +447,8 @@ jobs:
         run: ./node_modules/.bin/tsc --noEmit -p apps/web/tsconfig.json
       # RC campaigns are strictly observational, regardless of other dispatch
       # checkboxes. Separate consent is required for production publication.
+      - name: RC201 QR token rotation and fail-closed display state
+        run: node --experimental-strip-types --test apps/web/test/session-qr-state.test.ts
       - name: Validate RC campaign is non-publishing and non-strict
         if: github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite || (github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[full-ci]') || contains(github.event.head_commit.message, '[publish-docker]')))
         env:
@@ -1207,7 +1211,9 @@ jobs:
           python3 tools/verify_rc_cycle196_inventory.py --historical
           python3 tools/verify_rc_cycle197_inventory.py --historical
           python3 tools/verify_rc_cycle198_inventory.py --historical
-          python3 tools/verify_rc_cycle199_inventory.py
+          python3 tools/verify_rc_cycle199_inventory.py --historical
+          python3 tools/verify_rc_cycle200_inventory.py --historical
+          python3 tools/verify_rc_cycle201_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

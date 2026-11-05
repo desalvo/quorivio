@@ -142,6 +142,18 @@ def _validate_export_input(data):
     for activity in activities:
         if not isinstance(activity, dict):
             raise ValueError('Invalid slide')
+        slide_asset_id = activity.get('slide_asset_id')
+        if slide_asset_id is not None:
+            if activity.get('type') != 'slide':
+                raise ValueError('Slide snapshot asset is only valid for slide pages')
+            try:
+                valid_slide_asset = (isinstance(slide_asset_id, str) and
+                    str(uuid.UUID(slide_asset_id)) == slide_asset_id and
+                    uuid.UUID(slide_asset_id).version == 4)
+            except (ValueError, AttributeError, TypeError):
+                valid_slide_asset = False
+            if not valid_slide_asset:
+                raise ValueError('Invalid slide snapshot asset ID')
         design = activity.get('page_design', {})
         if not isinstance(design, dict):
             raise ValueError('Invalid page design')
@@ -1131,6 +1143,27 @@ def portable_to_pptx(data, destination, media_dir=None):
             from pptx.dml.color import RGBColor
             slide.background.fill.solid()
             slide.background.fill.fore_color.rgb = RGBColor.from_string(background[1:])
+        # A PDF/PPTX imported slide is stored as a session-owned raster image.
+        # Re-embed its verified pixels before overlaying editable Quorivio widgets.
+        slide_asset_id = activity.get('slide_asset_id')
+        if slide_asset_id:
+            if media_dir is None:
+                raise ValueError('Slide export requires a private media directory')
+            media_base = Path(media_dir)
+            picture_path = media_base / slide_asset_id
+            if (any(parent.is_symlink() for parent in (media_base, *media_base.parents)) or
+                    picture_path.is_symlink() or not picture_path.is_file() or
+                    picture_path.stat().st_size > 10 * 1024 * 1024):
+                raise ValueError('Missing or oversized slide snapshot asset')
+            blob = picture_path.read_bytes()
+            if not (_supported_image(blob, 'image/png') or _supported_image(blob, 'image/jpeg')):
+                raise ValueError('Unsupported or invalid slide snapshot asset')
+            if slide_asset_id not in seen_assets:
+                seen_assets.add(slide_asset_id)
+                total_asset_bytes += len(blob)
+                if len(seen_assets) > 200 or total_asset_bytes > 50 * 1024 * 1024:
+                    raise ValueError('PowerPoint media quota exceeded')
+            slide.shapes.add_picture(io.BytesIO(blob), 0, 0, p.slide_width, p.slide_height)
         widgets = (activity.get('page_design') or {}).get('widgets') or []
         # Export global schema widgets in the same order and geometry as React.
         master = (((data.get('session') or {}).get('theme') or {}).get('master') or {})
