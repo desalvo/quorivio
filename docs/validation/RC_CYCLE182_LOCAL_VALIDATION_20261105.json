@@ -1,0 +1,33 @@
+{
+  "project": "Quorivio",
+  "version": "0.1.0-dev",
+  "cycle": 182,
+  "date": "2026-11-05",
+  "base": "RC181",
+  "ci_run_analyzed": "41944096707",
+  "ci_job_analyzed": "126971883724",
+  "head_sha": "d9b116338ea17019ed6948852a777fe0f53a5e7e",
+  "ci_failure": {
+    "step": "Chromium editor PostgreSQL persistence and conflict acceptance (opt-in)",
+    "test": "tools/ci_browser_editor_conflict_visibility.py",
+    "viewport_px": 1100,
+    "element_width_px": 140,
+    "text_scroll_width_px": 152,
+    "failure": "revision-conflict header status clipped by later !important width cap"
+  },
+  "fix": "Allow .editor-autosave-indicator.has-error to wrap and size within the viewport without weakening normal sync-status compactness",
+  "local_verification": {
+    "frontend_node": {"passed": 313, "failed": 0},
+    "api_node": {"passed": 588, "failed": 0},
+    "chromium_rc182": {"viewports_px": [1440, 1100, 960, 390], "cases_per_viewport": 3, "passed": 12},
+    "negative_css_control": "RC181 original CSS fails the new stress regression before fix",
+    "chromium_rc181_accessibility": "passed",
+    "chromium_rc180_palette_context": "passed at 1440, 960 and 390 px",
+    "chromium_rc178_editor_mock_layout": "passed",
+    "github_full_ci_post_commit": "pending"
+  },
+  "release_controls": {"rc_strict": false, "publish_image": false, "publish_latest": false},
+  "certified_completion_pct": 85.25,
+  "gate_counts": {"accepted": 43, "partial": 17},
+  "assistant_commit_push_tag": false
+}

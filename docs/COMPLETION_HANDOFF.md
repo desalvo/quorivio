@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC182 — editor conflict indicator CI handoff
+
+**RC182 after user-committed RC181:** CI `41944096707` passed compiled browser and participant/PostgreSQL checks, then failed at `ci_browser_editor_conflict_visibility.py` because the 1100px error status was clipped by the later RC171 140px important cap. Fixed responsive error-only wrapping, added 12 Chromium cases across 1440/1100/960/390px and red-before/green-after regression, moved the browser guard before database setup. Current inventory refreshed, historical manifests preserved. **85.25% certified (43 accepted / 17 partial).** `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no assistant commit/push/tag/deploy. GitHub CI for RC182 not yet run. See `docs/RC_CYCLE182_CONFLICT_INDICATOR_FIDELITY.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC181 — Chromium accessible disclosure dock CI handoff
 
 **RC181 after user-committed RC180:** GitHub `41931287829` passed earlier checks but `ci_accessible_disclosure_chromium.py` failed because its historical fixture required a toolbar/disclosure overlap removed by the RC180 dock. Reconciled the browser assertion and its historical unittest; early CI regression now enforces no overlap, genuine pointer hit-test and working accessible controls in touch/desktop Chromium. No runtime behavior changed. New immutable source receipt; CI acceptance remains pending. **Certified 85.25% (43 accepted/17 partial).** `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no assistant commit/push/tag/deploy. See `docs/RC_CYCLE181_ACCESSIBLE_DISCLOSURE_DOCK_CI.en.md`.

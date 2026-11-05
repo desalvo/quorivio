@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC182 — editor conflict status layout fix
+
+**RC182:** GitHub run `41944096707` reached PostgreSQL browser acceptance but failed on editor conflict status clipping at 1100px (140px box vs 152px text). The RC171 `!important` width cap overrode RC120 error protection. Fixed error-only wrapping and responsive width, leaving ordinary status compact. Chromium stress tests pass at 1440/1100/960/390px, including long error text; original RC181 CSS fails the new negative guard. Early CI browser and Python preflights added. Certified **85.25% (43 accepted/17 partial)**, `rc_strict=false`, `publish_image=false`, `publish_latest=false`; full post-commit CI pending. No assistant commit/push/tag/deploy. See `docs/RC_CYCLE182_CONFLICT_INDICATOR_FIDELITY.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC181 — accessible disclosure dock CI reconciliation
 
 **RC181:** run `41931287829` reached Chromium editor after successful earlier checks, then failed on stale `assert overlap` in `ci_accessible_disclosure_chromium.py` after RC180 removed overlap by docking controls. The real Chromium CSS test now demands non-overlapping accessible disclosure and retains native click/tap, checkbox, toolbar dismissal and contextual layer action. Historical unittest updated, early CI guard added; no application runtime edits. Local focused tests PASS; full CI/React/PostgreSQL still pending. **85.25% certified (43 accepted, 17 partial)**, `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag/deploy. See `docs/RC_CYCLE181_ACCESSIBLE_DISCLOSURE_DOCK_CI.en.md`.

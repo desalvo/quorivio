@@ -184,6 +184,8 @@ jobs:
         run: python3 -m unittest tools.tests.test_rc180_editor_rail_context_docking -q
       - name: RC181 accessible summary is unobstructed after contextual docking
         run: python3 -m unittest tools.tests.test_rc181_disclosure_dock -q
+      - name: RC182 conflict indicator keeps full text across responsive widths
+        run: python3 -m unittest tools.tests.test_rc182_conflict_indicator -q
       - name: RC170 schema-owned footer number and phone preview/live parity preflight
         run: python3 -m unittest tools.tests.test_rc170_phone_footer_number_parity -q
       - name: Validate RC105 floating dialogs and selection-only resize geometry before npm
@@ -507,6 +509,8 @@ jobs:
           # authenticated editor uses contextual duplicate/arrange commands.
           python3 tools/ci_rc179_editor_tool_pointer_chromium.py
           python3 tools/ci_rc180_editor_palette_context_coexist_chromium.py
+          # RC182: catch 1100px conflict-status clipping before authenticated PostgreSQL setup.
+          python3 tools/ci_browser_editor_conflict_visibility.py
           python3 tools/ci_browser_editor.py
           # Actual native Chromium drag, ambiguous PUT acknowledgement, server readback and keyboard persistence.
           python3 tools/ci_page_thumbnail_native.py --engines chromium
@@ -1081,7 +1085,8 @@ jobs:
           python3 tools/verify_rc_cycle178_inventory.py --historical
           python3 tools/verify_rc_cycle179_inventory.py --historical
           python3 tools/verify_rc_cycle180_inventory.py --historical
-          python3 tools/verify_rc_cycle181_inventory.py
+          python3 tools/verify_rc_cycle181_inventory.py --historical
+          python3 tools/verify_rc_cycle182_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

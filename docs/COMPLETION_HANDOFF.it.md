@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC182 — handoff CI stato conflitti editor
+
+**RC182 dopo RC181 committata dall’utente:** CI `41944096707` verde fino ai test browser/PostgreSQL partecipanti; il test `ci_browser_editor_conflict_visibility.py` rileva a 1100 px lo stato di conflitto tagliato dall’importante limite di 140 px ereditato da RC171. Corretto wrapping responsivo esclusivamente per gli errori, 12 test Chromium a 1440/1100/960/390 px, verifica negativa con CSS precedente e guard browser anticipato prima dell’integrazione database. Inventario corrente rigenerato, storico immutato. **85,25% certificato (43 accettati / 17 parziali).** `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag/deploy; CI GitHub RC182 non ancora eseguita. Vedi `docs/RC_CYCLE182_CONFLICT_INDICATOR_FIDELITY.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC181 — Handoff test Chromium accessibilità
 
 **RC181 dopo RC180 committata dall’utente:** nella CI `41931287829` passano i controlli precedenti, ma `ci_accessible_disclosure_chromium.py` impone ancora una sovrapposizione tra toolbar e riepilogo accessibile eliminata dalla RC180. Aggiornato il test Chromium e il relativo contratto storico; nuova regressione CI anticipata garantisce assenza di sovrapposizione, hit test reale e comandi accessibili funzionanti su smartphone e desktop. Nessuna modifica al runtime. Nuovo inventario immutabile; CI completa ancora da confermare. **85,25% certificato (43/17)**, `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag/deploy. Vedi `docs/RC_CYCLE181_ACCESSIBLE_DISCLOSURE_DOCK_CI.it.md`.

@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC182 — stato dei conflitti leggibile nell’editor
+
+**RC182:** run GitHub `41944096707`: arrivata al collaudo browser con PostgreSQL, bloccata da testo conflitto tagliato a 1100 px (contenitore 140 px, testo 152 px). La regola RC171 `!important` sovrascriveva la correzione RC120. Ripristinato il wrapping solo negli stati di errore e un limite viewport; indicatore normale invariato. Chromium a 1440/1100/960/390 px supera messaggi lunghi e font stressato, mentre il vecchio CSS fallisce la prova negativa. Anticipati preflight Python e browser nella CI. **85,25% certificato (43 accettati/17 parziali)**, `rc_strict=false`, `publish_image=false`, `publish_latest=false`; CI completa dopo commit ancora da verificare. Nessun commit/push/tag/deploy. Vedi `docs/RC_CYCLE182_CONFLICT_INDICATOR_FIDELITY.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC181 — riconciliazione Chromium dei controlli accessibili
 
 **RC181:** run `41931287829`: controlli precedenti superati, errore sulla vecchia asserzione `assert overlap` nel test Chromium accessibile dopo che la RC180 ha eliminato correttamente la sovrapposizione. Il test con il CSS reale ora impone assenza di sovrapposizione, conservando click/tap nativi, checkbox, chiusura toolbar e comando livello. Aggiornato il contratto storico, aggiunto preflight anticipato; nessuna modifica al runtime. Prove mirate locali verdi; CI completa/React/PostgreSQL aperte. **85,25% certificato (43 accettati / 17 parziali)**, `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag/deploy. Vedi `docs/RC_CYCLE181_ACCESSIBLE_DISCLOSURE_DOCK_CI.it.md`.

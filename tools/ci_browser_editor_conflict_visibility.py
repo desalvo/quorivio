@@ -37,24 +37,36 @@ async def verify():
     async with async_playwright() as pw:
         browser = await pw.chromium.launch(**launch, headless=True, args=['--no-sandbox'])
         try:
+            # Exercise both the exact CI failure message and a longer operator
+            # diagnostic. Include a 14px bold font stress case: runner images
+            # do not share identical font metrics, which exposed the 1100px
+            # overflow only in GitHub Chromium (run 41944096707).
+            cases = (
+                ('Conflitto di revisione', False),
+                ('Conflitto di revisione', True),
+                ('Impossibile salvare: conflitto di revisione con un altro presentatore', True),
+            )
             for width in (1440, 1100, 960, 390):
-                page = await browser.new_page(viewport={'width': width, 'height': 900})
-                try:
-                    await page.set_content(fixture())
-                    # Use the same exact locator that detected the RC119 failure.
-                    status = page.get_by_role('region', name='Editor grafico delle pagine').get_by_text('Conflitto di revisione', exact=True)
-                    await expect(status).to_be_visible()
-                    values = await status.evaluate('''e => {
-                      const b = e.getBoundingClientRect(), h = e.closest('.editor-mock-header').getBoundingClientRect();
-                      return { x:b.x, y:b.y, w:b.width, h:b.height, scroll:e.scrollWidth,
-                        headerWidth:h.width, visible:getComputedStyle(e).visibility, overflow:getComputedStyle(e).overflow }
-                    }''')
-                    assert values['w'] >= 115, f'{width}px: status compressed: {values}'
-                    assert values['x'] >= 0 and values['x'] + values['w'] <= width + 1, f'{width}px: status offscreen: {values}'
-                    assert values['scroll'] <= values['w'] + 3, f'{width}px: status text clipped: {values}'
-                    print(f'PASS RC120 Chromium {width}px: editor revision conflict remains visible ({values["w"]:.1f}px)')
-                finally:
-                    await page.close()
+                for message, stress in cases:
+                    page = await browser.new_page(viewport={'width': width, 'height': 900})
+                    try:
+                        await page.set_content(fixture(status=message))
+                        status = page.get_by_role('region', name='Editor grafico delle pagine').get_by_text(message, exact=True)
+                        await expect(status).to_be_visible()
+                        if stress:
+                            await status.evaluate("e => { e.style.fontFamily='Arial, sans-serif'; e.style.fontSize='14px'; e.style.fontWeight='700' }")
+                        values = await status.evaluate('''e => {
+                          const b = e.getBoundingClientRect(), h = e.closest('.editor-mock-header').getBoundingClientRect();
+                          return { x:b.x, y:b.y, w:b.width, h:b.height, scroll:e.scrollWidth,
+                            headerWidth:h.width, visible:getComputedStyle(e).visibility,
+                            overflow:getComputedStyle(e).overflow }
+                        }''')
+                        assert values['w'] >= 115, f'{width}px: status compressed: {values}'
+                        assert values['x'] >= 0 and values['x'] + values['w'] <= width + 1, f'{width}px: status offscreen: {values}'
+                        assert values['scroll'] <= values['w'] + 3, f'{width}px: status text clipped: {values}'
+                        print(f'PASS RC182 Chromium {width}px stress={stress}: conflict status readable ({values["w"]:.1f}px)')
+                    finally:
+                        await page.close()
         finally:
             await browser.close()
 
