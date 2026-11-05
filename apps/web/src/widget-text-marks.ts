@@ -144,7 +144,9 @@ export function applyAllWidgetTypeface(widget:{style?:Record<string,unknown>;tex
     change.fontFamily!==undefined?{answerFontFamily:change.fontFamily}:{},
     change.color!==undefined?{answerColor:change.color}:{},
     change.bold!==undefined?{answerBold:change.bold}:{},
-    change.italic!==undefined?{answerItalic:change.italic}:{});
+    change.italic!==undefined?{answerItalic:change.italic}:{},
+    change.underline!==undefined?{answerUnderline:change.underline}:{},
+    change.strikethrough!==undefined?{answerStrikethrough:change.strikethrough}:{});
  const marks=(widget.textMarks||[]).map(mark=>({...mark,style:{...mark.style,...change}}));
  return {style,textMarks:marks};
 }

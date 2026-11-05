@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC198 — Risposte sottolineate e barrate
+
+**RC198:** allineati API ed editor per sottolineato e barrato delle risposte in tutti gli ambiti; vecchi progetti compatibili. Node API **605/605**, frontend **348/348** verdi. CI della RC197 #298 in corso all’ultima verifica; nuova CI RC198 non avviata. **85,25%** certificato (43 gate accettati/17 parziali); versione e impostazioni release immutate; nessun commit/push/tag. `docs/RC_CYCLE198_ANSWER_DECORATION.it.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC197 — Riconciliazione test Python integrati
 
 **RC197:** run GitHub #297 (`42085779348`) fermata nel passo Python Kubernetes dopo 2.024 test (sei asserzioni storiche obsolete). Corretti e anticipati prima di npm i contratti di anteprima indipendente, layout smartphone, reazioni, tipografia e sottodomande. Nessuna modifica al runtime. Python globale `2.027` eseguiti: `2.026` superati (1 saltato), mirati `35/35`, API Node `603/603`, frontend Node `345/345` verdi; nuova CI completa da confermare. **85,25%** certificato, 43 accettati e 17 parziali; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Ultima baseline pubblicata RC190. Nessun commit/push/tag. `docs/RC_CYCLE197_KUBERNETES_PYTHON_RECONCILIATION.it.md`.

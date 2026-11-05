@@ -1175,7 +1175,7 @@ function WidgetCanvas({widgets,numberingWidgets,onChange,pageTitle="",sessionTit
  };
  const baseline:InlineStyle=w.kind==='title'?widgetDisplay(w,{pageTitle,masterTitleStyle}).style:(widgetTextDefaults(w.kind,style)||style);
  const questionStyle=widgetTextDefaults(w.kind,style)||style;
- const baselineField=effectiveScope==='answers'?{...baseline,fontFamily:questionStyle.answerFontFamily||questionStyle.fontFamily,fontSize:questionStyle.answerFontSize||questionStyle.fontSize,color:questionStyle.answerColor||questionStyle.color,bold:questionStyle.answerBold??false,italic:questionStyle.answerItalic??questionStyle.italic}:baseline;
+ const baselineField=effectiveScope==='answers'?{...baseline,fontFamily:questionStyle.answerFontFamily||questionStyle.fontFamily,fontSize:questionStyle.answerFontSize||questionStyle.fontSize,color:questionStyle.answerColor||questionStyle.color,bold:questionStyle.answerBold??false,italic:questionStyle.answerItalic??questionStyle.italic,underline:questionStyle.answerUnderline??questionStyle.underline,strikethrough:questionStyle.answerStrikethrough??questionStyle.strikethrough}:baseline;
  const selectedValue=<K extends keyof InlineStyle>(key:K):InlineStyle[K]|undefined=>{
   if(selectedRange){
    const text=fieldText(selectedRange.field);
@@ -1211,7 +1211,7 @@ function WidgetCanvas({widgets,numberingWidgets,onChange,pageTitle="",sessionTit
    return;
   }
   if(effectiveScope==='answers'&&typographic){
-   const mapping:Record<string,string>={fontFamily:'answerFontFamily',fontSize:'answerFontSize',color:'answerColor',bold:'answerBold',italic:'answerItalic'};
+   const mapping:Record<string,string>={fontFamily:'answerFontFamily',fontSize:'answerFontSize',color:'answerColor',bold:'answerBold',italic:'answerItalic',underline:'answerUnderline',strikethrough:'answerStrikethrough'};
    const updated={...style};for(const [key,val] of Object.entries(changes))updated[mapping[key]||key]=val;
    const marks=(w.textMarks||[]).map((mark:TextMark)=>mark.field.startsWith('option:')||mark.field.includes(':option:')?{...mark,style:{...mark.style,...changes}}:mark);
    patch(w.id,{style:updated,textMarks:marks});return;
@@ -1293,6 +1293,8 @@ function WidgetCanvas({widgets,numberingWidgets,onChange,pageTitle="",sessionTit
       <div className="palette-ribbon-buttons" role="group" aria-label="Stili risposte">
         <button type="button" title="Grassetto risposta" aria-label="Grassetto risposte" aria-pressed={!!style.answerBold} onClick={()=>patch(w.id,{style:{...style,answerBold:!style.answerBold}})}><BoldIcon size={16}/></button>
         <button type="button" title="Corsivo risposta" aria-label="Corsivo risposte" aria-pressed={!!style.answerItalic} onClick={()=>patch(w.id,{style:{...style,answerItalic:!style.answerItalic}})}><ItalicIcon size={16}/></button>
+        <button type="button" title="Sottolineato risposte" aria-label="Sottolineato risposte" aria-pressed={!!style.answerUnderline} onClick={()=>patch(w.id,{style:{...style,answerUnderline:!style.answerUnderline}})}><UnderlineIcon size={16}/></button>
+        <button type="button" title="Barrato risposte" aria-label="Barrato risposte" aria-pressed={!!style.answerStrikethrough} onClick={()=>patch(w.id,{style:{...style,answerStrikethrough:!style.answerStrikethrough}})}><StrikethroughIcon size={16}/></button>
         <label className="palette-ribbon-color" title="Colore testo risposte"><span aria-hidden="true">A</span><input type="color" aria-label="Colore risposte" value={style.answerColor||'#152236'} onChange={e=>patch(w.id,{style:{...style,answerColor:e.target.value}})}/></label>
             <label className="palette-ribbon-answer" title="Larghezza del campo di risposta libera">Campo % <input type="number" aria-label="Larghezza risposta libera" min={25} max={100} step={5} value={style.answerFieldWidth||100} onChange={e=>{const n=Number(e.target.value);if(Number.isInteger(n)&&n>=25&&n<=100)setStyle({answerFieldWidth:n})}}/></label>
         <label className="palette-ribbon-answer" title="Altezza del campo di risposta libera">Campo px <input type="number" aria-label="Altezza risposta libera" min={48} max={400} step={8} value={style.answerFieldHeight||96} onChange={e=>{const n=Number(e.target.value);if(Number.isInteger(n)&&n>=48&&n<=400)setStyle({answerFieldHeight:n})}}/></label>
@@ -2303,6 +2305,8 @@ me===undefined?<main id="main-content" className="narrow">Caricamento...</main>:
     <label>Colore testo risposta<input type="color" value={w.style?.answerColor||'#152236'} onChange={e=>setPageWidgets(old=>old.map(z=>z.id===w.id?{...z,style:{...z.style,answerColor:e.target.value}}:z))}/></label>
     <label><input type="checkbox" checked={!!w.style?.answerBold} onChange={e=>setPageWidgets(old=>old.map(z=>z.id===w.id?{...z,style:{...z.style,answerBold:e.target.checked}}:z))}/> Risposta in grassetto</label>
     <label><input type="checkbox" checked={!!w.style?.answerItalic} onChange={e=>setPageWidgets(old=>old.map(z=>z.id===w.id?{...z,style:{...z.style,answerItalic:e.target.checked}}:z))}/> Risposta in corsivo</label>
+    <label><input type="checkbox" checked={!!w.style?.answerUnderline} onChange={e=>setPageWidgets(old=>old.map(z=>z.id===w.id?{...z,style:{...z.style,answerUnderline:e.target.checked}}:z))}/> Risposta sottolineata</label>
+    <label><input type="checkbox" checked={!!w.style?.answerStrikethrough} onChange={e=>setPageWidgets(old=>old.map(z=>z.id===w.id?{...z,style:{...z.style,answerStrikethrough:e.target.checked}}:z))}/> Risposta barrata</label>
      <label>Larghezza casella risposta libera (%)<input type="number" aria-label="Larghezza casella risposta libera" min={25} max={100} step={5} value={w.style?.answerFieldWidth||100} onChange={e=>{const v=Number(e.target.value);if(Number.isInteger(v)&&v>=25&&v<=100)setPageWidgets(old=>old.map(z=>z.id===w.id?{...z,style:{...z.style,answerFieldWidth:v}}:z))}}/></label>
      <label>Altezza casella risposta libera (px)<input type="number" aria-label="Altezza casella risposta libera" min={48} max={400} step={8} value={w.style?.answerFieldHeight||96} onChange={e=>{const v=Number(e.target.value);if(Number.isInteger(v)&&v>=48&&v<=400)setPageWidgets(old=>old.map(z=>z.id===w.id?{...z,style:{...z.style,answerFieldHeight:v}}:z))}}/></label>
     <label>Dimensione pulsante invio (px)<input type="number" aria-label="Dimensione pulsante invio" min={12} max={40} value={w.style?.submitButtonSize||16} onChange={e=>{const v=Number(e.target.value);if(Number.isInteger(v)&&v>=12&&v<=40)setPageWidgets(old=>old.map(z=>z.id===w.id?{...z,style:{...z.style,submitButtonSize:v}}:z))}}/></label>

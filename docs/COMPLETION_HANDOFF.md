@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC198 — Answer decoration parity
+
+**RC198:** based on user-committed RC197 (`0794f02`, CI #298 launched). Added independently validated answer underline and strikethrough for Whole widget / Answers scopes and independent subquestions. API Node 605/605, frontend Node 348/348 passed; compiled React/TypeScript CI pending. **85.25%** certified (43 accepted, 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. `docs/RC_CYCLE198_ANSWER_DECORATION.en.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC197 — Kubernetes Python integration contract reconciliation
 
 **RC197:** GitHub run #297 (`42085779348`) failed in the Kubernetes Python step after 2,024 tests (six stale historical assertions). Reconciled and moved early before npm the independent rehearsal page, smartphone, reaction, typography and typed subquestion checks. No runtime changes. Full Python `2,027` run: `2,026` passed (1 skipped), targeted `35/35`, API Node `603/603`, frontend Node `345/345` green; full CI pending. Certified **85.25%**, 43 accepted/17 partial; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Last published baseline RC190. No commit/push/tag. `docs/RC_CYCLE197_KUBERNETES_PYTHON_RECONCILIATION.en.md`.

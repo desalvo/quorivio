@@ -8,7 +8,9 @@ export function answerOptionStyle(style?:WidgetTextStyle){
  const family=style?.answerFontFamily||style?.fontFamily||'Arial';
  const size=`${((style?.answerFontSize||style?.fontSize||16)/12.8).toFixed(5)}cqw`;
  return {fontFamily:family,fontSize:size,'--q-answer-font-family':family,'--q-answer-font-size':size,
-  fontWeight:style?.answerBold?'700':'400',fontStyle:style?.answerItalic?'italic':'normal',color:style?.answerColor||'#152236'};
+  fontWeight:style?.answerBold?'700':'400',fontStyle:style?.answerItalic?'italic':'normal',
+  textDecoration:[style?.answerUnderline?'underline':'',style?.answerStrikethrough?'line-through':''].filter(Boolean).join(' ')||'none',
+  color:style?.answerColor||'#152236'};
 }
 export function answerSubmitStyle(style?:WidgetTextStyle){
  const size=style?.submitButtonSize||DEFAULT_SUBMIT_SIZE;
