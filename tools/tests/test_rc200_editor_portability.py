@@ -40,6 +40,20 @@ class RC200EditorPortability(unittest.TestCase):
         self.assertIn('portable-export-pdf', worker)
         self.assertIn('export-pdf', worker)
 
+    def test_invalid_or_non_slide_snapshot_is_rejected(self):
+        for item in [
+            {'type':'slide', 'slide_asset_id':'../../file'},
+            {'type':'poll', 'slide_asset_id':str(uuid.uuid4())},
+        ]:
+            with self.subTest(item=item):
+                with self.assertRaisesRegex(ValueError, 'slide|Slide'):
+                    _validate_export_input({'format':'quorivio-session','version':1,
+                        'activities':[{**item,'page_design':{'widgets':[]}}]})
+
+
+
+class RC200NativePowerPointPortability(unittest.TestCase):
+    """Needs python-pptx and Pillow; run only after CI installs conversion dependencies."""
     def test_raster_snapshot_round_trip_to_editable_pptx(self):
         from PIL import Image
         from pptx import Presentation
@@ -63,16 +77,6 @@ class RC200EditorPortability(unittest.TestCase):
             self.assertEqual(slide.shapes[0].width, Presentation(dest).slide_width)
             self.assertEqual(slide.shapes[0].height, Presentation(dest).slide_height)
             self.assertEqual(slide.shapes[1].text, 'Didascalia')
-
-    def test_invalid_or_non_slide_snapshot_is_rejected(self):
-        for item in [
-            {'type':'slide', 'slide_asset_id':'../../file'},
-            {'type':'poll', 'slide_asset_id':str(uuid.uuid4())},
-        ]:
-            with self.subTest(item=item):
-                with self.assertRaisesRegex(ValueError, 'slide|Slide'):
-                    _validate_export_input({'format':'quorivio-session','version':1,
-                        'activities':[{**item,'page_design':{'widgets':[]}}]})
 
     def test_missing_snapshot_fails_closed(self):
         with tempfile.TemporaryDirectory() as folder:

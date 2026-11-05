@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC202 — Python dependency staging CI repair
+
+**RC202:** The maintainer committed RC201 (GitHub Actions run `42105427044`, production-quality job `127518865236`), which failed in the early release-header step because two native RC200 PowerPoint tests imported `pptx` and `PIL` before Python conversion dependencies were installed. Split the four dependency-free source checks from the two real image/PPTX roundtrip checks; run native checks after explicit `python-pptx`/Pillow installation and import verification, add RC202 staging regression. No application/QR runtime changes. Local targeted tests pass; full RC202 CI pending, last full green RC199 `42096705867`. **85.25%** certified (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. See `docs/RC_CYCLE202_CI_DEPENDENCY_STAGING.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC201 — Live QR synchronization
 
 **RC201:** From RC200 cumulative, fixed automatic participant QR/link refresh after session URL rotation: owner live sockets survive reset, invalid public sockets close, dashboard and widgets fetch canonical URLs with 12-second polling, focus/online refresh, revisioned images and fail-closed behavior; shared configured origins stay consistent across replicas. Local 4 executable QR state tests and 21 QR/lifecycle Python checks green. RC200/RC201 integrated CI pending; last verified full green RC199 `42096705867`. **85.25%** certified (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. See `docs/RC_CYCLE201_LIVE_QR_SYNC.en.md`.

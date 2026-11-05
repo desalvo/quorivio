@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC202 — Python conversion dependency CI handoff
+
+**RC202 handoff:** Resume from this cumulative; RC201 committed by maintainer, run `42105427044`, job `127518865236` fails before dependency install in `test_rc200_editor_portability` with missing `pptx`/`PIL`. Fixed only CI/test staging: early `RC200EditorPortability` class (4 dependency-free checks), late `RC200NativePowerPointPortability` class (2 fail-closed real PPTX cases) after required Python dependencies, added RC202 negative-staging regression. Preserve RC201 no-reload QR updates, RC200 portable formats, history and manifest receipts. Full RC202 CI is pending; last green RC199 run `42096705867`. **85.25%** certified (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. Read `docs/RC_CYCLE202_CI_DEPENDENCY_STAGING.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC201 — Live QR handoff
 
 **RC201 handoff:** Resume from this cumulative. RC200 import/export work retained; RC199 last full CI success `42096705867`. Canonical QR URLs now auto-refresh in dashboard/widgets, update immediately from live owner snapshots after a rotated join code, poll every 12 seconds to catch public-origin changes, refresh on focus/online/visibility, remove stale QR pixels on revoke or fetch error, and use the shared DB-configured public origin across replicas. Reset keeps owner WebSockets but disconnects deleted participants. Local QR state 4/4, focused Python 21/21; full React/PostgreSQL/Kubernetes CI pending. Certified **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag. Read `docs/RC_CYCLE201_LIVE_QR_SYNC.en.md`.

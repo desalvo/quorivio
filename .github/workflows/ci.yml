@@ -125,7 +125,9 @@ jobs:
           PYTHONPATH=tools python3 tools/verify_rc_release_status.py
           PYTHONPATH=tools python3 -m unittest tools.tests.test_rc_cycle100_release_status_guard -q
           PYTHONPATH=tools python3 -m unittest tools.tests.test_rc199_release_headers -q
-          PYTHONPATH=tools python3 -m unittest tools.tests.test_rc200_editor_portability -q
+          # Pure-source RC200 assertions; native PowerPoint cases run only after Pillow/pptx installation.
+          PYTHONPATH=tools python3 -m unittest tools.tests.test_rc200_editor_portability.RC200EditorPortability -q
+          PYTHONPATH=tools python3 -m unittest tools.tests.test_rc202_dependency_staging -q
           PYTHONPATH=tools python3 -m unittest tools.tests.test_rc201_live_qr_refresh -q
           PYTHONPATH=tools python3 -m unittest tools.tests.test_rc147_inventory_no_cache -q
           PYTHONPATH=tools python3 -m unittest tools.tests.test_rc148_phone_atomic_undo -q
@@ -964,6 +966,9 @@ jobs:
           python3 -m pip install --disable-pip-version-check --break-system-packages 'reportlab>=4,<5' 'python-pptx>=1.0,<2' 'Pillow>=11,<14' 'qrcode==8.2' 'aiohttp>=3.9,<4'
           python3 -c 'import reportlab' # fail gate rather than skipping the PDF rendering test
           python3 -c 'import pptx, aiohttp' # enforce PPTX and load-test integration prerequisites
+          python3 -c 'import PIL' # enforce Pillow before native slide-snapshot regression
+      - name: RC202 native imported-slide PowerPoint fidelity after Python dependencies
+        run: PYTHONPATH=tools python3 -m unittest tools.tests.test_rc200_editor_portability.RC200NativePowerPointPortability -v
       # Explicitly run native PPTX regression cases only after python-pptx is present.
       # They also remain in the full tools/tests discovery that follows.
       - name: Verify RC74 footer and RC91 scheme native PowerPoint fidelity
@@ -1213,7 +1218,8 @@ jobs:
           python3 tools/verify_rc_cycle198_inventory.py --historical
           python3 tools/verify_rc_cycle199_inventory.py --historical
           python3 tools/verify_rc_cycle200_inventory.py --historical
-          python3 tools/verify_rc_cycle201_inventory.py
+          python3 tools/verify_rc_cycle201_inventory.py --historical
+          python3 tools/verify_rc_cycle202_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:
