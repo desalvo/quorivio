@@ -1,3 +1,12 @@
+# Quorivio 0.1.0-dev — RC188 — Separate presenter/audience first-page CI reconciliation
+
+**RC188:** reconciled the legacy RC92 assertion expecting `ORDER BY position,id LIMIT 1`. Since RC185, starting a projection must load ordered pages, choose the first **presenter-visible** page (`firstPresenterPage`), resolve its audience target (`audienceForPresenter`), and atomically update both projection pointers under the session row lock without rewinding an existing presentation. Added an early RC188 fail-closed preflight with negative mutations and a real TypeScript routing behavior test. No runtime changes. RC187 GitHub run `42011405908` stopped at RC92 before npm; ClamAV passed. Last fully green CI remains RC184 `41993094578`. Certified completion **85.25%** (43 accepted gates, 17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. See `docs/RC_CYCLE188_PRESENTER_START_CI.en.md`.
+
+
+**Completed local checks:** 87/87 dependency-free CI preflight commands, 599/599 API tests, 321/321 frontend tests, RC92/RC185/RC188 contracts and SHA-256 source inventory. Post-commit GitHub CI for RC188 remains required.
+
+---
+
 # Quorivio 0.1.0-dev — RC187 — Optional true/false answer keys
 
 **RC187:** Added per-choice opt-in True/False answer keys for ordinary single/multiple choice questions and independent subquestions, with controls in widget properties and canvas context menu. The grading response is returned only after a successful participant submission; keyed answers are excluded from public snapshots. Keys participate in answer revisions, and idempotent retries use stored answers. Based on RC186; latest GitHub-green baseline RC184 `41993094578`. Certified **85.25%** (43 accepted, 17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. See `docs/RC_CYCLE187_QUESTION_ANSWER_KEYS.en.md`.

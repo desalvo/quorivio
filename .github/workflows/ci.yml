@@ -336,6 +336,11 @@ jobs:
         run: python3 -m unittest tools.tests.test_rc_cycle99_ci_contract -q
       - name: Validate RC98 presenter and scheme TypeScript fixes before npm
         run: python3 -m unittest tools.tests.test_rc_cycle98_web_compile -q
+      # RC188: RC92 pre-dates the RC185 split between presenter and audience
+      # activity pointers. Prove skip/redirect and atomic first-page startup
+      # before any slower browser or PostgreSQL checks.
+      - name: RC188 presenter first-page routing and historical RC92 reconciliation
+        run: python3 -m unittest tools.tests.test_rc188_presenter_start_reconciliation -q
       - name: Validate RC92 presenter stage, gated navigation and fullscreen before npm
         run: python3 -m unittest tools.tests.test_rc92_presenter_stage -q
       - name: Validate RC93 participant QR and link parity before npm
@@ -1122,7 +1127,8 @@ jobs:
           python3 tools/verify_rc_cycle184_inventory.py --historical
           python3 tools/verify_rc_cycle185_inventory.py --historical
           python3 tools/verify_rc_cycle186_inventory.py --historical
-          python3 tools/verify_rc_cycle187_inventory.py
+          python3 tools/verify_rc_cycle187_inventory.py --historical
+          python3 tools/verify_rc_cycle188_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

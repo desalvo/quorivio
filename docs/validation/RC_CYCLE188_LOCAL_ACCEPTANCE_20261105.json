@@ -1,0 +1,48 @@
+{
+  "version": "0.1.0-dev",
+  "cycle": 188,
+  "date": "2026-11-05",
+  "based_on_cycle": 187,
+  "failed_ci": {
+    "run_id": 42011405908,
+    "job_id": 127191083032,
+    "failed_step": "Validate RC92 presenter stage, gated navigation and fullscreen before npm",
+    "cause": "outdated LIMIT 1 assertion conflicts with presenter-hidden pages and distinct audience routes"
+  },
+  "last_confirmed_green_ci": {
+    "cycle": 184,
+    "run_id": 41993094578
+  },
+  "scope": {
+    "historical_rc92_assertion_updated": true,
+    "early_negative_mutation_tests": true,
+    "typescript_routing_behavior_test": true,
+    "runtime_changes": false,
+    "historical_inventories_unchanged": true
+  },
+  "local_validation": {
+    "python_rc92_rc188_rc185_passed": 15,
+    "api_rc185_node_passed": 5,
+    "ci_full_run": "pending",
+    "all_87_dependency_free_ci_preflight_commands_passed": true,
+    "preflight_commands_passed": 87,
+    "web_node_tests_passed": 321,
+    "api_node_tests_passed": 599,
+    "source_file_sha256_verified": true,
+    "historical_ci_inventory_verifiers": 175,
+    "zip_checksum_verified": true
+  },
+  "pending_validation": [
+    "GitHub Actions end-to-end with npm, PostgreSQL, Chromium, Kubernetes and container security after RC188 commit",
+    "Independent operator acceptance and external privacy/accessibility checks"
+  ],
+  "certified_gate_score": 85.25,
+  "accepted_gates": 43,
+  "partial_gates": 17,
+  "rc_strict": false,
+  "publish_image": false,
+  "publish_latest": false,
+  "assistant_committed": false,
+  "assistant_pushed": false,
+  "assistant_tagged": false
+}

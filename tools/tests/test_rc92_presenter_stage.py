@@ -12,7 +12,13 @@ class PresenterStageContract(unittest.TestCase):
   route=API.split("app.post('/api/sessions/:id/presentation/ensure-first-page'")[1].split("app.post('/api/sessions/:id/activities/:aid/open'")[0]
   self.assertIn('FOR UPDATE',route)
   self.assertIn('if(session.current_activity_id)',route)
-  self.assertIn('ORDER BY position,id LIMIT 1',route)
+  # RC185+: the first *presenter-visible* page may not be the first
+  # activity, while the audience may remain on a hidden question page.
+  self.assertIn('SELECT id,page_design FROM activities WHERE session_id=$1 ORDER BY position,id',route)
+  self.assertIn('const presenter=firstPresenterPage(pages)',route)
+  self.assertIn('const audience=audienceForPresenter(pages,presenter)',route)
+  self.assertIn('presenter_activity_id=$3',route)
+  self.assertNotIn('ORDER BY position,id LIMIT 1',route)
   self.assertIn("status='active'",route)
   self.assertIn('opened_at=COALESCE(opened_at,now())',route)
   self.assertIn('await broadcast(req.params.id)',route)

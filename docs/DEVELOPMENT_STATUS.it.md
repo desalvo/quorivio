@@ -1,3 +1,12 @@
+# Quorivio 0.1.0-dev — RC188 — Avvio presentazione con pagine presentatore/pubblico separate
+
+**RC188:** riconciliato il controllo storico RC92 che richiedeva `ORDER BY position,id LIMIT 1`: dalla RC185 l'avvio deve recuperare le pagine ordinate, scegliere la prima **visibile al presentatore** (`firstPresenterPage`), risolvere la pagina del pubblico (`audienceForPresenter`) e aggiornare atomicamente entrambi i puntatori sotto blocco di sessione, senza riaprire una proiezione già avviata. Aggiunto un preflight RC188 anticipato con test negativi e prova TypeScript reale. Nessuna modifica al runtime. Run CI RC187 `42011405908` interrotta nel preflight RC92, ClamAV verde; l'ultima campagna interamente verde confermata resta RC184 `41993094578`. Completamento certificato **85,25%** (43 gate accettati, 17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag eseguito. Vedi `docs/RC_CYCLE188_PRESENTER_START_CI.it.md`.
+
+
+**Verifiche locali concluse:** 87/87 preflight CI eseguibili senza npm, 599/599 test API, 321/321 test frontend, contratti RC92/RC185/RC188 e inventario SHA-256. La nuova CI GitHub sul commit RC188 è ancora necessaria.
+
+---
+
 # Quorivio 0.1.0-dev — RC187 — Risposte vere/false facoltative
 
 **RC187:** introdotta chiave vero/falso opzionale per ogni risposta delle domande a scelta singola/multipla, incluse le domande indipendenti, modificabile dalle proprietà e dal menu contestuale del canvas. Il riscontro viene restituito privatamente solo dopo il salvataggio della risposta, senza esporre le soluzioni alla pagina pubblica. Le modifiche aggiornano le revisioni e i retry utilizzano la risposta già salvata. Baseline RC186; ultima CI completamente verde RC184 `41993094578`. Completamento certificato **85,25%** (43 accettati, 17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag eseguito. Vedere `docs/RC_CYCLE187_QUESTION_ANSWER_KEYS.it.md`.
