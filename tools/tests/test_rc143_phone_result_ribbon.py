@@ -19,8 +19,10 @@ class RC143PhoneResultsRibbon(unittest.TestCase):
   self.assertIn('linked-result-final',MAIN)
  def test_phone_independent_stage_and_no_desktop_background(self):
   for marker in ('PhoneRehearsalStage','renderSlide(\'participant\',true)','width:390px!important;height:100%!important',
-                 'mobilePageWidgets(widgets,activity?.page_design?.mobile)','position:absolute!important;left:var(--stage-x)!important'):
+                 'mobilePageWidgets(viewWidgets,viewActivity?.page_design?.mobile)','position:absolute!important;left:var(--stage-x)!important'):
    self.assertIn(marker,MAIN+CSS)
+  self.assertIn('participantPhoneLayout(viewWidgets,viewActivity?.page_design?.mobile).widgets',MAIN)
+  self.assertIn("const viewActivity=viewer==='presenter'?activity:audienceActivity",MAIN)
   self.assertNotIn('rehearsal-phone-frame">{renderSlide(\'participant\')}',MAIN)
  def test_existing_preview_modes_still_operate(self):
   for marker in ('Presentatore','Partecipante','Affiancate','Smartphone',"mode==='both'&&participantDevice==='phone'"):

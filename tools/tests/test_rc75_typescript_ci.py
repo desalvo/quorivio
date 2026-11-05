@@ -28,8 +28,10 @@ class RC75TypescriptRegression(unittest.TestCase):
     def test_free_text_subquestions_are_typed_consistently(self):
         source = (ROOT / 'apps/web/src/widget-results.ts').read_text(encoding='utf8')
         self.assertIn('answerMode?:string;options?:', source)
-        self.assertIn('questions?:{id:string;label:string;answerMode?:string;', source)
+        self.assertIn('questions?:{id:string;label:string;description?:string;answerMode?:string;', source)
         self.assertIn('rehearsalFreeTextRows(source:StatisticalWidget,', source)
+        self.assertIn('showSourceQuestion?:boolean', source)
+        self.assertIn('targetQuestionId?:string', source)
 
     @unittest.skipUnless(shutil.which('tsc'), 'TypeScript compiler is unavailable locally')
     def test_strict_typescript_compilation_of_affected_independent_modules(self):

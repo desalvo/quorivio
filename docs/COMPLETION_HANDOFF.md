@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC197 — Kubernetes Python integration contract reconciliation
+
+**RC197:** GitHub run #297 (`42085779348`) failed in the Kubernetes Python step after 2,024 tests (six stale historical assertions). Reconciled and moved early before npm the independent rehearsal page, smartphone, reaction, typography and typed subquestion checks. No runtime changes. Full Python `2,027` run: `2,026` passed (1 skipped), targeted `35/35`, API Node `603/603`, frontend Node `345/345` green; full CI pending. Certified **85.25%**, 43 accepted/17 partial; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Last published baseline RC190. No commit/push/tag. `docs/RC_CYCLE197_KUBERNETES_PYTHON_RECONCILIATION.en.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC196 handoff — strict frontend types
 
 **RC196 handoff:** Source is RC195 cumulative, now corrected for GitHub #296’s three React TS errors (`linkedResultQuestion` import and `showSourceQuestion` editor typing). Added early Python negative-mutation guard and post-install full frontend strict compiler, without altering API, result permissions or projection routing. Frontend/API Node suites green; full Vite CI must confirm. Preserve immutable inventories; RC196 cumulative SHA receipt. RC190 remains published baseline; **85.25%** certified (43 accepted/17 partial). No commit/push/tag. `docs/RC_CYCLE196_FRONTEND_RESULTS_TYPES.en.md`.

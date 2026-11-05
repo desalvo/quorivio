@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC197 — Riconciliazione test Python integrati
+
+**RC197:** run GitHub #297 (`42085779348`) fermata nel passo Python Kubernetes dopo 2.024 test (sei asserzioni storiche obsolete). Corretti e anticipati prima di npm i contratti di anteprima indipendente, layout smartphone, reazioni, tipografia e sottodomande. Nessuna modifica al runtime. Python globale `2.027` eseguiti: `2.026` superati (1 saltato), mirati `35/35`, API Node `603/603`, frontend Node `345/345` verdi; nuova CI completa da confermare. **85,25%** certificato, 43 accettati e 17 parziali; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Ultima baseline pubblicata RC190. Nessun commit/push/tag. `docs/RC_CYCLE197_KUBERNETES_PYTHON_RECONCILIATION.it.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC196 handoff — tipi React risultati
 
 **RC196 handoff:** corrette le tre segnalazioni TypeScript di GitHub #296: import di `linkedResultQuestion` e tipizzazione editor di `showSourceQuestion`. Aggiunti test anticipati a mutazioni negative e compilazione frontend rigorosa subito dopo npm; nessun intervento su API o politiche di visibilità dei risultati. Suite Node API/frontend verdi; compilazione integrata Vite in attesa CI. Inventari storici integri. Baseline pubblicata RC190, **85,25%** certificato (43 accettati/17 parziali). Nessun commit/push/tag. `docs/RC_CYCLE196_FRONTEND_RESULTS_TYPES.it.md`.

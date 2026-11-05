@@ -16,8 +16,9 @@ class RehearsalSendParity(unittest.TestCase):
   self.assertIn('seed,submittedAnswers,w.targetQuestionId',UI)
   self.assertNotIn('seed,responses,w.targetQuestionId',UI)
  def test_no_double_reaction_across_widgets(self):
-  self.assertIn('REHEARSAL_REACTION_PREFIX+activity.id', UI)
+  self.assertIn('REHEARSAL_REACTION_PREFIX+audienceActivity.id', UI)
   self.assertIn('changeRehearsalReaction(previous,pageKey,widgetId,value)', UI)
+  self.assertIn('const audienceActivity=rehearsalAudiencePage(activity,activities)',UI)
   self.assertIn("kind==='reactions'&&viewer==='presenter'?<ProjectionWidgetContent",UI)
   self.assertIn("<ReactionChoices size={w.reactionIconSize||32}",UI)
   self.assertIn("selected={typeof submittedAnswers[w.id]==='string'?submittedAnswers[w.id] as string:undefined}",UI)

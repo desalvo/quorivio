@@ -27,8 +27,11 @@ class PageRenamePreviewContract(unittest.TestCase):
  def test_rehearsal_exposes_one_page_with_navigation_only_in_preview_footer(self):
   block=UI.split('function SessionRehearsal(',1)[1].split('const editorWidgetKinds=',1)[0]
   self.assertNotIn('className="rehearsal-pages"',block)
-  self.assertIn('!widgets.length&&<h2 className="rehearsal-empty-title">{activity?.page_design?.header||activity?.title}</h2>',block)
+  self.assertIn('!viewWidgets.length&&<h2 className="rehearsal-empty-title">{viewActivity?.page_design?.header||viewActivity?.title}</h2>',block)
+  self.assertIn("const viewActivity=viewer==='presenter'?activity:audienceActivity",block)
+  self.assertIn("const viewWidgets=viewer==='presenter'?presenterWidgets:widgets",block)
   self.assertIn('Successiva →',block)
+  self.assertIn('disabled={page>=presenterPages.length-1}',block)
   self.assertIn('Nessuna risposta di prova viene salvata',block)
   self.assertIn('.rehearsal-stage{display:block;',CSS)
  def test_live_participant_uses_only_server_selected_current_activity(self):

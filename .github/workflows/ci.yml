@@ -152,6 +152,21 @@ jobs:
       # overrides rather than expecting an obsolete inline main.tsx literal.
       # RC196: cover the source question import and the editor's persisted
       # showSourceQuestion field before the slow front-end build.
+      # RC197: the 2,024-case Kubernetes Python megasuite previously failed at
+      # six stale source-string checks on the independent presenter/audience
+      # pages, typed subquestion description and centralized typography.
+      # Run all six exact historic test modules early, keeping their behavioral
+      # assertions, without requiring Docker/PostgreSQL/Chromium.
+      - name: RC197 reconcile Kubernetes Python integration contracts before npm
+        run: |
+          python3 -m unittest -q \
+            tools.tests.test_rc197_kubernetes_python_reconciliation \
+            tools.tests.test_page_rename_preview_contract_20261027 \
+            tools.tests.test_rc143_phone_result_ribbon \
+            tools.tests.test_rc75_typescript_ci \
+            tools.tests.test_rc_presenter_linked_preview_20261028 \
+            tools.tests.test_rehearsal_send_parity_20261028 \
+            tools.tests.test_visual_parity_rehearsal_20261028
       - name: RC196 cross-page source question frontend typing contract before npm
         run: python3 -m unittest tools.tests.test_rc196_frontend_results_types -q
       - name: RC195 centralized Arial master typography contract before npm
@@ -1188,7 +1203,8 @@ jobs:
           python3 tools/verify_rc_cycle193_inventory.py --historical
           python3 tools/verify_rc_cycle194_inventory.py --historical
           python3 tools/verify_rc_cycle195_inventory.py --historical
-          python3 tools/verify_rc_cycle196_inventory.py
+          python3 tools/verify_rc_cycle196_inventory.py --historical
+          python3 tools/verify_rc_cycle197_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

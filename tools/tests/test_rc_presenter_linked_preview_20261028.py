@@ -22,8 +22,9 @@ class PresenterLinkedPreview(unittest.TestCase):
  def test_preview_reaction_local_state(self):
   self.assertIn("onSelect={emoji=>submitDemoDirect(w.id,'reactions',emoji)}",SRC)
   self.assertIn("<ReactionChoices size={w.reactionIconSize||32}",SRC)
-  self.assertIn("const pageKey=REHEARSAL_REACTION_PREFIX+activity.id",SRC)
+  self.assertIn("const pageKey=REHEARSAL_REACTION_PREFIX+audienceActivity.id",SRC)
   self.assertIn('changeRehearsalReaction(previous,pageKey,widgetId,value)',SRC)
+  self.assertNotIn('const pageKey=REHEARSAL_REACTION_PREFIX+activity.id',SRC)
   self.assertIn('Nessuna risposta di prova viene salvata',SRC)
  def test_one_full_widget_and_one_selected_text_style_path(self):
   # Selected text is styled through the canonical overlap-aware helper.
