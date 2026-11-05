@@ -27,7 +27,12 @@ class RC141ResultAndRatingContract(unittest.TestCase):
 
     def test_reactions_share_render_and_title_off(self):
         self.assertEqual(UI.count('<ReactionChoices'), 3)
-        self.assertIn("['rating','reactions','results-button'].includes(w.kind)", UI)
+        # RC169 and later render the shared reaction component in all three
+        # projection surfaces; editor projection suppresses the duplicated
+        # outer heading, while an explicitly shown authored title is retained.
+        self.assertIn("['reactions','results-button'].includes(w.kind)?{...w,showTitle:false}:w", UI)
+        self.assertEqual(UI.count('<ReactionChoices'), 3)
+        self.assertIn('data-show-title={widgetTitleVisible(w)}', UI)
         self.assertIn("w.showTitle!==false&&<strong><WidgetStyledText text={w.label||'Reazioni'}", UI)
         self.assertIn('REHEARSAL_EMOJIS.map(emoji', REACTIONS)
         self.assertIn('data-show-title="false"', (ROOT / 'tools/ci_rc141_widget_parity_chromium.py').read_text())

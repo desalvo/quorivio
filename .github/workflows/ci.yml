@@ -186,6 +186,12 @@ jobs:
         run: python3 -m unittest tools.tests.test_rc181_disclosure_dock -q
       - name: RC182 conflict indicator keeps full text across responsive widths
         run: python3 -m unittest tools.tests.test_rc182_conflict_indicator -q
+      # RC183: the final Python discovery used to fail *after* authenticated
+      # React/PostgreSQL on stale RC139/141/public-stage source spellings.
+      # Assert shared policy, privacy and three explicit modes before npm.
+      - name: RC183 projection parity and historical full-suite reconciliation before npm
+        run: |
+          python3 -m unittest tools.tests.test_rc139_rating_text_selection tools.tests.test_rc141_stage_result_rating_contract tools.tests.test_rc_public_stage_and_dynamic_portals_20261028 tools.tests.test_rc183_projection_contract_reconciliation -q
       - name: RC170 schema-owned footer number and phone preview/live parity preflight
         run: python3 -m unittest tools.tests.test_rc170_phone_footer_number_parity -q
       - name: Validate RC105 floating dialogs and selection-only resize geometry before npm
@@ -1086,7 +1092,8 @@ jobs:
           python3 tools/verify_rc_cycle179_inventory.py --historical
           python3 tools/verify_rc_cycle180_inventory.py --historical
           python3 tools/verify_rc_cycle181_inventory.py --historical
-          python3 tools/verify_rc_cycle182_inventory.py
+          python3 tools/verify_rc_cycle182_inventory.py --historical
+          python3 tools/verify_rc_cycle183_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

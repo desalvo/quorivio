@@ -14,7 +14,13 @@ class RC139RatingTextSelection(unittest.TestCase):
   self.assertEqual(UI.count('<RatingStageContent'),3,'editor via projection plus live and rehearsal use the shared component')
   self.assertIn('function RatingStageContent(',UI)
   self.assertNotIn('canvas-rating-preview',UI)
-  self.assertIn("['rating','reactions','results-button'].includes(w.kind)?{...w,showTitle:false}:w",UI)
+  # RC169+ keeps the authored title outside editing and suppresses it only
+  # while the same rating label is being edited. The shared content handles
+  # the other views without duplicating rating/optional-comment controls.
+  self.assertIn("w.kind==='rating'?{...w,showTitle:editing===w.id?false:w.showTitle}",UI)
+  self.assertIn('widgetTitleVisible(widget)&&<strong>',UI)
+  self.assertIn('widgetTitleVisible(w)',UI)
+  self.assertIn('function widgetTitleVisible(', (ROOT/'apps/web/src/live-slide-policy.ts').read_text())
   self.assertIn('widget.showTitle!==false',UI)
   self.assertIn('readOnly||disabled||!onSelect',SCALE)
  def test_edit_text_mouse_without_moving_widget(self):

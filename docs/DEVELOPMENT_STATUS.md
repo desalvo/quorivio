@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC183 — full Python discovery CI reconciliation
+
+**RC183:** GitHub run `41952294082` reached the final 1,948-test Python discovery after successful build, React/Chromium and PostgreSQL acceptance. Four historic RC139/RC141/public-stage source-string assertions failed; reconciled with real shared title, three-mode public presentation and activity-scoped media contracts. Added early CI guard and negative mutation tests. No application runtime changes. Certified **85.25% (43 accepted/17 partial)**; `rc_strict=false`, `publish_image=false`, `publish_latest=false`; full post-commit CI pending. No assistant commit/push/tag/deploy. See `docs/RC_CYCLE183_FULL_PYTHON_DISCOVERY_RECONCILIATION.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC182 — editor conflict status layout fix
 
 **RC182:** GitHub run `41944096707` reached PostgreSQL browser acceptance but failed on editor conflict status clipping at 1100px (140px box vs 152px text). The RC171 `!important` width cap overrode RC120 error protection. Fixed error-only wrapping and responsive width, leaving ordinary status compact. Chromium stress tests pass at 1440/1100/960/390px, including long error text; original RC181 CSS fails the new negative guard. Early CI browser and Python preflights added. Certified **85.25% (43 accepted/17 partial)**, `rc_strict=false`, `publish_image=false`, `publish_latest=false`; full post-commit CI pending. No assistant commit/push/tag/deploy. See `docs/RC_CYCLE182_CONFLICT_INDICATOR_FIDELITY.en.md`.

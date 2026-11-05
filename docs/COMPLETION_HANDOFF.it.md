@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC183 — handoff discovery Python completa
+
+**RC183:** la run GitHub `41952294082` ha raggiunto la discovery Python da 1.948 test dopo build, React/Chromium e PostgreSQL, ma quattro contratti storici RC139/RC141/public-stage verificavano espressioni eliminate. Riconciliati con il comportamento corrente (titoli condivisi, tre modalità partecipante, media privati per attività), aggiunti preflight anticipato e mutazioni negative. Runtime applicativo invariato. **85,25% certificato (43 gate accettati / 17 parziali)**; `rc_strict=false`, `publish_image=false`, `publish_latest=false`; CI post-commit ancora da validare. Nessun commit/push/tag/deploy. Vedi `docs/RC_CYCLE183_FULL_PYTHON_DISCOVERY_RECONCILIATION.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC182 — handoff CI stato conflitti editor
 
 **RC182 dopo RC181 committata dall’utente:** CI `41944096707` verde fino ai test browser/PostgreSQL partecipanti; il test `ci_browser_editor_conflict_visibility.py` rileva a 1100 px lo stato di conflitto tagliato dall’importante limite di 140 px ereditato da RC171. Corretto wrapping responsivo esclusivamente per gli errori, 12 test Chromium a 1440/1100/960/390 px, verifica negativa con CSS precedente e guard browser anticipato prima dell’integrazione database. Inventario corrente rigenerato, storico immutato. **85,25% certificato (43 accettati / 17 parziali).** `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag/deploy; CI GitHub RC182 non ancora eseguita. Vedi `docs/RC_CYCLE182_CONFLICT_INDICATOR_FIDELITY.it.md`.

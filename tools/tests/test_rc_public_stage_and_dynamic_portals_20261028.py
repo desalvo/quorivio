@@ -15,17 +15,26 @@ class PublicSlideFidelity(unittest.TestCase):
    self.assertIn(clause,UI+'\n'+CSS)
   self.assertNotIn('position:"relative",minHeight:560',UI)
  def test_reading_mode_is_visible_controlled_and_reachable(self):
-  for clause in ('participantReadingMode','Diapositiva 16:9','Lettura accessibile','aria-pressed={!participantReadingMode}','aria-pressed={participantReadingMode}','aria-label="Visualizzazione della pagina"','aria-label="Contenuto della diapositiva" tabIndex={0}'):
+  for clause in ('participantReadingMode','Diapositiva 16:9','Lettura accessibile','aria-pressed={!participantReadingMode&&!participantPhoneMode}','aria-pressed={participantPhoneMode&&!participantReadingMode}','aria-pressed={participantReadingMode}','aria-label="Visualizzazione della pagina"','aria-label="Contenuto della diapositiva" tabIndex={0}'):
    self.assertIn(clause,UI)
-  self.assertIn("window.matchMedia('(max-width:700px)').matches",UI)
+  # Phone is a separately selected mode; it must not be inferred merely
+  # from the viewport width, otherwise 16:9 changes geometry on mobile.
+  self.assertIn('setParticipantPhoneMode(true)', UI)
+  self.assertIn('setParticipantPhoneMode(false)', UI)
+  self.assertIn('audiencePortrait?audiencePhoneLayout.widgets:participantReadingMode?audienceReadingWidgets:audienceVisibleWidgets',UI)
   self.assertIn('.audience-widget-layout.stage-reading>.page-widget[style*="--stage-x"]',CSS)
   self.assertIn('min-height:44px',CSS)
  def test_live_uses_private_asset_access_fence_already_present(self):
   backend=(ROOT/'apps/api/src/server.ts').read_text()
   self.assertIn("app.get('/api/join/:code/activities/:aid/media/:assetId'",backend)
   self.assertIn('current_activity_id!==req.params.aid',backend)
-  self.assertIn('entry.activity.page_design.backgroundAssetId',UI)
-  self.assertIn('encodeURIComponent(entry.activity.page_design.backgroundAssetId)',UI)
+  # The RC173+ public background is resolved through the shared presentation
+  # helper, using the same activity-scoped, authenticated public media URL as
+  # other public assets. Never require an obsolete inline background URL.
+  self.assertIn('slideBackgroundCss(entry.activity.page_design,entry.theme,id=>',UI)
+  self.assertIn('media/${encodeURIComponent(id)}`)',UI)
+  self.assertIn('backgroundImage:"none",backgroundColor:"#ffffff"',UI)
+  self.assertIn('participantPhoneMode',UI)
   self.assertIn('src={`/api/join/',UI)
  def test_live_maintains_rich_text_and_imported_image_crop(self):
   for clause in ('<CroppedImage className="projection-media" src={`/api/join/', 'crop={w.crop}', '<WidgetStyledText text={w.description} widget={w} field="description"/>', '<WidgetStyledText text={w.label||\'Nota\'} widget={w} field="label"/>'):
