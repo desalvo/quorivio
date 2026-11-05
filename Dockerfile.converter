@@ -1,7 +1,23 @@
-FROM python:3.12-slim
-RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends poppler-utils libreoffice-impress fonts-dejavu-core \
-    && rm -rf /var/lib/apt/lists/* \
-    && useradd -u 1000 -m converter && mkdir /conversions && chown converter:converter /conversions
+FROM python:3.12-slim-trixie
+# Debian 13 security advisory DSA-6607-1 (CVE-2026-109518):
+# upgrade APT and its library before installing other packages.
+# The vulnerable APT client must not retry downloads during its own upgrade.
+# Fail closed if the fixed packages are not yet available from trixie-security.
+RUN set -eux; \
+    apt-get -o Acquire::Retries=0 update; \
+    DEBIAN_FRONTEND=noninteractive apt-get -o Acquire::Retries=0 install -y --no-install-recommends --only-upgrade apt libapt-pkg7.0; \
+    for package in apt libapt-pkg7.0; do \
+      version="$(dpkg-query -W -f='${Version}' "$package")"; \
+      if ! dpkg --compare-versions "$version" ge 3.0.4; then \
+        echo "Unsafe Debian APT package $package at $version (requires >= 3.0.4)" >&2; \
+        exit 1; \
+      fi; \
+    done; \
+    DEBIAN_FRONTEND=noninteractive apt-get -o Acquire::Retries=0 install -y --no-install-recommends poppler-utils libreoffice-impress fonts-dejavu-core; \
+    rm -rf /var/lib/apt/lists/*; \
+    useradd -u 1000 -m converter; \
+    mkdir /conversions; \
+    chown converter:converter /conversions
 WORKDIR /app/tools
 RUN pip install --no-cache-dir python-pptx==1.0.2 'Pillow>=11,<14' qrcode==8.2
 COPY tools/import_presentation.py tools/conversion_worker.py tools/pptx_portable.py ./

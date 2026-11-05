@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC184 — converter APT security update
+
+**RC184:** GitHub Actions run `41988947593` passed Production quality gate, Chromium/PostgreSQL, ClamAV and Kubernetes/Podman/OCI checks; the only RC failure was the converter Trivy scan: `apt`/`libapt-pkg7.0` 3.0.3 vulnerable to CVE-2026-109518 (fixed in 3.0.4). Added early fail-closed APT upgrade and installed-version check in the Dockerfile, plus a security/Trivy preflight before expensive tests, preserving the blocking HIGH/CRITICAL scan. **85.25% certified (43 accepted/17 partial)**; `rc_strict=false`, `publish_image=false`, `publish_latest=false`; the next CI must validate the actual Trivy scan. No assistant commit/push/tag. See `docs/RC_CYCLE184_CONVERTER_APT_SECURITY.en.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC183 — full Python discovery CI handoff
 
 **RC183:** GitHub run `41952294082` reached the final 1,948-test Python discovery after successful build, React/Chromium and PostgreSQL acceptance. Four historic RC139/RC141/public-stage source-string assertions failed; reconciled with real shared title, three-mode public presentation and activity-scoped media contracts. Added early CI guard and negative mutation tests. No application runtime changes. Certified **85.25% (43 accepted/17 partial)**; `rc_strict=false`, `publish_image=false`, `publish_latest=false`; full post-commit CI pending. No assistant commit/push/tag/deploy. See `docs/RC_CYCLE183_FULL_PYTHON_DISCOVERY_RECONCILIATION.en.md`.

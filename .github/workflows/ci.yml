@@ -192,6 +192,12 @@ jobs:
       - name: RC183 projection parity and historical full-suite reconciliation before npm
         run: |
           python3 -m unittest tools.tests.test_rc139_rating_text_selection tools.tests.test_rc141_stage_result_rating_contract tools.tests.test_rc_public_stage_and_dynamic_portals_20261028 tools.tests.test_rc183_projection_contract_reconciliation -q
+      # RC184: guard the Debian APT security floor and the blocking converter
+      # image scan before npm, databases, browsers and expensive Docker builds.
+      - name: RC184 converter APT security and Trivy fail-closed preflight
+        run: |
+          python3 tools/ci_converter_apt_security.py
+          python3 -m unittest tools.tests.test_rc184_converter_apt_security -q
       - name: RC170 schema-owned footer number and phone preview/live parity preflight
         run: python3 -m unittest tools.tests.test_rc170_phone_footer_number_parity -q
       - name: Validate RC105 floating dialogs and selection-only resize geometry before npm
@@ -1093,7 +1099,8 @@ jobs:
           python3 tools/verify_rc_cycle180_inventory.py --historical
           python3 tools/verify_rc_cycle181_inventory.py --historical
           python3 tools/verify_rc_cycle182_inventory.py --historical
-          python3 tools/verify_rc_cycle183_inventory.py
+          python3 tools/verify_rc_cycle183_inventory.py --historical
+          python3 tools/verify_rc_cycle184_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:
