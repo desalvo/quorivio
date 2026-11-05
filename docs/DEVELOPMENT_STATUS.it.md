@@ -1,7 +1,12 @@
+# Quorivio 0.1.0-dev — RC199 — Verifica preventiva intestazioni release e package cumulativo
+
+**RC199:** la CI [#299](https://github.com/desalvo/quorivio/actions/runs/42094437419), job `127480690817`, si è arrestata nel controllo preventivo delle intestazioni: nei riepiloghi RC198 italiano/inglese dello stato di sviluppo mancavano i tre flag espliciti di sicurezza. Ripristinati nelle quattro intestazioni attive della RC199, mantenuta la RC198 come storico, aggiunto un test di regressione che riproduce l’omissione e un controllo delle intestazioni contenute nello ZIP prima della consegna. Nessuna modifica al runtime; CI GitHub completa da confermare. **85,25%** certificato (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag dell’assistente. `docs/RC_CYCLE199_RELEASE_HEADER_CI_FIX.it.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC198 — Risposte sottolineate e barrate
 
 **RC198:** allineati API ed editor per sottolineato e barrato delle risposte in tutti gli ambiti; vecchi progetti compatibili. Node API **605/605**, frontend **348/348** verdi. CI della RC197 #298 in corso all’ultima verifica; nuova CI RC198 non avviata. **85,25%** certificato (43 gate accettati/17 parziali); versione e impostazioni release immutate; nessun commit/push/tag. `docs/RC_CYCLE198_ANSWER_DECORATION.it.md`.
-
 ---
 
 # Quorivio 0.1.0-dev — RC197 — Riconciliazione test Python integrati

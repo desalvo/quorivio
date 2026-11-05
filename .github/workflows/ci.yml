@@ -124,6 +124,7 @@ jobs:
         run: |
           PYTHONPATH=tools python3 tools/verify_rc_release_status.py
           PYTHONPATH=tools python3 -m unittest tools.tests.test_rc_cycle100_release_status_guard -q
+          PYTHONPATH=tools python3 -m unittest tools.tests.test_rc199_release_headers -q
           PYTHONPATH=tools python3 -m unittest tools.tests.test_rc147_inventory_no_cache -q
           PYTHONPATH=tools python3 -m unittest tools.tests.test_rc148_phone_atomic_undo -q
           PYTHONPATH=tools python3 -m unittest tools.tests.test_rc149_background_contracts -q
@@ -1205,7 +1206,8 @@ jobs:
           python3 tools/verify_rc_cycle195_inventory.py --historical
           python3 tools/verify_rc_cycle196_inventory.py --historical
           python3 tools/verify_rc_cycle197_inventory.py --historical
-          python3 tools/verify_rc_cycle198_inventory.py
+          python3 tools/verify_rc_cycle198_inventory.py --historical
+          python3 tools/verify_rc_cycle199_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

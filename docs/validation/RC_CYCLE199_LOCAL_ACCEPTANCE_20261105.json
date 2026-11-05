@@ -1,0 +1,28 @@
+{
+  "release": "0.1.0-dev",
+  "cycle": 199,
+  "date": "2026-11-05",
+  "baseline": "RC198 cumulativo committato dall'utente, commit 0375877",
+  "failure_reference": "https://github.com/desalvo/quorivio/actions/runs/42094437419/job/127480690817",
+  "reproduced_failure": "ValueError: DEVELOPMENT_STATUS.md: missing one or more explicit release flags",
+  "checks": {
+    "release_header_guard": "pass, 4 bilingual active release headers",
+    "historical_inventory_reference_guard": "pass, 186 workflow inventory verifiers",
+    "early_python_preflights": "pass, 68 tests",
+    "api_node": "pass, 605 tests",
+    "frontend_node": "pass, 348 tests",
+    "complete_python_unittest": "not certified; timed out in integration tests, no conclusive summary",
+    "frontend_vite_build": "not run; project dependencies unavailable in local source workspace",
+    "github_full_ci": "pending new RC199 commit and workflow",
+    "strict_rc_acceptance": "not approved",
+    "docker_publish": "not requested"
+  },
+  "certified_gate_percentage": 85.25,
+  "certified_accepted_gates": 43,
+  "certified_partial_gates": 17,
+  "policy": {
+    "rc_strict": false,
+    "publish_image": false,
+    "publish_latest": false
+  }
+}

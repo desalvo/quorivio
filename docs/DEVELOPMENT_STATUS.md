@@ -1,7 +1,12 @@
+# Quorivio 0.1.0-dev — RC199 — Early release-header and cumulative package preflight
+
+**RC199:** CI run [#299](https://github.com/desalvo/quorivio/actions/runs/42094437419), job `127480690817`, stopped at the early active release-header check: RC198 English and Italian development-status summaries omitted explicit release safety flags. Restored the required flags in all four RC199 active bilingual headers, preserved RC198 as historical text, added an early regression fixture for exactly this omission, and made the RC199 ZIP verifier reject an archive whose embedded headers are stale/incomplete. Source and ZIP checks are required before uploading. No application/runtime behavior changed; full GitHub CI pending. Certified **85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. See `docs/RC_CYCLE199_RELEASE_HEADER_CI_FIX.en.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC198 — Answer underline and strikethrough
 
 **RC198:** independently validated API/editor answer decoration in whole-widget and answers scopes, backward-compatible with existing project styles. **605/605** API and **348/348** frontend Node tests green. RC197 GitHub #298 still in progress at last check; RC198 CI not started. Certified **85.25%** (43 accepted/17 partial); version and release settings unchanged. No commit/push/tag. `docs/RC_CYCLE198_ANSWER_DECORATION.en.md`.
-
 ---
 
 # Quorivio 0.1.0-dev — RC197 — Kubernetes Python integration contract reconciliation

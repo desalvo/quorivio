@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC199 — Correzione intestazioni release in CI #299
+
+**RC199:** dalla RC198 committata dall’utente (`0375877`), la CI #299 si è fermata al controllo `Validate active RC release headers against the current inventory` per i flag mancanti nei due riepiloghi di sviluppo RC198. Sincronizzate le quattro intestazioni RC199, introdotti test preventivi e controllo delle intestazioni effettive nello ZIP; inventario storico RC198 e note precedenti preservati. Nessuna modifica al runtime; CI completa GitHub da confermare. **85,25%** certificato (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag dell’assistente. `docs/RC_CYCLE199_RELEASE_HEADER_CI_FIX.it.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC198 — Decorazioni delle risposte
 
 **RC198:** dalla RC197 committata dall’utente (`0794f02`; CI #298 avviata), corrette sottolineatura e barratura delle risposte in «Widget intero» e «Risposte», con proprietà API dedicate anche per le sottodomande. Node API 605/605, web 348/348; build React/TypeScript CI da verificare. Completamento **85,25%** certificato (43 accettati, 17 parziali), `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. `docs/RC_CYCLE198_ANSWER_DECORATION.it.md`.

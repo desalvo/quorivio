@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC199 — GitHub #299 active release-header regression fix
+
+**RC199:** starts from maintainer-committed RC198 (`0375877`), GitHub Actions #299 production quality gate failed at `Validate active RC release headers against the current inventory` because RC198 status summaries lacked explicit flags in their current (pre-divider) sections. Synchronized all four RC199 headings/flag declarations; added early regression tests and a ZIP-contained-header preflight; retained immutable RC198 inventory and historical entries. No runtime edits, no claim of full GitHub CI pass. **85.25%** certified (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. `docs/RC_CYCLE199_RELEASE_HEADER_CI_FIX.en.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC198 — Answer decoration parity
 
 **RC198:** based on user-committed RC197 (`0794f02`, CI #298 launched). Added independently validated answer underline and strikethrough for Whole widget / Answers scopes and independent subquestions. API Node 605/605, frontend Node 348/348 passed; compiled React/TypeScript CI pending. **85.25%** certified (43 accepted, 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. `docs/RC_CYCLE198_ANSWER_DECORATION.en.md`.
