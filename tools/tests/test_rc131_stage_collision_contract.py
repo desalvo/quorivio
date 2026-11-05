@@ -21,7 +21,7 @@ class RC131StageAndCollision(unittest.TestCase):
   # widgets continue using their own saved style. The legacy literal check
   # silently assumed every kind had the same source fields.
   self.assertIn('stageWidgetTypography(w,{pageTitle:entry.activity.title,masterTitleStyle:entry.theme?.master?.titleStyle},audiencePortrait)',APP)
-  self.assertIn("const resolved=widget.kind==='title'?widgetDisplay(widget,context).style:widget.style",TYPO)
+  self.assertIn("const resolved=widget.kind==='title'?widgetDisplay(widget,context).style:widgetTextDefaults(widget.kind,widget.style)",TYPO)
   self.assertIn("'--authored-widget-font-size':typography.fontSize",TYPO)
   self.assertIn('.audience-widget-layout.stage-fidelity>.page-widget{font-size:var(--authored-widget-font-size,1.25cqw)!important;}',CSS)
   self.assertIn('stage-reading>.page-widget',CSS)

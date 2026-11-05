@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC195 — Riconciliazione CI font master
+
+**RC195:** aggiornato il test storico RC161 alla sorgente centrale del font Arial per titolo/footer, preservando i font personalizzati; preflight Python/Node con mutazioni negative. Nessuna modifica all’applicazione. Riconciliati anche i controlli storici delle anteprime indipendenti, tipografia smartphone, timer pubblico e numerazione pagine. Run `42074647393` fallita al passo 14 RC161, prima di npm; ClamAV verde. Ultima baseline CI/pubblicata RC190 (`42027634427`/`42032833536`). Certificato **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Vedi `docs/RC_CYCLE195_CENTRALIZED_FONT_CI_RECONCILIATION.it.md`.
+
+## Ciclo precedente RC194
+
 # Quorivio 0.1.0-dev — RC194 — Tipografia domande, risposte lunghe e selezione
 
 **RC194:** Arial predefinito con titolo domanda in grassetto 22 e risposte normali 16; ritorno a capo automatico delle risposte lunghe; il tipo di font «Widget intero» si applica anche alle opzioni e alle sottodomande; ripristino della selezione evidenziata dopo la formattazione; digitazione successiva con lo stile del carattere precedente. Test Node frontend 342/342, API 603/603; browser Chromium su stili calcolati 1440/390px. CI integrata React/PostgreSQL dopo commit ancora da eseguire. Ultima baseline verde/pubblicata RC190 (`42027634427`/`42032833536`). Certificato **85,25%** (43 accettati, 17 parziali); nessun commit/push/tag. Dettagli `docs/RC_CYCLE194_QUESTION_TEXT_TYPOGRAPHY.it.md`.

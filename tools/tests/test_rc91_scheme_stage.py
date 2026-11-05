@@ -14,7 +14,10 @@ class GlobalMasterRegressions(unittest.TestCase):
   self.assertIn('pointer-events:none!important',CSS)
   self.assertIn('function SlideCanvasNumber',UI)
   self.assertIn('pageNumber={slidePageNumber(snapshot.activities,activity.id)}',UI)
-  self.assertIn('pageNumber={page+1}',UI)
+  # RC195: the rehearsal number follows the actual presenter/audience page,
+  # not the position of the presenter in a shared page array.
+  self.assertIn('viewPageNumber=slidePageNumber(activities,viewActivity.id)',UI)
+  self.assertIn('pageNumber={viewPageNumber}',UI)
   self.assertIn('pageNumber={pageNumber}',UI)
   self.assertIn('pageNumber={Number(entry.activity.position)+1}',UI)
   self.assertEqual(UI.count('className="slide-footer-number"'),0)

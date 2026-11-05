@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC195 handoff — contratto CI tipografia master
+
+**RC195 handoff:** la run #295 falliva a RC161 per il controllo letterale `fontFamily:'Arial'` in `main.tsx`, non più valido dopo la centralizzazione dei default. Aggiornato RC161 e introdotti test anticipati RC195 Python/Node per titolo, footer, master personalizzato, smartphone e risposte. Nessuna modifica runtime; Riconciliati anche i controlli storici RC144/RC167/RC168/RC169/RC131, timer e numero pagina. ultima baseline verde/pubblicata RC190 (`42027634427`/`42032833536`). CI integrata RC195 da confermare. Certificato **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. `docs/RC_CYCLE195_CENTRALIZED_FONT_CI_RECONCILIATION.it.md`.
+
+## Ciclo precedente RC194
+
 # Quorivio 0.1.0-dev — RC194 handoff — Font e selezione testo
 
 **RC194 handoff:** Nuovi default condivisi domanda/risposta con Arial, titolo grassetto 22 e opzioni normali 16; ritorno a capo delle opzioni lunghe; correzione CSS che sovrascriveva la famiglia dei font applicata a «Widget intero». L’inserimento in testo formattato eredita lo stile del carattere precedente anche fra marcature Unicode e la selezione resta evidenziata dopo la formattazione. Nuovi controlli preflight Node/Python/Chromium e manifesto SHA-256 cumulativo. Test locali 342 frontend e 603 API verdi; CI integrata ancora da confermare. Baseline pubblicata RC190 `42027634427`/`42032833536`. Certificato **85,25%**, nessun commit/push/tag. `docs/RC_CYCLE194_QUESTION_TEXT_TYPOGRAPHY.it.md`.

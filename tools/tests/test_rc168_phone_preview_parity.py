@@ -37,9 +37,9 @@ class RC168PhoneParity(unittest.TestCase):
         self.assertNotIn('participantVisibleWidgets(audiencePortrait?mobilePageWidgets(', UI)
 
     def test_rehearsal_participant_shares_layout_but_presenter_keeps_own(self):
-        self.assertIn('mobile?participantPhoneLayout(widgets,activity?.page_design?.mobile).widgets', UI)
-        self.assertIn('height={participantPhoneLayout(widgets,activity?.page_design?.mobile).height}', UI)
-        self.assertIn("viewer==='presenter'?(mobile?mobilePageWidgets(widgets", UI)
+        self.assertIn('mobile?participantPhoneLayout(viewWidgets,viewActivity?.page_design?.mobile).widgets', UI)
+        self.assertIn('height={participantPhoneLayout(widgets,audienceActivity?.page_design?.mobile).height}', UI)
+        self.assertIn("viewer==='presenter'?(mobile?mobilePageWidgets(viewWidgets", UI)
 
     def test_real_postgresql_fixture_checks_footer_and_drops_phantom_height(self):
         ast.parse(BROWSER)

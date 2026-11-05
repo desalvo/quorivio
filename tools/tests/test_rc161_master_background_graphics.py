@@ -28,9 +28,22 @@ class RC161MasterGraphics(unittest.TestCase):
   self.assertIn('scan(definition?.session?.theme?.master)',BUNDLE)
   self.assertIn('rewrite(copy.session?.theme?.master)',BUNDLE)
  def test_title_and_footer_always_have_effective_arial_without_erasing_custom_font(self):
-  self.assertIn('font-family:Arial,sans-serif',CSS)
-  self.assertIn("fontFamily:'Arial'",UI)
+  # RC195: RC161 originally grepped an inline Arial literal in main.tsx.
+  # Since RC194, the defaults live in the typed slide-master module and are
+  # resolved for each surface; the editor must not duplicate this definition.
+  master=(ROOT/'apps/web/src/slide-master.ts').read_text()
+  appearance=(ROOT/'apps/web/src/widget-appearance.ts').read_text()
+  stage=(ROOT/'apps/web/src/stage-widget-typography.ts').read_text()
+  self.assertIn("DEFAULT_TITLE_STYLE={fontFamily:'Arial'",master)
+  self.assertIn("DEFAULT_FOOTER_STYLE={fontFamily:'Arial'",master)
+  self.assertIn('...DEFAULT_TITLE_STYLE,...(w.titleUseMaster!==false?context.masterTitleStyle:{}),...w.style',master)
+  self.assertIn('fontFamily:footer.style?.footerNumberFontFamily||footer.style?.fontFamily||DEFAULT_FOOTER_STYLE.fontFamily',master)
+  self.assertIn("fontFamily:style?.fontFamily||'Arial'",appearance)
+  self.assertIn('DEFAULT_TITLE_STYLE',UI)
+  self.assertIn("w.kind==='title'?widgetDisplay(w,{pageTitle,masterTitleStyle}).style",UI)
+  self.assertIn("widget.kind==='title'?widgetDisplay(widget,context).style",stage)
   self.assertRegex(CSS,r'\.slide-scheme-workspace,.powerpoint-editor')
+  self.assertIn('font-family:Arial,sans-serif',CSS)
  def test_lines_and_shapes_render_without_text_and_have_shared_insertion_menu(self):
   self.assertIn("if(kind==='shape'||kind==='line')return null;",UI)
   self.assertIn("!['line','shape'].includes(w.kind)",UI)

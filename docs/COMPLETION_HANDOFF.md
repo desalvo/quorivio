@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC195 handoff — master font CI contract
+
+**RC195 handoff:** GitHub run #295 failed the RC161 pre-npm literal `fontFamily:'Arial'` grep. The default is now shared in `slide-master.ts`, with custom master/widget precedence resolved through `widgetDisplay`, `stageWidgetTypography` and `widgetTypographyStyle`. Updated historic RC161 and added early, fail-closed RC195 Python/Node tests without changing app runtime. Latest fully green and published baseline RC190 (`42027634427`/`42032833536`). Full RC195 CI pending. Certified **85.25%**, 43 accepted/17 partial; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag. `docs/RC_CYCLE195_CENTRALIZED_FONT_CI_RECONCILIATION.en.md`.
+
+## Previous cycle RC194
+
 # Quorivio 0.1.0-dev — RC194 handoff — typography and caret-selection fixes
 
 **RC194 handoff:** Added `widget-typography-defaults.ts` shared between editor and stage; normalized Arial/bold 22 question versus regular 16 answer for missing defaults; repaired answer line-wrap and CSS `font-family` priority across surfaces. `widget-text-marks.ts` now inherits the previous character style when inserting, including exact mark boundaries and UTF-16 text. Widget Format restores highlighted selection via `restoreDomTextRange` after edits. New Node/Python/browser regression preflights and immutable inventory; all 342 frontend and 603 API tests pass locally. Full integrated CI still pending. Last green published RC190 `42027634427`/`42032833536`. Certified **85.25%**, no commit/push/tag. `docs/RC_CYCLE194_QUESTION_TEXT_TYPOGRAPHY.en.md`.
@@ -34,7 +40,7 @@
 
 # Quorivio 0.1.0-dev — RC188 — Separate presenter/audience first-page CI reconciliation
 
-**RC188:** reconciled the legacy RC92 assertion expecting `ORDER BY position,id LIMIT 1`. Since RC185, starting a projection must load ordered pages, choose the first **presenter-visible** page (`firstPresenterPage`), resolve its audience target (`audienceForPresenter`), and atomically update both projection pointers under the session row lock without rewinding an existing presentation. Added an early RC188 fail-closed preflight with negative mutations and a real TypeScript routing behavior test. No runtime changes. RC187 GitHub run `42011405908` stopped at RC92 before npm; ClamAV passed. Last fully green CI remains RC184 `41993094578`. Certified completion **85.25%** (43 accepted gates, 17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. See `docs/RC_CYCLE188_PRESENTER_START_CI.en.md`.
+**RC188:** reconciled the legacy RC92 assertion expecting `ORDER BY position,id LIMIT 1`. Since RC185, starting a projection must load ordered pages, choose the first **presenter-visible** page (`firstPresenterPage`), resolve its audience target (`audienceForPresenter`), and atomically update both projection pointers under the session row lock without rewinding an existing presentation. Added an early RC188 fail-closed preflight with negative mutations and a real TypeScript routing behavior test. No runtime changes. Reconciled old RC144/RC167/RC168/RC169/RC131, deadline and page-number preflights. RC187 GitHub run `42011405908` stopped at RC92 before npm; ClamAV passed. Last fully green CI remains RC184 `41993094578`. Certified completion **85.25%** (43 accepted gates, 17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. See `docs/RC_CYCLE188_PRESENTER_START_CI.en.md`.
 
 
 **Completed local checks:** 87/87 dependency-free CI preflight commands, 599/599 API tests, 321/321 frontend tests, RC92/RC185/RC188 contracts and SHA-256 source inventory. Post-commit GitHub CI for RC188 remains required.

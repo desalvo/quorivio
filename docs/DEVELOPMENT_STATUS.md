@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC195 — Centralized master font CI reconciliation
+
+**RC195:** reconciles the RC161 historical source-string check with centralized Arial title/footer defaults and authored font override paths after RC194. Adds early RC195 Python/Node behavior and negative-mutation guards; no runtime changes. Additional outdated historical checks of dual-page rehearsal, mobile typography, audience timer and page numbering were also reconciled. GitHub run `42074647393` failed at step 14 RC161, before npm; ClamAV passed. Latest full green and published baseline RC190 (`42027634427`/`42032833536`). Certified **85.25%**, 43 accepted/17 partial; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag. See `docs/RC_CYCLE195_CENTRALIZED_FONT_CI_RECONCILIATION.en.md`.
+
+## Previous cycle RC194
+
 # Quorivio 0.1.0-dev — RC194 — Question defaults, long choices and text continuity
 
 **RC194:** Fixed question/quiz Arial default with bold 22 title vs regular 16 choices, long-answer multi-line wrap in all surfaces, whole-widget font family propagation through answer and independent-question runs, preserved highlighted DOM selection after formatting, and inherited previous-character typography on subsequent insertion. Frontend 342/342 and API 603/603 Node tests green; Chromium computed-style proof at 1440/390 px. Post-commit integrated React/PostgreSQL CI pending. Last fully green and published source remains RC190 (runs `42027634427` and `42032833536`). Certified **85.25%** (43 accepted, 17 partial); no commit/push/tag. See `docs/RC_CYCLE194_QUESTION_TEXT_TYPOGRAPHY.en.md`.

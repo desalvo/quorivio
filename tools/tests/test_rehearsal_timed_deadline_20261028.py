@@ -8,7 +8,8 @@ CI=(ROOT/'.github/workflows/ci.yml').read_text()
 class RehearsalTimedDeadline(unittest.TestCase):
  def test_one_clock_for_presenter_and_participant(self):
   self.assertIn('const [pageStartedAt,setPageStartedAt]=useState',UI)
-  self.assertIn('[activity?.id,seed]',UI)
+  # Presenter-only results page changes must not reset the voting deadline.
+  self.assertIn('[audienceActivity?.id,seed]',UI)
   self.assertIn("openedAt={new Date(pageStartedAt).toISOString()}",UI)
   self.assertIn('kind===\'timed-quiz\'&&<PageTimer',UI)
  def test_deadline_is_checked_on_submit_not_just_on_render(self):

@@ -40,7 +40,7 @@ class RC167LivePreviewFidelity(unittest.TestCase):
   self.assertIn('const audienceVisibleWidgets=participantVisibleWidgets(audienceAuthoredWidgets)',UI)
   self.assertIn('const audienceReadingWidgets=participantReadingWidgets(audienceAuthoredWidgets)',UI)
   self.assertIn('const audiencePhoneLayout=participantPhoneLayout(audienceAuthoredWidgets',UI)
-  self.assertIn('mobile?participantPhoneLayout(widgets,activity?.page_design?.mobile).widgets:participantVisibleWidgets(widgets)',UI)
+  self.assertIn('mobile?participantPhoneLayout(viewWidgets,viewActivity?.page_design?.mobile).widgets:participantVisibleWidgets(viewWidgets)',UI)
   self.assertIn("(w.kind==='shape'||w.kind==='line')?null:",UI)
   self.assertNotIn('CI_PRIVATE_LINE_CAPTION',UI)
 

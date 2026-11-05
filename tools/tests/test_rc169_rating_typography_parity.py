@@ -26,7 +26,7 @@ class RC169RatingTypographyParity(unittest.TestCase):
         self.assertIn('size={widget.style?.ratingButtonSize}',UI)
 
     def test_phone_title_master_style_is_resolved_before_phone_font(self):
-        self.assertIn("widget.kind==='title'?widgetDisplay(widget,context).style:widget.style",TYPO)
+        self.assertIn("widget.kind==='title'?widgetDisplay(widget,context).style:widgetTextDefaults(widget.kind,widget.style)",TYPO)
         self.assertIn("const px=",TYPO)
         self.assertIn('resolved?.fontSize??16',TYPO)
         self.assertIn('stageWidgetTypography(w,{pageTitle:viewActivity.title',UI)

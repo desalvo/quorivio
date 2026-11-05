@@ -148,6 +148,12 @@ jobs:
         run: python3 -m unittest tools.tests.test_rc159_live_preview_parity -q
       - name: RC160 participant widget-only rendering, rating comment and footer preflight
         run: python3 -m unittest tools.tests.test_rc160_participant_widget_ownership -q
+      # RC195: RC161 must verify the resolved master default and authored font
+      # overrides rather than expecting an obsolete inline main.tsx literal.
+      - name: RC195 centralized Arial master typography contract before npm
+        run: |
+          python3 -m unittest tools.tests.test_rc161_master_background_graphics tools.tests.test_rc195_master_typography_ci -q
+          node --experimental-strip-types --test apps/web/test/rc195-master-typography.test.ts
       - name: RC161 master image, Arial and graphics presets contracts before npm
         run: python3 -m unittest tools.tests.test_rc161_master_background_graphics -q
       - name: RC162 smartphone editor slider, independent positions and QR title/URL contracts
@@ -1172,7 +1178,8 @@ jobs:
           python3 tools/verify_rc_cycle191_inventory.py --historical
           python3 tools/verify_rc_cycle192_inventory.py --historical
           python3 tools/verify_rc_cycle193_inventory.py --historical
-          python3 tools/verify_rc_cycle194_inventory.py
+          python3 tools/verify_rc_cycle194_inventory.py --historical
+          python3 tools/verify_rc_cycle195_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:
