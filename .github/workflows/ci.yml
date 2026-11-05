@@ -128,6 +128,7 @@ jobs:
           # Pure-source RC200 assertions; native PowerPoint cases run only after Pillow/pptx installation.
           PYTHONPATH=tools python3 -m unittest tools.tests.test_rc200_editor_portability.RC200EditorPortability -q
           PYTHONPATH=tools python3 -m unittest tools.tests.test_rc202_dependency_staging -q
+          PYTHONPATH=tools python3 -m unittest tools.tests.test_rc203_editor_grid_track -q
           PYTHONPATH=tools python3 -m unittest tools.tests.test_rc201_live_qr_refresh -q
           PYTHONPATH=tools python3 -m unittest tools.tests.test_rc147_inventory_no_cache -q
           PYTHONPATH=tools python3 -m unittest tools.tests.test_rc148_phone_atomic_undo -q
@@ -1219,7 +1220,8 @@ jobs:
           python3 tools/verify_rc_cycle199_inventory.py --historical
           python3 tools/verify_rc_cycle200_inventory.py --historical
           python3 tools/verify_rc_cycle201_inventory.py --historical
-          python3 tools/verify_rc_cycle202_inventory.py
+          python3 tools/verify_rc_cycle202_inventory.py --historical
+          python3 tools/verify_rc_cycle203_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

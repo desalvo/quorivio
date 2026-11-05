@@ -19,7 +19,7 @@ class WrappedPaletteAcceptance(unittest.TestCase):
         self.assertNotEqual(rules, CSS, 'RC178 effective cascade missing')
         self.assertIn('grid-template-rows:78px minmax(72px,auto) minmax(0,1fr)!important', rules)
         self.assertIn('grid-template-rows:minmax(130px,auto) minmax(72px,auto) minmax(0,1fr)!important', rules)
-        self.assertIn('max-width:min(100%,calc((100dvh - 240px)*16/9))!important', rules)
+        self.assertIn('max-width:min(100%,calc((100dvh - 280px)*16/9))!important', rules)
         self.assertIn('overflow-x:hidden!important;overflow-y:auto!important', CSS)
 
     def test_broken_fixed_palette_regression_fails_closed(self):

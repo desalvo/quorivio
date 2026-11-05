@@ -73,8 +73,9 @@ async def main():
   opts={'executable_path':os.environ['QUORIVIO_CHROMIUM_PATH']} if os.environ.get('QUORIVIO_CHROMIUM_PATH') else {}
   browser=await pw.chromium.launch(headless=True,args=['--no-sandbox','--allow-file-access-from-files'],**opts)
   try:
-   await verify(browser,1440,900,False)
-   await verify(browser,390,844,True)
+   # RC203: cover grid tracks where the header wraps and the compact mobile rail.
+   for width,height,mobile in ((1440,900,False),(1200,900,False),(960,760,False),(390,844,True)):
+    await verify(browser,width,height,mobile)
   finally:await browser.close()
  print('PASS RC178 editor: unclipped wrapped widget catalog, bounded vertical scrolling, visible 16:9 canvas and Exit; desktop and mobile Chromium')
 if __name__=='__main__':asyncio.run(main())

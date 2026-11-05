@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC203 — Editor palette grid track recovery
+
+**RC203**: Maintainer CI run `42107111552` / job `127524721412` passed Python dependency staging, frontend/API builds and Node suites, but failed at Chromium editor mock: RC200 compact header override replaced the required three-row editor grid with two tracks, yielding a 140px widget catalog inside a 122.77px rail and a desktop canvas exceeding the viewport. Restored three grid tracks across desktop/tablet/phone, reserved extra canvas height, expanded Chromium breakpoints and added pre-npm RC203 negative-mutation regression. Full RC203 CI pending; last full green RC199 `42096705867`. **85.25%** certified (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. See `docs/RC_CYCLE203_EDITOR_GRID_RECOVERY.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC202 — Python dependency staging CI repair
 
 **RC202:** The maintainer committed RC201 (GitHub Actions run `42105427044`, production-quality job `127518865236`), which failed in the early release-header step because two native RC200 PowerPoint tests imported `pptx` and `PIL` before Python conversion dependencies were installed. Split the four dependency-free source checks from the two real image/PPTX roundtrip checks; run native checks after explicit `python-pptx`/Pillow installation and import verification, add RC202 staging regression. No application/QR runtime changes. Local targeted tests pass; full RC202 CI pending, last full green RC199 `42096705867`. **85.25%** certified (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. See `docs/RC_CYCLE202_CI_DEPENDENCY_STAGING.en.md`.
