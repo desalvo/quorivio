@@ -1177,7 +1177,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: {persist-credentials: false}
-      - uses: helm/kind-action@v1.12.0
+      - uses: helm/kind-action@v1.15.1
         with:
           cluster_name: quorivio-schema
           version: v0.26.0
@@ -1193,7 +1193,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: {persist-credentials: false}
-      - uses: helm/kind-action@v1.12.0
+      - uses: helm/kind-action@v1.15.1
         with:
           cluster_name: quorivio-runtime
           version: v0.26.0
@@ -1223,7 +1223,7 @@ jobs:
           test "$(id -u)" -ne 0
           sudo install -d -m 0777 /tmp/quorivio-kind-multinode-shared
           test "$(stat -c %a /tmp/quorivio-kind-multinode-shared)" = 777
-      - uses: helm/kind-action@v1.12.0
+      - uses: helm/kind-action@v1.15.1
         with:
           cluster_name: quorivio-multinode
           version: v0.26.0
@@ -1263,7 +1263,7 @@ jobs:
         run: |
           test "$(id -u)" -ne 0
           sudo install -d -m 0777 /tmp/quorivio-kind-multinode-shared
-      - uses: helm/kind-action@v1.12.0
+      - uses: helm/kind-action@v1.15.1
         with:
           cluster_name: quorivio-multinode
           version: v0.26.0
@@ -1298,7 +1298,7 @@ jobs:
         run: |
           test "$(id -u)" -ne 0
           sudo install -d -m 0777 /tmp/quorivio-kind-multinode-shared
-      - uses: helm/kind-action@v1.12.0
+      - uses: helm/kind-action@v1.15.1
         with:
           cluster_name: quorivio-multinode
           version: v0.26.0
