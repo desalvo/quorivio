@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC196 — React compilation and cross-page results typing
+
+**RC196:** GitHub run #296 (`42081815639`) failed during React/TypeScript compilation after passing early checks and 345 frontend tests: missing `linkedResultQuestion` import (`TS2552`) and omitted `showSourceQuestion` editor field type (two `TS2339`). Fixed both, introduced frontend strict typecheck immediately after npm and a pre-npm regression contract. Local frontend/API Node suites pass; integrated Vite/Chromium/PG CI pending. No new gate promotions, **85.25% certified**, 43 accepted/17 partial; last published green RC190. No commit/push/tag. See `docs/RC_CYCLE196_FRONTEND_RESULTS_TYPES.en.md`.
+
+## Previous cycle RC195
+
 # Quorivio 0.1.0-dev — RC195 — Centralized master font CI reconciliation
 
 **RC195:** reconciles the RC161 historical source-string check with centralized Arial title/footer defaults and authored font override paths after RC194. Adds early RC195 Python/Node behavior and negative-mutation guards; no runtime changes. Additional outdated historical checks of dual-page rehearsal, mobile typography, audience timer and page numbering were also reconciled. GitHub run `42074647393` failed at step 14 RC161, before npm; ClamAV passed. Latest full green and published baseline RC190 (`42027634427`/`42032833536`). Certified **85.25%**, 43 accepted/17 partial; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag. See `docs/RC_CYCLE195_CENTRALIZED_FONT_CI_RECONCILIATION.en.md`.

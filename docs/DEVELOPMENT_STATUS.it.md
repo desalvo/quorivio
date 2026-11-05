@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC196 — Compilazione React e tipizzazione risultati
+
+**RC196:** run GitHub #296 (`42081815639`) fallita durante la compilazione React/TypeScript dopo preflight e 345 test frontend verdi: import mancante di `linkedResultQuestion` (`TS2552`) e assenza di `showSourceQuestion` dal tipo editor (due `TS2339`). Corretti entrambi; nuovo typecheck frontend rigoroso subito dopo npm e preflight dedicato. Test Node frontend/API locali verdi, CI integrata Vite/Chromium/PostgreSQL da verificare. **85,25% certificato**, 43 accettati/17 parziali; ultima baseline pubblicata RC190. Nessun commit/push/tag. Dettagli `docs/RC_CYCLE196_FRONTEND_RESULTS_TYPES.it.md`.
+
+## Previous cycle RC195
+
 # Quorivio 0.1.0-dev — RC195 — Riconciliazione CI font master
 
 **RC195:** aggiornato il test storico RC161 alla sorgente centrale del font Arial per titolo/footer, preservando i font personalizzati; preflight Python/Node con mutazioni negative. Nessuna modifica all’applicazione. Riconciliati anche i controlli storici delle anteprime indipendenti, tipografia smartphone, timer pubblico e numerazione pagine. Run `42074647393` fallita al passo 14 RC161, prima di npm; ClamAV verde. Ultima baseline CI/pubblicata RC190 (`42027634427`/`42032833536`). Certificato **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Vedi `docs/RC_CYCLE195_CENTRALIZED_FONT_CI_RECONCILIATION.it.md`.

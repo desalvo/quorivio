@@ -150,6 +150,10 @@ jobs:
         run: python3 -m unittest tools.tests.test_rc160_participant_widget_ownership -q
       # RC195: RC161 must verify the resolved master default and authored font
       # overrides rather than expecting an obsolete inline main.tsx literal.
+      # RC196: cover the source question import and the editor's persisted
+      # showSourceQuestion field before the slow front-end build.
+      - name: RC196 cross-page source question frontend typing contract before npm
+        run: python3 -m unittest tools.tests.test_rc196_frontend_results_types -q
       - name: RC195 centralized Arial master typography contract before npm
         run: |
           python3 -m unittest tools.tests.test_rc161_master_background_graphics tools.tests.test_rc195_master_typography_ci -q
@@ -419,6 +423,10 @@ jobs:
       # typed cross-page import defect cannot hide behind 100+ later steps.
       - name: RC189 strict API TypeScript typecheck before extended CI
         run: ./node_modules/.bin/tsc --noEmit -p apps/api/tsconfig.json
+      # RC196: independently fail early on TypeScript errors in the React
+      # frontend, before PostgreSQL/Chromium and other integration work.
+      - name: RC196 strict frontend TypeScript typecheck before extended CI
+        run: ./node_modules/.bin/tsc --noEmit -p apps/web/tsconfig.json
       # RC campaigns are strictly observational, regardless of other dispatch
       # checkboxes. Separate consent is required for production publication.
       - name: Validate RC campaign is non-publishing and non-strict
@@ -1179,7 +1187,8 @@ jobs:
           python3 tools/verify_rc_cycle192_inventory.py --historical
           python3 tools/verify_rc_cycle193_inventory.py --historical
           python3 tools/verify_rc_cycle194_inventory.py --historical
-          python3 tools/verify_rc_cycle195_inventory.py
+          python3 tools/verify_rc_cycle195_inventory.py --historical
+          python3 tools/verify_rc_cycle196_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

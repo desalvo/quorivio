@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC196 handoff — strict frontend types
+
+**RC196 handoff:** Source is RC195 cumulative, now corrected for GitHub #296’s three React TS errors (`linkedResultQuestion` import and `showSourceQuestion` editor typing). Added early Python negative-mutation guard and post-install full frontend strict compiler, without altering API, result permissions or projection routing. Frontend/API Node suites green; full Vite CI must confirm. Preserve immutable inventories; RC196 cumulative SHA receipt. RC190 remains published baseline; **85.25%** certified (43 accepted/17 partial). No commit/push/tag. `docs/RC_CYCLE196_FRONTEND_RESULTS_TYPES.en.md`.
+
+## Previous cycle RC195
+
 # Quorivio 0.1.0-dev — RC195 handoff — master font CI contract
 
 **RC195 handoff:** GitHub run #295 failed the RC161 pre-npm literal `fontFamily:'Arial'` grep. The default is now shared in `slide-master.ts`, with custom master/widget precedence resolved through `widgetDisplay`, `stageWidgetTypography` and `widgetTypographyStyle`. Updated historic RC161 and added early, fail-closed RC195 Python/Node tests without changing app runtime. Latest fully green and published baseline RC190 (`42027634427`/`42032833536`). Full RC195 CI pending. Certified **85.25%**, 43 accepted/17 partial; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag. `docs/RC_CYCLE195_CENTRALIZED_FONT_CI_RECONCILIATION.en.md`.

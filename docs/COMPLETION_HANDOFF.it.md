@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC196 handoff — tipi React risultati
+
+**RC196 handoff:** corrette le tre segnalazioni TypeScript di GitHub #296: import di `linkedResultQuestion` e tipizzazione editor di `showSourceQuestion`. Aggiunti test anticipati a mutazioni negative e compilazione frontend rigorosa subito dopo npm; nessun intervento su API o politiche di visibilità dei risultati. Suite Node API/frontend verdi; compilazione integrata Vite in attesa CI. Inventari storici integri. Baseline pubblicata RC190, **85,25%** certificato (43 accettati/17 parziali). Nessun commit/push/tag. `docs/RC_CYCLE196_FRONTEND_RESULTS_TYPES.it.md`.
+
+## Previous cycle RC195
+
 # Quorivio 0.1.0-dev — RC195 handoff — contratto CI tipografia master
 
 **RC195 handoff:** la run #295 falliva a RC161 per il controllo letterale `fontFamily:'Arial'` in `main.tsx`, non più valido dopo la centralizzazione dei default. Aggiornato RC161 e introdotti test anticipati RC195 Python/Node per titolo, footer, master personalizzato, smartphone e risposte. Nessuna modifica runtime; Riconciliati anche i controlli storici RC144/RC167/RC168/RC169/RC131, timer e numero pagina. ultima baseline verde/pubblicata RC190 (`42027634427`/`42032833536`). CI integrata RC195 da confermare. Certificato **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. `docs/RC_CYCLE195_CENTRALIZED_FONT_CI_RECONCILIATION.it.md`.
