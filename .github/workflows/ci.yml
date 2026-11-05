@@ -336,6 +336,10 @@ jobs:
         run: python3 -m unittest tools.tests.test_rc_cycle99_ci_contract -q
       - name: Validate RC98 presenter and scheme TypeScript fixes before npm
         run: python3 -m unittest tools.tests.test_rc_cycle98_web_compile -q
+      # RC189: inspect the portable Map<string,string> contract and reject
+      # the old Map<unknown,unknown> inferred by TypeScript in RC188.
+      - name: RC189 portable page remapping type and TS2345 regression preflight
+        run: python3 -m unittest tools.tests.test_rc189_portable_map_types -q
       # RC188: RC92 pre-dates the RC185 split between presenter and audience
       # activity pointers. Prove skip/redirect and atomic first-page startup
       # before any slower browser or PostgreSQL checks.
@@ -378,6 +382,10 @@ jobs:
         with: {node-version: '22'} # npm caching requires a committed package-lock.json
       - name: Install reproducibly
         run: npm install --ignore-scripts --no-audit --no-fund
+      # RC189: run the actual strict API compiler immediately after npm so a
+      # typed cross-page import defect cannot hide behind 100+ later steps.
+      - name: RC189 strict API TypeScript typecheck before extended CI
+        run: ./node_modules/.bin/tsc --noEmit -p apps/api/tsconfig.json
       # RC campaigns are strictly observational, regardless of other dispatch
       # checkboxes. Separate consent is required for production publication.
       - name: Validate RC campaign is non-publishing and non-strict
@@ -1128,7 +1136,8 @@ jobs:
           python3 tools/verify_rc_cycle185_inventory.py --historical
           python3 tools/verify_rc_cycle186_inventory.py --historical
           python3 tools/verify_rc_cycle187_inventory.py --historical
-          python3 tools/verify_rc_cycle188_inventory.py
+          python3 tools/verify_rc_cycle188_inventory.py --historical
+          python3 tools/verify_rc_cycle189_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

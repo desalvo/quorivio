@@ -1,0 +1,48 @@
+{
+  "version": "0.1.0-dev",
+  "cycle": 189,
+  "date": "2026-11-05",
+  "based_on_cycle": 188,
+  "failed_ci": {
+    "run_id": 42021367453,
+    "job_id": 127224676741,
+    "commit": "d1540d215638ee893e480fdad152dd116135be8a",
+    "failed_step": "Compile frontend and backend",
+    "root_cause": "TypeScript TS2345 Map<unknown,unknown> passed to ReadonlyMap<string,string> in portable page remapping"
+  },
+  "last_confirmed_green_ci": {
+    "cycle": 184,
+    "run_id": 41993094578
+  },
+  "scope": {
+    "portable_page_remap_string_typed": true,
+    "legacy_portable_ids_optional": true,
+    "strict_api_typecheck_moved_immediately_after_npm": true,
+    "fail_closed_pre_npm_type_contract_and_negative_mutation": true,
+    "historical_inventories_unchanged": true,
+    "presenter_audience_routing_unmodified": true
+  },
+  "local_validation": {
+    "api_node_tests_passed": 599,
+    "frontend_node_tests_passed": 321,
+    "python_targeted_tests_passed": 19,
+    "strict_isolated_ts_positive_and_original_negative_passed": true,
+    "source_fragment_node_runtime_passed": true,
+    "full_backend_npm_build": "pending GitHub CI after commit",
+    "source_inventory_verified": true,
+    "zip_integrity_verified": true
+  },
+  "pending_validation": [
+    "Complete GitHub Actions with dependency-installed backend typecheck, frontend build, real PostgreSQL, Chromium, Kubernetes and Trivy",
+    "Independent operator approval and residual RC sign-offs"
+  ],
+  "certified_gate_score": 85.25,
+  "accepted_gates": 43,
+  "partial_gates": 17,
+  "rc_strict": false,
+  "publish_image": false,
+  "publish_latest": false,
+  "assistant_committed": false,
+  "assistant_pushed": false,
+  "assistant_tagged": false
+}

@@ -976,7 +976,13 @@ async function createFromPortable(data:any,uid:string,importMediaDir?:string,bun
   const importedIds=definition.activities.map((a:any)=>a.portable_id).filter((id:unknown)=>typeof id==='string');
   if(new Set(importedIds).size!==importedIds.length)throw Error('duplicate_portable_page_id');
   const newIds=definition.activities.map(()=>randomUUID());
-  const pageMap=new Map(definition.activities.map((a:any,i:number)=>[a.portable_id,newIds[i]]));
+  // Portable IDs are optional for older exports. Only string source IDs may
+  // enter the remapping table; this is a Map<string,string>, not Map<unknown,unknown>.
+  const pageMap=new Map<string,string>();
+  for(let i=0;i<definition.activities.length;i++){
+   const oldId:unknown=definition.activities[i].portable_id;
+   if(typeof oldId==='string')pageMap.set(oldId,newIds[i]);
+  }
   for(let i=0;i<definition.activities.length;i++){
    const a=definition.activities[i];
    await cx.query('INSERT INTO activities(id,session_id,type,title,options,correct_option_id,duration_seconds,page_design,result_design,position,answer_mode,answer_required,correct_option_ids) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)',[newIds[i],sid,a.type,a.title,JSON.stringify(a.options),['quiz','timed_quiz'].includes(a.type)?a.correct_option_id:null,a.duration_seconds,JSON.stringify(remapPortablePageRouting(a.page_design,pageMap)),JSON.stringify(remapPortablePageRouting(a.result_design,pageMap)),i,a.answer_mode||'single',a.answer_required??true,JSON.stringify(a.correct_option_ids||[])]);
