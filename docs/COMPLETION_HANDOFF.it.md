@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC230 — Handoff promozione inventario CI
+
+**RC230:** La full CI `42230115609` è fallita nel preflight perché il workflow usava RC227 come ultimo inventario non storico, pur avendo le intestazioni di RC229. RC227–229 ora sono verificatori storici, RC230 è il corrente; creato manifest SHA-256 cumulativo e test anticipato contro la regressione. Nessuna modifica a UI, autorizzazioni, database o deploy. Full CI RC230 ancora da eseguire; ultima verde RC219 `42197607753`. Avanzamento certificato **85,25%** (43 accettati/17 parziali), invariato. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Dettagli: `docs/RC_CYCLE230_INVENTORY_PROMOTION.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC229 — Handoff test storici e diagnostica sfondi
 
 **RC229:** Cumulativo successivo a RC228, che risolve il gate RC225 fallito nella run `42226572219` dopo il commit RC227 dell'utente. I test Python globali hanno trovato anche controlli obsoleti relativi a import JSON, link QR, dimensione font smartphone, upload nominati e mock PPTX; aggiornati e ripristinati i messaggi sanitizzati degli errori upload nella funzione `uploadNamedFile` per gli sfondi. Nuovo preflight 101 casi prima di npm; full CI GitHub del prossimo commit da verificare. Ultima completamente verde RC219 `42197607753`. **85,25%** certificato (43 accettati/17 parziali), `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Dettagli `docs/RC_CYCLE229_GLOBAL_DISCOVERY_RECONCILIATION.it.md`.

@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC230 — Promozione inventario attivo e ripristino preflight CI
+
+**RC230:** La run GitHub `42230115609` sul commit RC229 `41a0339e9cc0ac6f52c7f7d28d322e2c9229fa66` è fallita perché il workflow indicava ancora RC227 come inventario corrente, mentre le quattro intestazioni erano RC229. RC230 è ora l’unico inventario corrente; RC227–229 rimangono verifiche storiche con manifest originali. Nuovo test negativo contro ricadute analoghe. Nessuna modifica al comportamento dell’applicazione, database o pubblicazione. Full CI RC230 da verificare; ultima completamente verde RC219 `42197607753`. Completamento certificato **85,25%** (43 accettati/17 parziali), invariato. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag eseguito. Dettagli: `docs/RC_CYCLE230_INVENTORY_PROMOTION.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC229 — Riconciliazione test globali e upload sfondi
 
 **RC229:** Dopo il commit RC227 dell'utente, la run `42226572219` ha fallito per il vecchio test RC225 (risolto in RC228). La suite globale sullo ZIP (2168 test) ha inoltre mostrato 9 fallimenti storici e 20 errori per l'assenza del repository Git. Corretti contratti su import JSON, QR, font smartphone e caricamento sfondi, oltre al mock del convertitore; ripristinata la diagnostica HTTP sanitizzata per gli upload di sfondi. Preflight locale anticipato RC229 101/101. CI GitHub integrata da ricontrollare; ultima verde RC219 `42197607753`. Avanzamento certificato **85,25%** (43 accettati/17 parziali), invariato. `rc_strict=false`, `publish_image=false`, `publish_latest=false`, nessun commit/push/tag. `docs/RC_CYCLE229_GLOBAL_DISCOVERY_RECONCILIATION.it.md`.

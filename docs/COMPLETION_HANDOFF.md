@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC230 — CI current inventory promotion handoff
+
+**RC230:** Full GitHub CI `42230115609` failed before expensive gates because the workflow’s last nonhistorical inventory was still RC227 although release headers were RC229. Marked RC227–229 historical, selected RC230 as current, added reproducible fail-closed RC230 receipt and pre-npm guard. All code behavior and rights unchanged. Last full-green RC219 `42197607753`; integrated RC230 CI pending. **85.25%** certified (43 accepted/17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. See `docs/RC_CYCLE230_INVENTORY_PROMOTION.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC229 — Historical source contract and background error handoff
 
 **RC229:** New cumulative includes all RC228 work, which fixes failed GitHub quality gate `42226572219` (old RC225 schema gallery label in portaled modal). Local full Python discovery uncovered additional stale tests on import label/QR link/mobile scaling/named upload/PPTX fixture; updated these tests and restored sanitized `backgroundUploadError` handling in `uploadNamedFile` when `library==='backgrounds'`. Added RC229 101-case pre-npm acceptance. No permissions, database, publishing or privacy change. GitHub full CI still to be run after user's next commit; last verified full-green RC219 `42197607753`. **85.25%** certified (43 accepted/17 partial), flags `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. See `docs/RC_CYCLE229_GLOBAL_DISCOVERY_RECONCILIATION.en.md`.
