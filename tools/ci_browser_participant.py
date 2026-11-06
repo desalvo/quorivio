@@ -118,7 +118,7 @@ def prepare():
  return admin,sid,code,secret,aid
 
 
-async def enter(page,secret,name):
+async def enter(page,secret,name,default_phone=False):
  await page.goto(WEB+'/join/'+secret,wait_until='domcontentloaded')
  notice=page.get_by_role('button',name='Ho capito')
  if await notice.count():await notice.click()
@@ -128,8 +128,17 @@ async def enter(page,secret,name):
  await page.get_by_role('checkbox',name='Accetto i cookie funzionali necessari al servizio').check()
  await page.get_by_role('button',name='Entra').click()
  await expect(page.get_by_role('heading',name='CI browser poll')).to_be_visible()
- # The live default is an authored 16:9 slide; the question belongs inside it.
+ # RC238: RC227 defaults to the phone layout for narrow/touch devices.
+ # Assert that user-facing default first, then explicitly choose faithful 16:9
+ # for the unchanged authored-widget geometry and cross-device checks below.
+ if default_phone:
+  await expect(page.get_by_role('button',name='Layout smartphone')).to_have_attribute('aria-pressed','true')
+  await expect(page.locator('.audience-widget-layout.stage-phone')).to_have_count(1)
+  await page.get_by_role('button',name='Diapositiva 16:9').click()
+ else:
+  await expect(page.get_by_role('button',name='Diapositiva 16:9')).to_have_attribute('aria-pressed','true')
  await expect(page.get_by_role('button',name='Diapositiva 16:9')).to_have_attribute('aria-pressed','true')
+ await expect(page.locator('.audience-widget-layout.stage-fidelity')).to_have_count(1)
  await expect(page.locator('[data-widget-kind="question"]')).to_have_count(1)
  await expect(page.locator('[data-widget-kind="topic-question"]')).to_have_count(1)
  await expect(page.locator('[data-widget-kind="rating"]')).to_have_count(1)
@@ -203,7 +212,7 @@ async def run():
   try:
    # 1. A long QR join secret and a short typed code both work.
    await enter(p1,secret,'Browser Alice')
-   await enter(p2,code,'Browser Bob')
+   await enter(p2,code,'Browser Bob',default_phone=True)
    # 2. No participant sees an admin report; no quiz key or aggregate result leaks.
    assert (await p1.request.get(WEB+f'/api/sessions/{sid}/report.json')).status==401
    assert (await p2.request.get(WEB+f'/api/sessions/{sid}/report.json')).status==401
@@ -227,6 +236,12 @@ async def run():
    # 6. Mobile reload recovers its cookie; authored controls fit the viewport.
    await p2.reload(wait_until='domcontentloaded')
    await expect(p2.get_by_role('heading',name='CI browser poll')).to_be_visible()
+   # RC238: a full page reload resets the explicit choice and correctly
+   # selects the phone layout again. Restore 16:9 before geometry comparison.
+   await expect(p2.get_by_role('button',name='Layout smartphone')).to_have_attribute('aria-pressed','true')
+   await expect(p2.locator('.audience-widget-layout.stage-phone')).to_have_count(1)
+   await p2.get_by_role('button',name='Diapositiva 16:9').click()
+   await expect(p2.locator('.audience-widget-layout.stage-fidelity')).to_have_count(1)
    button=p2.locator('[data-widget-kind="question"]').get_by_role('radio',name='Yes',exact=True)
    bounds=await button.bounding_box()
    assert bounds and bounds['x']>=0 and bounds['x']+bounds['width']<=392,bounds

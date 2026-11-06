@@ -303,6 +303,10 @@ jobs:
       # aliases while retaining the original PostgreSQL/Chromium checks.
       - name: RC237 rename versus export action scope regression before npm
         run: python3 -m unittest tools.tests.test_rc237_rename_scope_guard -q
+      # RC238: RC227 auto-selects smartphone for touch/narrow participants.
+      # Join, reload and faithful 16:9 cross-device comparisons must agree.
+      - name: RC238 participant auto-phone and faithful-slide Chromium contract before npm
+        run: python3 -m unittest tools.tests.test_rc238_auto_phone_participant_chromium -q
       - name: RC218 real editor thumbnail rename browser contract before npm
         run: python3 -m unittest tools.tests.test_rc218_browser_postgres_thumbnail_rename -q
       # RC215: RC141 compared a glyph Range top with an output border-box
@@ -1453,7 +1457,8 @@ jobs:
           python3 tools/verify_rc_cycle234_inventory.py --historical
           python3 tools/verify_rc_cycle235_inventory.py --historical
           python3 tools/verify_rc_cycle236_inventory.py --historical
-          python3 tools/verify_rc_cycle237_inventory.py
+          python3 tools/verify_rc_cycle237_inventory.py --historical
+          python3 tools/verify_rc_cycle238_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

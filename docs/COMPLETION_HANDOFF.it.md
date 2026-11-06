@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC238 — Handoff layout smartphone/Chromium
+
+**RC238:** Base: RC237 committata su GitHub `4c4b7ee0451e0a20abb791da2a0ea585eddc8f63`, full CI [42269302109](https://github.com/desalvo/quorivio/actions/runs/42269302109) fallita nel Chromium reale con PostgreSQL. La fixture storica pretendeva 16:9 predefinito anche su touch da 390px. Verificare il corretto default smartphone RC227 in fase di ingresso e dopo reload, selezionare esplicitamente 16:9 per la geometria comune, conservare tutti i test della modalità smartphone e lettura accessibile. Aggiornata la verifica RC176 e introdotte regressioni fail-closed RC238 prima di npm. Nessuna modifica all’applicazione; RC237 storica, RC238 corrente. Full CI da certificare. **85,25%** (43 accettati/17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag dell’assistente. `docs/RC_CYCLE238_PARTICIPANT_PHONE_CHROMIUM.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC237 — Handoff controllo della rinomina
 
 **RC237:** Partenza da RC236 committata `910c60216d9e18c7602a47070a5d822588f1194f`. Full CI [42256926397](https://github.com/desalvo/quorivio/actions/runs/42256926397) fallita poiché il test negativo RC218 accettava per errore la sottostringa `actions=` dentro `export_actions=`. Ora è obbligatoria l'assegnazione esatta del selettore e sono aggiunte mutazioni RC237 prima di npm. Nessuna modifica applicativa e nessun gate disabilitato. RC236 storico, RC237 corrente; full CI da certificare. **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag dell'assistente. `docs/RC_CYCLE237_RENAME_ACTION_SCOPE.it.md`.

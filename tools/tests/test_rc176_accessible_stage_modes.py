@@ -19,10 +19,12 @@ def browser_mode_guards(source:str)->bool:
     phone_stage="await expect(p2.locator('.audience-widget-layout.stage-phone')).to_have_count(1)"
     reading="await p2.get_by_role('button',name='Lettura accessibile').click()"
     reading_stage="await expect(p2.locator('.audience-widget-layout.stage-reading')).to_have_count(1)"
+    # RC238: phone stage also exists before the explicit switch as the mobile default.
+    # Restrict this historical RC176 ordering assertion to its own explicit click.
     return (all(x in source for x in (phone,phone_stage,reading,reading_stage,
          'normalized_slide_geometry(p1)','normalized_slide_geometry(p2)',
          "reading['kinds'][-1]=='footer'", "reading['fieldHeight']>=44"))
-         and source.index(phone)<source.index(phone_stage)<source.index(reading)<source.index(reading_stage))
+         and source.index(phone)<source.index(phone_stage, source.index(phone))<source.index(reading)<source.index(reading_stage))
 
 
 class RC176AccessibleModes(unittest.TestCase):
