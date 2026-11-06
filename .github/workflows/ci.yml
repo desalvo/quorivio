@@ -122,6 +122,8 @@ jobs:
           python3 -m unittest tools.tests.test_rc103_native_thumbnail_reconciliation -q
       - name: RC230 inventory promotion guard before npm
         run: python3 -m unittest tools.tests.test_rc230_inventory_promotion -q
+      - name: RC231 Python import-path verification before npm
+        run: python3 -m unittest tools.tests.test_rc231_import_paths -q
       - name: Validate active RC release headers against the current inventory
         run: |
           PYTHONPATH=tools python3 tools/verify_rc_release_status.py
@@ -1417,7 +1419,8 @@ jobs:
           python3 tools/verify_rc_cycle227_inventory.py --historical
           python3 tools/verify_rc_cycle228_inventory.py --historical
           python3 tools/verify_rc_cycle229_inventory.py --historical
-          python3 tools/verify_rc_cycle230_inventory.py
+          python3 tools/verify_rc_cycle230_inventory.py --historical
+          python3 tools/verify_rc_cycle231_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

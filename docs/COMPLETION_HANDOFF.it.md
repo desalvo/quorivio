@@ -1,6 +1,6 @@
-# Quorivio 0.1.0-dev — RC230 — Handoff promozione inventario CI
+# Quorivio 0.1.0-dev — RC231 — Handoff importazione moduli nella CI
 
-**RC230:** La full CI `42230115609` è fallita nel preflight perché il workflow usava RC227 come ultimo inventario non storico, pur avendo le intestazioni di RC229. RC227–229 ora sono verificatori storici, RC230 è il corrente; creato manifest SHA-256 cumulativo e test anticipato contro la regressione. Nessuna modifica a UI, autorizzazioni, database o deploy. Full CI RC230 ancora da eseguire; ultima verde RC219 `42197607753`. Avanzamento certificato **85,25%** (43 accettati/17 parziali), invariato. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Dettagli: `docs/RC_CYCLE230_INVENTORY_PROMOTION.it.md`.
+**RC231:** La full CI `42233651517` falliva nel nuovo test unittest RC230 prima di npm per `ModuleNotFoundError: ci_inventory_reference_guard`, chiamando `tools.verify_rc_current_inventory` senza registrare la directory dei moduli fratelli. Ora il modulo risolve deterministicamente la directory tools in `sys.path`, senza impostare `PYTHONPATH` esternamente. Nuovi test in sottoprocesso, ricevuta RC230 storica immutabile e inventario corrente RC231. Nessun intervento su app, database o deploy. Ultima full CI verde RC219 `42197607753`; RC231 da verificare. **85,25%** certificato (43 accettati/17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. `docs/RC_CYCLE231_IMPORT_PATHS.it.md`.
 
 ---
 # Quorivio 0.1.0-dev — RC229 — Handoff test storici e diagnostica sfondi

@@ -7,6 +7,15 @@ release time. The workflow reference guard performs independent safety checks.
 from __future__ import annotations
 
 import importlib
+import sys
+from pathlib import Path
+
+# Module may be imported as tools.verify_rc_current_inventory by unittest,
+# or by its short name from scripts executed inside tools/. Both modes
+# require sibling verifiers to be importable without PYTHONPATH overrides.
+_TOOLS = str(Path(__file__).resolve().parent)
+if _TOOLS not in sys.path:
+    sys.path.insert(0, _TOOLS)
 
 from ci_inventory_reference_guard import COMMAND, ROOT, WORKFLOW, verify_references
 

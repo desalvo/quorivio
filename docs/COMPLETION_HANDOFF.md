@@ -1,6 +1,6 @@
-# Quorivio 0.1.0-dev — RC230 — CI current inventory promotion handoff
+# Quorivio 0.1.0-dev — RC231 — Python import-path CI handoff
 
-**RC230:** Full GitHub CI `42230115609` failed before expensive gates because the workflow’s last nonhistorical inventory was still RC227 although release headers were RC229. Marked RC227–229 historical, selected RC230 as current, added reproducible fail-closed RC230 receipt and pre-npm guard. All code behavior and rights unchanged. Last full-green RC219 `42197607753`; integrated RC230 CI pending. **85.25%** certified (43 accepted/17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. See `docs/RC_CYCLE230_INVENTORY_PROMOTION.en.md`.
+**RC231:** Full CI `42233651517` failed at the new RC230 pre-npm unittest due to `ModuleNotFoundError: ci_inventory_reference_guard`, because the helper was imported as `tools.verify_rc_current_inventory` without a sibling module path. Its module now deterministically adds the local tools directory to `sys.path` and resolves the same verifier names used by all legacy tests. Added Python subprocess acceptance without `PYTHONPATH`, RC231 current manifest and historical RC230 receipt. No application, database, auth or publish changes. Last full-green CI RC219 `42197607753`; full GitHub RC231 validation pending. **85.25%** certified (43 accepted/17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. `docs/RC_CYCLE231_IMPORT_PATHS.en.md`.
 
 ---
 # Quorivio 0.1.0-dev — RC229 — Historical source contract and background error handoff
