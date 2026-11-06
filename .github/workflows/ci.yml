@@ -198,6 +198,10 @@ jobs:
       # top, falsely failing all four surfaces; preserve glyph-to-glyph checks.
       - name: RC215 results word/count glyph alignment contract before npm
         run: python3 -m unittest tools.tests.test_rc215_chromium_result_text_alignment -q
+      # RC216: the expired-auth browser recovery scenario must target the
+      # accessible landing-page login, not a retired main.narrow CSS selector.
+      - name: RC216 Chromium expired-auth login and editor restoration contract before npm
+        run: python3 -m unittest tools.tests.test_rc216_expired_auth_browser_contract -q
       - name: RC196 cross-page source question frontend typing contract before npm
         run: python3 -m unittest tools.tests.test_rc196_frontend_results_types -q
       # RC211: independent audience slide content must use the presenter's
@@ -1291,7 +1295,8 @@ jobs:
           python3 tools/verify_rc_cycle212_inventory.py --historical
           python3 tools/verify_rc_cycle213_inventory.py --historical
           python3 tools/verify_rc_cycle214_inventory.py --historical
-          python3 tools/verify_rc_cycle215_inventory.py
+          python3 tools/verify_rc_cycle215_inventory.py --historical
+          python3 tools/verify_rc_cycle216_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

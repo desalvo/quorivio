@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC216 — Recupero login Chromium
+
+**RC216:** La run `42145939288` è fallita nel test browser RC208: il login era correttamente visibile dopo il `401`, ma `tools/ci_browser_editor.py` cercava il contenitore storico `main.narrow`. Ora il test verifica l’intestazione e i controlli accessibili del login, l’assenza dell’editor protetto e il recupero dopo ri-autenticazione senza cancellare cookie. Preflight anticipato e mutazioni negative; nessuna modifica al runtime. Full CI RC216 da verificare; ultima full verde RC203. Certificato **85,25%** (43 accettati/17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Vedi `docs/RC_CYCLE216_AUTH_RECOVERY_BROWSER_LOGIN.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC215 — Allineamento grafico Chromium del conteggio risultati
 
 **RC215:** La full CI RC214 `42144060435` ha fallito il test Chromium RC141 che confrontava erroneamente il box di `output` con il range dei glifi (scarto 2,076 px). Confronto corretto fra due range di testo e protezione di a capo/leggibilità preservata; aggiunto test negativo in Chromium (offset 8 px) e preflight prima di npm. Nessuna modifica all’applicazione. In attesa della full CI RC215; ultima full verde RC203. Certificato **85,25%** (43 accettati/17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Vedi `docs/RC_CYCLE215_CHROMIUM_RESULT_GLYPH_ALIGNMENT.it.md`.

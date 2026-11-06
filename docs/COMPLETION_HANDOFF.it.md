@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC216 — Handoff recupero login Chromium
+
+**RC216:** Proseguire dal cumulativo RC216. CI RC215 `42145939288` fallita per un selettore `main.narrow` inesistente dopo simulazione del `401`; l’interfaccia corretta è il login accessibile nella home. Test aggiornato per controllare login e ripristino dell’editor senza cancellazione dei cookie, con preflight preventivo e mutazioni negative. Nessun cambiamento al runtime. Full CI RC216 necessaria; ultima full verde RC203. Certificato **85,25%**; `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Vedi `docs/RC_CYCLE216_AUTH_RECOVERY_BROWSER_LOGIN.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC215 — Handoff test Chromium risultati
 
 **RC215:** Proseguire da RC215 cumulativa. La full CI RC214 `42144060435` è passata fino al controllo browser RC141, dove un test storico confondeva il testo `Range` con il box di `output`. Ora confronta glifi con glifi, e verifica che il conteggio segua l’ultima parola senza andare a capo. Chromium verde su editor, presentatore, anteprima e partecipante a 1440/390 px; 8 px di disallineamento intenzionale viene rifiutato. Test pre-npm e mutazioni negative inclusi. Full CI RC215 ancora necessaria; ultima full verde RC203. Certificato **85,25%**, `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Dettagli `docs/RC_CYCLE215_CHROMIUM_RESULT_GLYPH_ALIGNMENT.it.md`.

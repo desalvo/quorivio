@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC216 — Chromium auth-recovery login
+
+**RC216:** Run `42145939288` failed a compiled browser recovery check after a mock 401: the actual sign-in form was present but the historical selector `main.narrow` was obsolete. Replaced with accessible login heading/input/button assertions; preserved protected-editor exclusion and restoration after authentication without cookie clearing. Early pre-npm negative-mutation gate, no application runtime changes. Full RC216 CI pending; last full-green RC203. Certified **85.25%** (43 accepted/17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag. See `docs/RC_CYCLE216_AUTH_RECOVERY_BROWSER_LOGIN.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC215 — Chromium result glyph alignment
 
 **RC215:** Full RC214 run `42144060435` failed an RC141 Chromium false positive comparing an `output` element box to a text glyph range (2.076 px difference). Fixed glyph-to-glyph alignment checks while preserving wrapping and accessibility. Added negative Chromium offset assertion and pre-npm contract test. Application code unchanged. RC215 full CI pending; last full-green RC203. Certified **85.25%** (43 accepted/17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag. See `docs/RC_CYCLE215_CHROMIUM_RESULT_GLYPH_ALIGNMENT.en.md`.

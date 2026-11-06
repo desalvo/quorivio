@@ -399,7 +399,14 @@ async def main():
    state['auth_error']=401
    await page.reload(wait_until='domcontentloaded')
    await await_frontend_mount(page,errors)
-   await expect(page.locator('main.narrow')).to_be_visible(timeout=15000)
+   # RC216: the unauthenticated presenter form now lives inside the landing
+   # screen, not the removed legacy narrow container. Assert accessible login
+   # controls and that the previous protected editor is no longer rendered.
+   await expect(page.get_by_role('heading',name='Accedi come presentatore',exact=True)).to_be_visible(timeout=15000)
+   await expect(page.get_by_role('textbox',name='Email o nickname')).to_be_visible()
+   await expect(page.get_by_role('textbox',name='Password')).to_be_visible()
+   await expect(page.get_by_role('button',name='Accedi',exact=True)).to_be_visible()
+   await expect(page.get_by_role('region',name='Editor grafico delle pagine')).to_have_count(0)
    state['auth_error']=None
    await page.reload(wait_until='domcontentloaded')
    await await_frontend_mount(page,errors)

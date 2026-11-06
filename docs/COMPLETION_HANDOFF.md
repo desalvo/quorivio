@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC216 — Chromium reauthentication handoff
+
+**RC216:** Continue from cumulative RC216. RC215 full GitHub CI `42145939288` failed because a stale `main.narrow` selector looked for the old login container despite the correct accessible form already being rendered after a mocked 401. Chromium acceptance now checks the login controls and protected-editor absence, then requires the same workspace to reopen after authentication is restored without cookie deletion. New early preflight and negative mutations; application runtime unchanged. Full RC216 CI required; last full-green RC203. Certified **85.25%**; `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag. See `docs/RC_CYCLE216_AUTH_RECOVERY_BROWSER_LOGIN.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC215 — Chromium result glyph test handoff
 
 **RC215:** Continue from cumulative RC215. Full RC214 run `42144060435` reached RC141 Chromium test and failed due to comparing an output *element box* with a text `Range`. Test now compares glyph ranges and verifies final word/count remain on one line without clipping. Chromium passes across editor, presenter, rehearsal and participant at 1440/390 px, and rejects a synthetic 8 px offset. Early pre-npm negative-mutation guard added. Full RC215 GitHub CI still required; last full-green RC203. Certified **85.25%**, `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag. See `docs/RC_CYCLE215_CHROMIUM_RESULT_GLYPH_ALIGNMENT.en.md`.
