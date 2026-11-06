@@ -289,6 +289,10 @@ jobs:
       # vertically wrapped palette while retaining horizontal page thumbnails.
       - name: RC235 responsive studio palette compatibility before npm
         run: python3 -m unittest tools.tests.test_rc235_responsive_browser_compat -q
+      # RC236: the thumbnail menu now uses native disclosure sections, so
+      # authenticated Chromium/PostgreSQL tests must expand the real summary.
+      - name: RC236 page thumbnail browser disclosure compatibility before npm
+        run: python3 -m unittest tools.tests.test_rc236_page_menu_disclosures -q
       # RC227: accessible compact master background chooser and responsive
       # participant rotation, preserving explicit manual screen mode selection.
       - name: RC227 schema backgrounds and mobile participant mode before npm
@@ -1443,7 +1447,8 @@ jobs:
           python3 tools/verify_rc_cycle232_inventory.py --historical
           python3 tools/verify_rc_cycle233_inventory.py --historical
           python3 tools/verify_rc_cycle234_inventory.py --historical
-          python3 tools/verify_rc_cycle235_inventory.py
+          python3 tools/verify_rc_cycle235_inventory.py --historical
+          python3 tools/verify_rc_cycle236_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

@@ -1,0 +1,9 @@
+# Quorivio RC236 — Sezioni espandibili del menu miniature nei test browser
+
+**Causa CI.** La full CI GitHub [42252842551](https://github.com/desalvo/quorivio/actions/runs/42252842551), commit `98a3a39c15aa83deaab722f1ed872f0f7ff9883e`, supera il test Chromium della palette responsive RC234 ma si ferma in `tools/ci_browser_editor.py`: cerca `Nuova pagina prima` quando la sezione nativa `Crea e importa pagine` è chiusa. L'interfaccia usa correttamente i gruppi HTML `<details>`; la vecchia prova assumeva erroneamente un menu senza sezioni.
+
+**Correzione.** Nessuna modifica al funzionamento applicativo. Il test Chromium autenticato apre realmente `Crea e importa pagine` ed `Esporta e dati` con un clic sui relativi `<summary>`, verifica che siano espansi e controlla creazione, importazione PDF/PPTX e JSON ed esportazione JSON. Corretto anche il secondo accesso all'export dopo un ricaricamento e l'analogo test browser con PostgreSQL reale. Nessun clic forzato, test disattivato o modifica CSS.
+
+**Prevenzione.** Il nuovo `tools/tests/test_rc236_page_menu_disclosures.py` controlla la struttura reale a sezioni del codice, l'ordine delle interazioni nei due test Chromium, le mutazioni negative e l'esecuzione obbligatoria nel workflow. Resta attivo il test Chromium RC224 del menu a quattro dimensioni: 320x240, 390x380, 390x844, 1440x900.
+
+**Verifiche.** Passano localmente il preflight RC236 e la fixture Chromium RC224. Il test browser completo su React compilato richiede dipendenze Vite/npm non presenti in questo ambiente e resta obbligatorio nella full CI GitHub. La CI integrata RC236 non è ancora certificata. RC235 resta storico immutabile, RC236 è l'inventario corrente. Completamento **85,25%** (43 gate accettati/17 parziali). Flag: `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit, push o tag dell'assistente.

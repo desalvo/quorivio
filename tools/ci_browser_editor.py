@@ -243,9 +243,26 @@ async def main():
    thumb=page.get_by_role('button',name='Menu pagina 1: crea, duplica, elimina, sposta')
    await thumb.click()
    actions=page.get_by_role('group',name='Azioni pagina 1')
-   for label in ('Nuova pagina prima','Nuova pagina dopo','Duplica pagina','Elimina pagina','Esporta layout JSON'):
+   # RC236: page actions are arranged in native <details> disclosures.
+   # The former acceptance test queried hidden descendants of a closed
+   # disclosure. Open the actual accessible controls with user clicks instead
+   # of forcing CSS visibility or weakening the command assertions.
+   for label in ('Apri pagina','Duplica pagina','Elimina pagina'):
     await expect(actions.get_by_role('button',name=label)).to_be_visible()
-   await expect(actions.get_by_text('Importa layout JSON')).to_be_visible()
+   create_section=actions.locator('details.page-editor-thumb-submenu').filter(
+    has=page.get_by_text('Crea e importa pagine',exact=True))
+   await expect(create_section).not_to_have_attribute('open','')
+   await create_section.locator('summary').click()
+   await expect(create_section).to_have_attribute('open','')
+   for label in ('Nuova pagina prima','Nuova pagina dopo'):
+    await expect(actions.get_by_role('button',name=label)).to_be_visible()
+   await expect(create_section.get_by_text('Importa layout JSON')).to_be_visible()
+   await expect(create_section.get_by_text('Importa PDF/PPTX…')).to_be_visible()
+   export_section=actions.locator('details.page-editor-thumb-submenu').filter(
+    has=page.get_by_text('Esporta e dati',exact=True))
+   await export_section.locator('summary').click()
+   await expect(export_section).to_have_attribute('open','')
+   await expect(actions.get_by_role('button',name='Esporta layout JSON')).to_be_visible()
    await thumb.click()
    # Keyboard and grouped arrangement remain functional through the context menu.
    disclosure=page.locator('.canvas-accessible-controls > summary')
@@ -416,8 +433,14 @@ async def main():
 
    # Import/export live only on the relevant thumbnail, never below the artboard.
    await page.get_by_role('button',name='Menu pagina 1: crea, duplica, elimina, sposta').click()
+   # RC236: downloads are under a native collapsed disclosure after reload too.
+   export_actions=page.get_by_role('group',name='Azioni pagina 1',exact=True)
+   export_details=export_actions.locator('details.page-editor-thumb-submenu').filter(
+    has=page.get_by_text('Esporta e dati',exact=True))
+   await export_details.locator('summary').click()
+   await expect(export_details).to_have_attribute('open','')
    async with page.expect_download() as info:
-    await page.get_by_role('button',name='Esporta layout JSON').click()
+    await export_actions.get_by_role('button',name='Esporta layout JSON').click()
    backup=await info.value
    assert Path(await backup.path()).exists()
    await page.get_by_role('button',name='Esci',exact=True).click()

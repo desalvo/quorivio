@@ -197,8 +197,14 @@ async def main():
    assert resolved['result_design']['header']=='Remote results heading'
    # Export backup only in active thumbnail context, never as a persistent canvas footer.
    await page.get_by_role('button',name='Menu pagina 1: crea, duplica, elimina, sposta').click()
+   # RC236: exercise the same native disclosure as the mocked browser gate.
+   export_actions=page.get_by_role('group',name='Azioni pagina 1',exact=True)
+   export_details=export_actions.locator('details.page-editor-thumb-submenu').filter(
+    has=page.get_by_text('Esporta e dati',exact=True))
+   await export_details.locator('summary').click()
+   await expect(export_details).to_have_attribute('open','')
    async with page.expect_download() as download_info:
-    await page.get_by_role('button',name='Esporta layout JSON').click()
+    await export_actions.get_by_role('button',name='Esporta layout JSON').click()
    backup=json.loads(Path(await (await download_info.value).path()).read_text())
    assert backup['format']=='quorivio-local-draft-v2'
    assert backup['base_revision']==7
