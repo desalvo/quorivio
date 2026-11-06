@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC215 — Allineamento grafico Chromium del conteggio risultati
+
+**RC215:** La full CI RC214 `42144060435` ha fallito il test Chromium RC141 che confrontava erroneamente il box di `output` con il range dei glifi (scarto 2,076 px). Confronto corretto fra due range di testo e protezione di a capo/leggibilità preservata; aggiunto test negativo in Chromium (offset 8 px) e preflight prima di npm. Nessuna modifica all’applicazione. In attesa della full CI RC215; ultima full verde RC203. Certificato **85,25%** (43 accettati/17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Vedi `docs/RC_CYCLE215_CHROMIUM_RESULT_GLYPH_ALIGNMENT.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC214 — Selezione miniature e accessibilità CI
 
 **RC214:** Run CI RC213 `42142002249` bloccata al preflight RC106 per un test sul vecchio clic delle miniature. Aggiornati tre test storici, preservando Ctrl/Cmd+clic per la selezione multipla e il clic semplice per aprire la pagina; corretta inoltre la restituzione del focus al pulsante del menu dopo Escape. Aggiunto preflight RC214 con mutazioni negative per intercettare regressioni prima di npm. Cumulativo, non certificato in GitHub; ultima full CI verde RC203 `42110429701`. Certificato **85,25%** (43 gate accettati/17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Vedi `docs/RC_CYCLE214_THUMBNAIL_SELECTION_CI.it.md`.

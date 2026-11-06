@@ -2,7 +2,8 @@
 """Real Chromium CSS parity contract for RC141–RC152 on all widget surfaces.
 
 RC143 deliberately allows long result labels to wrap while keeping the final
-word and bracketed count together. The old RC141 assertion that the entire
+word and bracketed count together. RC215 measures glyph/text ranges on both
+sides, not one text range against the output element padding box. The old RC141 assertion that the entire
 pair must be nowrap was obsolete and hid this accessibility requirement.
 Uses only synthetic values and no user, network or session data.
 """
@@ -54,12 +55,15 @@ def run(css_text: str | None = None) -> None:
                    const final=pair.querySelector('.linked-result-final');
                    const count=final.querySelector('output');
                    const finalWord=document.createRange();finalWord.selectNodeContents(final.firstChild);
+                   const countText=document.createRange();countText.selectNodeContents(count);
+                   const wordRect=finalWord.getBoundingClientRect();
+                   const countRect=countText.getBoundingClientRect();
                    const labelFragments=label.getClientRects();
                    return [el.dataset.stage,{titleVisible:getComputedStyle(title).display!=='none',
                      pairWraps:getComputedStyle(pair).whiteSpace!=='nowrap',
                      labelWraps:labelFragments.length>1,
                      tailNoWrap:getComputedStyle(final).whiteSpace==='nowrap',
-                     tailInline:Math.abs(finalWord.getBoundingClientRect().top-count.getBoundingClientRect().top)<1.5,
+                     tailInline:Math.abs(wordRect.top-countRect.top)<1.5 && countRect.left>wordRect.right && countRect.left-wordRect.right<28,
                      pairFits:pair.scrollWidth<=pair.clientWidth+1,
                      width:r.width,height:r.height,font:getComputedStyle(reaction).fontSize,
                      checkboxWidth:c.width,checkboxHeight:c.height,

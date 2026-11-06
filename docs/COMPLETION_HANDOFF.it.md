@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC215 — Handoff test Chromium risultati
+
+**RC215:** Proseguire da RC215 cumulativa. La full CI RC214 `42144060435` è passata fino al controllo browser RC141, dove un test storico confondeva il testo `Range` con il box di `output`. Ora confronta glifi con glifi, e verifica che il conteggio segua l’ultima parola senza andare a capo. Chromium verde su editor, presentatore, anteprima e partecipante a 1440/390 px; 8 px di disallineamento intenzionale viene rifiutato. Test pre-npm e mutazioni negative inclusi. Full CI RC215 ancora necessaria; ultima full verde RC203. Certificato **85,25%**, `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Dettagli `docs/RC_CYCLE215_CHROMIUM_RESULT_GLYPH_ALIGNMENT.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC214 — Handoff miniature e menu contestuali
 
 **RC214:** Proseguire dal cumulativo RC214; preservate tutte le funzionalità RC204–213. Dopo il fallimento CI RC213 `42142002249`, aggiornati i contratti storici per selezione multipla Ctrl/Cmd, shortcut D/R/Backspace, navigazione con clic normale e labels dinamici. Corretto focus Escape del menu portalled. Aggiunti test negativi e preflight prima di npm. La full CI RC214 deve ancora certificare build React, Chromium, PostgreSQL e Kubernetes; ultima full green RC203 `42110429701`. Certificato **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Dettagli: `docs/RC_CYCLE214_THUMBNAIL_SELECTION_CI.it.md`.

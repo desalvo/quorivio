@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC215 — Chromium result glyph test handoff
+
+**RC215:** Continue from cumulative RC215. Full RC214 run `42144060435` reached RC141 Chromium test and failed due to comparing an output *element box* with a text `Range`. Test now compares glyph ranges and verifies final word/count remain on one line without clipping. Chromium passes across editor, presenter, rehearsal and participant at 1440/390 px, and rejects a synthetic 8 px offset. Early pre-npm negative-mutation guard added. Full RC215 GitHub CI still required; last full-green RC203. Certified **85.25%**, `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag. See `docs/RC_CYCLE215_CHROMIUM_RESULT_GLYPH_ALIGNMENT.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC214 — Thumbnail selection and Escape focus CI handoff
 
 **RC214:** Continue from cumulative RC214 preserving all RC204–213 features. Run `42142002249` failed the RC106 legacy inline thumbnail click contract. Reconciled three historic tests with Ctrl/Cmd multi-select, normal navigation, D/R/Backspace, dynamic labels and closed-session protections. Fixed Escape focus restoration in the portalled thumbnail menu; added fail-closed mutations and early pre-npm coverage. Full RC214 GitHub CI remains required for React/Chromium/PostgreSQL/Kubernetes; latest fully green RC203 `42110429701`. Certified **85.25%** (43 accepted/17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag. See `docs/RC_CYCLE214_THUMBNAIL_SELECTION_CI.en.md`.

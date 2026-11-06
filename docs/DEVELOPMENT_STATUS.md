@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC215 — Chromium result glyph alignment
+
+**RC215:** Full RC214 run `42144060435` failed an RC141 Chromium false positive comparing an `output` element box to a text glyph range (2.076 px difference). Fixed glyph-to-glyph alignment checks while preserving wrapping and accessibility. Added negative Chromium offset assertion and pre-npm contract test. Application code unchanged. RC215 full CI pending; last full-green RC203. Certified **85.25%** (43 accepted/17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag. See `docs/RC_CYCLE215_CHROMIUM_RESULT_GLYPH_ALIGNMENT.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC214 — Thumbnail selection CI and Escape focus
 
 **RC214:** RC213 full CI `42142002249` failed RC106 obsolete inline thumbnail click assertion. Reconciled three historical tests with Ctrl/Cmd multi-selection and single-click navigation; fixed restoring keyboard focus to the thumbnail trigger after Escape. New RC214 pre-npm regression and negative mutations, with historical checks preserved. Full RC214 CI pending; last full-green RC203 `42110429701`. Certified **85.25%** (43 accepted/17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag. See `docs/RC_CYCLE214_THUMBNAIL_SELECTION_CI.en.md`.
