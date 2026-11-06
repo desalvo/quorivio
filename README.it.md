@@ -1,5 +1,7 @@
 # Quorivio 0.1.0-dev
 
+> **RC220:** La RC219 è la baseline full CI verde (run `42197607753`). In RC220 è disponibile **Configurazione server → Convertitore PDF / PowerPoint** per amministratori. Le opzioni dei risultati collegati per titolo e risposte sono indipendenti. Vedi `docs/RC_CYCLE220_PDF_WORKER_AND_LINKED_RESULTS.it.md`. La nuova RC220 necessita ancora della CI.
+
 > **Stato RC (2 novembre 2026):** RC135 ha superato la CI completa GitHub (run 41437489546). La RC formale **non è ancora approvata**: 43/60 gate accettati, 17 parziali; certificato 85,25%. Procedura per i fascicoli di prova privati e la revisione indipendente: [`docs/RC136_EXTERNAL_ACCEPTANCE_IT.md`](docs/RC136_EXTERNAL_ACCEPTANCE_IT.md). Non caricare in Git le evidenze private e non confondere CI verde con certificazioni legali o su dispositivi reali.
 
 ## Cronologia dello sviluppo
@@ -103,7 +105,7 @@ Upload in streaming: gli allegati di presentatori e partecipanti sono scritti su
 Slide integrate: carica un gruppo di immagini PNG/JPEG/WebP dal workspace del presentatore per inserirle come pagine; i PDF/PPTX devono ancora essere convertiti offline con tools/import_presentation.py.
 
 ### Import PDF/PPTX da browser (sperimentale)
-Il presentatore può caricare PDF/PPTX tramite `/api/sessions/:id/presentation-import` (massimo 100 MiB, 200 pagine). La funzione è disabilitata per default: richiede `QUORIVIO_ENABLE_CONVERTER=true`, Python/Poppler e LibreOffice per PPTX. **Il subprocess attuale non è isolato in un container dedicato e non deve essere abilitato in produzione prima dei collaudi di sicurezza.** Le nuove slide vengono salvate nella medesima transazione database.
+Il presentatore può importare PDF/PPTX in pagine-immagine (massimo 100 MiB e 200 pagine) tramite `/api/sessions/:id/presentation-import`. La conversione viene eseguita esclusivamente nel **worker isolato** del deployment, mai in un subprocess dell'API. L'amministratore verifica e attiva la disponibilità da **Configurazione server → Convertitore PDF / PowerPoint**; la pagina indica i prerequisiti mancanti. Servono `QUORIVIO_ENABLE_CONVERTER=true`, URL interno del worker e token segreto valido. Compose e Helm includono il worker, ma occorre configurarne il Secret/ambiente e verificarne lo stato. Vedi [`docs/ISOLATED_CONVERTER.it.md`](docs/ISOLATED_CONVERTER.it.md) e [`docs/RC_CYCLE220_PDF_WORKER_AND_LINKED_RESULTS.it.md`](docs/RC_CYCLE220_PDF_WORKER_AND_LINKED_RESULTS.it.md).
 
 ### MFA e SMTP (0.1.0-dev)
 
@@ -148,3 +150,4 @@ La CI full 40215782964 falliva perché la dashboard intercettava il clic di conf
 ## CI controllata dal commit (RC102)
 
 Un push su `main` con commit ordinario avvia la CI standard; `[full-ci]` avvia direttamente tutti i gate automatici estesi, senza pubblicare. Il marker esplicito `[publish-docker]` avvia la stessa campagna estesa e **solo quando tutti i gate risultano verdi** pubblica `desalvo/quorivio:sha-<12>` e `desalvo/quorivio:latest` nell'environment protetto `production`. Non usare questo marker se non vuoi aggiornare `latest`. La pubblicazione manuale `workflow_dispatch` rimane separata; mai pubblicazione da PR, branch diversi da `main` o test falliti. Configura la variabile `DOCKERHUB_USERNAME` e il segreto `DOCKERHUB_TOKEN`, più eventuali revisori richiesti nell'environment `production`.
+**Novità RC221:** scegliere prima dell’import PDF/PPTX tra **immagini fedeli** nella sessione corrente e **elementi modificabili parzialmente** in una nuova sessione, con estrazione di testo nativo e immagini tramite worker isolato. Nei risultati: switch privato per risposte vere e formattazione autonoma di domande, risposte e righe statistiche. Vedi `docs/RC_CYCLE221_RESULTS_GRADING_AND_PDF_IMPORT.it.md`.

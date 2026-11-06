@@ -1,12 +1,15 @@
 /** Page-scoped presenter statistics; result controls never reference participants directly. */
 export const STATISTICAL_WIDGET_KINDS=['question','timed-quiz','rating','reactions','topic-question'] as const;
-export type StatisticalWidget={id:string;kind:string;label?:string;description?:string;answerMode?:string;options?:{id:string;label:string}[];targetWidgetId?:string;targetActivityId?:string;targetQuestionId?:string;questions?:{id:string;label:string;description?:string;answerMode?:string;options?:{id:string;label:string}[]}[];resultsView?:string;resultsOnly?:boolean;showTitle?:boolean;showSourceQuestion?:boolean};
+export type StatisticalWidget={id:string;kind:string;label?:string;description?:string;answerMode?:string;options?:{id:string;label:string}[];targetWidgetId?:string;targetActivityId?:string;targetQuestionId?:string;questions?:{id:string;label:string;description?:string;answerMode?:string;options?:{id:string;label:string}[]}[];resultsView?:string;resultsOnly?:boolean;showTitle?:boolean;showSourceQuestion?:boolean;showSourceTitle?:boolean;showSourceAnswers?:boolean};
 export type StatRow={id:string;label:string;count:number};
 export type SourceQuestionPart={id?:string;label:string;description?:string;answerMode?:string;options?:{id:string;label:string}[]};
 /** The author may reveal a read-only copy of the SOURCE question above the
  * aggregated results. Never infer grading keys or send the source to viewers. */
+export function resultSourceTitleVisible(result:Pick<StatisticalWidget,'showSourceQuestion'|'showSourceTitle'>):boolean {return result.showSourceTitle??result.showSourceQuestion===true;}
+export function resultSourceAnswersVisible(result:Pick<StatisticalWidget,'showSourceQuestion'|'showSourceAnswers'>):boolean {return result.showSourceAnswers??result.showSourceQuestion===true;}
 export function linkedResultQuestion(result:StatisticalWidget,source:StatisticalWidget):{part:SourceQuestionPart;questionId:string}|undefined{
- if(result.showSourceQuestion!==true)return undefined;
+ if(result.showSourceQuestion!==true&&result.showSourceTitle!==true&&result.showSourceAnswers!==true)return undefined;
+ if(!resultSourceTitleVisible(result)&&!resultSourceAnswersVisible(result))return undefined;
  const questionId=result.targetQuestionId||'';
  const part=questionId?source.questions?.find(q=>q.id===questionId):source;
  if(!part)return undefined;

@@ -37,5 +37,7 @@ test('all five presenter file-picker entry points use the same validated MIME re
   assert.ok(body.startsWith(`async function ${name}(`),name);
   assert.match(body.slice(0,1350),/mediaUploadMime\(file,\s*'(?:asset|image)'\)|mediaUploadMime\(file,kind\)/,name);
  }
- assert.match(editor,/headers:\{'Content-Type':mime\},body:file/g);
+ assert.match(editor,/const send=\(acceptRename:boolean\)=>fetch\(endpoint/);
+ assert.match(editor,/'X-Quorivio-Filename':encodeURIComponent\(file.name\)/);
+ assert.match(editor,/const saved=await uploadNamedFile\(file,mime,'assets'\)/);
 });

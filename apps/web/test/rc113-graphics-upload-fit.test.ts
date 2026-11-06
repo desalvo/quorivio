@@ -15,11 +15,11 @@ test('logo and backgrounds support JPEG selected by desktop OS file picker with 
  assert.equal(mediaUploadMime({name:'movie.mp4',type:''},'video'),'video/mp4');
  assert.equal(mediaUploadMime({name:'not-png.html',type:''},'logo'),null);
  assert.match(web,/setAutoSaveBlockedSignature\(''\);setPageSaveError\(''\);await refreshAssets/);
- assert.match(web,/headers:\{'Content-Type':mime\},body:file/);
+ assert.match(web,/headers:\{'Content-Type':mime,'X-Quorivio-Filename':encodeURIComponent\(file.name\)/);
 });
 test('double click starts inline editing without auto-opening the inspector',()=>{
  assert.match(web,/onDoubleClick=\{e=>\{if\(\(e\.target as HTMLElement\)\.closest\(\x27\[contenteditable=true\]\x27\)\)return;const targetField=/);
- assert.match(web,/setSelectedWidgets\(\[w\.id\]\);setRibbonDismissed\(false\);setContextWidget\(null\);/);
+ assert.match(web,/setSelectedWidgets\(\[w\.id\]\);setRibbonDismissed\(true\);setContextWidget\(null\);/);
  assert.match(web,/data-widget-text-field/);
  assert.match(web,/Proprietà widget<\/button>/);
 });

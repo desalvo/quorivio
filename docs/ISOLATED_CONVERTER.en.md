@@ -10,3 +10,6 @@ Store `QUORIVIO_WORKER_TOKEN` in `existingSecret`. The API and worker share a po
 
 ## Status and limitations
 Python worker path and protocol tests pass, but a real Compose/Helm worker runtime is untested. Conversion binaries need to be tested in the container with representative documents. Animations are not preserved. Monitor and protect the scratch volume. Do not treat this as production validated before browser/PostgreSQL integration, cluster tests and container isolation checks.
+
+## Administrator UI (RC220)
+Sign in as a `platform_admin`, open **Server configuration → Isolated PDF/PowerPoint converter**, check worker status, then enable importing. The button is disabled when the deployment flag, internal worker URL, token or health check is missing. Configure and restart the deployment first; the UI never starts a container or exposes credentials. The preference is stored in PostgreSQL and applies to all API replicas.

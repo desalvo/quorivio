@@ -63,6 +63,8 @@ test('live projection uses the same cross-page resolver with the source activity
  assert.match(live,/results temporarily|Risultati temporaneamente non disponibili/);
  assert.match(live,/window\.setInterval\(\(\)=>void load\(\),3000\)/);
  assert.doesNotMatch(live,/liveRevision/,'live snapshot updates must not cancel every in-flight source stats HTTP request');
- assert.match(live,/linked-results-no-data|LinkedResultChart widget=\{widget\}/);
+ assert.match(live,/LinkedResultChart widget=\{\{\.\.\.widget,showCorrectAnswers:showCorrectLive\}\}/);
+ assert.match(live,/resultHasAnswerKey\(source,widget\.targetQuestionId/);
+ assert.match(live,/setShowCorrectLive\(e\.target\.checked\)/);
 
 });

@@ -1,3 +1,43 @@
+# Quorivio 0.1.0-dev — RC227 — Sfondi schemi accessibili e rotazione smartphone
+
+**RC227:** La barra schemi offre un unico pulsante **Sfondi** con icona, nome e tooltip; le miniature con nomi file si aprono in una finestra accessibile e scorrevole, chiudibile anche con Escape, senza espandere la barra. La vista smartphone dei partecipanti si aggiorna al ridimensionamento/rotazione finché non si sceglie manualmente 16:9, smartphone o lettura accessibile. Frontend Node 398/398, Python RC227/RC226 9/9, Chromium 4 viewport e parsing TypeScript TSX senza errori. La build React, i test PostgreSQL e la full CI GitHub RC227 sono da verificare. Ultima full CI verde RC219 `42197607753`; completamento certificato **85,25%** (43 accettati/17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Vedi `docs/RC_CYCLE227_MASTER_BACKGROUND_PHONE_ROTATION.it.md`.
+
+---
+# Quorivio 0.1.0-dev — RC226 — Studio mobile e barra schemi
+
+**RC226:** Editor schemi con icone, nomi e tooltip nei comandi, stessa grafica e colori delle widget dell’editor pagine; scelta iniziale automatica della vista smartphone per i partecipanti. Dashboard/sessioni, editor pagine, schemi, tabelle e anteprima presentatore adattati entro 760px, desktop invariato. Test locali API 628, web 394, Python 30, Chromium CSS a 4 dimensioni; full React/CI da certificare. Ultima full CI verde RC219 `42197607753`, certificato **85,25%** (43 accettati/17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Dettagli `docs/RC_CYCLE226_RESPONSIVE_STUDIO.it.md`.
+
+---
+# Quorivio 0.1.0-dev — RC225 — Allegati nominati e selezione visiva sfondi
+
+**RC225:** Allegati e libreria usano nomi originali con conferma e suffisso numerico per i duplicati; rinomina e cancellazione immediata senza falso errore JSON 204. Sfondo globale visibile nell’editor degli schemi; miniature nominate per scegliere sfondi in tutte le viste. Conservati i nomi anche nelle copie di sessione e negli archivi portabili. Test API 628, web 390, Python RC225 e Chromium CSS verde. Ultima full CI verde RC219 `42197607753`; RC220–225 da verificare. Certificato **85,25%** (43 accettati, 17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Vedi `docs/RC_CYCLE225_ASSET_LIBRARY_AND_SCHEME.it.md`.
+
+---
+# Quorivio 0.1.0-dev — RC224 — Menu miniature accessibile e font Arial predefinito
+
+**RC224:** Menu contestuale miniature in portale con gruppi espandibili accessibili e altezza calcolata dai bordi reali della finestra. Verificato Arial di default per tutti i 20 tipi di widget in editor pagine e schemi, senza sovrascrivere i font personalizzati. Test locali verdi: 625 API, 390 frontend, 54 Python, Chromium su 4 risoluzioni. Ultima CI completamente verde RC219 `42197607753`; RC220–224 in attesa della CI integrata. Certificato **85,25%** (43 accettati, 17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Vedi `docs/RC_CYCLE224_THUMBNAIL_MENU_AND_ARIAL.it.md`.
+
+---
+# Quorivio 0.1.0-dev — RC223 — Formato contestuale e correzioni layout widget
+
+**RC223:** Il Formato si apre solo dal menu contestuale, con schede Testo/Bordi/Effetti/Contenuti/Collegamenti; il footer rispetta gli allineamenti orizzontali e verticali, la URL QR rimane su una riga scorribile e il numero partecipanti si dimensiona in funzione della widget. Test locali API/frontend e geometria Chromium verificati. Ultima full CI verde RC219 `42197607753`, RC220–223 da convalidare. Certificato **85,25%** (43 accettati e 17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Vedi `docs/RC_CYCLE223_CONTEXT_FORMAT_AND_STAGE_LAYOUT.it.md`.
+
+---
+# Quorivio 0.1.0-dev — RC222 — Formato widget compatto e risposte coerenti
+
+**RC222:** Compattata la finestra Formato widget (~101 px nelle prove CSS Chromium a 1440/390 px); su smartphone si scorrono orizzontalmente i gruppi e la formattazione dei singoli testi risultati è espandibile. Le opzioni di risposta singole/multiple nell’editor vanno a capo, usano Arial di default e recepiscono il cambio font “Widget intero” anche per sottodomande e rich-text. Ultima full CI verde RC219 (`42197607753`); RC220–222 da confermare. Certificato **85,25%** (43 gate accettati, 17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Dettagli `docs/RC_CYCLE222_EDITOR_FORMAT_PARITY.it.md`.
+
+---
+# Quorivio 0.1.0-dev — RC221 — Vero/falso, formati indipendenti e import PDF
+
+**RC221:** RC221 integra switch privato sul risultato vero/falso in editor/presentatore, formattazione indipendente per testo domanda, opzioni e righe statistiche, e scelta preliminare tra import PDF/PPTX come immagini fedeli o elementi parzialmente editabili su worker isolato. Ultima full CI verde RC219 `42197607753`; RC220/RC221 da confermare. Certificato **85,25%** (43 gate accettati, 17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Dettagli `docs/RC_CYCLE221_RESULTS_GRADING_AND_PDF_IMPORT.it.md`.
+
+---
+# Quorivio 0.1.0-dev — RC220 — Configurazione PDF e formattazione risultati collegati
+
+**RC220:** La RC219 è totalmente verde in GitHub Actions `42197607753`: 14 job conclusi con successo (tre job per immagini e pubblicazione finale saltati). La RC220 aggiunge un pannello amministrativo per il worker PDF/PPTX isolato con diagnostica, prerequisiti e abilitazione/disabilitazione persistente; separa titolo e risposte della sorgente collegata, con pallini, grassetto e colore personalizzabile del testo domanda. La full CI RC220 è ancora da verificare. Completamento certificato **85,25%** (43 gate accettati, 17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit, push o tag dell’assistente. Dettagli in `docs/RC_CYCLE220_PDF_WORKER_AND_LINKED_RESULTS.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC219 — Ripristino scoperta globale dei test Python
 
 **RC219:** La CI RC218 (`42194028262`) ha raggiunto la suite globale `unittest discover` (2.115 test: 4 failure, 2 errori). Corretti due import relativi RC214 che fallivano solo con i nomi modulo della discovery e quattro contratti storici non aggiornati (navigazione protetta dalle modifiche non salvate, formattazione condivisa del numero pagina, sottolineatura e barratura indipendenti). Aggiunti test negativi e verifica pre-npm in entrambe le modalità; nessuna modifica al runtime. Verifica full RC219 ancora richiesta; ultima full verde RC203. **85,25%** (43 accettati, 17 parziali), `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Dettagli `docs/RC_CYCLE219_FULL_DISCOVERY_RECONCILIATION.it.md`.

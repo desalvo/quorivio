@@ -1,5 +1,7 @@
 # Quorivio 0.1.0-dev
 
+> **RC220:** RC219 is the last full-green CI baseline (run `42197607753`). RC220 adds the **Server configuration → Isolated PDF/PowerPoint converter** administrator panel and separate linked-results source title/answers. See `docs/RC_CYCLE220_PDF_WORKER_AND_LINKED_RESULTS.en.md`. Full RC220 CI remains pending.
+
 > **RC readiness (2 November 2026):** RC135 passed the complete GitHub CI campaign (run 41437489546). The formal RC is **not approved**: 43/60 gates accepted, 17 partial; certified 85.25%. Follow [`docs/RC136_EXTERNAL_ACCEPTANCE_EN.md`](docs/RC136_EXTERNAL_ACCEPTANCE_EN.md) for the private, independently reviewed evidence packet. Do not commit operator evidence or infer legal/physical-device certification from CI.
 
 ## Historical development checkpoints
@@ -188,3 +190,4 @@ On a push to `main`, the message controls which checks run:
 - `[publish-docker]`: automatically requests the full campaign; **only after every required gate is successful**, publishes multi-arch `desalvo/quorivio:sha-<12>` and `desalvo/quorivio:latest` via the protected `production` environment. Do not use it unless you explicitly intend to update `latest`.
 
 Manual `workflow_dispatch` with `rc_acceptance_suite=true` never publishes, even if a publish checkbox was previously selected. Manual `publish_image` remains separate. PRs, non-main pushes and incomplete checks cannot trigger publication. Configure `DOCKERHUB_USERNAME` (variable) and `DOCKERHUB_TOKEN` (secret) and any desired required reviewers on the `production` environment.
+**RC221:** choose **visual-fidelity image slides** or **partially editable elements** before PDF/PPTX import. Native PDF text and extractable raster images use the isolated worker. Presenter result widgets now offer private true-answer highlighting and per-text typography. See `docs/RC_CYCLE221_RESULTS_GRADING_AND_PDF_IMPORT.en.md`.

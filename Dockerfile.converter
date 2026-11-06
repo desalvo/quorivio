@@ -20,7 +20,7 @@ RUN set -eux; \
     chown converter:converter /conversions
 WORKDIR /app/tools
 RUN pip install --no-cache-dir python-pptx==1.0.2 'Pillow>=11,<14' qrcode==8.2
-COPY tools/import_presentation.py tools/conversion_worker.py tools/pptx_portable.py ./
+COPY tools/import_presentation.py tools/conversion_worker.py tools/pptx_portable.py tools/pdf_portable.py ./
 USER converter
 ENV PYTHONDONTWRITEBYTECODE=1 QUORIVIO_CONVERSION_DIR=/conversions
 EXPOSE 8099

@@ -1,0 +1,18 @@
+# Quorivio 0.1.0-dev — RC221: result grading and partial editable PDF import
+
+## Baseline and scope
+RC219 is the last verified full-green CI campaign: [run 42197607753](https://github.com/desalvo/quorivio/actions/runs/42197607753) with 14 successful jobs. RC220 has no verified full CI yet. RC221 remains `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Functional gate score stays **85.25% (43 accepted, 17 partial)** until a full campaign and application acceptance. No automated git commit, push, release or publication.
+
+## Results widgets
+- A results widget targeting a single/multiple-choice question or a timed quiz with an authored answer key exposes **Show true answers** below the result widget in the editor, in the properties, and on the private live presenter stage. The switch defaults off. Private presenter interaction is temporary; editor changes can be saved with the page design. Truth highlighting marks correct choices with a green accent and `✓ Vero` without changing submitted answers.
+- Source title, each selected source question, each choice, and each chart/result label have independent font family, size, color, bold, italic, underline and strikethrough settings in **Widget Format**, persisted in validated `resultTextStyles`. The same choice IDs in separate subquestions have independent keys. Existing source-rich formatting remains as fallback if no result override is set. A question defaults to blue; source options default to bold.
+- Keys are never supplied to participant snapshots, and participant projection filters out results widgets. The API permits result-specific fields only for a `results-button` widget, restricts style keys and limits all CSS values to validated enums/hex/booleans/bounded integers.
+
+## PDF/PPTX import choice
+- The PDF/PPTX file selector opens a **mode choice before upload/conversion**. **Images (visual fidelity)** uses the established isolated converter, importing each page to the active session as a flattened image slide. **Editable elements (partial fidelity)** opens a new session via the existing private `/api/presentations/import-editable` endpoint.
+- PDFs now have a real isolated worker conversion path: Poppler `pdftohtml -xml` recovers native text boxes with layout and colors, plus extractable raster images as separately movable/editable image widgets. Content limits: 50 MiB source, 200 pages, max 16 editable widgets per page, 200 images and 50 MiB extracted assets. Complex vectors, charts, tables, embedded content, full font fidelity, scanned text and annotations do **not** become editable; no OCR is attempted. Images can be repositioned but pixels are not editable. No unverified promise of full PDF editability.
+- Private worker isolation, opaque job IDs, file and manifest bounds, PDF signature validation, source digest recheck, authenticated presenter route, malware scanning, admin-enabled worker and scoped asset import are retained. No arbitrary server-side subprocess path is opened to the user.
+
+## CI and remaining verification
+- Pre-npm RC221 Python/Node guards cover selection before conversion, private worker boundaries, source style validation, correct-answer visibility, and legacy compatibility. The editor and API suites, release inventory and SHA-256 ZIP closure must pass locally before packaging.
+- Outstanding: GitHub full CI RC221; real deployed worker PDF/PPTX import acceptance with representative native text, raster pictures, vector content, scanned documents and both import modes; visual browser testing with linked questions from other pages; security review of PDF parsing limits.

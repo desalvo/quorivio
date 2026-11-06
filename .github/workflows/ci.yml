@@ -212,6 +212,59 @@ jobs:
             test_rc_cycle198_answer_decorations.py; do
             PYTHONPATH=tools python3 -m unittest discover -s tools/tests -p "$case" -q
           done
+      # RC220: catch missing private converter prerequisites and linked-results
+      # schema/visual contract drift before npm and browser integration.
+      - name: RC220 PDF worker administration and linked result rendering before npm
+        run: |
+          python3 -m unittest tools.tests.test_rc220_converter_and_linked_results tools.tests.test_rc192_source_and_delete tools.tests.test_rc196_frontend_results_types -q
+          node --experimental-strip-types --test \
+            apps/api/test/converter-admission.test.ts \
+            apps/api/test/rc220-results-configuration.test.ts \
+            apps/web/test/rc220-source-sections.test.ts
+      # RC221: validate PDF editable/import-as-image choice, bounded private
+      # Poppler worker, author-only truth overlay and independently saved styles.
+      - name: RC221 PDF editable choices and per-result grading formatting before npm
+        run: |
+          python3 -m unittest tools.tests.test_rc221_pdf_editable_and_results -q
+          node --experimental-strip-types --test \
+            apps/api/test/rc221-results-validation.test.ts \
+            apps/web/test/rc221-results-format.test.ts
+      # RC222: prevent stale editor-only nowrap/Arial bugs and tall formatting bars
+      # before npm, real Chromium then covers both 1440px and mobile widths.
+      - name: RC222 compact formatting and answer-option typography before npm
+        run: |
+          python3 -m unittest tools.tests.test_rc222_compact_editor_answers tools.tests.test_rc205_editor_consistency -q
+          node --experimental-strip-types --test \
+            apps/web/test/rc222-editor-compact-answer-format.test.ts \
+            apps/web/test/rc193-font-focus.test.ts
+      # RC223: format opens only from the widget context menu; border/effects,
+      # content visibility and linked-source tabs must keep verified contracts.
+      - name: RC223 contextual formatter and responsive widget layout before npm
+        run: |
+          python3 -m unittest tools.tests.test_rc223_format_layout tools.tests.test_rc222_compact_editor_answers -q
+          node --experimental-strip-types --test apps/web/test/rc223-format-footer-qr.test.ts
+      # RC224: all page/scheme widget defaults Arial, no clipped thumbnail actions.
+      - name: RC224 viewport-safe thumbnail menu and Arial defaults before npm
+        run: |
+          python3 -m unittest tools.tests.test_rc224_thumbnail_arials -q
+          node --experimental-strip-types --test apps/web/test/rc224-thumbnail-menu-arial.test.ts
+      # RC225: surface filenames, refuse accidental overwrites and render image thumbnails.
+      - name: RC225 asset filenames, delete recovery and schema background before npm
+        run: |
+          python3 -m unittest tools.tests.test_rc225_asset_library_and_scheme -q
+          node --experimental-strip-types --test apps/api/test/file-display-names.test.ts
+      # RC226: master ribbon icon/caption parity, mobile presenter studio and
+      # automatic participant phone layout must be checked before npm.
+      - name: RC226 responsive presenter and master editor contracts before npm
+        run: |
+          python3 -m unittest tools.tests.test_rc226_master_mobile_ui tools.tests.test_rc224_thumbnail_arials -q
+          node --experimental-strip-types --test apps/web/test/rc226-participant-device.test.ts
+      # RC227: accessible compact master background chooser and responsive
+      # participant rotation, preserving explicit manual screen mode selection.
+      - name: RC227 schema backgrounds and mobile participant mode before npm
+        run: |
+          python3 -m unittest tools.tests.test_rc227_background_phone tools.tests.test_rc226_master_mobile_ui -q
+          node --experimental-strip-types --test apps/web/test/rc227-scheme-background-and-phone.test.ts apps/web/test/rc173-public-slide-fidelity.test.ts
       - name: RC218 real editor thumbnail rename browser contract before npm
         run: python3 -m unittest tools.tests.test_rc218_browser_postgres_thumbnail_rename -q
       # RC215: RC141 compared a glyph Range top with an output border-box
@@ -625,6 +678,14 @@ jobs:
           python3 tools/ci_rc134_projection_answer_chromium.py
           # RC141: reaction buttons, native checkboxes and hidden titles across four stage shells.
           python3 tools/ci_rc141_widget_parity_chromium.py
+          # RC222 browser-computed text wraps and compact format controls.
+          python3 tools/ci_rc222_format_widget_chromium.py
+          # RC223: real browser-computed footer/QR/counter geometry on desktop/phone.
+          python3 tools/ci_rc223_widget_layout_chromium.py
+          python3 tools/ci_rc224_thumbnail_menu_chromium.py
+          python3 tools/ci_rc225_asset_gallery_chromium.py
+          python3 tools/ci_rc226_responsive_studio_chromium.py
+          python3 tools/ci_rc227_background_gallery_chromium.py
           # RC159: browser-computed lifecycle colors and readable rating comment fields.
           python3 tools/ci_rc159_presenter_visual_chromium.py
           python3 tools/ci_rc159_live_preview_parity_chromium.py
@@ -1326,7 +1387,15 @@ jobs:
           python3 tools/verify_rc_cycle216_inventory.py --historical
           python3 tools/verify_rc_cycle217_inventory.py --historical
           python3 tools/verify_rc_cycle218_inventory.py --historical
-          python3 tools/verify_rc_cycle219_inventory.py
+          python3 tools/verify_rc_cycle219_inventory.py --historical
+          python3 tools/verify_rc_cycle220_inventory.py --historical
+          python3 tools/verify_rc_cycle221_inventory.py --historical
+          python3 tools/verify_rc_cycle222_inventory.py --historical
+          python3 tools/verify_rc_cycle223_inventory.py --historical
+          python3 tools/verify_rc_cycle224_inventory.py --historical
+          python3 tools/verify_rc_cycle225_inventory.py --historical
+          python3 tools/verify_rc_cycle226_inventory.py --historical
+          python3 tools/verify_rc_cycle227_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

@@ -39,7 +39,7 @@ test('RC162 QR title defaults hidden, URL is optional, and validation rejects wr
  assert.equal(validPageDesign({widgets:[{id:'q',kind:'qr',showQrUrl:'false'}]}),false);
  assert.equal(validPageDesign({widgets:[{id:'s',kind:'shape',showQrUrl:false}]}),false);
  assert.match(ui,/widget\.showTitle===true&&<strong><WidgetStyledText text=\{widget\.label\|\|'Accesso partecipanti'\}/);
- assert.match(ui,/widget\.showQrUrl!==false&&<span className="participant-qr-url"/);
+ assert.match(ui,/widget\.showQrUrl!==false&&<a className="participant-qr-url"/);
  assert.match(ui,/checked=\{w\.showQrUrl!==false\}/);
  assert.match(ui,/kind:k,\.\.\.\(k==='qr'\?\{showTitle:false,showQrUrl:true\}/);
 });

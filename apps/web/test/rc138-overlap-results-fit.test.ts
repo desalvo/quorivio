@@ -23,7 +23,7 @@ test('RC138: shrinking lower edge disables auto fit rather than rescaling the re
  assert.equal(next[0].autoFit,false);
  assert.equal(original[0].position.height,40);
  assert.match(main,/aria-label="Ridimensionamento automatico contenuto risultati"/);
- assert.match(main,/allowScale=\{w.kind!=='results-button'\|\|w.autoFit!==false\}/);
+ assert.match(main,/allowScale=\{!\['qr','participant-count'\]\.includes\(w\.kind\)\&\&\(w\.kind!=='results-button'\|\|w\.autoFit!==false\)\}/);
  assert.match(css,/widget-fit-frame\[data-fit-mode="scroll"\] \.linked-results/);
 });
 test('RC138: presenter-owned results are aggregate only and never include answer identity',()=>{

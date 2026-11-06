@@ -1,3 +1,43 @@
+# Quorivio 0.1.0-dev — RC227 — Accessible background and responsive participant handoff
+
+**RC227:** Continue from this cumulative archive, preserving RC226. The master ribbon opens the named, scrollable image library from a compact accessible icon command instead of embedding all thumbnails. Keyboard focus is trapped/restored, with Escape to close. Participant phone layout adapts to orientation/width until a manual 16:9, smartphone or reading selection overrides it. 398 web Node, 9 targeted Python, four Chromium fixture sizes and TSX syntax parsing pass. Full compiled React, PostgreSQL and integrated GitHub CI remain required. Last full-green CI RC219 `42197607753`; certified **85.25%** (43 accepted/17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag. See `docs/RC_CYCLE227_MASTER_BACKGROUND_PHONE_ROTATION.en.md`.
+
+---
+# Quorivio 0.1.0-dev — RC226 — Responsive studio handoff
+
+**RC226:** All RC225 sources retained; accessible icon/caption master ribbon and shared widget colors, phone-default participant projection and mobile-safe studio, session selection/dashboard, editors and preview. No changes to API, database or permissions. Node API 628, web 394, focused Python 30, four representative CSS Chromium layouts passed; full compiled React and GitHub CI pending. Last green CI RC219 `42197607753`; **85.25%** certified (43 accepted/17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag. `docs/RC_CYCLE226_RESPONSIVE_STUDIO.en.md`.
+
+---
+# Quorivio 0.1.0-dev — RC225 — Asset library handoff
+
+**RC225:** Preserves RC224 cumulative. Safe persistent filenames, server-enforced duplicate prompts, asset rename/delete with 204-aware immediate refresh, thumbnail-and-name background galleries, and proper master background preview. DB migration and portable bundle metadata retain names and exempt library copies from duplicate checks. Local API 628/frontend 390, RC225 Python and Chromium CSS green. Full CI required; last green RC219 `42197607753`. **85.25%** certified (43 accepted/17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag. `docs/RC_CYCLE225_ASSET_LIBRARY_AND_SCHEME.en.md`.
+
+---
+# Quorivio 0.1.0-dev — RC224 — Thumbnail context menu and Arial defaults handoff
+
+**RC224:** Based on RC223, keeps all historical functionality while organizing thumbnail actions into keyboard/touch expandable groups with true viewport-clamped internal scrolling. Tested all new canvas/scheme widgets for Arial effective defaults without breaking customized title/master fonts. Node API/web, targeted Python and actual CSS Chromium viewport fixtures pass; compiled React and PostgreSQL full CI still pending. Last green RC219 run `42197607753`; certified **85.25%**, 43 accepted/17 partial. `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no assistant commit/push/tag. See `docs/RC_CYCLE224_THUMBNAIL_MENU_AND_ARIAL.en.md`.
+
+---
+# Quorivio 0.1.0-dev — RC223 — Context format, footer, QR and participant count handoff
+
+**RC223:** Cumulative RC222+ code. Format panel opens only on context-menu Format, is tabbed and responsive, preserves complete server-validated border/effect/content/source link settings. Authored footer alignments, reserved QR URL row and self-sized participant counter corrected. Local Node/API/Python and two-size Chromium CSS fixture acceptance run; compiled React and full PostgreSQL CI pending. Last green GitHub CI RC219 `42197607753`, certified **85.25%**, 43 accepted/17 partial. `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag. See `docs/RC_CYCLE223_CONTEXT_FORMAT_AND_STAGE_LAYOUT.en.md`.
+
+---
+# Quorivio 0.1.0-dev — RC222 — Compact format and editor answer handoff
+
+**RC222:** Base RC221 preserved; format toolbar vertically compact with phone swipe; corrected editor-only choice glyph spans (`white-space`/ellipsis) and applied normalized Arial/whole-widget answer font to main choices and subquestions. Test coverage: full API/web Node, Python source contracts, Chrome stylesheet fixture (1440/390), historical inventories and release headers. Full RC222 CI and genuine production server browser test pending. Last fully green RC219 `42197607753`. **85.25%**, 43 accepted/17 partial. `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no assistant commit/push/tag. See `docs/RC_CYCLE222_EDITOR_FORMAT_PARITY.en.md`.
+
+---
+# Quorivio 0.1.0-dev — RC221 — Results and PDF handoff
+
+**RC221:** Last verified full-green campaign **RC219** `42197607753`. RC221 adds owner-only result truth controls, independently styled source questions and options, and preselected image-fidelity or partial editable PDF/PPTX import through a private Poppler worker. RC220/221 require full CI. **85.25%**, 43 accepted/17 partial. `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag/release. See `docs/RC_CYCLE221_RESULTS_GRADING_AND_PDF_IMPORT.en.md`.
+
+---
+# Quorivio 0.1.0-dev — RC220 — PDF converter administration and linked-results formatting
+
+**RC220:** RC219 fully green on GitHub run `42197607753`: 14 successful jobs (three final-image/publication jobs skipped). RC220 adds a platform-admin panel for an isolated PDF/PPTX worker with readiness checks, deployment prerequisites and persistent enable/disable control; separately configurable linked source title and answers, with bullet-prefixed bold responses and distinct customizable question colour. New full RC220 CI still pending. Certified **85.25%** (43 accepted, 17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit, push or tag. See `docs/RC_CYCLE220_PDF_WORKER_AND_LINKED_RESULTS.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC219 — Full Python discovery and historical contract reconciliation
 
 **RC219:** RC218 full CI (`42194028262`) reached the global `unittest discover` suite (2,115 cases: four failures and two import errors). Fixed two RC214 helper imports that broke under bare-module discovery and four stale contracts for unsaved page navigation, shared footer-number formatting, and independent answer underline/strikethrough. Added fail-closed negative mutations and early pre-npm testing in both import modes; application runtime unchanged. Full RC219 CI pending; last fully green RC203. Certified **85.25%** (43 accepted, 17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. See `docs/RC_CYCLE219_FULL_DISCOVERY_RECONCILIATION.en.md`.

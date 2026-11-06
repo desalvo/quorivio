@@ -15,6 +15,7 @@ import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from import_presentation import convert
 from pptx_portable import pptx_to_portable, portable_to_pptx, inspect_pptx_fidelity
+from pdf_portable import pdf_to_portable
 
 ROOT = pathlib.Path(os.path.abspath(os.environ.get('QUORIVIO_CONVERSION_DIR', '/conversions')))  # Do not resolve away a symlink before checking it
 TOKEN = os.environ.get('QUORIVIO_WORKER_TOKEN', '')
@@ -117,7 +118,9 @@ def execute_portable_job(job, mode):
         except FileExistsError as exc:
             raise ValueError('job already running') from exc
         if mode == 'import':
-            source = workspace / 'source.pptx'
+            sources=[p for p in (workspace / 'source.pptx',workspace / 'source.pdf') if p.is_file() and not p.is_symlink()]
+            if len(sources)!=1:raise ValueError('expected one editable source')
+            source=sources[0]
             destination = workspace / 'portable.json'
             media = workspace / 'import-media'
             if (not source.is_file() or source.is_symlink() or
@@ -126,7 +129,7 @@ def execute_portable_job(job, mode):
                 raise ValueError('invalid import source or existing output')
             source_digest = _source_digest(source)
             staged_media = pathlib.Path(tempfile.mkdtemp(prefix='.import-media-', dir=workspace))
-            result = pptx_to_portable(source, media_dir=staged_media)
+            result, fidelity = pdf_to_portable(source, media_dir=staged_media) if source.suffix=='.pdf' else (pptx_to_portable(source, media_dir=staged_media), inspect_pptx_fidelity(source))
             encoded = json.dumps(result, ensure_ascii=False, allow_nan=False).encode('utf-8')
             if len(encoded) > 2 * 1024 * 1024:
                 raise ValueError('portable definition too large')
@@ -134,9 +137,8 @@ def execute_portable_job(job, mode):
             with staged_file.open('xb') as stream:
                 os.chmod(staged_file, 0o600)
                 stream.write(encoded)
-            fidelity = inspect_pptx_fidelity(source)
             if _source_digest(source) != source_digest:
-                raise ValueError('PowerPoint source changed during import')
+                raise ValueError('Presentation source changed during import')
             if media.exists() or media.is_symlink():
                 raise ValueError('import media already exists')
             staged_media.rename(media)

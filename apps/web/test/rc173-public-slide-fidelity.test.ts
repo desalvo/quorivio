@@ -31,10 +31,10 @@ test('RC173 participant page paints the authored background once (stage only), n
  assert.match(css,/main\.participant-live-view\{background-image:none!important;background-color:transparent!important\}/);
 });
 
-test('RC173 accessible reading is a separate linear white document, while phone customization is opt-in',()=>{
+test('RC173 accessible reading is a separate linear white document, while manually selected phone layout overrides automatic resizing',()=>{
  assert.match(participant, /participantReadingMode\?\{backgroundImage:"none",backgroundColor:"#ffffff",backgroundSize:"auto"\}/);
- assert.match(participant,/aria-pressed=\{participantReadingMode\} onClick=\{\(\)=>\{setParticipantReadingMode\(true\);setParticipantPhoneMode\(false\)\}\}>Lettura accessibile/);
- assert.match(participant,/onClick=\{\(\)=>\{setParticipantReadingMode\(false\);setParticipantPhoneMode\(true\)\}\}>Layout smartphone/);
+ assert.match(participant,/aria-pressed=\{participantReadingMode\} onClick=\{\(\)=>\{setParticipantModeExplicit\(true\);setParticipantReadingMode\(true\);setParticipantPhoneMode\(false\)\}\}>Lettura accessibile/);
+ assert.match(participant,/onClick=\{\(\)=>\{setParticipantModeExplicit\(true\);setParticipantReadingMode\(false\);setParticipantPhoneMode\(true\)\}\}>Layout smartphone/);
  assert.match(ui,/const audiencePortrait=joinPath&&participantPhoneMode&&!participantReadingMode/);
  assert.match(css,/stage-reading\{\s*background:#fff!important;background-image:none!important/);
  assert.match(css,/stage-reading>\.page-widget:is\(\[data-widget-kind="shape"\],\[data-widget-kind="line"\]\)\{display:none!important\}/);

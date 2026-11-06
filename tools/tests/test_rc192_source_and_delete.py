@@ -37,7 +37,9 @@ class SourceAndDelete(unittest.TestCase):
   self.assertIn("w.showSourceQuestion===undefined",DOMAIN)
   self.assertIn('result.showSourceQuestion!==true',RESULTS)
   self.assertIn('linkedResultQuestion(result,source)',UI)
-  self.assertIn('Mostra titolo e risposte della domanda sorgente',UI)
+  self.assertIn('Mostra titolo della widget collegata',UI)
+  self.assertIn('Mostra risposte della widget collegata',UI)
+  self.assertIn('showSourceQuestion:e.target.checked',UI)
   self.assertIn('question:'+"'"+'+questionId',UI)
  def test_live_and_rehearsal_reuse_single_results_renderer(self):
   self.assertIn('function LinkedResultSourceQuestion(',UI)

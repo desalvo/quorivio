@@ -2687,3 +2687,499 @@ body .editor-floating-panel.widget-selection-palette [aria-label="Formato numero
  font-size:var(--q-phone-answer-font-size,18px)!important;
  line-height:1.35!important;
 }
+
+/* RC220: the linked source heading, question and answers have distinct roles.
+ * Preserve word wrapping, original rich text and readable contrast. */
+.linked-results>.linked-source-question{order:-1;display:block;padding-top:.1em}
+.linked-source-question-title{display:block;font-size:1.2em;line-height:1.35;white-space:pre-wrap;overflow-wrap:anywhere}
+.linked-source-question-title:not([data-result-custom]){font-size:1.2em!important;font-weight:800!important;line-height:1.35;margin:0 0 .5em;white-space:pre-wrap;overflow-wrap:anywhere}
+.linked-source-question-prompt{display:block;font-weight:750;white-space:pre-wrap;overflow-wrap:anywhere;margin:.15em 0 .4em}
+.linked-source-answer.widget-answer-option{display:block!important;white-space:pre-wrap!important;overflow-wrap:anywhere!important}
+.linked-source-answer.widget-answer-option:not([data-result-custom]){font-weight:750!important;white-space:pre-wrap!important;overflow-wrap:anywhere!important}
+.linked-source-answer.widget-answer-option:not([data-result-custom]) strong{font-weight:800!important}
+.linked-source-question-title:not([data-result-custom]) :is(span,strong){font-weight:800!important}
+.linked-source-question-prompt :is(span,strong){color:inherit!important}
+.linked-source-answer.widget-answer-option:not([data-result-custom]) :is(span,strong){font-weight:800!important}
+
+/* RC221: explicit, private grading overlay and individually formatted result text. */
+.linked-source-answer-true,.linked-results-row.linked-source-answer-true{background:rgba(22,163,74,.13);border-left:3px solid #16803d;padding-left:5px;border-radius:3px}
+.linked-answer-true-label{margin-left:8px;color:#126c35;font-size:.75em;font-weight:700;white-space:nowrap}
+.result-format-panel .result-format-fields{max-height:240px;overflow:auto;min-width:min(300px,80vw)}
+.result-format-field{display:flex;flex-wrap:wrap;gap:6px;padding:5px 8px;margin:3px;border:1px solid #cbd5e1;min-width:0}
+.result-format-field legend{font-size:12px;font-weight:700;max-width:265px;overflow-wrap:anywhere}
+.result-format-field label{display:flex;align-items:center;gap:3px;font-size:12px}
+.result-format-field input[type=number]{width:54px}
+
+.presentation-import-backdrop{position:fixed;inset:0;background:#0009;z-index:99999;display:grid;place-items:center;padding:12px}
+.presentation-import-dialog{background:#fff;color:#172554;border-radius:12px;padding:20px;max-width:min(530px,96vw);max-height:95vh;overflow:auto;display:flex;flex-direction:column;gap:10px;box-shadow:0 16px 60px #0005}
+.presentation-import-dialog button{min-height:44px}
+
+.canvas-results-truth-toggle{position:absolute;left:3px;right:3px;top:100%;margin-top:3px;z-index:22;display:flex;align-items:center;gap:5px;background:#f0fdf4;border:1px solid #16a34a;border-radius:5px;padding:2px 5px;font-size:11px;cursor:pointer;color:#12522f;white-space:nowrap}
+.canvas-results-truth-toggle input{width:16px;height:16px;flex:0 0 16px;accent-color:#15803d}
+
+.presenter-results-truth-toggle{display:flex;align-items:center;gap:6px;margin-top:8px;padding:4px 6px;border:1px solid #16a34a;border-radius:5px;background:#f0fdf4;color:#14532d;font-size:.85em;cursor:pointer}
+.presenter-results-truth-toggle input{width:17px;height:17px;accent-color:#15803d;flex-shrink:0}
+
+/* RC222 — compact, two-dimensional floating format bar. Previous 44px label
+   minima and 320px scroll area made ordinary typography changes needlessly tall.
+   All controls remain keyboard accessible; advanced per-result formats unfold
+   only when requested. Mobile/short viewports retain bounded scrolling. */
+body .editor-floating-panel.widget-selection-palette{
+ padding:0!important;gap:0!important;border-radius:9px!important;
+ width:min(860px,calc(100vw - 16px))!important;
+ max-height:calc(100dvh - 16px)!important;
+}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-head{
+ min-height:27px!important;padding:3px 8px!important;gap:6px!important;
+ border-radius:8px 8px 0 0!important;
+}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-context{font-size:11px!important}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-selection{
+ white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;font-size:10px!important;
+}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-groups{
+ padding:4px 6px!important;gap:3px 4px!important;
+ max-height:calc(100dvh - 55px)!important;
+ align-items:center!important;align-content:flex-start!important;
+ overflow-x:hidden!important;overflow-y:auto!important;
+}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-group{
+ padding:2px 6px!important;gap:0!important;
+ border-right:1px solid #d8e0eb!important;
+}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-group-title{
+ display:none!important; /* Section aria-label already identifies the group. */
+}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-controls{
+ min-height:0!important;gap:3px!important;
+}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-group label{
+ min-height:0!important;padding:0!important;margin:0!important;
+ font-size:11px!important;line-height:1.15!important;
+}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-target label{
+ flex-direction:row!important;align-items:center!important;gap:4px!important;
+}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-group select,
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-group input[type=number]{
+ min-height:25px!important;height:25px!important;padding:2px 4px!important;
+}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-group button,
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-color{
+ min-height:27px!important;height:27px!important;min-width:27px!important;padding:2px 4px!important;
+}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-font-size{height:27px!important}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-font-stepper button{
+ min-height:12px!important;height:12px!important;padding:0!important;
+}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-target{min-width:0!important}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-target select{width:137px!important;max-width:137px!important}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-font-picker select{width:135px!important;max-width:135px!important}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-font-picker{gap:3px!important}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-font{max-width:310px!important}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-paragraph .palette-ribbon-controls,
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-shape .palette-ribbon-controls,
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-answer-types .palette-ribbon-controls{
+ flex-direction:row!important;align-items:center!important;flex-wrap:wrap!important;
+}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-help{display:none!important}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-answer-types{min-width:0!important}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-answer-types .palette-ribbon-answer{
+ display:inline-flex!important;align-items:center!important;gap:3px!important;
+}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-answer-types input[type=number]{
+ width:50px!important;min-width:50px!important;
+}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-advanced>summary{
+ cursor:pointer;white-space:nowrap;font-size:11px;font-weight:700;color:#254a74;
+ padding:5px 3px;min-height:27px;box-sizing:border-box;
+}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-advanced[open] .result-format-fields{
+ max-height:min(210px,40dvh)!important;overflow-y:auto!important;
+ min-width:min(300px,calc(100vw - 48px))!important;
+}
+@media(max-width:520px){
+ body .editor-floating-panel.widget-selection-palette .palette-ribbon-groups{gap:2px!important}
+ body .editor-floating-panel.widget-selection-palette .palette-ribbon-selection{display:none!important}
+}
+
+/* RC222 — answer typography belongs to each choice and not to the title.
+   The old broad `.canvas-widget-answer-preview span` nowrap/ellipsis selector
+   also targeted rich-text glyph spans and truncated 255-character answers.
+   These rules handle both main question and independent subquestions, and do
+   not touch rehearsal/presenter/participant (already correct). */
+.editor-ux-v2 .widget-canvas-item .canvas-widget-answer-preview[data-answer-mode],
+.editor-ux-v2 .widget-canvas-item .canvas-widget-answer-preview[data-answer-mode]>.widget-answer-option,
+.editor-ux-v2 .widget-canvas-item .canvas-subquestion-option{
+ font-family:var(--q-answer-font-family,Arial)!important;
+ font-size:var(--q-answer-font-size,inherit)!important;
+ min-width:0!important;max-width:100%!important;
+ white-space:normal!important;overflow:visible!important;text-overflow:clip!important;
+}
+.editor-ux-v2 .widget-canvas-item .canvas-widget-answer-preview[data-answer-mode]>.widget-answer-option>.widget-rich-inline,
+.editor-ux-v2 .widget-canvas-item .canvas-subquestion-option>.widget-rich-inline{
+ display:block!important;flex:1 1 0%!important;min-width:0!important;width:auto!important;
+ font-family:var(--q-answer-font-family,Arial)!important;
+ font-size:inherit!important;font-weight:inherit!important;font-style:inherit!important;
+ line-height:1.3!important;white-space:pre-wrap!important;overflow-wrap:anywhere!important;
+ overflow:visible!important;text-overflow:clip!important;
+}
+.editor-ux-v2 .widget-canvas-item .canvas-widget-answer-preview[data-answer-mode]>.widget-answer-option>.widget-rich-inline>span,
+.editor-ux-v2 .widget-canvas-item .canvas-subquestion-option>.widget-rich-inline>span{
+ display:inline!important;align-items:baseline!important;white-space:inherit!important;
+ overflow-wrap:anywhere!important;overflow:visible!important;text-overflow:clip!important;
+}
+
+/* On phones keep the same short ribbon; sideways swipe reveals all groups
+   instead of stacking a tall modal over the editing canvas. */
+@media(max-width:520px){
+ body .editor-floating-panel.widget-selection-palette .palette-ribbon-groups{
+  flex-wrap:nowrap!important;justify-content:flex-start!important;
+  overflow-x:auto!important;overflow-y:hidden!important;
+  scroll-snap-type:x proximity;overscroll-behavior-x:contain;
+ }
+ body .editor-floating-panel.widget-selection-palette .palette-ribbon-group{
+  flex:0 0 auto!important;scroll-snap-align:start;
+ }
+}
+
+/* RC223: footer uses the authored paragraph and vertical alignment in every
+ * surface. Older centered master/footer rules are not an override of format. */
+:is(.editor-ux-v2 .widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-widget-kind="footer"]{
+ align-items:stretch!important;justify-content:flex-start!important;
+}
+:is(.editor-ux-v2 .widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-widget-kind="footer"] .widget-fit-frame{
+ width:100%!important;height:100%!important;flex:1 1 auto!important;
+}
+:is(.editor-ux-v2 .widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-widget-kind="footer"] .widget-fit-content{
+ width:100%!important;height:100%!important;min-height:0!important;
+ display:flex!important;flex-direction:column!important;justify-content:flex-start!important;
+}
+:is(.editor-ux-v2 .widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-widget-kind="footer"][data-vertical-align="middle"] .widget-fit-content{justify-content:center!important}
+:is(.editor-ux-v2 .widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-widget-kind="footer"][data-vertical-align="bottom"] .widget-fit-content{justify-content:flex-end!important}
+:is(.editor-ux-v2 .widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-widget-kind="footer"] .widget-fit-content>.widget-rich-inline{
+ display:block!important;position:relative!important;left:auto!important;top:auto!important;
+ width:100%!important;max-width:100%!important;min-height:0!important;
+ flex:0 0 auto!important;text-align:inherit!important;transform:none!important;
+}
+:is(.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-widget-kind="footer"] .projection-slide-footer{
+ display:flex!important;flex-direction:column!important;justify-content:flex-start!important;
+ align-items:stretch!important;text-align:inherit!important;width:100%!important;height:100%!important;
+}
+:is(.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-widget-kind="footer"][data-vertical-align="middle"] .projection-slide-footer{justify-content:center!important}
+:is(.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-widget-kind="footer"][data-vertical-align="bottom"] .projection-slide-footer{justify-content:flex-end!important}
+:is(.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-widget-kind="footer"] .projection-slide-footer>.slide-footer-center{
+ display:block!important;width:100%!important;max-width:100%!important;
+ flex:none!important;text-align:inherit!important;
+}
+
+/* RC223: the formatter is opt-in through the context menu, with compact tabs
+ * instead of one tall stack of unrelated sections. Each tab exposes only its
+ * current controls, and the panel is bounded even on a short mobile display. */
+body .editor-floating-panel.widget-selection-palette{
+ width:min(760px,calc(100vw - 16px))!important;max-height:min(390px,calc(100dvh - 16px))!important;
+}
+body .editor-floating-panel.widget-selection-palette .widget-format-tabs{
+ display:flex;gap:3px;align-items:center;padding:3px 6px;
+ overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin;
+ border-bottom:1px solid #b8cadc;min-height:31px;flex:none;
+}
+body .editor-floating-panel.widget-selection-palette .widget-format-tabs button{
+ flex:0 0 auto;min-height:26px;height:26px;padding:2px 9px;
+ border-radius:5px;background:transparent;color:inherit;border:1px solid transparent;
+ font-size:11px;font-weight:650;white-space:nowrap;
+}
+body .editor-floating-panel.widget-selection-palette .widget-format-tabs button[aria-selected="true"]{
+ background:#d9e8ff;color:#13385d;border-color:#93b4d9;
+}
+body .editor-floating-panel.widget-selection-palette .widget-format-tabs button:focus-visible{outline:2px solid #1268bf;outline-offset:-2px}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-groups[role="tabpanel"]{
+ min-height:35px;max-height:min(310px,calc(100dvh - 86px))!important;
+ overflow-y:auto!important;overflow-x:auto!important;align-items:flex-start!important;
+}
+body .editor-floating-panel.widget-selection-palette .widget-format-advanced{
+ display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;
+ gap:6px 10px!important;align-items:center!important;
+}
+body .editor-floating-panel.widget-selection-palette .widget-format-advanced label{
+ display:inline-flex!important;flex-direction:row!important;align-items:center!important;
+ gap:4px!important;max-width:100%;white-space:nowrap;
+}
+body .editor-floating-panel.widget-selection-palette .widget-format-advanced select{max-width:175px;width:auto!important}
+body .editor-floating-panel.widget-selection-palette .widget-format-advanced input[type=range]{width:85px}
+body .editor-floating-panel.widget-selection-palette .widget-format-advanced input[type=checkbox]{width:15px;height:15px}
+@media(max-width:520px){
+ body .editor-floating-panel.widget-selection-palette .palette-ribbon-groups[role="tabpanel"]{
+  flex-wrap:wrap!important;overflow-y:auto!important;overflow-x:hidden!important;
+ }
+ body .editor-floating-panel.widget-selection-palette .widget-format-advanced label{white-space:normal}
+}
+
+/* RC223: the participant URL gets its own single, non-shrinking text row.
+ * Long destinations scroll horizontally (including via keyboard), never wrap,
+ * hide behind the QR image, or become illegible due to whole-widget scaling. */
+.participant-access-qr{
+ display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+ grid-template-rows:minmax(0,1fr) minmax(22px,auto)!important;
+ width:100%!important;height:100%!important;gap:2px!important;
+ min-width:0!important;min-height:0!important;
+ container-type:inline-size;
+}
+.participant-access-qr[data-qr-show-title="true"]{grid-template-rows:auto minmax(0,1fr) minmax(22px,auto)!important}
+.participant-access-qr[data-qr-show-url="false"]{grid-template-rows:minmax(0,1fr)!important}
+.participant-access-qr[data-qr-show-title="true"][data-qr-show-url="false"]{grid-template-rows:auto minmax(0,1fr)!important}
+.participant-access-qr>img{max-height:100%!important;max-width:100%!important;width:auto!important;height:auto!important;min-height:0!important;object-fit:contain!important;justify-self:center}
+.participant-access-qr>.participant-qr-url{
+ display:block!important;width:100%!important;max-width:100%!important;
+ min-height:22px!important;height:auto!important;max-height:24px!important;
+ box-sizing:border-box;overflow-x:auto!important;overflow-y:hidden!important;
+ font-family:Arial,sans-serif!important;font-size:clamp(11px,3.2cqw,15px)!important;
+ line-height:20px!important;white-space:nowrap!important;word-break:normal!important;
+ overflow-wrap:normal!important;text-overflow:clip!important;text-align:center;
+ color:inherit;text-decoration:underline;user-select:text!important;pointer-events:auto!important;
+ scrollbar-width:thin;scrollbar-color:#8494a9 transparent;
+}
+.participant-access-qr>.participant-qr-url:focus-visible{outline:2px solid #2563eb;outline-offset:-2px}
+:is(.editor-ux-v2 .widget-canvas-item,.projection-widget,.rehearsal-widget)[data-widget-kind="qr"] .widget-fit-frame{min-height:0!important;height:100%!important}
+.editor-ux-v2 .widget-canvas-item[data-widget-kind="qr"] .widget-fit-content>.canvas-widget-body-preview{height:100%!important;overflow:visible!important;pointer-events:auto!important}
+
+/* RC223: participant counters scale to their own box, not to the browser's
+ * viewport. Remove inherited padding and flex gaps that caused scale-to-fit
+ * to shrink the entire widget even when there was ample space. */
+:is(.editor-ux-v2 .widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-widget-kind="participant-count"]{
+ padding:0!important;overflow:hidden!important;
+}
+:is(.editor-ux-v2 .widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-widget-kind="participant-count"] .widget-fit-content{
+ height:100%!important;min-height:0!important;width:100%!important;
+}
+.editor-ux-v2 .widget-canvas-item[data-widget-kind="participant-count"] .canvas-widget-body-preview{
+ width:100%!important;height:100%!important;max-height:100%!important;margin:0!important;
+ padding:0!important;overflow:hidden!important;
+}
+.projection-participant-count{
+ display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;
+ container-type:size;width:100%!important;height:100%!important;min-height:0!important;
+ box-sizing:border-box;padding:2px!important;margin:0!important;gap:clamp(0px,1cqh,5px)!important;
+ text-align:center!important;overflow:hidden!important;
+}
+.projection-participant-count>strong{
+ display:block;flex:0 1 auto;max-width:100%;min-height:0;
+ font-size:clamp(10px,min(6cqw,21cqh),22px)!important;
+ line-height:1.1!important;overflow-wrap:anywhere!important;
+}
+.projection-participant-count [data-live-participants],
+.projection-participant-count [data-simulated-participants]{
+ display:block;flex:0 1 auto;max-width:100%;min-height:0;
+ font-size:clamp(16px,min(30cqw,55cqh),96px)!important;
+ font-weight:800!important;line-height:1!important;font-variant-numeric:tabular-nums;
+}
+.projection-participant-count[data-show-title="false"]>strong,
+:is(.editor-ux-v2 .widget-canvas-item,.projection-widget,.rehearsal-widget)[data-widget-kind="participant-count"][data-show-title="false"] .projection-participant-count>strong{display:none!important}
+.projection-participant-count>small{flex:none;font-size:clamp(8px,2cqh,13px);line-height:1.1}
+
+/* RC224: compact accessible thumbnail menu, including narrow/short viewports.
+ * Portal remains outside the scrollable page rail. Native details ensure
+ * keyboard/touch-accessible nested commands; expanded groups scroll INSIDE. */
+.page-editor-thumb-menu-floating{
+ max-height:var(--thumbnail-menu-max-height,calc(100dvh - 16px))!important;
+ min-height:0!important;overflow-x:hidden!important;overflow-y:auto!important;
+ scrollbar-width:thin;scrollbar-color:#9ab6cb #152d43;
+ scroll-padding:8px;align-content:start;
+}
+.page-editor-thumb-menu-floating .page-editor-thumb-submenu{
+ flex:0 0 auto;display:block;min-width:0;
+ border:1px solid #506f89;border-radius:8px;overflow:visible;
+ background:#152b43;
+}
+.page-editor-thumb-menu-floating .page-editor-thumb-submenu>summary{
+ cursor:pointer;display:list-item;list-style-position:inside;
+ color:#e9f7ff;padding:9px 10px;min-height:38px;
+ line-height:20px;font-size:13px;font-weight:650;
+}
+.page-editor-thumb-menu-floating .page-editor-thumb-submenu>summary:hover,
+.page-editor-thumb-menu-floating .page-editor-thumb-submenu>summary:focus-visible{
+ background:#28627e;outline:2px solid #79e4f0;outline-offset:-2px;
+}
+.page-editor-thumb-menu-floating .page-editor-thumb-submenu-items{
+ display:grid;gap:2px;padding:4px;border-top:1px solid #506f89;
+}
+.page-editor-thumb-menu-floating .page-editor-thumb-submenu :is(button,.editor-thumb-import){
+ min-height:38px;white-space:normal;overflow-wrap:anywhere;
+}
+/* A default Arial face is inherited by *all* new authoring text controls.
+ * Explicitly saved fonts/inline marks keep their own higher specificity. */
+:is(.slide-scheme-workspace,.powerpoint-editor) .widget-canvas-item :is(input,textarea,[contenteditable="true"]){
+ font-family:inherit;
+}
+
+/* RC225: master background parity and filename-labeled visual library selection. */
+.slide-scheme-canvas .canvas-with-rulers .widget-canvas{background-image:var(--editor-page-background,none)!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important}
+.background-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:7px;max-height:min(235px,38vh);overflow-y:auto;overscroll-behavior:contain;padding:5px;border:1px solid #a6b3c2;border-radius:9px;background:rgba(255,255,255,.94);min-width:0}
+.background-gallery-choice{display:flex;flex-direction:column;align-items:stretch;gap:4px;min-width:0;min-height:93px;padding:5px;border:1px solid #a9bacb;border-radius:6px;background:#f8fafc;color:#16283d;cursor:pointer;overflow:hidden}
+.background-gallery-choice[aria-pressed="true"]{outline:2px solid #086ec6;outline-offset:-2px;background:#e5f2ff}
+.background-gallery-choice:focus-visible{outline:3px solid #086ec6}
+.background-gallery-choice img{display:block;width:100%;height:66px;object-fit:contain;background:repeating-conic-gradient(#ddd 0% 25%,#fff 0% 50%) 50% / 14px 14px;border-radius:4px}
+.background-gallery-choice span{display:block;overflow-wrap:anywhere;line-height:1.22;font:500 11px/1.2 Arial,sans-serif;min-height:26px;color:#172b42}
+@media(max-width:440px){.background-gallery{grid-template-columns:repeat(auto-fill,minmax(83px,1fr));max-height:min(190px,32vh);gap:5px}.background-gallery-choice{min-height:85px}.background-gallery-choice img{height:53px}}
+
+/* RC226 — The slide-master command strip shares the page editor's icon language.
+   Every command retains an accessible name and a complete hover/focus tooltip. */
+.slide-scheme-ribbon{gap:4px!important;align-items:stretch!important;padding:6px!important}
+.slide-scheme-ribbon-group{gap:5px!important;padding:6px 9px!important;align-content:start!important;border-radius:8px}
+.slide-scheme-ribbon-group>strong{letter-spacing:.03em!important;font-size:10px!important}
+.slide-scheme-ribbon-actions{gap:4px!important;align-items:stretch!important}
+.slide-scheme-ribbon-actions .slide-scheme-ribbon-tool{
+ display:inline-flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;
+ gap:3px!important;min-height:59px!important;min-width:57px!important;max-width:88px!important;
+ padding:5px 7px!important;text-align:center!important;font-size:10px!important;line-height:1.15!important;
+ border-radius:9px!important;background:#eaf2fc!important;color:#234c78!important;
+ border:1px solid #b7cee7!important;box-shadow:inset 0 1px 0 #fff,0 2px 5px #0d356314!important;
+ white-space:normal!important;
+}
+.slide-scheme-ribbon-actions .slide-scheme-ribbon-tool:is(:hover,:focus-visible):not(:disabled){background:#cfe7ff!important;border-color:#4685be!important;outline:2px solid #347fc6;outline-offset:1px}
+.slide-scheme-ribbon-icon{display:grid;place-items:center;color:#2167a7}
+.slide-scheme-ribbon-caption{display:block;max-width:100%;overflow-wrap:normal}
+.slide-scheme-ribbon-actions .slide-scheme-ribbon-tool.primary{background:#315da0!important;color:#fff!important;border-color:#174b85!important}
+.slide-scheme-ribbon-tool.primary .slide-scheme-ribbon-icon{color:white}
+/* Master and page insertion palettes use identical kind accents and icon geometry. */
+.slide-scheme-widget-options>button[data-widget-kind],
+.slide-scheme-widget-options>.slide-scheme-graphic-trigger[data-widget-kind]{
+ display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+ min-width:68px;flex:0 0 76px;min-height:69px;padding:5px 4px!important;
+ --widget-accent:#5ce1ff;
+ background:linear-gradient(145deg,color-mix(in srgb,var(--widget-accent) 28%,#17263b),#17263b 72%)!important;
+ border:1px solid color-mix(in srgb,var(--widget-accent) 53%,#384e68)!important;
+ color:var(--widget-accent)!important;border-radius:10px!important;
+ box-shadow:inset 0 1px 0 #ffffff2e,0 4px 10px #0004;
+ font:600 10px/1.15 Arial,sans-serif!important;text-align:center;white-space:normal;
+}
+.slide-scheme-widget-options>[data-widget-kind] svg{width:24px!important;height:24px!important;flex:none}
+.slide-scheme-widget-options>[data-widget-kind] span{display:block;max-width:100%;color:#f1faff;overflow-wrap:anywhere}
+.slide-scheme-widget-options>[data-widget-kind]:is(:hover,:focus-visible):not(:disabled){outline:2px solid #78e2e9;outline-offset:1px;filter:brightness(1.19)}
+:is(.slide-scheme-widget-options>[data-widget-kind=rating],.slide-scheme-widget-options>[data-widget-kind=timer]){--widget-accent:#ffbe42}
+:is(.slide-scheme-widget-options>[data-widget-kind=reactions],.slide-scheme-widget-options>[data-widget-kind=logo]){--widget-accent:#46e5ab}
+:is(.slide-scheme-widget-options>[data-widget-kind=text],.slide-scheme-widget-options>[data-widget-kind=qr]){--widget-accent:#48d7ff}
+:is(.slide-scheme-widget-options>[data-widget-kind=pdf],.slide-scheme-widget-options>[data-widget-kind=footer]){--widget-accent:#d5e7fa}
+:is(.slide-scheme-widget-options>[data-widget-kind=profile],.slide-scheme-widget-options>[data-widget-kind=postit]){--widget-accent:#9e80ff}
+:is(.slide-scheme-widget-options>[data-widget-kind=question],.slide-scheme-widget-options>[data-widget-kind=topic-question]){--widget-accent:#6db7ff}
+:is(.slide-scheme-widget-options>[data-widget-kind=image],.slide-scheme-widget-options>[data-widget-kind=results-button]){--widget-accent:#59e3c9}
+:is(.slide-scheme-widget-options>[data-widget-kind=video],.slide-scheme-widget-options>[data-widget-kind=timed-quiz]){--widget-accent:#ff688c}
+.slide-scheme-widget-options>[data-widget-kind=participant-count]{--widget-accent:#80b6ff}
+.slide-scheme-widget-options>[data-widget-kind=title]{--widget-accent:#84d0ff}
+
+/* RC226 — Mobile presenter/admin workspace. The desktop layout is untouched:
+   every override below is guarded by a narrow viewport media query. */
+@media(max-width:760px){
+ html,body,#root,.app{max-width:100%;min-width:0}
+ .app{overflow-x:clip}
+ .app>header{height:auto!important;min-height:58px;max-width:100%;padding:9px 12px!important;display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center}
+ .app>header nav{display:flex;flex:1 1 100%;align-items:center;gap:7px;max-width:100%;overflow-x:auto;padding:4px 0;scrollbar-width:thin}
+ .app>header nav :is(a,button){flex:none;white-space:nowrap;font-size:12px}
+ .dashboard{display:grid!important;grid-template-columns:minmax(0,1fr)!important;max-width:100%;min-width:0;overflow:visible}
+ .dashboard>.aside{width:100%;min-width:0;max-width:100%;padding:10px!important;overflow-x:auto;overflow-y:visible;border-right:0!important;border-bottom:1px solid #7183a055}
+ .dashboard>.aside .list{display:flex;flex-wrap:nowrap;gap:6px;overflow-x:auto;max-width:100%;padding:4px 0;scrollbar-width:thin}
+ .dashboard>.aside :is(.session,button,a){min-width:0;max-width:100%;overflow-wrap:anywhere}
+ .dashboard>.workspace{min-width:0;width:100%;max-width:100%;padding:12px 9px!important;overflow-x:clip}
+ .workspace-head,.activity-row,.downloads,.session-tabs,.session-toolbar{flex-wrap:wrap!important;min-width:0;gap:7px}
+ .workspace-head>*{min-width:0;max-width:100%}
+ .session-tabs{overflow-x:auto;scrollbar-width:thin;padding-bottom:5px}
+ .session-tabs button{flex:1 0 120px;min-height:42px}
+ .dashboard :is(.panel,section,article,form,fieldset){min-width:0;max-width:100%;box-sizing:border-box}
+ .dashboard .panel{padding:12px!important}
+ .dashboard :is(input,textarea,select){box-sizing:border-box;max-width:100%;min-width:0}
+ .dashboard input:not([type=checkbox]):not([type=radio]):not([type=color]),.dashboard select{min-height:40px}
+ .dashboard :is(button,a.asbutton){touch-action:manipulation;overflow-wrap:anywhere}
+ .dashboard table{display:block;max-width:100%;overflow-x:auto;white-space:normal;scrollbar-width:thin}
+ .dashboard :is(.cols,.grid,.qr-layout){min-width:0;max-width:100%}
+ .dashboard :is(.modal,.dialog,[role=dialog]){max-width:calc(100dvw - 16px)!important;max-height:calc(100dvh - 16px)!important;overflow:auto!important}
+ .slide-scheme-workspace{min-width:0;overflow:visible!important}
+ .slide-scheme-header{flex-wrap:wrap!important;gap:8px}
+ .slide-scheme-header>div{flex:1 1 180px;min-width:0}
+ .slide-scheme-ribbon{display:flex!important;flex-wrap:nowrap!important;max-width:100%!important;overflow-x:auto!important;overscroll-behavior-x:contain;scrollbar-width:thin}
+ .slide-scheme-ribbon-group{flex:0 0 auto;max-width:75vw!important;padding:4px 7px!important}
+ .slide-scheme-ribbon-actions{flex-wrap:nowrap!important;max-width:100%;overflow-x:auto;scrollbar-width:thin}
+ .slide-scheme-ribbon-actions .slide-scheme-ribbon-tool{flex:0 0 62px;min-width:62px!important}
+ .slide-scheme-background-controls{min-width:190px!important}
+ .slide-scheme-background-upload{max-width:160px;overflow:hidden}
+ .slide-scheme-background-upload input{max-width:150px}
+ .slide-scheme-widget-rail{max-width:100%;min-width:0;flex-wrap:wrap;gap:4px;padding:7px}
+ .slide-scheme-widget-options{width:100%;flex-basis:100%;overflow-x:auto;max-width:100%}
+ .slide-scheme-layout{grid-template-columns:minmax(0,1fr)!important;gap:8px}
+ .slide-scheme-canvas,.slide-scheme-inspector{width:100%;max-width:100%;min-width:0}
+ .slide-scheme-canvas .widget-canvas{min-height:0!important}
+ .slide-scheme-inspector{padding:10px!important}
+ .slide-scheme-properties{min-width:0}
+ /* One-column mobile page editor: header, palette, horizontal filmstrip, canvas. */
+ body .editor-ux-v2,body .editor-ux-v2:fullscreen{
+  grid-template-columns:minmax(0,1fr)!important;
+  grid-template-rows:auto auto auto minmax(0,1fr)!important;
+  max-width:100dvw!important;max-height:100dvh!important;overflow:hidden!important;
+ }
+ body .editor-ux-v2 .editor-mock-header{
+  grid-column:1!important;grid-row:1!important;min-height:0!important;
+  max-height:min(25dvh,164px)!important;overflow-y:auto!important;
+  padding:6px 8px!important;gap:3px!important;align-content:start!important;
+ }
+ body .editor-ux-v2 .editor-mock-brand{flex:0 1 90px!important;max-width:90px!important}
+ body .editor-ux-v2 .editor-mock-header>.editor-device-switch{flex:1 1 100%!important;min-height:30px!important;order:2!important}
+ body .editor-ux-v2 .editor-mock-actions{flex:1 1 190px!important;max-width:100%!important;gap:3px!important}
+ body .editor-ux-v2 .editor-mock-action-buttons{justify-content:flex-start;gap:4px}
+ body .editor-ux-v2 .editor-mock-meta{display:none!important}
+ body .editor-ux-v2 .editor-widget-rail{
+  grid-column:1!important;grid-row:2!important;display:flex!important;max-height:78px!important;min-height:0!important;
+  overflow:hidden!important;padding:3px 6px!important;border:0!important;border-bottom:1px solid var(--editor-line)!important;
+ }
+ body .editor-ux-v2 .editor-widget-grid{display:flex!important;flex-wrap:nowrap!important;overflow-x:auto!important;overflow-y:hidden!important;max-height:74px!important;height:74px!important;align-items:center!important;padding:3px!important;gap:5px!important}
+ body .editor-ux-v2 .editor-widget-grid :is(.editor-icon-wrapper,.editor-graphic-wrapper){flex:0 0 58px!important;min-width:54px!important;max-width:62px!important}
+ body .editor-ux-v2 .page-editor-sidebar{
+  grid-column:1!important;grid-row:3!important;display:flex!important;flex-direction:column!important;
+  height:104px!important;min-height:0!important;max-height:104px!important;
+  overflow:hidden!important;padding:4px 7px!important;border:0!important;border-bottom:1px solid var(--editor-line)!important;
+ }
+ body .editor-ux-v2 .page-editor-sidebar header{min-height:19px!important;height:19px!important;padding:0 4px!important}
+ body .editor-ux-v2 .page-editor-sidebar .thumbnail-selection-help{display:none}
+ body .editor-ux-v2 .page-editor-thumbnails{display:flex!important;flex-direction:row!important;gap:8px!important;overflow-x:auto!important;overflow-y:hidden!important;min-height:0!important;padding:3px!important;scrollbar-width:thin}
+ body .editor-ux-v2 .page-editor-thumb-row{flex:0 0 112px!important;width:112px!important;min-width:112px!important;max-width:112px!important}
+ body .editor-ux-v2 .page-editor-thumb-menu-floating{max-width:calc(100dvw - 16px)!important}
+ body .editor-ux-v2 .editor-stage{
+  grid-column:1!important;grid-row:4!important;min-height:0!important;max-height:none!important;
+  display:flex!important;justify-content:flex-start!important;align-items:stretch!important;
+  overflow:auto!important;padding:7px!important;gap:6px!important;
+ }
+ body .editor-ux-v2 .editor-canvas-slot{width:100%!important;min-height:0!important;padding:5px!important;max-width:100%!important}
+ body .editor-ux-v2 .editor-bottom-controls{flex-wrap:wrap;min-height:40px!important}
+ body .editor-ux-v2 .canvas-with-rulers{overflow:auto!important;max-width:100%}
+ .rehearsal-backdrop{padding:4px!important}
+ .rehearsal-shell{width:calc(100dvw - 8px)!important;height:calc(100dvh - 8px)!important;max-height:none!important;border-radius:8px}
+ .rehearsal-toolbar,.rehearsal-footer{padding:7px!important;gap:5px}
+ .rehearsal-stage{padding:7px!important;min-width:0}
+ .presenter-stage-header{flex-wrap:wrap;gap:7px}
+ .presenter-stage-tools{justify-content:flex-start;width:100%;gap:7px}
+ .presenter-stage-tools button{min-height:40px}
+ .presenter-stage-slide{max-width:100%}
+}
+@media(max-width:390px){
+ .slide-scheme-ribbon-group{max-width:calc(100dvw - 34px)!important}
+ body .editor-ux-v2 .editor-mock-header{max-height:min(27dvh,156px)!important}
+ body .editor-ux-v2 .editor-widget-grid :is(.editor-icon-wrapper,.editor-graphic-wrapper){flex-basis:54px!important}
+ .dashboard>.workspace{padding:8px 6px!important}
+}
+
+/* RC226: image upload is a genuine keyboard-accessible icon tool, not a native
+   file input that stretches the entire master command strip. */
+.slide-scheme-background-upload{position:relative;display:inline-flex!important;flex-direction:column;justify-content:center;align-items:center;gap:3px!important;min-height:59px;min-width:78px;max-width:110px;padding:5px!important;font-size:10px!important;line-height:1.15;background:#eaf2fc;color:#234c78;border:1px solid #b7cee7;border-radius:9px;cursor:pointer;text-align:center;overflow:hidden}
+.slide-scheme-background-upload svg{flex:none;color:#2167a7}
+.slide-scheme-background-upload input[type=file]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;max-width:none!important}
+.slide-scheme-background-upload:focus-within{outline:2px solid #347fc6;outline-offset:1px}
+
+/* RC227 — The master background gallery is an accessible, viewport-bound modal.
+   Do not put all its thumbnails in the horizontal PowerPoint-like ribbon. */
+.schema-background-modal-backdrop{position:fixed;z-index:2147482000;inset:0;display:grid;place-items:center;padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));background:#06162cbf}
+.schema-background-modal{display:flex;flex-direction:column;gap:12px;min-width:0;width:min(820px,100%);max-height:calc(100dvh - 24px);overflow:hidden;background:#fff;border:1px solid #c4d5e6;border-radius:13px;box-shadow:0 22px 70px #06162c88;padding:16px;color:#243c5a;outline:none}
+.schema-background-modal>header{display:flex;flex-wrap:wrap;align-items:start;justify-content:space-between;gap:12px}
+.schema-background-modal>header h2{font-size:18px;margin:0 0 5px}
+.schema-background-modal>header p{font-size:12px;margin:0;color:#52677c}
+.schema-background-modal .background-gallery{min-width:0;overflow-y:auto;overscroll-behavior:contain;max-height:min(65dvh,570px);padding:3px;grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}
+.schema-background-modal .background-gallery-choice{min-width:0;overflow:hidden}
+.schema-background-modal .background-gallery-choice:focus-visible{outline:3px solid #246aaa;outline-offset:1px}
+@media(max-width:440px){.schema-background-modal{padding:12px;max-height:calc(100dvh - 24px)}.schema-background-modal .background-gallery{grid-template-columns:repeat(2,minmax(0,1fr));max-height:60dvh}.schema-background-modal>header h2{font-size:16px}}

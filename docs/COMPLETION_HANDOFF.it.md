@@ -1,3 +1,43 @@
+# Quorivio 0.1.0-dev — RC227 — Handoff selezione sfondi e partecipanti
+
+**RC227:** Riprendere da questo cumulativo, non da RC226: schermata schemi con libreria sfondi in finestra accessibile tramite comando compatto; conservata la selezione visiva con nomi, impostazione globale e cancellazione separata. Modalità smartphone partecipanti adattativa a orientamento/viewport/puntatore prima della scelta manuale, stabile dopo la scelta. Test Node frontend 398, Python mirati 9, Chromium rappresentativo 4 dimensioni e parse TSX verdi; build React completa, PostgreSQL e full CI GitHub ancora da certificare. Baseline full CI RC219 `42197607753`; **85,25%**, 43 accettati e 17 parziali. `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. `docs/RC_CYCLE227_MASTER_BACKGROUND_PHONE_ROTATION.it.md`.
+
+---
+# Quorivio 0.1.0-dev — RC226 — Handoff editor responsive
+
+**RC226:** Base RC225 integralmente conservata; comandi schemi compatti con icona, etichetta e tooltip, widget con palette cromatica comune, default smartphone partecipanti, vista mobile amministratore/presentatore e editor pagine/schemi con viewport piccolo. Nessuna modifica alle API o ai permessi. API 628, web 394, Python 30, Chromium CSS 4 viewport locali verdi; test browser React integrati e full CI GitHub da eseguire. Ultima CI verde RC219 `42197607753`. Certificato **85,25%** (43/17), flags `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. `docs/RC_CYCLE226_RESPONSIVE_STUDIO.it.md`.
+
+---
+# Quorivio 0.1.0-dev — RC225 — Handoff allegati e sfondi
+
+**RC225:** Base RC224 conservata. Nomi sicuri e visibili per allegati/libreria, confronto collisioni lato server con conferma client, rinomina/cancellazione senza errori JSON e aggiornamento immediato; sfondo schema mostrato nel canvas e selezione visiva con miniature più filename. Schema DB evolutivo per nomi e copie, portabilità mantenuta. API/frontend Node verdi (628/390), Python RC225 e Chromium CSS verdi; full CI da eseguire. Ultima CI verde RC219 `42197607753`. Certificato **85,25%** (43/17), flags `rc_strict=false`, `publish_image=false`, `publish_latest=false`, nessun commit/push/tag. `docs/RC_CYCLE225_ASSET_LIBRARY_AND_SCHEME.it.md`.
+
+---
+# Quorivio 0.1.0-dev — RC224 — Handoff menu miniature e font Arial
+
+**RC224:** Cumulativo RC223 preservato; menu miniature riorganizzato con gruppi espandibili accessibili via tastiera/touch e scorrimento realmente limitato alla finestra. Verificati i font Arial predefiniti su ogni widget di pagine/schemi, rispettando i font scelti nei master e nelle widget. Suite Node/API, test Python e Chromium CSS su quattro risoluzioni verdi; full CI React/PostgreSQL da eseguire. Ultima verde RC219 `42197607753`; completamento certificato **85,25%**, 43 accettati/17 parziali. `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Dettagli `docs/RC_CYCLE224_THUMBNAIL_MENU_AND_ARIAL.it.md`.
+
+---
+# Quorivio 0.1.0-dev — RC223 — Handoff Formato, footer, QR e contatore
+
+**RC223:** Cumulativo della RC222. Finestra Formato aperta solo da menu contestuale e organizzata in schede responsive per tutti i campi validati; corretti allineamenti footer, URL QR dedicata su una riga e contatore dei partecipanti senza padding/scaling eccessivi. Test Node/API/Python e Chromium CSS su due risoluzioni superati; React compilato/PostgreSQL e full CI da verificare. Ultima CI verde RC219 `42197607753`, completamento certificato **85,25%**, 43 accettati/17 parziali. `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Vedi `docs/RC_CYCLE223_CONTEXT_FORMAT_AND_STAGE_LAYOUT.it.md`.
+
+---
+# Quorivio 0.1.0-dev — RC222 — Handoff formato compatto e opzioni di risposta
+
+**RC222:** Conservata la RC221. Barra Formato widget compatta e scorribile su smartphone; nell’editor risolti il nowrap dei caratteri rich-text, il default Arial e la sincronizzazione del font con «Widget intero» per opzioni principali e sottodomande. Test API/frontend Node, contratti Python, fixture Chromium CSS 1440/390, inventari e intestazioni; full CI e verifica browser sull’app reale da eseguire. Ultima CI verde RC219 `42197607753`. **85,25%**, 43 accettati/17 parziali. `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Vedi `docs/RC_CYCLE222_EDITOR_FORMAT_PARITY.it.md`.
+
+---
+# Quorivio 0.1.0-dev — RC221 — Handoff risultati e PDF
+
+**RC221:** Baseline full CI verde **RC219** `42197607753`. RC221 include controllo vero/falso soltanto presentatore, formattazione indipendente dei testi risultati, import PDF/PPTX scelta immagini/editabile parziale e parser PDF Poppler isolato; RC220/221 devono essere convalidati con CI. **85,25%**, 43 accettati/17 parziali. `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessuna operazione git o release eseguita. Vedi `docs/RC_CYCLE221_RESULTS_GRADING_AND_PDF_IMPORT.it.md`.
+
+---
+# Quorivio 0.1.0-dev — RC220 — Configurazione PDF e formattazione risultati collegati
+
+**RC220:** La RC219 è totalmente verde in GitHub Actions `42197607753`: 14 job conclusi con successo (tre job per immagini e pubblicazione finale saltati). La RC220 aggiunge un pannello amministrativo per il worker PDF/PPTX isolato con diagnostica, prerequisiti e abilitazione/disabilitazione persistente; separa titolo e risposte della sorgente collegata, con pallini, grassetto e colore personalizzabile del testo domanda. La full CI RC220 è ancora da verificare. Completamento certificato **85,25%** (43 gate accettati, 17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit, push o tag dell’assistente. Dettagli in `docs/RC_CYCLE220_PDF_WORKER_AND_LINKED_RESULTS.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC219 — Ripristino scoperta globale dei test Python
 
 **RC219:** La CI RC218 (`42194028262`) ha raggiunto la suite globale `unittest discover` (2.115 test: 4 failure, 2 errori). Corretti due import relativi RC214 che fallivano solo con i nomi modulo della discovery e quattro contratti storici non aggiornati (navigazione protetta dalle modifiche non salvate, formattazione condivisa del numero pagina, sottolineatura e barratura indipendenti). Aggiunti test negativi e verifica pre-npm in entrambe le modalità; nessuna modifica al runtime. Verifica full RC219 ancora richiesta; ultima full verde RC203. **85,25%** (43 accettati, 17 parziali), `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Dettagli `docs/RC_CYCLE219_FULL_DISCOVERY_RECONCILIATION.it.md`.

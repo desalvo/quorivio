@@ -21,7 +21,7 @@ const UUID_RE=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const MAX_MANIFEST_BYTES=2*1024*1024;
 const CRC_TABLE=Array.from({length:256},(_,i)=>{let c=i;for(let j=0;j<8;j++)c=c&1?0xedb88320^(c>>>1):c>>>1;return c>>>0});
 export function crc32(data:Uint8Array){let c=0xffffffff;for(const b of data)c=CRC_TABLE[(c^b)&255]^(c>>>8);return (c^0xffffffff)>>>0}
-export type BundleAsset={id:string;mime:string;bytes:number;sha256:string};
+export type BundleAsset={id:string;mime:string;bytes:number;sha256:string;display_name?:string;background_library_copy?:boolean};
 export type BundleManifest={format:'quorivio-bundle';version:1;definition:any;assets:BundleAsset[]};
 export function referencedAssets(definition:any):Set<string>{
  const out=new Set<string>();const add=(v:any)=>{if(typeof v==='string'&&v)out.add(v)};
@@ -52,7 +52,7 @@ export function remapPortableAssets(definition:any,sourceAssetIds:string[]):{def
 export function validateBundleManifest(m:any):m is BundleManifest{
  if(!m||m.format!=='quorivio-bundle'||m.version!==1||!m.definition||!Array.isArray(m.assets)||m.assets.length>300)return false;
  const ids=new Set<string>();let total=0;
- for(const a of m.assets){if(!a||typeof a.id!=='string'||!UUID_RE.test(a.id)||ids.has(a.id)||!['image/png','image/jpeg','image/gif','image/webp','application/pdf','video/mp4','video/webm'].includes(a.mime)||!Number.isSafeInteger(a.bytes)||a.bytes<1||a.bytes>50*1024*1024||! /^[a-f0-9]{64}$/.test(a.sha256))return false;ids.add(a.id);total+=a.bytes;}
+ for(const a of m.assets){if(!a||typeof a.id!=='string'||!UUID_RE.test(a.id)||ids.has(a.id)||!['image/png','image/jpeg','image/gif','image/webp','application/pdf','video/mp4','video/webm'].includes(a.mime)||!Number.isSafeInteger(a.bytes)||a.bytes<1||a.bytes>50*1024*1024||! /^[a-f0-9]{64}$/.test(a.sha256)||(a.display_name!==undefined&&(typeof a.display_name!=='string'||a.display_name.length<1||a.display_name.length>120||/[\x00-\x1f\x7f]/.test(a.display_name)))||(a.background_library_copy!==undefined&&typeof a.background_library_copy!=='boolean'))return false;ids.add(a.id);total+=a.bytes;}
  if(total>MAX_MEDIA_BYTES)return false;
  const refs=referencedAssets(m.definition);return refs.size===ids.size&&[...refs].every(id=>ids.has(id));
 }

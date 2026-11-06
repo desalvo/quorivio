@@ -101,6 +101,18 @@ CREATE TABLE IF NOT EXISTS presenter_backgrounds(
 CREATE INDEX IF NOT EXISTS idx_presenter_backgrounds_owner ON presenter_backgrounds(owner_id,created_at DESC);
 -- RC206: explicit library labels and immutable provenance for in-use checks.
 ALTER TABLE presenter_backgrounds ADD COLUMN IF NOT EXISTS display_name text;
+-- RC225: friendly asset names and case-insensitive uniqueness, scoped to their owner/session.
+ALTER TABLE session_assets ADD COLUMN IF NOT EXISTS display_name text;
+
+-- Historical libraries allowed duplicate labels; disambiguate those once before the constraint.
+WITH dup AS (
+ SELECT id,row_number() OVER (PARTITION BY owner_id,lower(display_name) ORDER BY created_at,id) AS seq
+ FROM presenter_backgrounds WHERE display_name IS NOT NULL
+)
+UPDATE presenter_backgrounds b SET display_name=left(b.display_name,100)||' ('||left(b.id::text,8)||')'
+FROM dup WHERE b.id=dup.id AND dup.seq>1;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_background_display_name ON presenter_backgrounds(owner_id,lower(display_name)) WHERE display_name IS NOT NULL;
+
 ALTER TABLE session_assets ADD COLUMN IF NOT EXISTS source_background_id uuid REFERENCES presenter_backgrounds(id) ON DELETE RESTRICT;
 CREATE INDEX IF NOT EXISTS idx_session_assets_source_background ON session_assets(source_background_id) WHERE source_background_id IS NOT NULL;
 
@@ -231,6 +243,11 @@ CREATE INDEX IF NOT EXISTS idx_widget_timed_ranking ON widget_answers(activity_i
 
 -- Preserve ownership of anonymous uploads; presenter assets keep a NULL participant_id.
 ALTER TABLE session_assets ADD COLUMN IF NOT EXISTS participant_id uuid REFERENCES participants(id) ON DELETE SET NULL;
+-- Only presenter-owned library entries participate in filename collision checks.
+-- Background-library copies remain exempt even if the library origin is later removed.
+ALTER TABLE session_assets ADD COLUMN IF NOT EXISTS background_library_copy boolean NOT NULL DEFAULT false;
+UPDATE session_assets SET background_library_copy=true WHERE source_background_id IS NOT NULL AND NOT background_library_copy;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_session_asset_display_name ON session_assets(session_id,lower(display_name)) WHERE display_name IS NOT NULL AND participant_id IS NULL AND NOT background_library_copy;
 CREATE INDEX IF NOT EXISTS idx_session_assets_participant ON session_assets(session_id,participant_id);
 
 -- Safe integrated image-slide presentation pages (no historical answer mutation).

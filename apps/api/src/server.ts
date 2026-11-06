@@ -9,6 +9,7 @@ import {encodeBundle,decodeBundle,referencedAssets,remapPortableAssets,BUNDLE_MI
 import {exportStatisticRows,statisticsCsv,statisticsXlsx,type StatisticRecord} from './statistics-export.js';
 import {parseLeaderboardPage} from './pagination-policy.js';
 import {validateSettingsPatch} from './platform-settings.js';
+import {converterAdmission,validConverterToggle} from './converter-admission.js';
 import {SESSION_RETENTION_DEFAULT_SQL, SESSION_RETENTION_PURGE_SQL, SESSION_DELETE_WITH_CLEANUP_SQL, SESSION_CLEANUP_CLAIM_SQL} from './session-retention.js';
 import {ASSET_DELETE_WITH_CLEANUP_SQL,drainAssetErasureJobs,PROFILE_ERASURE_ENQUEUE_SQL,drainProfileErasureJobs,erasureFailureCode} from './asset-erasure.js';
 import {profilePhotoId,publicPresenterProfiles} from './profile-photo.js';
@@ -33,7 +34,7 @@ import {widgetAnswerShapeChanged,aggregateWidgetAnswerRevisions,aggregateShortTe
 import {answerKeyIds,gradeChoiceAnswer} from './widget-answer-key.js';
 import {normalizeWord,validateQuestion,moderationStatus,safeFrequency,parseModerationQueueQuery,parseModerationBulk} from './audience-tools.js';
 import {validPageOrder} from './page-sequence.js';
-import express from 'express';import helmet from 'helmet';import pg from 'pg';import bcrypt from 'bcryptjs';import QRCode from 'qrcode';import {WebSocketServer,WebSocket} from 'ws';import {liveSessionActive,livePresenterAuthorized,liveParticipantAuthorized} from './live-socket-policy.js';import {createLiveSnapshotQueue} from './live-snapshot-queue.js';import {createLivePeriodicRefresh} from './live-periodic-refresh.js';import {deliverLiveSnapshot} from './live-broadcast.js';import {shouldDropSlowSocket} from './live-delivery-policy.js';import {createServer} from 'node:http';import {randomUUID,randomBytes,createHash,createHmac,timingSafeEqual} from 'node:crypto';import {readFileSync,existsSync} from 'node:fs';import {mkdir,writeFile,readFile,unlink,rm,copyFile} from 'node:fs/promises';import {validAsset} from './asset-policy.js';import {receiveAssetStream} from './stream-upload.js';import {scanUploadedFile} from './malware-scan.js';import {classifyBackgroundUploadFailure,backgroundUploadLog,type BackgroundUploadPhase} from './background-upload-failure.js';import {readdir,stat} from 'node:fs/promises';import path from 'node:path';import {fileURLToPath} from 'node:url';import {validTransition,validateOptions,checkAnswer,publicActivity,publicTheme,escapeCsvCell,validRetentionDays,validPageDesign,validPseudonym,validAnswerMode,validateSubmittedAnswer,validReaction,type Activity,type SessionStatus} from './domain.js';
+import express from 'express';import helmet from 'helmet';import pg from 'pg';import bcrypt from 'bcryptjs';import QRCode from 'qrcode';import {WebSocketServer,WebSocket} from 'ws';import {liveSessionActive,livePresenterAuthorized,liveParticipantAuthorized} from './live-socket-policy.js';import {createLiveSnapshotQueue} from './live-snapshot-queue.js';import {createLivePeriodicRefresh} from './live-periodic-refresh.js';import {deliverLiveSnapshot} from './live-broadcast.js';import {shouldDropSlowSocket} from './live-delivery-policy.js';import {createServer} from 'node:http';import {randomUUID,randomBytes,createHash,createHmac,timingSafeEqual} from 'node:crypto';import {readFileSync,existsSync} from 'node:fs';import {mkdir,writeFile,readFile,unlink,rm,copyFile} from 'node:fs/promises';import {validAsset} from './asset-policy.js';import {normalizedFileName,findAvailableFileName} from './file-display-names.js';import {receiveAssetStream} from './stream-upload.js';import {scanUploadedFile} from './malware-scan.js';import {classifyBackgroundUploadFailure,backgroundUploadLog,type BackgroundUploadPhase} from './background-upload-failure.js';import {readdir,stat} from 'node:fs/promises';import path from 'node:path';import {fileURLToPath} from 'node:url';import {validTransition,validateOptions,checkAnswer,publicActivity,publicTheme,escapeCsvCell,validRetentionDays,validPageDesign,validPseudonym,validAnswerMode,validateSubmittedAnswer,validReaction,type Activity,type SessionStatus} from './domain.js';
 const db=new pg.Pool({connectionString:process.env.DATABASE_URL});const secret=process.env.AUTH_SECRET||'';if(secret.length<32)throw new Error('AUTH_SECRET must have >= 32 characters');
 const base=process.env.PUBLIC_BASE_URL||'http://localhost:8080';let publicBase=base;const app=express();app.disable('x-powered-by');
 // Vite HMR is used only in development; production serves precompiled local assets.
@@ -774,6 +775,40 @@ app.patch('/api/admin/settings',requireAuth,requireAdmin,async(req,res)=>{
  }catch(e){await cx.query('ROLLBACK').catch(()=>{});sendError(res,e)}
  finally{cx.release()}
 });
+/** PDF/PPTX worker is an isolated deployment dependency. The platform admin
+ * may disable/re-enable it at runtime only if all deployment prerequisites pass. */
+async function converterAdmissionState(){
+ const row=await db.query("SELECT value FROM platform_settings WHERE key='converter_enabled'");
+ return converterAdmission(process.env,row.rows[0]?.value??null);
+}
+async function converterWorkerReady():Promise<boolean>{
+ const url=process.env.QUORIVIO_CONVERTER_WORKER_URL;
+ if(!url)return false;
+ try{
+  const response=await fetch(`${url}/health`,{signal:AbortSignal.timeout(2500),redirect:'error'});
+  if(!response.ok)return false;
+  const body=await response.json() as {ready?:boolean};
+  return body.ready===true;
+ }catch{return false}
+}
+app.get('/api/admin/converter',requireAuth,requireAdmin,async(_req,res)=>{
+ try{const state=await converterAdmissionState();res.setHeader('Cache-Control','no-store');res.json({...state,worker_ready:state.deployment_enabled&&state.worker_configured?await converterWorkerReady():false})}
+ catch(e){sendError(res,e)}
+});
+app.put('/api/admin/converter',requireAuth,requireAdmin,async(req,res)=>{
+ if(!validConverterToggle(req.body)){res.status(400).json({error:'invalid_converter_setting'});return}
+ try{
+  const admission=converterAdmission(process.env,null);
+  if(req.body.enabled&&(!admission.deployment_enabled||!admission.worker_configured)){
+   res.status(409).json({error:'converter_deployment_not_ready'});return;
+  }
+  if(req.body.enabled&&!await converterWorkerReady()){
+   res.status(409).json({error:'conversion_worker_unavailable'});return;
+  }
+  await db.query("INSERT INTO platform_settings(key,value) VALUES('converter_enabled',$1) ON CONFLICT(key) DO UPDATE SET value=$1,updated_at=now()",[req.body.enabled?'true':'false']);
+  const state=await converterAdmissionState();res.setHeader('Cache-Control','no-store');res.json({...state,worker_ready:state.enabled?await converterWorkerReady():false});
+ }catch(e){sendError(res,e)}
+});
 app.use('/api/sessions',requireAuth,requirePresenter);
 // Profile images are private uploads, never arbitrary externally hosted URLs.
 const profilePhotoFolder=()=>path.join(assetRoot,'profile-photos');
@@ -1030,7 +1065,7 @@ async function createFromPortable(data:any,uid:string,importMediaDir?:string,bun
     await scanUploadedFile(source); // honor the same ClamAV fail-closed policy as direct uploads
     const freshId=imported!.ids.get(asset.id)!;
     await writeFile(path.join(folder,freshId),contents,{flag:'wx',mode:0o600});
-    await cx.query('INSERT INTO session_assets(id,session_id,uploaded_by,mime_type,byte_size,sha256) VALUES($1,$2,$3,$4,$5,$6)',[freshId,sid,uid,asset.mime,asset.bytes,asset.sha256]);
+    await cx.query('INSERT INTO session_assets(id,session_id,uploaded_by,mime_type,byte_size,sha256,display_name,background_library_copy) VALUES($1,$2,$3,$4,$5,$6,$7,$8)',[freshId,sid,uid,asset.mime,asset.bytes,asset.sha256,typeof asset.display_name==='string'?normalizedFileName(asset.display_name,`Allegato ${freshId.slice(0,8)}`):null,asset.background_library_copy===true]);
    }
   }
   for(let i=0;i<definition.activities.length;i++){
@@ -1054,10 +1089,27 @@ async function allowedUploadBytes(){const r=await db.query("SELECT value FROM pl
 const backgroundRoot=path.join(assetRoot,'background-library');
 const backgroundTypes=new Set(['image/png','image/jpeg','image/gif','image/webp']);
 const backgroundPath=(uid:string,id:string)=>path.join(backgroundRoot,uid,id);
+/** Client names are never used as filesystem paths. A duplicate is rejected until
+ * the user explicitly authorizes a numbered copy in the upload dialog. */
+function declaredUploadName(req:any,fallback:string):string{
+ const raw=req.headers['x-quorivio-filename'];
+ if(typeof raw!=='string')return fallback;
+ try{return normalizedFileName(decodeURIComponent(raw),fallback)}catch{return fallback}
+}
+async function chooseUploadName(req:any,name:string,scope:'background'|'asset',scopeId:string){
+ const table=scope==='background'?'presenter_backgrounds':'session_assets';
+ const key=scope==='background'?'owner_id':'session_id';
+ const available=await findAvailableFileName(name,async candidate=>{
+  const check=await db.query(`SELECT 1 FROM ${table} WHERE ${key}=$1 AND lower(display_name)=lower($2) ${scope==='asset'?'AND participant_id IS NULL AND NOT background_library_copy':''} LIMIT 1`,[scopeId,candidate]);
+  return !!check.rowCount;
+ });
+ return available.duplicate&&req.headers['x-quorivio-allow-rename']!=='1'?{conflict:true,suggested:available.name}:{conflict:false,name:available.name};
+}
+function uploadConflict(res:any,name:string){res.status(409).json({error:'duplicate_filename',suggested_name:name})}
 const backgroundUuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
 async function accessibleBackground(s:any,uid:string,id:string){
  if(!backgroundUuid.test(id))return undefined;
- const result=await db.query(`SELECT b.id,b.owner_id,b.mime_type,b.byte_size,b.sha256
+ const result=await db.query(`SELECT b.id,b.owner_id,b.mime_type,b.byte_size,b.sha256,b.display_name
  FROM presenter_backgrounds b WHERE b.id=$1 AND (b.owner_id=$2 OR EXISTS(
   SELECT 1 FROM sessions shared WHERE
   (shared.owner_id=$2 OR EXISTS(SELECT 1 FROM session_presenters me WHERE me.session_id=shared.id AND me.user_id=$2))
@@ -1068,7 +1120,7 @@ async function accessibleBackground(s:any,uid:string,id:string){
 async function useBackground(s:any,uid:string,b:any){
  // Copy-on-use creates *both* an independently owned library entry (when borrowed)
  // and a session-scoped asset. Removing any other collaborator cannot break it.
- const borrowed=b.owner_id!==uid;const libraryId=borrowed?randomUUID():b.id;
+ const borrowed=b.owner_id!==uid;const libraryId=borrowed?randomUUID():b.id;let copiedName=normalizedFileName(b.display_name,`Immagine ${libraryId.slice(0,8)}`);
  const assetId=randomUUID();const source=backgroundPath(b.owner_id,b.id);
  const libraryTarget=backgroundPath(uid,libraryId);const sessionTarget=path.join(assetRoot,s.id,assetId);
  await mkdir(path.dirname(sessionTarget),{recursive:true});
@@ -1078,8 +1130,11 @@ async function useBackground(s:any,uid:string,b:any){
   await copyFile(source,sessionTarget);
   const cx=await db.connect();
   try{await cx.query('BEGIN');
-   if(borrowed)await cx.query('INSERT INTO presenter_backgrounds(id,owner_id,mime_type,byte_size,sha256) VALUES($1,$2,$3,$4,$5)',[libraryId,uid,b.mime_type,b.byte_size,b.sha256]);
-   await cx.query('INSERT INTO session_assets(id,session_id,uploaded_by,mime_type,byte_size,sha256,source_background_id) VALUES($1,$2,$3,$4,$5,$6,$7)',[assetId,s.id,uid,b.mime_type,b.byte_size,b.sha256,libraryId]);
+   if(borrowed){
+    const assigned=await chooseUploadName({headers:{'x-quorivio-allow-rename':'1'}},normalizedFileName(b.display_name,'Immagine condivisa'),'background',uid);copiedName=assigned.name!;
+    await cx.query('INSERT INTO presenter_backgrounds(id,owner_id,mime_type,byte_size,sha256,display_name) VALUES($1,$2,$3,$4,$5,$6)',[libraryId,uid,b.mime_type,b.byte_size,b.sha256,assigned.name]);
+   }
+   await cx.query('INSERT INTO session_assets(id,session_id,uploaded_by,mime_type,byte_size,sha256,source_background_id,display_name,background_library_copy) VALUES($1,$2,$3,$4,$5,$6,$7,$8,true)',[assetId,s.id,uid,b.mime_type,b.byte_size,b.sha256,libraryId,copiedName]);
    await cx.query('COMMIT');
   }catch(e){await cx.query('ROLLBACK');throw e}finally{cx.release()}
  }catch(e){await unlink(sessionTarget).catch(()=>{});if(borrowed)await unlink(libraryTarget).catch(()=>{});throw e}
@@ -1102,6 +1157,8 @@ app.patch('/api/sessions/:id/backgrounds/:bid',requireAuth,async(req,res)=>{try{
  const uid=auth(req)!;if(!await owner(req.params.id,uid)){res.status(404).end();return}
  const name=req.body?.name;
  if(typeof name!=='string'||!name.trim()||name.trim().length>120||/[\x00-\x1f\x7f]/.test(name)){res.status(400).json({error:'invalid_background_name'});return}
+ const duplicate=await db.query('SELECT 1 FROM presenter_backgrounds WHERE owner_id=$1 AND lower(display_name)=lower($2) AND id<>$3 LIMIT 1',[uid,name.trim(),req.params.bid]);
+ if(duplicate.rowCount){res.status(409).json({error:'duplicate_filename'});return}
  const record=await db.query('UPDATE presenter_backgrounds SET display_name=$3 WHERE id=$1 AND owner_id=$2 RETURNING id,display_name',[req.params.bid,uid,name.trim()]);
  if(!record.rowCount){res.status(404).end();return}res.json(record.rows[0]);
  }catch(e){sendError(res,e)}});
@@ -1153,14 +1210,16 @@ app.post('/api/sessions/:id/backgrounds',requireAuth,async(req,res)=>{
   const mime=String(req.headers['content-type']||'').split(';')[0].trim().toLowerCase();
   if(!backgroundTypes.has(mime)){res.status(415).json({error:'unsupported_background_media'});return}
   const id=randomUUID();const folder=path.join(backgroundRoot,uid);
+  const named=await chooseUploadName(req,declaredUploadName(req,`Immagine ${id.slice(0,8)}`),'background',uid);
+  if(named.conflict){uploadConflict(res,named.suggested!);return}
   phase='receiving';
   const received=await receiveAssetStream(req,folder,id,mime,cap,length);
   try{
    phase='scanning';await scanUploadedFile(received.destination);
-   phase='registering';await db.query('INSERT INTO presenter_backgrounds(id,owner_id,mime_type,byte_size,sha256) VALUES($1,$2,$3,$4,$5)',[id,uid,mime,received.size,received.sha256]);
+   phase='registering';await db.query('INSERT INTO presenter_backgrounds(id,owner_id,mime_type,byte_size,sha256,display_name) VALUES($1,$2,$3,$4,$5,$6)',[id,uid,mime,received.size,received.sha256,named.name]);
   }catch(e){await unlink(received.destination).catch(()=>{});throw e}
   phase='applying';
-  const applied=await useBackground(s,uid,{id,owner_id:uid,mime_type:mime,byte_size:received.size,sha256:received.sha256});
+  const applied=await useBackground(s,uid,{id,owner_id:uid,mime_type:mime,byte_size:received.size,sha256:received.sha256,display_name:named.name});
   res.status(201).json(applied);
  }catch(e){
   const diagnosis=classifyBackgroundUploadFailure(phase,e);
@@ -1197,7 +1256,7 @@ app.post('/api/join/:code/activities/:aid/widgets/:wid/upload',async(req,res)=>{
  if(Number(count.rows[0].n)>=10){res.status(429).json({error:'participant_upload_quota_exceeded'});return}
  const id=randomUUID();const folder=path.join(assetRoot,who.sessionId);
  const received=await receiveAssetStream(req,folder,id,declared,cap,length);
- try{await scanUploadedFile(received.destination);await db.query('INSERT INTO session_assets(id,session_id,uploaded_by,participant_id,mime_type,byte_size,sha256) VALUES($1,$2,NULL,$3,$4,$5,$6)',[id,who.sessionId,who.participantId,declared,received.size,received.sha256])}catch(e){await unlink(received.destination);throw e}
+ try{await scanUploadedFile(received.destination);await db.query('INSERT INTO session_assets(id,session_id,uploaded_by,participant_id,mime_type,byte_size,sha256,display_name) VALUES($1,$2,NULL,$3,$4,$5,$6,$7)',[id,who.sessionId,who.participantId,declared,received.size,received.sha256,normalizedFileName(declaredUploadName(req,`Allegato ${id.slice(0,8)}`),`Allegato ${id.slice(0,8)}`)])}catch(e){await unlink(received.destination);throw e}
  res.status(201).json({asset_id:id,mime_type:declared,bytes:received.size});
  }catch(e){sendError(res,e)} });
 app.post('/api/sessions/:id/assets',requireAuth,async(req,res)=>{try{
@@ -1208,15 +1267,27 @@ app.post('/api/sessions/:id/assets',requireAuth,async(req,res)=>{try{
  const declared=String(req.headers['content-type']||'').split(';')[0].trim().toLowerCase();
  if(!['image/png','image/jpeg','image/gif','image/webp','application/pdf','video/mp4','video/webm'].includes(declared)){res.status(415).json({error:'unsupported_media'});return}
  const id=randomUUID();const folder=path.join(assetRoot,s.id);
+ const named=await chooseUploadName(req,declaredUploadName(req,`Allegato ${id.slice(0,8)}`),'asset',s.id);
+ if(named.conflict){uploadConflict(res,named.suggested!);return}
  const received=await receiveAssetStream(req,folder,id,declared,cap,length);
- try{await scanUploadedFile(received.destination);await db.query('INSERT INTO session_assets(id,session_id,uploaded_by,mime_type,byte_size,sha256) VALUES($1,$2,$3,$4,$5,$6)',[id,s.id,auth(req),declared,received.size,received.sha256])}catch(e){await unlink(received.destination);throw e}
- res.status(201).json({id,mime_type:declared,bytes:received.size,url:`/api/sessions/${s.id}/assets/${id}`});
+ try{await scanUploadedFile(received.destination);await db.query('INSERT INTO session_assets(id,session_id,uploaded_by,mime_type,byte_size,sha256,display_name) VALUES($1,$2,$3,$4,$5,$6,$7)',[id,s.id,auth(req),declared,received.size,received.sha256,named.name])}catch(e){await unlink(received.destination);throw e}
+ res.status(201).json({id,display_name:named.name,mime_type:declared,bytes:received.size,url:`/api/sessions/${s.id}/assets/${id}`});
  }catch(e){sendError(res,e)}});
 // Asset inventory and removal are always scoped to an authorized session presenter.
 app.get('/api/sessions/:id/assets',requireAuth,async(req,res)=>{try{
  const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}
- const r=await db.query('SELECT id,mime_type,byte_size,sha256,created_at FROM session_assets WHERE session_id=$1 ORDER BY created_at DESC LIMIT 500',[s.id]);
+ const r=await db.query('SELECT sa.id,coalesce(sa.display_name,b.display_name) AS display_name,sa.mime_type,sa.byte_size,sa.sha256,sa.created_at FROM session_assets sa LEFT JOIN presenter_backgrounds b ON b.id=sa.source_background_id WHERE sa.session_id=$1 ORDER BY sa.created_at DESC LIMIT 500',[s.id]);
  res.json(r.rows.map(x=>({...x,url:`/api/sessions/${s.id}/assets/${x.id}`})));
+ }catch(e){sendError(res,e)}});
+app.patch('/api/sessions/:id/assets/:assetId',requireAuth,async(req,res)=>{try{
+ const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}
+ if(s.status==='closed'){res.status(409).json({error:'session_closed'});return}
+ const name=req.body?.name;
+ if(typeof name!=='string'||!name.trim()||name.trim().length>120||/[\x00-\x1f\x7f]/.test(name)){res.status(400).json({error:'invalid_asset_name'});return}
+ const duplicate=await db.query('SELECT 1 FROM session_assets WHERE session_id=$1 AND lower(display_name)=lower($2) AND id<>$3 LIMIT 1',[s.id,name.trim(),req.params.assetId]);
+ if(duplicate.rowCount){res.status(409).json({error:'duplicate_filename'});return}
+ const result=await db.query('UPDATE session_assets SET display_name=$3 WHERE id=$1 AND session_id=$2 RETURNING id,display_name',[req.params.assetId,s.id,name.trim()]);
+ if(!result.rowCount){res.status(404).end();return}res.json(result.rows[0]);
  }catch(e){sendError(res,e)}});
 app.delete('/api/sessions/:id/assets/:assetId',requireAuth,async(req,res)=>{try{
  const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}
@@ -1257,14 +1328,14 @@ app.get('/api/sessions/:id/export.quorivio',requireAuth,async(req,res)=>{try{
  const session=await owner(req.params.id,auth(req)!);if(!session){res.status(404).end();return}
  const definition=await portableSession(session.id),refs=[...referencedAssets(definition)];
  if(refs.length>300){res.status(413).json({error:'too_many_assets'});return}
- const rows=refs.length?(await db.query('SELECT id,mime_type,byte_size,sha256 FROM session_assets WHERE session_id=$1 AND participant_id IS NULL AND id=ANY($2::uuid[])',[session.id,refs])).rows:[];
+ const rows=refs.length?(await db.query('SELECT id,display_name,background_library_copy,mime_type,byte_size,sha256 FROM session_assets WHERE session_id=$1 AND participant_id IS NULL AND id=ANY($2::uuid[])',[session.id,refs])).rows:[];
  if(rows.length!==refs.length){res.status(409).json({error:'missing_session_assets'});return}
  let total=0;const assets:BundleAsset[]=[],media=new Map<string,Buffer>();
  for(const row of rows){const bytes=Number(row.byte_size);total+=bytes;
   if(total>80*1024*1024||bytes>50*1024*1024){res.status(413).json({error:'bundle_media_limit'});return}
   const body=await readFile(path.join(assetRoot,session.id,row.id));const digest=createHash('sha256').update(body).digest('hex');
   if(body.length!==bytes||digest!==row.sha256){res.status(409).json({error:'asset_integrity_failure'});return}
-  assets.push({id:row.id,mime:row.mime_type,bytes,sha256:digest});media.set(row.id,body);
+  assets.push({id:row.id,mime:row.mime_type,bytes,sha256:digest,...(row.display_name?{display_name:row.display_name}:{}),...(row.background_library_copy?{background_library_copy:true}:{})});media.set(row.id,body);
  }
  const bundle=encodeBundle({format:'quorivio-bundle',version:1,definition,assets},media);
  if(bundle.length>MAX_BUNDLE_BYTES){res.status(413).json({error:'bundle_too_large'});return}
@@ -1293,7 +1364,7 @@ app.post('/api/sessions/:id/duplicate',requireAuth,async(req,res)=>{try{
  // participants, moderation, usage statistics, presenter invitations and join credentials.
  const portable=await portableSession(s.id);portable.session.title=(portable.session.title+' — Copia').slice(0,160);
  const refs=[...referencedAssets(portable)];
- const rows=refs.length?(await db.query('SELECT id,mime_type AS mime,byte_size AS bytes,sha256 FROM session_assets WHERE session_id=$1 AND participant_id IS NULL AND id=ANY($2::uuid[])',[s.id,refs])).rows:[];
+ const rows=refs.length?(await db.query('SELECT id,display_name,background_library_copy,mime_type AS mime,byte_size AS bytes,sha256 FROM session_assets WHERE session_id=$1 AND participant_id IS NULL AND id=ANY($2::uuid[])',[s.id,refs])).rows:[];
  if(rows.length!==refs.length){res.status(409).json({error:'missing_session_assets'});return}
  // Internal cloning also copies the referenced media. Global UUIDs must never be reused.
  // PostgreSQL BIGINT values are returned as strings by node-postgres. Bundle manifests
@@ -1518,9 +1589,10 @@ app.post('/api/sessions/:id/presentation-import',requireAuth,async(req,res)=>{
  const s=await owner(req.params.id,auth(req)!);
  if(!s){res.status(404).end();return}
  if(s.status==='closed'){res.status(409).json({error:'session_closed'});return}
- if(process.env.QUORIVIO_ENABLE_CONVERTER!=='true'){
+ if(!await converterAdmissionState().then(state=>state.enabled)){
   res.status(503).json({error:'conversion_worker_not_configured'});return;
  }
+ if(!await converterWorkerReady()){res.status(503).json({error:'conversion_worker_unavailable'});return}
  const mime=String(req.headers['content-type']||'').split(';')[0].trim().toLowerCase();
  if(!['application/pdf','application/vnd.openxmlformats-officedocument.presentationml.presentation'].includes(mime)){
   res.status(415).json({error:'unsupported_presentation'});return;
@@ -1574,8 +1646,8 @@ app.post('/api/sessions/:id/presentation-import',requireAuth,async(req,res)=>{
 // The imported PPTX becomes a NEW editable session; existing sessions are unchanged.
 app.post('/api/presentations/import-editable',requireAuth,requirePresenter,async(req,res)=>{
  const mime=String(req.headers['content-type']||'').split(';')[0].trim().toLowerCase();
- if(mime!=='application/vnd.openxmlformats-officedocument.presentationml.presentation'){res.status(415).json({error:'pptx_required'});return}
- if(process.env.QUORIVIO_ENABLE_CONVERTER!=='true'){res.status(503).json({error:'conversion_worker_not_configured'});return}
+ if(!['application/pdf','application/vnd.openxmlformats-officedocument.presentationml.presentation'].includes(mime)){res.status(415).json({error:'pdf_or_pptx_required'});return}
+ if(!await converterAdmissionState().then(state=>state.enabled)){res.status(503).json({error:'conversion_worker_not_configured'});return}
  const workerUrl=process.env.QUORIVIO_CONVERTER_WORKER_URL,token=process.env.QUORIVIO_WORKER_TOKEN||'';
  if(!workerUrl||!/^http:\/\/[a-zA-Z0-9.-]+:\d{2,5}$/.test(workerUrl)||token.length<32){res.status(503).json({error:'conversion_worker_not_configured'});return}
  const length=Number(req.headers['content-length']);
@@ -1583,7 +1655,7 @@ app.post('/api/presentations/import-editable',requireAuth,requirePresenter,async
  const scratch=path.join(process.env.QUORIVIO_CONVERSION_DIR||'/conversions',randomBytes(16).toString('hex'));
  await mkdir(scratch,{recursive:false,mode:0o700});
  try{
-  const received=await receiveAssetStream(req,scratch,'source.pptx',mime,50*1024*1024,length);
+  const received=await receiveAssetStream(req,scratch,mime==='application/pdf'?'source.pdf':'source.pptx',mime,50*1024*1024,length);
   await scanUploadedFile(received.destination);
   const controller=new AbortController(),deadline=setTimeout(()=>controller.abort(),240000);
   let fidelity:unknown;
@@ -1594,13 +1666,13 @@ app.post('/api/presentations/import-editable',requireAuth,requirePresenter,async
   const portable=JSON.parse(file.toString('utf8'));
   if(!validPortable(portable))throw Error('invalid_editable_conversion');
   const id=await createFromPortable(portable,auth(req)!,path.join(scratch,'import-media'));
-  res.status(201).json({id,pages:portable.activities.length,warning:'partial_pptx_fidelity',fidelity});
+  res.status(201).json({id,pages:portable.activities.length,warning:mime==='application/pdf'?'partial_pdf_fidelity':'partial_pptx_fidelity',fidelity});
  }catch(e){sendError(res,e)}finally{await rm(scratch,{recursive:true,force:true}).catch(()=>{})}
 });
 async function servePresentationExport(req:express.Request,res:express.Response,format:'pptx'|'pdf'){
  try{
   const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}
-  if(process.env.QUORIVIO_ENABLE_CONVERTER!=='true'){res.status(503).json({error:'conversion_worker_not_configured'});return}
+  if(!await converterAdmissionState().then(state=>state.enabled)){res.status(503).json({error:'conversion_worker_not_configured'});return}
   const workerUrl=process.env.QUORIVIO_CONVERTER_WORKER_URL,token=process.env.QUORIVIO_WORKER_TOKEN||'';
   if(!workerUrl||!/^http:\/\/[a-zA-Z0-9.-]+:\d{2,5}$/.test(workerUrl)||token.length<32){res.status(503).json({error:'conversion_worker_not_configured'});return}
   const scratch=path.join(process.env.QUORIVIO_CONVERSION_DIR||'/conversions',randomBytes(16).toString('hex'));
