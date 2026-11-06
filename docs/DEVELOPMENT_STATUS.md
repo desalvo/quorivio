@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC212 — Private participant snapshot CI reconciliation
+
+**RC212:** RC211 full CI `42140039942` failed RC185 preflight: a historical assertion confused internal `presenter_activity_id` use for shared footer numbering with exposing that ID to participants. Repaired the test and the function boundary, added fail-closed Python mutations and four Node behavioral tests executing the actual public snapshot function. No runtime or authorization changes. Full RC212 CI pending; last full-green RC203 `42110429701`. Certified **85.25%** (43 accepted, 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag. See `docs/RC_CYCLE212_PARTICIPANT_PROJECTION_CI.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC211 — Presenter numbering CI reconciliation
 
 **RC211:** RC210 full CI `42139200296` stopped at the RC195 Python preflight: two historical tests expected the audience page ordinal rather than the current visible presenter page ordinal for the footer. Also repaired the related RC91 contract; introduced fail-closed RC211 mutation tests and an early preflight. No app-runtime, DB, or authorization changes. Version `0.1.0-dev`; certified **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. RC211 full CI pending; last fully green RC203 `42110429701`. No commit/push/tag. See `docs/RC_CYCLE211_PRESENTER_NUMBERING_CI.en.md`.

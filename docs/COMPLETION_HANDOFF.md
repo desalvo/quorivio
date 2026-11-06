@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC212 — Public projection CI handoff
+
+**RC212:** Resume from RC211 with all RC204–211 capabilities preserved. Reconciled RC185 with RC206: `presenter_activity_id` may be read internally only to compute the shared `presenter_page_number` but must not appear in the participant snapshot. Added Python negative mutations, four Node tests executing the actual function and a new CI preflight. RC212 full CI pending; last fully green RC203 `42110429701`. Certified **85.25%** (43 accepted, 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag. See `docs/RC_CYCLE212_PARTICIPANT_PROJECTION_CI.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC211 — Numbering CI reconciliation handoff
 
 **RC211:** Reconciled historic RC91/RC195 assertions to the RC206 presenter-visible page number shared by participant footer, retaining independent participant content. Added early fail-closed RC211 mutation checks. RC211 full CI pending; last full-green RC203 `42110429701`. Certified **85.25%** (43 accepted/17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag. See `docs/RC_CYCLE211_PRESENTER_NUMBERING_CI.en.md`.

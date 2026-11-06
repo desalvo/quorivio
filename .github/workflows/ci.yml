@@ -265,6 +265,13 @@ jobs:
         run: |
           python3 -m unittest tools.tests.test_rc185_cross_page_projection -q
           node --experimental-strip-types --test apps/api/test/rc185-dual-projection.test.ts apps/web/test/rc185-projection-navigation.test.ts
+      # RC212: RC206 page numbering needs the presenter ID internally, but the
+      # public participant snapshot must never disclose presenter routing or
+      # unpublished slide content. Run real projection behavior before npm.
+      - name: RC212 private presenter routing and audience footer projection before npm
+        run: |
+          python3 -m unittest tools.tests.test_rc212_private_presenter_projection_ci tools.tests.test_rc185_cross_page_projection -q
+          node --experimental-strip-types --test apps/api/test/rc212-participant-snapshot.test.ts
       # RC186: Enter in the second-factor input must submit the same validated
       # form as the visible button, without triggering duplicate MFA requests.
       - name: RC186 TOTP Enter and secure second-factor form preflight
@@ -1262,7 +1269,8 @@ jobs:
           python3 tools/verify_rc_cycle208_inventory.py --historical
           python3 tools/verify_rc_cycle209_inventory.py --historical
           python3 tools/verify_rc_cycle210_inventory.py --historical
-          python3 tools/verify_rc_cycle211_inventory.py
+          python3 tools/verify_rc_cycle211_inventory.py --historical
+          python3 tools/verify_rc_cycle212_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

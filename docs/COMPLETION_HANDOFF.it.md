@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC212 — Handoff proiezione pubblica
+
+**RC212:** Ripartire dalla RC211 con tutte le funzioni RC204–211. Allineato RC185 alla semantica RC206: `presenter_activity_id` può essere letto solo internamente per calcolare `presenter_page_number`, senza comparire nello snapshot partecipante. Aggiunti controllo negativo Python, 4 test Node sulla funzione reale e preflight CI. Full CI RC212 non ancora verificata; ultima completamente verde RC203 `42110429701`. Certificato **85,25%** (43 gate accettati, 17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Vedi `docs/RC_CYCLE212_PARTICIPANT_PROJECTION_CI.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC211 — Handoff controllo numerazione e CI
 
 **RC211:** Allineati i test storici RC91/RC195 alla numerazione pagina presentatore introdotta in RC206; conservata la differenza del contenuto partecipanti e verificata la numerazione condivisa senza buchi. Nuovo preflight con mutazioni negative. Full CI RC211 ancora da eseguire; ultima completa verde RC203 `42110429701`. Certificato **85,25%**, 43 gate accettati e 17 parziali. `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Vedi `docs/RC_CYCLE211_PRESENTER_NUMBERING_CI.it.md`.

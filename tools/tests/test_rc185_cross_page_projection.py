@@ -12,10 +12,17 @@ SCHEMA = (ROOT / 'apps/api/src/schema.sql').read_text()
 class IndependentLivePages(unittest.TestCase):
     def test_participant_receives_only_current_audience_page(self):
         start = API.index('function participantSnapshot(')
-        snippet = API[start:API.index('\n}', start) + 2]
+        # The RC206 audience footer needs the presenter page *number*, not its
+        # private activity ID. Examine the actual one-line function boundary:
+        # the historical '\n}' search accidentally consumed later functions.
+        snippet = API[start:API.index('\nconst webRoot=', start)]
+        self.assertIn('const presenterId=data.session.presenter_activity_id||data.session.current_activity_id', snippet)
         self.assertIn('data.session.current_activity_id', snippet)
-        self.assertNotIn('presenter_activity_id', snippet)
-        self.assertIn('published?[publicActivity(published)]:[]', snippet)
+        self.assertIn('presenter_page_number:presenterNumber', snippet)
+        public_response = snippet.split('return {session:', 1)[1]
+        self.assertNotIn('presenter_activity_id', public_response)
+        self.assertNotIn('presenterId', public_response)
+        self.assertIn('published?[publicActivity(published)]:[]', public_response)
 
     def test_one_open_audience_page_and_transactional_cas(self):
         route = API[API.index("app.post('/api/sessions/:id/activities/:aid/open'"):

@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC212 — Snapshot partecipante privato e numerazione sincronizzata
+
+**RC212:** Full CI RC211 `42140039942` fallita in preflight RC185: un contratto storico confondeva l'uso interno di `presenter_activity_id` per il numero della pagina con la sua esposizione pubblica. Corretto il test e l'estrazione della funzione; aggiunti un controllo negativo Python e quattro prove Node che eseguono lo snapshot reale senza divulgare ID privati o pagine non pubblicate. Runtime e autorizzazioni invariati. Full CI RC212 da verificare, ultima full CI verde RC203 `42110429701`. Completamento certificato **85,25%** (43 accettati, 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Vedi `docs/RC_CYCLE212_PARTICIPANT_PROJECTION_CI.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC211 — Correzione CI numerazione presentatore
 
 **RC211:** La full CI RC210 `42139200296` si è arrestata nello step RC195: due test storici pretendevano ancora la numerazione del footer basata sulla pagina del partecipante, anziché sulla pagina visibile corrente del presentatore. Corretto anche il contratto RC91 con la stessa aspettativa; aggiunti test negativi RC211 e preflight dedicato per impedire il ritorno alla numerazione con buchi o indipendente tra gli schermi. Nessuna modifica al runtime, DB o autorizzazioni. Versione `0.1.0-dev`; certificato **85,25%** (43 accettati, 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full CI RC211 da verificare; ultima full CI verde RC203 `42110429701`. Nessun commit/push/tag. Dettagli `docs/RC_CYCLE211_PRESENTER_NUMBERING_CI.it.md`.
