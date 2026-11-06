@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC232 — Correzione ordine dipendenze convertitore CI
+
+**RC232:** La full CI GitHub `42237834439` sul commit RC231 (`86721afdd9ebed4ee9158d5770d7e4535c3b77a8`) falliva nel preflight RC229 perché i test reali PDF/PPTX venivano eseguiti prima di installare Poppler, ReportLab e LibreOffice: 6 errori e 3 fallimenti sui 101 test. RC232 mantiene i test statici prima di npm, sposta i test reali dopo il provisioning OS/Python e aggiunge un controllo fail-closed sull’ordine dei passi. RC231 resta storico e RC232 diventa corrente. Nessun cambio alla logica applicativa. Full CI RC232 da verificare; ultima completamente verde RC219 `42197607753`. Completamento certificato **85,25%** (43 accettati/17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Dettagli: `docs/RC_CYCLE232_CONVERTER_CI_DEPENDENCIES.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC231 — Correzione import Python preflight CI
 
 **RC231:** La full CI GitHub `42233651517` sul commit RC230 `3f8aa5b3111cd5990bf3a6dc953eac27789656cf` falliva prima delle dipendenze: `tools.verify_rc_current_inventory` importava un modulo vicino senza garantire la presenza della directory `tools` in `sys.path` durante unittest dalla radice, senza `PYTHONPATH`. Corretto il resolver per invocazioni come modulo o script, aggiunti test in sottoprocesso che non richiedono `PYTHONPATH`; RC230 resta storico e RC231 è l’inventario attivo. Nessuna modifica applicativa. Full CI RC231 da verificare; ultima verde RC219 `42197607753`. Completamento certificato **85,25%** (43 accettati/17 parziali), invariato. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Dettagli: `docs/RC_CYCLE231_IMPORT_PATHS.it.md`.

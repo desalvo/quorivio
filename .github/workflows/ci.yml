@@ -252,9 +252,9 @@ jobs:
         run: |
           python3 -m unittest tools.tests.test_rc224_thumbnail_arials -q
           node --experimental-strip-types --test apps/web/test/rc224-thumbnail-menu-arial.test.ts
-      # RC229: reconcile obsolete source-string fixtures against the accessible
-      # QR link, modern canvas scaling, safe named-upload errors and bounded PPTX
-      # worker. Run before npm to avoid costly unrelated jobs for stale tests.
+      # RC229: run source-only UI/worker contracts before npm. The native PDF/PPTX
+      # conversion boundary suite requires Poppler, LibreOffice and ReportLab;
+      # RC232 runs it AFTER those OS/Python packages are provisioned.
       - name: RC229 consolidated legacy UI and converter preflight before npm
         run: |
           python3 -m unittest -q tools.tests.test_rc229_historical_ci_consolidation \
@@ -263,8 +263,11 @@ jobs:
             tools.tests.test_rc137_presenter_privacy_background \
             tools.tests.test_rc144_mobile_rating \
             tools.tests.test_rc162_mobile_qr_contracts \
-            tools.tests.test_rc_cycle89_editor_feedback \
-            tools.tests.test_rc_conversion_30_cycle
+            tools.tests.test_rc_cycle89_editor_feedback
+      # RC232: prevent runtime PDF/PPTX conversion acceptance from running
+      # before its native and Python dependencies are installed on fresh runners.
+      - name: RC232 conversion test provisioning order preflight before npm
+        run: python3 -m unittest tools.tests.test_rc232_conversion_ci_order -q
       # RC228: the historical RC225 gallery test must accept RC227's portaled
       # accessible scheme dialog, without weakening its modal and selection checks.
       - name: RC228 historical modal-gallery CI contract before npm
@@ -1137,6 +1140,13 @@ jobs:
           python3 -c 'import reportlab' # fail gate rather than skipping the PDF rendering test
           python3 -c 'import pptx, aiohttp' # enforce PPTX and load-test integration prerequisites
           python3 -c 'import PIL' # enforce Pillow before native slide-snapshot regression
+          command -v pdfinfo >/dev/null
+          command -v pdftoppm >/dev/null
+          command -v libreoffice >/dev/null
+      # RC232: run real conversion/quotas/PPTX assertions only after the native
+      # binaries and Python packages above exist. Keep all tests mandatory.
+      - name: RC232 PDF/PPTX converter boundary after native dependencies
+        run: python3 -m unittest tools.tests.test_rc_conversion_30_cycle -q
       - name: RC202 native imported-slide PowerPoint fidelity after Python dependencies
         run: PYTHONPATH=tools python3 -m unittest tools.tests.test_rc200_editor_portability.RC200NativePowerPointPortability -v
       - name: RC205 imported raster slide round-trip and editability
@@ -1420,7 +1430,8 @@ jobs:
           python3 tools/verify_rc_cycle228_inventory.py --historical
           python3 tools/verify_rc_cycle229_inventory.py --historical
           python3 tools/verify_rc_cycle230_inventory.py --historical
-          python3 tools/verify_rc_cycle231_inventory.py
+          python3 tools/verify_rc_cycle231_inventory.py --historical
+          python3 tools/verify_rc_cycle232_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

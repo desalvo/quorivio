@@ -14,7 +14,9 @@ ROOT = Path(__file__).resolve().parents[2]
 
 class RC231PythonImportPaths(unittest.TestCase):
     def test_current_verifier_module_is_resolved_from_project_root(self):
-        self.assertEqual(current_verifier_module().__name__, 'verify_rc_cycle231_inventory')
+        # The import-path contract survives subsequent promotions of the current RC.
+        self.assertRegex(current_verifier_module().__name__, r'^verify_rc_cycle[0-9]+_inventory$')
+        self.assertGreaterEqual(int(current_verifier_module().__name__.split('cycle', 1)[1].split('_', 1)[0]), 231)
 
     def test_ci_unittest_entrypoint_runs_without_pythonpath(self):
         env = os.environ.copy()
