@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC213 — Correzione TypeScript dello stato delle miniature
+
+**RC213:** Full CI RC212 `42140973603` arrestata nel typecheck TypeScript (TS2448/TS2454): `pageOrderPending` veniva letto nelle dipendenze di un effetto prima della sua dichiarazione. Spostato lo stesso hook nel blocco incondizionato degli stati `App()`, conservate le operazioni sulle pagine e introdotti test preventivi con mutazioni negative. Full CI RC213 da eseguire; ultima verde RC203 `42110429701`. Certificato **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Vedi `docs/RC_CYCLE213_PAGE_ORDER_TYPESCRIPT_CI.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC212 — Snapshot partecipante privato e numerazione sincronizzata
 
 **RC212:** Full CI RC211 `42140039942` fallita in preflight RC185: un contratto storico confondeva l'uso interno di `presenter_activity_id` per il numero della pagina con la sua esposizione pubblica. Corretto il test e l'estrazione della funzione; aggiunti un controllo negativo Python e quattro prove Node che eseguono lo snapshot reale senza divulgare ID privati o pagine non pubblicate. Runtime e autorizzazioni invariati. Full CI RC212 da verificare, ultima full CI verde RC203 `42110429701`. Completamento certificato **85,25%** (43 accettati, 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Vedi `docs/RC_CYCLE212_PARTICIPANT_PROJECTION_CI.it.md`.

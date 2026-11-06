@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC213 — Frontend page order typecheck handoff
+
+**RC213:** Continue from the RC213 cumulative ZIP, preserving all RC204–RC212 features. The RC212 GitHub CI run `42140973603` identified real React `pageOrderPending` temporal-dead-zone TypeScript errors TS2448/TS2454. Initializer relocated before shortcut effect; pre-npm negative mutation tests guard recurrence. Need full GitHub CI for RC213. Latest fully green RC203 `42110429701`; certified **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag. See `docs/RC_CYCLE213_PAGE_ORDER_TYPESCRIPT_CI.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC212 — Public projection CI handoff
 
 **RC212:** Resume from RC211 with all RC204–211 capabilities preserved. Reconciled RC185 with RC206: `presenter_activity_id` may be read internally only to compute the shared `presenter_page_number` but must not appear in the participant snapshot. Added Python negative mutations, four Node tests executing the actual function and a new CI preflight. RC212 full CI pending; last fully green RC203 `42110429701`. Certified **85.25%** (43 accepted, 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag. See `docs/RC_CYCLE212_PARTICIPANT_PROJECTION_CI.en.md`.

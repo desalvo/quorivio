@@ -180,6 +180,11 @@ jobs:
       # the title-only authorized path is disconnected.
       - name: RC210 selection-aware thumbnail rename contract before npm
         run: python3 -m unittest tools.tests.test_rc210_thumbnail_rename_ci -q
+      # RC213: the RC206 thumbnail keyboard effect had a TS2448/TS2454
+      # temporal-dead-zone read in its dependency array. Guard hook order
+      # before npm and retain the strict real TypeScript compile later.
+      - name: RC213 React page order state initialization before npm
+        run: python3 -m unittest tools.tests.test_rc213_page_order_state_ci -q
       - name: RC196 cross-page source question frontend typing contract before npm
         run: python3 -m unittest tools.tests.test_rc196_frontend_results_types -q
       # RC211: independent audience slide content must use the presenter's
@@ -1270,7 +1275,8 @@ jobs:
           python3 tools/verify_rc_cycle209_inventory.py --historical
           python3 tools/verify_rc_cycle210_inventory.py --historical
           python3 tools/verify_rc_cycle211_inventory.py --historical
-          python3 tools/verify_rc_cycle212_inventory.py
+          python3 tools/verify_rc_cycle212_inventory.py --historical
+          python3 tools/verify_rc_cycle213_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

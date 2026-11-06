@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC213 — Frontend page-order hook typecheck recovery
+
+**RC213:** RC212 full CI `42140973603` stopped at strict TypeScript TS2448/TS2454: `pageOrderPending` was read in a thumbnail-keyboard effect dependency before initialization. Moved the existing React state hook into unconditional `App()` state declarations, kept all page actions unchanged, added pre-npm fail-closed mutation coverage, and retained the mandatory strict TypeScript gate. Integrated RC213 full CI pending; last green RC203 `42110429701`. Certified **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag. See `docs/RC_CYCLE213_PAGE_ORDER_TYPESCRIPT_CI.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC212 — Private participant snapshot CI reconciliation
 
 **RC212:** RC211 full CI `42140039942` failed RC185 preflight: a historical assertion confused internal `presenter_activity_id` use for shared footer numbering with exposing that ID to participants. Repaired the test and the function boundary, added fail-closed Python mutations and four Node behavioral tests executing the actual public snapshot function. No runtime or authorization changes. Full RC212 CI pending; last full-green RC203 `42110429701`. Certified **85.25%** (43 accepted, 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag. See `docs/RC_CYCLE212_PARTICIPANT_PROJECTION_CI.en.md`.

@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC213 — Handoff TypeScript ordine pagine
+
+**RC213:** Ripartire dal cumulativo RC213 con tutte le funzionalità RC204–212. La full CI RC212 `42140973603` ha rilevato errori reali TypeScript TS2448/TS2454 per l’uso di `pageOrderPending` prima della dichiarazione. Inizializzazione anticipata e test preventivo con mutazioni negative; full CI RC213 da eseguire. Ultima interamente verde RC203 `42110429701`; certificato **85,25%** (43 gate accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Vedi `docs/RC_CYCLE213_PAGE_ORDER_TYPESCRIPT_CI.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC212 — Handoff proiezione pubblica
 
 **RC212:** Ripartire dalla RC211 con tutte le funzioni RC204–211. Allineato RC185 alla semantica RC206: `presenter_activity_id` può essere letto solo internamente per calcolare `presenter_page_number`, senza comparire nello snapshot partecipante. Aggiunti controllo negativo Python, 4 test Node sulla funzione reale e preflight CI. Full CI RC212 non ancora verificata; ultima completamente verde RC203 `42110429701`. Certificato **85,25%** (43 gate accettati, 17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Vedi `docs/RC_CYCLE212_PARTICIPANT_PROJECTION_CI.it.md`.
