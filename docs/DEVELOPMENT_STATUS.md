@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC218 — Real PostgreSQL thumbnail rename browser recovery
+
+**RC218:** The RC217 full CI (run `42191917542`) passed earlier checks but failed in real Chromium/PostgreSQL editor acceptance: the script expected `Rinomina pagina` exactly, while RC206 shows `Rinomina pagina (R)` or the selected-pages variant. The browser now matches the anchored accessible name **inside the portaled page-menu group**. Added early negative-mutation contract checks; no runtime modifications. Full RC218 CI pending; last fully green RC203 (`42110429701`). Certified **85.25%** (43 accepted/17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no assistant commit/push/tag. See `docs/RC_CYCLE218_REAL_EDITOR_THUMBNAIL_RENAME_CI.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC217 — Dynamic public mobile page geometry
 
 **RC217:** RC216 full CI `42150766799` failed real Chromium participant phone acceptance because its 998px fixed height predates RC207 44px answer rows (new legitimate height 1028px). Browser acceptance now uses computed bounds of seven visible public widgets and checks margins, gaps, footer and absence of phantom private-widget space. RC168/169/177 historical assertions reconciled, pre-npm negative Python/Node checks and local 390/1440 Chromium pass; integrated RC217 CI pending. No app runtime changes; last green RC203; certified **85.25%** (43 accepted/17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag. See `docs/RC_CYCLE217_PUBLIC_PHONE_DYNAMIC_HEIGHT.en.md`.

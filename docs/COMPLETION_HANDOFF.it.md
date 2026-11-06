@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC218 — Handoff test rinomina miniatura con PostgreSQL
+
+**RC218 handoff:** Riprendere dal nuovo ZIP cumulativo RC218. Run RC217 `42191917542`, quality gate `127805753403`: timeout dell’esatto selettore `Rinomina pagina` nel browser Chromium/PostgreSQL reale; il menu corrente usa `Rinomina pagina (R)` o `Rinomina pagine selezionate (R)`. Test corretto nel gruppo portaled `Azioni pagina 1` con una sola corrispondenza; rimangono le verifiche reali DB su titolo, revisioni, conflitti ed export. Aggiunta regressione preventiva con mutazioni negative, nessuna modifica al runtime. Full CI da eseguire; ultima verde RC203. Completamento certificato **85,25%**; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Dettagli in `docs/RC_CYCLE218_REAL_EDITOR_THUMBNAIL_RENAME_CI.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC217 — Handoff altezza smartphone pubblico
 
 **RC217:** Ripartire dal cumulativo RC217. Dopo il miglioramento RC207 dell’altezza minima delle opzioni, il test integrato RC176/RC165 usava ancora 998px e ha bloccato RC216 (`42150766799`); altezza reale fixture 1028px. Il controllo ora deriva l’altezza dai soli widget visibili e verifica 16px/8px, footer e assenza degli spazi privati. Aggiornati i test storici e i preflight Python/Node. Chromium sintetico reale 390/1440 verde; full CI GitHub RC217 necessaria. Runtime immutato; **85,25%**, `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Dettagli in `docs/RC_CYCLE217_PUBLIC_PHONE_DYNAMIC_HEIGHT.it.md`.

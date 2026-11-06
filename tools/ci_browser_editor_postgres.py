@@ -7,6 +7,7 @@ session and a browser cookie jar authenticated through the real API.
 import asyncio
 import json
 import os
+import re
 from pathlib import Path
 from urllib.parse import urlsplit
 from playwright.async_api import async_playwright, expect
@@ -147,8 +148,15 @@ async def main():
    # Rename the current page through the thumbnail menu. No question options,
    # response history, or widget geometry may be overwritten by a title edit.
    await page.get_by_role('button',name='Menu pagina 1: crea, duplica, elimina, sposta').click()
+   # RC218: the selection-aware thumbnail menu explicitly advertises (R), and
+   # Ctrl/Cmd+click can change its label to plural. Scope to the portaled page
+   # action group so the unrelated canvas-background rename cannot match.
+   actions=page.get_by_role('group',name='Azioni pagina 1',exact=True)
+   await expect(actions).to_be_visible()
+   rename=actions.get_by_role('button',name=re.compile(r'^Rinomina (?:pagina|pagine selezionate) \(R\)$'))
+   await expect(rename).to_have_count(1)
    page.once('dialog',lambda dialog:asyncio.create_task(dialog.accept('Renamed browser slide')))
-   await page.get_by_role('button',name='Rinomina pagina',exact=True).click()
+   await rename.click()
    await expect(page.get_by_role('button',name='Mostra pagina 1: Renamed browser slide',exact=False)).to_be_visible()
    renamed=await call(context,'GET',f'/api/sessions/{sid}')
    renamed_activity=next(x for x in renamed['activities'] if x['id']==aid)

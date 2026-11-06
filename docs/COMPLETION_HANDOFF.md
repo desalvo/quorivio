@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC218 — Browser PostgreSQL thumbnail rename handoff
+
+**RC218 handoff:** Continue from the new cumulative RC218 ZIP. RC217 run `42191917542` / quality job `127805753403` timed out on the obsolete exact-name `Rinomina pagina` locator in real Chromium PostgreSQL editor acceptance. The current thumbnail menu uses `Rinomina pagina (R)` or `Rinomina pagine selezionate (R)`. Updated the browser test to scope the portaled `Azioni pagina 1` group, assert one anchored match, and retain real database readback/conflict/export checks. Added early negative-mutation preflight; no app-runtime changes. Full CI still required, last full green RC203. Certified **85.25%**; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. Details in `docs/RC_CYCLE218_REAL_EDITOR_THUMBNAIL_RENAME_CI.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC217 — Dynamic participant-phone stage handoff
 
 **RC217:** Continue from RC217 cumulative. RC216 full run `42150766799` failed because the old real Chromium participant fixture enforced 998px after RC207 increased minimum question choice rows, legitimately yielding 1028px. The updated browser contract derives expected height from seven visible public widget bounds, checks 16px margins/8px gaps/footer and rejects phantom private controls. RC168/RC169/RC177 historical tests reconciled, new early Python/Node mutation controls and local real Chromium 390/1440 green. GitHub RC217 full CI pending; runtime unchanged; certified **85.25%**, `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag. See `docs/RC_CYCLE217_PUBLIC_PHONE_DYNAMIC_HEIGHT.en.md`.

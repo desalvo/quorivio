@@ -194,6 +194,11 @@ jobs:
             tools.tests.test_editor_contextual_layout_v2 \
             tools.tests.test_editor_thumbnail_keyboard_rc \
             tools.tests.test_page_editor_followup
+      # RC218: RC206 selection-aware thumbnail menus include a shortcut suffix
+      # and optionally a plural label. Guard the real PostgreSQL Chromium
+      # selector and persisted title-only rename before installing npm.
+      - name: RC218 real editor thumbnail rename browser contract before npm
+        run: python3 -m unittest tools.tests.test_rc218_browser_postgres_thumbnail_rename -q
       # RC215: RC141 compared a glyph Range top with an output border-box
       # top, falsely failing all four surfaces; preserve glyph-to-glyph checks.
       - name: RC215 results word/count glyph alignment contract before npm
@@ -1304,7 +1309,8 @@ jobs:
           python3 tools/verify_rc_cycle214_inventory.py --historical
           python3 tools/verify_rc_cycle215_inventory.py --historical
           python3 tools/verify_rc_cycle216_inventory.py --historical
-          python3 tools/verify_rc_cycle217_inventory.py
+          python3 tools/verify_rc_cycle217_inventory.py --historical
+          python3 tools/verify_rc_cycle218_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC218 — Ripristino browser rinomina miniatura con PostgreSQL
+
+**RC218:** La full CI RC217 (`42191917542`) ha superato i controlli precedenti ma è fallita nel test Chromium/PostgreSQL dell’editor: selettore esatto `Rinomina pagina` obsoleto rispetto a `Rinomina pagina (R)` e alla variante plurale RC206. Il test verifica ora l’etichetta accessibile ancorata **dentro il menu portaled della miniatura**. Aggiunta regressione preventiva con mutazioni negative; nessuna modifica al runtime. Full CI RC218 da eseguire, ultima interamente verde RC203 (`42110429701`). Completamento **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Dettagli: `docs/RC_CYCLE218_REAL_EDITOR_THUMBNAIL_RENAME_CI.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC217 — Altezza dinamica canvas smartphone
 
 **RC217:** La run RC216 `42150766799` è fallita nel test Chromium partecipante perché confrontava l’altezza smartphone con i vecchi 998px, incompatibili con le risposte RC207 alte almeno 44px (altezza attuale 1028px). Ora il test confronta l’altezza con i sette widget pubblici renderizzati e verifica margini, distanze, footer, nessuno spazio fantasma privato. Test storici RC168/169/177 riconciliati, prove Python/Node fail-closed prima di npm e Chromium locale a 390/1440 superati; full CI RC217 da eseguire. Runtime invariato, ultima full verde RC203, certificato **85,25%** (43 gate accettati/17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Vedi `docs/RC_CYCLE217_PUBLIC_PHONE_DYNAMIC_HEIGHT.it.md`.
