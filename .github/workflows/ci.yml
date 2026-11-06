@@ -175,6 +175,11 @@ jobs:
             tools.tests.test_rc_presenter_linked_preview_20261028 \
             tools.tests.test_rehearsal_send_parity_20261028 \
             tools.tests.test_visual_parity_rehearsal_20261028
+      # RC210: RC206 moved thumbnail rename behind the selection-aware batch
+      # handler. Keep the historical UI contract aligned and fail early if
+      # the title-only authorized path is disconnected.
+      - name: RC210 selection-aware thumbnail rename contract before npm
+        run: python3 -m unittest tools.tests.test_rc210_thumbnail_rename_ci -q
       - name: RC196 cross-page source question frontend typing contract before npm
         run: python3 -m unittest tools.tests.test_rc196_frontend_results_types -q
       - name: RC195 centralized Arial master typography contract before npm
@@ -1248,7 +1253,8 @@ jobs:
           python3 tools/verify_rc_cycle206_inventory.py --historical
           python3 tools/verify_rc_cycle207_inventory.py --historical
           python3 tools/verify_rc_cycle208_inventory.py --historical
-          python3 tools/verify_rc_cycle209_inventory.py
+          python3 tools/verify_rc_cycle209_inventory.py --historical
+          python3 tools/verify_rc_cycle210_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

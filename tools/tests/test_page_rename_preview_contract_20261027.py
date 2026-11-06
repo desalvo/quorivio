@@ -22,7 +22,14 @@ class PageRenamePreviewContract(unittest.TestCase):
   self.assertIn('async function renameCanvasPage(page:Activity)',UI)
   self.assertIn('onRenamePage={renameCurrentCanvasPage}',UI)
   self.assertIn('>Rinomina pagina</button>',UI)
-  self.assertIn('void renameCanvasPage(a)',UI)
+  # RC206+: thumbnail rename is selection-aware. A batch iterates the
+  # ordered page IDs and still uses the authorized, title-only endpoint.
+  # The canvas context action remains an independent single-page entry point.
+  self.assertIn('async function renameSelectedPages(fallbackId?:string)',UI)
+  self.assertIn('orderedSelectedPageIds(snapshot.activities,selectedPageIds.length?',UI)
+  self.assertIn('if(page)await renameCanvasPage(page)',UI)
+  self.assertIn('void renameSelectedPages(a.id)',UI)
+  self.assertIn("if(action==='rename')void renameSelectedPages()",UI)
   self.assertIn('setSnap(old=>old?{...old,activities:old.activities.map(',UI)
  def test_rehearsal_exposes_one_page_with_navigation_only_in_preview_footer(self):
   block=UI.split('function SessionRehearsal(',1)[1].split('const editorWidgetKinds=',1)[0]
