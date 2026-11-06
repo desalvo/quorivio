@@ -9,7 +9,7 @@ CSS=(ROOT/'apps/web/src/style.css').read_text(encoding='utf-8')
 HTML='''<!doctype html><html><head><meta charset="utf-8"><style>__CSS__</style></head>
 <body class="editor-ux-v2"><div class="widget-selection-palette editor-floating-panel" style="top:10px;left:8px" role="toolbar" aria-label="Formato widget">
   <div class="palette-ribbon-head"><span class="palette-ribbon-context">Formato widget</span><strong class="palette-widget-label">Risultati</strong><span class="palette-ribbon-selection">Testo selezionato nella domanda</span><button type="button" class="palette-ribbon-dismiss" aria-label="Chiudi Formato widget" onclick="this.closest('.widget-selection-palette').remove()">X</button></div>
-  <div class="palette-ribbon-groups">__GROUPS__</div></div>
+  <div class="palette-ribbon-groups" role="tabpanel" tabindex="0" aria-label="Opzioni formato">__GROUPS__</div></div>
   <div class="linked-results result-view-cloud" style="position:absolute;top:350px;left:8px;width:175px;height:200px;font-size:17px;">
     <div class="linked-results-items"><div class="linked-results-row"><span class="linked-result-pair"><span class="linked-result-label">Infrastrutture di calcolo distribuito </span><span class="linked-result-final">avanzato<output>[15]</output></span></span></div></div>
   </div>

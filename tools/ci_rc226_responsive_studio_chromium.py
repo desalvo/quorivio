@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
-"""RC226 actual CSS acceptance on phone + tablet + desktop: studio screens fit."""
+"""RC226 studio geometry acceptance, reconciled with RC234 wrapped mobile palette.
+
+The original RC226 requirement for *horizontal* palette scrolling was replaced
+by RC234: mobile tools wrap vertically and must remain keyboard/scroll reachable.
+The filmstrip of page thumbnails still scrolls horizontally as designed.
+"""
 from pathlib import Path
 import asyncio
 from playwright.async_api import async_playwright
 ROOT=Path(__file__).resolve().parents[1]
 CSS=(ROOT/'apps/web/src/style.css').read_text()
 SHELL='''<div class="app"><header><span class="brand">Quorivio</span><nav><a href="#">Manuale</a><a href="#">Dashboard</a><button>Logout</button></nav></header><div class="dashboard"><aside class="aside"><div class="list"><button class="session">Sessione lunga</button><button class="session">Un'altra sessione</button></div></aside><main class="workspace"><div class="workspace-head"><h2>Dashboard</h2><button>Apri sessione</button></div><section class="panel"><h3>Statistiche</h3><table><tr>'''+''.join('<td>Dati '+str(i)+'</td>' for i in range(15))+'''</tr></table></section><div class="slide-scheme-workspace"><header class="slide-scheme-header"><h2>Editor schemi</h2><button>Esci</button></header><div class="slide-scheme-ribbon">'''+''.join('<div class="slide-scheme-ribbon-group"><strong>Allinea</strong><div class="slide-scheme-ribbon-actions">'+''.join('<button class="slide-scheme-ribbon-tool"><span class="slide-scheme-ribbon-icon">▤</span><span class="slide-scheme-ribbon-caption">'+str(i)+'</span></button>' for i in range(6))+'</div></div>' for _ in range(4))+'''</div><div class="slide-scheme-widget-rail"><strong>Widget</strong><div class="slide-scheme-widget-options">'''+''.join('<button data-widget-kind="question"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></svg><span>Domanda</span></button>' for _ in range(15))+'''</div></div><div class="slide-scheme-layout"><div class="slide-scheme-canvas"><div class="canvas-with-rulers"><div class="widget-canvas"></div></div></div><aside class="panel slide-scheme-inspector">Proprietà dello schema</aside></div></div></main></div></div>'''
-EDITOR='''<section class="editor-ux-v2"><header class="editor-mock-header"><div class="editor-mock-brand">Quorivio</div><div class="editor-mock-actions"><div class="editor-mock-action-buttons"><button>Esci</button><button>Anteprima</button><button>Salva</button></div></div><div class="editor-device-switch">Smartphone</div></header><aside class="page-editor-sidebar"><header><strong>Pagine</strong></header><div class="page-editor-thumbnails">'''+''.join('<div class="page-editor-thumb-row"><button class="page-editor-thumb"><span class="page-editor-preview">Anteprima</span></button></div>' for _ in range(16))+'''</div></aside><div class="editor-widget-rail"><div class="editor-widget-grid">'''+''.join('<button class="editor-icon-tool">A</button>' for _ in range(16))+'''</div></div><main class="editor-stage"><div class="editor-canvas-slot"><div class="canvas-editor-group"><div class="canvas-with-rulers"><div class="widget-canvas"></div></div></div></div><div class="editor-bottom-controls">Azioni</div></main></section>'''
+EDITOR='''<section class="editor-ux-v2"><header class="editor-mock-header"><div class="editor-mock-brand">Quorivio</div><div class="editor-mock-actions"><div class="editor-mock-action-buttons"><button>Esci</button><button>Anteprima</button><button>Salva</button></div></div><div class="editor-device-switch">Smartphone</div></header><aside class="page-editor-sidebar"><header><strong>Pagine</strong></header><div class="page-editor-thumbnails">'''+''.join('<div class="page-editor-thumb-row"><button class="page-editor-thumb"><span class="page-editor-preview">Anteprima</span></button></div>' for _ in range(16))+'''</div></aside><div class="editor-widget-rail"><div class="editor-widget-grid">'''+''.join('<span class="editor-icon-wrapper"><button class="editor-icon-tool"><span class="editor-icon-caption">Widget</span></button></span>' for _ in range(16))+'''</div></div><main class="editor-stage"><div class="editor-canvas-slot"><div class="canvas-editor-group"><div class="canvas-with-rulers"><div class="widget-canvas"></div></div></div></div><div class="editor-bottom-controls">Azioni</div></main></section>'''
 async def run():
  async with async_playwright() as p:
   browser=await p.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox'])
@@ -28,10 +33,23 @@ async def run():
      const r=e=>e.getBoundingClientRect();
      return {columns:getComputedStyle(root).gridTemplateColumns.split(' ').length,stageFits:r(stage).right<=innerWidth+2,
      railFits:r(rail).right<=innerWidth+2,thumbnailsScrollable:thumbs.scrollWidth>thumbs.clientWidth,
-     paletteScrollable:palette.scrollWidth>palette.clientWidth,stageVisible:r(stage).height>50};
+     paletteFits:palette.scrollWidth<=palette.clientWidth+3, paletteWrap:getComputedStyle(palette).flexWrap, paletteOverflowY:getComputedStyle(palette).overflowY, paletteCount:palette.querySelectorAll('button').length, stageVisible:r(stage).height>50};
     }''')
     assert view['stageFits'] and view['stageVisible'],(width,view)
-    if width<=760:assert view['columns']==1 and view['railFits'] and view['thumbnailsScrollable'] and view['paletteScrollable'],(width,view)
+    if width<=760:
+     assert view['columns']==1 and view['railFits'] and view['thumbnailsScrollable'],(width,view)
+     # RC234 intentionally removes RC226's old horizontal scrolling design.
+     # Tools now wrap, with vertical scrolling when the rows exceed the rail.
+     assert view['paletteFits'] and view['paletteWrap']=='wrap' and view['paletteOverflowY']=='auto',(width,view)
+     assert view['paletteCount']==16,(width,view)
+     await page.locator('.editor-widget-grid button').last.scroll_into_view_if_needed()
+     palette_last_reachable=await page.evaluate('''() => {
+       const palette=document.querySelector('.editor-widget-grid').getBoundingClientRect();
+       const last=[...document.querySelectorAll('.editor-widget-grid button')].at(-1).getBoundingClientRect();
+       return last.left>=palette.left-3 && last.right<=palette.right+3 &&
+              last.top>=palette.top-3 && last.bottom<=palette.bottom+3;
+     }''')
+     assert palette_last_reachable,(width,view,'last widget tool cannot be scrolled into view')
     else:assert view['columns']>=2,(width,view)
     print(f'PASS RC226 Chromium {width}×{height}: studio, master ribbon, page editor layout',flush=True)
     await page.close()

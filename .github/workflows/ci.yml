@@ -285,6 +285,10 @@ jobs:
         run: |
           python3 -m unittest tools.tests.test_rc226_master_mobile_ui tools.tests.test_rc224_thumbnail_arials -q
           node --experimental-strip-types --test apps/web/test/rc226-participant-device.test.ts
+      # RC235: historical RC226 viewport fixture must follow the accepted RC234
+      # vertically wrapped palette while retaining horizontal page thumbnails.
+      - name: RC235 responsive studio palette compatibility before npm
+        run: python3 -m unittest tools.tests.test_rc235_responsive_browser_compat -q
       # RC227: accessible compact master background chooser and responsive
       # participant rotation, preserving explicit manual screen mode selection.
       - name: RC227 schema backgrounds and mobile participant mode before npm
@@ -1438,7 +1442,8 @@ jobs:
           python3 tools/verify_rc_cycle231_inventory.py --historical
           python3 tools/verify_rc_cycle232_inventory.py --historical
           python3 tools/verify_rc_cycle233_inventory.py --historical
-          python3 tools/verify_rc_cycle234_inventory.py
+          python3 tools/verify_rc_cycle234_inventory.py --historical
+          python3 tools/verify_rc_cycle235_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

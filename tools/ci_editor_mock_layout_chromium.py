@@ -25,7 +25,14 @@ async def verify(browser,width,height,mobile):
   hb,tb,sb,rb,cb=await asyncio.gather(*(x.bounding_box() for x in (header,thumb,stage,rail,canvas)))
   assert all(v for v in (hb,tb,sb,rb,cb))
   assert hb['y']<tb['y']+2 and hb['y']<rb['y']+2
-  assert tb['x']+tb['width']<=sb['x']+5,(tb,sb)
+  # RC226 mobile editor has a single column with a horizontal thumbnail
+  # filmstrip *above* the stage; the historical desktop left sidebar stays.
+  if width<=760:
+   assert tb['y']+tb['height']<=sb['y']+5,(tb,sb)
+   assert abs(tb['x']-sb['x'])<=5 and abs(tb['width']-sb['width'])<=5,(tb,sb)
+   assert rb['y']+rb['height']<=tb['y']+5,(rb,tb)
+  else:
+   assert tb['x']+tb['width']<=sb['x']+5,(tb,sb)
   # RC89+: the widget rail is above the canvas, not a third/right column.
   # Ensure both its ends and the slide remain visible within the viewport.
   assert abs(rb['x']-sb['x'])<=5,(rb,sb)
