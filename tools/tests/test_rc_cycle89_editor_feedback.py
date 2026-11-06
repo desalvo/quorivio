@@ -70,7 +70,8 @@ class RC89EditorFeedback(unittest.TestCase):
   self.assertIn(".catch(error=>{setBackgroundUploadStatus('Caricamento non riuscito:",UI)
   self.assertNotIn('onBackgroundUpload(file).then(()=>setBackgroundMenu(false))',UI)
   self.assertIn('Carica immagine nello sfondo e nella libreria…',UI)
-  self.assertIn("/backgrounds`,{method:'POST'",UI)
+  self.assertIn("const endpoint=`/api/sessions/${encodeURIComponent(selected)}/${library}`",UI)
+  self.assertIn("const applied=await uploadNamedFile(file,mime,'backgrounds')",UI)
   self.assertIn('setQuestionBackgroundAsset(applied.id)',UI)
 
  def test_preview_buttons_open_real_dialog_and_submit_is_legible(self):

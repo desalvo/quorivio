@@ -1,3 +1,13 @@
+# Quorivio 0.1.0-dev — RC229 — Historical source contract and background error handoff
+
+**RC229:** New cumulative includes all RC228 work, which fixes failed GitHub quality gate `42226572219` (old RC225 schema gallery label in portaled modal). Local full Python discovery uncovered additional stale tests on import label/QR link/mobile scaling/named upload/PPTX fixture; updated these tests and restored sanitized `backgroundUploadError` handling in `uploadNamedFile` when `library==='backgrounds'`. Added RC229 101-case pre-npm acceptance. No permissions, database, publishing or privacy change. GitHub full CI still to be run after user's next commit; last verified full-green RC219 `42197607753`. **85.25%** certified (43 accepted/17 partial), flags `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. See `docs/RC_CYCLE229_GLOBAL_DISCOVERY_RECONCILIATION.en.md`.
+
+---
+# Quorivio 0.1.0-dev — RC228 — RC225 legacy gallery gate recovery
+
+**RC228:** Continue from cumulative RC228 after user-committed RC227 (`ec9de12e8f7e39cbc90d573bc2758b7fdf034ce2`). GitHub run `42226572219` failed at the RC225 Python check `test_gallery_covers_all_background_flows`: outdated inline schema gallery label despite the new accessible master dialog. Fixed the historical test to verify dialog semantics and selected background rather than the obsolete label, added tests for the exact committed shape and negative mutations, plus a CI pre-npm check. No runtime change; next full CI is pending. Last green RC219 `42197607753`; certified **85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. See `docs/RC_CYCLE228_CI_GALLERY_CONTRACT.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC227 — Accessible background and responsive participant handoff
 
 **RC227:** Continue from this cumulative archive, preserving RC226. The master ribbon opens the named, scrollable image library from a compact accessible icon command instead of embedding all thumbnails. Keyboard focus is trapped/restored, with Escape to close. Participant phone layout adapts to orientation/width until a manual 16:9, smartphone or reading selection overrides it. 398 web Node, 9 targeted Python, four Chromium fixture sizes and TSX syntax parsing pass. Full compiled React, PostgreSQL and integrated GitHub CI remain required. Last full-green CI RC219 `42197607753`; certified **85.25%** (43 accepted/17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag. See `docs/RC_CYCLE227_MASTER_BACKGROUND_PHONE_ROTATION.en.md`.

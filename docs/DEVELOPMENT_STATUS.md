@@ -1,6 +1,16 @@
+# Quorivio 0.1.0-dev — RC229 — Global Python discovery reconciliation
+
+**RC229:** After RC227 commit, CI run `42226572219` failed the historical RC225 gallery assertion (fixed in RC228). Additional ZIP-only full Python discovery (2,168 tests) revealed 9 failing historic checks and 20 missing-Git-related errors. Updated six stale frontend contracts and one converter fake-fixture check; restored actionable sanitized background upload errors in the shared named-upload route. New pre-npm 101-test gate passes locally; 29 Python gallery/editor tests, 101 Python RC229 acceptance tests, 398 web Node and 628 API Node tests pass after consolidation. Integrated GitHub CI RC229 not yet run. Last complete green RC219 `42197607753`; **85.25%** certified (43 accepted, 17 partial), no advancement. `rc_strict=false`, `publish_image=false`, `publish_latest=false`, no assistant commit/push/tag. `docs/RC_CYCLE229_GLOBAL_DISCOVERY_RECONCILIATION.en.md`.
+
+---
+# Quorivio 0.1.0-dev — RC228 — Historical gallery CI hotfix
+
+**RC228:** User committed RC227 (`ec9de12e8f7e39cbc90d573bc2758b7fdf034ce2`); full CI run `42226572219` fails the RC225 pre-npm test because the old schema `label` prop no longer exists in the committed RC227 portaled gallery. Fixed the historical test to assert accessible modal structure and selection instead, added negative-mutation compatibility tests and an early CI step. No production behavior changed. Full GitHub CI RC228 pending; last full green RC219 `42197607753`. Certified **85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. `docs/RC_CYCLE228_CI_GALLERY_CONTRACT.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC227 — Accessible master backgrounds and phone rotation
 
-**RC227:** The slide-master ribbon now has a single icon+caption+tooltip **Backgrounds** command, opening a named-thumbnail gallery in a keyboard-accessible, viewport-bound dialog with Escape/focus restoration. Participant smartphone mode tracks viewport/pointer changes until one of the three explicit view modes is manually selected. All 398 frontend Node tests, 9 targeted Python tests, four representative Chromium modal viewports and TSX syntax parsing pass. Compiled React, PostgreSQL integration and GitHub full CI RC227 remain pending. Last full-green CI RC219 `42197607753`; certified **85.25%** (43 accepted/17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag. See `docs/RC_CYCLE227_MASTER_BACKGROUND_PHONE_ROTATION.en.md`.
+**RC227:** The slide-master ribbon now has a single icon+caption+tooltip **Backgrounds** command, opening a named-thumbnail gallery in a keyboard-accessible, viewport-bound dialog with Escape/focus restoration. Participant smartphone mode tracks viewport/pointer changes until one of the three explicit view modes is manually selected. All 398 frontend Node tests, 34 focused Python tests, four representative Chromium modal viewports and TSX syntax parsing pass. Compiled React, PostgreSQL integration and GitHub full CI RC227 remain pending. Last full-green CI RC219 `42197607753`; certified **85.25%** (43 accepted/17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag. See `docs/RC_CYCLE227_MASTER_BACKGROUND_PHONE_ROTATION.en.md`.
 
 ---
 # Quorivio 0.1.0-dev — RC226 — Mobile studio and master ribbon

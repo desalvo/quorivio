@@ -9,6 +9,8 @@
 
 ## Evidence and remaining gates
 
-- All **398/398** web Node tests, **9/9** focused Python tests, TypeScript TSX syntax parsing and real Chromium representative CSS/modal viewport checks at 320, 390, 760 and 1440px pass; RC173 expectations updated for the new manual override behavior.
+- All **398/398** web Node tests, **34/34** focused Python tests, TypeScript TSX syntax parsing and real Chromium representative CSS/modal viewport checks at 320, 390, 760 and 1440px pass; RC173 expectations updated for the new manual override behavior.
 - Integrated compiled React/browser interactions, PostgreSQL and the full GitHub CI are still unverified. `npm ci` could not reach npm registry due to DNS `EAI_AGAIN`; this is not a build failure.
 - Last fully green CI RC219 run `42197607753`; certified **85.25%** (43 accepted, 17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit, push, tag or image publication.
+
+- The full Python test discovery did not complete within the local 45-second limit; no green global-suite claim is made.

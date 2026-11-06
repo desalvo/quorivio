@@ -248,6 +248,23 @@ jobs:
         run: |
           python3 -m unittest tools.tests.test_rc224_thumbnail_arials -q
           node --experimental-strip-types --test apps/web/test/rc224-thumbnail-menu-arial.test.ts
+      # RC229: reconcile obsolete source-string fixtures against the accessible
+      # QR link, modern canvas scaling, safe named-upload errors and bounded PPTX
+      # worker. Run before npm to avoid costly unrelated jobs for stale tests.
+      - name: RC229 consolidated legacy UI and converter preflight before npm
+        run: |
+          python3 -m unittest -q tools.tests.test_rc229_historical_ci_consolidation \
+            tools.tests.test_editor_draft_import \
+            tools.tests.test_rc110_background_cloud_answer \
+            tools.tests.test_rc137_presenter_privacy_background \
+            tools.tests.test_rc144_mobile_rating \
+            tools.tests.test_rc162_mobile_qr_contracts \
+            tools.tests.test_rc_cycle89_editor_feedback \
+            tools.tests.test_rc_conversion_30_cycle
+      # RC228: the historical RC225 gallery test must accept RC227's portaled
+      # accessible scheme dialog, without weakening its modal and selection checks.
+      - name: RC228 historical modal-gallery CI contract before npm
+        run: python3 -m unittest tools.tests.test_rc228_ci_gallery_contract tools.tests.test_rc225_asset_library_and_scheme -q
       # RC225: surface filenames, refuse accidental overwrites and render image thumbnails.
       - name: RC225 asset filenames, delete recovery and schema background before npm
         run: |

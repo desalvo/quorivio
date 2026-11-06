@@ -26,8 +26,17 @@ class AssetLibraryRegression(unittest.TestCase):
   self.assertNotIn('path.join(backgroundRoot,uid,named.name)',API)
  def test_gallery_covers_all_background_flows(self):
   self.assertIn('function BackgroundGallery(',UI)
-  for a in ['Scegli sfondo canvas','Seleziona sfondo pagina dalla libreria','Seleziona sfondo risultati dalla libreria','Immagine sfondo dello schema','Immagine da gestire nella libreria']:
+  # The ordinary galleries have inline labels. RC227 intentionally moved the
+  # master gallery into an accessible dialog, so it no longer needs the old
+  # inline `label="Immagine sfondo dello schema"` call-site string.
+  for a in ['Scegli sfondo canvas','Seleziona sfondo pagina dalla libreria','Seleziona sfondo risultati dalla libreria','Immagine da gestire nella libreria']:
    self.assertIn(f'label="{a}"',UI)
+  master = UI.split('function SchemaBackgroundTool(',1)[1].split('function App(){',1)[0]
+  self.assertIn('<SchemaRibbonButton label="Sfondi"',master)
+  self.assertIn('role="dialog" aria-modal="true"',master)
+  self.assertIn('<BackgroundGallery items={items}',master)
+  self.assertIn('onSelect={id=>{onSelect(id);setOpen(false)}}',master)
+  self.assertIn('selectedId={schemaBackgroundAsset}',UI)
   self.assertIn('background-gallery-choice',CSS)
   self.assertIn('<img loading="lazy" src={item.url}',UI)
  def test_background_copies_and_portable_names_survive_deletion(self):

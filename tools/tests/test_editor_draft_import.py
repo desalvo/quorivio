@@ -7,7 +7,7 @@ REC=(R/'apps/web/src/page-draft-recovery.ts').read_text()
 BROWSER=(R/'tools/ci_browser_editor_postgres.py').read_text()
 class EditorDraftImport(unittest.TestCase):
  def test_export_is_v2_with_baseline(self):self.assertIn("format:'quorivio-local-draft-v2'",REC);self.assertIn('createPageDraftBackup(selected,designActivity',MAIN)
- def test_explicit_file_upload(self):self.assertIn('type="file" accept=".json,application/json"',MAIN)
+ def test_explicit_file_upload(self):self.assertIn('type="file" aria-label={`Importa layout JSON nella pagina ${i+1}`} accept=".json,application/json"',MAIN)
  def test_user_confirmation(self):self.assertIn('window.confirm(plan.mode',MAIN)
  def test_no_automatic_local_storage(self):self.assertNotIn('localStorage',REC);self.assertNotIn('sessionStorage',REC)
  def test_stale_requires_reconciliation(self):self.assertIn("plan.mode==='reconcile'",MAIN);self.assertIn('base:backup.base_draft,local:backup.draft',MAIN)

@@ -372,7 +372,7 @@ class WorkerAtomic30(unittest.TestCase):
 
     def test_39_import_oversize_json_rejected_atomically(self):
         (self.workspace / 'source.pptx').write_bytes(b'PK fake')
-        with patch.object(worker, 'pptx_to_portable', return_value={'activities': [{'x': 'x' * (3 * 1024 * 1024)}]}):
+        with patch.object(worker, 'pptx_to_portable', return_value={'activities': [{'x': 'x' * (3 * 1024 * 1024)}]}), patch.object(worker, 'inspect_pptx_fidelity', return_value={}):
             with self.assertRaisesRegex(ValueError, 'too large'):
                 worker.execute_portable_job(self.job, 'import')
         self.assertFalse((self.workspace / 'portable.json').exists())

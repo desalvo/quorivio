@@ -54,7 +54,8 @@ class RC137PresenterPrivacyAndBackground(unittest.TestCase):
   self.assertIn('node --experimental-strip-types --test apps/web/test/*.test.ts',workflow)
  def test_background_upload_reports_actual_rejection_and_never_swallows_errors(self):
   upload=SRC.split('async function uploadBackground(')[1].split('async function deleteAsset(')[0]
-  self.assertIn('backgroundUploadError(r.status,code)',upload)
+  self.assertIn("library==='backgrounds'?backgroundUploadError(response.status,code)",SRC)
+  self.assertIn("const code=typeof detail?.error==='string'?detail.error:''",SRC)
   self.assertIn('catch(e){notify(e);throw e}',upload)
   self.assertNotIn('return false}finally',upload)
   self.assertIn("error instanceof Error?error.message:String(error)",SRC)

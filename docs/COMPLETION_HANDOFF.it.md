@@ -1,6 +1,16 @@
+# Quorivio 0.1.0-dev — RC229 — Handoff test storici e diagnostica sfondi
+
+**RC229:** Cumulativo successivo a RC228, che risolve il gate RC225 fallito nella run `42226572219` dopo il commit RC227 dell'utente. I test Python globali hanno trovato anche controlli obsoleti relativi a import JSON, link QR, dimensione font smartphone, upload nominati e mock PPTX; aggiornati e ripristinati i messaggi sanitizzati degli errori upload nella funzione `uploadNamedFile` per gli sfondi. Nuovo preflight 101 casi prima di npm; full CI GitHub del prossimo commit da verificare. Ultima completamente verde RC219 `42197607753`. **85,25%** certificato (43 accettati/17 parziali), `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Dettagli `docs/RC_CYCLE229_GLOBAL_DISCOVERY_RECONCILIATION.it.md`.
+
+---
+# Quorivio 0.1.0-dev — RC228 — Correzione contratto galleria storica RC225
+
+**RC228:** Riprendere dal nuovo pacchetto cumulativo, successivo alla RC227 committata dall'utente (`ec9de12e8f7e39cbc90d573bc2758b7fdf034ce2`). Nella run `42226572219` il vecchio test RC225 richiedeva una proprietà della galleria inline ormai sostituita dal dialogo accessibile. Il test ora controlla struttura accessibile, selezione e chiusura; nuovi test di mutazione e nuovo passo CI prima di npm. Nessuna modifica al runtime; la nuova full CI va verificata. Ultima verde RC219 `42197607753`; completamento **85,25%** (43 accettati/17 parziali), `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Dettagli `docs/RC_CYCLE228_CI_GALLERY_CONTRACT.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC227 — Handoff selezione sfondi e partecipanti
 
-**RC227:** Riprendere da questo cumulativo, non da RC226: schermata schemi con libreria sfondi in finestra accessibile tramite comando compatto; conservata la selezione visiva con nomi, impostazione globale e cancellazione separata. Modalità smartphone partecipanti adattativa a orientamento/viewport/puntatore prima della scelta manuale, stabile dopo la scelta. Test Node frontend 398, Python mirati 9, Chromium rappresentativo 4 dimensioni e parse TSX verdi; build React completa, PostgreSQL e full CI GitHub ancora da certificare. Baseline full CI RC219 `42197607753`; **85,25%**, 43 accettati e 17 parziali. `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. `docs/RC_CYCLE227_MASTER_BACKGROUND_PHONE_ROTATION.it.md`.
+**RC227:** Riprendere da questo cumulativo, non da RC226: schermata schemi con libreria sfondi in finestra accessibile tramite comando compatto; conservata la selezione visiva con nomi, impostazione globale e cancellazione separata. Modalità smartphone partecipanti adattativa a orientamento/viewport/puntatore prima della scelta manuale, stabile dopo la scelta. Test Node frontend 398, Python mirati 34, Chromium rappresentativo 4 dimensioni e parse TSX verdi; build React completa, PostgreSQL e full CI GitHub ancora da certificare. Baseline full CI RC219 `42197607753`; **85,25%**, 43 accettati e 17 parziali. `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. `docs/RC_CYCLE227_MASTER_BACKGROUND_PHONE_ROTATION.it.md`.
 
 ---
 # Quorivio 0.1.0-dev — RC226 — Handoff editor responsive

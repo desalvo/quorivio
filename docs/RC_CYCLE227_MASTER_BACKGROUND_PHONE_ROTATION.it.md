@@ -10,7 +10,9 @@
 
 ## Test e blocchi
 
-- Frontend Node **398/398** inclusi nuovi test RC227 e riconciliazione del test storico RC173. Python mirati RC226–227 **9/9**. Sintassi TSX analizzata con TypeScript 5.8.3: zero errori di parsing.
+- Frontend Node **398/398** inclusi nuovi test RC227 e riconciliazione del test storico RC173. Python mirati RC222–227 **34/34**. Sintassi TSX analizzata con TypeScript 5.8.3: zero errori di parsing.
 - Chromium reale con CSS di produzione e DOM rappresentativo, **320×568, 390×844, 760×920, 1440×900**: dialogo contenuto nel viewport, miniature scorrevoli, mantenimento delle prove RC226.
 - **Non** sono state eseguite build Vite/React o prove con app React compilata e PostgreSQL: `npm ci` non è riuscito per risoluzione DNS (`EAI_AGAIN` verso registry.npmjs.org), non a causa di una build fallita. La GitHub full CI RC227 è da eseguire dopo il commit dell'utente.
 - Percentuale certificata invariata: **85,25%** (43 gate accettati, 17 parziali). Ultima full verde RC219 `42197607753`. Versione `0.1.0-dev`; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit, push, tag o pubblicazione Docker eseguito.
+
+- La suite globale Python non è stata completata entro il limite temporale di 45 secondi; nessun esito globale viene dichiarato.

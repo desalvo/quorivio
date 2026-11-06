@@ -1,6 +1,16 @@
+# Quorivio 0.1.0-dev — RC229 — Riconciliazione test globali e upload sfondi
+
+**RC229:** Dopo il commit RC227 dell'utente, la run `42226572219` ha fallito per il vecchio test RC225 (risolto in RC228). La suite globale sullo ZIP (2168 test) ha inoltre mostrato 9 fallimenti storici e 20 errori per l'assenza del repository Git. Corretti contratti su import JSON, QR, font smartphone e caricamento sfondi, oltre al mock del convertitore; ripristinata la diagnostica HTTP sanitizzata per gli upload di sfondi. Preflight locale anticipato RC229 101/101. CI GitHub integrata da ricontrollare; ultima verde RC219 `42197607753`. Avanzamento certificato **85,25%** (43 accettati/17 parziali), invariato. `rc_strict=false`, `publish_image=false`, `publish_latest=false`, nessun commit/push/tag. `docs/RC_CYCLE229_GLOBAL_DISCOVERY_RECONCILIATION.it.md`.
+
+---
+# Quorivio 0.1.0-dev — RC228 — Hotfix CI galleria sfondi
+
+**RC228:** L'utente ha committato RC227 (`ec9de12e8f7e39cbc90d573bc2758b7fdf034ce2`). Nella full CI `42226572219` è fallito il test RC225 prima di npm per un attributo `label` legacy, sostituito da un dialogo accessibile RC227. Il test storico ora verifica struttura e selezione del dialogo, con nuove prove di mutazione negativa e controllo CI anticipato. Nessuna modifica al runtime. Full CI RC228 ancora da confermare; ultima verde RC219 `42197607753`. Certificato **85,25%** (43 accettati/17 parziali), invariato. `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Vedi `docs/RC_CYCLE228_CI_GALLERY_CONTRACT.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC227 — Sfondi schemi accessibili e rotazione smartphone
 
-**RC227:** La barra schemi offre un unico pulsante **Sfondi** con icona, nome e tooltip; le miniature con nomi file si aprono in una finestra accessibile e scorrevole, chiudibile anche con Escape, senza espandere la barra. La vista smartphone dei partecipanti si aggiorna al ridimensionamento/rotazione finché non si sceglie manualmente 16:9, smartphone o lettura accessibile. Frontend Node 398/398, Python RC227/RC226 9/9, Chromium 4 viewport e parsing TypeScript TSX senza errori. La build React, i test PostgreSQL e la full CI GitHub RC227 sono da verificare. Ultima full CI verde RC219 `42197607753`; completamento certificato **85,25%** (43 accettati/17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Vedi `docs/RC_CYCLE227_MASTER_BACKGROUND_PHONE_ROTATION.it.md`.
+**RC227:** La barra schemi offre un unico pulsante **Sfondi** con icona, nome e tooltip; le miniature con nomi file si aprono in una finestra accessibile e scorrevole, chiudibile anche con Escape, senza espandere la barra. La vista smartphone dei partecipanti si aggiorna al ridimensionamento/rotazione finché non si sceglie manualmente 16:9, smartphone o lettura accessibile. Frontend Node 398/398, Python mirati RC222–227 34/34, Chromium 4 viewport e parsing TypeScript TSX senza errori. La build React, i test PostgreSQL e la full CI GitHub RC227 sono da verificare. Ultima full CI verde RC219 `42197607753`; completamento certificato **85,25%** (43 accettati/17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Vedi `docs/RC_CYCLE227_MASTER_BACKGROUND_PHONE_ROTATION.it.md`.
 
 ---
 # Quorivio 0.1.0-dev — RC226 — Studio mobile e barra schemi

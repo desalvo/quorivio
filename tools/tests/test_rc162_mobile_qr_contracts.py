@@ -27,16 +27,17 @@ class RC162MobileQrContracts(unittest.TestCase):
     def test_qr_url_visibility_is_persisted_and_validated(self):
         self.assertIn('showQrUrl?:boolean',API)
         self.assertIn("w.kind==='qr'&&typeof w.showQrUrl==='boolean'",API)
-        self.assertIn('widget.showQrUrl!==false&&<span className="participant-qr-url"',UI)
+        self.assertIn('widget.showQrUrl!==false&&<a className="participant-qr-url"',UI)
         self.assertIn('Mostra URL sotto al codice QR',UI)
     def test_responsive_url_reserved_row_and_no_preview_shrink(self):
         self.assertIn('grid-template-rows:minmax(0,1fr) minmax(1.3em,auto)',CSS)
         self.assertIn('data-qr-show-url="false"',CSS)
         self.assertNotIn('.projection-sample-qr img{display:block;max-width:80%;max-height:75%',CSS)
     def test_negative_mutations_are_detected(self):
-        for old,new in [('widget.showQrUrl!==false&&<span','false&&<span'),
+        for old,new in [('widget.showQrUrl!==false&&<a','false&&<a'),
                         ('widget.showTitle===true&&<strong','widget.showTitle!==false&&<strong'),
                         ('mergeMobilePositionEdits(pageWidgets,old,items)','captureMobilePositions(items)')]:
+            self.assertIn(old,UI)
             bad=UI.replace(old,new,1)
             self.assertNotIn(old,bad)
 
