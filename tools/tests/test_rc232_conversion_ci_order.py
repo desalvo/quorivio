@@ -75,7 +75,14 @@ class RC232ConversionCIOrder(unittest.TestCase):
     def test_rc231_receipt_stays_historical_and_rc232_is_current(self):
         workflow = CI.read_text(encoding='utf8')
         self.assertIn('python3 tools/verify_rc_cycle231_inventory.py --historical', workflow)
-        self.assertIn('python3 tools/verify_rc_cycle232_inventory.py\n', workflow)
+        # RC232 remains an immutable historical receipt after future promotions.
+        self.assertIn('python3 tools/verify_rc_cycle232_inventory.py --historical', workflow)
+        current = re.findall(r'^\s+python3 tools/verify_rc_cycle([0-9]+)_inventory.py\s*$', workflow, re.M)
+        # RC8 and RC10 retain their historic nonhistorical compatibility mode.
+        self.assertEqual(sorted(int(x) for x in current if int(x) < 20), [8, 10])
+        current_recent = [int(x) for x in current if int(x) >= 200]
+        self.assertEqual(len(current_recent), 1, 'Exactly one modern current inventory is allowed')
+        self.assertGreaterEqual(current_recent[0], 233)
 
     def _mutation_rejected(self, expected: str, replacement: str) -> None:
         workflow = CI.read_text(encoding='utf8')
