@@ -1,0 +1,41 @@
+{
+  "cycle": 204,
+  "version": "0.1.0-dev",
+  "base": {
+    "cycle": 203,
+    "full_ci_run_id": 42110429701,
+    "full_ci_conclusion": "success"
+  },
+  "change_scope": "anonymous csv/xlsx per-bucket five-distinct-subject suppression; person counts and join-code-safe anonymous filenames",
+  "local_checks": {
+    "web_node": {
+      "passed": 352,
+      "failed": 0
+    },
+    "rc204_node_focused": {
+      "passed": 6,
+      "failed": 0
+    },
+    "rc204_early_preflight": {
+      "passed": 4,
+      "failed": 0
+    },
+    "api_node_final": {
+      "passed": 615,
+      "failed": 0
+    }
+  },
+  "gate_score_percent": 85.25,
+  "accepted_gates": 43,
+  "partial_gates": 17,
+  "limitations": [
+    "No formal anonymity guarantee against differencing, linkage or authored identifiable labels",
+    "external operator GDPR sign-off pending",
+    "full RC204 GitHub CI pending"
+  ],
+  "release_safety": {
+    "rc_strict": false,
+    "publish_image": false,
+    "publish_latest": false
+  }
+}

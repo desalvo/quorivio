@@ -37,8 +37,11 @@ test('whole-widget decoration overrides existing formatted answer and independen
 test('answer-only formatting targets independent answer properties and provides visible controls',()=>{
  assert.match(main,/underline:'answerUnderline',strikethrough:'answerStrikethrough'/);
  assert.match(main,/underline:questionStyle.answerUnderline\?\?questionStyle.underline/);
- assert.match(main,/aria-label="Sottolineato risposte"/);
- assert.match(main,/aria-label="Barrato risposte"/);
+ // RC205 consolidated the formerly duplicated answer-only buttons into
+ // the shared typography ribbon. Verify scope routing instead of old labels.
+ assert.match(main,/effectiveScope==='answers'/);
+ assert.match(main,/underline:'answerUnderline',strikethrough:'answerStrikethrough'/);
+ assert.match(main,/fontFamily:'answerFontFamily'/);
  assert.match(main,/Risposta sottolineata/);
  assert.match(main,/Risposta barrata/);
 });

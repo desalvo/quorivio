@@ -1079,7 +1079,7 @@ async function useBackground(s:any,uid:string,b:any){
   const cx=await db.connect();
   try{await cx.query('BEGIN');
    if(borrowed)await cx.query('INSERT INTO presenter_backgrounds(id,owner_id,mime_type,byte_size,sha256) VALUES($1,$2,$3,$4,$5)',[libraryId,uid,b.mime_type,b.byte_size,b.sha256]);
-   await cx.query('INSERT INTO session_assets(id,session_id,uploaded_by,mime_type,byte_size,sha256) VALUES($1,$2,$3,$4,$5,$6)',[assetId,s.id,uid,b.mime_type,b.byte_size,b.sha256]);
+   await cx.query('INSERT INTO session_assets(id,session_id,uploaded_by,mime_type,byte_size,sha256,source_background_id) VALUES($1,$2,$3,$4,$5,$6,$7)',[assetId,s.id,uid,b.mime_type,b.byte_size,b.sha256,libraryId]);
    await cx.query('COMMIT');
   }catch(e){await cx.query('ROLLBACK');throw e}finally{cx.release()}
  }catch(e){await unlink(sessionTarget).catch(()=>{});if(borrowed)await unlink(libraryTarget).catch(()=>{});throw e}
@@ -1087,7 +1087,7 @@ async function useBackground(s:any,uid:string,b:any){
 }
 app.get('/api/sessions/:id/backgrounds',requireAuth,async(req,res)=>{try{
  const uid=auth(req)!;const s=await owner(req.params.id,uid);if(!s){res.status(404).end();return}
- const r=await db.query(`SELECT b.id,b.owner_id,b.mime_type,b.byte_size,b.created_at,
+ const r=await db.query(`SELECT b.id,b.owner_id,b.mime_type,b.byte_size,b.created_at,b.display_name,
  CASE WHEN b.owner_id=$1 THEN true ELSE false END AS mine
  FROM presenter_backgrounds b WHERE b.owner_id=$1 OR EXISTS(
   SELECT 1 FROM sessions shared WHERE
@@ -1097,6 +1097,46 @@ app.get('/api/sessions/:id/backgrounds',requireAuth,async(req,res)=>{try{
  ORDER BY mine DESC,b.created_at DESC LIMIT 500`,[uid]);
  res.setHeader('Cache-Control','private, no-store');res.json(r.rows.map(b=>({...b,url:`/api/sessions/${s.id}/backgrounds/${b.id}/image`})));
  }catch(e){sendError(res,e)}});
+/** Only the actual owner can change a library image's display name. */
+app.patch('/api/sessions/:id/backgrounds/:bid',requireAuth,async(req,res)=>{try{
+ const uid=auth(req)!;if(!await owner(req.params.id,uid)){res.status(404).end();return}
+ const name=req.body?.name;
+ if(typeof name!=='string'||!name.trim()||name.trim().length>120||/[\x00-\x1f\x7f]/.test(name)){res.status(400).json({error:'invalid_background_name'});return}
+ const record=await db.query('UPDATE presenter_backgrounds SET display_name=$3 WHERE id=$1 AND owner_id=$2 RETURNING id,display_name',[req.params.bid,uid,name.trim()]);
+ if(!record.rowCount){res.status(404).end();return}res.json(record.rows[0]);
+ }catch(e){sendError(res,e)}});
+/** A background is deletable only if no current slide/master/phone references
+ * any of the session asset copies tied to it. Enforce inside a transaction. */
+app.delete('/api/sessions/:id/backgrounds/:bid',requireAuth,async(req,res)=>{
+ const uid=auth(req)!,cx=await db.connect();let begun=false;let shouldErase=false;
+ try{
+  if(!await owner(req.params.id,uid)){res.status(404).end();return}
+  if(!backgroundUuid.test(req.params.bid)){res.status(404).end();return}
+  await cx.query('BEGIN');begun=true;
+  const own=await cx.query('SELECT id FROM presenter_backgrounds WHERE id=$1 AND owner_id=$2 FOR UPDATE',[req.params.bid,uid]);
+  if(!own.rowCount){await cx.query('ROLLBACK');begun=false;res.status(404).end();return}
+  const used=await cx.query(`SELECT 1 FROM session_assets sa
+   JOIN sessions s ON s.id=sa.session_id
+   WHERE (sa.source_background_id=$1 OR (
+    -- RC206 compatibility: copies made before the source ID existed must
+    -- also block removal if still referenced. A SHA match is conservative;
+    -- another image with identical bytes is deliberately treated as in use.
+    sa.source_background_id IS NULL AND sa.uploaded_by=$2
+    AND sa.sha256=(SELECT sha256 FROM presenter_backgrounds WHERE id=$1 AND owner_id=$2)
+   )) AND (
+    position(sa.id::text in coalesce(s.theme::text,''))>0
+    OR EXISTS(SELECT 1 FROM activities a WHERE a.session_id=s.id AND (
+     position(sa.id::text in coalesce(a.page_design::text,''))>0 OR
+     position(sa.id::text in coalesce(a.result_design::text,''))>0
+    )) OR EXISTS(SELECT 1 FROM presentation_slide_assets psa WHERE psa.asset_id=sa.id)
+   ) LIMIT 1`,[req.params.bid,uid]);
+  if(used.rowCount){await cx.query('ROLLBACK');begun=false;res.status(409).json({error:'background_in_use'});return}
+  // Session copies not in use may outlive the library record but not its FK.
+  await cx.query('UPDATE session_assets SET source_background_id=NULL WHERE source_background_id=$1',[req.params.bid]);
+  await cx.query('DELETE FROM presenter_backgrounds WHERE id=$1 AND owner_id=$2',[req.params.bid,uid]);
+  await cx.query('COMMIT');begun=false;shouldErase=true;res.status(204).end();
+ }catch(e){if(begun)await cx.query('ROLLBACK').catch(()=>{});sendError(res,e)}finally{cx.release();if(shouldErase)await unlink(backgroundPath(uid,req.params.bid)).catch(error=>{if((error as NodeJS.ErrnoException).code!=='ENOENT')console.error('background file erasure queued for operator retry')})}
+});
 app.get('/api/sessions/:id/backgrounds/:bid/image',requireAuth,async(req,res)=>{try{
  const uid=auth(req)!;const s=await owner(req.params.id,uid);if(!s){res.status(404).end();return}
  const b=await accessibleBackground(s,uid,req.params.bid);if(!b){res.status(404).end();return}
@@ -1522,7 +1562,7 @@ app.post('/api/sessions/:id/presentation-import',requireAuth,async(req,res)=>{
    await writeFile(dest,contents,{flag:'wx',mode:0o600});created.push(dest);
    await cx.query('INSERT INTO session_assets(id,session_id,uploaded_by,mime_type,byte_size,sha256) VALUES($1,$2,$3,$4,$5,$6)',[assetId,s.id,auth(req),'image/png',contents.length,entry.sha256]);
    const title=`Slide ${i+1}`;
-   await cx.query("INSERT INTO activities(id,session_id,type,title,options,position,page_design,result_design,answer_mode,answer_required) VALUES($1,$2,'slide',$3,'[]'::jsonb,$4,$5,'{}'::jsonb,'text',false)",[aid,s.id,title,Number(next.rows[0].p)+i,JSON.stringify({media:[{kind:'image',url:`/api/join/${s.join_secret}/slides/${aid}/image`,alt:title}]})]);
+   await cx.query("INSERT INTO activities(id,session_id,type,title,options,position,page_design,result_design,answer_mode,answer_required) VALUES($1,$2,'slide',$3,'[]'::jsonb,$4,$5,'{}'::jsonb,'text',false)",[aid,s.id,title,Number(next.rows[0].p)+i,JSON.stringify({widgets:[{id:'imported_slide',kind:'image',label:title,assetId:assetId,position:{x:0,y:0,width:100,height:100,rotation:0}}]})]);
    await cx.query('INSERT INTO presentation_slide_assets(activity_id,asset_id) VALUES($1,$2)',[aid,assetId]);ids.push(aid);
   }
   await cx.query('COMMIT');transaction=false;await broadcast(s.id);
@@ -1731,7 +1771,7 @@ app.post('/api/sessions/:id/reset-to-ready',requireAuth,async(req,res)=>{
   await cx.query('BEGIN');begun=true;
   const session=await cx.query('SELECT id,status FROM sessions WHERE id=$1 AND owner_id=$2 FOR UPDATE',[req.params.id,auth(req)]);
   if(!session.rowCount){await cx.query('ROLLBACK');begun=false;res.status(403).json({error:'owner_required'});return}
-  if(!['active','paused'].includes(session.rows[0].status)){await cx.query('ROLLBACK');begun=false;res.status(409).json({error:'session_not_started'});return}
+  if(!['active','paused','closed'].includes(session.rows[0].status)){await cx.query('ROLLBACK');begun=false;res.status(409).json({error:'session_not_started'});return}
   await cx.query(`WITH erased AS (DELETE FROM session_assets WHERE session_id=$1 AND participant_id IS NOT NULL RETURNING session_id,id),
    queued AS (INSERT INTO session_asset_file_cleanup_jobs(session_id,asset_id)
     SELECT session_id,id FROM erased ON CONFLICT(session_id,asset_id) DO UPDATE SET
@@ -1745,7 +1785,7 @@ app.post('/api/sessions/:id/reset-to-ready',requireAuth,async(req,res)=>{
   }
   await cx.query('DELETE FROM live_connections WHERE session_id=$1',[req.params.id]);
   await cx.query("UPDATE activities SET status='pending',opened_at=NULL WHERE session_id=$1",[req.params.id]);
-  await cx.query("UPDATE sessions SET status='ready',current_activity_id=NULL,presenter_activity_id=NULL,closed_at=NULL,join_code=$2,join_secret=$3 WHERE id=$1",[req.params.id,randomBytes(5).toString('hex').toUpperCase(),randomBytes(20).toString('base64url')]);
+  await cx.query("UPDATE sessions SET status='ready',current_activity_id=NULL,presenter_activity_id=NULL,closed_at=NULL,join_code=$2,join_secret=$3,expires_at=GREATEST(expires_at,now()+interval '24 hours') WHERE id=$1",[req.params.id,randomBytes(5).toString('hex').toUpperCase(),randomBytes(20).toString('base64url')]);
   await cx.query('COMMIT');begun=false;
   // A reset rotates the public token, not presenter authorization. Keep owner
   // sockets connected so their dashboards and projected QRs receive the new
@@ -1835,7 +1875,10 @@ async function exportSessionStatistics(req:express.Request,res:express.Response,
   if(records.length>50000){res.status(413).json({error:'statistics_export_row_limit'});return}
   const rows=exportStatisticRows(records,anonymize);
   res.setHeader('Cache-Control','private, no-store');res.setHeader('X-Content-Type-Options','nosniff');
-  res.setHeader('Content-Disposition',`attachment; filename="quorivio-${session.join_code}-${anonymize?'anonimo':'nominativo'}.${format}"`);
+  // Anonymous downloads must not advertise the active session join code in
+  // filenames or browser download history.
+  const filename=anonymize?`quorivio-statistiche-anonime.${format}`:`quorivio-${session.join_code}-nominativo.${format}`;
+  res.setHeader('Content-Disposition',`attachment; filename="${filename}"`);
   if(format==='xlsx'){res.type('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');res.send(statisticsXlsx(rows))}
   else{res.setHeader('Content-Type','text/csv; charset=utf-8');res.send(statisticsCsv(rows))}
  }catch(e){sendError(res,e)}
@@ -1843,7 +1886,10 @@ async function exportSessionStatistics(req:express.Request,res:express.Response,
 app.get('/api/sessions/:id/export.csv',requireAuth,(req,res)=>void exportSessionStatistics(req,res,'csv'));
 app.get('/api/sessions/:id/export.xlsx',requireAuth,(req,res)=>void exportSessionStatistics(req,res,'xlsx'));
 async function publicSession(secretOrCode:string){const r=await db.query('SELECT * FROM sessions WHERE (join_secret=$1 OR join_code=$1) AND status=$2 AND expires_at>now()',[secretOrCode,'active']);return r.rows[0]}
-app.get('/api/join/:code',async(req,res)=>{try{const s=await publicSession(req.params.code);if(!s){res.status(404).json({error:'session_unavailable'});return}const a=s.current_activity_id?(await db.query('SELECT * FROM activities WHERE id=$1',[s.current_activity_id])).rows[0]:null;res.json({session:{id:s.id,title:s.title,status:s.status},activity:a?publicActivity(a):null,allow_anonymous:s.allow_anonymous,show_results:s.show_results,theme:publicTheme(s.theme)})}catch(e){sendError(res,e)}});
+app.get('/api/join/:code',async(req,res)=>{try{const s=await publicSession(req.params.code);if(!s){res.status(404).json({error:'session_unavailable'});return}const a=s.current_activity_id?(await db.query('SELECT * FROM activities WHERE id=$1',[s.current_activity_id])).rows[0]:null;
+ const visible=await db.query("SELECT id FROM activities WHERE session_id=$1 AND page_design->>'presenterHidden' IS DISTINCT FROM 'true' ORDER BY position,id",[s.id]);
+ const presenterId=s.presenter_activity_id||s.current_activity_id;const pageIndex=visible.rows.findIndex(row=>row.id===presenterId);
+ res.json({session:{id:s.id,title:s.title,status:s.status,presenter_page_number:pageIndex>=0?pageIndex+1:1},activity:a?publicActivity(a):null,allow_anonymous:s.allow_anonymous,show_results:s.show_results,theme:publicTheme(s.theme)})}catch(e){sendError(res,e)}});
 // Read-only QR endpoint; embeds only the public participant URL, never access privileges.
 app.get('/api/join/:code/qr.svg',async(req,res)=>{try{const s=await publicSession(req.params.code);if(!s){res.status(404).end();return}const url=`${await configuredQrPublicBase()}/join/${s.join_secret}`;res.setHeader('Cache-Control','no-store');res.type('image/svg+xml').send(await QRCode.toString(url,{type:'svg',margin:2}))}catch(e){sendError(res,e)}});
 // Public QR text and image use the identical canonical participant URL.
@@ -2133,7 +2179,7 @@ wss.on('connection',(ws:WebSocket,_req:unknown,sid:string)=>{
  void broadcastLocal(sid).catch(()=>{if(ws.readyState===WebSocket.OPEN)ws.close(1011,'snapshot unavailable')});
  ws.on('close',()=>{clearInterval(beat);group?.delete(ws);if(!group?.size)sockets.delete(sid);void db.query('DELETE FROM live_connections WHERE id=$1',[id]).then(()=>broadcast(sid)).catch(()=>{})});
 });
-function participantSnapshot(data:any){if(!data)return data;const aid=data.session.status==='active'?data.session.current_activity_id:null;const published=aid?data.activities.find((a:Activity)=>a.id===aid&&a.status==='open'):null;return {session:{id:data.session.id,title:data.session.title,status:data.session.status,current_activity_id:published?aid:null},activities:published?[publicActivity(published)]:[],results:published&&data.session.show_results?data.results.filter((r:any)=>r.activity_id===aid):[],totals:published&&data.session.show_results?data.totals.filter((r:any)=>r.activity_id===aid):[]}}
+function participantSnapshot(data:any){if(!data)return data;const presenterId=data.session.presenter_activity_id||data.session.current_activity_id;const visibleIndex=(data.activities||[]).filter((a:any)=>a.page_design?.presenterHidden!==true).findIndex((a:any)=>a.id===presenterId);const presenterNumber=visibleIndex>=0?visibleIndex+1:1;const aid=data.session.status==='active'?data.session.current_activity_id:null;const published=aid?data.activities.find((a:Activity)=>a.id===aid&&a.status==='open'):null;return {session:{id:data.session.id,title:data.session.title,status:data.session.status,current_activity_id:published?aid:null,presenter_page_number:presenterNumber},activities:published?[publicActivity(published)]:[],results:published&&data.session.show_results?data.results.filter((r:any)=>r.activity_id===aid):[],totals:published&&data.session.show_results?data.totals.filter((r:any)=>r.activity_id===aid):[]}}
 const webRoot=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../../web/dist');if(existsSync(webRoot)){app.use(express.static(webRoot));app.get('*',(_,res)=>res.sendFile(path.join(webRoot,'index.html')))}
 async function initialize(){await withBootstrapLock(db,async bootstrap=>{const schema=readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)),'../src/schema.sql'),'utf8');await bootstrap.query(schema);publicBase=(await bootstrap.query("SELECT value FROM platform_settings WHERE key='public_base_url'")).rows[0]?.value||base;const email=process.env.ADMIN_EMAIL?.toLowerCase(),password=process.env.ADMIN_PASSWORD;if(email&&password){if(password.length<12&&!(process.env.ALLOW_INSECURE_DEV_BOOTSTRAP==='true'&&process.env.NODE_ENV!=='production'&&password==='000000'))throw new Error('ADMIN_PASSWORD must be >=12 characters (insecure demo bootstrap allowed only outside production)');const count=await bootstrap.query('SELECT count(*)::int AS n FROM users');if(count.rows[0].n===0){const oid=randomUUID(),uid=randomUUID();await bootstrap.query('BEGIN');try{await bootstrap.query('INSERT INTO organizations(id,name) VALUES($1,$2)',[oid,'Default']);await bootstrap.query('INSERT INTO users(id,organization_id,email,password_hash,role) VALUES($1,$2,$3,$4,$5)',[uid,oid,email,await bcrypt.hash(password,12),'platform_admin']);await bootstrap.query('UPDATE users SET approved=true,must_change_password=true,is_primary_admin=true,nickname=$2 WHERE id=$1',[uid,'admin']);await provisionDemo(bootstrap,uid,oid);await provisionLoadDemo(bootstrap,uid,oid);await bootstrap.query('COMMIT')}catch(e){await bootstrap.query('ROLLBACK');throw e}console.log('Initial admin provisioned; password change required')}}await bootstrap.query("UPDATE users SET is_primary_admin=true,nickname='admin' WHERE id=(SELECT id FROM users WHERE role='platform_admin' AND approved=true ORDER BY created_at ASC LIMIT 1) AND NOT EXISTS (SELECT 1 FROM users WHERE is_primary_admin=true)");});startSessionBus(async()=>{const client=new pg.Client({connectionString:process.env.DATABASE_URL});await client.connect();return client},broadcastLocal,console.error,async()=>{await Promise.all([...sockets.keys()].map(sid=>broadcastLocal(sid)))});await db.query("DELETE FROM live_connections WHERE last_seen<now()-interval '2 minutes'");setInterval(()=>db.query("DELETE FROM live_connections WHERE last_seen<now()-interval '2 minutes'").catch(()=>{}),60000).unref();await purgeExpiredSessions();setInterval(()=>purgeExpiredSessions().catch(e=>console.error('retention purge error',e instanceof Error?e.message:'unknown')),3600000).unref();setInterval(()=>cleanupPendingSessionFiles().catch(()=>console.error('session asset cleanup worker retry pending')),60000).unref();setInterval(()=>drainAssetErasureJobs(db,assetRoot).catch(()=>console.error('asset erasure worker retry pending')),60000).unref();setInterval(()=>drainProfileErasureJobs(db,assetRoot).catch(()=>console.error('profile erasure worker retry pending')),60000).unref();setInterval(()=>db.query("DELETE FROM auth_flows WHERE expires_at<now(); DELETE FROM email_mfa_challenges WHERE expires_at<now(); DELETE FROM email_mfa_enrollments WHERE expires_at<now(); DELETE FROM api_rate_windows WHERE bucket<floor(extract(epoch from now())/60)-3").catch(e=>console.error('auth cleanup error',e instanceof Error?e.message:'unknown')),3600000).unref();server.listen(Number(process.env.PORT||8080),'0.0.0.0',()=>console.log('Quorivio API ready'))}
 // Rolling Kubernetes replacement: fail readiness before closing connections so

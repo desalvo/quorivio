@@ -1200,6 +1200,11 @@ def portable_to_pptx(data, destination, media_dir=None):
                 continue
             if widget.get('kind') in ('image', 'logo'):
                 asset_id = widget.get('assetId')
+                # Converter-created pages retain the original image as the
+                # slide snapshot AND as an editable canvas widget. Embed it
+                # only once to avoid doubling the visual pixels on export.
+                if asset_id == slide_asset_id and widget.get('kind') == 'image':
+                    continue
                 try:
                     valid_asset_id = isinstance(asset_id, str) and str(uuid.UUID(asset_id)) == asset_id and uuid.UUID(asset_id).version == 4
                 except (ValueError, AttributeError, TypeError):

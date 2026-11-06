@@ -53,7 +53,8 @@ export function styledSegments(text:string,marks:TextMark[]|undefined,field:stri
  return points.slice(0,-1).map((start,index)=>({text:text.slice(start,points[index+1]),style:Object.assign({},...relevant.filter(m=>m.start<=start&&m.end>=points[index+1]).map(m=>m.style))}));
 }
 export function inlineMarkCss(s:InlineStyle):Record<string,string|undefined>{
- return {fontFamily:s.fontFamily,fontSize:s.fontSize!==undefined?`${(s.fontSize/1280*100).toFixed(5)}cqw`:undefined,color:s.color,fontWeight:s.bold?'bold':s.bold===false?'normal':undefined,fontStyle:s.italic?'italic':s.italic===false?'normal':undefined,textDecoration:[s.underline?'underline':'',s.strikethrough?'line-through':''].filter(Boolean).join(' ')||(s.underline===false||s.strikethrough===false?'none':undefined)};
+ return {fontFamily:s.fontFamily,fontSize:s.fontSize!==undefined?`${(s.fontSize/1280*100).toFixed(5)}cqw`:undefined,
+  '--q-inline-phone-font-size':s.fontSize!==undefined?`${s.fontSize}px`:undefined,color:s.color,fontWeight:s.bold?'bold':s.bold===false?'normal':undefined,fontStyle:s.italic?'italic':s.italic===false?'normal':undefined,textDecoration:[s.underline?'underline':'',s.strikethrough?'line-through':''].filter(Boolean).join(' ')||(s.underline===false||s.strikethrough===false?'none':undefined)};
 }
 
 
@@ -114,12 +115,13 @@ export function scaleWidgetFont(widget:{style?:{fontSize?:number};textMarks?:Tex
  * Text options, answer field and submit text inherit the same proportional factor.
  * Persist only server-approved fields; never turn a multi-size widget into one size.
  */
-export function scaleAllWidgetTypography(widget:{style?:{fontSize?:number;answerFontSize?:number;submitButtonSize?:number};textMarks?:TextMark[]},factor:number){
+export function scaleAllWidgetTypography(widget:{kind?:string;style?:{fontSize?:number;answerFontSize?:number;submitButtonSize?:number;footerNumberFontSize?:number};textMarks?:TextMark[]},factor:number){
  if(!Number.isFinite(factor)||factor<=0)return {style:{...(widget.style||{})},textMarks:widget.textMarks||[]};
  const scale=(size:number,min:number,max:number)=>Math.max(min,Math.min(max,Math.round(size*factor)));
  return {style:{...(widget.style||{}),fontSize:scale(widget.style?.fontSize??16,10,96),
   answerFontSize:scale(widget.style?.answerFontSize??widget.style?.fontSize??16,10,96),
-  ...(widget.style?.submitButtonSize?{submitButtonSize:scale(widget.style.submitButtonSize,12,40)}:{})},
+  ...(['question','timed-quiz','topic-question'].includes(widget.kind||'')?{submitButtonSize:scale(widget.style?.submitButtonSize??16,12,40)}:widget.style?.submitButtonSize?{submitButtonSize:scale(widget.style.submitButtonSize,12,40)}:{}),
+  ...(widget.kind==='footer'?{footerNumberFontSize:scale(widget.style?.footerNumberFontSize??14,8,96)}:widget.style?.footerNumberFontSize?{footerNumberFontSize:scale(widget.style.footerNumberFontSize,8,96)}:{})},
   textMarks:(widget.textMarks||[]).map(mark=>({...mark,style:mark.style.fontSize===undefined?mark.style:
     {...mark.style,fontSize:scale(mark.style.fontSize,10,96)}}))};
 }
@@ -142,6 +144,12 @@ export function applyAllWidgetTypeface(widget:{style?:Record<string,unknown>;tex
   // optional answer fields supported by the saved widget schema.
   Object.assign(style,
     change.fontFamily!==undefined?{answerFontFamily:change.fontFamily}:{},
+    change.fontFamily!==undefined?{submitFontFamily:change.fontFamily,footerNumberFontFamily:change.fontFamily}:{},
+    change.color!==undefined?{submitColor:change.color,footerNumberColor:change.color}:{},
+    change.bold!==undefined?{submitBold:change.bold,footerNumberBold:change.bold}:{},
+    change.italic!==undefined?{submitItalic:change.italic,footerNumberItalic:change.italic}:{},
+    change.underline!==undefined?{submitUnderline:change.underline,footerNumberUnderline:change.underline}:{},
+    change.strikethrough!==undefined?{submitStrikethrough:change.strikethrough,footerNumberStrikethrough:change.strikethrough}:{},
     change.color!==undefined?{answerColor:change.color}:{},
     change.bold!==undefined?{answerBold:change.bold}:{},
     change.italic!==undefined?{answerItalic:change.italic}:{},

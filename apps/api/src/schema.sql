@@ -99,6 +99,10 @@ CREATE TABLE IF NOT EXISTS presenter_backgrounds(
  created_at timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS idx_presenter_backgrounds_owner ON presenter_backgrounds(owner_id,created_at DESC);
+-- RC206: explicit library labels and immutable provenance for in-use checks.
+ALTER TABLE presenter_backgrounds ADD COLUMN IF NOT EXISTS display_name text;
+ALTER TABLE session_assets ADD COLUMN IF NOT EXISTS source_background_id uuid REFERENCES presenter_backgrounds(id) ON DELETE RESTRICT;
+CREATE INDEX IF NOT EXISTS idx_session_assets_source_background ON session_assets(source_background_id) WHERE source_background_id IS NOT NULL;
 
 
 -- Keep invalidated answers for audit but permit one NEW active response after invalidation.

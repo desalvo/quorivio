@@ -1,6 +1,8 @@
-/** RC200: privacy-scoped statistics export, with dependency-free spreadsheet encoding.
- * An anonymized export is aggregated: it never retains participant IDs, pseudonyms,
- * exact timestamps, attachment IDs or free-text content that can identify a person.
+/** RC204: privacy-scoped statistics exports with small-cohort suppression.
+ * Aggregate groups must represent enough *distinct* participants (not merely
+ * repeated responses from one person) before any totals are released.
+ * Never emit IDs, pseudonyms, precise timestamps, attachment IDs or free text
+ * in anonymous output. This is data minimization, NOT a formal anonymity proof.
  */
 import {deflateRawSync} from 'node:zlib';
 // Independent CRC32: report exports must remain testable without the bundle parser.
@@ -9,21 +11,28 @@ function crc32(bytes:Uint8Array):number{let c=0xffffffff;for(const b of bytes)c=
 
 export type StatisticRecord={kind:string;page:string;question:string;answer:string;correct:string;participantId:string;pseudonym:string;submittedAt:string;count?:number;isFreeText?:boolean};
 export const STAT_COLUMNS=['Tipo','Pagina','Domanda/widget','Risposta','Corretta','Conteggio','ID partecipante','Pseudonimo','Data e ora'] as const;
+export const ANONYMOUS_MIN_PARTICIPANTS=5;
 const omitted='[contenuto personale omesso]';
 const safeText=(v:unknown)=>String(v??'').slice(0,32000);
 
 export function exportStatisticRows(records:StatisticRecord[],anonymize:boolean):string[][]{
  if(!anonymize)return records.map(x=>[x.kind,x.page,x.question,x.answer,x.correct,String(x.count||1),x.participantId,x.pseudonym,x.submittedAt].map(safeText));
- const grouped=new Map<string,{kind:string;page:string;question:string;answer:string;correct:string;count:number}>();
+ const grouped=new Map<string,{kind:string;page:string;question:string;answer:string;correct:string;participants:Set<string>}>();
  for(const x of records){
   // Never leak free text, uploaded media identifiers, or participant-linked metadata.
+  // Never treat a missing/unknown subject or a pre-aggregated count as proof
+  // of distinct people. One participant may submit repeatedly in a session.
+  const participant=String(x.participantId||'').trim();
+  if(!participant)continue;
   const answer=x.isFreeText?omitted:x.answer;
   const key=JSON.stringify([x.kind,x.page,x.question,answer,x.correct]);
   const found=grouped.get(key);
-  if(found)found.count+=x.count||1;
-  else grouped.set(key,{kind:x.kind,page:x.page,question:x.question,answer,correct:x.correct,count:x.count||1});
+  if(found)found.participants.add(participant);
+  else grouped.set(key,{kind:x.kind,page:x.page,question:x.question,answer,correct:x.correct,participants:new Set([participant])});
  }
- return [...grouped.values()].map(x=>[x.kind,x.page,x.question,x.answer,x.correct,String(x.count),'','',''].map(safeText));
+ return [...grouped.values()]
+  .filter(x=>x.participants.size>=ANONYMOUS_MIN_PARTICIPANTS)
+  .map(x=>[x.kind,x.page,x.question,x.answer,x.correct,String(x.participants.size),'','',''].map(safeText));
 }
 export function escapeSpreadsheetCsv(v:unknown):string{
  const raw=safeText(v);

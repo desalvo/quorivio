@@ -53,6 +53,10 @@ test('server switches audience page atomically while presenter projection remain
  assert.match(server,/result_source_not_in_session/);
  assert.match(server,/expected_presenter_activity_id/);
  const participant=server.slice(server.indexOf('function participantSnapshot('),server.indexOf('function participantSnapshot(')+750);
- assert.doesNotMatch(participant,/presenter_activity_id/);
- assert.match(participant,/current_activity_id/);
+ // RC206: the private presenter id may be read to compute the shared footer
+ // ordinal, but must never appear as a property in the PUBLIC snapshot.
+ const publicReturn=participant.slice(participant.indexOf('return {session:{'));
+ assert.doesNotMatch(publicReturn,/presenter_activity_id\s*:/);
+ assert.match(publicReturn,/presenter_page_number:presenterNumber/);
+ assert.match(publicReturn,/current_activity_id/);
 });

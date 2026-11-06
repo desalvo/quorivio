@@ -50,7 +50,10 @@ export function RichWidgetText({value,marks,field,active,onChange,onSelection,on
   const fragment=document.createDocumentFragment();
   for(const part of parts){
    const span=document.createElement('span');span.textContent=part.text;
-   Object.assign(span.style,inlineMarkCss(part.style));fragment.appendChild(span);
+   const css=inlineMarkCss(part.style);
+   Object.assign(span.style,css);
+   if(css['--q-inline-phone-font-size'])span.style.setProperty('--q-inline-phone-font-size',css['--q-inline-phone-font-size']);
+   fragment.appendChild(span);
   }
   lock.current=true;
   el.replaceChildren(fragment);

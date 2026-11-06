@@ -2538,3 +2538,152 @@ main.participant-live-view.participant-slide-active .audience-stage-scroll{
 .editor-ux-v2 .editor-mock-meta .editor-presenter-identities>span{padding:2px 7px;font-size:10px;max-width:205px}
 @media(max-width:1200px){.editor-ux-v2,.editor-ux-v2:fullscreen{grid-template-rows:minmax(118px,auto) minmax(72px,auto) minmax(0,1fr)!important}.editor-ux-v2 .editor-mock-actions{order:1!important;flex:1 1 60%!important}.editor-ux-v2 .editor-mock-header>.editor-device-switch{order:2!important;flex:1 1 100%!important}}
 @media(max-width:750px){.editor-ux-v2,.editor-ux-v2:fullscreen{grid-template-rows:minmax(158px,auto) minmax(72px,auto) minmax(0,1fr)!important}.editor-ux-v2 .editor-mock-brand{flex:0 1 95px!important}.editor-ux-v2 .editor-mock-meta{justify-content:flex-start!important}.editor-ux-v2 .editor-mock-meta .editor-presenter-identities{max-width:100%}.editor-ux-v2 .editor-session-title{max-width:90vw}}
+
+
+/* RC205: keep the shared page/master typography ribbon compact at every size.
+ * Prior flex:1 stretched footer controls to almost the whole viewport. */
+body .editor-floating-panel.widget-selection-palette{
+ height:auto!important;min-height:0!important;width:min(860px,calc(100vw - 16px))!important;
+ align-self:flex-start!important;
+}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-groups{
+ flex:0 1 auto!important;height:auto!important;max-height:min(320px,calc(100dvh - 76px))!important;
+ overflow-x:hidden!important;overflow-y:auto!important;align-content:flex-start!important;
+ align-items:flex-start!important;
+}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-group{
+ flex:0 1 auto!important;justify-content:flex-start!important;
+}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-group label,
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-group strong{
+ color:#253954!important;
+}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-answer-types{min-width:170px!important}
+body .editor-floating-panel.widget-selection-palette [aria-label="Formato numero pagina"]{min-width:178px!important}
+.widget-truth-hint{display:block;max-width:100%;margin:.25em 0 0;font-size:.76em!important;line-height:1.3;white-space:normal;overflow-wrap:anywhere;color:inherit}
+/* The answer text itself is the second flex item, not a 1-line flexbox span. */
+.editor-ux-v2 .widget-canvas-item .canvas-widget-answer-preview .widget-answer-option>.widget-rich-inline,
+.editor-ux-v2 .widget-canvas-item .canvas-subquestion-option>.widget-rich-inline{
+ display:block!important;min-width:0!important;flex:1 1 0%!important;
+ width:auto!important;white-space:pre-wrap!important;overflow-wrap:anywhere!important;
+ text-overflow:clip!important;overflow:visible!important;
+}
+.editor-ux-v2 .widget-canvas-item .canvas-widget-answer-preview .widget-answer-option{
+ height:auto!important;max-height:none!important;min-height:0!important;
+ white-space:normal!important;text-overflow:clip!important;
+}
+/* Keep the shared authored button color even with the historical outline rules. */
+:is(.widget-question,.rehearsal-widget,.projection-widget,.editor-ux-v2 .widget-canvas-item) .canvas-widget-submit-preview,
+:is(.widget-question,.rehearsal-widget,.projection-widget) .projection-readonly-submit,
+:is(.widget-question,.rehearsal-widget,.projection-widget) button.outline{
+ color:var(--q-submit-color,#142c43)!important;
+}
+
+/* RC206: the thumbnail menu lives in document.body, outside the scrollable rail.
+ * Its own viewport-bounded scroll always keeps the final command accessible. */
+.page-editor-thumb-menu-floating{
+ position:fixed!important;z-index:25000!important;display:flex;flex-direction:column;
+ box-sizing:border-box;width:min(270px,calc(100vw - 16px))!important;
+ max-height:calc(100dvh - 16px)!important;overflow:auto!important;overscroll-behavior:contain;
+ gap:3px;padding:8px;background:#0e1b30f7;color:#f5faff;border:1px solid #749ac2;
+ border-radius:12px;box-shadow:0 18px 44px #000c;
+}
+.page-editor-thumb-menu-floating button,.page-editor-thumb-menu-floating .editor-thumb-import{
+ flex:0 0 auto;display:block!important;width:100%;min-height:38px;text-align:left;
+ color:#f5faff!important;background:transparent;border:0;border-radius:7px;
+ padding:9px 12px!important;font-size:13px;font-weight:500;cursor:pointer;
+}
+/* In a body portal the old .editor-ux-v2 ancestor selector no longer applies:
+ * keep the native file input covering its menu label without visible overflow. */
+.page-editor-thumb-menu-floating .editor-thumb-import{position:relative;line-height:22px}
+.page-editor-thumb-menu-floating .editor-thumb-import input[type="file"]{
+ position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;
+}
+.page-editor-thumb-menu-floating .editor-delete-action{color:#ffbec5!important}
+.page-editor-thumb-menu-floating :is(button,.editor-thumb-import):hover,
+.page-editor-thumb-menu-floating :is(button,.editor-thumb-import):focus-within{background:#28627e!important;outline:2px solid #79e4f0}
+.editor-ux-v2 .page-editor-thumb-row.is-selected{border-color:#f3bf52!important;box-shadow:0 0 0 2px #f3bf5270,0 10px 28px #0007}
+.editor-ux-v2 .page-editor-thumb-row.is-selected.is-active{border-color:#5de3de!important;box-shadow:0 0 0 2px #5de3de,0 0 0 5px #f3bf5270}
+.editor-ux-v2 .thumbnail-selection-help{display:block;padding:3px 4px 8px;font-size:10px;line-height:1.3;color:#bdcfdf;overflow-wrap:anywhere}
+
+/* RC206: each result row has its own breathing space, a readable count and a
+ * wrapped label on both the authoring canvas and projection. */
+:is(.widget-results-bars,.result-view-bars)>.widget-results-bar-row{display:flex;flex-direction:column;gap:.3em;margin-bottom:.8em;min-width:0;white-space:normal;overflow-wrap:anywhere}
+.widget-results-bar-caption{display:flex;align-items:flex-start;justify-content:space-between;gap:.65em;min-width:0;line-height:1.4}
+.widget-results-bar-caption>span{min-width:0;white-space:normal;overflow-wrap:anywhere}
+.widget-results-bar-caption>strong{flex:0 0 auto;min-width:2.1em;padding:.16em .48em;text-align:center;font-variant-numeric:tabular-nums;border-radius:.6em;background:#194b72;color:#fff;font-size:1.05em}
+.widget-results-bar-row progress{display:block;width:100%;min-height:10px;height:.7em;margin:.1em 0 .3em;accent-color:#237caa}
+/* The linked results widget is the primary bars view used by most slides. */
+:is(.linked-results,.result-view-bars) .linked-results-row{margin-bottom:.75em!important;row-gap:.36em!important;min-height:2.2em!important}
+:is(.linked-results,.result-view-bars) .linked-results-row .linked-result-final output{font-variant-numeric:tabular-nums;font-weight:800;background:#194b72;color:#fff;border-radius:.5em;padding:.14em .45em;margin-inline-start:.4em;white-space:nowrap}
+/* Library actions belong to the canvas context; no window-size layout jumps. */
+.canvas-library-manager{margin:7px 0;padding:8px;border:1px solid #5e7897;border-radius:8px;min-width:0}
+.canvas-library-manager summary{cursor:pointer;font-size:.9em;font-weight:700;white-space:normal;overflow-wrap:anywhere}
+.canvas-library-manager label{display:block;margin:7px 0}
+.canvas-library-manager select{max-width:100%;width:100%;min-width:0}
+.canvas-library-actions{display:flex;gap:6px;flex-wrap:wrap}
+.canvas-library-actions button{flex:1 1 110px}
+
+
+/* RC207: phone stages are 390 logical CSS pixels, not 1280. Response/submit
+ * inline styles retain 1280-based cqw for desktop projection; smartphone
+ * surfaces consume their matching pixel values so 16px answers never become
+ * 4.875px on a 390px-wide device. Identical rules apply in editor, rehearsal
+ * and public participant stage. Explicit phone typography remains authoritative. */
+:is(.editor-ux-v2 .canvas-editor-group[data-canvas-device="phone"] .widget-canvas-item,
+    .rehearsal-phone-stage .rehearsal-widget,
+    .audience-widget-layout.stage-phone>.page-widget) .widget-answer-option,
+:is(.editor-ux-v2 .canvas-editor-group[data-canvas-device="phone"] .widget-canvas-item,
+    .rehearsal-phone-stage .rehearsal-widget,
+    .audience-widget-layout.stage-phone>.page-widget) .canvas-subquestion-option,
+:is(.editor-ux-v2 .canvas-editor-group[data-canvas-device="phone"] .widget-canvas-item,
+    .rehearsal-phone-stage .rehearsal-widget,
+    .audience-widget-layout.stage-phone>.page-widget) .canvas-widget-answer-preview[data-answer-mode]{
+ font-size:var(--q-phone-answer-font-size,18px)!important;
+ line-height:1.35!important;
+ white-space:normal!important;
+ overflow-wrap:anywhere!important;
+}
+:is(.editor-ux-v2 .canvas-editor-group[data-canvas-device="phone"] .widget-canvas-item,
+    .rehearsal-phone-stage .rehearsal-widget,
+    .audience-widget-layout.stage-phone>.page-widget) .widget-answer-option{
+ min-height:44px!important;align-items:center!important;padding:6px 0!important;
+}
+:is(.editor-ux-v2 .canvas-editor-group[data-canvas-device="phone"] .widget-canvas-item,
+    .rehearsal-phone-stage .rehearsal-widget,
+    .audience-widget-layout.stage-phone>.page-widget) .widget-answer-option>input:is([type="checkbox"],[type="radio"]){
+ width:20px!important;height:20px!important;min-width:20px!important;flex-basis:20px!important;
+}
+:is(.editor-ux-v2 .canvas-editor-group[data-canvas-device="phone"] .widget-canvas-item,
+    .rehearsal-phone-stage .rehearsal-widget,
+    .audience-widget-layout.stage-phone>.page-widget) .widget-free-answer-field{
+ font-size:var(--q-phone-answer-font-size,18px)!important;
+ height:var(--q-phone-answer-height,96px)!important;min-height:76px!important;
+ line-height:1.4!important;
+}
+:is(.editor-ux-v2 .canvas-editor-group[data-canvas-device="phone"] .widget-canvas-item,
+    .rehearsal-phone-stage .rehearsal-widget,
+    .audience-widget-layout.stage-phone>.page-widget) :is(.canvas-widget-submit-preview,.projection-readonly-submit,.widget-question>button,.projection-interactive-widget>button,.projection-sample-topic>button){
+ font-size:var(--q-phone-submit-font-size,18px)!important;
+ min-height:var(--q-phone-submit-min-height,44px)!important;
+ padding:var(--q-phone-submit-padding,7px 15px)!important;
+ line-height:1.25!important;white-space:normal!important;
+}
+:is(.editor-ux-v2 .canvas-editor-group[data-canvas-device="phone"] .widget-canvas-item,
+    .rehearsal-phone-stage .rehearsal-widget,
+    .audience-widget-layout.stage-phone>.page-widget) .widget-rich-inline span[style*="--q-inline-phone-font-size"]{
+ font-size:var(--q-inline-phone-font-size)!important;
+}
+:is(.editor-ux-v2 .canvas-editor-group[data-canvas-device="phone"] .widget-canvas-item,
+    .rehearsal-phone-stage .rehearsal-widget,
+    .audience-widget-layout.stage-phone>.page-widget) .widget-truth-hint{
+ font-size:max(14px,.85em)!important;line-height:1.4!important;
+}
+
+/* RC207: contentEditable options inherit the PHONE option size rather than the
+ * older 1280-cqw answer-size variable used by desktop canvas. */
+.editor-ux-v2 .canvas-editor-group[data-canvas-device="phone"] .widget-canvas-item
+ :is(.canvas-widget-answer-preview[data-answer-mode],.canvas-subquestion-option) .widget-rich-inline{
+ font-size:var(--q-phone-answer-font-size,18px)!important;
+ line-height:1.35!important;
+}

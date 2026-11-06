@@ -72,7 +72,22 @@ def run():
     assert reset['results']==[] and all(a['status']=='pending' and a['opened_at'] is None for a in reset['activities'])
     assert next(a for a in reset['activities'] if a['id']==aid)['page_design']['widgets']==page['widgets']
     req(audience,'POST',f'/api/join/{code}/respond',{'activity_id':aid,'option_id':'yes'},expected=404)
-    print('PASS disposable PostgreSQL RC71: one-shot first timer, preserved revisit, confirmed restart, re-answer, owner-only reset, cleared stats and persistent design')
+    # RC209: an already-closed session may be reset by its owner from the
+    # Open Session list, without visiting the dashboard or losing its pages.
+    req(admin,'POST',f'/api/sessions/{sid}/status',{'status':'active'})
+    req(admin,'POST',f'/api/sessions/{sid}/status',{'status':'closed'})
+    old_code=req(admin,'GET',f'/api/sessions/{sid}')['session']['join_code']
+    req(admin,'POST',f'/api/sessions/{sid}/reset-to-ready',{},expected=400)
+    req(admin,'POST',f'/api/sessions/{sid}/reset-to-ready',{'confirmation':'RESET_SESSION_RESULTS'})
+    closed_reset=req(admin,'GET',f'/api/sessions/{sid}')
+    assert closed_reset['session']['status']=='ready'
+    assert closed_reset['session']['join_code']!=old_code
+    assert closed_reset['session']['current_activity_id'] is None
+    assert closed_reset['results']==[]
+    assert next(a for a in closed_reset['activities'] if a['id']==aid)['page_design']['widgets']==page['widgets']
+    # Ready again: a second reset must be rejected as a non-destructive no-op.
+    req(admin,'POST',f'/api/sessions/{sid}/reset-to-ready',{'confirmation':'RESET_SESSION_RESULTS'},expected=409)
+    print('PASS disposable PostgreSQL RC71: one-shot first timer, preserved revisit, confirmed restart, re-answer, owner-only active/closed reset, cleared stats and persistent design')
 
 if __name__=='__main__':
     run()

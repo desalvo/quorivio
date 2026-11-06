@@ -10,12 +10,23 @@ export type MobileWidget={id:string;kind:string;position?:{x:number;y:number;wid
  * Heights are measured in 390px *logical* pixels, not scaled desktop pixels.
  * A page only grows beyond 720px if its actual interactive content needs it.
  * User-authored mobile positions are never rewritten by the automatic plan. */
+/** Approximate wrapped 18px phone choices at 390px, reserving a 44px tap row.
+ * Long (up to 255-character) answers must gain height instead of shrinking. */
+function mobileChoiceHeight(choice:unknown):number {
+ const label=choice&&typeof choice==='object'&&'label' in choice&&typeof choice.label==='string'?choice.label:'';
+ return Math.max(44,Math.ceil(Math.max(1,label.length)/32)*26+12);
+}
 export function mobileWidgetHeight(widget:MobileWidget):number {
- const optionCount=Array.isArray(widget.options)?widget.options.length:0;
- const subquestionCount=Array.isArray(widget.questions)?widget.questions.length:0;
+ const options=Array.isArray(widget.options)?widget.options:[];
+ const subquestions=Array.isArray(widget.questions)?widget.questions:[];
+ const optionSpace=options.reduce<number>((sum,choice)=>sum+mobileChoiceHeight(choice),0);
+ const subquestionSpace=subquestions.reduce<number>((sum,question)=>{
+  const options=question&&typeof question==='object'&&'options' in question&&Array.isArray(question.options)?question.options:[];
+  return sum+190+options.reduce<number>((size,choice)=>size+mobileChoiceHeight(choice),0);
+ },0);
  const textLength=(widget.description||'').length;
  switch(widget.kind){
-  case 'question':case 'timed-quiz':return Math.min(540,190+optionCount*29+subquestionCount*82+Math.min(70,Math.ceil(textLength/90)*20));
+  case 'question':case 'timed-quiz':return Math.min(3000,190+optionSpace+subquestionSpace+Math.min(190,Math.ceil(textLength/40)*26));
   case 'topic-question':return 190;
   case 'rating':return 230; // Comment and all ten 0–9 choices remain usable.
   case 'reactions':return 125;

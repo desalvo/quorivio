@@ -87,7 +87,7 @@ async def main():
   browser=await pw.chromium.launch(**launch,headless=True,args=['--no-sandbox'])
   page=await browser.new_page(viewport={'width':1440,'height':940},accept_downloads=True)
   page.set_default_timeout(12000)
-  state={'widgets':copy.deepcopy(WIDGETS),'revision':1,'saves':0,'drop_before':False,'drop_after':False}
+  state={'widgets':copy.deepcopy(WIDGETS),'revision':1,'saves':0,'drop_before':False,'drop_after':False,'auth_error':None,'session_error':None,'session_active':False}
   errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
   async def mock(route):
    from urllib.parse import urlparse
@@ -106,10 +106,17 @@ async def main():
      state['drop_after']=False
      await route.abort('failed');return
     data={'ok':True,'design_revision':state['revision']}
-   elif path=='/api/auth/me':data={'id':'user-test','email':'test@example.org','nickname':'Test','role':'presenter'}
+   elif path=='/api/auth/me':
+    if state['auth_error']:
+     await route.fulfill(status=state['auth_error'],content_type='application/json',json={'error':'unauthorized'});return
+    data={'id':'user-test','email':'test@example.org','nickname':'Test','role':'presenter'}
    elif path=='/api/auth/oidc/providers':data={'providers':[]}
    elif path=='/api/sessions':data={'items':[SES],'total':1}
-   elif path==f'/api/sessions/{SESSION}':data={**SNAP,'activities':[{**ACT,'design_revision':state['revision'],'page_design':{'widgets':copy.deepcopy(state['widgets'])},'result_design':{}}]}
+   elif path==f'/api/sessions/{SESSION}':
+    if state['session_error']:
+     await route.fulfill(status=state['session_error'],content_type='application/json',json={'error':'temporarily_unavailable'});return
+    live_session={**SES,'status':'active' if state['session_active'] else 'draft','join_code':'ROTATED' if state['session_active'] else 'ABCDEF'}
+    data={**SNAP,'session':live_session,'activities':[{**ACT,'design_revision':state['revision'],'page_design':{'widgets':copy.deepcopy(state['widgets'])},'result_design':{}}]}
    elif path.endswith('/assets') or path.endswith('/presenter-profiles') or path.endswith('/appointments') or path.endswith('/schedule'):data=[]
    elif path=='/api/calendar':data=[]
    else:data=[]
@@ -366,6 +373,40 @@ async def main():
    recovered=await page.evaluate("() => JSON.parse(sessionStorage.getItem('quorivio.workspace.v1') || '{}')")
    assert recovered.get('sessionId')==SESSION and recovered.get('pageId')==ACTIVITY, (
        'Reload lost the selected authenticated session or editor page')
+   # RC208: a restarted/active session with a rotated join code must recover
+   # the editor from this tab's stored route, without clearing auth cookies.
+   state['session_active']=True
+   await page.reload(wait_until='domcontentloaded')
+   await await_frontend_mount(page,errors)
+   editor=page.get_by_role('region',name='Editor grafico delle pagine')
+   await expect(editor).to_be_visible(timeout=30000)
+   await expect(editor.locator('.widget-canvas-item')).to_have_count(4)
+   assert await page.evaluate("() => JSON.parse(sessionStorage.getItem('quorivio.workspace.v1') || '{}').sessionId") == SESSION
+
+   # A temporary snapshot outage must show a visible recovery UI, not a blank
+   # canvas or an instruction to erase cookies. A manual retry restores the editor.
+   state['session_error']=503
+   await page.reload(wait_until='domcontentloaded')
+   await await_frontend_mount(page,errors)
+   await expect(page.locator('.session-restore-status')).to_be_visible(timeout=15000)
+   state['session_error']=None
+   await page.get_by_role('button',name='Riprova ora').click()
+   editor=page.get_by_role('region',name='Editor grafico delle pagine')
+   await expect(editor).to_be_visible(timeout=30000)
+
+   # An expired presenter cookie causes a normal login view, not a permanent
+   # freeze; restoring server authentication permits opening the same workspace.
+   state['auth_error']=401
+   await page.reload(wait_until='domcontentloaded')
+   await await_frontend_mount(page,errors)
+   await expect(page.locator('main.narrow')).to_be_visible(timeout=15000)
+   state['auth_error']=None
+   await page.reload(wait_until='domcontentloaded')
+   await await_frontend_mount(page,errors)
+   editor=page.get_by_role('region',name='Editor grafico delle pagine')
+   await expect(editor).to_be_visible(timeout=30000)
+   state['session_active']=False
+
    # Import/export live only on the relevant thumbnail, never below the artboard.
    await page.get_by_role('button',name='Menu pagina 1: crea, duplica, elimina, sposta').click()
    async with page.expect_download() as info:

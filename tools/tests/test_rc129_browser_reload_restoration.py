@@ -31,6 +31,10 @@ class BrowserWorkspaceReload(unittest.TestCase):
   self.assertIn("const [selected,setSelected]=useState<string>(()=>readWorkspaceLocation().sessionId)",UI)
   self.assertIn('if(me===undefined||!me)return;writeWorkspaceLocation',UI)
   self.assertIn('if(!me||!selected||!snap||snap.session.id!==selected',UI)
-  self.assertIn("setSnap(null);writeWorkspaceLocation({sessionId:'',section:'workspace'",UI)
+  # RC208: a failed transient snapshot stays retryable; only permanently revoked/removed
+  # sessions clear the tab-local route. This must never clear the auth cookie.
+  self.assertIn("outcome==='unavailable'",UI)
+  self.assertIn("writeWorkspaceLocation({sessionId:'',section:'workspace'",UI)
+  self.assertIn("setSessionLoadState('retry')",UI)
 
 if __name__=='__main__': unittest.main()

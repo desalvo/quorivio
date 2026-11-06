@@ -129,6 +129,8 @@ jobs:
           PYTHONPATH=tools python3 -m unittest tools.tests.test_rc200_editor_portability.RC200EditorPortability -q
           PYTHONPATH=tools python3 -m unittest tools.tests.test_rc202_dependency_staging -q
           PYTHONPATH=tools python3 -m unittest tools.tests.test_rc203_editor_grid_track -q
+          PYTHONPATH=tools python3 -m unittest tools.tests.test_rc204_anon_cohort_contract -q
+          PYTHONPATH=tools python3 -m unittest tools.tests.test_rc205_editor_consistency -q
           PYTHONPATH=tools python3 -m unittest tools.tests.test_rc201_live_qr_refresh -q
           PYTHONPATH=tools python3 -m unittest tools.tests.test_rc147_inventory_no_cache -q
           PYTHONPATH=tools python3 -m unittest tools.tests.test_rc148_phone_atomic_undo -q
@@ -207,6 +209,22 @@ jobs:
         run: python3 -m unittest tools.tests.test_rc175_media_geometry -q
       - name: RC176 three-mode accessibility and real participant geometry preflight before npm
         run: python3 -m unittest tools.tests.test_rc176_accessible_stage_modes -q
+      - name: RC206 thumbnail selection, shortcuts, footer numbering and background library preflight
+        run: |
+          python3 -m unittest tools.tests.test_rc206_page_selection_and_library -q
+          node --experimental-strip-types --test apps/web/test/rc206-page-thumbnail-selection.test.ts apps/api/test/independent-widget-answers.test.ts
+      - name: RC207 readable default phone questions and response controls before npm
+        run: |
+          python3 -m unittest tools.tests.test_rc207_phone_readability -q
+          node --experimental-strip-types --test apps/web/test/rc207-smartphone-readable-text.test.ts
+      - name: RC208 reconnect and restore active owner session without clearing cookies before npm
+        run: |
+          python3 -m unittest tools.tests.test_rc208_session_recovery -q
+          node --experimental-strip-types --test apps/web/test/session-load-recovery.test.ts apps/web/test/session-qr-state.test.ts
+      - name: RC209 owner-only reset and delete from Open Session list before npm
+        run: |
+          python3 -m unittest tools.tests.test_rc209_open_session_actions -q
+          node --experimental-strip-types --test apps/web/test/rc209-session-list-management.test.ts
       - name: RC178 responsive widget palette and unclipped canvas preflight
         run: python3 -m unittest tools.tests.test_rc178_palette_clipping -q
       - name: RC179 contextual canvas pointer stays above wrapped palette preflight
@@ -576,6 +594,7 @@ jobs:
           # Actual editor geometry: expanded keyboard/touch controls must not cover Save.
           python3 tools/ci_editor_save_flow_chromium.py
           python3 tools/ci_editor_mock_layout_chromium.py
+          python3 tools/ci_rc207_phone_readability_chromium.py
           # RC105: selected-only, pixel-aligned handles and viewport-floating palette.
           python3 tools/ci_editor_floating_layout_chromium.py
           # Regression: a fixed mock header may cover the 7px canvas corner after scrolling.
@@ -970,6 +989,8 @@ jobs:
           python3 -c 'import PIL' # enforce Pillow before native slide-snapshot regression
       - name: RC202 native imported-slide PowerPoint fidelity after Python dependencies
         run: PYTHONPATH=tools python3 -m unittest tools.tests.test_rc200_editor_portability.RC200NativePowerPointPortability -v
+      - name: RC205 imported raster slide round-trip and editability
+        run: PYTHONPATH=tools python3 -m unittest tools.tests.test_rc205_native_slide_roundtrip -v
       # Explicitly run native PPTX regression cases only after python-pptx is present.
       # They also remain in the full tools/tests discovery that follows.
       - name: Verify RC74 footer and RC91 scheme native PowerPoint fidelity
@@ -1221,7 +1242,13 @@ jobs:
           python3 tools/verify_rc_cycle200_inventory.py --historical
           python3 tools/verify_rc_cycle201_inventory.py --historical
           python3 tools/verify_rc_cycle202_inventory.py --historical
-          python3 tools/verify_rc_cycle203_inventory.py
+          python3 tools/verify_rc_cycle203_inventory.py --historical
+          python3 tools/verify_rc_cycle204_inventory.py --historical
+          python3 tools/verify_rc_cycle205_inventory.py --historical
+          python3 tools/verify_rc_cycle206_inventory.py --historical
+          python3 tools/verify_rc_cycle207_inventory.py --historical
+          python3 tools/verify_rc_cycle208_inventory.py --historical
+          python3 tools/verify_rc_cycle209_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:
