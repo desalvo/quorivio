@@ -730,6 +730,9 @@ jobs:
           python3 tools/ci_rc170_phone_footer_number_chromium.py
           # RC171: visible editor phone switch, graphic menu triggers and wrapping icon rail.
           python3 tools/ci_rc171_editor_palette_chromium.py
+          # RC234: Chromium viewport regression for wrapped, vertically scrollable phone palette.
+          python3 -m unittest tools.tests.test_rc234_palette_responsive -q
+          python3 tools/ci_rc234_palette_chromium.py
           # RC162: compact QR URL must remain visible when resized; no URL row when hidden.
           python3 tools/ci_rc162_qr_resizing_chromium.py
           # RC152: mutation-tested current long-label wrapping and attached [count]
@@ -1434,7 +1437,8 @@ jobs:
           python3 tools/verify_rc_cycle230_inventory.py --historical
           python3 tools/verify_rc_cycle231_inventory.py --historical
           python3 tools/verify_rc_cycle232_inventory.py --historical
-          python3 tools/verify_rc_cycle233_inventory.py
+          python3 tools/verify_rc_cycle233_inventory.py --historical
+          python3 tools/verify_rc_cycle234_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

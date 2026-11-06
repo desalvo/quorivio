@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC234 — Responsive editor palette Chromium correction
+
+**RC234:** Full GitHub CI `42245983528` at RC233 commit `d744de0eac508c5e6196e97315c09aa388c55985` failed real Chromium at 620 px: the palette overflowed 1198 px within a 608 px container. Resolved RC226/RC171 CSS cascade conflict by restoring vertical wrapping, bounded height and no horizontal overflow in the one-column mobile editor. Added RC234 real Chromium regression at nine widths (320–1440 px), mutation-tested CSS/source contract, and mandatory workflow verification. RC233 is historical, RC234 current. RC234 full CI pending; certified **85.25%** (43 accepted/17 partial), unchanged. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. See `docs/RC_CYCLE234_PALETTE_RESPONSIVE.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC233 — Linked-results TypeScript compile gate fix
 
 **RC233:** GitHub CI `42241665883` for RC232 (`68391862f85036cf0327e511afbfd5ff0db5da2e`) reached the strict frontend TypeScript gate and failed on seven TS2339 references to `showSourceTitle`, `showSourceAnswers` and `showCorrectAnswers` in `apps/web/src/main.tsx`, because the typed editor history omitted these existing canonical `PageDesign` keys. RC233 adds them to the narrow `Pick<>`, retaining strict typing and preserving presenter-only answer truth. Added RC233 pre-npm type contract regression; RC232 remains historical and RC233 is current. CI integration pending; last confirmed all-green RC219 `42197607753`. Certified **85.25%** (43 accepted / 17 partial), unchanged. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. See `docs/RC_CYCLE233_LINKED_RESULTS_TYPECHECK.en.md`.

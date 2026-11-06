@@ -3125,11 +3125,22 @@ body .editor-floating-panel.widget-selection-palette .widget-format-advanced inp
  body .editor-ux-v2 .editor-mock-actions{flex:1 1 190px!important;max-width:100%!important;gap:3px!important}
  body .editor-ux-v2 .editor-mock-action-buttons{justify-content:flex-start;gap:4px}
  body .editor-ux-v2 .editor-mock-meta{display:none!important}
+ /* RC234: preserve the RC171 wrapped, vertically scrollable widget palette
+    even when RC226 switches the mobile editor to a one-column layout.
+    A nowrap rail required ~1200px inside a 620px viewport, hiding tools. */
  body .editor-ux-v2 .editor-widget-rail{
-  grid-column:1!important;grid-row:2!important;display:flex!important;max-height:78px!important;min-height:0!important;
+  grid-column:1!important;grid-row:2!important;display:flex!important;
+  height:auto!important;max-height:min(30dvh,198px)!important;min-height:72px!important;
+  min-width:0!important;max-width:100%!important;box-sizing:border-box!important;
   overflow:hidden!important;padding:3px 6px!important;border:0!important;border-bottom:1px solid var(--editor-line)!important;
  }
- body .editor-ux-v2 .editor-widget-grid{display:flex!important;flex-wrap:nowrap!important;overflow-x:auto!important;overflow-y:hidden!important;max-height:74px!important;height:74px!important;align-items:center!important;padding:3px!important;gap:5px!important}
+ body .editor-ux-v2 .editor-widget-grid{
+  display:flex!important;flex-wrap:wrap!important;align-content:flex-start!important;
+  overflow-x:hidden!important;overflow-y:auto!important;
+  min-width:0!important;max-width:100%!important;box-sizing:border-box!important;
+  height:auto!important;max-height:min(30dvh,198px)!important;
+  align-items:flex-start!important;padding:3px!important;gap:5px!important;
+ }
  body .editor-ux-v2 .editor-widget-grid :is(.editor-icon-wrapper,.editor-graphic-wrapper){flex:0 0 58px!important;min-width:54px!important;max-width:62px!important}
  body .editor-ux-v2 .page-editor-sidebar{
   grid-column:1!important;grid-row:3!important;display:flex!important;flex-direction:column!important;
