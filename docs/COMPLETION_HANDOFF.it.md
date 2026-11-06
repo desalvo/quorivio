@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC211 — Handoff controllo numerazione e CI
+
+**RC211:** Allineati i test storici RC91/RC195 alla numerazione pagina presentatore introdotta in RC206; conservata la differenza del contenuto partecipanti e verificata la numerazione condivisa senza buchi. Nuovo preflight con mutazioni negative. Full CI RC211 ancora da eseguire; ultima completa verde RC203 `42110429701`. Certificato **85,25%**, 43 gate accettati e 17 parziali. `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Vedi `docs/RC_CYCLE211_PRESENTER_NUMBERING_CI.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC210 — Handoff riconciliazione CI rinomina miniature
 
 **RC210:** Ripartire dalla RC209 conservando RC204–RC209. Run GitHub `42138018546`, job `127630992928`: fallimento anticipato nel test di ottobre che cercava `void renameCanvasPage(a)` nel menu miniature. Dalla RC206 la rinomina delle miniature e la scorciatoia R passano correttamente da `renameSelectedPages(a.id)`, che delega a `renameCanvasPage(page)` per ciascuna pagina selezionata. Contratto storico aggiornato, tre nuovi test positivi/negativi registrati prima di npm; gruppo CI originale da 35 test verde localmente. Nessuna modifica al runtime prodotto. Full CI RC210 da verificare; ultima verde RC203 `42110429701`. Completamento **85,25%** certificato (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Dettagli `docs/RC_CYCLE210_THUMBNAIL_RENAME_CI.it.md`.

@@ -41,7 +41,7 @@ class RC195MasterTypographyCI(unittest.TestCase):
   }
   for file,contract in checks.items():
    self.assertIn(contract,(ROOT/file).read_text(),file)
-  for contract in ('[audienceActivity?.id,seed]','viewPageNumber=slidePageNumber(activities,viewActivity.id)',
+  for contract in ('[audienceActivity?.id,seed]','viewPageNumber=slidePageNumber(activities,activity.id)',
     'mobile?participantPhoneLayout(viewWidgets,viewActivity?.page_design?.mobile).widgets',
     'height={participantPhoneLayout(widgets,audienceActivity?.page_design?.mobile).height}'):
    self.assertIn(contract,ui)
@@ -49,7 +49,8 @@ class RC195MasterTypographyCI(unittest.TestCase):
 
  def test_negative_mutations_reject_incorrect_phone_and_timer_contract(self):
   for old,new in [('[audienceActivity?.id,seed]','[activity?.id,seed]'),
-                  ('viewPageNumber=slidePageNumber(activities,viewActivity.id)','viewPageNumber=page+1'),
+                  ('viewPageNumber=slidePageNumber(activities,activity.id)','viewPageNumber=page+1'),
+                  ('viewPageNumber=slidePageNumber(activities,activity.id)','viewPageNumber=slidePageNumber(activities,viewActivity.id)'),
                   ('participantPhoneLayout(viewWidgets,viewActivity?.page_design?.mobile).widgets','participantVisibleWidgets(viewWidgets)')]:
    self.assertIn(old,UI)
    self.assertNotIn(old,UI.replace(old,new,1))

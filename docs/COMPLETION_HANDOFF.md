@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC211 — Numbering CI reconciliation handoff
+
+**RC211:** Reconciled historic RC91/RC195 assertions to the RC206 presenter-visible page number shared by participant footer, retaining independent participant content. Added early fail-closed RC211 mutation checks. RC211 full CI pending; last full-green RC203 `42110429701`. Certified **85.25%** (43 accepted/17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag. See `docs/RC_CYCLE211_PRESENTER_NUMBERING_CI.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC210 — Thumbnail rename CI reconciliation handoff
 
 **RC210:** Resume from RC209, preserving all RC204–RC209 features. GitHub run `42138018546` quality job `127630992928` failed early because the October thumbnail test looked for direct `void renameCanvasPage(a)`; RC206 correctly routes thumbnail and R shortcuts via the ordered multi-selection handler, which calls `renameCanvasPage(page)` for authorized title-only updates. Updated historic source contract, added 3 negative/positive pre-npm regressions and retained the seven-module early CI gate (35 tests locally green). No product runtime changes. New full CI pending; last complete green RC203 `42110429701`. Certified **85.25%** (43 accepted/17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no assistant commit/push/tag. See `docs/RC_CYCLE210_THUMBNAIL_RENAME_CI.en.md`.

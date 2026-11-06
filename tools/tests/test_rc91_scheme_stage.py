@@ -14,12 +14,15 @@ class GlobalMasterRegressions(unittest.TestCase):
   self.assertIn('pointer-events:none!important',CSS)
   self.assertIn('function SlideCanvasNumber',UI)
   self.assertIn('pageNumber={slidePageNumber(snapshot.activities,activity.id)}',UI)
-  # RC195: the rehearsal number follows the actual presenter/audience page,
-  # not the position of the presenter in a shared page array.
-  self.assertIn('viewPageNumber=slidePageNumber(activities,viewActivity.id)',UI)
+  # RC206/RC211: the audience may view an independent page, but its footer
+  # must display the presenter's ordinal (hidden presenter pages excluded).
+  self.assertIn('viewPageNumber=slidePageNumber(activities,activity.id)',UI)
+  self.assertNotIn('viewPageNumber=slidePageNumber(activities,viewActivity.id)',UI)
   self.assertIn('pageNumber={viewPageNumber}',UI)
   self.assertIn('pageNumber={pageNumber}',UI)
-  self.assertIn('pageNumber={Number(entry.activity.position)+1}',UI)
+  # RC206: participant stage prefers the authoritative presenter ordinal.
+  self.assertIn('pageNumber={Math.max(1,Number(entry.session.presenter_page_number)||Number(entry.activity.position)+1)}',UI)
+  self.assertNotIn('pageNumber={Number(entry.activity.position)+1}',UI)
   self.assertEqual(UI.count('className="slide-footer-number"'),0)
   self.assertIn('className="slide-canvas-page-number"',UI)
   # RC128 scales the page-number font to canvas container units, preserving

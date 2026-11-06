@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC211 — Presenter numbering CI reconciliation
+
+**RC211:** RC210 full CI `42139200296` stopped at the RC195 Python preflight: two historical tests expected the audience page ordinal rather than the current visible presenter page ordinal for the footer. Also repaired the related RC91 contract; introduced fail-closed RC211 mutation tests and an early preflight. No app-runtime, DB, or authorization changes. Version `0.1.0-dev`; certified **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. RC211 full CI pending; last fully green RC203 `42110429701`. No commit/push/tag. See `docs/RC_CYCLE211_PRESENTER_NUMBERING_CI.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC210 — Historical thumbnail rename CI reconciliation
 
 **RC210:** The RC209 full CI (`42138018546`, quality job `127630992928`) failed in early RC197 Python preflight because an October source-contract test expected obsolete `void renameCanvasPage(a)` instead of the RC206 selection-aware `renameSelectedPages(a.id)`. Updated the historic test to assert that menu, keyboard and ordered multi-selection paths delegate to the original authorized title-only API. Added a fail-closed RC210 regression with negative mutation, and registered it before expensive CI. The previously failing CI group now passes locally (35 Python tests); 3 new RC210 tests also pass. Application runtime, DB, security policy and version unchanged; full RC210 CI pending, most recent complete green RC203 `42110429701`. Certified **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. Details: `docs/RC_CYCLE210_THUMBNAIL_RENAME_CI.en.md`.
