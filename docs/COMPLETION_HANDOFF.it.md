@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC239 — Handoff formattazione contestuale
+
+**RC239:** Partenza da RC238 committata `e1f7d2f234a712a112f98b23e3774905825a28d8`, full CI [42274460486](https://github.com/desalvo/quorivio/actions/runs/42274460486). Passati salvataggio, conflitti ed esportazione JSON reali; RC193 si bloccava perché cercava l'ambito formattazione in **Proprietà widget**. Mantenere la finestra distinta RC223 e aprire **Formato widget** dal menu contestuale dopo la chiusura delle proprietà; verificare la toolbar prima di operare sui font, conservando tutti i test focus. Regressioni negative RC239 obbligatorie prima di npm, test Chromium/PostgreSQL confermato nel workflow. Inventario RC238 storico invariato; RC239 corrente, applicazione invariata. Full CI GitHub da verificare, **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Non effettuare commit, push o tag senza richiesta. `docs/RC_CYCLE239_CONTEXTUAL_FORMAT_CHROMIUM.it.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC238 — Handoff layout smartphone/Chromium
 
 **RC238:** Base: RC237 committata su GitHub `4c4b7ee0451e0a20abb791da2a0ea585eddc8f63`, full CI [42269302109](https://github.com/desalvo/quorivio/actions/runs/42269302109) fallita nel Chromium reale con PostgreSQL. La fixture storica pretendeva 16:9 predefinito anche su touch da 390px. Verificare il corretto default smartphone RC227 in fase di ingresso e dopo reload, selezionare esplicitamente 16:9 per la geometria comune, conservare tutti i test della modalità smartphone e lettura accessibile. Aggiornata la verifica RC176 e introdotte regressioni fail-closed RC238 prima di npm. Nessuna modifica all’applicazione; RC237 storica, RC238 corrente. Full CI da certificare. **85,25%** (43 accettati/17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag dell’assistente. `docs/RC_CYCLE238_PARTICIPANT_PHONE_CHROMIUM.it.md`.

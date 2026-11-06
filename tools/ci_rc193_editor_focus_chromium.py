@@ -63,19 +63,29 @@ async def main():
    await page.keyboard.type(' scrivo tutta la frase',delay=12)
    await expect(option1).to_have_value('Testo iniziale scrivo tutta la frase')
    assert await option1.evaluate('e=>document.activeElement===e'),'Properties drawer lost the active answer input'
-   # Return to whole-widget scope: selected option text can temporarily force
-   # the Answer scope while the caret is active.
-   await page.get_by_role('combobox',name='Ambito della formattazione').select_option('widget')
+   # RC239 / RC223: the inspector and the formatting window are distinct.
+   # Finish the property text edit before using the explicit context-menu
+   # "Formato widget" action. Selecting the widget alone must not auto-open
+   # formatting, and the old inspector must not mask the floating palette.
+   await page.get_by_role('button',name='Chiudi proprietà widget').click()
+   await widget.click(button='right',position={'x':14,'y':14})
+   context_menu=page.get_by_role('group',name='Azioni widget question',exact=True)
+   await context_menu.get_by_role('button',name='Formato widget',exact=True).click()
+   format_panel=page.get_by_role('toolbar',name='Formattazione rapida widget selezionato')
+   await expect(format_panel).to_be_visible()
+   # Selected option text can force the Answer scope while the caret is active;
+   # the test's font parity contract explicitly covers the entire widget.
+   await format_panel.get_by_role('combobox',name='Ambito della formattazione').select_option('widget')
    # Numeric editing: an empty intermediate value is allowed; commit by Enter.
-   size=page.get_by_role('spinbutton',name='Dimensione del testo selezionato')
+   size=format_panel.get_by_role('spinbutton',name='Dimensione del testo selezionato')
    await expect(size).to_be_visible()
    await size.fill('')
    await expect(size).to_have_value('')
    await size.fill('27');await size.press('Enter')
    await expect(size).to_have_value('27')
-   await page.get_by_role('button',name='Aumenta dimensione carattere di 1').click()
+   await format_panel.get_by_role('button',name='Aumenta dimensione carattere di 1').click()
    await expect(size).to_have_value('28')
-   font=page.get_by_role('combobox',name='Font del testo')
+   font=format_panel.get_by_role('combobox',name='Font del testo')
    await font.select_option('Georgia')
    family=await widget.locator('.widget-answer-option').first.evaluate('e=>getComputedStyle(e).fontFamily')
    assert 'Georgia' in family,f'Answer options did not inherit the whole-widget font: {family}'
