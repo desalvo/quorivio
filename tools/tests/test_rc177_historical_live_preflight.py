@@ -35,15 +35,15 @@ class RC177HistoricalLivePreflight(unittest.TestCase):
                 self.assertNotIn("self.assertIn('audiencePortrait?audiencePhoneLayout.widgets:audienceVisibleWidgets'", test)
         for name in LEGACY[2:]:
             test=(ROOT/'tools/tests'/name).read_text(encoding='utf-8')
-            self.assertIn("geometry['height']-998",test.replace("\\'", "'"))
-            self.assertNotIn("geometry['height']-1174",test.replace("\\'", "'"))
+            self.assertIn("geometry['height']-geometry['expectedHeight']",test.replace("\\'", "'"))
+            self.assertNotIn("geometry['height']-998",test.replace("\\'", "'"))
 
     def test_browser_fixture_and_negative_mutation_prove_private_height(self):
-        self.assertIn("geometry['height']-998", BROWSER)
+        self.assertIn("geometry['height']-geometry['expectedHeight']", BROWSER)
         self.assertIn("'results-button','participant-count'", BROWSER)
-        old=BROWSER.replace("geometry['height']-998", "geometry['height']-1174")
+        old=BROWSER.replace("geometry['height']-geometry['expectedHeight']", "geometry['height']-1174")
         self.assertNotEqual(old,BROWSER)
-        self.assertNotIn("geometry['height']-998",old)
+        self.assertNotIn("geometry['height']-geometry['expectedHeight']",old)
 
     def test_early_ci_checks_legacy_and_current_contracts(self):
         self.assertIn('tools.tests.test_rc177_historical_live_preflight',CI)

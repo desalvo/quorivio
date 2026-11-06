@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC217 — Dynamic public mobile page geometry
+
+**RC217:** RC216 full CI `42150766799` failed real Chromium participant phone acceptance because its 998px fixed height predates RC207 44px answer rows (new legitimate height 1028px). Browser acceptance now uses computed bounds of seven visible public widgets and checks margins, gaps, footer and absence of phantom private-widget space. RC168/169/177 historical assertions reconciled, pre-npm negative Python/Node checks and local 390/1440 Chromium pass; integrated RC217 CI pending. No app runtime changes; last green RC203; certified **85.25%** (43 accepted/17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag. See `docs/RC_CYCLE217_PUBLIC_PHONE_DYNAMIC_HEIGHT.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC216 — Chromium auth-recovery login
 
 **RC216:** Run `42145939288` failed a compiled browser recovery check after a mock 401: the actual sign-in form was present but the historical selector `main.narrow` was obsolete. Replaced with accessible login heading/input/button assertions; preserved protected-editor exclusion and restoration after authentication without cookie clearing. Early pre-npm negative-mutation gate, no application runtime changes. Full RC216 CI pending; last full-green RC203. Certified **85.25%** (43 accepted/17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag. See `docs/RC_CYCLE216_AUTH_RECOVERY_BROWSER_LOGIN.en.md`.

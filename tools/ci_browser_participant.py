@@ -270,13 +270,30 @@ async def run():
    geometry=await p2.locator('.audience-widget-layout.stage-phone').evaluate('''stage=>{
      const sr=stage.getBoundingClientRect(),footer=stage.querySelector('[data-widget-kind="footer"]');
      const fr=footer?.getBoundingClientRect();
-     const kinds=[...stage.querySelectorAll(':scope>.page-widget')].map(w=>w.dataset.widgetKind);
-     return {height:sr.height,footerOffset:fr?sr.bottom-fr.bottom:null,kinds};
+     const publicWidgets=[...stage.querySelectorAll(':scope>.page-widget')];
+     const kinds=publicWidgets.map(w=>w.dataset.widgetKind);
+     // RC217: measure only rendered PUBLIC widgets. The RC207 44px touch
+     // rows legitimately increased the question from 248px to 278px; a
+     // literal 998px fixture height became obsolete. Extra hidden presenter
+     // widgets still increase stage height and MUST fail this invariant.
+     const ordered=publicWidgets.map(w=>w.getBoundingClientRect()).sort((a,b)=>a.top-b.top);
+     const expectedHeight=16+ordered.reduce((sum,r)=>sum+r.height,0)+Math.max(0,ordered.length-1)*8+16;
+     const topGap=ordered.length?ordered[0].top-sr.top:null;
+     const gaps=ordered.slice(1).map((r,i)=>r.top-ordered[i].bottom);
+     const question=stage.querySelector('[data-widget-kind="question"]');
+     return {height:sr.height,expectedHeight,topGap,gaps,
+             questionHeight:question?.getBoundingClientRect().height??0,
+             footerOffset:fr?sr.bottom-fr.bottom:null,kinds};
    }''')
-   # 7 public widgets: title(68)+question(248)+rating(230)+topic(190)+
-   # line(64)+shape(64)+footer(54)+six 8px gaps+32px margins = 998px.
-   # The two presenter-only result/count widgets must not add 190+145px.
-   assert abs(geometry['height']-998)<2, 'public phone stage reserves invisible presenter widgets'
+   # The phone stage must exactly contain its public content: top/bottom
+   # margins of 16px, 8px between widgets, and no phantom presenter widgets.
+   # Derive the height from visible DOM geometry, not a frozen count from a
+   # previous typography version. Long answers can legitimately grow further.
+   assert len(geometry['kinds'])==7, 'public phone fixture lost or gained a widget'
+   assert geometry['questionHeight']>=278-1, 'RC207 readable question rows shrank'
+   assert abs(geometry['height']-geometry['expectedHeight'])<2, 'public phone stage reserves invisible presenter widgets'
+   assert geometry['topGap'] is not None and abs(geometry['topGap']-16)<2, 'phone stage top margin drifted'
+   assert all(abs(gap-8)<2 for gap in geometry['gaps']), 'phone stage contains phantom vertical gaps'
    assert 10<=geometry['footerOffset']<=20, 'footer does not finish the public phone document'
    assert geometry['kinds'].count('footer')==1
    assert not {'results-button','participant-count'}.intersection(geometry['kinds'])

@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC217 — Handoff altezza smartphone pubblico
+
+**RC217:** Ripartire dal cumulativo RC217. Dopo il miglioramento RC207 dell’altezza minima delle opzioni, il test integrato RC176/RC165 usava ancora 998px e ha bloccato RC216 (`42150766799`); altezza reale fixture 1028px. Il controllo ora deriva l’altezza dai soli widget visibili e verifica 16px/8px, footer e assenza degli spazi privati. Aggiornati i test storici e i preflight Python/Node. Chromium sintetico reale 390/1440 verde; full CI GitHub RC217 necessaria. Runtime immutato; **85,25%**, `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Dettagli in `docs/RC_CYCLE217_PUBLIC_PHONE_DYNAMIC_HEIGHT.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC216 — Handoff recupero login Chromium
 
 **RC216:** Proseguire dal cumulativo RC216. CI RC215 `42145939288` fallita per un selettore `main.narrow` inesistente dopo simulazione del `401`; l’interfaccia corretta è il login accessibile nella home. Test aggiornato per controllare login e ripristino dell’editor senza cancellazione dei cookie, con preflight preventivo e mutazioni negative. Nessun cambiamento al runtime. Full CI RC216 necessaria; ultima full verde RC203. Certificato **85,25%**; `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Vedi `docs/RC_CYCLE216_AUTH_RECOVERY_BROWSER_LOGIN.it.md`.

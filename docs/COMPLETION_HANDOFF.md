@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC217 — Dynamic participant-phone stage handoff
+
+**RC217:** Continue from RC217 cumulative. RC216 full run `42150766799` failed because the old real Chromium participant fixture enforced 998px after RC207 increased minimum question choice rows, legitimately yielding 1028px. The updated browser contract derives expected height from seven visible public widget bounds, checks 16px margins/8px gaps/footer and rejects phantom private controls. RC168/RC169/RC177 historical tests reconciled, new early Python/Node mutation controls and local real Chromium 390/1440 green. GitHub RC217 full CI pending; runtime unchanged; certified **85.25%**, `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag. See `docs/RC_CYCLE217_PUBLIC_PHONE_DYNAMIC_HEIGHT.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC216 — Chromium reauthentication handoff
 
 **RC216:** Continue from cumulative RC216. RC215 full GitHub CI `42145939288` failed because a stale `main.narrow` selector looked for the old login container despite the correct accessible form already being rendered after a mocked 401. Chromium acceptance now checks the login controls and protected-editor absence, then requires the same workspace to reopen after authentication is restored without cookie deletion. New early preflight and negative mutations; application runtime unchanged. Full RC216 CI required; last full-green RC203. Certified **85.25%**; `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag. See `docs/RC_CYCLE216_AUTH_RECOVERY_BROWSER_LOGIN.en.md`.

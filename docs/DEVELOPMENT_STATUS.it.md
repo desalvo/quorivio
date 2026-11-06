@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC217 — Altezza dinamica canvas smartphone
+
+**RC217:** La run RC216 `42150766799` è fallita nel test Chromium partecipante perché confrontava l’altezza smartphone con i vecchi 998px, incompatibili con le risposte RC207 alte almeno 44px (altezza attuale 1028px). Ora il test confronta l’altezza con i sette widget pubblici renderizzati e verifica margini, distanze, footer, nessuno spazio fantasma privato. Test storici RC168/169/177 riconciliati, prove Python/Node fail-closed prima di npm e Chromium locale a 390/1440 superati; full CI RC217 da eseguire. Runtime invariato, ultima full verde RC203, certificato **85,25%** (43 gate accettati/17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Vedi `docs/RC_CYCLE217_PUBLIC_PHONE_DYNAMIC_HEIGHT.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC216 — Recupero login Chromium
 
 **RC216:** La run `42145939288` è fallita nel test browser RC208: il login era correttamente visibile dopo il `401`, ma `tools/ci_browser_editor.py` cercava il contenitore storico `main.narrow`. Ora il test verifica l’intestazione e i controlli accessibili del login, l’assenza dell’editor protetto e il recupero dopo ri-autenticazione senza cancellare cookie. Preflight anticipato e mutazioni negative; nessuna modifica al runtime. Full CI RC216 da verificare; ultima full verde RC203. Certificato **85,25%** (43 accettati/17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Vedi `docs/RC_CYCLE216_AUTH_RECOVERY_BROWSER_LOGIN.it.md`.

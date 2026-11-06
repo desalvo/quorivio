@@ -43,7 +43,7 @@ class RC168PhoneParity(unittest.TestCase):
 
     def test_real_postgresql_fixture_checks_footer_and_drops_phantom_height(self):
         ast.parse(BROWSER)
-        for marker in ('FOOTER_WIDGET', "'kind':'footer'", 'geometry[\'height\']-998',
+        for marker in ('FOOTER_WIDGET', "'kind':'footer'", "geometry['height']-geometry['expectedHeight']",
                        "geometry['footerOffset']", "'.audience-widget-layout.stage-phone'",
                        'stage-reading', 'stage-fidelity', "'results-button','participant-count'"):
             self.assertIn(marker, BROWSER)
