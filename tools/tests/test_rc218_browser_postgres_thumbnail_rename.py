@@ -7,6 +7,7 @@ wasting an expensive Chromium/PostgreSQL run.
 from __future__ import annotations
 
 import ast
+import re
 from pathlib import Path
 import unittest
 
@@ -28,7 +29,6 @@ def verify_contract(script: str, app: str, workflow: str) -> None:
     ast.parse(script, filename=SCRIPT_PATH)
     required_browser = (
         "name='Menu pagina 1: crea, duplica, elimina, sposta'",
-        "actions=page.get_by_role('group',name='Azioni pagina 1',exact=True)",
         "await expect(actions).to_be_visible()",
         "rename=actions.get_by_role('button',name=re.compile(r'" + RENAME_PATTERN + "'))",
         "await expect(rename).to_have_count(1)",
@@ -42,6 +42,15 @@ def verify_contract(script: str, app: str, workflow: str) -> None:
     for token in required_browser:
         if token not in script:
             raise AssertionError('real Chromium rename contract missing: ' + token)
+    # Match the *complete assignment* to the rename action group. A substring
+    # search accidentally accepts `export_actions=...`, which RC236 introduced
+    # for a different disclosure. That false positive disabled a negative
+    # mutation and blocked GitHub run 42256926397.
+    if re.search(
+        r"(?m)^[ \t]*actions=page\.get_by_role\('group',name='Azioni pagina 1',exact=True\)[ \t]*$",
+        script,
+    ) is None:
+        raise AssertionError('real Chromium rename contract missing: scoped rename action group')
     if "get_by_role('button',name='Rinomina pagina',exact=True)" in script:
         raise AssertionError('obsolete exact-match selector in the real browser')
     required_ui = (
@@ -64,6 +73,18 @@ def verify_contract(script: str, app: str, workflow: str) -> None:
 class RC218RealEditorThumbnailRename(unittest.TestCase):
     def test_current_real_browser_selector_and_title_only_persistence(self):
         verify_contract(SCRIPT, APP, WORKFLOW)
+
+    def test_export_action_group_cannot_mask_missing_rename_group(self):
+        # An unrelated `export_actions` assignment must never satisfy the
+        # negative rename-path contract, even when its locator is identical.
+        self.assertIn("export_actions=page.get_by_role('group',name='Azioni pagina 1',exact=True)", SCRIPT)
+        corrupted = SCRIPT.replace(
+            "actions=page.get_by_role('group',name='Azioni pagina 1',exact=True)",
+            "actions=page.get_by_role('group',name='Menu contestuale sfondo canvas',exact=True)",
+            1,
+        )
+        with self.assertRaisesRegex(AssertionError, 'scoped rename action group'):
+            verify_contract(corrupted, APP, WORKFLOW)
 
     def test_accessible_name_patterns_accept_single_and_group_labels(self):
         import re

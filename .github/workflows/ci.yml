@@ -299,6 +299,10 @@ jobs:
         run: |
           python3 -m unittest tools.tests.test_rc227_background_phone tools.tests.test_rc226_master_mobile_ui -q
           node --experimental-strip-types --test apps/web/test/rc227-scheme-background-and-phone.test.ts apps/web/test/rc173-public-slide-fidelity.test.ts
+      # RC237: exact rename locator guard rejects export_actions substring
+      # aliases while retaining the original PostgreSQL/Chromium checks.
+      - name: RC237 rename versus export action scope regression before npm
+        run: python3 -m unittest tools.tests.test_rc237_rename_scope_guard -q
       - name: RC218 real editor thumbnail rename browser contract before npm
         run: python3 -m unittest tools.tests.test_rc218_browser_postgres_thumbnail_rename -q
       # RC215: RC141 compared a glyph Range top with an output border-box
@@ -1448,7 +1452,8 @@ jobs:
           python3 tools/verify_rc_cycle233_inventory.py --historical
           python3 tools/verify_rc_cycle234_inventory.py --historical
           python3 tools/verify_rc_cycle235_inventory.py --historical
-          python3 tools/verify_rc_cycle236_inventory.py
+          python3 tools/verify_rc_cycle236_inventory.py --historical
+          python3 tools/verify_rc_cycle237_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

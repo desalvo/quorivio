@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC237 — Scoped rename action CI regression
+
+**RC237:** GitHub full CI [42256926397](https://github.com/desalvo/quorivio/actions/runs/42256926397), commit `910c60216d9e18c7602a47070a5d822588f1194f`, failed in the early RC218 negative mutation guard: the locator `actions=` was accidentally satisfied by RC236 `export_actions=`. The check now requires the complete assignment line. Added mandatory RC237 negative tests, retaining title-only persistence and PostgreSQL/Chromium acceptance. No application runtime changes, no tests disabled. RC236 becomes historical, RC237 is current. Integrated GitHub CI pending. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. `docs/RC_CYCLE237_RENAME_ACTION_SCOPE.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC236 — Browser page-action disclosure reconciliation
 
 **RC236:** Full CI [42252842551](https://github.com/desalvo/quorivio/actions/runs/42252842551), commit `98a3a39c15aa83deaab722f1ed872f0f7ff9883e`, failed in the authenticated Chromium editor because it queried `Nuova pagina prima` in a closed native `<details>` group. Updated the browser's create/import/export disclosure interactions and a second export after reload, plus PostgreSQL Chromium export. The application source is unchanged. Added mandatory pre-npm RC236 mutation tests; RC224 native Chromium menu fixture passes all four viewport cases. RC235 historical receipts unchanged. GitHub integrated CI pending; **85.25%** (43 accepted/17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. See `docs/RC_CYCLE236_THUMBNAIL_MENU_DISCLOSURES.en.md`.

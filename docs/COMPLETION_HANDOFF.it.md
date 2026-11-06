@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC237 — Handoff controllo della rinomina
+
+**RC237:** Partenza da RC236 committata `910c60216d9e18c7602a47070a5d822588f1194f`. Full CI [42256926397](https://github.com/desalvo/quorivio/actions/runs/42256926397) fallita poiché il test negativo RC218 accettava per errore la sottostringa `actions=` dentro `export_actions=`. Ora è obbligatoria l'assegnazione esatta del selettore e sono aggiunte mutazioni RC237 prima di npm. Nessuna modifica applicativa e nessun gate disabilitato. RC236 storico, RC237 corrente; full CI da certificare. **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag dell'assistente. `docs/RC_CYCLE237_RENAME_ACTION_SCOPE.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC236 — Riconciliazione sezioni espandibili del menu pagine
 
 **RC236:** La full CI [42252842551](https://github.com/desalvo/quorivio/actions/runs/42252842551), commit `98a3a39c15aa83deaab722f1ed872f0f7ff9883e`, fallisce nel test Chromium dell'editor perché cerca `Nuova pagina prima` all'interno di una sezione nativa `<details>` chiusa. Corrette le interazioni browser di creazione/importazione/esportazione, il secondo export dopo il reload e l'export nel test PostgreSQL. Codice applicativo invariato. Aggiunti test RC236 obbligatori nel preflight; fixture Chromium RC224 verde su quattro viewport. Inventari storici RC235 immutati. CI integrata ancora da verificare; **85,25%** (43 accettati/17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag dell'assistente. Dettagli: `docs/RC_CYCLE236_THUMBNAIL_MENU_DISCLOSURES.it.md`.
