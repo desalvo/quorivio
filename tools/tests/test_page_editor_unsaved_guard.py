@@ -15,7 +15,11 @@ class EditorUnsavedGuardTest(unittest.TestCase):
             self.assertIn(part, self.source)
 
     def test_navigation_and_close_are_guarded(self):
-        self.assertIn("designActivity!==a.id&&!confirmPageNavigation()", self.source)
+        # The RC206 thumbnail handler delegates to beginPageDesign(), where the
+        # central unsaved-change check remains enforced for every page change.
+        self.assertIn("if(designActivity&&designActivity!==a.id&&!skipNavigationConfirm&&!confirmPageNavigation())return", self.source)
+        self.assertIn("setSelectedPageIds([a.id]);beginPageDesign(a)", self.source)
+        self.assertNotIn("setSelectedPageIds([a.id]);beginPageDesign(a,true)", self.source)
         self.assertIn("if(confirmPageNavigation())setDesignActivity('')", self.source)
         self.assertIn("if(designActivity===a.id&&!confirmPageNavigation())return", self.source)
 

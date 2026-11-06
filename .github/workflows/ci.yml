@@ -197,6 +197,21 @@ jobs:
       # RC218: RC206 selection-aware thumbnail menus include a shortcut suffix
       # and optionally a plural label. Guard the real PostgreSQL Chromium
       # selector and persisted title-only rename before installing npm.
+      # RC219: the 2,115-case discovery also loads tests as bare modules,
+      # unlike the dotted module preflights. Check both import contexts and
+      # reconciled unsaved navigation, shared footer typography and answer
+      # underline/strike before expensive Chromium/PostgreSQL/Kubernetes.
+      - name: RC219 Python discovery import and historical UI contracts before npm
+        run: |
+          python3 -m unittest tools.tests.test_rc219_full_discovery_contract -q
+          for case in \
+            test_editor_contextual_layout_v2.py \
+            test_editor_thumbnail_keyboard_rc.py \
+            test_page_editor_unsaved_guard.py \
+            test_rc142_editor_clipboard_mobile_footer.py \
+            test_rc_cycle198_answer_decorations.py; do
+            PYTHONPATH=tools python3 -m unittest discover -s tools/tests -p "$case" -q
+          done
       - name: RC218 real editor thumbnail rename browser contract before npm
         run: python3 -m unittest tools.tests.test_rc218_browser_postgres_thumbnail_rename -q
       # RC215: RC141 compared a glyph Range top with an output border-box
@@ -1310,7 +1325,8 @@ jobs:
           python3 tools/verify_rc_cycle215_inventory.py --historical
           python3 tools/verify_rc_cycle216_inventory.py --historical
           python3 tools/verify_rc_cycle217_inventory.py --historical
-          python3 tools/verify_rc_cycle218_inventory.py
+          python3 tools/verify_rc_cycle218_inventory.py --historical
+          python3 tools/verify_rc_cycle219_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

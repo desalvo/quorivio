@@ -21,7 +21,7 @@ class ThumbnailKeyboardRC(unittest.TestCase):
   self.assertIn('commitAndReconcilePageOrder(',self.tsx)
  def test_navigation_is_distinct_from_reordering(self):
   self.assertIn("if(pages[to]){beginPageDesign(pages[to]);requestAnimationFrame",self.tsx)
-  from .test_rc214_thumbnail_selection_ci import verify_thumbnail_click
+  from tools.tests.test_rc214_thumbnail_selection_ci import verify_thumbnail_click
   verify_thumbnail_click(self.tsx)
  def test_menu_escape_restores_keyboard_focus(self):
   self.assertIn("e.key==='Escape'){e.preventDefault();e.stopPropagation();const trigger=",self.tsx)

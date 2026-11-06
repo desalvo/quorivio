@@ -34,7 +34,7 @@ class ContextualEditorUX(unittest.TestCase):
         self.assertIn('page-editor-thumb-number', WEB)
         self.assertIn('page-editor-thumb-menu-trigger', WEB)
         self.assertNotIn('className="page-editor-thumb-actions"', WEB)
-        from .test_rc214_thumbnail_selection_ci import verify_thumbnail_click
+        from tools.tests.test_rc214_thumbnail_selection_ci import verify_thumbnail_click
         verify_thumbnail_click(WEB)
 
     def test_touch_help_for_visible_text_controls(self):

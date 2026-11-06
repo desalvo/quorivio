@@ -19,7 +19,11 @@ class RC142EditorFeatures(unittest.TestCase):
    self.assertIn(mark,MAIN)
   self.assertIn('width:min(390px,100%)',STYLE)
  def test_footer_format_and_scale_use_persisted_validated_fields(self):
-  for mark in ('Font numero pagina','Dimensione numero pagina','Colore numero pagina','Padding destro numero pagina','Padding inferiore numero pagina','Dimensione emoji reazioni','Dimensione pulsanti gradimento','Allinea testo in basso'):
+  for mark in ('Formato numero pagina','Font del testo','Colore del testo','Padding destro numero pagina','Padding inferiore numero pagina','Dimensione emoji reazioni','Dimensione pulsanti gradimento','Allinea testo in basso'):
+   self.assertIn(mark,MAIN)
+  # RC205 merged footer typography into the shared font/size/color ribbon,
+  # selecting the number via the explicit page-number formatting scope.
+  for mark in ('value="page-number">Numero pagina',"effectiveScope==='page-number'", "fontFamily:'footerNumberFontFamily',fontSize:'footerNumberFontSize',color:'footerNumberColor'", "onChange={e=>setStyle({fontFamily:e.target.value})}", "onChange={e=>setStyle({color:e.target.value})}"):
    self.assertIn(mark,MAIN)
   for mark in ('footerNumberPaddingRight','footerNumberPaddingBottom','footerNumberFontSize','footerNumberColor','ratingButtonSize'):
    self.assertIn(mark,DOMAIN)

@@ -13,7 +13,10 @@ class AnswerDecorationContract(unittest.TestCase):
         for name in ('answerUnderline', 'answerStrikethrough'):
             self.assertIn(f'{name}?:boolean', schema)
             self.assertIn(f"'{name}'", schema)
-        self.assertIn("'answerUnderline','answerStrikethrough'].every", schema)
+        # The validator groups *all* boolean decorations in one allowlist;
+        # old RC198 expected a two-name terminal list and is now obsolete.
+        self.assertIn("'answerUnderline','answerStrikethrough','submitBold'", schema)
+        self.assertIn("].every(k=>v[k]===undefined||typeof v[k]==='boolean')", schema)
 
     def test_view_preserves_both_independent_answer_decorations(self):
         answer = source('apps/web/src/widget-answer-style.ts')
@@ -24,8 +27,14 @@ class AnswerDecorationContract(unittest.TestCase):
         self.assertIn('answerStrikethrough:change.strikethrough', marks)
         main = source('apps/web/src/main.tsx')
         self.assertIn("underline:'answerUnderline',strikethrough:'answerStrikethrough'", main)
-        self.assertIn('aria-label="Sottolineato risposte"', main)
-        self.assertIn('aria-label="Barrato risposte"', main)
+        # The unified RC205 formatting ribbon selects "Risposte" as scope,
+        # while the same accessible underline and strike buttons apply there.
+        self.assertIn('<option value="answers">Risposte</option>', main)
+        self.assertIn("underline:'answerUnderline',strikethrough:'answerStrikethrough'", main)
+        self.assertIn("aria-label=\"Sottolineato\" aria-pressed={selectedFlag('underline')}", main)
+        self.assertIn("aria-label=\"Barrato\" aria-pressed={selectedFlag('strikethrough')}", main)
+        self.assertIn("onClick={()=>setStyle({underline:!selectedFlag('underline')})}", main)
+        self.assertIn("onClick={()=>setStyle({strikethrough:!selectedFlag('strikethrough')})}", main)
 
     def test_rc197_is_historical_and_rc198_is_current_inventory(self):
         workflow=source('.github/workflows/ci.yml')

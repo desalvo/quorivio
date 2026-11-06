@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC219 — Ripristino scoperta globale dei test Python
+
+**RC219:** La CI RC218 (`42194028262`) ha raggiunto la suite globale `unittest discover` (2.115 test: 4 failure, 2 errori). Corretti due import relativi RC214 che fallivano solo con i nomi modulo della discovery e quattro contratti storici non aggiornati (navigazione protetta dalle modifiche non salvate, formattazione condivisa del numero pagina, sottolineatura e barratura indipendenti). Aggiunti test negativi e verifica pre-npm in entrambe le modalità; nessuna modifica al runtime. Verifica full RC219 ancora richiesta; ultima full verde RC203. **85,25%** (43 accettati, 17 parziali), `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Dettagli `docs/RC_CYCLE219_FULL_DISCOVERY_RECONCILIATION.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC218 — Ripristino browser rinomina miniatura con PostgreSQL
 
 **RC218:** La full CI RC217 (`42191917542`) ha superato i controlli precedenti ma è fallita nel test Chromium/PostgreSQL dell’editor: selettore esatto `Rinomina pagina` obsoleto rispetto a `Rinomina pagina (R)` e alla variante plurale RC206. Il test verifica ora l’etichetta accessibile ancorata **dentro il menu portaled della miniatura**. Aggiunta regressione preventiva con mutazioni negative; nessuna modifica al runtime. Full CI RC218 da eseguire, ultima interamente verde RC203 (`42110429701`). Completamento **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Dettagli: `docs/RC_CYCLE218_REAL_EDITOR_THUMBNAIL_RENAME_CI.it.md`.

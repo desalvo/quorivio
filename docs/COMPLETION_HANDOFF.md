@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC219 — Full Python discovery and historical contract reconciliation
+
+**RC219:** RC218 full CI (`42194028262`) reached the global `unittest discover` suite (2,115 cases: four failures and two import errors). Fixed two RC214 helper imports that broke under bare-module discovery and four stale contracts for unsaved page navigation, shared footer-number formatting, and independent answer underline/strikethrough. Added fail-closed negative mutations and early pre-npm testing in both import modes; application runtime unchanged. Full RC219 CI pending; last fully green RC203. Certified **85.25%** (43 accepted, 17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. See `docs/RC_CYCLE219_FULL_DISCOVERY_RECONCILIATION.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC218 — Browser PostgreSQL thumbnail rename handoff
 
 **RC218 handoff:** Continue from the new cumulative RC218 ZIP. RC217 run `42191917542` / quality job `127805753403` timed out on the obsolete exact-name `Rinomina pagina` locator in real Chromium PostgreSQL editor acceptance. The current thumbnail menu uses `Rinomina pagina (R)` or `Rinomina pagine selezionate (R)`. Updated the browser test to scope the portaled `Azioni pagina 1` group, assert one anchored match, and retain real database readback/conflict/export checks. Added early negative-mutation preflight; no app-runtime changes. Full CI still required, last full green RC203. Certified **85.25%**; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. Details in `docs/RC_CYCLE218_REAL_EDITOR_THUMBNAIL_RENAME_CI.en.md`.
