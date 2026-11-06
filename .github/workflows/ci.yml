@@ -185,6 +185,15 @@ jobs:
       # before npm and retain the strict real TypeScript compile later.
       - name: RC213 React page order state initialization before npm
         run: python3 -m unittest tools.tests.test_rc213_page_order_state_ci -q
+      # RC214: RC106/keyboard historic inline-click assertions predate RC206
+      # Ctrl/Cmd multi-selection. Run both suites early and verify Escape focus.
+      - name: RC214 thumbnail multi-selection and Escape focus contracts before npm
+        run: |
+          python3 -m unittest -q \
+            tools.tests.test_rc214_thumbnail_selection_ci \
+            tools.tests.test_editor_contextual_layout_v2 \
+            tools.tests.test_editor_thumbnail_keyboard_rc \
+            tools.tests.test_page_editor_followup
       - name: RC196 cross-page source question frontend typing contract before npm
         run: python3 -m unittest tools.tests.test_rc196_frontend_results_types -q
       # RC211: independent audience slide content must use the presenter's
@@ -1276,7 +1285,8 @@ jobs:
           python3 tools/verify_rc_cycle210_inventory.py --historical
           python3 tools/verify_rc_cycle211_inventory.py --historical
           python3 tools/verify_rc_cycle212_inventory.py --historical
-          python3 tools/verify_rc_cycle213_inventory.py
+          python3 tools/verify_rc_cycle213_inventory.py --historical
+          python3 tools/verify_rc_cycle214_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

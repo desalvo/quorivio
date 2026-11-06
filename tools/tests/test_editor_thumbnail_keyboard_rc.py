@@ -14,17 +14,18 @@ class ThumbnailKeyboardRC(unittest.TestCase):
   cls.tsx=(ROOT/'apps/web/src/main.tsx').read_text()
   cls.css=(ROOT/'apps/web/src/style.css').read_text()
  def test_keyboard_reordering_uses_server_endpoint_and_draft_guard(self):
-  self.assertIn('aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown"',self.tsx)
+  self.assertIn('aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown D R Backspace"',self.tsx)
   self.assertIn("if(e.altKey){if((e.key==='ArrowUp'||e.key==='ArrowDown')&&to!==i)void dropPage(a.id,pages[to].id);return}",self.tsx)
   self.assertIn('sourceId===targetId||!confirmPageNavigation()',self.tsx)
   self.assertIn("()=>request(`/sessions/${sessionId}/pages/order`,'PUT',{activity_ids:activityIds})",self.tsx)
   self.assertIn('commitAndReconcilePageOrder(',self.tsx)
  def test_navigation_is_distinct_from_reordering(self):
   self.assertIn("if(pages[to]){beginPageDesign(pages[to]);requestAnimationFrame",self.tsx)
-  self.assertIn('onClick={()=>beginPageDesign(a)}',self.tsx)
+  from .test_rc214_thumbnail_selection_ci import verify_thumbnail_click
+  verify_thumbnail_click(self.tsx)
  def test_menu_escape_restores_keyboard_focus(self):
-  self.assertIn("e.key==='Escape'){e.preventDefault();e.stopPropagation();setPageThumbMenu('')",self.tsx)
-  self.assertIn('requestAnimationFrame(()=>trigger?.focus())',self.tsx)
+  self.assertIn("e.key==='Escape'){e.preventDefault();e.stopPropagation();const trigger=",self.tsx)
+  self.assertIn("const trigger=document.querySelector<HTMLButtonElement>('.page-editor-thumb-menu-trigger[aria-expanded=\"true\"]');setPageThumbMenu('');requestAnimationFrame(()=>trigger?.focus())",self.tsx)
  def test_page_order_announced_on_completion_failure_and_pending(self):
   for value in ('Riordino delle pagine in corso','Ordine delle pagine salvato','Esito del riordino non verificabile'):
    self.assertIn(value,self.tsx)

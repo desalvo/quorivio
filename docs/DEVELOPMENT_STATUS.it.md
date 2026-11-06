@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC214 — Selezione miniature e accessibilità CI
+
+**RC214:** Run CI RC213 `42142002249` bloccata al preflight RC106 per un test sul vecchio clic delle miniature. Aggiornati tre test storici, preservando Ctrl/Cmd+clic per la selezione multipla e il clic semplice per aprire la pagina; corretta inoltre la restituzione del focus al pulsante del menu dopo Escape. Aggiunto preflight RC214 con mutazioni negative per intercettare regressioni prima di npm. Cumulativo, non certificato in GitHub; ultima full CI verde RC203 `42110429701`. Certificato **85,25%** (43 gate accettati/17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Vedi `docs/RC_CYCLE214_THUMBNAIL_SELECTION_CI.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC213 — Correzione TypeScript dello stato delle miniature
 
 **RC213:** Full CI RC212 `42140973603` arrestata nel typecheck TypeScript (TS2448/TS2454): `pageOrderPending` veniva letto nelle dipendenze di un effetto prima della sua dichiarazione. Spostato lo stesso hook nel blocco incondizionato degli stati `App()`, conservate le operazioni sulle pagine e introdotti test preventivi con mutazioni negative. Full CI RC213 da eseguire; ultima verde RC203 `42110429701`. Certificato **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Vedi `docs/RC_CYCLE213_PAGE_ORDER_TYPESCRIPT_CI.it.md`.

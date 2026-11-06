@@ -34,7 +34,8 @@ class ContextualEditorUX(unittest.TestCase):
         self.assertIn('page-editor-thumb-number', WEB)
         self.assertIn('page-editor-thumb-menu-trigger', WEB)
         self.assertNotIn('className="page-editor-thumb-actions"', WEB)
-        self.assertIn('onClick={()=>beginPageDesign(a)}',WEB)
+        from .test_rc214_thumbnail_selection_ci import verify_thumbnail_click
+        verify_thumbnail_click(WEB)
 
     def test_touch_help_for_visible_text_controls(self):
         self.assertIn("button.title||button.getAttribute('aria-label')||button.textContent?.trim()", WEB)

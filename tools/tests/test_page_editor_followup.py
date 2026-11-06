@@ -21,9 +21,11 @@ class PageEditorFollowupTests(unittest.TestCase):
 
     def test_closed_session_actions_disabled(self):
         self.assertIn("{snap.session.status!=='closed'&&<>",self.ui)
-        for action in ('Nuova pagina prima','Nuova pagina dopo','Duplica pagina','Sposta su','Sposta giù','Elimina pagina'):
+        for action in ('Nuova pagina prima','Nuova pagina dopo','Sposta su','Sposta giù'):
             self.assertIn(action,self.ui)
         self.assertIn("draggable={snap.session.status!=='closed'&&!pageOrderPending}",self.ui)
+        self.assertIn("void duplicateSelectedPages(a.id)}}>Duplica {selectedPageIds.length>1?'pagine selezionate':'pagina'} (D)",self.ui)
+        self.assertIn("void deleteSelectedPages(a.id)}}>Elimina {selectedPageIds.length>1?'pagine selezionate':'pagina'} (Backspace)",self.ui)
 
 if __name__ == '__main__':
     unittest.main()

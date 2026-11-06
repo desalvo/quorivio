@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC214 — Handoff miniature e menu contestuali
+
+**RC214:** Proseguire dal cumulativo RC214; preservate tutte le funzionalità RC204–213. Dopo il fallimento CI RC213 `42142002249`, aggiornati i contratti storici per selezione multipla Ctrl/Cmd, shortcut D/R/Backspace, navigazione con clic normale e labels dinamici. Corretto focus Escape del menu portalled. Aggiunti test negativi e preflight prima di npm. La full CI RC214 deve ancora certificare build React, Chromium, PostgreSQL e Kubernetes; ultima full green RC203 `42110429701`. Certificato **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Dettagli: `docs/RC_CYCLE214_THUMBNAIL_SELECTION_CI.it.md`.
+
+---
 # Quorivio 0.1.0-dev — RC213 — Handoff TypeScript ordine pagine
 
 **RC213:** Ripartire dal cumulativo RC213 con tutte le funzionalità RC204–212. La full CI RC212 `42140973603` ha rilevato errori reali TypeScript TS2448/TS2454 per l’uso di `pageOrderPending` prima della dichiarazione. Inizializzazione anticipata e test preventivo con mutazioni negative; full CI RC213 da eseguire. Ultima interamente verde RC203 `42110429701`; certificato **85,25%** (43 gate accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. Vedi `docs/RC_CYCLE213_PAGE_ORDER_TYPESCRIPT_CI.it.md`.

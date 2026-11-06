@@ -1,3 +1,8 @@
+# Quorivio 0.1.0-dev — RC214 — Thumbnail selection and Escape focus CI handoff
+
+**RC214:** Continue from cumulative RC214 preserving all RC204–213 features. Run `42142002249` failed the RC106 legacy inline thumbnail click contract. Reconciled three historic tests with Ctrl/Cmd multi-select, normal navigation, D/R/Backspace, dynamic labels and closed-session protections. Fixed Escape focus restoration in the portalled thumbnail menu; added fail-closed mutations and early pre-npm coverage. Full RC214 GitHub CI remains required for React/Chromium/PostgreSQL/Kubernetes; latest fully green RC203 `42110429701`. Certified **85.25%** (43 accepted/17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag. See `docs/RC_CYCLE214_THUMBNAIL_SELECTION_CI.en.md`.
+
+---
 # Quorivio 0.1.0-dev — RC213 — Frontend page order typecheck handoff
 
 **RC213:** Continue from the RC213 cumulative ZIP, preserving all RC204–RC212 features. The RC212 GitHub CI run `42140973603` identified real React `pageOrderPending` temporal-dead-zone TypeScript errors TS2448/TS2454. Initializer relocated before shortcut effect; pre-npm negative mutation tests guard recurrence. Need full GitHub CI for RC213. Latest fully green RC203 `42110429701`; certified **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag. See `docs/RC_CYCLE213_PAGE_ORDER_TYPESCRIPT_CI.en.md`.
