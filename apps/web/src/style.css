@@ -3385,3 +3385,18 @@ html,body,#root,.app{min-height:calc(100dvh / var(--quorivio-ui-scale))}
 /* Full-width dashboard rather than a centered 1600 CSS-pixel island after the
  * UI is made more compact; the saved widget canvas keeps its own aspect ratio. */
 .app .dashboard{max-width:none;width:100%;min-height:0}
+
+/* RC248: cap the desktop canvas against the ACTUAL editor-stage content box,
+ * rather than viewport height. RC247 expanded the editor but used 100dvh in
+ * the canvas max-width expression, ignoring the occupied toolbar/palette rows.
+ * At 1440x900 that made the canvas extend past the stage by 15px (real CI).
+ * A size container exposes the remaining third grid row as 100cqh. The 28px
+ * vertical ruler, 29px horizontal ruler and 6px safety margin are accounted
+ * for while preserving the widest possible 16:9 slide in the available area.
+ * Mobile's intentionally scrollable phone canvas keeps its own bounds. */
+@media(min-width:761px){
+ .editor-ux-v2 .editor-stage{container-type:size}
+ .editor-ux-v2 .editor-canvas-slot{
+  max-width:min(100%,calc(28px + (100cqh - 35px)*16/9))!important;
+ }
+}

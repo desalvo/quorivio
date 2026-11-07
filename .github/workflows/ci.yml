@@ -348,6 +348,10 @@ jobs:
         run: |
           python3 -m unittest tools.tests.test_rc247_editor_zoom_converter_contract -q
           node --experimental-strip-types --test apps/web/test/rc247-typography-zoom-converter.test.ts
+      # RC248: preserve the enlarged 16:9 canvas within the *remaining* stage
+      # after wrapped header/palette, rather than deriving it from 100dvh.
+      - name: RC248 actual editor-stage canvas fit regression before npm
+        run: python3 -m unittest tools.tests.test_rc248_stage_fit_contract -q
       - name: RC218 real editor thumbnail rename browser contract before npm
         run: python3 -m unittest tools.tests.test_rc218_browser_postgres_thumbnail_rename -q
       # RC215: RC141 compared a glyph Range top with an output border-box
@@ -793,6 +797,7 @@ jobs:
           # RC242: real browser font inheritance, compact master and document zoom.
           python3 tools/ci_rc242_arial_zoom_chromium.py
           python3 tools/ci_rc247_zoom_editor_chromium.py
+          python3 tools/ci_rc248_stage_fit_chromium.py
           # RC162: compact QR URL must remain visible when resized; no URL row when hidden.
           python3 tools/ci_rc162_qr_resizing_chromium.py
           # RC152: mutation-tested current long-label wrapping and attached [count]
@@ -1512,7 +1517,8 @@ jobs:
           python3 tools/verify_rc_cycle244_inventory.py --historical
           python3 tools/verify_rc_cycle245_inventory.py --historical
           python3 tools/verify_rc_cycle246_inventory.py --historical
-          python3 tools/verify_rc_cycle247_inventory.py
+          python3 tools/verify_rc_cycle247_inventory.py --historical
+          python3 tools/verify_rc_cycle248_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

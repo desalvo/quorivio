@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC248 — Contenimento canvas nell’editor
+
+**RC248:** Full CI GitHub [42401914583](https://github.com/desalvo/quorivio/actions/runs/42401914583) della RC247 committata `6a7f8e5eae6a972a218fca4b45348067ef58307d` fallita per canvas 15px oltre il limite verticale dell’editor a 1440×900. Il limite RC247 si basava sull’altezza totale del viewport, ignorando intestazione e palette. Ora il canvas desktop è limitato dall’altezza effettiva residua (`100cqh`) con righelli e margine di sicurezza, mantenendo il formato 16:9 grande e il mobile scorrevole. Nuovi controlli CI preventivi e Chromium a più dimensioni/scale; inventario RC247 storico immutato; full CI RC248 da verificare. **85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. `docs/RC_CYCLE248_EDITOR_STAGE_FIT.it.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC247 — Font widget, canvas e tag converter
 
 **RC247:** Corrette dimensioni proporzionali dei font dei risultati, propagazione di «Widget intero» a domande annidate e markup esistente, ereditarietà Arial per tutti i 20 tipi di widget nei due editor e compensazione dello zoom per la copertura completa del viewport. Il nuovo 100% corrisponde al precedente 80% e il canvas 16:9 si espande sfruttando lo spazio liberato; dashboard a piena larghezza. Il workflow converter manuale usa `latest` da `main` e il nome del tag Git per release taggate; il wizard sicuro accetta entrambi. RC246 storica conservata; full CI RC247 da verificare e cluster non modificato. **85,25%** (43 gate accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Vedi `docs/RC_CYCLE247_EDITOR_FONT_ZOOM_CONVERTER.it.md`.

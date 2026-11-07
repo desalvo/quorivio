@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC248 — Editor stage containment handoff
+
+**RC248:** Continue from maintainer-committed RC247 `6a7f8e5eae6a972a218fca4b45348067ef58307d`. GitHub full CI [42401914583](https://github.com/desalvo/quorivio/actions/runs/42401914583) failed the historical RC178 Chromium layout with a 15px canvas overflow at 1440×900. Limit desktop canvas dimensions using actual editor-stage CSS container height (`100cqh`), with 29px horizontal and 28px vertical rulers and a safety margin. Keep UI zoom 80%-based compact and large 16:9 canvas, unchanged mobile scrolling. New fail-closed early static contract and 15 Chromium real-viewport/zoom scenarios, retain RC178. Run full GitHub CI after user commit. **85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no assistant commit/push/tag. `docs/RC_CYCLE248_EDITOR_STAGE_FIT.en.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC247 — Editor and converter handoff
 
 **RC247:** Resume from RC246 cumulative. Restore editor/preview result font parity via stage-relative `cqw`; apply Whole widget fonts to title, answers, nested subquestions, rich marks and buttons; enforce Arial defaults without overriding authored fonts. Browser-like compact UI zoom displays 100% for former 80%, fills physical fullscreen overlays, expands 16:9 canvas and removes empty dashboard side gutters. Converter publisher remains manually authorized, tags `main` as `latest`, Git tags verbatim. Historical RC246 inventory unchanged. Run complete full CI on maintainer commit, verify real editors and operator acceptance. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no assistant commit/push/tag. `docs/RC_CYCLE247_EDITOR_FONT_ZOOM_CONVERTER.en.md`.

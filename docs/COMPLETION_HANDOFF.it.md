@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC248 — Handoff contenimento canvas editor
+
+**RC248:** Ripartire da RC247 committata dall’utente `6a7f8e5eae6a972a218fca4b45348067ef58307d`. Full CI [42401914583](https://github.com/desalvo/quorivio/actions/runs/42401914583) fallita al test storico RC178 Chromium: canvas 15px oltre il fondo dell’editor a 1440×900. La larghezza massima desktop ora usa l’altezza residua reale della zona editor (`100cqh`) con righello superiore da 29px, laterale 28px e margine di sicurezza. Zoom compatto 80% e canvas 16:9 grande conservati, mobile scorrevole invariato. Nuovo preflight negativo e 15 scenari Chromium viewport/zoom reali; RC178 preservato. Dopo il commit dell’utente eseguire full CI. **85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. `docs/RC_CYCLE248_EDITOR_STAGE_FIT.it.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC247 — Handoff font, canvas e converter
 
 **RC247:** Ripartire dalla RC246 cumulativa. Risultati con font `cqw` proporzionali su editor/anteprime; «Widget intero» applica carattere a titolo, risposte, sottodomande, markup rich-text e pulsanti; Arial predefinito per le 20 widget preservando i font scelti. Zoom UI compatto con 100% = vecchio 80%, finestre full screen senza mostrare dashboard, canvas 16:9 più grande e dashboard senza fasce vuote. Publisher converter solo manuale: `latest` da `main`, nome esatto del tag Git per release. Inventario RC246 storico invariato. Full CI RC247 e collaudi reali da verificare. **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. `docs/RC_CYCLE247_EDITOR_FONT_ZOOM_CONVERTER.it.md`.
