@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC250 — Menu miniature con zoom corretto
+
+**RC250:** La full CI GitHub [42410387603](https://github.com/desalvo/quorivio/actions/runs/42410387603), commit RC249 `cf0a1e45048ad49e6d320eddf610f205e4d4bc53`, ha superato i test iniziali ma è fallita in `ci_browser_editor.py:266`: il menu miniature espanso copriva il pulsante di chiusura con zoom CSS della radice all’80%. `getBoundingClientRect()` restituisce coordinate visive già riscalate, ma il portale fixed applicava di nuovo il fattore di zoom. Corrette le coordinate finali del menu dividendo per lo zoom CSS reale su apertura, scorrimento, resize e variazione zoom; non si usano clic forzati e rimane obbligatorio il test Chromium sul React compilato. Aggiunti test Node negativi, gate pre-npm e 8 prove Chromium con menu espanso a zoom 64%, 80%, 100%, 120%. RC249 storica, full CI RC250 da eseguire. **85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. `docs/RC_CYCLE250_THUMBNAIL_CSS_ZOOM.it.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC249 — Menu miniature sempre cliccabile
 
 **RC249:** La full CI GitHub [42405687692](https://github.com/desalvo/quorivio/actions/runs/42405687692) della RC248 committata `9027af34f0d8182d12bda366a89e239286b63a41` ha fallito in Chromium reale perché il menu flottante aperto copriva il proprio pulsante «Menu pagina 1». Ora il menu viene ancorato al rettangolo del pulsante, evitandone il contatto, e viene riposizionato dopo scroll o resize (anche zoom). Aggiunti test negativi, Node e Chromium che verificano hit-test e click reale senza forzature. RC248 storica; full CI RC249 in attesa. **85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. `docs/RC_CYCLE249_THUMBNAIL_MENU_ANCHOR.it.md`.

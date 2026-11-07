@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC250 — CSS-zoom-aware thumbnail portal
+
+**RC250:** GitHub full CI [42410387603](https://github.com/desalvo/quorivio/actions/runs/42410387603), committed RC249 `cf0a1e45048ad49e6d320eddf610f205e4d4bc53`, passed early guards and independent Chromium CSS checks but failed `ci_browser_editor.py:266` when an expanded thumbnail menu overlapped its own toggle under the 80% root CSS zoom. `getBoundingClientRect()` gives zoomed *visual* coordinates, but fixed-position body portals apply the CSS zoom again. Corrected menu layout coordinates by dividing the final clamped result by the computed document zoom on open, scroll, resize, and root zoom changes; no forced clicks and original compiled React UI acceptance remains mandatory. Added negative Node reproducer, pre-npm contract and 8 real Chromium tests with expanded menu at zoom 64%, 80%, 100%, 120%. RC249 historical; full RC250 GitHub CI pending. **85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no assistant commit/push/tag. `docs/RC_CYCLE250_THUMBNAIL_CSS_ZOOM.en.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC249 — Thumbnail menu trigger-safe anchoring
 
 **RC249:** GitHub full CI [42405687692](https://github.com/desalvo/quorivio/actions/runs/42405687692) for committed RC248 `9027af34f0d8182d12bda366a89e239286b63a41` failed the real Chromium editor because the expanded portaled thumbnail menu intercepted its own toggle. Menu now anchors beside the actual trigger rectangle and repositions after scroll/resize/zoom, preserving keyboard/escape and accessible scroll. Added pre-npm negative guard, Node geometry and real Chromium hit-target acceptance with no forced clicks. RC248 immutable, full RC249 CI pending. **85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no assistant commit/push/tag. `docs/RC_CYCLE249_THUMBNAIL_MENU_ANCHOR.en.md`.

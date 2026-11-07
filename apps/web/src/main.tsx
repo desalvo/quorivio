@@ -2269,8 +2269,12 @@ async function renameSelectedPages(fallbackId?:string){
 }
 function openThumbnailMenu(id:string,event:{clientX:number;clientY:number;anchor?:{left:number;right:number;top:number;bottom:number}}){
  // Portal + viewport clamping: never clipped by the scrollable thumbnail rail.
+ // DOMRect and PointerEvent coordinates are in *visual* CSS pixels. CSS zoom
+ // scales the portal's fixed-position coordinates again, so convert the final
+ // menu rectangle back into layout pixels (RC250, CI 42410387603).
+ const rootZoom=Number.parseFloat(getComputedStyle(document.documentElement).zoom)||1;
  setPageMenuPosition(thumbnailMenuPosition(event.clientX,event.clientY,window.innerWidth,window.innerHeight,
-  event.anchor));
+  event.anchor,rootZoom));
  setPageExportError('');setSelectedPageIds(current=>current.includes(id)?current:[id]);setPageThumbMenu(id);
 }
 // A scrollable rail, keyboard focus, or zoom can move a thumbnail while its
@@ -2283,18 +2287,23 @@ useEffect(()=>{
   if(!button)return;
   const rect=button.getBoundingClientRect();
   if(!rect.width||!rect.height)return;
+  const rootZoom=Number.parseFloat(getComputedStyle(document.documentElement).zoom)||1;
   const next=thumbnailMenuPosition(rect.right+8,rect.top,window.innerWidth,window.innerHeight,
-   {left:rect.left,right:rect.right,top:rect.top,bottom:rect.bottom});
+   {left:rect.left,right:rect.right,top:rect.top,bottom:rect.bottom},rootZoom);
   setPageMenuPosition(old=>old.left===next.left&&old.top===next.top&&old.maxHeight===next.maxHeight&&old.width===next.width?old:next);
  };
  reposition();
  window.addEventListener('scroll',reposition,true);
  window.addEventListener('resize',reposition);
  window.visualViewport?.addEventListener('resize',reposition);
+ // A live app-wide zoom changes the root style, not necessarily window size.
+ const zoomObserver=new MutationObserver(reposition);
+ zoomObserver.observe(document.documentElement,{attributes:true,attributeFilter:['style']});
  return()=>{
   window.removeEventListener('scroll',reposition,true);
   window.removeEventListener('resize',reposition);
   window.visualViewport?.removeEventListener('resize',reposition);
+  zoomObserver.disconnect();
  };
 },[pageThumbMenu]);
 useEffect(()=>{if(!designActivity||!snap)return;const onKey=(event:KeyboardEvent)=>{

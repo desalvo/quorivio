@@ -358,6 +358,12 @@ jobs:
         run: |
           python3 -m unittest tools.tests.test_rc249_thumbnail_trigger_contract -q
           node --experimental-strip-types --test apps/web/test/rc249-thumbnail-menu-anchor.test.ts
+      # RC250: root CSS zoom converts DOMRect visual pixels into fixed-position
+      # layout pixels; negative regression prevents menu overlap after expand.
+      - name: RC250 browser root zoom menu before npm
+        run: |
+          python3 -m unittest tools.tests.test_rc250_thumbnail_zoom_contract -q
+          node --experimental-strip-types --test apps/web/test/rc250-thumbnail-menu-css-zoom.test.ts
       - name: RC218 real editor thumbnail rename browser contract before npm
         run: python3 -m unittest tools.tests.test_rc218_browser_postgres_thumbnail_rename -q
       # RC215: RC141 compared a glyph Range top with an output border-box
@@ -807,6 +813,9 @@ jobs:
           # RC249: real pointer hit-test of the popover's own toggle on
           # narrow/tall desktops and phones; full compiled editor follows.
           python3 tools/ci_rc249_thumbnail_trigger_chromium.py
+          # Root CSS zoom is genuinely applied; expand the nested disclosures
+          # and close via the original trigger with a real Chromium pointer.
+          python3 tools/ci_rc250_thumbnail_zoom_chromium.py
           # RC162: compact QR URL must remain visible when resized; no URL row when hidden.
           python3 tools/ci_rc162_qr_resizing_chromium.py
           # RC152: mutation-tested current long-label wrapping and attached [count]
@@ -1528,7 +1537,8 @@ jobs:
           python3 tools/verify_rc_cycle246_inventory.py --historical
           python3 tools/verify_rc_cycle247_inventory.py --historical
           python3 tools/verify_rc_cycle248_inventory.py --historical
-          python3 tools/verify_rc_cycle249_inventory.py
+          python3 tools/verify_rc_cycle249_inventory.py --historical
+          python3 tools/verify_rc_cycle250_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

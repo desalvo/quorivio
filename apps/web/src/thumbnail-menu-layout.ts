@@ -13,6 +13,7 @@ export type ThumbnailMenuAnchor={left:number;right:number;top:number;bottom:numb
 export function thumbnailMenuPosition(
  x:number,y:number,viewportWidth:number,viewportHeight:number,
  anchor?:ThumbnailMenuAnchor,
+ rootZoom=1,
 ){
  const pad=8,gap=8;
  const safeViewportWidth=Math.max(1,viewportWidth);
@@ -51,5 +52,9 @@ export function thumbnailMenuPosition(
      }
    }
  }
- return {left,top,maxHeight,width};
+ // getBoundingClientRect() and event.clientX/Y are visual viewport coordinates,
+ // whereas a body portal's `position: fixed` offsets are scaled by root CSS
+ // zoom. Undo that scaling exactly once, after collision/clamp calculations.
+ const factor=Number.isFinite(rootZoom)&&rootZoom>0?rootZoom:1;
+ return {left:left/factor,top:top/factor,maxHeight:maxHeight/factor,width:width/factor};
 }
