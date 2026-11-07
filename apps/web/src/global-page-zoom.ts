@@ -14,6 +14,13 @@ export function normalizeGlobalZoom(value:unknown):number{
 export function nextGlobalZoom(value:number,direction:-1|1):number{
  return normalizeGlobalZoom(normalizeGlobalZoom(value)+direction*GLOBAL_ZOOM_STEP);
 }
-export function zoomStyleValue(value:number):string{
+/** Live participant and public screen are authored pixel canvases, NOT studio chrome.
+ * The studio zoom must not shrink 44px touch targets or desynchronise 16:9 layout.
+ * Public routes use a fresh page navigation, so location.pathname is authoritative. */
+export function isUnscaledPublicSurface(pathname:unknown):boolean{
+ return typeof pathname==='string'&&(pathname.startsWith('/join/')||pathname.startsWith('/screen/'));
+}
+export function zoomStyleValue(value:number,pathname?:string):string{
+ if(isUnscaledPublicSurface(pathname))return '100%';
  return `${Math.round(normalizeGlobalZoom(value)*GLOBAL_ZOOM_BASE)}%`;
 }

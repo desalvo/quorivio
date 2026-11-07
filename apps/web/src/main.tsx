@@ -63,7 +63,7 @@ import {pasteWidget} from './widget-clipboard';
 import {saveEditorWidgetClipboard,readEditorWidgetClipboard} from './editor-cross-page-clipboard';
 import {newWidgetHistory,editWidgets,reconcileWidgetAutoFit,beginWidgetGesture,endWidgetGesture,undoWidgets,redoWidgets} from './widget-history';
 import {EditableNumberField} from './editable-number-field.js';
-import {GLOBAL_ZOOM_STORAGE_KEY,GLOBAL_ZOOM_MIN,GLOBAL_ZOOM_MAX,GLOBAL_ZOOM_CSS_VARIABLE,normalizeGlobalZoom,nextGlobalZoom,zoomStyleValue} from './global-page-zoom.js';
+import {GLOBAL_ZOOM_STORAGE_KEY,GLOBAL_ZOOM_MIN,GLOBAL_ZOOM_MAX,GLOBAL_ZOOM_CSS_VARIABLE,normalizeGlobalZoom,nextGlobalZoom,zoomStyleValue,isUnscaledPublicSurface} from './global-page-zoom.js';
 import {movePageId} from './page-order';
 import {presenterPageIndex,presenterAdjacentPage,presenterKeyboardDirection,presenterVisiblePages} from './presenter-navigation';
 import {commitAndReconcilePageOrder} from './page-order-recovery';
@@ -2791,17 +2791,18 @@ class WorkspaceErrorBoundary extends React.Component<Record<string,never>,{faile
   return <App key={this.state.generation}/>;
  }
 }
-/** Page-wide zoom lives outside the workspace so login, dashboard, editor, public
- * participant and presenter routes all share one accessible control. Portaled
- * dialogs are zoomed too because the property belongs to the root document. */
+/** Studio-wide zoom shrinks dashboard/editor chrome while the live audience and
+ * public screen retain native pixel geometry and 44px minimum touch targets.
+ * Portaled studio dialogs still share the root CSS zoom. */
 function GlobalPageZoomShell(){
+ const isLiveSurface=isUnscaledPublicSurface(window.location.pathname);
  const [zoom,setZoom]=useState<number>(()=>{
   try{return normalizeGlobalZoom(window.localStorage.getItem(GLOBAL_ZOOM_STORAGE_KEY))}
   catch{return 100}
  });
  useEffect(()=>{
   const root=document.documentElement;
-  const value=zoomStyleValue(zoom);
+  const value=zoomStyleValue(zoom,window.location.pathname);
   root.style.setProperty('zoom',value);
   // Fixed-position overlays are compensated separately so that the whole
   // physical viewport remains covered instead of revealing the dashboard.
@@ -2811,12 +2812,12 @@ function GlobalPageZoomShell(){
  },[zoom]);
  return <>
   <WorkspaceErrorBoundary/>
-  <aside className="global-page-zoom" role="group" aria-label="Zoom globale dell'interfaccia">
+  {!isLiveSurface&&<aside className="global-page-zoom" role="group" aria-label="Zoom globale dell'interfaccia">
    <button type="button" aria-label="Riduci zoom dell'interfaccia" title="Riduci zoom in tutte le pagine" disabled={zoom<=GLOBAL_ZOOM_MIN} onClick={()=>setZoom(n=>nextGlobalZoom(n,-1))}>−</button>
    <output aria-live="polite" aria-label="Livello di zoom corrente">{zoom}%</output>
    <button type="button" aria-label="Aumenta zoom dell'interfaccia" title="Aumenta zoom in tutte le pagine" disabled={zoom>=GLOBAL_ZOOM_MAX} onClick={()=>setZoom(n=>nextGlobalZoom(n,1))}>+</button>
    <button type="button" className="global-page-zoom-reset" aria-label="Ripristina zoom al 100%" title="Zoom predefinito 100%" disabled={zoom===100} onClick={()=>setZoom(100)}>100%</button>
-  </aside>
+  </aside>}
  </>;
 }
 createRoot(document.getElementById('root')!).render(<GlobalPageZoomShell/>);
