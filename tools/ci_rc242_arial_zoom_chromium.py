@@ -19,7 +19,7 @@ HTML='''<!doctype html><html><body><main class="slide-scheme-workspace">
    <button class="slide-scheme-ribbon-tool primary" aria-label="Salva schema">Salva schema</button>
    <span role="status">Modifiche non salvate</span></div></div>
  </div>
- <div class="widget-canvas-item" id="default-widget" style="font-family:Arial,sans-serif;width:140px">
+ <div class="widget-canvas-item" id="default-widget" style="width:140px">
   <div class="widget-fit-content"><h2 id="default-title">Titolo widget</h2><strong id="default-strong">Opzioni</strong>
   <label id="default-label">Risposta<input id="default-input" value="Testo"/></label>
   <span id="custom-font" style="font-family:Georgia">Personalizzato</span></div>
@@ -34,7 +34,7 @@ async def run():
    for width in (390,760,1440):
     page=await browser.new_page(viewport={'width':width,'height':880})
     # Both real editor containers, for all 20 insertable widget kinds.
-    audit=''.join(f'<div class="widget-canvas-item" data-widget-kind="{kind}" style="font-family:Arial,sans-serif"><div class="widget-fit-content"><h3 data-q242-font="true">Titolo</h3><strong data-q242-font="true">Risposta</strong><label data-q242-font="true">Etichetta<input data-q242-font="true" value="Testo"/></label></div></div>' for kind in KINDS)
+    audit=''.join(f'<div class="widget-canvas-item" data-widget-kind="{kind}"><div class="widget-fit-content"><h3 data-q242-font="true">Titolo</h3><strong data-q242-font="true">Risposta</strong><label data-q242-font="true">Etichetta<input data-q242-font="true" value="Testo"/></label></div></div>' for kind in KINDS)
     content=HTML.replace('</main>',f'<section class="editor-ux-v2" aria-label="Editor pagine">{audit}</section><section class="slide-scheme-workspace" aria-label="Editor schemi">{audit}</section></main>')
     await page.set_content(content)
     await page.add_style_tag(content=CSS)

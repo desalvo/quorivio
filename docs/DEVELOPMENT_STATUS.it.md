@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC244 — Arial predefinito sulla radice delle widget
+
+**RC244:** La full CI [42377514266](https://github.com/desalvo/quorivio/actions/runs/42377514266), commit RC243 `a0e7dbcf22b6f73ce8a04caa028ef4745825698e`, ha superato TypeScript ma è fallita su RC224 Chromium: i testi delle widget nello schema ereditavano ancora DM Sans. Ora la radice delle widget usa Arial in entrambi gli editor e conserva i caratteri personalizzati. La prova Chromium RC242 non forza più Arial inline nelle widget di default. Aggiunte regressioni RC244 preventive; RC224/RC242 Chromium restano obbligatorie. RC243 storica immutata, RC244 corrente; full CI da verificare. **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag assistente. `docs/RC_CYCLE244_EDITOR_ARIAL_BASELINE.it.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC243 — Correzione cleanup zoom globale React / typecheck CI
 
 **RC243:** La full CI GitHub [42376234500](https://github.com/desalvo/quorivio/actions/runs/42376234500), commit RC242 `f2899cc76320667a442b504d9e89f38c6f1611ff`, si è fermata al typecheck rigoroso React: il cleanup di `useEffect` per lo zoom globale restituiva la stringa di `CSSStyleDeclaration.removeProperty`. Corretto con funzione di cleanup che restituisce `void`, senza modificare funzionalità, persistenza o accessibilità. Aggiunto test negativo RC243 prima di npm, mantenuto il typecheck completo obbligatorio; RC242 resta storica e RC243 è corrente. Full CI RC243 da certificare; completamento **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Vedi `docs/RC_CYCLE243_ZOOM_EFFECT_TYPECHECK.it.md`.

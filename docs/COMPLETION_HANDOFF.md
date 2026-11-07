@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC244 — Editor Arial baseline CI reconciliation
+
+**RC244 handoff:** Start from user-committed RC243 `a0e7dbcf22b6f73ce8a04caa028ef4745825698e`. Full CI [42377514266](https://github.com/desalvo/quorivio/actions/runs/42377514266) passed strict React TypeScript, then RC224 Chromium found inherited DM Sans on the slide-master widget root. Replace root `font-family:inherit` with an Arial default on both editors, preserving custom inline fonts; make RC242 browser fixture independently test default typography without inline Arial. Add RC244 pre-npm negative mutation guard, retain real browser tests and all historical inventories. RC243 historical, RC244 current; full CI after commit pending. **85.25%** (43 accepted/17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no assistant commit/push/tag. `docs/RC_CYCLE244_EDITOR_ARIAL_BASELINE.en.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC243 — React global zoom effect cleanup / strict TypeScript
 
 **RC243:** Full GitHub CI [42376234500](https://github.com/desalvo/quorivio/actions/runs/42376234500) for RC242 commit `f2899cc76320667a442b504d9e89f38c6f1611ff` stopped at the strict React TypeScript check because the global zoom `useEffect` destructor returned the string from `CSSStyleDeclaration.removeProperty`. Replace the expression-bodied cleanup with a void-returning block while preserving global zoom behavior, persistence, and accessibility. New fail-closed RC243 negative guard runs before npm, full TypeScript remains mandatory. RC242 historical, RC243 current; RC243 full GitHub CI pending. Certified **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no assistant commit/push/tag. See `docs/RC_CYCLE243_ZOOM_EFFECT_TYPECHECK.en.md`.

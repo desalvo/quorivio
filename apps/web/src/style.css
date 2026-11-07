@@ -3293,7 +3293,11 @@ body .widget-selection-palette .result-format-field .editable-number-field>input
 /* RC242: the application theme must never leak its Outfit/DM Sans faces into
  * freshly inserted widgets in either editor. Inline authored font-family styles
  * remain more specific than these inherited defaults. */
-:is(.editor-ux-v2,.slide-scheme-workspace) .widget-canvas-item,
+/* RC244: begin a new widget with Arial rather than inheriting the global DM Sans
+ * app theme. Author-saved inline font-family on a widget still takes precedence. */
+:is(.editor-ux-v2,.slide-scheme-workspace,.powerpoint-editor) .widget-canvas-item{
+ font-family:Arial,sans-serif;
+}
 :is(.editor-ux-v2,.slide-scheme-workspace) .widget-canvas-item .widget-fit-content{
  font-family:inherit;
 }
