@@ -18,7 +18,7 @@ export function validResultTextStyles(value:unknown):value is ResultTextStyles {
 }
 export function resultTextCss(styles:ResultTextStyles|undefined,key:string,defaults:ResultTextStyle={}):CSSProperties{
  const x={...defaults,...(styles?.[key]||{})};
- return {fontFamily:x.fontFamily,fontSize:x.fontSize?`${x.fontSize}px`:undefined,color:x.color,fontWeight:x.bold===undefined?undefined:x.bold?700:400,fontStyle:x.italic===undefined?undefined:x.italic?'italic':'normal',textDecoration:[x.underline?'underline':'',x.strikethrough?'line-through':''].filter(Boolean).join(' ')||undefined};
+ return {fontFamily:x.fontFamily,fontSize:x.fontSize?`${(x.fontSize/12.8).toFixed(5)}cqw`:undefined,color:x.color,fontWeight:x.bold===undefined?undefined:x.bold?700:400,fontStyle:x.italic===undefined?undefined:x.italic?'italic':'normal',textDecoration:[x.underline?'underline':'',x.strikethrough?'line-through':''].filter(Boolean).join(' ')||undefined};
 }
 export function resultElementKey(kind:'option'|'row',questionId:string,optionId:string):string{
  return kind+':'+(questionId?questionId+':':'')+optionId;

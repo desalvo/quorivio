@@ -29,11 +29,16 @@ class RC240FullCIEvidence(unittest.TestCase):
         matrix = json.loads(MATRIX.read_text())
         receipt = json.loads(CI.read_text())
         self.assertEqual((receipt['run_id'], receipt['head_sha'], receipt['conclusion']), (RUN, SHA, 'success'))
-        self.assertEqual((matrix['last_verified_full_ci']['run_id'], matrix['last_verified_full_ci']['head_sha']), (RUN, SHA))
-        self.assertEqual(matrix['last_verified_full_ci']['acceptance_receipt'], str(CI.relative_to(ROOT)))
+        # RC239 is now an immutable historical receipt, not the current pointer.
+        prior=matrix['historical_full_ci_rc239_20261107']
+        self.assertEqual((prior['run_id'], prior['head_sha']), (RUN, SHA))
+        self.assertEqual(prior['acceptance_receipt'], str(CI.relative_to(ROOT)))
         self.assertEqual(matrix['historical_full_ci_20261031']['head_sha'], OLD_SHA)
         self.assertEqual(matrix['historical_maintainer_confirmed_commit_20261031'], OLD_SHA)
-        self.assertEqual(matrix['last_maintainer_confirmed_commit'], SHA)
+        current=matrix['last_verified_full_ci']
+        self.assertEqual((current['run_id'],current['head_sha']),
+                         (42382296263,'c108694705d2bd0d8d8444f7840a944b5913e25d'))
+        self.assertEqual(matrix['last_maintainer_confirmed_commit'],current['head_sha'])
         self.assertEqual(receipt['github_run_url'], f'https://github.com/desalvo/quorivio/actions/runs/{RUN}')
 
     def test_all_required_ci_jobs_and_no_inferred_publishing(self):
@@ -56,7 +61,12 @@ class RC240FullCIEvidence(unittest.TestCase):
         matrix = json.loads(MATRIX.read_text())
         self.assertEqual(report['external_operator_gates_remaining'], 17)
         self.assertEqual(report['external_operator_reviews_completed_by_this_run'], 0)
-        self.assertFalse(matrix['last_verified_full_ci']['published_docker_hub'])
+        # RC239 itself did NOT publish. RC245 subsequently DID publish the
+        # main app image; neither run certifies a separate converter or external reviews.
+        self.assertFalse(matrix['historical_full_ci_rc239_20261107']['published_docker_hub'])
+        self.assertTrue(matrix['last_verified_full_ci']['published_docker_hub'])
+        self.assertFalse(matrix['last_verified_full_ci']['converter_image_published'])
+        self.assertEqual(matrix['last_verified_full_ci']['docker_publication_run_id'], 42385404670)
         self.assertEqual(matrix['last_verified_full_ci']['independent_external_reviews_newly_accepted'], 0)
         self.assertEqual((audit()['score'], len(audit()['unaccepted'])), (85.25, 17))
         self.assertEqual((preflight()['accepted_gates'], preflight()['release_candidate_ready']), (43, False))

@@ -684,21 +684,29 @@
     }
   ],
   "last_verified_full_ci": {
-    "run_id": 42284582481,
-    "head_sha": "0594b72806a7b6bf27de07a5fb2856747c8fd68d",
+    "run_id": 42382296263,
+    "head_sha": "c108694705d2bd0d8d8444f7840a944b5913e25d",
     "conclusion": "success",
     "observed_on": "2026-11-07",
-    "completed_at_utc": "2026-11-06T20:18:06Z",
-    "quality_job_id": 128121995282,
-    "campaign_summary_job_id": 128130802311,
+    "completed_at_utc": "2026-11-07T14:52:02Z",
+    "quality_job_id": 128432271936,
+    "campaign_summary_job_id": 128436156734,
     "required_campaign_jobs_passed": 11,
     "required_campaign_jobs_total": 11,
     "all_successful_jobs": 14,
     "nonpublication_jobs_skipped": 3,
-    "published_docker_hub": false,
+    "published_docker_hub": true,
+    "docker_publication_run_id": 42385404670,
+    "published_image": "desalvo/quorivio",
+    "published_tags": [
+      "sha-c108694705d2",
+      "latest"
+    ],
+    "published_manifest_digest": "sha256:458c54687ab50099760235102791eebc413f99c502650a4db502d7fd904f6b28",
+    "converter_image_published": false,
     "independent_external_reviews_newly_accepted": 0,
-    "acceptance_receipt": "docs/validation/RC239_FULL_CI_ACCEPTANCE_20261107.json",
-    "scope": "GitHub 11/11 opt-in campaign jobs and production quality gate; not 17 external operator approvals"
+    "acceptance_receipt": "docs/validation/RC245_FULL_CI_DOCKER_20261107.json",
+    "scope": "Full RC245 GitHub 11/11 + published app image; NOT converter image or 17 physical operator reviews"
   },
   "pending_local_batch": {
     "description": "RC cycle37 editor bug fixes: contrast, portaled menus, preview recovery and multiple-choice save validation; HAProxy CI acceptance remains pending",
@@ -1195,7 +1203,7 @@
       "GDPR/legal key custody review"
     ]
   },
-  "last_maintainer_confirmed_commit": "0594b72806a7b6bf27de07a5fb2856747c8fd68d",
+  "last_maintainer_confirmed_commit": "c108694705d2bd0d8d8444f7840a944b5913e25d",
   "scoring_reconciliation_20261029_cycle22": {
     "date": "2026-10-29",
     "prior_score": 77.0,
@@ -1807,5 +1815,22 @@
     "kubernetes_tls_test": "skipped (workflow input false)",
     "published_docker_hub": true
   },
-  "historical_maintainer_confirmed_commit_20261031": "c0fe7f7b9e41c0295387d84996a7b531b91b69a0"
+  "historical_maintainer_confirmed_commit_20261031": "c0fe7f7b9e41c0295387d84996a7b531b91b69a0",
+  "historical_full_ci_rc239_20261107": {
+    "run_id": 42284582481,
+    "head_sha": "0594b72806a7b6bf27de07a5fb2856747c8fd68d",
+    "conclusion": "success",
+    "observed_on": "2026-11-07",
+    "completed_at_utc": "2026-11-06T20:18:06Z",
+    "quality_job_id": 128121995282,
+    "campaign_summary_job_id": 128130802311,
+    "required_campaign_jobs_passed": 11,
+    "required_campaign_jobs_total": 11,
+    "all_successful_jobs": 14,
+    "nonpublication_jobs_skipped": 3,
+    "published_docker_hub": false,
+    "independent_external_reviews_newly_accepted": 0,
+    "acceptance_receipt": "docs/validation/RC239_FULL_CI_ACCEPTANCE_20261107.json",
+    "scope": "GitHub 11/11 opt-in campaign jobs and production quality gate; not 17 external operator approvals"
+  }
 }

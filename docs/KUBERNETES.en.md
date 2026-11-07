@@ -25,3 +25,12 @@ Use `haproxy_variant=community` for the `kubernetes.io/ingress.class` legacy ann
 The wizard **never writes credentials**. Before deployment create a secret with `DATABASE_URL` and `AUTH_SECRET`; internal PostgreSQL additionally requires `POSTGRES_PASSWORD`. PostgreSQL URLs must be URL-encoded and include suitable `sslmode` and trusted certificates for external TLS. `PGSSLMODE` in a ConfigMap is *not* a substitute for correctly configuring TLS in `DATABASE_URL`. The generated `StatefulSet` lacks managed backups and HA: configure and test both before production. The API remains deliberately single-replica until cross-replica event synchronization is implemented.
 
 Use `kubectl kustomize ./generated` and validate against your cluster; neither this generator nor the source's Helm chart has yet been cluster-verified.
+
+
+## RC246 — Safe in-place converter upgrade
+
+For an existing wizard-generated installation, **do not** re-generate or re-apply the old complete Kustomize base. Run `python3 tools/k8s_wizard.py --ensure-converter-token` and then `--upgrade-converter` to prepare a minimal, non-destructive JSON Patch against the live Deployment; explicitly apply via `--apply-converter` only after review. Publish the separate converter image via `.github/workflows/converter-image.yml` (manual workflow only) or Docker Buildx first. No DB/PVC/Ingress/Service/credential replacement, and stale plans are rejected. Full guide: `docs/RC_CYCLE246_EXISTING_K8S_CONVERTER_UPGRADE.en.md`.
+
+## RC247 — Worker image tags
+
+Run the manual converter publisher on `main` with `confirm_publish=true` for `desalvo/quorivio-converter:latest`; run it on a Git tag ref to publish `desalvo/quorivio-converter:<tag-name>`. The live upgrade wizard accepts `latest`, release tags and digests without regenerating database/PVC/Ingress. Since `latest` is mutable, inspect its digest before rollout. No cluster upgrade is automatic.

@@ -3354,3 +3354,34 @@ body .widget-selection-palette .result-format-field .editable-number-field>input
 .global-page-zoom output{min-width:36px;text-align:center;font-variant-numeric:tabular-nums}
 .global-page-zoom .global-page-zoom-reset{font-size:10px;min-width:36px}
 @media(max-width:480px){.global-page-zoom{right:5px;bottom:5px;padding:3px;gap:2px}.global-page-zoom button{min-width:28px;min-height:28px}}
+
+/* RC247: Browser-like UI zoom without hiding the workspace or shrinking its
+ * canvas. The physical viewport is independent from CSS zoom; compensate all
+ * full-screen layers by the reciprocal zoom factor. Chrome becomes more compact
+ * while the freed area is available to the 16:9 canvas. */
+:root{--quorivio-ui-scale:1}
+html,body,#root,.app{min-height:calc(100dvh / var(--quorivio-ui-scale))}
+.editor-ux-v2,.editor-ux-v2:fullscreen,
+.editor-ux-v2.powerpoint-editor:not(:fullscreen){
+ width:calc(100vw / var(--quorivio-ui-scale))!important;
+ height:calc(100dvh / var(--quorivio-ui-scale))!important;
+ min-height:0!important;max-height:none!important;
+}
+.editor-ux-v2 .editor-canvas-slot{
+ max-width:min(100%,calc((100dvh / var(--quorivio-ui-scale) - 146px)*16/9))!important;
+}
+@media(max-width:760px){
+ .editor-ux-v2 .editor-canvas-slot{max-width:100%!important}
+}
+/* The editor's internal typography must start at Arial irrespective of
+ * application-level heading styles. Inline authored choices stay authoritative. */
+:is(.editor-ux-v2,.slide-scheme-workspace) .widget-canvas-item
+ :is(.widget-rich-inline,.widget-rich-inline>span,.canvas-widget-answer-preview,
+     .canvas-widget-body-preview,.canvas-subquestion,.widget-answer-option,
+     .projection-slide-footer,.slide-footer-center){font-family:inherit}
+:is(.editor-ux-v2,.slide-scheme-workspace) .widget-canvas-item
+ :is(h1,h2,h3,h4){font-family:inherit}
+
+/* Full-width dashboard rather than a centered 1600 CSS-pixel island after the
+ * UI is made more compact; the saved widget canvas keeps its own aspect ratio. */
+.app .dashboard{max-width:none;width:100%;min-height:0}

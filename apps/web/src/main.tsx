@@ -63,7 +63,7 @@ import {pasteWidget} from './widget-clipboard';
 import {saveEditorWidgetClipboard,readEditorWidgetClipboard} from './editor-cross-page-clipboard';
 import {newWidgetHistory,editWidgets,reconcileWidgetAutoFit,beginWidgetGesture,endWidgetGesture,undoWidgets,redoWidgets} from './widget-history';
 import {EditableNumberField} from './editable-number-field.js';
-import {GLOBAL_ZOOM_STORAGE_KEY,GLOBAL_ZOOM_MIN,GLOBAL_ZOOM_MAX,normalizeGlobalZoom,nextGlobalZoom,zoomStyleValue} from './global-page-zoom.js';
+import {GLOBAL_ZOOM_STORAGE_KEY,GLOBAL_ZOOM_MIN,GLOBAL_ZOOM_MAX,GLOBAL_ZOOM_CSS_VARIABLE,normalizeGlobalZoom,nextGlobalZoom,zoomStyleValue} from './global-page-zoom.js';
 import {movePageId} from './page-order';
 import {presenterPageIndex,presenterAdjacentPage,presenterKeyboardDirection,presenterVisiblePages} from './presenter-navigation';
 import {commitAndReconcilePageOrder} from './page-order-recovery';
@@ -1263,7 +1263,7 @@ function WidgetCanvas({widgets,numberingWidgets,onChange,pageTitle="",sessionTit
  </div>}{['question','timed-quiz'].includes(w.kind)&&<ChoiceTruthEditor context question={w} kind={w.kind} onPatch={changes=>patch(w.id,changes)}/>}{['question','timed-quiz'].includes(w.kind)&&(w.questions||[]).map((q:any)=><ChoiceTruthEditor key={q.id} context question={q} kind={w.kind} onPatch={changes=>patch(w.id,{questions:(w.questions||[]).map((part:any)=>part.id===q.id?{...part,...changes}:part)})}/>)}{w.kind!=='line'&&w.kind!=='shape'&&<button type="button" onClick={()=>{setEditing(w.id);setContextWidget(null)}}>Modifica titolo</button>}{['question','timed-quiz'].includes(w.kind)&&<button type="button" disabled={(w.questions||[]).length>=5} onClick={()=>{patch(w.id,{questions:[...(w.questions||[]),newIndependentQuestion(w.kind)]});setEditing(w.id);setContextWidget(null)}}>Aggiungi domanda indipendente</button>}{['question','timed-quiz'].includes(w.kind)&&<button type="button" disabled={(w.options||[]).length>=12} onClick={()=>{patch(w.id,{answerMode:w.answerMode||'single',options:[...(w.options||[]),{id:'opt_'+crypto.randomUUID().replace(/-/g,'').slice(0,24),label:'Nuova opzione'}]});setEditing(w.id);setContextWidget(null)}}>Aggiungi opzione di risposta</button>}{['image','video','logo','pdf'].includes(w.kind)&&<div className="canvas-context-assets"><label htmlFor={'canvas-asset-'+w.id}>Sostituisci file</label><select id={'canvas-asset-'+w.id} aria-label={'Seleziona asset '+w.kind} value={w.assetId||''} onChange={e=>patch(w.id,{assetId:e.target.value})}><option value="">Nessun file</option>{assets.filter(a=>w.kind==='pdf'?a.mime_type==='application/pdf':w.kind==='video'?a.mime_type.startsWith('video/'):a.mime_type.startsWith('image/')).map(a=><option key={a.id} value={a.id}>{a.display_name||a.mime_type+' · '+a.id.slice(0,8)}</option>)}</select>{onUpload&&<label className="canvas-context-upload">Carica nuovo file<input type="file" aria-label={'Carica file '+w.kind} accept={w.kind==='pdf'?'application/pdf':w.kind==='video'?'video/mp4,video/webm':'image/png,image/jpeg,image/gif,image/webp'} disabled={assetBusy} onChange={e=>{void onUpload(w.id,e.target.files?.[0],w.kind);e.target.value=''}}/></label>}<small>Salva il layout per applicare la modifica.</small></div>}<button type="button" onClick={()=>{if(!window.confirm('Eliminare questo widget dal canvas?'))return;onChange(widgets.filter(z=>z.id!==w.id));setActive(null);setContextWidget(null)}}>Elimina</button></div>,document.body)}<button type="button" className="canvas-remove" aria-label={'Rimuovi widget '+w.kind} title="Rimuovi widget" onClick={()=>{if(!window.confirm('Eliminare questo widget dal canvas?'))return;onChange(widgets.filter(z=>z.id!==w.id));setActive(null)}}>×</button><span className="widget-rotate-handle" data-rotate-handle="true" title="Ruota widget" aria-label="Ruota widget"/>{edges.map(edge=><span key={edge} role="presentation" data-resize-edge={edge} className={'widget-resize-edge edge-'+edge}/>)}</div>})}<SlideCanvasNumber widgets={numberingWidgets??widgets} pageNumber={pageNumber}/></div></div>{active&&!ribbonDismissed&&!suspendFormattingRibbon&&widgets.some(w=>w.id===active)&&<EditorFloatingWindow portal placement="palette" className="widget-selection-palette" role="toolbar" ariaLabel="Formattazione rapida widget selezionato" onMouseDownCapture={e=>{if((e.target as HTMLElement).closest("button"))e.preventDefault()}}>
  {(()=>{const w=widgets.find(z=>z.id===active)!;const style=w.style||{};
  const selectedRange=toolbarRange?.id===w.id&&editing===w.id?toolbarRange:null;
- const effectiveScope=selectedRange&&selectedRange.end>selectedRange.start?(selectedRange.field.startsWith('option:')||selectedRange.field.includes(':option:')?'answers':selectedRange.field==='description'||selectedRange.field.includes(':description')?'description':'label'):formatScope;
+ const effectiveScope=formatScope==='widget'?'widget':selectedRange&&selectedRange.end>selectedRange.start?(selectedRange.field.startsWith('option:')||selectedRange.field.includes(':option:')?'answers':selectedRange.field==='description'||selectedRange.field.includes(':description')?'description':'label'):formatScope;
  const activeTextField=effectiveScope==='widget'?null:selectedRange?selectedRange.field:effectiveScope==='label'?'label':effectiveScope==='description'?'description':null;
  const fieldText=(field:string):string=>{
   if(field==='label')return w.kind==='title'?widgetDisplay(w,{pageTitle,masterTitleStyle}).title:w.kind==='footer'?widgetDisplay(w,{sessionTitle,pageNumber}).center:w.label||'';
@@ -2768,10 +2768,12 @@ function GlobalPageZoomShell(){
  useEffect(()=>{
   const root=document.documentElement;
   const value=zoomStyleValue(zoom);
-  if(value)root.style.setProperty('zoom',value);
-  else root.style.removeProperty('zoom');
+  root.style.setProperty('zoom',value);
+  // Fixed-position overlays are compensated separately so that the whole
+  // physical viewport remains covered instead of revealing the dashboard.
+  root.style.setProperty(GLOBAL_ZOOM_CSS_VARIABLE,String(Number.parseFloat(value)/100));
   try{window.localStorage.setItem(GLOBAL_ZOOM_STORAGE_KEY,String(zoom))}catch{/* Private mode: zoom remains usable this session. */}
-  return()=>{root.style.removeProperty('zoom');};
+  return()=>{root.style.removeProperty('zoom');root.style.removeProperty(GLOBAL_ZOOM_CSS_VARIABLE);};
  },[zoom]);
  return <>
   <WorkspaceErrorBoundary/>

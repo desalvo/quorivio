@@ -1,5 +1,13 @@
 # Matrice di accettazione RC — 7 novembre 2026
 
+**RC245: full CI [42382296263](https://github.com/desalvo/quorivio/actions/runs/42382296263) verde, commit c108694705d2bd0d8d8444f7840a944b5913e25d; 11/11 obbligatori e 14 riusciti. App Docker Hub amd64/arm64 pubblicata con [42385404670](https://github.com/desalvo/quorivio/actions/runs/42385404670), non l’immagine worker separata. **85,25/100**, 17 gate parziali, RC formale non approvata.**
+
+Receipt: `docs/validation/RC245_FULL_CI_DOCKER_20261107.json`. Previous RC239 proof remains in history. RC246 full CI pending. Never commit private operator evidence.
+
+---
+
+# Matrice di accettazione RC — 7 novembre 2026
+
 **0.1.0-dev; ultima full CI verde verificata: RC239, run GitHub 42284582481, commit `0594b72806a7b6bf27de07a5fb2856747c8fd68d`. Passati 11/11 job obbligatori e tutti i 14 job attivi. Punteggio 85,25/100; 17 gate esterni parziali. Release candidate formale NON approvata.**
 
 Convenzione: accepted=100%, partial=50%, open/blocked=0%; non rappresenta copertura software né certificazione legale o di accessibilità. I job di pubblicazione sono stati saltati intenzionalmente. `docs/validation/RC239_FULL_CI_ACCEPTANCE_20261107.json` contiene l'elenco dei job; la precedente CI rimane archiviata. Servono ancora le approvazioni indipendenti; le prove private non vanno committate nel repository.

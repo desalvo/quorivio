@@ -25,7 +25,7 @@ test('whole-widget font replaces answer font and existing inline overrides, with
  assert.equal(next.style.answerFontFamily,'Georgia');
  assert.equal(answerOptionStyle(next.style).fontFamily,'Georgia');
  assert.ok(next.textMarks.every(mark=>mark.style.fontFamily==='Georgia'&&mark.style.bold===true));
- assert.match(ui,/const effectiveScope=selectedRange&&selectedRange\.end>selectedRange\.start\?/);
+ assert.match(ui,/const effectiveScope=formatScope==='widget'\?'widget':selectedRange&&selectedRange\.end>selectedRange\.start\?/);
  assert.match(ui,/const activeTextField=effectiveScope==='widget'\?null:/);
  assert.match(ui,/if\(typographic\)\{patch\(w\.id,applyAllWidgetTypeface\(w,changes as InlineStyle\)\);return;\}/);
 });

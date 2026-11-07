@@ -25,3 +25,12 @@ python3 tools/k8s_wizard.py --unattended --output ./external --set postgres_mode
 Il wizard **non salva credenziali**. Preparare un Secret con `DATABASE_URL` e `AUTH_SECRET`; PostgreSQL interno richiede anche `POSTGRES_PASSWORD`. L'URL deve usare l'escaping corretto, un adeguato `sslmode` e CA attendibili per database esterni. `PGSSLMODE` nella ConfigMap *non sostituisce* la corretta configurazione TLS di `DATABASE_URL`. Lo StatefulSet generato non offre ancora backup gestiti né alta disponibilità; configurarli e testarli prima della produzione. L'API deve restare a una replica finché non è implementata la sincronizzazione degli eventi tra repliche.
 
 Usare `kubectl kustomize ./generated` e validare sul cluster: wizard e chart Helm non sono ancora stati verificati in un cluster reale.
+
+
+## RC246 — Aggiornare senza reinstallare (worker PDF/PPTX)
+
+Per una installazione già generata con il wizard, **non** rigenerare o applicare tutti i vecchi manifest: usare invece `python3 tools/k8s_wizard.py --ensure-converter-token`, poi `--upgrade-converter` per ottenere una patch mirata sul Deployment vivo e infine `--apply-converter` per applicarla esplicitamente dopo la revisione. L'immagine del worker deve essere pubblicata separatamente con il workflow manuale `.github/workflows/converter-image.yml` oppure con `docker buildx`. Il wizard non cambia PostgreSQL/PVC/Ingress/Service/credenziali e rifiuta di applicare piani scaduti. Procedura completa: `docs/RC_CYCLE246_EXISTING_K8S_CONVERTER_UPGRADE.it.md`.
+
+## RC247 — Tag immagine worker
+
+Eseguire manualmente il workflow di pubblicazione converter su `main` con `confirm_publish=true` per ottenere `desalvo/quorivio-converter:latest`; eseguirlo sul tag Git per ottenere `desalvo/quorivio-converter:<nome-tag>`. Il wizard di aggiornamento live accetta `latest`, tag release oppure un digest e non re-installa database/PVC/Ingress. Il tag `latest` è mobile: verificare il digest prima del rollout. Nessun aggiornamento del cluster è automatico.

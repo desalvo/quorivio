@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC247 — Font widget, canvas e tag converter
+
+**RC247:** Corrette dimensioni proporzionali dei font dei risultati, propagazione di «Widget intero» a domande annidate e markup esistente, ereditarietà Arial per tutti i 20 tipi di widget nei due editor e compensazione dello zoom per la copertura completa del viewport. Il nuovo 100% corrisponde al precedente 80% e il canvas 16:9 si espande sfruttando lo spazio liberato; dashboard a piena larghezza. Il workflow converter manuale usa `latest` da `main` e il nome del tag Git per release taggate; il wizard sicuro accetta entrambi. RC246 storica conservata; full CI RC247 da verificare e cluster non modificato. **85,25%** (43 gate accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Vedi `docs/RC_CYCLE247_EDITOR_FONT_ZOOM_CONVERTER.it.md`.
+
+---
+
+# Quorivio 0.1.0-dev — RC246 — Wizard converter su cluster Kubernetes esistente
+
+**RC246:** RC245 committata c108694705d2bd0d8d8444f7840a944b5913e25d, full CI GitHub 42382296263 verde (11/11 obbligatori e 14 job riusciti); immagine principale Docker multiarch pubblicata tramite 42385404670 come desalvo/quorivio:sha-c108694705d2 e latest. RC246 estende il wizard Kubernetes sul Deployment reale con generazione di JSON Patch mirata al worker PDF/PPTX, aggiunta del token nel Secret esistente solo con comando esplicito e applicazione separata dopo controllo di contesto/UID/resourceVersion e rollout. Nessuna reinstallazione di database, PVC, Ingress, Service, ripristino credenziali o sovrascrittura della base Kustomize. Aggiunto publisher Docker manuale dedicato per il converter: immagine SEPARATA da quella già pubblicata. Nessun upgrade del cluster reale compiuto; CI RC246 e accettazione operatori in attesa. **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag assistente. `docs/RC_CYCLE246_EXISTING_K8S_CONVERTER_UPGRADE.it.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC245 — Accettazione domande smartphone compatte
 
 **RC245:** La full CI [42380437684](https://github.com/desalvo/quorivio/actions/runs/42380437684), commit RC244 `9af6cb4c99f8347c386b59f58ec1eced903928d3`, ha superato le verifiche preliminari, TypeScript e Chromium editor, poi si è fermata sul test reale partecipante/PostgreSQL: la soglia RC207 di 278px non riflette più la riduzione intenzionale di 40px della parte non interattiva introdotta in RC241. Il browser partecipante controlla ora due risposte effettive, altezza touch di almeno 44px, font leggibili di almeno 18px, geometria pubblica e assenza di widget riservati al presentatore. Aggiornato RC217, aggiunte verifiche negative pre-npm, Node e Chromium a 320/390/760px. UI applicativa immutata; RC244 storica, RC245 corrente; full CI da verificare. **85,25%** (43 gate accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag assistente. `docs/RC_CYCLE245_COMPACT_PHONE_QUESTION.it.md`.

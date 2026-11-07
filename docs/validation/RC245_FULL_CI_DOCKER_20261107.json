@@ -1,0 +1,43 @@
+{
+  "version": "0.1.0-dev",
+  "release_cycle": 245,
+  "observed_on": "2026-11-07",
+  "commit": "c108694705d2bd0d8d8444f7840a944b5913e25d",
+  "full_ci": {
+    "run_id": 42382296263,
+    "url": "https://github.com/desalvo/quorivio/actions/runs/42382296263",
+    "conclusion": "success",
+    "quality_job_id": 128432271936,
+    "campaign_summary_job_id": 128436156734,
+    "required_jobs_passed": 11,
+    "required_jobs_total": 11,
+    "successful_jobs": 14,
+    "publication_jobs_skipped": 3,
+    "completed_at_utc": "2026-11-07T14:52:02Z"
+  },
+  "docker_publication": {
+    "run_id": 42385404670,
+    "url": "https://github.com/desalvo/quorivio/actions/runs/42385404670",
+    "conclusion": "success",
+    "main_image": "desalvo/quorivio",
+    "tags": [
+      "sha-c108694705d2",
+      "latest"
+    ],
+    "architectures": [
+      "linux/amd64",
+      "linux/arm64"
+    ],
+    "publication_job_id": 128443424224,
+    "manifest_digest": "sha256:458c54687ab50099760235102791eebc413f99c502650a4db502d7fd904f6b28",
+    "converter_image_published": false,
+    "converter_image_note": "Converter is a different image and requires separately authorized build/publish"
+  },
+  "scoring": {
+    "accepted_gates": 43,
+    "partial_gates": 17,
+    "certified_percentage": 85.25,
+    "independent_external_signoffs_newly_accepted": 0
+  },
+  "scope": "Full CI plus MAIN app Docker image; converter and operator/production-cluster reviews are unverified."
+}

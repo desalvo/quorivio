@@ -14,7 +14,7 @@ test('zoom increments in steps of ten, never outside accessible range',()=>{
  assert.equal(normalizeGlobalZoom(1000),GLOBAL_ZOOM_MAX);
 });
 test('normal zoom restores the original document scaling',()=>{
- assert.equal(zoomStyleValue(100),'');
- assert.equal(zoomStyleValue(120),'120%');
- assert.equal(zoomStyleValue(80),'80%');
+ assert.equal(zoomStyleValue(100),'80%');
+ assert.equal(zoomStyleValue(120),'96%');
+ assert.equal(zoomStyleValue(80),'64%');
 });

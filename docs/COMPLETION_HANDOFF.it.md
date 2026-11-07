@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC247 — Handoff font, canvas e converter
+
+**RC247:** Ripartire dalla RC246 cumulativa. Risultati con font `cqw` proporzionali su editor/anteprime; «Widget intero» applica carattere a titolo, risposte, sottodomande, markup rich-text e pulsanti; Arial predefinito per le 20 widget preservando i font scelti. Zoom UI compatto con 100% = vecchio 80%, finestre full screen senza mostrare dashboard, canvas 16:9 più grande e dashboard senza fasce vuote. Publisher converter solo manuale: `latest` da `main`, nome esatto del tag Git per release. Inventario RC246 storico invariato. Full CI RC247 e collaudi reali da verificare. **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. `docs/RC_CYCLE247_EDITOR_FONT_ZOOM_CONVERTER.it.md`.
+
+---
+
+# Quorivio 0.1.0-dev — RC246 — Handoff aggiornamento converter Kubernetes
+
+**RC246:** RC245 committata c108694705d2bd0d8d8444f7840a944b5913e25d, full CI GitHub 42382296263 verde (11/11 obbligatori e 14 job riusciti); immagine principale Docker multiarch pubblicata tramite 42385404670 come desalvo/quorivio:sha-c108694705d2 e latest. RC246 estende il wizard Kubernetes sul Deployment reale con generazione di JSON Patch mirata al worker PDF/PPTX, aggiunta del token nel Secret esistente solo con comando esplicito e applicazione separata dopo controllo di contesto/UID/resourceVersion e rollout. Nessuna reinstallazione di database, PVC, Ingress, Service, ripristino credenziali o sovrascrittura della base Kustomize. Aggiunto publisher Docker manuale dedicato per il converter: immagine SEPARATA da quella già pubblicata. Nessun upgrade del cluster reale compiuto; CI RC246 e accettazione operatori in attesa. **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag assistente. `docs/RC_CYCLE246_EXISTING_K8S_CONVERTER_UPGRADE.it.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC245 — Handoff CI smartphone compatto
 
 **Handoff RC245:** Da RC244 committata `9af6cb4c99f8347c386b59f58ec1eced903928d3`: la full CI `42380437684` si è fermata nel browser partecipante per la vecchia soglia RC207 `questionHeight>=278-1`. RC241 ha ridotto intenzionalmente la domanda automatica con due risposte brevi da 278 a 238px. Il browser reale React/PostgreSQL controlla ora entrambe le risposte, altezza touch >=44px, font >=18px, geometria compatta e filtro widget privati. Aggiornata la verifica RC217; aggiunte regressioni negative pre-npm, Node e Chromium isolato. UI e flag di sicurezza invariati. RC244 storica, RC245 corrente; da ripetere full CI. 85,25% (43 accettati/17 parziali), `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. `docs/RC_CYCLE245_COMPACT_PHONE_QUESTION.it.md`.

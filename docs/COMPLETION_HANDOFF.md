@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC247 — Editor and converter handoff
+
+**RC247:** Resume from RC246 cumulative. Restore editor/preview result font parity via stage-relative `cqw`; apply Whole widget fonts to title, answers, nested subquestions, rich marks and buttons; enforce Arial defaults without overriding authored fonts. Browser-like compact UI zoom displays 100% for former 80%, fills physical fullscreen overlays, expands 16:9 canvas and removes empty dashboard side gutters. Converter publisher remains manually authorized, tags `main` as `latest`, Git tags verbatim. Historical RC246 inventory unchanged. Run complete full CI on maintainer commit, verify real editors and operator acceptance. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no assistant commit/push/tag. `docs/RC_CYCLE247_EDITOR_FONT_ZOOM_CONVERTER.en.md`.
+
+---
+
+# Quorivio 0.1.0-dev — RC246 — Existing Kubernetes worker handoff
+
+**RC246:** RC245 source commit c108694705d2bd0d8d8444f7840a944b5913e25d passed full CI GitHub 42382296263 (11/11 mandatory jobs, 14 successful). The primary app image was published with amd64/arm64 in workflow 42385404670 under desalvo/quorivio:sha-c108694705d2 and latest. RC246 extends the live Kubernetes wizard with read-only Deployment discovery, a non-destructive scoped JSON Patch plan for a sidecar PDF/PPTX worker, an explicitly initiated token addition to the existing Secret, separate deliberate apply/rollout with context/UID/resourceVersion validation, and a separate manual-only converter image publisher. No database/PVC/Ingress/Service recreation, credential resets or original Kustomize overwrite. The isolated converter Docker image is NOT included in the prior app publication and must be published explicitly; no real cluster upgrade performed. RC246 full CI and operator sign-off pending. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no assistant commit/push/tag. `docs/RC_CYCLE246_EXISTING_K8S_CONVERTER_UPGRADE.en.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC245 — Compact phone question CI handoff
 
 **RC245 handoff:** Starting from user-committed RC244 `9af6cb4c99f8347c386b59f58ec1eced903928d3`, full CI run `42380437684` stopped at `tools/ci_browser_participant.py` due to the stale RC207 `questionHeight>=278-1` check. RC241 compacted the automatic mobile question from 278px to 238px for two short options. The corrected real React/PostgreSQL browser requires both authored responses, actual touch heights >=44px, text >=18px, compact stage budget and no private presenter widgets. RC217 mutation guard reconciled; RC245 early Python/Node tests and isolated Chromium fixture added. No application UI or safety flags changed. Preserve RC244 receipt, promote RC245 current; rerun full GitHub CI. 85.25% (43 accepted/17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no assistant commit/push/tag. `docs/RC_CYCLE245_COMPACT_PHONE_QUESTION.en.md`.

@@ -527,10 +527,62 @@ def main(argv=None):
     a.add_argument('--unattended',action='store_true',help='Use defaults plus overrides without prompting')
     a.add_argument('--output',default='k8s-generated',help='Target directory for deterministic Kustomize manifests')
     a.add_argument('--values',help='Existing JSON with custom overrides, e.g. saved quorivio-overrides.json')
-    a.add_argument('--inspect-cluster',action='store_true',help='Read-only inspect live installation; write nonsecret discovery report, never generate/apply replacement manifests')
+    modes=a.add_mutually_exclusive_group()
+    modes.add_argument('--inspect-cluster',action='store_true',help='Read-only inspection of an existing installation')
+    modes.add_argument('--upgrade-converter',action='store_true',help='Plan ONLY a converter sidecar addition to a live Deployment; never apply automatically')
+    modes.add_argument('--apply-converter',action='store_true',help='Explicitly apply a previously generated and revalidated converter-only JSON Patch')
+    modes.add_argument('--ensure-converter-token',action='store_true',help='Explicitly add a private 32-byte converter token ONLY when the existing app Secret lacks one')
+    a.add_argument('--converter-image',help='Published converter-specific image, e.g. your-registry/quorivio-converter:tag; required for --upgrade-converter')
+    a.add_argument('--converter-deployment',help='Existing Deployment name (defaults to --set name=...)')
+    a.add_argument('--app-container',help='Existing Quorivio API container name, otherwise discover from Deployment')
+    a.add_argument('--converter-secret',help='Existing app Secret name, otherwise discover from API container references')
+    a.add_argument('--kubectl',default='kubectl',help='kubectl executable; current kubeconfig context is recorded in plans')
     a.add_argument('--set',action='append',default=[],metavar='KEY=VALUE')
     args=a.parse_args(argv)
     cfg=dict(DEFAULTS);out=Path(args.output)
+    if args.upgrade_converter or args.apply_converter or args.ensure_converter_token:
+        from k8s_converter_upgrade import UpgradeError, prepare_upgrade, apply_upgrade, plan_token_provision, valid_name
+        # Converter modes inspect the LIVE Deployment, never old wizard
+        # overrides which could replace credentials or storage configuration.
+        if args.values:a.error('--values cannot regenerate or replace existing credentials in converter mode')
+        if args.apply_converter:
+            if args.set or args.converter_image or args.converter_secret or args.converter_deployment or args.app_container:
+                a.error('--apply-converter uses ONLY the already reviewed plan; do not add override options')
+            if not any(x == '--output' or x.startswith('--output=') for x in (argv if argv is not None else sys.argv[1:])):
+                a.error('--apply-converter requires explicit --output PATH to reviewed converter plan')
+            try:report=apply_upgrade(out,kubectl=args.kubectl)
+            except (UpgradeError, KeyError, OSError) as exc:a.error(str(exc))
+            print('Converter-only Deployment patch applied and rollout verified:',report['namespace'],report['deployment'])
+            print('Open platform admin -> Server configuration -> PDF/PowerPoint converter -> Check worker -> Enable.')
+            return 0
+        overrides={}
+        for entry in args.set:
+            if '=' not in entry:a.error('--set requires KEY=VALUE')
+            key,value=entry.split('=',1)
+            if key not in ('namespace','name'):a.error('converter upgrade permits only --set namespace=... and --set name=...')
+            overrides[key]=value
+        ns=overrides.get('namespace',cfg['namespace'])
+        deployment=args.converter_deployment or overrides.get('name',cfg['name'])
+        try:
+            valid_name(ns,'Namespace');valid_name(deployment,'Deployment')
+            if args.ensure_converter_token:
+                if args.converter_image:a.error('--ensure-converter-token does not accept --converter-image')
+                secret,created=plan_token_provision(ns,deployment,args.app_container,args.converter_secret,kubectl=args.kubectl)
+                print('Private worker token', 'provisioned in' if created else 'already valid in', 'existing Secret:',secret)
+                print('No other Secret fields or Kubernetes resources changed; token not printed or stored locally.')
+            else:
+                if not args.converter_image:a.error('--upgrade-converter requires --converter-image with a published and accessible converter-specific image')
+                if not any(x == '--output' or x.startswith('--output=') for x in (argv if argv is not None else sys.argv[1:])):
+                    a.error('--upgrade-converter requires explicit --output PATH different from original wizard manifests')
+                plan=prepare_upgrade(ns,deployment,out,args.converter_image,app_container=args.app_container,secret_name=args.converter_secret,kubectl=args.kubectl)
+                print('Converter-only upgrade plan prepared in:',out)
+                print('Context:',plan['context'],'Deployment:',plan['namespace']+'/'+plan['deployment'])
+                print('Only Deployment pod template will change; no apply, database, PVC, Ingress or Secret modifications.')
+                print('Inspect the patch, then use --apply-converter --output',out)
+        except (UpgradeError, OSError, KeyError) as exc:a.error(str(exc))
+        return 0
+    if args.converter_image or args.converter_deployment or args.app_container or args.converter_secret:
+        a.error('converter-specific flags require --upgrade-converter or --ensure-converter-token')
     if args.inspect_cluster:
         from k8s_cluster_inspection import inspect_resources,derive_nonsecret_config,save_report
         # A read-only path is required: never generate new Secret or overwrite

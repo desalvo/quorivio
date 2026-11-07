@@ -25,7 +25,7 @@ def assert_cleanup_void(source: str) -> None:
     # Regression: `return()=>root.style.removeProperty(...)` returns a string.
     assert not re.search(r'return\s*\(\s*\)\s*=>\s*root\.style\.removeProperty\(', shell)
     # Braced arrow callback makes the cleanup's return value void.
-    assert re.search(r'return\s*\(\s*\)\s*=>\s*\{\s*root\.style\.removeProperty\(\s*[\"\']zoom[\"\']\s*\)\s*;\s*\}\s*;', shell)
+    assert "return()=>{root.style.removeProperty(\'zoom\');root.style.removeProperty(GLOBAL_ZOOM_CSS_VARIABLE);};" in shell
     assert shell.index('return()=>{root.style.removeProperty') < shell.index('},[zoom]);')
 
 
@@ -35,7 +35,7 @@ class RC243GlobalZoomCleanup(unittest.TestCase):
 
     def test_negative_regression_rejects_expression_body_cleanup(self):
         source = MAIN.read_text(encoding='utf8')
-        mutated = source.replace('return()=>{root.style.removeProperty(\'zoom\');};',
+        mutated = source.replace('return()=>{root.style.removeProperty(\'zoom\');root.style.removeProperty(GLOBAL_ZOOM_CSS_VARIABLE);};',
                                  'return()=>root.style.removeProperty(\'zoom\');')
         self.assertNotEqual(mutated, source)
         with self.assertRaises(AssertionError):

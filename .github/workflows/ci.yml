@@ -335,6 +335,19 @@ jobs:
         run: |
           python3 -m unittest tools.tests.test_rc245_compact_phone_stage_ci -q
           node --experimental-strip-types --test apps/web/test/rc245-compact-phone-question.test.ts
+      # RC246: updating an existing wizard-managed cluster must NEVER regenerate
+      # PostgreSQL, PVCs, Ingress or Secrets. Guard isolated sidecar-only JSON
+      # Patch, stale-plan refusal, and manual-only converter image publication.
+      - name: RC246 existing Kubernetes converter upgrade safety before npm
+        run: |
+          python3 -m unittest tools.tests.test_rc246_converter_upgrade -q
+          python3 -m unittest tools.tests.test_rc246_converter_publish_workflow -q
+          python3 -m unittest tools.tests.test_k8s_wizard -q
+      # RC247: whole-widget Arial, compact browser-like zoom and manual converter tags.
+      - name: RC247 compact full-viewport typography and converter regression before npm
+        run: |
+          python3 -m unittest tools.tests.test_rc247_editor_zoom_converter_contract -q
+          node --experimental-strip-types --test apps/web/test/rc247-typography-zoom-converter.test.ts
       - name: RC218 real editor thumbnail rename browser contract before npm
         run: python3 -m unittest tools.tests.test_rc218_browser_postgres_thumbnail_rename -q
       # RC215: RC141 compared a glyph Range top with an output border-box
@@ -779,6 +792,7 @@ jobs:
           python3 tools/ci_rc234_palette_chromium.py
           # RC242: real browser font inheritance, compact master and document zoom.
           python3 tools/ci_rc242_arial_zoom_chromium.py
+          python3 tools/ci_rc247_zoom_editor_chromium.py
           # RC162: compact QR URL must remain visible when resized; no URL row when hidden.
           python3 tools/ci_rc162_qr_resizing_chromium.py
           # RC152: mutation-tested current long-label wrapping and attached [count]
@@ -1496,7 +1510,9 @@ jobs:
           python3 tools/verify_rc_cycle242_inventory.py --historical
           python3 tools/verify_rc_cycle243_inventory.py --historical
           python3 tools/verify_rc_cycle244_inventory.py --historical
-          python3 tools/verify_rc_cycle245_inventory.py
+          python3 tools/verify_rc_cycle245_inventory.py --historical
+          python3 tools/verify_rc_cycle246_inventory.py --historical
+          python3 tools/verify_rc_cycle247_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:
