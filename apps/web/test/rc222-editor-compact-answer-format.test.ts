@@ -36,8 +36,8 @@ test('editor rich-text glyph spans can wrap and cannot be truncated by legacy ge
  assert.match(css,/white-space:pre-wrap!important;overflow-wrap:anywhere!important;/);
  assert.match(css,/font-family:var\(--q-answer-font-family,Arial\)!important/);
 });
-test('format ribbon is compact, per-result typography remains accessible on demand',()=>{
- assert.match(ui,/<details className="palette-ribbon-advanced"><summary>Testi indipendenti…<\/summary>/);
+test('format ribbon is compact, per-result typography is directly visible',()=>{
+ assert.match(ui,/<details className="palette-ribbon-advanced" open><summary>Stile indipendente delle opzioni e delle barre<\/summary>/);
  assert.match(ui,/Schede Formato widget/);
  assert.match(css,/body \.editor-floating-panel\.widget-selection-palette \.palette-ribbon-group-title\{\s*display:none!important/);
  assert.match(css,/body \.editor-floating-panel\.widget-selection-palette \.palette-ribbon-group label\{\s*min-height:0!important/);

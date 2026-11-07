@@ -15,7 +15,7 @@ def guard(ui=UI,css=CSS,rich=RICH):
         'className="canvas-subquestion-option" style={answerOptionStyle(widgetTextDefaults(w.kind,w.style))}',
         "const activeTextField=effectiveScope==='widget'?null:",
         'patch(w.id,applyAllWidgetTypeface(w,changes as InlineStyle))',
-        '<details className="palette-ribbon-advanced"><summary>Testi indipendenti…</summary>',
+        '<details className="palette-ribbon-advanced" open><summary>Stile indipendente delle opzioni e delle barre</summary>',
         "role=\"tabpanel\" tabIndex={0} aria-label={'Opzioni '+formatTab}",
     ]
     expected_css=[

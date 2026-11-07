@@ -45,8 +45,8 @@ def require_page_number_format(code: str) -> None:
         "fontFamily:'footerNumberFontFamily',fontSize:'footerNumberFontSize',color:'footerNumberColor'",
         'aria-label="Font del testo"',
         'aria-label="Colore del testo"',
-        'aria-label="Padding destro numero pagina"',
-        'aria-label="Padding inferiore numero pagina"',
+        'ariaLabel="Padding destro numero pagina"',
+        'ariaLabel="Padding inferiore numero pagina"',
     )
     if any(item not in code for item in required):
         raise AssertionError('shared formatting ribbon must preserve editable footer-number fields')

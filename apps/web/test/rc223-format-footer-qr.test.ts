@@ -13,7 +13,7 @@ test('format opens only from the selected widget context menu',()=>{
  assert.match(ui,/setFormatTab\('text'\);setRibbonDismissed\(false\);setContextWidget\(null\)/);
 });
 test('format tabs expose existing server-validated borders effects visibility and linked results',()=>{
- for(const entry of ['"widget-format-tabs" role="tablist"',"'border'",'aria-label="Spessore bordo widget"','aria-label="Effetto grafico widget"','aria-label="Pagina collegata ai risultati"','Mostra testo della domanda'])
+ for(const entry of ['"widget-format-tabs" role="tablist"',"'border'",'ariaLabel="Spessore bordo widget"','aria-label="Effetto grafico widget"','aria-label="Pagina collegata ai risultati"','Mostra testo della domanda'])
   assert.ok(ui.includes(entry),entry);
 });
 test('footer authored horizontal and vertical alignment overrides old forced centering',()=>{

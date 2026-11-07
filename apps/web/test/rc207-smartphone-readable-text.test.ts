@@ -44,7 +44,7 @@ test('RC207 inline-marked text remains readable at its authored phone size',()=>
 test('RC207 long answers reserve actual wrapped lines rather than shrinking controls',()=>{
  const short={id:'q',kind:'question',options:[{label:'Sì'},{label:'No'}]};
  const long={id:'q',kind:'question',options:[{label:'L'.repeat(255)},{label:'No'}]};
- assert.ok(mobileWidgetHeight(short)>=278);
+ assert.ok(mobileWidgetHeight(short)>=230);
  assert.ok(mobileWidgetHeight(long)>mobileWidgetHeight(short)+100);
  assert.equal(mobileWidgetHeight({id:'q',kind:'question',options:[]}),190);
  assert.match(css,/min-height:44px!important;align-items:center!important;padding:6px 0!important/);

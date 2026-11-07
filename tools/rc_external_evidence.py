@@ -12,6 +12,7 @@ import hashlib
 import json
 import os
 import re
+import stat
 import sys
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
@@ -124,6 +125,42 @@ def _artifact_is_safe(evidence_dir: Path, filename: object) -> bool:
     return True
 
 
+
+def _read_pinned_regular(path: Path, copy_to=None) -> str:
+    """Hash a single pinned inode, rejecting symlink swaps and concurrent edits.
+
+    The check is deliberately bounded to a 1 GiB regular file. The verified
+    inode must still occupy the same path when reading finishes. This limits
+    TOCTOU exposure when an operator adds private, externally sourced proof.
+    """
+    flags = os.O_RDONLY | getattr(os, 'O_NOFOLLOW', 0) | getattr(os, 'O_NONBLOCK', 0)
+    flags |= getattr(os, 'O_CLOEXEC', 0)
+    fd = os.open(path, flags)
+    with os.fdopen(fd, 'rb') as src:
+        before = os.fstat(src.fileno())
+        if not stat.S_ISREG(before.st_mode) or not 0 < before.st_size <= MAX_EVIDENCE_SIZE:
+            raise ValueError('attachment must be a nonempty regular file not exceeding 1 GiB')
+        h = hashlib.sha256()
+        size = 0
+        for chunk in iter(lambda: src.read(1024 * 1024), b''):
+            size += len(chunk)
+            if size > MAX_EVIDENCE_SIZE:
+                raise ValueError('attachment exceeded size limit while reading')
+            h.update(chunk)
+            if copy_to is not None:
+                copy_to.write(chunk)
+        after = os.fstat(src.fileno())
+    # An editable in-place file, a renamed/replaced file or a symlink swapped
+    # over the original pathname is not a stable acceptance artefact.
+    at_path = os.lstat(path)
+    fields = ('st_dev', 'st_ino', 'st_size', 'st_mtime_ns', 'st_ctime_ns')
+    if (size != before.st_size or
+            any(getattr(before, key) != getattr(after, key) for key in fields) or
+            any(getattr(before, key) != getattr(at_path, key) for key in fields) or
+            not stat.S_ISREG(at_path.st_mode)):
+        raise ValueError('attachment changed or was replaced while reading')
+    return h.hexdigest()
+
 def verify_packet(directory: Path, ledger_path: Path | None = None,
                   expected_commit: str | None = None) -> dict:
     """Return a structured finding, without upgrading any release status."""
@@ -212,14 +249,10 @@ def verify_packet(directory: Path, ledger_path: Path | None = None,
                     if file.stat().st_size == 0 or file.stat().st_size > MAX_EVIDENCE_SIZE:
                         errs.append('empty or oversized attachment for ' + facet)
                     else:
-                        h = hashlib.sha256()
-                        with file.open('rb') as src:
-                            for chunk in iter(lambda: src.read(1024 * 1024), b''):
-                                h.update(chunk)
-                        if h.hexdigest() != digest:
+                        if _read_pinned_regular(file) != digest:
                             errs.append('SHA-256 mismatch for ' + facet)
-                except OSError:
-                    errs.append('unreadable attachment for ' + facet)
+                except (OSError, ValueError) as exc:
+                    errs.append('unreadable or changed attachment for ' + facet + ': ' + str(exc))
         if errs:
             report['pending'].append(gate)
             issues.extend(f'{gate}: {issue}' for issue in errs)
@@ -265,24 +298,31 @@ def import_attachment(directory: Path, gate: str, facet: str, source: Path) -> s
     if out.is_symlink() or out.exists() or out.parent.is_symlink():
         raise ValueError('target evidence path already exists or is a symlink')
     out.parent.mkdir(parents=True, exist_ok=True)
-    h = hashlib.sha256()
-    # O_EXCL prevents a racing process from replacing an existing file.
+    # O_EXCL prevents a racing process from replacing an existing file. The
+    # source itself is opened once with O_NOFOLLOW and checked before/after
+    # copying. Never certify a mixture of revisions or a switched symlink.
     fd = os.open(out, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    tmp = directory / 'reviews.json.tmp'
+    tmp_created = False
     try:
-        with os.fdopen(fd, 'wb') as dst, source.open('rb') as src:
-            for chunk in iter(lambda: src.read(1024 * 1024), b''):
-                dst.write(chunk)
-                h.update(chunk)
-        entry.update(path=relative, sha256=h.hexdigest())
-        tmp = directory / 'reviews.json.tmp'
+        with os.fdopen(fd, 'wb') as dst:
+            digest = _read_pinned_regular(source, copy_to=dst)
+            dst.flush()
+            os.fsync(dst.fileno())
+        if out.is_symlink() or not out.is_file() or _read_pinned_regular(out) != digest:
+            raise ValueError('copied evidence failed destination integrity check')
+        entry.update(path=relative, sha256=digest)
         if tmp.exists() or tmp.is_symlink():
             raise ValueError('temporary review file already exists')
         with tmp.open('x', encoding='utf-8') as handle:
+            tmp_created = True
             json.dump(packet, handle, indent=2, ensure_ascii=False)
             handle.write('\n')
         os.replace(tmp, manifest)
     except BaseException:
         out.unlink(missing_ok=True)
+        if tmp_created and not tmp.is_symlink():
+            tmp.unlink(missing_ok=True)
         raise
     return relative
 

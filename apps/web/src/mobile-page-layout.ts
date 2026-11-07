@@ -26,7 +26,11 @@ export function mobileWidgetHeight(widget:MobileWidget):number {
  },0);
  const textLength=(widget.description||'').length;
  switch(widget.kind){
-  case 'question':case 'timed-quiz':return Math.min(3000,190+optionSpace+subquestionSpace+Math.min(190,Math.ceil(textLength/40)*26));
+  case 'question':case 'timed-quiz':return Math.min(3000,
+    // The historical 190px header was charged again even when the widget has
+    // options, leaving large unused blank zones above/below short answers.
+    // 150px reserves title/description/submit plus the 44px choice rows.
+    (options.length?150:190)+optionSpace+subquestionSpace+Math.min(190,Math.ceil(textLength/40)*26));
   case 'topic-question':return 190;
   case 'rating':return 230; // Comment and all ten 0–9 choices remain usable.
   case 'reactions':return 125;

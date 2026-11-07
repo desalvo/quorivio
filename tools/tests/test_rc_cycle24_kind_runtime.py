@@ -29,7 +29,7 @@ class RC24(unittest.TestCase):
         self.assertFalse(matrix['pending_local_batch']['kubernetes_kind_runtime_verified'])
         self.assertFalse(matrix['pending_local_batch']['new_feature_promoted'])
         self.assertTrue(matrix['pending_local_batch']['new_ci_required'])
-        self.assertEqual(matrix['last_verified_full_ci']['head_sha'],
+        self.assertEqual(matrix['historical_full_ci_20261031']['head_sha'],
                          'c0fe7f7b9e41c0295387d84996a7b531b91b69a0')
 
     def test_ci_checks_historical_before_current_and_leak_detection(self):

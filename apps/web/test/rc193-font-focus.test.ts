@@ -46,7 +46,7 @@ test('whole-widget font updates option font, including independent question mark
 test('numeric font size is editable at all scopes, validates on commit, and offers two real arrow buttons',()=>{
  assert.match(main,/function WidgetFontSizeControl\(/);
  assert.match(main,/value=\{draft\}/);
- assert.match(main,/onChange=\{e=>setDraft\(e\.target\.value\)\}/);
+ assert.match(main,/onChange=\{e=>\{const value=e\.currentTarget\.value;setDraft\(value\);const next=valid\(value\)/);
  assert.match(main,/onBlur=\{\(\)=>\{focused\.current=false;commit\(\)\}\}/);
  assert.match(main,/onApply=\{setSize\}/);
  assert.match(main,/Aumenta dimensione carattere di 1/);

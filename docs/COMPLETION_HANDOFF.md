@@ -1,3 +1,21 @@
+# Quorivio 0.1.0-dev — RC242 — Arial widget defaults, compact slide-master ribbon and global zoom
+
+**RC242:** Starting from RC241, all text descendants on the page and slide-master canvases inherit Arial by default, preserving authored custom typefaces. The scheme Save and status action is kept in one sticky compact row with reduced buttons, while other commands can scroll horizontally on narrow devices. A persistent global zoom controller (70–150%, 10% steps, reset to 100%) is displayed across login, public pages, dashboard, presenter and both editors, including portaled windows. Added early CI tests and real Chromium fixture at 390/760/1440px. RC241 becomes historical, RC242 is current. GitHub full CI pending; certified **85.25%** (43 accepted/17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. See `docs/RC_CYCLE242_WIDGET_ARIAL_ZOOM.en.md`.
+
+---
+
+# Quorivio 0.1.0-dev — RC241 — Result typography, phone editor parity and numeric format controls
+
+**RC241:** Building on the RC240 cumulative package, implemented independently persisted result-row typeface/size/colour, uniform final-word typography, more compact automatic phone question height and identical 390px insets in edit/rehearsal, a common 1280×720 presenter preview stage, and editor cut/copy/paste/info/undo/redo toolbar actions. All numeric inputs in **Formato widget**, including independent result rows, retain a keyboard-editable draft until Enter/blur and expose explicit increment/decrement buttons. Added tests and fail-closed early CI gate. RC240 immutable historical. The verified full GitHub RC239 campaign is the last acknowledged green run; RC241 integrated Chromium/TypeScript checks still pending. Certified **85.25%** (43 accepted/17 partial); independent operator sign-offs remain outstanding. `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no assistant commit/push/tag. See `docs/RC_CYCLE241_EDITOR_RESULT_FORMAT_PHONE.en.md`.
+
+---
+
+# Quorivio 0.1.0-dev — RC240 — Full-green acceptance and protected external evidence handoff
+
+**RC240 handoff:** Work from user-committed RC239 `0594b72806a7b6bf27de07a5fb2856747c8fd68d`; confirmed full CI [42284582481](https://github.com/desalvo/quorivio/actions/runs/42284582481) succeeded all 11 RC campaign requirements (14 job successes, 3 publication skips). Current ledger now links its GitHub receipt, retaining Oct legacy CI in a dedicated historical field; old SHA manifests unchanged. Operator-evidence attachment intake and verification now pin read-only regular-file descriptors, reject swaps/edits, verify destination bytes and roll back temp manifests. Mandatory RC240 tests are early in CI. Operational/legal reviews still missing for **17 partial gates**, certified **85.25%** (43 accepted); do not claim an official RC. `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no assistant commit/push/tag. Next: full CI RC240, then independent operator evidence using the existing private `tools/rc_external_evidence.py` CLI. Details in `docs/RC_CYCLE240_FULL_GREEN_EVIDENCE.en.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC239 — Explicit contextual widget format handoff
 
 **RC239:** Based on user-committed RC238 `e1f7d2f234a712a112f98b23e3774905825a28d8`, full CI [42274460486](https://github.com/desalvo/quorivio/actions/runs/42274460486). Real editor/PostgreSQL persistence, conflict handling and JSON export passed, then RC193 timed out while looking for the formatter scope in the properties inspector. Keep RC223's correct separate format dialog and use **Formato widget** from the question context menu after closing properties; scope subsequent font actions to the visible toolbar and preserve all typing/focus assertions. Add mandatory pre-npm RC239 negative regressions; retain the genuine Chromium/PostgreSQL gate. RC238 immutable historical inventory, RC239 current; runtime untouched. Full GitHub CI still pending, certified **85.25%** (43 accepted, 17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Do not commit, push or tag without the user's request. `docs/RC_CYCLE239_CONTEXTUAL_FORMAT_CHROMIUM.en.md`.

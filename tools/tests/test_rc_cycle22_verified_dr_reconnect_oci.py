@@ -47,8 +47,8 @@ class Cycle22RemoteReconciliation(unittest.TestCase):
         self.assertFalse(preflight()['release_candidate_ready'])
         self.assertEqual(self.doc['scoring_reconciliation_20261029_cycle16']['reconciled_score'],77)
         self.assertEqual(self.doc['scoring_reconciliation_20261029_cycle22']['delta_pp'],2.0)
-        self.assertEqual(self.doc['last_verified_full_ci']['head_sha'],'c0fe7f7b9e41c0295387d84996a7b531b91b69a0')
-        self.assertEqual(self.doc['last_verified_full_ci']['head_sha'],'c0fe7f7b9e41c0295387d84996a7b531b91b69a0')
+        self.assertEqual(self.doc['historical_full_ci_20261031']['head_sha'],'c0fe7f7b9e41c0295387d84996a7b531b91b69a0')
+        self.assertEqual(self.doc['historical_full_ci_20261031']['head_sha'],'c0fe7f7b9e41c0295387d84996a7b531b91b69a0')
         self.assertFalse(self.doc['pending_local_batch']['new_local_runtime_smoke_promoted'])
         self.assertFalse(self.doc['pending_local_batch']['strict_rc_ready'])
 

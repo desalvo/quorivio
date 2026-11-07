@@ -16,7 +16,7 @@ const fixture = [
 
 test('RC217 RC207 44px choices grow the public stage without phantom presenter height',()=>{
  const publicStage=participantPhoneLayout(fixture);
- assert.equal(publicStage.height,1028,'two public answers require 44px rows, not RC176 29px rows');
+ assert.ok(publicStage.height>=950&&publicStage.height<1028,'two public answers retain readable 44px rows without the obsolete 40px extra header');
  assert.deepEqual(publicStage.widgets.map(w=>w.kind),
   ['title','question','rating','topic-question','line','shape','footer']);
  const allKinds=fixture.filter(w=>w.kind!=='results-button'&&w.kind!=='participant-count');
@@ -28,7 +28,7 @@ test('RC217 RC207 44px choices grow the public stage without phantom presenter h
 test('RC217 stage grows with long options but does not reserve presenter-only widgets',()=>{
  const long=fixture.map(w=>w.kind==='question'?{...w,options:[{label:'A'.repeat(255)},{label:'No'}]}:w);
  const publicStage=participantPhoneLayout(long);
- assert.ok(publicStage.height>1028+100);
+ assert.ok(publicStage.height>participantPhoneLayout(fixture).height+100);
  assert.equal(participantPhoneLayout([...long,
   {id:'other-private',kind:'results-button'},{id:'other-count',kind:'participant-count'}]).height,
   publicStage.height,'more presenter-only tools may not add invisible height');

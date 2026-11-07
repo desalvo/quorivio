@@ -1,20 +1,8 @@
-# Matrice di accettazione RC — 2 novembre 2026
+# Matrice di accettazione RC — 7 novembre 2026
 
-**0.1.0-dev, baseline RC135 con CI completa verde. Punteggio certificato ponderato: 85,25/100; 17 gate indipendenti restano parziali. Release candidate ufficiale NON approvata.**
+**0.1.0-dev; ultima full CI verde verificata: RC239, run GitHub 42284582481, commit `0594b72806a7b6bf27de07a5fb2856747c8fd68d`. Passati 11/11 job obbligatori e tutti i 14 job attivi. Punteggio 85,25/100; 17 gate esterni parziali. Release candidate formale NON approvata.**
 
-Convenzione: accepted=100% del peso, partial=50%, open/blocked=0. Questo **non** misura la quantità di codice scritto e non certifica aspetti legali o di accessibilità.
-
-| Area | Punti / totale | % |
-| --- | ---: | ---: |
-| A-editor | 20,5 / 24 | 85,4% |
-| B-sessions | 18,5 / 21,0 | 88,1% |
-| C-admin | 16,5 / 20 | 82,5% |
-| C-security | 2,0 / 2 | 100,0% |
-| D-validation | 25,75 / 31,0 | 83,1% |
-| B-live | 2,0 / 2 | 100,0% |
-| **Totale** | **85,25 / 100** | **85,25%** |
-
-**CI completa verificata:** run [41437489546](https://github.com/desalvo/quorivio/actions/runs/41437489546), commit `6c1118e93076c5d2eb8d60e96a43f8c663178053`: quality, browser nativi, PostgreSQL, Podman, Kubernetes NGINX/HAProxy, ClamAV reale, AMD64/ARM64 e pubblicazione Docker superati. **Evidenze esterne ancora mancanti:** `docs/RC136_EXTERNAL_ACCEPTANCE_IT.md` e `docs/validation/RC136_OPERATOR_EVIDENCE_REQUIREMENTS_20261102.json`. Lo strumento RC136 non attribuisce punti.
+Convenzione: accepted=100%, partial=50%, open/blocked=0%; non rappresenta copertura software né certificazione legale o di accessibilità. I job di pubblicazione sono stati saltati intenzionalmente. `docs/validation/RC239_FULL_CI_ACCEPTANCE_20261107.json` contiene l'elenco dei job; la precedente CI rimane archiviata. Servono ancora le approvazioni indipendenti; le prove private non vanno committate nel repository.
 
 ---
 

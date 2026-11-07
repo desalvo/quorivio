@@ -20,7 +20,7 @@ class RC58VerifiedAcceptance(unittest.TestCase):
 
  def test_two_new_gates_are_accepted_with_distinct_scopes_and_one_provenance(self):
   ids=['B1-IDLE-TWO-REPLICA','B4-500-GLOBAL-SLO']
-  self.assertEqual(self.matrix['last_maintainer_confirmed_commit'],'c0fe7f7b9e41c0295387d84996a7b531b91b69a0')
+  self.assertEqual(self.matrix['historical_maintainer_confirmed_commit_20261031'],'c0fe7f7b9e41c0295387d84996a7b531b91b69a0')
   self.assertGreaterEqual(len(self.matrix['gates']),55)
   for gid in ids:
    sub=self.gates[gid]

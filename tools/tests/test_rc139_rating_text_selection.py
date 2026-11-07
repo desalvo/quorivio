@@ -28,7 +28,12 @@ class RC139RatingTextSelection(unittest.TestCase):
   self.assertIn("[contenteditable=true],[role=textbox]",UI)
   self.assertIn("if((e.target as HTMLElement).closest('[contenteditable=true]'))return",UI)
  def test_native_property_cursor_and_formatting_close(self):
-  self.assertNotIn('e.currentTarget.select()',UI)
+  # Selecting the whole size is intentional only for the numeric font picker;
+  # editable widget text must keep its cursor/selection.
+  start=UI.index('function WidgetFontSizeControl(')
+  end=UI.index('function WidgetCanvas(',start)
+  self.assertIn('e.currentTarget.select()',UI[start:end])
+  self.assertNotIn('e.currentTarget.select()',UI[:start]+UI[end:])
   self.assertIn('onClick={()=>setRibbonDismissed(true)}',UI)
   self.assertIn('active&&!ribbonDismissed',UI)
  def test_unified_16_by_9_padding(self):

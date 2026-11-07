@@ -19,7 +19,7 @@ class FocusAndFont(unittest.TestCase):
   self.assertIn('onApply={setSize}',UI)
   self.assertIn('Aumenta dimensione carattere di 1',UI)
   self.assertIn('Diminuisci dimensione carattere di 1',UI)
-  self.assertIn('setDraft(e.target.value)',UI)
+  self.assertIn('setDraft(value);const next=valid(value)',UI)
   self.assertIn('palette-ribbon-font-stepper button',STYLE)
  def test_arials_and_answer_styles_reach_original_and_independent_options(self):
   self.assertIn("style?.fontFamily||'Arial'",OPTIONS)

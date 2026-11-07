@@ -1,3 +1,21 @@
+# Quorivio 0.1.0-dev — RC242 — Arial predefinito nelle widget, barra schemi compatta e zoom globale
+
+**RC242:** Dalla RC241, tutti i discendenti testuali delle widget negli editor pagine e schemi ereditano Arial come font predefinito, senza sovrascrivere font personalizzati. La sezione Salva schema e stato rimane su una singola riga compatta e sempre raggiungibile, con pulsanti ridotti; gli altri comandi possono scorrere orizzontalmente. Nuovo zoom globale persistente (70–150%, passi 10%, ripristino 100%) su accesso, pagine pubbliche, dashboard, proiezione ed entrambi gli editor, compresi i portali. Test CI preventivi e Chromium reale a 390/760/1440px. RC241 storica e RC242 corrente. Full CI GitHub da verificare; completamento **85,25%** (43 accettati/17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag assistente. Vedi `docs/RC_CYCLE242_WIDGET_ARIAL_ZOOM.it.md`.
+
+---
+
+# Quorivio 0.1.0-dev — RC241 — Risultati, editor smartphone e campi numerici
+
+**RC241:** Partendo dal cumulativo RC240, aggiunti stile font/dimensione/colore indipendente per ogni risposta nei risultati, eliminata la differenza di dimensione sull'ultima parola, compattata l'altezza automatica smartphone e uniformati i margini tra editor e anteprima. Una scena logica comune da 1280×720 preserva le proporzioni fra anteprima presentatore singola e affiancata; aggiunti pulsanti taglia/copia/incolla/info/annulla/ripeti. Tutti i campi numerici di **Formato widget**, compresi i risultati, consentono modifica da tastiera e frecce esplicite. Test e preflight CI obbligatori aggiunti, RC240 storica immutata. Full CI RC241 ancora da certificare; ultima confermata verde RC239. **85,25%** (43 accettati/17 parziali); approvazioni operatori indipendenti ancora mancanti. `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Vedi `docs/RC_CYCLE241_EDITOR_RESULT_FORMAT_PHONE.it.md`.
+
+---
+
+# Quorivio 0.1.0-dev — RC240 — Riconciliazione della CI verde e prove esterne protette
+
+**RC240:** La RC239 committata dall'utente (`0594b72806a7b6bf27de07a5fb2856747c8fd68d`) ha superato la [full CI 42284582481](https://github.com/desalvo/quorivio/actions/runs/42284582481): 14 job riusciti, 3 job di pubblicazione saltati come previsto, 11/11 job obbligatori della campagna RC riusciti. La matrice indica ora l'ultima CI effettivamente verificata e conserva la vecchia evidenza come storica. Rafforzata la raccolta privata di prove indipendenti con file regolari aperti con NOFOLLOW, rilevamento di modifiche e sostituzioni, verifica SHA-256 e rollback atomico; test negativi obbligatori prima di npm. Nessun cambiamento al frontend o alle API. **17 approvazioni esterne restano mancanti: 85,25% certificato (43 accettati/17 parziali)**, RC formale bloccata. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag dell'assistente. `docs/RC_CYCLE240_FULL_GREEN_EVIDENCE.it.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC239 — Ciclo di formattazione contestuale nel browser
 
 **RC239:** Full CI [42274460486](https://github.com/desalvo/quorivio/actions/runs/42274460486) della RC238, commit `e1f7d2f234a712a112f98b23e3774905825a28d8`: passati autosalvataggio, conflitti ed esportazione JSON con PostgreSQL/Chromium; la fixture RC193 seguente cercava `Ambito della formattazione` nell'ispettore anziché nella finestra separata di RC223. La correzione chiude l'ispettore, apre **Formato widget** dal menu contestuale, verifica la toolbar visibile e tutti i controlli font, con regressione negativa obbligatoria prima di npm. Applicazione invariata; RC238 storica, RC239 corrente, nuova full CI da verificare. **85,25%** (43 gate accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag dell'assistente. `docs/RC_CYCLE239_CONTEXTUAL_FORMAT_CHROMIUM.it.md`.

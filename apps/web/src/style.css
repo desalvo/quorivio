@@ -3194,3 +3194,159 @@ body .editor-floating-panel.widget-selection-palette .widget-format-advanced inp
 .schema-background-modal .background-gallery-choice{min-width:0;overflow:hidden}
 .schema-background-modal .background-gallery-choice:focus-visible{outline:3px solid #246aaa;outline-offset:1px}
 @media(max-width:440px){.schema-background-modal{padding:12px;max-height:calc(100dvh - 24px)}.schema-background-modal .background-gallery{grid-template-columns:repeat(2,minmax(0,1fr));max-height:60dvh}.schema-background-modal>header h2{font-size:16px}}
+
+/* RC241: the final word must never receive a different face or font size from
+ * the rest of its label. Keep the last word and count together as one unit;
+ * row-scoped author styles still propagate independently to each result. */
+.linked-results .linked-results-row .linked-result-pair{
+ font-family:inherit;letter-spacing:inherit;line-height:inherit;
+}
+.linked-results .linked-results-row .linked-result-pair>.linked-result-label,
+.linked-results .linked-results-row .linked-result-pair>.linked-result-final{
+ font-family:inherit!important;font-size:inherit!important;
+ font-weight:inherit!important;font-style:inherit!important;
+ color:inherit!important;line-height:inherit!important;letter-spacing:inherit!important;
+ text-decoration:inherit!important;
+}
+/* Formatting the label does not change the deliberately distinct count badge. */
+.linked-results .linked-result-final>output{font-size:inherit!important;line-height:inherit!important}
+/* Format Widget: independent styles for result rows are available without
+ * an extra collapsed control. Keep the list scrollable for long answer sets. */
+.result-format-panel>.palette-ribbon-advanced[open] .result-format-fields{
+ max-height:min(340px,48dvh)!important;overflow-y:auto!important;
+}
+/* RC241: phone editor and the phone preview use the same widget insets,
+ * coordinate system and text sizes; editor handles remain overlays. */
+.editor-ux-v2 .canvas-editor-group[data-canvas-device="phone"] .widget-canvas-item{
+ box-sizing:border-box!important;padding:10px!important;
+ overflow:auto!important;line-height:1.2!important;
+}
+/* RC241: both rehearsal modes render a fixed 1280x720 logical stage, then
+ * uniformly scale the entire slide. WidgetContentFit therefore receives
+ * identical measurements in single-presenter and side-by-side previews. */
+.rehearsal-desktop-viewport{width:100%;min-width:0;overflow:hidden;flex:none}
+.rehearsal-desktop-sizer{position:relative;width:100%;overflow:visible}
+.rehearsal-desktop-stage{position:absolute;left:0;top:0;transform-origin:top left;overflow:hidden}
+.rehearsal-desktop-stage>.rehearsal-slide{
+ position:relative!important;display:block!important;width:1280px!important;
+ height:720px!important;min-height:720px!important;aspect-ratio:16/9!important;
+ border:1px solid #cad2e1!important;box-sizing:border-box!important;
+ padding:0!important;margin:0!important;overflow:hidden!important;
+}
+.rehearsal-desktop-stage>.rehearsal-slide>.rehearsal-widgets{
+ position:absolute!important;inset:0!important;display:block!important;
+ width:100%!important;height:100%!important;min-height:0!important;
+ container-type:inline-size!important;overflow:hidden!important;
+}
+.rehearsal-desktop-stage .rehearsal-widget{
+ position:absolute!important;left:var(--stage-x)!important;top:var(--stage-y)!important;
+ width:var(--stage-width)!important;height:var(--stage-height)!important;
+ min-height:0!important;max-height:none!important;max-width:none!important;
+ margin:0!important;padding:.7em!important;box-sizing:border-box!important;
+ overflow:hidden!important;transform-origin:center center;
+ font-size:var(--authored-widget-font-size,1.25cqw)!important;line-height:1.2;
+}
+/* Real icon buttons in the upper editor bar, focusable and tooltipped. */
+.editor-ux-v2 .editor-quick-actions{display:flex;align-items:center;gap:4px;flex-wrap:wrap;border-right:1px solid #acc4d6;padding-right:8px}
+.editor-ux-v2 .editor-quick-actions>button{
+ display:grid;place-items:center;min-width:34px;min-height:34px;padding:5px;
+ border:1px solid #789bb5;border-radius:6px;background:#163b58;color:#f6fbff;
+}
+.editor-ux-v2 .editor-quick-actions>button:disabled{opacity:.42;cursor:not-allowed}
+.editor-ux-v2 .editor-quick-actions>button:not(:disabled):hover{background:#246183}
+.editor-ux-v2 .editor-quick-actions>button:focus-visible{outline:3px solid #facc15;outline-offset:2px}
+
+/* RC241: every numeric field in Format Widget has explicit arrows on all
+ * browsers. The text box retains an editable draft until Enter/blur; do not
+ * force a half-entered number back to its previous value. */
+body .widget-selection-palette .editable-number-field{
+ display:inline-flex!important;align-items:stretch!important;vertical-align:middle;
+ max-width:100%;height:30px;min-width:87px;gap:2px;
+}
+body .widget-selection-palette .editable-number-field>input[type=number]{
+ display:block!important;flex:1 1 0!important;width:58px!important;min-width:42px!important;
+ max-width:76px!important;min-height:27px!important;height:30px!important;
+ padding:3px 4px!important;box-sizing:border-box;text-align:center;
+ appearance:textfield;-moz-appearance:textfield;
+}
+body .widget-selection-palette .editable-number-field>input::-webkit-inner-spin-button,
+body .widget-selection-palette .editable-number-field>input::-webkit-outer-spin-button{
+ -webkit-appearance:none;margin:0;
+}
+body .widget-selection-palette .editable-number-arrows{
+ display:flex!important;flex-direction:column!important;width:25px;flex:none;gap:1px;
+}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-group .editable-number-arrows>button,
+body .widget-selection-palette .editable-number-arrows>button{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ flex:1 1 0!important;height:14px!important;min-height:13px!important;
+ width:25px!important;min-width:25px!important;padding:0!important;
+ font-size:10px!important;line-height:1!important;cursor:pointer;
+}
+body .widget-selection-palette .editable-number-arrows>button:focus-visible,
+body .widget-selection-palette .editable-number-field>input:focus-visible{
+ outline:2px solid #1d6ea6!important;outline-offset:1px;
+}
+body .widget-selection-palette .result-format-field .editable-number-field{min-width:87px!important}
+body .widget-selection-palette .result-format-field .editable-number-field>input[type=number]{width:58px!important}
+
+/* RC242: the application theme must never leak its Outfit/DM Sans faces into
+ * freshly inserted widgets in either editor. Inline authored font-family styles
+ * remain more specific than these inherited defaults. */
+:is(.editor-ux-v2,.slide-scheme-workspace) .widget-canvas-item,
+:is(.editor-ux-v2,.slide-scheme-workspace) .widget-canvas-item .widget-fit-content{
+ font-family:inherit;
+}
+:is(.editor-ux-v2,.slide-scheme-workspace) .widget-canvas-item :not(svg):not(path){
+ font-family:inherit;
+}
+/* RC242: one compact horizontal command strip for slide masters, with a
+ * permanently accessible save action. Other groups scroll horizontally on
+ * narrow screens rather than consuming multiple vertical rows. */
+.slide-scheme-workspace .slide-scheme-ribbon{
+ display:flex!important;flex-wrap:nowrap!important;align-items:center!important;
+ max-width:100%!important;overflow-x:auto!important;overflow-y:hidden!important;
+ gap:3px!important;padding:4px!important;
+}
+.slide-scheme-workspace .slide-scheme-ribbon-group{
+ display:flex!important;flex-direction:column!important;justify-content:center!important;
+ flex:0 0 auto!important;gap:2px!important;padding:3px 5px!important;
+}
+.slide-scheme-workspace .slide-scheme-ribbon-actions{
+ flex-wrap:nowrap!important;align-items:center!important;gap:3px!important;
+}
+.slide-scheme-workspace .slide-scheme-ribbon-actions .slide-scheme-ribbon-tool{
+ flex:0 0 auto!important;min-width:43px!important;max-width:66px!important;
+ min-height:39px!important;height:39px!important;padding:3px 5px!important;
+ font-size:9px!important;line-height:1.05!important;gap:1px!important;
+}
+.slide-scheme-workspace .slide-scheme-ribbon-icon svg{height:15px;width:15px}
+.slide-scheme-workspace .slide-scheme-ribbon-save{
+ position:sticky!important;right:0!important;z-index:3!important;
+ flex-direction:row!important;align-items:center!important;gap:6px!important;
+ margin-left:auto!important;background:#f9fbff!important;white-space:nowrap!important;
+ border-left:1px solid #d6e0ec!important;border-right:0!important;
+}
+.slide-scheme-workspace .slide-scheme-ribbon-save .slide-scheme-ribbon-actions{overflow:visible!important}
+.slide-scheme-workspace .slide-scheme-ribbon-save .slide-scheme-ribbon-tool{max-width:84px!important}
+.slide-scheme-workspace .slide-scheme-ribbon-save [role="status"]{white-space:nowrap;font-size:10px}
+
+/* The controls are outside the workspace and always available, including
+ * login, participant, master editor and full-screen presentation routes. */
+.global-page-zoom{
+ position:fixed;right:12px;bottom:12px;z-index:2147483000;
+ display:flex;align-items:center;gap:4px;white-space:nowrap;
+ padding:5px 6px;border-radius:12px;border:1px solid #8799b7;
+ background:#f7faff;color:#142b44;box-shadow:0 4px 18px #07122260;
+ font:600 12px/1.2 Arial,sans-serif;
+}
+.global-page-zoom button{
+ min-width:30px;min-height:30px;padding:4px 7px;border-radius:7px;
+ background:#e5efff;color:#1e3c61;border:1px solid #afc4df;
+ font:700 15px Arial,sans-serif;
+}
+.global-page-zoom button:focus-visible{outline:2px solid #246bd3;outline-offset:2px}
+.global-page-zoom button:disabled{opacity:.4}
+.global-page-zoom output{min-width:36px;text-align:center;font-variant-numeric:tabular-nums}
+.global-page-zoom .global-page-zoom-reset{font-size:10px;min-width:36px}
+@media(max-width:480px){.global-page-zoom{right:5px;bottom:5px;padding:3px;gap:2px}.global-page-zoom button{min-width:28px;min-height:28px}}

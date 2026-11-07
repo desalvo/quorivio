@@ -1,0 +1,117 @@
+{
+  "schema": "quorivio-rc-verified-github-run-v1",
+  "version": "0.1.0-dev",
+  "cycle": 239,
+  "run_id": 42284582481,
+  "github_run_url": "https://github.com/desalvo/quorivio/actions/runs/42284582481",
+  "head_sha": "0594b72806a7b6bf27de07a5fb2856747c8fd68d",
+  "conclusion": "success",
+  "completed_at_utc": "2026-11-06T20:18:06Z",
+  "observed_on": "2026-11-07",
+  "job_counts": {
+    "success": 14,
+    "skipped": 3,
+    "failed": 0
+  },
+  "successful_jobs": [
+    {
+      "name": "Production quality gate",
+      "job_id": 128121995282,
+      "conclusion": "success"
+    },
+    {
+      "name": "Real ClamAV signature and production fail-closed acceptance",
+      "job_id": 128121995811,
+      "conclusion": "success"
+    },
+    {
+      "name": "Native Firefox and WebKit acceptance",
+      "job_id": 128128871798,
+      "conclusion": "success"
+    },
+    {
+      "name": "Kubernetes real API manifest schema",
+      "job_id": 128128871804,
+      "conclusion": "success"
+    },
+    {
+      "name": "Native OCI runtime amd64",
+      "job_id": 128128871857,
+      "conclusion": "success"
+    },
+    {
+      "name": "Container build gate",
+      "job_id": 128128871937,
+      "conclusion": "success"
+    },
+    {
+      "name": "Kubernetes live two-worker NGINX ingress and failover",
+      "job_id": 128128871945,
+      "conclusion": "success"
+    },
+    {
+      "name": "Kubernetes live single-node runtime and pod replacement",
+      "job_id": 128128872060,
+      "conclusion": "success"
+    },
+    {
+      "name": "Rootless Podman PostgreSQL runtime acceptance",
+      "job_id": 128128872084,
+      "conclusion": "success"
+    },
+    {
+      "name": "Native OCI runtime arm64",
+      "job_id": 128128872218,
+      "conclusion": "success"
+    },
+    {
+      "name": "Kubernetes real HTTPS ingress and failover haproxytech",
+      "job_id": 128128872463,
+      "conclusion": "success"
+    },
+    {
+      "name": "Kubernetes live HAProxy Technologies two-worker ingress and failover",
+      "job_id": 128128872835,
+      "conclusion": "success"
+    },
+    {
+      "name": "Kubernetes real HTTPS ingress and failover nginx",
+      "job_id": 128128873401,
+      "conclusion": "success"
+    },
+    {
+      "name": "Full automatic RC campaign acceptance summary",
+      "job_id": 128130802311,
+      "conclusion": "success"
+    }
+  ],
+  "skipped_jobs": [
+    {
+      "name": "Native OCI image publishing",
+      "job_id": 128130867353,
+      "conclusion": "skipped"
+    },
+    {
+      "name": "Verified multiarch Docker Hub publication manual",
+      "job_id": 128130867992,
+      "conclusion": "skipped"
+    },
+    {
+      "name": "Verified multiarch Docker Hub publication explicit commit",
+      "job_id": 128130868650,
+      "conclusion": "skipped"
+    }
+  ],
+  "campaign_summary": {
+    "job_id": 128130802311,
+    "required_jobs_passed": 11,
+    "required_jobs_total": 11,
+    "conclusion": "success"
+  },
+  "external_operator_reviews_completed_by_this_run": 0,
+  "external_operator_gates_remaining": 17,
+  "source": "GitHub workflow run and per-job logs inspected through connected GitHub API; status is an observation, not a signed operator approval.",
+  "publish_image": false,
+  "publish_latest": false,
+  "rc_strict": false
+}

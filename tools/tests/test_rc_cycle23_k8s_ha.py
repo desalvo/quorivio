@@ -25,7 +25,7 @@ class Cycle23RC(unittest.TestCase):
         self.assertEqual((audit()['score'],preflight()['accepted_gates']),(audit()['score'],preflight()['accepted_gates']))
         self.assertEqual(len(preflight()['unaccepted_gates']),17)
         self.assertFalse(preflight()['release_candidate_ready'])
-        self.assertEqual(m['last_verified_full_ci']['head_sha'],'c0fe7f7b9e41c0295387d84996a7b531b91b69a0')
+        self.assertEqual(m['historical_full_ci_20261031']['head_sha'],'c0fe7f7b9e41c0295387d84996a7b531b91b69a0')
         p=m['pending_local_batch']
         self.assertFalse(p['new_feature_promoted'])
         self.assertTrue(p['new_ci_required'])

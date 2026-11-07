@@ -1,3 +1,21 @@
+# Quorivio 0.1.0-dev — RC242 — Arial widget defaults, compact slide-master ribbon and global zoom
+
+**RC242:** Starting from RC241, all text descendants on the page and slide-master canvases inherit Arial by default, preserving authored custom typefaces. The scheme Save and status action is kept in one sticky compact row with reduced buttons, while other commands can scroll horizontally on narrow devices. A persistent global zoom controller (70–150%, 10% steps, reset to 100%) is displayed across login, public pages, dashboard, presenter and both editors, including portaled windows. Added early CI tests and real Chromium fixture at 390/760/1440px. RC241 becomes historical, RC242 is current. GitHub full CI pending; certified **85.25%** (43 accepted/17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. See `docs/RC_CYCLE242_WIDGET_ARIAL_ZOOM.en.md`.
+
+---
+
+# Quorivio 0.1.0-dev — RC241 — Result typography, phone editor parity and numeric format controls
+
+**RC241:** Building on the RC240 cumulative package, implemented independently persisted result-row typeface/size/colour, uniform final-word typography, more compact automatic phone question height and identical 390px insets in edit/rehearsal, a common 1280×720 presenter preview stage, and editor cut/copy/paste/info/undo/redo toolbar actions. All numeric inputs in **Formato widget**, including independent result rows, retain a keyboard-editable draft until Enter/blur and expose explicit increment/decrement buttons. Added tests and fail-closed early CI gate. RC240 immutable historical. The verified full GitHub RC239 campaign is the last acknowledged green run; RC241 integrated Chromium/TypeScript checks still pending. Certified **85.25%** (43 accepted/17 partial); independent operator sign-offs remain outstanding. `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no assistant commit/push/tag. See `docs/RC_CYCLE241_EDITOR_RESULT_FORMAT_PHONE.en.md`.
+
+---
+
+# Quorivio 0.1.0-dev — RC240 — Verified full-CI reconciliation and safe operator evidence
+
+**RC240:** Maintainer-committed RC239 `0594b72806a7b6bf27de07a5fb2856747c8fd68d` has **full GitHub CI green** [42284582481](https://github.com/desalvo/quorivio/actions/runs/42284582481): 14 jobs succeeded, 3 publication jobs skipped as intended, 11/11 required RC campaign jobs green. The ledger's latest-verified pointer now references an auditable job receipt while the old Oct 2026 evidence remains pinned as historical. Hardened private independent-review evidence import with NOFOLLOW pinned regular inodes, mutation/replacement detection, destination hash verification and atomic cleanup; added fail-closed pre-npm negative regressions. No application UI or API behavior changed. **External independent sign-offs are still absent: 85.25% certified (43 accepted/17 partial)** and formal RC remains blocked. `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. See `docs/RC_CYCLE240_FULL_GREEN_EVIDENCE.en.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC239 — Explicit widget-format Chromium lifecycle
 
 **RC239:** GitHub full CI [42274460486](https://github.com/desalvo/quorivio/actions/runs/42274460486) for RC238 commit `e1f7d2f234a712a112f98b23e3774905825a28d8` passed real Chromium/PostgreSQL editor autosave, merge, and JSON export, but next RC193 fixture timed out seeking `Ambito della formattazione` in the inspector instead of RC223's explicit contextual format window. RC239 closes the inspector, uses the widget context menu to open **Formato widget**, scopes all font operations to the visible toolbar, adds pre-npm fail-closed regression and retains live browser acceptance. Production app unchanged; RC238 historical, RC239 current, full GitHub CI pending. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no assistant commit/push/tag. `docs/RC_CYCLE239_CONTEXTUAL_FORMAT_CHROMIUM.en.md`.

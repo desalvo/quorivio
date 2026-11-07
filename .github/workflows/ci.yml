@@ -311,6 +311,17 @@ jobs:
       # explicit widget context-menu action, not inside the inspector drawer.
       - name: RC239 real editor focus and explicit formatter lifecycle before npm
         run: python3 -m unittest tools.tests.test_rc239_editor_format_lifecycle -q
+      - name: RC240 verified full CI ledger and private evidence intake safety before npm
+        run: python3 -m unittest tools.tests.test_rc240_ci_operator_evidence -q
+      - name: RC241 results, smartphone preview, toolbar and editable numeric format preflight
+        run: |
+          python3 -m unittest tools.tests.test_rc241_widget_editor_contract -q
+          node --experimental-strip-types --test apps/web/test/rc241-editable-widget-numbers.test.ts apps/web/test/rc241-ui-feature-contract.test.ts
+      # RC242: Arial on widget text, compact master commands, persistent global zoom.
+      - name: RC242 Arial and app-wide zoom contract before npm
+        run: |
+          python3 -m unittest tools.tests.test_rc242_arial_master_zoom -q
+          node --experimental-strip-types --test apps/web/test/rc242-global-zoom.test.ts
       - name: RC218 real editor thumbnail rename browser contract before npm
         run: python3 -m unittest tools.tests.test_rc218_browser_postgres_thumbnail_rename -q
       # RC215: RC141 compared a glyph Range top with an output border-box
@@ -753,6 +764,8 @@ jobs:
           # RC234: Chromium viewport regression for wrapped, vertically scrollable phone palette.
           python3 -m unittest tools.tests.test_rc234_palette_responsive -q
           python3 tools/ci_rc234_palette_chromium.py
+          # RC242: real browser font inheritance, compact master and document zoom.
+          python3 tools/ci_rc242_arial_zoom_chromium.py
           # RC162: compact QR URL must remain visible when resized; no URL row when hidden.
           python3 tools/ci_rc162_qr_resizing_chromium.py
           # RC152: mutation-tested current long-label wrapping and attached [count]
@@ -1463,7 +1476,10 @@ jobs:
           python3 tools/verify_rc_cycle236_inventory.py --historical
           python3 tools/verify_rc_cycle237_inventory.py --historical
           python3 tools/verify_rc_cycle238_inventory.py --historical
-          python3 tools/verify_rc_cycle239_inventory.py
+          python3 tools/verify_rc_cycle239_inventory.py --historical
+          python3 tools/verify_rc_cycle240_inventory.py --historical
+          python3 tools/verify_rc_cycle241_inventory.py --historical
+          python3 tools/verify_rc_cycle242_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

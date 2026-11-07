@@ -684,22 +684,21 @@
     }
   ],
   "last_verified_full_ci": {
-    "run_id": 41152939003,
-    "head_sha": "c0fe7f7b9e41c0295387d84996a7b531b91b69a0",
+    "run_id": 42284582481,
+    "head_sha": "0594b72806a7b6bf27de07a5fb2856747c8fd68d",
     "conclusion": "success",
-    "quality_job_id": 124393360139,
-    "standard_run_id": 41152434205,
-    "standard_conclusion": "success",
-    "standard_quality_job_id": 124391767601,
-    "standard_container_job_id": 124392601623,
-    "extended_image_job_id": 124395716729,
-    "native_browser_job_id": 124395716798,
-    "bounded_verified_scopes": {
-      "two_replica_idle_websocket_70s": "PASS idle live: 70s two-replica PostgreSQL WebSocket snapshots without mutations, owner/participant isolation, no silent disconnect",
-      "500_independent_global_p95": "PASS 500 independent participants; full-sample global join/snapshot p95 SLO, >=60s hold and no errors"
-    },
-    "kubernetes_tls_test": "skipped (workflow input false)",
-    "published_docker_hub": true
+    "observed_on": "2026-11-07",
+    "completed_at_utc": "2026-11-06T20:18:06Z",
+    "quality_job_id": 128121995282,
+    "campaign_summary_job_id": 128130802311,
+    "required_campaign_jobs_passed": 11,
+    "required_campaign_jobs_total": 11,
+    "all_successful_jobs": 14,
+    "nonpublication_jobs_skipped": 3,
+    "published_docker_hub": false,
+    "independent_external_reviews_newly_accepted": 0,
+    "acceptance_receipt": "docs/validation/RC239_FULL_CI_ACCEPTANCE_20261107.json",
+    "scope": "GitHub 11/11 opt-in campaign jobs and production quality gate; not 17 external operator approvals"
   },
   "pending_local_batch": {
     "description": "RC cycle37 editor bug fixes: contrast, portaled menus, preview recovery and multiple-choice save validation; HAProxy CI acceptance remains pending",
@@ -1196,7 +1195,7 @@
       "GDPR/legal key custody review"
     ]
   },
-  "last_maintainer_confirmed_commit": "c0fe7f7b9e41c0295387d84996a7b531b91b69a0",
+  "last_maintainer_confirmed_commit": "0594b72806a7b6bf27de07a5fb2856747c8fd68d",
   "scoring_reconciliation_20261029_cycle22": {
     "date": "2026-10-29",
     "prior_score": 77.0,
@@ -1789,5 +1788,24 @@
     "score_after": 85.25,
     "strict_rc_ready": false,
     "note": "The 2026-11-02 run proved native image build/publish. New native PostgreSQL runtime acceptance must pass in future CI. The 17 partial gates require independent proof."
-  }
+  },
+  "historical_full_ci_20261031": {
+    "run_id": 41152939003,
+    "head_sha": "c0fe7f7b9e41c0295387d84996a7b531b91b69a0",
+    "conclusion": "success",
+    "quality_job_id": 124393360139,
+    "standard_run_id": 41152434205,
+    "standard_conclusion": "success",
+    "standard_quality_job_id": 124391767601,
+    "standard_container_job_id": 124392601623,
+    "extended_image_job_id": 124395716729,
+    "native_browser_job_id": 124395716798,
+    "bounded_verified_scopes": {
+      "two_replica_idle_websocket_70s": "PASS idle live: 70s two-replica PostgreSQL WebSocket snapshots without mutations, owner/participant isolation, no silent disconnect",
+      "500_independent_global_p95": "PASS 500 independent participants; full-sample global join/snapshot p95 SLO, >=60s hold and no errors"
+    },
+    "kubernetes_tls_test": "skipped (workflow input false)",
+    "published_docker_hub": true
+  },
+  "historical_maintainer_confirmed_commit_20261031": "c0fe7f7b9e41c0295387d84996a7b531b91b69a0"
 }
