@@ -287,17 +287,22 @@ async def run():
      const fr=footer?.getBoundingClientRect();
      const publicWidgets=[...stage.querySelectorAll(':scope>.page-widget')];
      const kinds=publicWidgets.map(w=>w.dataset.widgetKind);
-     // RC217: measure only rendered PUBLIC widgets. The RC207 44px touch
-     // rows legitimately increased the question from 248px to 278px; a
-     // literal 998px fixture height became obsolete. Extra hidden presenter
-     // widgets still increase stage height and MUST fail this invariant.
+     // RC245: only PUBLIC widgets count towards height. RC241 reduced the
+     // question's redundant fixed header from 190px to 150px, preserving the
+     // RC207 44px response rows. The former 278px fixed threshold therefore
+     // overestimates the current two-choice phone question by 40px.
+     // Hidden presenter widgets must never enlarge the public document.
      const ordered=publicWidgets.map(w=>w.getBoundingClientRect()).sort((a,b)=>a.top-b.top);
      const expectedHeight=16+ordered.reduce((sum,r)=>sum+r.height,0)+Math.max(0,ordered.length-1)*8+16;
      const topGap=ordered.length?ordered[0].top-sr.top:null;
      const gaps=ordered.slice(1).map((r,i)=>r.top-ordered[i].bottom);
      const question=stage.querySelector('[data-widget-kind="question"]');
+     const choices=[...(question?.querySelectorAll('.widget-answer-option')||[])];
+     const choiceHeights=choices.map(row=>row.getBoundingClientRect().height);
+     const choiceFontSizes=choices.map(row=>parseFloat(getComputedStyle(row).fontSize));
      return {height:sr.height,expectedHeight,topGap,gaps,
              questionHeight:question?.getBoundingClientRect().height??0,
+             choiceCount:choices.length,choiceHeights,choiceFontSizes,
              footerOffset:fr?sr.bottom-fr.bottom:null,kinds};
    }''')
    # The phone stage must exactly contain its public content: top/bottom
@@ -305,7 +310,14 @@ async def run():
    # Derive the height from visible DOM geometry, not a frozen count from a
    # previous typography version. Long answers can legitimately grow further.
    assert len(geometry['kinds'])==7, 'public phone fixture lost or gained a widget'
-   assert geometry['questionHeight']>=278-1, 'RC207 readable question rows shrank'
+   # RC245: RC241 compacted the question's non-interactive header from 190px
+   # to 150px. Do not reintroduce 40px of empty space just to satisfy an old
+   # RC207 geometry constant. Still require all authored answer rows to remain
+   # 44px touch targets at readable sizes, with the planned header budget.
+   assert geometry['choiceCount']==2, 'CI public question lost an authored answer'
+   assert all(height>=43.5 for height in geometry['choiceHeights']), 'RC207 44px answer targets shrank'
+   assert all(size>=17.5 for size in geometry['choiceFontSizes']), 'RC207 phone answer text became unreadable'
+   assert geometry['questionHeight']>=150+44*geometry['choiceCount']-1, 'RC241 compact question height clips answer rows'
    assert abs(geometry['height']-geometry['expectedHeight'])<2, 'public phone stage reserves invisible presenter widgets'
    assert geometry['topGap'] is not None and abs(geometry['topGap']-16)<2, 'phone stage top margin drifted'
    assert all(abs(gap-8)<2 for gap in geometry['gaps']), 'phone stage contains phantom vertical gaps'

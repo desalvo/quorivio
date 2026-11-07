@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC245 — Accettazione domande smartphone compatte
+
+**RC245:** La full CI [42380437684](https://github.com/desalvo/quorivio/actions/runs/42380437684), commit RC244 `9af6cb4c99f8347c386b59f58ec1eced903928d3`, ha superato le verifiche preliminari, TypeScript e Chromium editor, poi si è fermata sul test reale partecipante/PostgreSQL: la soglia RC207 di 278px non riflette più la riduzione intenzionale di 40px della parte non interattiva introdotta in RC241. Il browser partecipante controlla ora due risposte effettive, altezza touch di almeno 44px, font leggibili di almeno 18px, geometria pubblica e assenza di widget riservati al presentatore. Aggiornato RC217, aggiunte verifiche negative pre-npm, Node e Chromium a 320/390/760px. UI applicativa immutata; RC244 storica, RC245 corrente; full CI da verificare. **85,25%** (43 gate accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag assistente. `docs/RC_CYCLE245_COMPACT_PHONE_QUESTION.it.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC244 — Arial predefinito sulla radice delle widget
 
 **RC244:** La full CI [42377514266](https://github.com/desalvo/quorivio/actions/runs/42377514266), commit RC243 `a0e7dbcf22b6f73ce8a04caa028ef4745825698e`, ha superato TypeScript ma è fallita su RC224 Chromium: i testi delle widget nello schema ereditavano ancora DM Sans. Ora la radice delle widget usa Arial in entrambi gli editor e conserva i caratteri personalizzati. La prova Chromium RC242 non forza più Arial inline nelle widget di default. Aggiunte regressioni RC244 preventive; RC224/RC242 Chromium restano obbligatorie. RC243 storica immutata, RC244 corrente; full CI da verificare. **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag assistente. `docs/RC_CYCLE244_EDITOR_ARIAL_BASELINE.it.md`.

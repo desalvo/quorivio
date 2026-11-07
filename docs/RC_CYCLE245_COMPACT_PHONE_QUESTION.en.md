@@ -1,0 +1,7 @@
+# RC245 — Compact smartphone question browser reconciliation
+
+- **Evidence:** full CI [42380437684](https://github.com/desalvo/quorivio/actions/runs/42380437684), commit `9af6cb4c99f8347c386b59f58ec1eced903928d3`. Quality gate failed in the authenticated real participant/PostgreSQL browser, `tools/ci_browser_participant.py`, on obsolete `questionHeight>=278-1`.
+- **Cause:** RC241 intentionally reduced the redundant fixed question-header budget from 190px to 150px to prevent empty space and extra scrolling. Two short options still reserve **44px each**, so the correct compact question target is **238px**. The RC207 touch readability and RC217 public-stage invariants remain necessary.
+- **Fix:** real participant browser now requires two option rows, each at least 44px high, computed font size at least 17.5px (nominal 18px), question height consistent with 150px + touch rows, exact stage height/gaps/footer and presenter-private widget exclusion. Reconcile RC217 negative mutations. Do not change the production mobile planner or weaken readability.
+- **New checks:** mandatory pre-npm Python negative tests, Node two-choice/long-answer/manual override tests, and Chromium CSS fixture at 320/390/760px. Existing full real Chromium/PostgreSQL and RC207 checks remain mandatory.
+- **Status:** RC244 historical inventory immutable, RC245 current. No commit/push/tag, `rc_strict=false`, `publish_image=false`, `publish_latest=false`; completion remains **85.25%** (43 accepted, 17 partial). Full CI RC245 is pending.

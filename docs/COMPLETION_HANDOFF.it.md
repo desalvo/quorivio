@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC245 — Handoff CI smartphone compatto
+
+**Handoff RC245:** Da RC244 committata `9af6cb4c99f8347c386b59f58ec1eced903928d3`: la full CI `42380437684` si è fermata nel browser partecipante per la vecchia soglia RC207 `questionHeight>=278-1`. RC241 ha ridotto intenzionalmente la domanda automatica con due risposte brevi da 278 a 238px. Il browser reale React/PostgreSQL controlla ora entrambe le risposte, altezza touch >=44px, font >=18px, geometria compatta e filtro widget privati. Aggiornata la verifica RC217; aggiunte regressioni negative pre-npm, Node e Chromium isolato. UI e flag di sicurezza invariati. RC244 storica, RC245 corrente; da ripetere full CI. 85,25% (43 accettati/17 parziali), `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. `docs/RC_CYCLE245_COMPACT_PHONE_QUESTION.it.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC244 — Riconciliazione Arial canvas e CI
 
 **Handoff RC244:** Partenza da RC243 committata `a0e7dbcf22b6f73ce8a04caa028ef4745825698e`. La full CI [42377514266](https://github.com/desalvo/quorivio/actions/runs/42377514266) ha superato il typecheck React ma il test Chromium RC224 ha rilevato DM Sans nella radice delle widget dello schema. Il CSS ora inizializza Arial in entrambi gli editor, conservando i font inline personalizzati. La fixture RC242 verifica il default reale senza forzare Arial inline. Nuovo test preventivo RC244, nessun test Chromium rimosso; RC243 storica, RC244 corrente. Full CI da certificare. **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. `docs/RC_CYCLE244_EDITOR_ARIAL_BASELINE.it.md`.

@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC245 — Compact phone question CI handoff
+
+**RC245 handoff:** Starting from user-committed RC244 `9af6cb4c99f8347c386b59f58ec1eced903928d3`, full CI run `42380437684` stopped at `tools/ci_browser_participant.py` due to the stale RC207 `questionHeight>=278-1` check. RC241 compacted the automatic mobile question from 278px to 238px for two short options. The corrected real React/PostgreSQL browser requires both authored responses, actual touch heights >=44px, text >=18px, compact stage budget and no private presenter widgets. RC217 mutation guard reconciled; RC245 early Python/Node tests and isolated Chromium fixture added. No application UI or safety flags changed. Preserve RC244 receipt, promote RC245 current; rerun full GitHub CI. 85.25% (43 accepted/17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no assistant commit/push/tag. `docs/RC_CYCLE245_COMPACT_PHONE_QUESTION.en.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC244 — Editor Arial baseline CI reconciliation
 
 **RC244 handoff:** Start from user-committed RC243 `a0e7dbcf22b6f73ce8a04caa028ef4745825698e`. Full CI [42377514266](https://github.com/desalvo/quorivio/actions/runs/42377514266) passed strict React TypeScript, then RC224 Chromium found inherited DM Sans on the slide-master widget root. Replace root `font-family:inherit` with an Arial default on both editors, preserving custom inline fonts; make RC242 browser fixture independently test default typography without inline Arial. Add RC244 pre-npm negative mutation guard, retain real browser tests and all historical inventories. RC243 historical, RC244 current; full CI after commit pending. **85.25%** (43 accepted/17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no assistant commit/push/tag. `docs/RC_CYCLE244_EDITOR_ARIAL_BASELINE.en.md`.

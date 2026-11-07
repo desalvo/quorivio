@@ -16,7 +16,10 @@ def check_public_phone_contract(browser:str, policy:str, layout:str, workflow:st
         "const publicWidgets=[...stage.querySelectorAll(':scope>.page-widget')]",
         'const expectedHeight=16+ordered.reduce((sum,r)=>sum+r.height,0)+Math.max(0,ordered.length-1)*8+16;',
         "abs(geometry['height']-geometry['expectedHeight'])<2",
-        "geometry['questionHeight']>=278-1",
+        "geometry['questionHeight']>=150+44*geometry['choiceCount']-1",
+        "geometry['choiceCount']==2",
+        "all(height>=43.5 for height in geometry['choiceHeights'])",
+        "all(size>=17.5 for size in geometry['choiceFontSizes'])",
         "abs(geometry['topGap']-16)<2",
         "all(abs(gap-8)<2 for gap in geometry['gaps'])",
         "geometry['kinds'].count('footer')==1",
@@ -50,7 +53,9 @@ class RC217PublicPhoneStageCI(unittest.TestCase):
     def test_negative_hardcoded_height_and_missing_phantom_check(self):
         for broken in (
             BROWSER.replace("abs(geometry['height']-geometry['expectedHeight'])<2", "abs(geometry['height']-1028)<2"),
-            BROWSER.replace("geometry['questionHeight']>=278-1", "True"),
+            BROWSER.replace("geometry['questionHeight']>=150+44*geometry['choiceCount']-1", "True"),
+            BROWSER.replace("all(height>=43.5 for height in geometry['choiceHeights'])", "True"),
+            BROWSER.replace("all(size>=17.5 for size in geometry['choiceFontSizes'])", "True"),
             BROWSER.replace("all(abs(gap-8)<2 for gap in geometry['gaps'])", "True"),
         ):
             with self.assertRaisesRegex(AssertionError,'geometry|hard-coded'):
