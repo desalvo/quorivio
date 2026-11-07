@@ -2583,7 +2583,7 @@ body .editor-floating-panel.widget-selection-palette [aria-label="Formato numero
  * Its own viewport-bounded scroll always keeps the final command accessible. */
 .page-editor-thumb-menu-floating{
  position:fixed!important;z-index:25000!important;display:flex;flex-direction:column;
- box-sizing:border-box;width:min(270px,calc(100vw - 16px))!important;
+ box-sizing:border-box;width:var(--thumbnail-menu-width,min(270px,calc(100vw - 16px)))!important;
  max-height:calc(100dvh - 16px)!important;overflow:auto!important;overscroll-behavior:contain;
  gap:3px;padding:8px;background:#0e1b30f7;color:#f5faff;border:1px solid #749ac2;
  border-radius:12px;box-shadow:0 18px 44px #000c;

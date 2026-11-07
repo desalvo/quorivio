@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC249 — Menu miniature sempre cliccabile
+
+**RC249:** La full CI GitHub [42405687692](https://github.com/desalvo/quorivio/actions/runs/42405687692) della RC248 committata `9027af34f0d8182d12bda366a89e239286b63a41` ha fallito in Chromium reale perché il menu flottante aperto copriva il proprio pulsante «Menu pagina 1». Ora il menu viene ancorato al rettangolo del pulsante, evitandone il contatto, e viene riposizionato dopo scroll o resize (anche zoom). Aggiunti test negativi, Node e Chromium che verificano hit-test e click reale senza forzature. RC248 storica; full CI RC249 in attesa. **85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. `docs/RC_CYCLE249_THUMBNAIL_MENU_ANCHOR.it.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC248 — Handoff contenimento canvas editor
 
 **RC248:** Ripartire da RC247 committata dall’utente `6a7f8e5eae6a972a218fca4b45348067ef58307d`. Full CI [42401914583](https://github.com/desalvo/quorivio/actions/runs/42401914583) fallita al test storico RC178 Chromium: canvas 15px oltre il fondo dell’editor a 1440×900. La larghezza massima desktop ora usa l’altezza residua reale della zona editor (`100cqh`) con righello superiore da 29px, laterale 28px e margine di sicurezza. Zoom compatto 80% e canvas 16:9 grande conservati, mobile scorrevole invariato. Nuovo preflight negativo e 15 scenari Chromium viewport/zoom reali; RC178 preservato. Dopo il commit dell’utente eseguire full CI. **85,25%** (43 accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. `docs/RC_CYCLE248_EDITOR_STAGE_FIT.it.md`.

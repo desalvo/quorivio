@@ -352,6 +352,12 @@ jobs:
       # after wrapped header/palette, rather than deriving it from 100dvh.
       - name: RC248 actual editor-stage canvas fit regression before npm
         run: python3 -m unittest tools.tests.test_rc248_stage_fit_contract -q
+      # RC249: scrolling, global zoom and portal placement must never make a
+      # thumbnail dropdown intercept the very trigger that opens/closes it.
+      - name: RC249 anchored thumbnail menu before npm
+        run: |
+          python3 -m unittest tools.tests.test_rc249_thumbnail_trigger_contract -q
+          node --experimental-strip-types --test apps/web/test/rc249-thumbnail-menu-anchor.test.ts
       - name: RC218 real editor thumbnail rename browser contract before npm
         run: python3 -m unittest tools.tests.test_rc218_browser_postgres_thumbnail_rename -q
       # RC215: RC141 compared a glyph Range top with an output border-box
@@ -798,6 +804,9 @@ jobs:
           python3 tools/ci_rc242_arial_zoom_chromium.py
           python3 tools/ci_rc247_zoom_editor_chromium.py
           python3 tools/ci_rc248_stage_fit_chromium.py
+          # RC249: real pointer hit-test of the popover's own toggle on
+          # narrow/tall desktops and phones; full compiled editor follows.
+          python3 tools/ci_rc249_thumbnail_trigger_chromium.py
           # RC162: compact QR URL must remain visible when resized; no URL row when hidden.
           python3 tools/ci_rc162_qr_resizing_chromium.py
           # RC152: mutation-tested current long-label wrapping and attached [count]
@@ -1518,7 +1527,8 @@ jobs:
           python3 tools/verify_rc_cycle245_inventory.py --historical
           python3 tools/verify_rc_cycle246_inventory.py --historical
           python3 tools/verify_rc_cycle247_inventory.py --historical
-          python3 tools/verify_rc_cycle248_inventory.py
+          python3 tools/verify_rc_cycle248_inventory.py --historical
+          python3 tools/verify_rc_cycle249_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

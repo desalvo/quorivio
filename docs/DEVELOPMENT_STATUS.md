@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC249 — Thumbnail menu trigger-safe anchoring
+
+**RC249:** GitHub full CI [42405687692](https://github.com/desalvo/quorivio/actions/runs/42405687692) for committed RC248 `9027af34f0d8182d12bda366a89e239286b63a41` failed the real Chromium editor because the expanded portaled thumbnail menu intercepted its own toggle. Menu now anchors beside the actual trigger rectangle and repositions after scroll/resize/zoom, preserving keyboard/escape and accessible scroll. Added pre-npm negative guard, Node geometry and real Chromium hit-target acceptance with no forced clicks. RC248 immutable, full RC249 CI pending. **85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no assistant commit/push/tag. `docs/RC_CYCLE249_THUMBNAIL_MENU_ANCHOR.en.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC248 — Actual editor-stage canvas bounds
 
 **RC248:** GitHub full CI [42401914583](https://github.com/desalvo/quorivio/actions/runs/42401914583) for committed RC247 `6a7f8e5eae6a972a218fca4b45348067ef58307d` failed real Chromium editor geometry at 1440×900: canvas ended 15px below the editor stage because RC247 used overall viewport height, ignoring wrapped toolbar/palette rows. Desktop stage is now a size container and canvas width is computed from actual remaining content height (`100cqh`), with both rulers and margin accounted for. Preserve large 16:9 canvas, correct physical viewport coverage and independent mobile scrolling; new pre-npm and multi-zoom Chromium acceptance. Historical RC247 remains immutable; RC248 GitHub CI pending. **85.25%** (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no assistant commit/push/tag. `docs/RC_CYCLE248_EDITOR_STAGE_FIT.en.md`.
