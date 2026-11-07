@@ -2771,7 +2771,7 @@ function GlobalPageZoomShell(){
   if(value)root.style.setProperty('zoom',value);
   else root.style.removeProperty('zoom');
   try{window.localStorage.setItem(GLOBAL_ZOOM_STORAGE_KEY,String(zoom))}catch{/* Private mode: zoom remains usable this session. */}
-  return()=>root.style.removeProperty('zoom');
+  return()=>{root.style.removeProperty('zoom');};
  },[zoom]);
  return <>
   <WorkspaceErrorBoundary/>

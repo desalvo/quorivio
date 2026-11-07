@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC243 — React global zoom effect cleanup / strict TypeScript
+
+**RC243:** Full GitHub CI [42376234500](https://github.com/desalvo/quorivio/actions/runs/42376234500) for RC242 commit `f2899cc76320667a442b504d9e89f38c6f1611ff` stopped at the strict React TypeScript check because the global zoom `useEffect` destructor returned the string from `CSSStyleDeclaration.removeProperty`. Replace the expression-bodied cleanup with a void-returning block while preserving global zoom behavior, persistence, and accessibility. New fail-closed RC243 negative guard runs before npm, full TypeScript remains mandatory. RC242 historical, RC243 current; RC243 full GitHub CI pending. Certified **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no assistant commit/push/tag. See `docs/RC_CYCLE243_ZOOM_EFFECT_TYPECHECK.en.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC242 — Arial widget defaults, compact slide-master ribbon and global zoom
 
 **RC242:** Starting from RC241, all text descendants on the page and slide-master canvases inherit Arial by default, preserving authored custom typefaces. The scheme Save and status action is kept in one sticky compact row with reduced buttons, while other commands can scroll horizontally on narrow devices. A persistent global zoom controller (70–150%, 10% steps, reset to 100%) is displayed across login, public pages, dashboard, presenter and both editors, including portaled windows. Added early CI tests and real Chromium fixture at 390/760/1440px. RC241 becomes historical, RC242 is current. GitHub full CI pending; certified **85.25%** (43 accepted/17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. See `docs/RC_CYCLE242_WIDGET_ARIAL_ZOOM.en.md`.

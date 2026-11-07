@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC243 — Correzione cleanup zoom globale React / typecheck CI
+
+**RC243:** La full CI GitHub [42376234500](https://github.com/desalvo/quorivio/actions/runs/42376234500), commit RC242 `f2899cc76320667a442b504d9e89f38c6f1611ff`, si è fermata al typecheck rigoroso React: il cleanup di `useEffect` per lo zoom globale restituiva la stringa di `CSSStyleDeclaration.removeProperty`. Corretto con funzione di cleanup che restituisce `void`, senza modificare funzionalità, persistenza o accessibilità. Aggiunto test negativo RC243 prima di npm, mantenuto il typecheck completo obbligatorio; RC242 resta storica e RC243 è corrente. Full CI RC243 da certificare; completamento **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Vedi `docs/RC_CYCLE243_ZOOM_EFFECT_TYPECHECK.it.md`.
+
+---
+
 # Quorivio 0.1.0-dev — RC242 — Arial predefinito nelle widget, barra schemi compatta e zoom globale
 
 **RC242:** Dalla RC241, tutti i discendenti testuali delle widget negli editor pagine e schemi ereditano Arial come font predefinito, senza sovrascrivere font personalizzati. La sezione Salva schema e stato rimane su una singola riga compatta e sempre raggiungibile, con pulsanti ridotti; gli altri comandi possono scorrere orizzontalmente. Nuovo zoom globale persistente (70–150%, passi 10%, ripristino 100%) su accesso, pagine pubbliche, dashboard, proiezione ed entrambi gli editor, compresi i portali. Test CI preventivi e Chromium reale a 390/760/1440px. RC241 storica e RC242 corrente. Full CI GitHub da verificare; completamento **85,25%** (43 accettati/17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag assistente. Vedi `docs/RC_CYCLE242_WIDGET_ARIAL_ZOOM.it.md`.
