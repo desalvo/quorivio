@@ -33,11 +33,14 @@ class RC75TypescriptRegression(unittest.TestCase):
         self.assertIn('showSourceQuestion?:boolean', source)
         self.assertIn('targetQuestionId?:string', source)
 
+    # Native Node ESM tests import .ts modules directly. The independent strict
+    # tsc gate is --noEmit, so it must accept these valid source paths just
+    # like the bundler does; never weaken --strict or remove the .ts suffix.
     @unittest.skipUnless(shutil.which('tsc'), 'TypeScript compiler is unavailable locally')
     def test_strict_typescript_compilation_of_affected_independent_modules(self):
         with tempfile.TemporaryDirectory() as td:
             result = subprocess.run([
-                shutil.which('tsc'), '--noEmit', '--strict', '--target', 'ES2022',
+                shutil.which('tsc'), '--noEmit', '--allowImportingTsExtensions', '--strict', '--target', 'ES2022',
                 '--module', 'ESNext', '--moduleResolution', 'bundler',
                 '--typeRoots', td, '--skipLibCheck',
                 str(ROOT / 'apps/web/src/slide-master.ts'),

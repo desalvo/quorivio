@@ -179,6 +179,12 @@ jobs:
             tools.tests.test_rc_presenter_linked_preview_20261028 \
             tools.tests.test_rehearsal_send_parity_20261028 \
             tools.tests.test_visual_parity_rehearsal_20261028
+      # RC255: the RC75 strict standalone tsc invocation must include
+      # --allowImportingTsExtensions with --noEmit. The slide-master's native
+      # Node ESM import intentionally ends in .ts; Vite alone did not expose
+      # the TS5097 error that made RC254 full CI fail before npm.
+      - name: RC255 strict standalone TypeScript and Node ESM compatibility before npm
+        run: python3 -m unittest tools.tests.test_rc255_standalone_typescript_ci -q
       # RC210: RC206 moved thumbnail rename behind the selection-aware batch
       # handler. Keep the historical UI contract aligned and fail early if
       # the title-only authorized path is disconnected.
@@ -1565,7 +1571,8 @@ jobs:
           python3 tools/verify_rc_cycle251_inventory.py --historical
           python3 tools/verify_rc_cycle252_inventory.py --historical
           python3 tools/verify_rc_cycle253_inventory.py --historical
-          python3 tools/verify_rc_cycle254_inventory.py
+          python3 tools/verify_rc_cycle254_inventory.py --historical
+          python3 tools/verify_rc_cycle255_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:
