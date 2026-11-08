@@ -369,6 +369,15 @@ jobs:
             tools.tests.test_rc260_generated_manifest_reconciliation \
             tools.tests.test_rc246_converter_upgrade \
             tools.tests.test_rc258_standalone_wizard_rollout
+      # RC264: synthetic cross-filesystem renderer tests also need to mock
+      # PNG decoding in the pre-npm runner, which intentionally has no Pillow.
+      # Production _verify_png must continue to fail closed without Pillow.
+      - name: RC264 Pillow-independent simulated PDF early CI gate
+        run: |
+          python3 -m unittest -q \
+            tools.tests.test_rc264_pillow_independent_ci \
+            tools.tests.test_rc261_conversion_mount_and_zlib \
+            tools.tests.test_rc263_kube_defaults_and_ci
       # RC263: the PDF regression uses a synthetic subprocess runner and must
       # not require Poppler on GitHub's early runner; Kubernetes adds harmless
       # terminationMessage* defaults to StatefulSet containers post-apply.
@@ -1653,7 +1662,8 @@ jobs:
           python3 tools/verify_rc_cycle260_inventory.py --historical
           python3 tools/verify_rc_cycle261_inventory.py --historical
           python3 tools/verify_rc_cycle262_inventory.py --historical
-          python3 tools/verify_rc_cycle263_inventory.py
+          python3 tools/verify_rc_cycle263_inventory.py --historical
+          python3 tools/verify_rc_cycle264_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

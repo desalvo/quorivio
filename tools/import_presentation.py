@@ -165,6 +165,12 @@ def _verify_png(path):
     # untrusted raster before any page becomes visible to the API.
     try:
         from PIL import Image, UnidentifiedImageError
+    except ImportError as exc:
+        # The converter image installs Pillow. A bare CI runner may not: do
+        # not report a misleading PNG corruption (or raise UnboundLocalError).
+        # NEVER publish a rendered image without the mandatory full decode.
+        raise RuntimeError('Pillow required for full PNG verification') from exc
+    try:
         with Image.open(path) as picture:
             if picture.format != 'PNG' or picture.size != (width, height):
                 raise ValueError('Rendered PNG format mismatch')

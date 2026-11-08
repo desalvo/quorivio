@@ -1,3 +1,5 @@
+> **RC264 — Correzione CI Pillow:** la suite pre-npm non richiede Pillow né Poppler per i test sintetici di pubblicazione PDF; la verifica dei PNG reali rimane obbligatoria. Vedi [`docs/RC_CYCLE264_PILLOW_CI_FIX.it.md`](docs/RC_CYCLE264_PILLOW_CI_FIX.it.md).
+
 > **RC263 — Correzione CI e wizard PostgreSQL:** I test PDF simulano Poppler anche sui runner senza binari; il wizard accetta solo i due valori predefiniti di Kubernetes nella sonda DB, senza allentare i controlli su sicurezza o volumi. Per un rollout già completato usare `--sync-disk-monitor` senza riavviare PostgreSQL. Vedi [`docs/RC_CYCLE263_CI_KUBERNETES_DEFAULTS.it.md`](docs/RC_CYCLE263_CI_KUBERNETES_DEFAULTS.it.md).
 
 > **RC262 — Monitoraggio spazio disco:** Configurazione server mostra occupazione dei volumi allegati, conversioni e dati PostgreSQL. Al 90% avvisa via SMTP gli amministratori di piattaforma; riarmo all’85%. Il wizard Kubernetes standalone offre un piano controllato per aggiungere la sonda PostgreSQL, con conferma esplicita del riavvio del database. Vedi [`docs/RC_CYCLE262_DISK_CAPACITY_MONITORING.it.md`](docs/RC_CYCLE262_DISK_CAPACITY_MONITORING.it.md).

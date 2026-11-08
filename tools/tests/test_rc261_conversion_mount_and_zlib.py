@@ -45,6 +45,17 @@ def _render_mock(args,timeout=90):
     raise AssertionError('Unexpected converter subprocess')
 
 
+def _verify_synthetic_png(path):
+    # These two tests exercise same-device staging and atomic publication.
+    # Their fake Poppler renderer produces one deterministic PNG, so assert
+    # its exact bytes without invoking Pillow on the pre-npm GitHub runner.
+    # The real converter still requires full Pillow decoding before publish.
+    data = Path(path).read_bytes()
+    if data != _valid_small_png():
+        raise ValueError('Synthetic renderer generated unexpected PNG')
+    return len(data)
+
+
 def _fake_tools(binary):
     # The synthetic test renderer replaces subprocess calls; an external
     # Poppler installation is therefore not a test prerequisite. The real
@@ -68,7 +79,8 @@ class ConverterMountBoundary(unittest.TestCase):
                 return directory
             with patch.object(converter.tempfile,'TemporaryDirectory',side_effect=track),\
                  patch.object(converter.shutil,'which',side_effect=_fake_tools),\
-                 patch.object(converter,'run',side_effect=_render_mock):
+                 patch.object(converter,'run',side_effect=_render_mock),\
+                 patch.object(converter,'_verify_png',side_effect=_verify_synthetic_png):
                 result=converter.convert(source,parent/'pages')
             self.assertEqual(result['page_count'],1)
             self.assertTrue((parent/'pages/page-0001.png').is_file())
@@ -85,11 +97,27 @@ class ConverterMountBoundary(unittest.TestCase):
             source=parent/'source.pdf'
             source.write_bytes(b'%PDF-1.4\n% synthetic fixture\n')
             with patch.object(converter.shutil,'which',side_effect=_fake_tools),\
-                 patch.object(converter,'run',side_effect=_render_mock):
+                 patch.object(converter,'run',side_effect=_render_mock),\
+                 patch.object(converter,'_verify_png',side_effect=_verify_synthetic_png):
                 result=converter.convert(source,parent/'pages')
             self.assertEqual(result['page_count'],1)
             self.assertTrue((parent/'pages/page-0001.png').is_file())
             self.assertTrue((parent/'pages/manifest.json').is_file())
+
+    def test_real_decoder_fails_closed_without_pillow(self):
+        # Reproduce the early CI environment: its Python has no Pillow. This
+        # must raise a clear error, never a NameError/UnboundLocalError, and
+        # must NOT accept or publish the PNG on such a host.
+        with tempfile.TemporaryDirectory(prefix='qrc264-no-pillow-') as td:
+            image=Path(td)/'page.png'
+            image.write_bytes(_valid_small_png())
+            with patch.dict(sys.modules, {'PIL': None}):
+                with self.assertRaisesRegex(RuntimeError, 'Pillow required'):
+                    converter._verify_png(image)
+            image.write_bytes(b'not a PNG image')
+            with patch.dict(sys.modules, {'PIL': None}):
+                with self.assertRaisesRegex(ValueError, 'Invalid or oversized rendered PNG'):
+                    converter._verify_png(image)
 
     def test_worker_reports_safe_errno_not_document_paths(self):
         handler=worker.Handler.__new__(worker.Handler)

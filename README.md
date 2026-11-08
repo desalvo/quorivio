@@ -1,3 +1,5 @@
+> **RC264 — Pillow CI fix:** synthetic PDF staging regressions no longer require Pillow or Poppler before npm; production full PNG validation remains mandatory. See [`docs/RC_CYCLE264_PILLOW_CI_FIX.en.md`](docs/RC_CYCLE264_PILLOW_CI_FIX.en.md).
+
 > **RC263 — CI and PostgreSQL wizard reconciliation:** Mock PDF regressions now work without host Poppler; the standalone wizard allows only exact Kubernetes API defaults on the DB probe and still fails on real security or volume drift. Recover completed rollout with `--sync-disk-monitor` without another DB restart. See [`docs/RC_CYCLE263_CI_KUBERNETES_DEFAULTS.en.md`](docs/RC_CYCLE263_CI_KUBERNETES_DEFAULTS.en.md).
 
 > **RC262 — Storage capacity monitoring:** Server configuration shows actual disk utilization for assets, conversion scratch, and the PostgreSQL data PVC. At 90% it emails approved platform administrators through configured SMTP, re-arming after recovery below 85%. The standalone Kubernetes wizard supports a reviewed PostgreSQL probe rollout with explicit restart authorization. See [`docs/RC_CYCLE262_DISK_CAPACITY_MONITORING.en.md`](docs/RC_CYCLE262_DISK_CAPACITY_MONITORING.en.md).
