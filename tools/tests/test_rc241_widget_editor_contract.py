@@ -23,7 +23,7 @@ def verify_contract(ui=UI, css=CSS, result=RESULT, number=NUMBER, phone=PHONE):
   'numeric-widget-sizes': '<EditableNumberField ariaLabel="Dimensione emoji reazioni"' in ui and '<EditableNumberField ariaLabel="Dimensione pulsanti gradimento"' in ui,
   'mobile-height-reduction': '(options.length?150:190)+optionSpace' in phone,
   'matching-mobile-geometry': 'padding:10px!important' in css and 'data-canvas-device="phone"' in css,
-  'unified-preview-stage': 'function DesktopRehearsalStage(' in ui and '<DesktopRehearsalStage>{renderSlide(\'presenter\')}</DesktopRehearsalStage>' in ui,
+  'unified-preview-stage': 'function DesktopRehearsalStage(' in ui and '<DesktopRehearsalStage immersive={fullScreen}>{renderSlide(\'presenter\')}</DesktopRehearsalStage>' in ui,
   'toolbar-clipboard': "issueEditorClipboard('cut')" in ui and "issueEditorClipboard('copy')" in ui and "issueEditorClipboard('paste')" in ui,
   'toolbar-history': 'onClick={undoPageWidgets}' in ui and 'onClick={redoPageWidgets}' in ui,
   'toolbar-info': 'aria-label="Informazioni editor"' in ui,

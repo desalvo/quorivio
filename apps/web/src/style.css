@@ -3439,3 +3439,124 @@ body .editor-floating-panel.widget-selection-palette{
 .editor-floating-panel>.editor-floating-resize-handle:hover{background-color:#23658c!important}
 .editor-floating-panel>.editor-floating-resize-handle:focus-visible{outline:3px solid #fbcf58!important;outline-offset:-3px!important}
 body .editor-floating-panel.widget-selection-palette .palette-ribbon-groups{min-height:0!important;overflow-y:auto!important}
+
+/* RC268: fullscreen preview is the authored canvas, not a fullscreen window
+ * containing a reduced slide with a persistent toolbar and footer. */
+.rehearsal-shell.rehearsal-immersive:fullscreen{
+ width:100vw!important;height:100dvh!important;max-width:none!important;max-height:none!important;
+ margin:0!important;padding:0!important;border:0!important;border-radius:0!important;
+ background:#080e16!important;overflow:hidden!important;
+}
+.rehearsal-shell.rehearsal-immersive:fullscreen>.rehearsal-toolbar,
+.rehearsal-shell.rehearsal-immersive:fullscreen>.rehearsal-footer{display:none!important}
+.rehearsal-shell.rehearsal-immersive:fullscreen>.rehearsal-stage{
+ display:flex!important;align-items:center!important;justify-content:center!important;flex:1 1 auto!important;
+ padding:0!important;margin:0!important;overflow:hidden!important;
+ background:#080e16!important;min-height:0!important;width:100%!important;
+}
+.rehearsal-shell.rehearsal-immersive:fullscreen .rehearsal-panes{
+ display:flex!important;align-items:stretch!important;justify-content:center!important;
+ width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;
+ gap:0!important;margin:0!important;overflow:hidden!important;
+}
+.rehearsal-shell.rehearsal-immersive:fullscreen .rehearsal-pane{
+ display:flex!important;flex-direction:column!important;align-items:center!important;
+ justify-content:center!important;min-width:0!important;min-height:0!important;
+ height:100%!important;gap:0!important;padding:0!important;overflow:hidden!important;
+}
+.rehearsal-shell.rehearsal-immersive:fullscreen .rehearsal-pane-heading,
+.rehearsal-shell.rehearsal-immersive:fullscreen .rehearsal-statistics{display:none!important}
+.rehearsal-shell.rehearsal-immersive:fullscreen .rehearsal-desktop-viewport.immersive{
+ display:flex!important;justify-content:center!important;align-items:center!important;
+ height:100%!important;width:100%!important;min-height:0!important;flex:1 1 auto!important;
+}
+.rehearsal-shell.rehearsal-immersive:fullscreen .rehearsal-desktop-sizer{
+ flex:none!important;position:relative!important;margin:auto!important;
+}
+.rehearsal-shell.rehearsal-immersive:fullscreen .rehearsal-desktop-stage>.rehearsal-slide{
+ border:0!important;box-shadow:none!important;
+}
+.rehearsal-shell.rehearsal-immersive:fullscreen .rehearsal-pane-phone .rehearsal-phone-frame{
+ height:calc(100dvh - 20px)!important;width:min(420px,100%)!important;
+ max-height:none!important;flex:none!important;
+}
+.rehearsal-fullscreen-controls{position:absolute;inset:0;z-index:70;pointer-events:none;color:white}
+.rehearsal-fullscreen-controls button{pointer-events:auto;position:absolute;display:grid;place-items:center;
+ background:#091c31cc;color:#fff;border:1px solid #c4e3f488;border-radius:50%;
+ width:52px;height:52px;min-height:52px;cursor:pointer;box-shadow:0 4px 20px #0006;
+}
+.rehearsal-fullscreen-controls button:disabled{opacity:.2;pointer-events:none}
+.rehearsal-fullscreen-prev{left:12px;top:50%;transform:translateY(-50%);font-size:38px}
+.rehearsal-fullscreen-next{right:12px;top:50%;transform:translateY(-50%);font-size:38px}
+.rehearsal-fullscreen-controls .rehearsal-fullscreen-exit{
+ right:14px;top:12px;width:auto;min-width:70px;height:40px;min-height:40px;
+ padding:6px 12px;border-radius:8px;font-size:13px;
+}
+.rehearsal-fullscreen-count{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);
+ padding:5px 13px;background:#091c31b8;border-radius:8px;font-variant-numeric:tabular-nums;
+ font-size:14px;pointer-events:none;
+}
+@media(hover:hover){.rehearsal-fullscreen-prev,.rehearsal-fullscreen-next{opacity:.25}
+ .rehearsal-fullscreen-prev:hover,.rehearsal-fullscreen-next:hover,
+ .rehearsal-fullscreen-prev:focus-visible,.rehearsal-fullscreen-next:focus-visible{opacity:1}}
+
+/* RC268: drop zones are real targets, including the empty area AFTER the last
+ * thumbnail. They do not require hovering over another page. */
+.editor-ux-v2 .page-editor-thumbnails{gap:0!important}
+.editor-ux-v2 .page-editor-drop-slot{
+ display:block;position:relative;flex:0 0 12px;min-height:12px;
+ margin:1px 0;border:2px dashed transparent;border-radius:5px;
+ box-sizing:border-box;transition:background .1s,border-color .1s;
+}
+.editor-ux-v2 .page-editor-drop-slot-final{flex:1 0 50px;min-height:50px}
+.editor-ux-v2 .page-editor-drop-slot[data-active="true"]{
+ background:#20d5c533!important;border-color:#3debd5!important;
+ box-shadow:inset 0 0 0 2px #20d5c533;
+}
+@media(max-width:720px){
+ .editor-ux-v2 .page-editor-drop-slot{flex:0 0 13px;min-width:13px;min-height:0;margin:0 2px}
+ .editor-ux-v2 .page-editor-drop-slot-final{flex:1 0 32px;min-width:32px}
+}
+
+/* RC268: phone cards use compact natural height. Keep QR codes bounded to a
+ * legible 390px-stage size, and let linked results wrap instead of inheriting
+ * desktop max-content/scale rules. These rules apply identically to editor,
+ * rehearsal and the public participant stage. */
+:is(.editor-ux-v2 .canvas-editor-group[data-canvas-device="phone"] .widget-canvas-item,
+    .rehearsal-phone-stage .rehearsal-widget,
+    .audience-widget-layout.stage-phone>.page-widget)[data-widget-kind="qr"] .participant-access-qr>img{
+ width:auto!important;height:auto!important;max-width:190px!important;max-height:190px!important;
+ object-fit:contain!important;justify-self:center!important;
+}
+:is(.editor-ux-v2 .canvas-editor-group[data-canvas-device="phone"] .widget-canvas-item,
+    .rehearsal-phone-stage .rehearsal-widget,
+    .audience-widget-layout.stage-phone>.page-widget)[data-widget-kind="results-button"] .widget-fit-frame{
+ min-width:0!important;max-width:100%!important;overflow:auto!important;
+}
+:is(.editor-ux-v2 .canvas-editor-group[data-canvas-device="phone"] .widget-canvas-item,
+    .rehearsal-phone-stage .rehearsal-widget,
+    .audience-widget-layout.stage-phone>.page-widget)[data-widget-kind="results-button"] :is(.linked-results,.linked-results-items,.linked-results-row){
+ box-sizing:border-box!important;min-width:0!important;max-width:100%!important;
+ width:100%!important;overflow-wrap:anywhere!important;
+}
+:is(.editor-ux-v2 .canvas-editor-group[data-canvas-device="phone"] .widget-canvas-item,
+    .rehearsal-phone-stage .rehearsal-widget,
+    .audience-widget-layout.stage-phone>.page-widget)[data-widget-kind="results-button"] .linked-result-pair{
+ flex-wrap:wrap!important;white-space:normal!important;min-width:0!important;max-width:100%!important;
+}
+:is(.editor-ux-v2 .canvas-editor-group[data-canvas-device="phone"] .widget-canvas-item,
+    .rehearsal-phone-stage .rehearsal-widget,
+    .audience-widget-layout.stage-phone>.page-widget)[data-widget-kind="results-button"] .linked-results-row{
+ font-size:clamp(14px,4cqw,21px)!important;align-self:stretch!important;
+}
+:is(.editor-ux-v2 .canvas-editor-group[data-canvas-device="phone"] .widget-canvas-item,
+    .rehearsal-phone-stage .rehearsal-widget,
+    .audience-widget-layout.stage-phone>.page-widget)[data-widget-kind="results-button"] .result-view-pie .linked-results-pie{
+ width:min(170px,55%)!important;height:auto!important;aspect-ratio:1!important;
+}
+
+/* RC268: static/imported pages retain the complete authored 16:9 slide on a
+ * phone instead of being turned into a tall stack of unrelated widgets. */
+.rehearsal-phone-widescreen-frame{width:min(390px,100%);box-sizing:border-box;border:9px solid #1f2937;border-radius:20px;overflow:hidden;background:#fff;box-shadow:0 15px 35px #101a2d40}
+.rehearsal-phone-widescreen-frame .rehearsal-desktop-viewport{width:100%!important;height:auto!important;max-width:100%!important;overflow:hidden!important}
+.rehearsal-phone-widescreen-frame .rehearsal-desktop-sizer{max-width:100%}

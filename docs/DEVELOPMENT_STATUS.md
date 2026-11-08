@@ -1,3 +1,7 @@
+# Quorivio 0.1.0-dev — RC268 — Fullscreen, page ordering and phone presentation fidelity
+
+**RC268:** After RC267 green full CI [42516844646](https://github.com/desalvo/quorivio/actions/runs/42516844646) and manual multiarch publication [42518673212](https://github.com/desalvo/quorivio/actions/runs/42518673212), native fullscreen fits the real 16:9 canvas to both viewport axes, keyboard arrows navigate preview, empty thumbnail rail supports page menus and insertion drop zones, QR/results smartphone sizing is bounded, and static/PDF-imported slides automatically stay 16:9 on participant phones on a per-page basis (explicit manual choice and accessible reading preserved). **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; full RC268 GitHub CI and cluster validation pending; no commit/push/tag. `docs/RC_CYCLE268_PREVIEW_SIDEBAR_PHONE_FIDELITY.en.md`.
+
 # Quorivio 0.1.0-dev — RC267 — Node CI shell invocation hotfix
 
 **RC267:** Fix committed RC266 full CI [42511888604](https://github.com/desalvo/quorivio/actions/runs/42511888604): a missing shell line continuation executed a `.test.ts` file directly (`Permission denied`, exit 126). Restore one Node command for all three tests; a new dependency-free preflight executes the actual early CI shell block. Editor runtime and Kubernetes wizard are unchanged. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; GitHub RC267 full CI pending; no commit/push/tag. `docs/RC_CYCLE267_CI_NODE_RUNNER_CONTINUATION.en.md`.

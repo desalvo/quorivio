@@ -23,7 +23,7 @@ class RC173PublicStageTests(unittest.TestCase):
         self.assertNotIn('participant-live-view" style={window.matchMedia', self.participant)
 
     def test_reading_and_fidelity_are_explicit_separate_modes(self):
-        self.assertIn('const audiencePortrait=joinPath&&participantPhoneMode&&!participantReadingMode', self.ui)
+        self.assertIn('const audiencePortrait=joinPath&&participantPhoneLayoutEnabled(participantPhoneMode,participantReadingMode,participantModeExplicit,entry?.activity)', self.ui)
         for label in ('Diapositiva 16:9', 'Layout smartphone', 'Lettura accessibile'):
             self.assertIn(label, self.participant)
         self.assertIn('stage-reading{\n  background:#fff!important;background-image:none!important', self.css)

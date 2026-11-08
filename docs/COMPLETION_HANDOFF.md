@@ -1,3 +1,7 @@
+# Quorivio 0.1.0-dev — RC268 — Preview, ordering and mobile visual parity handoff
+
+**RC268:** RC267 full CI [42516844646](https://github.com/desalvo/quorivio/actions/runs/42516844646) and multiarch Docker publication [42518673212](https://github.com/desalvo/quorivio/actions/runs/42518673212) green. New fullscreen preview geometry/navigation, empty thumbnail sidebar contextual menu and before/between/after drop insertion, compact phone QR/results layout, and automatic page-scoped 16:9 for raster PDF/static slides shown to participant phones. Preserve explicit layout selection and accessible reading; no Kubernetes/database/converter changes. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; GitHub CI RC268 and authenticated cluster test pending; no commit/push/tag. `docs/RC_CYCLE268_PREVIEW_SIDEBAR_PHONE_FIDELITY.en.md`.
+
 # Quorivio 0.1.0-dev — RC267 — Node CI shell invocation hotfix
 
 **RC267:** Fix committed RC266 full CI [42511888604](https://github.com/desalvo/quorivio/actions/runs/42511888604): a missing shell line continuation executed a `.test.ts` file directly (`Permission denied`, exit 126). Restore one Node command for all three tests; a new dependency-free preflight executes the actual early CI shell block. Editor runtime and Kubernetes wizard are unchanged. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; GitHub RC267 full CI pending; no commit/push/tag. `docs/RC_CYCLE267_CI_NODE_RUNNER_CONTINUATION.en.md`.

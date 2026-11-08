@@ -32,7 +32,7 @@ test('presenter single and paired previews share the same 1280x720 stage',()=>{
  assert.match(ui,/height:720\*scale/);
  assert.match(ui,/width:1280,height:720,transform:`scale\(\$\{scale\}\)`/);
  assert.match(ui,/mode==='presenter'\|\|mode==='both'/);
- assert.match(ui,/<DesktopRehearsalStage>\{renderSlide\('presenter'\)\}<\/DesktopRehearsalStage>/);
+ assert.match(ui,/<DesktopRehearsalStage immersive=\{fullScreen\}>\{renderSlide\('presenter'\)\}<\/DesktopRehearsalStage>/);
  assert.match(css,/\.rehearsal-desktop-stage>\.rehearsal-slide/);
 });
 

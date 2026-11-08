@@ -299,6 +299,10 @@ jobs:
       # authenticated Chromium/PostgreSQL tests must expand the real summary.
       - name: RC236 page thumbnail browser disclosure compatibility before npm
         run: python3 -m unittest tools.tests.test_rc236_page_menu_disclosures -q
+      # RC268: exercise the current preview/sidebar contracts and page-specific
+      # participant phone 16:9 policy before installing npm dependencies.
+      - name: RC268 editor preview and static participant phone view before npm
+        run: node --experimental-strip-types --test apps/web/test/rc268-preview-sidebar-mobile.test.ts
       # RC267: run the actual early CI shell script in a dependency-free runner
       # so dropped line continuations cannot execute .test.ts files as commands.
       - name: RC267 early Node test runner invocation contract before npm
@@ -1686,7 +1690,8 @@ jobs:
           python3 tools/verify_rc_cycle264_inventory.py --historical
           python3 tools/verify_rc_cycle265_inventory.py --historical
           python3 tools/verify_rc_cycle266_inventory.py --historical
-          python3 tools/verify_rc_cycle267_inventory.py
+          python3 tools/verify_rc_cycle267_inventory.py --historical
+          python3 tools/verify_rc_cycle268_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

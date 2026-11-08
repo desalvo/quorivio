@@ -39,7 +39,7 @@ test('RC173 accessible reading is a separate linear white document, while manual
  assert.match(participant, /participantReadingMode\?\{backgroundImage:"none",backgroundColor:"#ffffff",backgroundSize:"auto"\}/);
  assert.match(participant,/aria-pressed=\{participantReadingMode\} onClick=\{\(\)=>\{setParticipantModeExplicit\(true\);setParticipantReadingMode\(true\);setParticipantPhoneMode\(false\)\}\}>Lettura accessibile/);
  assert.match(participant,/onClick=\{\(\)=>\{setParticipantModeExplicit\(true\);setParticipantReadingMode\(false\);setParticipantPhoneMode\(true\)\}\}>Layout smartphone/);
- assert.match(ui,/const audiencePortrait=joinPath&&participantPhoneMode&&!participantReadingMode/);
+ assert.match(ui,/const audiencePortrait=joinPath&&participantPhoneLayoutEnabled\(participantPhoneMode,participantReadingMode,participantModeExplicit,entry\?\.activity\)/);
  assert.match(css,/stage-reading\{\s*background:#fff!important;background-image:none!important/);
  assert.match(css,/stage-reading>\.page-widget:is\(\[data-widget-kind="shape"\],\[data-widget-kind="line"\]\)\{display:none!important\}/);
 });
@@ -47,7 +47,7 @@ test('RC173 accessible reading is a separate linear white document, while manual
 test('RC173 16:9 smartphone keeps saved geometry and removes mobile minimum touch-size distortions',()=>{
  assert.match(css,/main\.participant-live-view \.audience-widget-layout\.stage-fidelity>\.page-widget\{\s*position:absolute!important;left:var\(--stage-x\)!important;top:var\(--stage-y\)!important;/);
  assert.match(css,/main\.participant-live-view \.audience-widget-layout\.stage-fidelity :is\(button,select,input,textarea\)\{\s*min-width:0!important;min-height:0!important/);
- assert.match(participant,/aria-pressed=\{!participantReadingMode&&!participantPhoneMode\}/);
+ assert.match(participant,/aria-pressed=\{!participantReadingMode&&!audiencePortrait\}/);
  assert.match(participant,/audiencePortrait\?audiencePhoneLayout\.widgets:participantReadingMode\?audienceReadingWidgets:audienceVisibleWidgets/);
 });
 

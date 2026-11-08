@@ -4,7 +4,7 @@ import type {MobilePageLayout,WidgetTextStyle} from '../../api/src/domain';
  * document. No desktop background or desktop positions are imported. */
 export const MOBILE_PAGE_WIDTH = 390;
 export const MOBILE_PAGE_MIN_HEIGHT = 720;
-export type MobileWidget={id:string;kind:string;position?:{x:number;y:number;width:number;height?:number;rotation?:number};options?:unknown[];questions?:unknown[];description?:string;style?:WidgetTextStyle};
+export type MobileWidget={id:string;kind:string;position?:{x:number;y:number;width:number;height?:number;rotation?:number};options?:unknown[];questions?:unknown[];description?:string;resultTopCount?:number;showTitle?:boolean;showQrUrl?:boolean;style?:WidgetTextStyle};
 
 /** Automatically compact phone slides while leaving every answer usable.
  * Heights are measured in 390px *logical* pixels, not scaled desktop pixels.
@@ -31,15 +31,15 @@ export function mobileWidgetHeight(widget:MobileWidget):number {
     // options, leaving large unused blank zones above/below short answers.
     // 150px reserves title/description/submit plus the 44px choice rows.
     (options.length?150:190)+optionSpace+subquestionSpace+Math.min(190,Math.ceil(textLength/40)*26));
-  case 'topic-question':return 190;
+  case 'topic-question':return 228; // 96px textarea, 44px submit and title without scaling.
   case 'rating':return 230; // Comment and all ten 0–9 choices remain usable.
   case 'reactions':return 125;
-  case 'results-button':return 190;
+  case 'results-button':return Math.min(360,Math.max(176,110+Math.min(5,Math.max(1,Number(widget.resultTopCount)||5))*36)); // Reserve visible result rows, not empty card space.
   case 'title':return 68;
   case 'footer':return 54;
   case 'shape':case 'line':return 64;
   case 'text':case 'postit':return textLength>120?Math.min(220,130+Math.ceil((textLength-120)/90)*25):110;
-  case 'qr':return 164;
+  case 'qr':return 198+(widget.showQrUrl===false?0:28)+(widget.showTitle===true?22:0); // Bounded QR with optional URL/title, never desktop-sized.
   default:return 145;
  }
 }

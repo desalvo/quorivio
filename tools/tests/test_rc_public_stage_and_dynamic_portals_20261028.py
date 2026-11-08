@@ -15,7 +15,7 @@ class PublicSlideFidelity(unittest.TestCase):
    self.assertIn(clause,UI+'\n'+CSS)
   self.assertNotIn('position:"relative",minHeight:560',UI)
  def test_reading_mode_is_visible_controlled_and_reachable(self):
-  for clause in ('participantReadingMode','Diapositiva 16:9','Lettura accessibile','aria-pressed={!participantReadingMode&&!participantPhoneMode}','aria-pressed={participantPhoneMode&&!participantReadingMode}','aria-pressed={participantReadingMode}','aria-label="Visualizzazione della pagina"','aria-label="Contenuto della diapositiva" tabIndex={0}'):
+  for clause in ('participantReadingMode','Diapositiva 16:9','Lettura accessibile','aria-pressed={!participantReadingMode&&!audiencePortrait}','aria-pressed={!!audiencePortrait}','aria-pressed={participantReadingMode}','aria-label="Visualizzazione della pagina"','aria-label="Contenuto della diapositiva" tabIndex={0}'):
    self.assertIn(clause,UI)
   # Phone is a separately selected mode; it must not be inferred merely
   # from the viewport width, otherwise 16:9 changes geometry on mobile.

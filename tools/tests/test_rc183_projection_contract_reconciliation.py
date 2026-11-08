@@ -29,8 +29,8 @@ def rating_policy(ui: str, policy: str) -> bool:
 
 def reading_policy(ui: str, policy: str) -> bool:
     return all(x in ui for x in (
-        'aria-pressed={!participantReadingMode&&!participantPhoneMode}',
-        'aria-pressed={participantPhoneMode&&!participantReadingMode}',
+        'aria-pressed={!participantReadingMode&&!audiencePortrait}',
+        'aria-pressed={!!audiencePortrait}',
         'aria-pressed={participantReadingMode}',
         'participantReadingMode?audienceReadingWidgets:audienceVisibleWidgets',
         'backgroundImage:"none",backgroundColor:"#ffffff"',
@@ -72,7 +72,7 @@ class RC183ProjectionContracts(unittest.TestCase):
         self.assertTrue(reading_policy(UI, POLICY))
 
     def test_phone_and_reading_mutations_are_detected(self):
-        altered = UI.replace('aria-pressed={participantPhoneMode&&!participantReadingMode}',
+        altered = UI.replace('aria-pressed={!!audiencePortrait}',
                              'aria-pressed={participantReadingMode}', 1)
         self.assertNotEqual(altered, UI)
         self.assertFalse(reading_policy(altered, POLICY))

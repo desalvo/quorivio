@@ -67,8 +67,8 @@ def validate_contract(source: str, app: str, workflow: str) -> None:
     for value in (
         'defaultParticipantPhoneMode(window.innerWidth,window.matchMedia',
         'if(participantModeExplicit)return;',
-        "aria-pressed={participantPhoneMode&&!participantReadingMode}",
-        "aria-pressed={!participantReadingMode&&!participantPhoneMode}",
+        "aria-pressed={!!audiencePortrait}",
+        "aria-pressed={!participantReadingMode&&!audiencePortrait}",
         'setParticipantModeExplicit(true);setParticipantReadingMode(false);setParticipantPhoneMode(false)',
     ):
         if value not in app:

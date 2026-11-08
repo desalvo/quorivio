@@ -1,3 +1,7 @@
+# Quorivio 0.1.0-dev — RC268 — Anteprima, ordinamento e smartphone
+
+**RC268:** CI RC267 [42516844646](https://github.com/desalvo/quorivio/actions/runs/42516844646) e pubblicazione Docker [42518673212](https://github.com/desalvo/quorivio/actions/runs/42518673212) verdi. Fullscreen del vero canvas 16:9, frecce in anteprima, menu contestuale sulla parte vuota delle miniature, drop prima/tra/dopo, QR e risultati smartphone più compatti e proiezione automatica 16:9 per pagine PDF/statiche su smartphone, solo per pagina corrente. Restano selezione manuale e lettura accessibile. Kubernetes/database/converter immutati. **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; full CI RC268 e collaudo cluster ancora richiesti; nessun commit/push/tag. `docs/RC_CYCLE268_PREVIEW_SIDEBAR_PHONE_FIDELITY.it.md`.
+
 # Quorivio 0.1.0-dev — RC267 — Correzione shell della CI Node
 
 **RC267:** Risolto il fallimento della full CI RC266 [42511888604](https://github.com/desalvo/quorivio/actions/runs/42511888604): un carattere di continuazione mancante causava `Permission denied` quando bash eseguiva un file `.test.ts`. Ripristinato il comando Node con tutti e tre i test; nuovo test preventivo esegue lo script originale della CI prima delle dipendenze npm. Runtime dell’editor e wizard Kubernetes invariati. **85,25%** (43 gate accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; full CI RC267 ancora da eseguire, nessun commit/push/tag. `docs/RC_CYCLE267_CI_NODE_RUNNER_CONTINUATION.it.md`.
