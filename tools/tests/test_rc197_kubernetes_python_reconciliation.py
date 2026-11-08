@@ -15,7 +15,7 @@ class RC197IntegrationContracts(unittest.TestCase):
   self.assertIn('const audienceActivity=rehearsalAudiencePage(activity,activities)',rehearsal)
   self.assertIn("const viewActivity=viewer==='presenter'?activity:audienceActivity",rehearsal)
   self.assertIn("const viewWidgets=viewer==='presenter'?presenterWidgets:widgets",rehearsal)
-  self.assertIn('!viewWidgets.length&&<h2 className="rehearsal-empty-title">{viewActivity?.page_design?.header||viewActivity?.title}</h2>',rehearsal)
+  self.assertIn('!viewWidgets.length&&!viewActivity?.page_design?.importedImageFit&&<h2 className="rehearsal-empty-title">{viewActivity?.page_design?.header||viewActivity?.title}</h2>',rehearsal)
   self.assertIn('disabled={page>=presenterPages.length-1}',rehearsal)
   self.assertNotIn('REHEARSAL_REACTION_PREFIX+activity.id',rehearsal)
   self.assertIn('REHEARSAL_REACTION_PREFIX+audienceActivity.id',rehearsal)

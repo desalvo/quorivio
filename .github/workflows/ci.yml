@@ -369,6 +369,14 @@ jobs:
             tools.tests.test_rc260_generated_manifest_reconciliation \
             tools.tests.test_rc246_converter_upgrade \
             tools.tests.test_rc258_standalone_wizard_rollout
+      # RC265: imported full-bleed PDF/PPTX pages must use private canvas backgrounds,
+      # preserve three explicit fit modes, suppress inherited overlay by default,
+      # and render real thumbnails on all stages without an npm install.
+      - name: RC265 PDF image full-canvas and thumbnail acceptance before npm
+        run: |
+          node --experimental-strip-types --test \
+            apps/web/test/rc265-image-import-full-bleed.test.ts \
+            apps/api/test/rc265-image-import-full-bleed.test.ts
       # RC264: synthetic cross-filesystem renderer tests also need to mock
       # PNG decoding in the pre-npm runner, which intentionally has no Pillow.
       # Production _verify_png must continue to fail closed without Pillow.
@@ -1663,7 +1671,8 @@ jobs:
           python3 tools/verify_rc_cycle261_inventory.py --historical
           python3 tools/verify_rc_cycle262_inventory.py --historical
           python3 tools/verify_rc_cycle263_inventory.py --historical
-          python3 tools/verify_rc_cycle264_inventory.py
+          python3 tools/verify_rc_cycle264_inventory.py --historical
+          python3 tools/verify_rc_cycle265_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

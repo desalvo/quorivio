@@ -950,7 +950,7 @@ header.rehearsal-toolbar{height:auto;min-height:0;flex:0 0 auto;position:relativ
 .projection-sample-profile .page-widget img{width:min(4em,96px);height:min(4em,96px);object-fit:cover;border-radius:50%}
 
 /* Cycle 39: do not let old white canvas backgrounds override the selected page image. */
-.editor-ux-v2 .canvas-with-rulers .widget-canvas{background-color:#fff!important;background-image:var(--editor-page-background,none)!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important}
+.editor-ux-v2 .canvas-with-rulers .widget-canvas{background-color:#fff!important;background-image:var(--editor-page-background,none)!important;background-size:var(--editor-page-background-size,cover)!important;background-position:center!important;background-repeat:no-repeat!important}
 @keyframes quorivio-word-cloud-float{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-.3em) scale(1.035)}}
 .widget-results-cloud .result-cloud-word,.result-view-cloud .linked-results-row{animation:quorivio-word-cloud-float 3.8s ease-in-out infinite;will-change:transform}
 .widget-results-cloud .result-cloud-word:nth-child(3n),.result-view-cloud .linked-results-row:nth-child(3n){animation-delay:-1.3s}
@@ -3013,7 +3013,7 @@ body .editor-floating-panel.widget-selection-palette .widget-format-advanced inp
 }
 
 /* RC225: master background parity and filename-labeled visual library selection. */
-.slide-scheme-canvas .canvas-with-rulers .widget-canvas{background-image:var(--editor-page-background,none)!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important}
+.slide-scheme-canvas .canvas-with-rulers .widget-canvas{background-image:var(--editor-page-background,none)!important;background-size:var(--editor-page-background-size,cover)!important;background-position:center!important;background-repeat:no-repeat!important}
 .background-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:7px;max-height:min(235px,38vh);overflow-y:auto;overscroll-behavior:contain;padding:5px;border:1px solid #a6b3c2;border-radius:9px;background:rgba(255,255,255,.94);min-width:0}
 .background-gallery-choice{display:flex;flex-direction:column;align-items:stretch;gap:4px;min-width:0;min-height:93px;padding:5px;border:1px solid #a9bacb;border-radius:6px;background:#f8fafc;color:#16283d;cursor:pointer;overflow:hidden}
 .background-gallery-choice[aria-pressed="true"]{outline:2px solid #086ec6;outline-offset:-2px;background:#e5f2ff}
@@ -3400,3 +3400,14 @@ html,body,#root,.app{min-height:calc(100dvh / var(--quorivio-ui-scale))}
   max-width:min(100%,calc(28px + (100cqh - 35px)*16/9))!important;
  }
 }
+
+/* RC265: imported PDF/PPTX pages are full-canvas pictures, with no theme overlay in thumbnails. */
+.editor-ux-v2 .page-editor-preview[data-imported-image="true"]{background-color:#fff!important;background-repeat:no-repeat!important;box-shadow:none!important;}
+.editor-ux-v2 .page-editor-preview[data-imported-image="true"]::after{display:none!important;}
+.pdf-import-image-options{margin:10px 0;border:1px solid #8194a5;border-radius:8px;padding:12px;}
+.pdf-import-image-options label{display:block;margin:7px 0;}
+.pdf-import-hide-master{display:flex!important;gap:10px;align-items:flex-start;}
+.pdf-import-hide-master input{width:auto!important;flex:none;}
+
+.page-editor-preview-real-image{position:absolute;inset:0;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:cover;display:block;}
+.page-editor-preview-widget:has(>.page-editor-preview-real-image){border:0!important;padding:0!important;background:none!important;}

@@ -1,3 +1,7 @@
+# Quorivio 0.1.0-dev — RC265 — Full-canvas raster PDF/PPTX import
+
+**RC265:** Imported PDF/PPTX image pages now support `cover`, `contain` and forced `fill`, opt-out inherited scheme/title/footer/page number suppression, genuine private page backgrounds, and real page thumbnails. RC264 full CI green [42498365156](https://github.com/desalvo/quorivio/actions/runs/42498365156), manual app/converter Docker publication succeeded; full RC265 CI pending. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag. `docs/RC_CYCLE265_PDF_FULL_BLEED_IMPORT.en.md`.
+
 # Quorivio 0.1.0-dev — RC264 — Pillow-independent PDF converter preflight
 
 **RC264:** Committed RC263 full CI [42496843522](https://github.com/desalvo/quorivio/actions/runs/42496843522) stopped at pre-npm converter regression: mocked Poppler, but the synthetic PDF mount tests still invoked Pillow on an intentionally dependency-free runner. RC264 checks exact deterministic fixture PNG bytes in the mount tests without relying on Pillow, while production retains mandatory `Image.verify()` and `Image.load()`; absent Pillow now fails explicitly instead of `UnboundLocalError`. Added early RC264 gate, retained CVE/Trivy security checks. No wizard RC263 or Kubernetes mutation. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; GitHub full CI RC264 pending, no commit/push/tag. `docs/RC_CYCLE264_PILLOW_CI_FIX.en.md`.

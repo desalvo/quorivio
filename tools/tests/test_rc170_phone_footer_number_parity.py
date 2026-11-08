@@ -27,7 +27,7 @@ class RC170PhoneFooterParity(unittest.TestCase):
         self.assertIn(':not([data-custom-number="true"])',last)
 
     def test_editor_shows_master_page_number_without_changing_page_widgets(self):
-        self.assertIn('numberingWidgets={resolveSlideMasterWidgets(pageWidgets,snap.session.theme?.master?.widgets)}',UI)
+        self.assertIn('numberingWidgets={(snap.activities.find(a=>a.id===designActivity) as any)?.page_design?.suppressMaster?pageWidgets:resolveSlideMasterWidgets(pageWidgets,snap.session.theme?.master?.widgets)}',UI)
         self.assertIn('widgets={numberingWidgets??widgets}',UI)
         self.assertIn('onChange={changeCanvasWidgets}',UI)
         self.assertNotIn('onChange={resolveSlideMasterWidgets(',UI)

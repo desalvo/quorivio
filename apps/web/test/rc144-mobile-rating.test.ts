@@ -76,5 +76,5 @@ test('RC144 invalid mobile layout backups fail closed and phone backdrop never i
  assert.match(source,/onBackgroundColorChange=\{color=>setMobileLayoutDraft/);
  assert.match(css,/\.audience-widget-layout\.stage-phone/);
  assert.match(css,/background-color:var\(--editor-phone-background-color,#ffffff\)!important/);
- assert.match(source,/mobile\?\{backgroundImage:viewActivity\?\.page_design\?\.mobile\?\.backgroundAssetId/);
+ assert.match(source,/mobile&&!viewActivity\?\.page_design\?\.importedImageFit\?\{backgroundImage:viewActivity\?\.page_design\?\.mobile\?\.backgroundAssetId/);
 });

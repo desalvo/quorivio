@@ -31,7 +31,7 @@ class RC195MasterTypographyCI(unittest.TestCase):
  def test_historical_presentation_contracts_follow_independent_page_routing(self):
   ui=UI;typography=STAGE
   checks={
-   'tools/tests/test_rc144_mobile_rating.py':"mobile?{backgroundImage:viewActivity?.page_design?.mobile?.backgroundAssetId?",
+   'tools/tests/test_rc144_mobile_rating.py':"mobile&&!viewActivity?.page_design?.importedImageFit?{backgroundImage:viewActivity?.page_design?.mobile?.backgroundAssetId?",
    'tools/tests/test_rc167_live_preview_fidelity.py':'mobile?participantPhoneLayout(viewWidgets,viewActivity?.page_design?.mobile).widgets',
    'tools/tests/test_rc168_phone_preview_parity.py':'height={participantPhoneLayout(widgets,audienceActivity?.page_design?.mobile).height}',
    'tools/tests/test_rc169_rating_typography_parity.py':"widget.kind==='title'?widgetDisplay(widget,context).style:widgetTextDefaults(widget.kind,widget.style)",

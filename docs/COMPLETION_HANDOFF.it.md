@@ -1,3 +1,7 @@
+# Quorivio 0.1.0-dev — RC265 — PDF/PPTX immagini full canvas
+
+**RC265:** Importazione PDF/PPTX raster con scelta `cover`/`contain`/`fill` e nascondimento predefinito di schemi, titoli, footer, numerazione. Asset immagine locale come background di pagina con miniature reali. RC264 full CI verde [42498365156](https://github.com/desalvo/quorivio/actions/runs/42498365156), due immagini Docker pubblicate; nuova full CI RC265 da eseguire. **85,25%** (43 gate accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. `docs/RC_CYCLE265_PDF_FULL_BLEED_IMPORT.it.md`.
+
 # Quorivio 0.1.0-dev — RC264 — Preflight PDF indipendente da Pillow
 
 **RC264:** La full CI RC263 [42496843522](https://github.com/desalvo/quorivio/actions/runs/42496843522) si è fermata nel preflight RC263: i mock della conversione PDF simulavano Poppler ma non la decodifica Pillow, assente sul runner. I test di staging verificano ora i byte PNG sintetici senza dipendere da Pillow; la conversione reale continua a richiedere la verifica completa `Image.verify()` e `Image.load()` e segnala esplicitamente l'assenza di Pillow senza `UnboundLocalError`. Aggiunto preflight RC264 e mantenute le verifiche di sicurezza CVE/Trivy. Nessuna modifica al wizard RC263 né al cluster; manifest `k8s-generated` sincronizzati dall'operatore. **85,25%** (43 completati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; full CI RC264 ancora da verificare, nessun commit/push/tag. `docs/RC_CYCLE264_PILLOW_CI_FIX.it.md`.

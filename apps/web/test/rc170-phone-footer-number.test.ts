@@ -18,7 +18,7 @@ test('RC170 the editor renders a master-owned page number without copying the ma
  assert.equal(number?.fontSize,22);
  assert.equal(number?.paddingRight,17);
  assert.equal(number?.paddingBottom,13);
- assert.ok(main.includes('numberingWidgets={resolveSlideMasterWidgets(pageWidgets,snap.session.theme?.master?.widgets)}'));
+ assert.ok(main.includes('page_design?.suppressMaster?pageWidgets:resolveSlideMasterWidgets(pageWidgets,snap.session.theme?.master?.widgets)'));
  assert.ok(main.includes('<SlideCanvasNumber widgets={numberingWidgets??widgets} pageNumber={pageNumber}/>'));
 });
 

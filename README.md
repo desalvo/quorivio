@@ -1,3 +1,5 @@
+> **RC265 — PDF/PPTX full canvas:** import as pictures with `cover` default, `contain` or forced `fill`; hide inherited title/footer/page number by default; real page thumbnails. [`RC265 notes`](docs/RC_CYCLE265_PDF_FULL_BLEED_IMPORT.en.md).
+
 > **RC264 — Pillow CI fix:** synthetic PDF staging regressions no longer require Pillow or Poppler before npm; production full PNG validation remains mandatory. See [`docs/RC_CYCLE264_PILLOW_CI_FIX.en.md`](docs/RC_CYCLE264_PILLOW_CI_FIX.en.md).
 
 > **RC263 — CI and PostgreSQL wizard reconciliation:** Mock PDF regressions now work without host Poppler; the standalone wizard allows only exact Kubernetes API defaults on the DB probe and still fails on real security or volume drift. Recover completed rollout with `--sync-disk-monitor` without another DB restart. See [`docs/RC_CYCLE263_CI_KUBERNETES_DEFAULTS.en.md`](docs/RC_CYCLE263_CI_KUBERNETES_DEFAULTS.en.md).

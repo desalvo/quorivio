@@ -11,7 +11,10 @@ export function slideBackground(page:PageDesign|undefined,theme:PageDesign|undef
 }
 export function slideBackgroundCss(page:PageDesign|undefined,theme:PageDesign|undefined,assetUrl:(id:string)=>string){
  const chosen=slideBackground(page,theme);
- return chosen.assetId?{backgroundImage:`url("${assetUrl(chosen.assetId)}")`,backgroundSize:'cover',backgroundPosition:'center'}:
- chosen.url?{backgroundImage:`url("${chosen.url}")`,backgroundSize:'cover',backgroundPosition:'center'}:
+ const fit=page?.importedImageFit||'cover';
+ const imageSize=fit==='fill'?'100% 100%':fit;
+ const backdrop=page?.importedImageFit?{backgroundColor:'#ffffff',backgroundRepeat:'no-repeat'}:{};
+ return chosen.assetId?{...backdrop,backgroundImage:`url("${assetUrl(chosen.assetId)}")`,backgroundSize:imageSize,backgroundPosition:'center'}:
+ chosen.url?{...backdrop,backgroundImage:`url("${chosen.url}")`,backgroundSize:imageSize,backgroundPosition:'center'}:
  chosen.color?{backgroundColor:chosen.color}:{};
 }

@@ -1646,6 +1646,9 @@ app.post('/api/sessions/:id/presentation-import',requireAuth,async(req,res)=>{
  }
  if(!await converterWorkerReady()){res.status(503).json({error:'conversion_worker_unavailable'});return}
  const mime=String(req.headers['content-type']||'').split(';')[0].trim().toLowerCase();
+ const importedImageFit=String(req.headers['x-quorivio-image-fit']||'cover');
+ const suppressMaster=String(req.headers['x-quorivio-hide-scheme']||'1');
+ if(!['contain','cover','fill'].includes(importedImageFit)||!['0','1'].includes(suppressMaster)){res.status(400).json({error:'invalid_import_image_options'});return}
  if(!['application/pdf','application/vnd.openxmlformats-officedocument.presentationml.presentation'].includes(mime)){
   res.status(415).json({error:'unsupported_presentation'});return;
  }
@@ -1686,7 +1689,7 @@ app.post('/api/sessions/:id/presentation-import',requireAuth,async(req,res)=>{
    await writeFile(dest,contents,{flag:'wx',mode:0o600});created.push(dest);
    await cx.query('INSERT INTO session_assets(id,session_id,uploaded_by,mime_type,byte_size,sha256) VALUES($1,$2,$3,$4,$5,$6)',[assetId,s.id,auth(req),'image/png',contents.length,entry.sha256]);
    const title=`Slide ${i+1}`;
-   await cx.query("INSERT INTO activities(id,session_id,type,title,options,position,page_design,result_design,answer_mode,answer_required) VALUES($1,$2,'slide',$3,'[]'::jsonb,$4,$5,'{}'::jsonb,'text',false)",[aid,s.id,title,Number(next.rows[0].p)+i,JSON.stringify({widgets:[{id:'imported_slide',kind:'image',label:title,assetId:assetId,position:{x:0,y:0,width:100,height:100,rotation:0}}]})]);
+   await cx.query("INSERT INTO activities(id,session_id,type,title,options,position,page_design,result_design,answer_mode,answer_required) VALUES($1,$2,'slide',$3,'[]'::jsonb,$4,$5,'{}'::jsonb,'text',false)",[aid,s.id,title,Number(next.rows[0].p)+i,JSON.stringify({backgroundAssetId:assetId,backgroundColor:'#ffffff',importedImageFit,suppressMaster:suppressMaster==='1',widgets:[]})]);
    await cx.query('INSERT INTO presentation_slide_assets(activity_id,asset_id) VALUES($1,$2)',[aid,assetId]);ids.push(aid);
   }
   await cx.query('COMMIT');transaction=false;await broadcast(s.id);

@@ -55,8 +55,8 @@ def guard_editor_consistency(web: str, css: str, api: str, domain: str, pptx: st
                      'footerNumberFontSize', 'answerFontFamily'):
         if fragment not in domain:
             raise AssertionError('Missing persisted typography field: '+fragment)
-    for fragment in ("id:'imported_slide',kind:'image'", 'assetId:assetId',
-                     'position:{x:0,y:0,width:100,height:100,rotation:0}',
+    for fragment in ("backgroundAssetId:assetId", "importedImageFit",
+                     "suppressMaster:suppressMaster==='1'", 'widgets:[]',
                      'presentation_slide_assets(activity_id,asset_id)'):
         if fragment not in api:
             raise AssertionError('Imported page not visible in the editor: '+fragment)
@@ -77,7 +77,7 @@ class RC205EditorConsistency(unittest.TestCase):
 
     def test_guard_rejects_old_raster_only_import(self):
         with self.assertRaisesRegex(AssertionError, 'Imported page'):
-            guard_editor_consistency(WEB, CSS, API.replace("id:'imported_slide',kind:'image'", "media:[{kind:'image'}]", 1), DOMAIN, PPTX)
+            guard_editor_consistency(WEB, CSS, API.replace("backgroundAssetId:assetId", "media:[{kind:'image'}]", 1), DOMAIN, PPTX)
 
     def test_guard_rejects_duplicate_font_picker(self):
         with self.assertRaisesRegex(AssertionError, 'Duplicate'):

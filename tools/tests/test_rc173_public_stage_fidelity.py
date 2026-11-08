@@ -19,7 +19,7 @@ class RC173PublicStageTests(unittest.TestCase):
 
     def test_wrapper_is_not_second_slide_background(self):
         self.assertIn('style={{backgroundColor:"transparent",backgroundImage:"none"}}', self.participant)
-        self.assertIn(':slideBackgroundCss(entry.activity.page_design', self.participant)
+        self.assertIn('...slideBackgroundCss(entry.activity.page_design', self.participant)
         self.assertNotIn('participant-live-view" style={window.matchMedia', self.participant)
 
     def test_reading_and_fidelity_are_explicit_separate_modes(self):
