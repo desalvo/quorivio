@@ -336,6 +336,13 @@ jobs:
             tools.tests.test_rc161_master_background_graphics \
             tools.tests.test_rc145_mobile_background_font
           node --experimental-strip-types --test apps/web/test/rc254-all-widget-schema-fonts.test.ts
+      # RC257: RC256 missed the RC193 fixture that asserted an unsafe raw
+      # fontFamily fallback. Run the entire legacy font contract and a scan of
+      # future source-literal assertions early, before the older RC193 step.
+      - name: RC257 all historical Arial text fallback guards before npm
+        run: |
+          python3 -m unittest -q tools.tests.test_rc257_full_arial_preflight tools.tests.test_rc193_focus_and_font
+          node --experimental-strip-types --test apps/web/test/rc254-all-widget-schema-fonts.test.ts
       # RC242: Arial on widget text, compact master commands, persistent global zoom.
       - name: RC242 Arial and app-wide zoom contract before npm
         run: |
@@ -1586,7 +1593,8 @@ jobs:
           python3 tools/verify_rc_cycle253_inventory.py --historical
           python3 tools/verify_rc_cycle254_inventory.py --historical
           python3 tools/verify_rc_cycle255_inventory.py --historical
-          python3 tools/verify_rc_cycle256_inventory.py
+          python3 tools/verify_rc_cycle256_inventory.py --historical
+          python3 tools/verify_rc_cycle257_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

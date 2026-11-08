@@ -12,6 +12,7 @@ ROOT=Path(__file__).resolve().parents[2]
 
 HISTORICAL=(
     'tools/tests/test_rc145_mobile_background_font.py',
+    'tools/tests/test_rc193_focus_and_font.py',
     'tools/tests/test_rc161_master_background_graphics.py',
     'tools/tests/test_rc194_question_typography.py',
     'tools/tests/test_rc195_master_typography_ci.py',
@@ -58,7 +59,8 @@ class RC256HistoricalArialCompat(unittest.TestCase):
         preflight=ci[early:late]
         for module in ('test_rc256_historical_arial_compat','test_rc242_arial_master_zoom',
                        'test_rc194_question_typography','test_rc195_master_typography_ci',
-                       'test_rc161_master_background_graphics','test_rc145_mobile_background_font'):
+                       'test_rc161_master_background_graphics','test_rc145_mobile_background_font',
+                       'test_rc193_focus_and_font'):
             self.assertIn('tools.tests.'+module,preflight)
         self.assertIn('node --experimental-strip-types --test apps/web/test/rc254-all-widget-schema-fonts.test.ts',preflight)
 

@@ -22,11 +22,18 @@ class FocusAndFont(unittest.TestCase):
   self.assertIn('setDraft(value);const next=valid(value)',UI)
   self.assertIn('palette-ribbon-font-stepper button',STYLE)
  def test_arials_and_answer_styles_reach_original_and_independent_options(self):
-  self.assertIn("style?.fontFamily||'Arial'",OPTIONS)
+  # RC257: the original raw fallback accepts the literal CSS face "undefined".
+  # The validated helper must guard both the option and the submit button.
+  self.assertIn('const family=safeWidgetFontFamily(style?.answerFontFamily,safeWidgetFontFamily(style?.fontFamily));',OPTIONS)
+  self.assertIn('fontFamily:safeWidgetFontFamily(style?.submitFontFamily,safeWidgetFontFamily(style?.fontFamily))',OPTIONS)
+  self.assertNotIn("style?.fontFamily||'Arial'",OPTIONS)
   self.assertIn("'--q-answer-font-family':family",OPTIONS)
   self.assertIn('canvas-subquestion-option{',STYLE)
   self.assertIn('font-family:var(--q-answer-font-family,Arial)!important',STYLE)
-  self.assertIn("value={w.style?.answerFontFamily||w.style?.fontFamily||'Arial'}",UI)
+  # The answer-font selector must remain independently operable. Do not
+  # pin the test to an unsafe, hardcoded fallback expression in UI source.
+  self.assertIn('aria-label="Font campo risposta"',UI)
+  self.assertIn('style:{...z.style,answerFontFamily:e.target.value}',UI)
  def test_preflight_is_before_build(self):
   self.assertIn('tools.tests.test_rc193_focus_and_font',CI)
   self.assertIn('apps/web/test/rc193-font-focus.test.ts',CI)
