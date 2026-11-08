@@ -369,6 +369,20 @@ jobs:
             tools.tests.test_rc260_generated_manifest_reconciliation \
             tools.tests.test_rc246_converter_upgrade \
             tools.tests.test_rc258_standalone_wizard_rollout
+      # RC261: converting PDF/PPTX on separate Kubernetes /tmp and /conversions
+      # mounts must publish pages with same-filesystem atomic rename. The
+      # converter image must patch the two Trivy HIGH zlib1g CVEs, never waive.
+      - name: RC261 cross-mount PDF import and zlib CVE preflight before npm
+        run: |
+          python3 -m unittest tools.tests.test_rc261_conversion_mount_and_zlib -q
+          python3 tools/ci_converter_apt_security.py
+      # RC262: read actual PVC capacity, never pg_database_size as filesystem%,
+      # notify admins at 90% with cross-replica dedup and rearm below 85%.
+      # The standalone wizard adds a PostgreSQL probe with explicit restart opt-in.
+      - name: RC262 disk capacity telemetry, email thresholds and standalone PostgreSQL probe before npm
+        run: |
+          python3 -m unittest tools.tests.test_rc262_disk_monitor_wizard -q
+          node --experimental-strip-types --test apps/api/test/rc262-disk-capacity-monitor.test.ts
       # RC242: Arial on widget text, compact master commands, persistent global zoom.
       - name: RC242 Arial and app-wide zoom contract before npm
         run: |
@@ -1311,6 +1325,10 @@ jobs:
       # binaries and Python packages above exist. Keep all tests mandatory.
       - name: RC232 PDF/PPTX converter boundary after native dependencies
         run: python3 -m unittest tools.tests.test_rc_conversion_30_cycle -q
+      # RC261: actual one-page PDF and PPTX, Poppler and LibreOffice, using
+      # different Linux filesystems for renderer scratch and system /tmp.
+      - name: RC261 real PDF/PPTX import across separate writable mounts
+        run: python3 -m unittest tools.tests.test_rc261_real_mount_pdf_pptx -q
       - name: RC202 native imported-slide PowerPoint fidelity after Python dependencies
         run: PYTHONPATH=tools python3 -m unittest tools.tests.test_rc200_editor_portability.RC200NativePowerPointPortability -v
       - name: RC205 imported raster slide round-trip and editability
@@ -1623,7 +1641,9 @@ jobs:
           python3 tools/verify_rc_cycle257_inventory.py --historical
           python3 tools/verify_rc_cycle258_inventory.py --historical
           python3 tools/verify_rc_cycle259_inventory.py --historical
-          python3 tools/verify_rc_cycle260_inventory.py
+          python3 tools/verify_rc_cycle260_inventory.py --historical
+          python3 tools/verify_rc_cycle261_inventory.py --historical
+          python3 tools/verify_rc_cycle262_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

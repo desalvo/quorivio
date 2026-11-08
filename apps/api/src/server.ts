@@ -27,7 +27,8 @@ import {LOAD_DEMO_KEY,LOAD_DEMO_TITLE,loadDemoPages} from './load-test-demo.js';
 import {downloadGravatar} from './gravatar.js';
 import {normalizeResetEmail,generateResetToken,resetTokenDigest,validResetToken,validNewPassword,resetLink} from './password-reset.js';
 import {generateTotpSecret,makeTotp,verifyTotp,sealTotp,openTotp,totpAuthUrl,validTotpCode} from './totp.js';
-import {smtpConfigFromEnv,sendTestEmail,sendPasswordResetEmail,sendEmailOtp} from './smtp.js';
+import {smtpConfigFromEnv,sendTestEmail,sendPasswordResetEmail,sendEmailOtp,sendDiskCapacityAlert} from './smtp.js';
+import {readApplicationDisk,readDatabaseDisk,nextDiskAlertAction,diskAlertStateKey,DISK_ALERT_THRESHOLD_PERCENT,DISK_ALERT_RECOVERY_PERCENT,DISK_MONITOR_INTERVAL_MS,type DiskReading,type DiskVolume} from './disk-monitor.js';
 import {createEmailOtp,emailOtpDigest,matchesEmailOtp,validEmailOtp} from './email-otp.js';
 import {sealSmtpConfig,openSmtpConfig,validateSmtpInput,publicSmtpConfig} from './smtp-store.js';
 import {widgetAnswerShapeChanged,aggregateWidgetAnswerRevisions,aggregateShortTextAnswers,liveTimedWidgetMutation,questionRevisionAtHistory} from './widget-revisions.js';
@@ -757,6 +758,57 @@ app.get('/api/admin/privacy/erasure-status',requireAuth,requireAdmin,async(_req,
  res.setHeader('Cache-Control','private, no-store');res.json(result.rows[0]);
  }catch(e){sendError(res,e)}
 });
+/** Storage status is private to platform administrators. PostgreSQL's
+ * pg_database_size is shown only as context: it is NOT the filesystem used%
+ * and is never used for notifications (it omits WAL and other DB files). */
+async function collectDiskStatus(){
+ const [application,conversion,dbSample,logical,smtp]=await Promise.all([
+  readApplicationDisk(assetRoot),
+  readApplicationDisk(process.env.QUORIVIO_CONVERSION_DIR||'/conversions','conversion_volume'),
+  db.query("SELECT total_bytes,available_bytes,observed_at FROM disk_monitor_samples WHERE source='database'"),
+  db.query('SELECT pg_database_size(current_database()) AS logical_bytes'),
+  activeSmtpConfig().then(Boolean).catch(()=>false)
+ ]);
+ const database=readDatabaseDisk(dbSample.rows[0]||null);
+ return {thresholdPercent:DISK_ALERT_THRESHOLD_PERCENT,recoveryPercent:DISK_ALERT_RECOVERY_PERCENT,
+  checkedAt:new Date().toISOString(),emailNotificationsConfigured:smtp,application,conversion,database,logicalDatabaseBytes:Number(logical.rows[0]?.logical_bytes??0)};
+}
+app.get('/api/admin/disk-usage',requireAuth,requireAdmin,async(_req,res)=>{
+ try{res.setHeader('Cache-Control','private, no-store');res.json(await collectDiskStatus())}catch(e){sendError(res,e)}
+});
+/** A transaction-scoped row lock serializes alert delivery across API replicas.
+ * An SMTP failure rolls back the state, allowing the next periodic retry.
+ * Exactly-once network email is impossible after a crash between delivery and
+ * database commit, but in normal operation one email is sent per crossing. */
+async function applyDiskThresholdAlert(source:DiskVolume,reading:DiskReading){
+ if(reading.status==='unavailable'||reading.usedPercent===null||reading.usedBytes===null||reading.totalBytes===null)return;
+ const key=diskAlertStateKey(source,String(process.env.HOSTNAME||process.pid));
+ const cx=await db.connect();
+ try{
+  await cx.query('BEGIN');
+  await cx.query("INSERT INTO disk_monitor_alert_state(source,state) VALUES($1,'normal') ON CONFLICT(source) DO NOTHING",[key]);
+  const existing=await cx.query('SELECT state FROM disk_monitor_alert_state WHERE source=$1 FOR UPDATE',[key]);
+  const action=nextDiskAlertAction(reading.usedPercent,existing.rows[0]?.state||'normal');
+  if(action==='rearm')await cx.query("UPDATE disk_monitor_alert_state SET state='normal',updated_at=now() WHERE source=$1",[key]);
+  if(action==='send'){
+   const smtp=await activeSmtpConfig();
+   if(!smtp)throw Error('smtp_not_configured_for_disk_alerts');
+   const users=await cx.query("SELECT DISTINCT lower(email) AS email FROM users WHERE role='platform_admin' AND approved=true AND email IS NOT NULL ORDER BY email");
+   const recipients=users.rows.map(row=>String(row.email));
+   if(!recipients.length)throw Error('no_approved_platform_administrators');
+   await sendDiskCapacityAlert(smtp,recipients,source,reading.usedPercent,reading.usedBytes,reading.totalBytes);
+   await cx.query("UPDATE disk_monitor_alert_state SET state='alert',notified_at=now(),updated_at=now() WHERE source=$1",[key]);
+  }
+  await cx.query('COMMIT');
+ }catch(e){await cx.query('ROLLBACK').catch(()=>{});console.error('disk capacity alert pending',source,e instanceof Error?e.message:'unknown')}
+ finally{cx.release()}
+}
+async function runDiskCapacityAudit(){
+ try{
+  const {application,conversion,database}=await collectDiskStatus();
+  await Promise.all([applyDiskThresholdAlert('application',application),applyDiskThresholdAlert('conversion',conversion),applyDiskThresholdAlert('database',database)]);
+ }catch(e){console.error('disk capacity monitor unavailable',e instanceof Error?e.message:'unknown')}
+}
 app.get('/api/admin/settings',requireAuth,requireAdmin,async(_req,res)=>{try{const r=await db.query('SELECT key,value FROM platform_settings');res.json(Object.fromEntries(r.rows.map(x=>[x.key,x.value])))}catch(e){sendError(res,e)}});
 app.patch('/api/admin/settings',requireAuth,requireAdmin,async(req,res)=>{
  const patch=validateSettingsPatch(req.body);
@@ -1614,7 +1666,7 @@ app.post('/api/sessions/:id/presentation-import',requireAuth,async(req,res)=>{
   const controller=new AbortController();const deadline=setTimeout(()=>controller.abort(),240000);
   try{
    const reply=await fetch(`${workerUrl}/convert`,{method:'POST',headers:{'Authorization':`Bearer ${workerToken}`,'Content-Type':'application/json'},body:JSON.stringify({job:path.basename(scratch)}),signal:controller.signal});
-   if(!reply.ok)throw Error('conversion_worker_failed');
+   if(!reply.ok)throw Error(reply.status===422?'conversion_failed':'conversion_worker_failed');
   }finally{clearTimeout(deadline)}
   const manifest=JSON.parse(await readFile(path.join(output,'manifest.json'),'utf8'));
   if(manifest.format!=='quorivio-presentation-pages'||manifest.version!==1||!Number.isInteger(manifest.page_count)||manifest.page_count<1||manifest.page_count>200||!Array.isArray(manifest.pages)||manifest.pages.length!==manifest.page_count)throw Error('invalid_conversion_manifest');
@@ -1639,7 +1691,7 @@ app.post('/api/sessions/:id/presentation-import',requireAuth,async(req,res)=>{
   }
   await cx.query('COMMIT');transaction=false;await broadcast(s.id);
   res.status(201).json({created:ids.length,activity_ids:ids});
- }catch(e){if(transaction)await cx.query('ROLLBACK').catch(()=>{});for(const f of created)await unlink(f).catch(()=>{});sendError(res,e)}
+ }catch(e){if(transaction)await cx.query('ROLLBACK').catch(()=>{});for(const f of created)await unlink(f).catch(()=>{});if(e instanceof Error&&e.message==='conversion_failed'){res.status(422).json({error:'conversion_failed'});}else{sendError(res,e)}}
  finally{cx.release();await rm(scratch,{recursive:true,force:true}).catch(()=>{})}
 });
 // Editable PowerPoint import/export shares the existing isolated converter worker.
@@ -2253,7 +2305,7 @@ wss.on('connection',(ws:WebSocket,_req:unknown,sid:string)=>{
 });
 function participantSnapshot(data:any){if(!data)return data;const presenterId=data.session.presenter_activity_id||data.session.current_activity_id;const visibleIndex=(data.activities||[]).filter((a:any)=>a.page_design?.presenterHidden!==true).findIndex((a:any)=>a.id===presenterId);const presenterNumber=visibleIndex>=0?visibleIndex+1:1;const aid=data.session.status==='active'?data.session.current_activity_id:null;const published=aid?data.activities.find((a:Activity)=>a.id===aid&&a.status==='open'):null;return {session:{id:data.session.id,title:data.session.title,status:data.session.status,current_activity_id:published?aid:null,presenter_page_number:presenterNumber},activities:published?[publicActivity(published)]:[],results:published&&data.session.show_results?data.results.filter((r:any)=>r.activity_id===aid):[],totals:published&&data.session.show_results?data.totals.filter((r:any)=>r.activity_id===aid):[]}}
 const webRoot=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../../web/dist');if(existsSync(webRoot)){app.use(express.static(webRoot));app.get('*',(_,res)=>res.sendFile(path.join(webRoot,'index.html')))}
-async function initialize(){await withBootstrapLock(db,async bootstrap=>{const schema=readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)),'../src/schema.sql'),'utf8');await bootstrap.query(schema);publicBase=(await bootstrap.query("SELECT value FROM platform_settings WHERE key='public_base_url'")).rows[0]?.value||base;const email=process.env.ADMIN_EMAIL?.toLowerCase(),password=process.env.ADMIN_PASSWORD;if(email&&password){if(password.length<12&&!(process.env.ALLOW_INSECURE_DEV_BOOTSTRAP==='true'&&process.env.NODE_ENV!=='production'&&password==='000000'))throw new Error('ADMIN_PASSWORD must be >=12 characters (insecure demo bootstrap allowed only outside production)');const count=await bootstrap.query('SELECT count(*)::int AS n FROM users');if(count.rows[0].n===0){const oid=randomUUID(),uid=randomUUID();await bootstrap.query('BEGIN');try{await bootstrap.query('INSERT INTO organizations(id,name) VALUES($1,$2)',[oid,'Default']);await bootstrap.query('INSERT INTO users(id,organization_id,email,password_hash,role) VALUES($1,$2,$3,$4,$5)',[uid,oid,email,await bcrypt.hash(password,12),'platform_admin']);await bootstrap.query('UPDATE users SET approved=true,must_change_password=true,is_primary_admin=true,nickname=$2 WHERE id=$1',[uid,'admin']);await provisionDemo(bootstrap,uid,oid);await provisionLoadDemo(bootstrap,uid,oid);await bootstrap.query('COMMIT')}catch(e){await bootstrap.query('ROLLBACK');throw e}console.log('Initial admin provisioned; password change required')}}await bootstrap.query("UPDATE users SET is_primary_admin=true,nickname='admin' WHERE id=(SELECT id FROM users WHERE role='platform_admin' AND approved=true ORDER BY created_at ASC LIMIT 1) AND NOT EXISTS (SELECT 1 FROM users WHERE is_primary_admin=true)");});startSessionBus(async()=>{const client=new pg.Client({connectionString:process.env.DATABASE_URL});await client.connect();return client},broadcastLocal,console.error,async()=>{await Promise.all([...sockets.keys()].map(sid=>broadcastLocal(sid)))});await db.query("DELETE FROM live_connections WHERE last_seen<now()-interval '2 minutes'");setInterval(()=>db.query("DELETE FROM live_connections WHERE last_seen<now()-interval '2 minutes'").catch(()=>{}),60000).unref();await purgeExpiredSessions();setInterval(()=>purgeExpiredSessions().catch(e=>console.error('retention purge error',e instanceof Error?e.message:'unknown')),3600000).unref();setInterval(()=>cleanupPendingSessionFiles().catch(()=>console.error('session asset cleanup worker retry pending')),60000).unref();setInterval(()=>drainAssetErasureJobs(db,assetRoot).catch(()=>console.error('asset erasure worker retry pending')),60000).unref();setInterval(()=>drainProfileErasureJobs(db,assetRoot).catch(()=>console.error('profile erasure worker retry pending')),60000).unref();setInterval(()=>db.query("DELETE FROM auth_flows WHERE expires_at<now(); DELETE FROM email_mfa_challenges WHERE expires_at<now(); DELETE FROM email_mfa_enrollments WHERE expires_at<now(); DELETE FROM api_rate_windows WHERE bucket<floor(extract(epoch from now())/60)-3").catch(e=>console.error('auth cleanup error',e instanceof Error?e.message:'unknown')),3600000).unref();server.listen(Number(process.env.PORT||8080),'0.0.0.0',()=>console.log('Quorivio API ready'))}
+async function initialize(){await withBootstrapLock(db,async bootstrap=>{const schema=readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)),'../src/schema.sql'),'utf8');await bootstrap.query(schema);publicBase=(await bootstrap.query("SELECT value FROM platform_settings WHERE key='public_base_url'")).rows[0]?.value||base;const email=process.env.ADMIN_EMAIL?.toLowerCase(),password=process.env.ADMIN_PASSWORD;if(email&&password){if(password.length<12&&!(process.env.ALLOW_INSECURE_DEV_BOOTSTRAP==='true'&&process.env.NODE_ENV!=='production'&&password==='000000'))throw new Error('ADMIN_PASSWORD must be >=12 characters (insecure demo bootstrap allowed only outside production)');const count=await bootstrap.query('SELECT count(*)::int AS n FROM users');if(count.rows[0].n===0){const oid=randomUUID(),uid=randomUUID();await bootstrap.query('BEGIN');try{await bootstrap.query('INSERT INTO organizations(id,name) VALUES($1,$2)',[oid,'Default']);await bootstrap.query('INSERT INTO users(id,organization_id,email,password_hash,role) VALUES($1,$2,$3,$4,$5)',[uid,oid,email,await bcrypt.hash(password,12),'platform_admin']);await bootstrap.query('UPDATE users SET approved=true,must_change_password=true,is_primary_admin=true,nickname=$2 WHERE id=$1',[uid,'admin']);await provisionDemo(bootstrap,uid,oid);await provisionLoadDemo(bootstrap,uid,oid);await bootstrap.query('COMMIT')}catch(e){await bootstrap.query('ROLLBACK');throw e}console.log('Initial admin provisioned; password change required')}}await bootstrap.query("UPDATE users SET is_primary_admin=true,nickname='admin' WHERE id=(SELECT id FROM users WHERE role='platform_admin' AND approved=true ORDER BY created_at ASC LIMIT 1) AND NOT EXISTS (SELECT 1 FROM users WHERE is_primary_admin=true)");});startSessionBus(async()=>{const client=new pg.Client({connectionString:process.env.DATABASE_URL});await client.connect();return client},broadcastLocal,console.error,async()=>{await Promise.all([...sockets.keys()].map(sid=>broadcastLocal(sid)))});await db.query("DELETE FROM live_connections WHERE last_seen<now()-interval '2 minutes'");setInterval(()=>db.query("DELETE FROM live_connections WHERE last_seen<now()-interval '2 minutes'").catch(()=>{}),60000).unref();await purgeExpiredSessions();setInterval(()=>purgeExpiredSessions().catch(e=>console.error('retention purge error',e instanceof Error?e.message:'unknown')),3600000).unref();setInterval(()=>cleanupPendingSessionFiles().catch(()=>console.error('session asset cleanup worker retry pending')),60000).unref();setInterval(()=>drainAssetErasureJobs(db,assetRoot).catch(()=>console.error('asset erasure worker retry pending')),60000).unref();setInterval(()=>drainProfileErasureJobs(db,assetRoot).catch(()=>console.error('profile erasure worker retry pending')),60000).unref();setInterval(()=>db.query("DELETE FROM auth_flows WHERE expires_at<now(); DELETE FROM email_mfa_challenges WHERE expires_at<now(); DELETE FROM email_mfa_enrollments WHERE expires_at<now(); DELETE FROM api_rate_windows WHERE bucket<floor(extract(epoch from now())/60)-3").catch(e=>console.error('auth cleanup error',e instanceof Error?e.message:'unknown')),3600000).unref();setTimeout(()=>{void runDiskCapacityAudit()},30000).unref();setInterval(()=>{void runDiskCapacityAudit()},DISK_MONITOR_INTERVAL_MS).unref();server.listen(Number(process.env.PORT||8080),'0.0.0.0',()=>console.log('Quorivio API ready'))}
 // Rolling Kubernetes replacement: fail readiness before closing connections so
 // Services can stop routing new traffic. WebSocket 1012 instructs clients to
 // reconnect to another ready replica; do not invalidate sessions or votes.

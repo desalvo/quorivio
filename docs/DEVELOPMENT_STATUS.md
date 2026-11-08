@@ -1,3 +1,13 @@
+# Quorivio 0.1.0-dev — RC262 — Disk capacity telemetry and email alerts
+
+**RC262:** Added *Server configuration → Disk space and alerts* for asset PVC, conversion scratch and PostgreSQL data volume. App metrics use `statfs`; the read-only `db-disk-probe` monitors the database PVC with actual `df` data. `pg_database_size` is informational, never used for disk-alert percentages. SMTP notifications to approved platform admins trigger at 90% and rearm at ≤85%, with DB-locked cross-replica deduplication and stale samples shown as unavailable. Standalone Kubernetes wizard RC262: new generated internal DB workloads include the probe; existing deployments receive an explicit plan/apply workflow (PostgreSQL restart requires operator acknowledgment), persistent Kustomize overlay and private backups. Focused tests, builds and SHA-256 evidence; GitHub full CI pending. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag. `docs/RC_CYCLE262_DISK_CAPACITY_MONITORING.en.md`.
+
+---
+
+# Quorivio 0.1.0-dev — RC261 — Converter mount boundary and Trivy
+
+**RC261:** Reproduced RC260 `OSError errno=18` (`EXDEV`) across separate Kubernetes `/tmp` and `/conversions` mounts; atomic conversion stage/output now share one filesystem. Real PDF and PPTX passes locally. GitHub [42486677344](https://github.com/desalvo/quorivio/actions/runs/42486677344) had green production quality and a failed converter Trivy gate from `zlib1g` CVE-2026-76844/CVE-2026-85091; converter Dockerfile requires fixed `deb13u1` with no scanner exemptions. API/UI return a sanitized `conversion_failed` instead of `internal_error`. Standalone wizard safely synchronizes converter-image-only live changes into original Kustomize, with private backups. New RC261 tests and inventory; **RC261 full CI pending**. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no assistant commit/push/tag. `docs/RC_CYCLE261_CONVERTER_CROSS_MOUNT_AND_ZLIB_CI.en.md`.
+
 # Quorivio 0.1.0-dev — RC260 — Kubernetes `generated` synchronization
 
 **RC260:** Standalone self-updating wizard adds `--generated-dir` and `--sync-generated`: binds converter rollout plans to original Kustomize manifest hashes, synchronizes private token and strategic merge overlay only after successful rollout, supports local-only reconciliation of already-deployed converter, preserves the overlay and token during future regeneration, and leaves DB/PVC/Ingress/Service unchanged. Historical RC259 receipt retained; current inventory RC260. Full CI pending; **85.25%** (43 accepted/17 partial). No commit, push or tag. `docs/RC_CYCLE260_KUBERNETES_GENERATED_RECONCILIATION.en.md`.

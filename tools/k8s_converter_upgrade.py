@@ -366,6 +366,30 @@ def _manifest_overlay(deployment: dict, secret_name: str) -> str:
     return json.dumps(overlay,indent=2,ensure_ascii=False,sort_keys=True)+'\n'
 
 
+def _only_converter_image_changed(previous: dict, live: dict) -> bool:
+    """Allow a reviewed live image rollout to be synced back to Kustomize.
+
+    Every field other than converter.image must match byte-for-byte after
+    JSON parsing. Never bless drift in resources, mounts, security, Secrets,
+    probes, application image, or other sidecar properties.
+    """
+    old = copy.deepcopy(previous)
+    try:
+        old_containers = old['spec']['template']['spec']['containers']
+        new_containers = live['spec']['template']['spec']['containers']
+        older = [c for c in old_containers if c.get('name') == CONVERTER_NAME]
+        newer = [c for c in new_containers if c.get('name') == CONVERTER_NAME]
+        if len(older) != 1 or len(newer) != 1:
+            return False
+        if older[0].get('image') == newer[0].get('image'):
+            return False
+        # _manifest_overlay() has already validated the live image string.
+        older[0]['image'] = newer[0]['image']
+        return old == live
+    except (KeyError, TypeError, AttributeError):
+        return False
+
+
 def _generated_reconciliation_changes(directory: Path, namespace: str, deployment_name: str,
                                        secret_name: str, deployment: dict, live_secret: dict,
                                        expected_hashes: dict | None=None) -> tuple[dict[str,bytes],dict[str,bytes]]:
@@ -403,8 +427,9 @@ def _generated_reconciliation_changes(directory: Path, namespace: str, deploymen
         # Do not silently replace operator-customized overlays.
         try:old=json.loads(existing_patch.read_text(encoding='utf8'))
         except ValueError as exc:raise UpgradeError('existing converter overlay is not valid JSON') from exc
-        if old!=json.loads(patch):
-            raise UpgradeError('generated converter overlay differs from live; manual reconciliation required')
+        live_overlay=json.loads(patch)
+        if old!=live_overlay and not _only_converter_image_changed(old,live_overlay):
+            raise UpgradeError('generated converter overlay differs from live beyond converter image; manual reconciliation required')
     secret=_generated_secret_with_token(original['05-app-secret.yaml'].decode('utf8'),live_secret)
     edits={ '05-app-secret.yaml':secret.encode('utf8'),
             CONVERTER_OVERLAY:patch.encode('utf8'),

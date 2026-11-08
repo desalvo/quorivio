@@ -20,6 +20,9 @@ def verify_converter_security(dockerfile: str, workflow: str) -> None:
         'dpkg-query -W -f=\'${Version}\' "$package"',
         'dpkg --compare-versions "$version" ge 3.0.4',
         "exit 1",
+        "--only-upgrade zlib1g",
+        "dpkg-query -W -f='${Version}' zlib1g",
+        "dpkg --compare-versions \"$zlib_version\" ge '1:1.3.dfsg+really1.3.1-1+deb13u1'",
         "libreoffice-impress fonts-dejavu-core",
         "USER converter",
     )
@@ -29,9 +32,11 @@ def verify_converter_security(dockerfile: str, workflow: str) -> None:
     start = dockerfile.index("apt-get -o Acquire::Retries=0 update")
     upgrade = dockerfile.index("--only-upgrade apt libapt-pkg7.0")
     compare = dockerfile.index('dpkg --compare-versions "$version" ge 3.0.4')
+    zlib_upgrade = dockerfile.index("--only-upgrade zlib1g")
+    zlib_compare = dockerfile.index("dpkg --compare-versions \"$zlib_version\" ge '1:1.3.dfsg+really1.3.1-1+deb13u1'")
     application_packages = dockerfile.index("libreoffice-impress fonts-dejavu-core")
-    if not start < upgrade < compare < application_packages:
-        raise ValueError("Patch both APT packages before other Debian package installs")
+    if not start < upgrade < compare < zlib_upgrade < zlib_compare < application_packages:
+        raise ValueError("Patch APT and zlib1g before other Debian package installs")
     if "apt-get upgrade -y || true" in dockerfile or "|| true" in dockerfile:
         raise ValueError("Converter security upgrade must fail closed")
 

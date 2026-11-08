@@ -8,7 +8,7 @@ import urllib.error
 
 # This single-file wizard is the release unit.  Its upstream is intentionally
 # fixed to the official public repository: never accept a URL from CLI input.
-WIZARD_VERSION = '0.1.0-dev-rc260'
+WIZARD_VERSION = '0.1.0-dev-rc262'
 WIZARD_UPSTREAM_URL = 'https://raw.githubusercontent.com/desalvo/quorivio/main/tools/k8s_wizard.py'
 WIZARD_MAX_DOWNLOAD_BYTES = 2 * 1024 * 1024
 _WIZARD_RESTART_GUARD = 'QUORIVIO_WIZARD_RESTARTED_AFTER_UPDATE'
@@ -477,6 +477,8 @@ spec:
     files['kustomization.yaml']=files['kustomization.yaml'].replace('  - 10-configmap.yaml\n','  - 05-app-secret.yaml\n  - 10-configmap.yaml\n')
     if converter_enabled:
         files['kustomization.yaml']+='patches:\n  - path: 95-converter-sidecar-patch.json\n'
+    if cfg['postgres_mode']=='internal' and (out/'97-postgres-disk-probe-patch.json').is_file():
+        files['kustomization.yaml']+=('' if 'patches:' in files['kustomization.yaml'] else 'patches:\n')+'  - path: 97-postgres-disk-probe-patch.json\n'
     if cfg['postgres_mode']=='internal':
         files.update(postgres_resources(cfg,name,ns))
         files['kustomization.yaml']=files['kustomization.yaml'].replace('  - 10-configmap.yaml\n','  - 10-configmap.yaml\n  - 11-postgres-service.yaml\n  - 12-postgres-statefulset.yaml\n')
@@ -653,6 +655,37 @@ spec:
             limits:
               cpu: 1000m
               memory: 1Gi
+        - name: db-disk-probe
+          image: {cfg['postgres_image']}
+          command: {json.dumps(['/bin/sh','-ec',_standalone_component('k8s_disk_monitor_upgrade').PROBE_SCRIPT])}
+          env:
+            - name: POSTGRES_DB
+              value: {quote(cfg['postgres_database'])}
+            - name: POSTGRES_USER
+              value: {quote(cfg['postgres_user'])}
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {cfg['secret_name']}
+                  key: POSTGRES_PASSWORD
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql
+              readOnly: true
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 999
+            capabilities:
+              drop: [ALL]
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 150m
+              memory: 128Mi
   volumeClaimTemplates:
     - metadata:
         name: data
@@ -670,6 +703,7 @@ spec:
 # Regenerate embedded copies after editing tools/k8s_converter_upgrade.py or
 # tools/k8s_cluster_inspection.py and run the standalone contract tests.
 _STANDALONE_COMPONENT_SOURCES = {
+    'k8s_disk_monitor_upgrade': '#!/usr/bin/env python3\n"""Standalone-compatible PostgreSQL disk-PVC probe upgrade.\n\nA DB filesystem is observable only inside its pod/PVC. An existing wizard-\nmanaged PostgreSQL StatefulSet can receive a read-only filesystem probe,\nwhich writes real df capacity to a small, database-backed telemetry row.\nA planned/apply split and explicit DB restart acknowledgement guard against\nunintentional disruption of single-node PostgreSQL installations.\n"""\nfrom __future__ import annotations\nimport hashlib\nimport json\nimport os\nimport re\nimport stat\nimport subprocess\nimport tempfile\nfrom pathlib import Path\n\nNAME=re.compile(r\'[a-z0-9]([-a-z0-9]*[a-z0-9])?\\Z\')\nOVERLAY=\'97-postgres-disk-probe-patch.json\'\nPLAN=\'disk-monitor-plan.json\'\nPATCH=\'disk-monitor-json-patch.json\'\nPROBE_NAME=\'db-disk-probe\'\nPROBE_SCRIPT=\'\'\'\nwhile true; do\n  measure="$(df -Pk /var/lib/postgresql | awk \'END {print $2 " " $4}\')"\n  set -- $measure\n  if [ "$#" -eq 2 ]; then\n    case "$1:$2" in\n      *[!0-9:]*|:*) echo \'database disk probe: invalid df sample\' >&2 ;;\n      *)\n        total="$(( $1 * 1024 ))"\n        available="$(( $2 * 1024 ))"\n        if [ "$total" -gt 0 ] && [ "$available" -ge 0 ] && [ "$available" -le "$total" ]; then\n          PGPASSWORD="$POSTGRES_PASSWORD" PGSSLMODE=disable psql -w -X -q -v ON_ERROR_STOP=1 -h 127.0.0.1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c \\\n            "INSERT INTO disk_monitor_samples(source,total_bytes,available_bytes,observed_at) VALUES (\'database\',$total,$available,now()) ON CONFLICT(source) DO UPDATE SET total_bytes=excluded.total_bytes,available_bytes=excluded.available_bytes,observed_at=excluded.observed_at" >/dev/null 2>&1 || echo \'database disk probe: DB not ready; will retry\' >&2\n        fi ;;\n    esac\n  fi\n  sleep 300\ndone\n\'\'\'.strip()\n\nclass DiskMonitorUpgradeError(ValueError):pass\n\ndef valid_name(value:str)->str:\n if not isinstance(value,str) or len(value)>253 or any(len(part)>63 or not NAME.fullmatch(part) for part in value.split(\'.\')):raise DiskMonitorUpgradeError(\'invalid Kubernetes resource name\')\n return value\n\ndef _run(args:list[str],kubectl=\'kubectl\',stdin=None,timeout=30)->str:\n try:p=subprocess.run([kubectl,*args],input=stdin,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,timeout=timeout,check=False)\n except (OSError,subprocess.TimeoutExpired) as ex:raise DiskMonitorUpgradeError(\'kubectl unavailable, verify kubeconfig and RBAC\') from ex\n if p.returncode:raise DiskMonitorUpgradeError(\'kubectl operation failed: \'+str(args[:3])+\'; verify context, RBAC and rollout\')\n return p.stdout\n\ndef _context(kubectl=\'kubectl\')->str:\n value=_run([\'config\',\'current-context\'],kubectl).strip()\n if not value:raise DiskMonitorUpgradeError(\'missing Kubernetes context\')\n return value\n\ndef _statefulset(namespace:str,name:str,kubectl=\'kubectl\')->dict:\n s=json.loads(_run([\'-n\',namespace,\'get\',\'statefulset\',name,\'-o\',\'json\'],kubectl))\n if s.get(\'kind\')!=\'StatefulSet\' or s.get(\'metadata\',{}).get(\'name\')!=name or s.get(\'metadata\',{}).get(\'namespace\',namespace)!=namespace:raise DiskMonitorUpgradeError(\'StatefulSet mismatch\')\n return s\n\ndef disk_probe_sidecar(postgres:dict)->dict:\n containers=postgres.get(\'spec\',{}).get(\'template\',{}).get(\'spec\',{}).get(\'containers\',[])\n original=[c for c in containers if c.get(\'name\')==\'postgres\']\n if len(original)!=1:raise DiskMonitorUpgradeError(\'expected one postgres container\')\n pg=original[0]\n mounts=pg.get(\'volumeMounts\') or []\n if not any(m.get(\'mountPath\')==\'/var/lib/postgresql\' and m.get(\'name\') for m in mounts):raise DiskMonitorUpgradeError(\'PostgreSQL PVC mount not found at /var/lib/postgresql\')\n env=pg.get(\'env\') or []\n selected=[]\n for key in (\'POSTGRES_DB\',\'POSTGRES_USER\',\'POSTGRES_PASSWORD\'):\n  matches=[e for e in env if e.get(\'name\')==key]\n  if len(matches)!=1 or not isinstance(matches[0],dict) or (\'value\' not in matches[0] and \'valueFrom\' not in matches[0]):raise DiskMonitorUpgradeError(\'PostgreSQL \'+key+\' is not explicitly configured\')\n  selected.append(matches[0])\n if \'valueFrom\' not in selected[-1] or not selected[-1][\'valueFrom\'].get(\'secretKeyRef\'):\n  raise DiskMonitorUpgradeError(\'PostgreSQL password must come from a Kubernetes Secret\')\n image=pg.get(\'image\')\n if not isinstance(image,str) or not image.startswith(\'postgres:\'):raise DiskMonitorUpgradeError(\'probe requires official PostgreSQL image with psql and df\')\n mount=next(m for m in mounts if m.get(\'mountPath\')==\'/var/lib/postgresql\')\n return {\'name\':PROBE_NAME,\'image\':image,\'imagePullPolicy\':pg.get(\'imagePullPolicy\',\'IfNotPresent\'),\n  \'command\':[\'/bin/sh\',\'-ec\',PROBE_SCRIPT], \'env\':selected,\n  \'volumeMounts\':[{\'name\':mount[\'name\'],\'mountPath\':\'/var/lib/postgresql\',\'readOnly\':True}],\n  \'securityContext\':{\'allowPrivilegeEscalation\':False,\'readOnlyRootFilesystem\':True,\'runAsNonRoot\':True,\'runAsUser\':999,\'capabilities\':{\'drop\':[\'ALL\']}},\n  \'resources\':{\'requests\':{\'cpu\':\'10m\',\'memory\':\'32Mi\'},\'limits\':{\'cpu\':\'150m\',\'memory\':\'128Mi\'}}}\n\ndef _safe_write(path:Path,data:bytes)->None:\n if path.is_symlink() or (path.exists() and not path.is_file()):raise DiskMonitorUpgradeError(\'unsafe output file\')\n fd,tmp=tempfile.mkstemp(prefix=\'.db-disk-monitor-\',dir=str(path.parent));os.fchmod(fd,0o600)\n try:\n  with os.fdopen(fd,\'wb\') as dest:dest.write(data);dest.flush();os.fsync(dest.fileno())\n  os.replace(tmp,path)\n finally:\n  if os.path.exists(tmp):os.unlink(tmp)\n\ndef _generated(generated:Path,namespace:str,name:str,sidecar:dict)->None:\n generated=Path(generated).absolute()\n base=generated/\'12-postgres-statefulset.yaml\';kfile=generated/\'kustomization.yaml\';patchfile=generated/OVERLAY\n if generated.is_symlink() or not base.is_file() or base.is_symlink() or not kfile.is_file() or kfile.is_symlink():raise DiskMonitorUpgradeError(\'wizard-generated internal PostgreSQL manifests not found\')\n k=kfile.read_text()\n if name+\'-postgres\' not in base.read_text() or namespace not in base.read_text():raise DiskMonitorUpgradeError(\'generated StatefulSet identity mismatch\')\n if \'  - path: \'+OVERLAY not in k:\n  if re.search(r\'(?m)^patches:\\s*$\',k):\n   lines=k.splitlines(keepends=True);matches=[i for i,l in enumerate(lines) if l.strip()==\'patches:\' and l.startswith(\'patches:\')]\n   if len(matches)!=1:raise DiskMonitorUpgradeError(\'ambiguous Kustomize patches\')\n   idx=matches[0]+1\n   while idx<len(lines) and (lines[idx].startswith(\' \') or not lines[idx].strip()):idx+=1\n   lines.insert(idx,\'  - path: \'+OVERLAY+\'\\n\');k=\'\'.join(lines)\n  else:k=k.rstrip()+\'\\npatches:\\n  - path: \'+OVERLAY+\'\\n\'\n patch={\'apiVersion\':\'apps/v1\',\'kind\':\'StatefulSet\',\'metadata\':{\'name\':name+\'-postgres\',\'namespace\':namespace},\'spec\':{\'template\':{\'spec\':{\'containers\':[sidecar]}}}}\n if patchfile.is_symlink():raise DiskMonitorUpgradeError(\'refusing symlinked Kustomize patch\')\n # Backups private; do not back up credentials here.\n backup=generated/\'.quorivio-manifest-backups\';backup.mkdir(exist_ok=True,mode=0o700)\n if backup.is_symlink():raise DiskMonitorUpgradeError(\'unsafe backup location\')\n for file in (kfile,patchfile):\n  if file.is_file():\n   dest=backup/(file.name+\'.before-disk-monitor\')\n   if not dest.exists():_safe_write(dest,file.read_bytes())\n _safe_write(patchfile,(json.dumps(patch,indent=2,sort_keys=True)+\'\\n\').encode())\n _safe_write(kfile,k.encode())\n\ndef plan_disk_monitor(namespace:str,app_name:str,output:Path,generated:Path,kubectl=\'kubectl\')->dict:\n namespace=valid_name(namespace);app_name=valid_name(app_name)\n output=Path(output).absolute();generated=Path(generated).absolute()\n if output.exists() and any(output.iterdir()):raise DiskMonitorUpgradeError(\'plan output must be empty\')\n state=_statefulset(namespace,app_name+\'-postgres\',kubectl)\n containers=state[\'spec\'][\'template\'][\'spec\'][\'containers\']\n if any(c.get(\'name\')==PROBE_NAME for c in containers):raise DiskMonitorUpgradeError(\'disk probe already installed; use --sync-disk-monitor instead\')\n sidecar=disk_probe_sidecar(state)\n meta=state[\'metadata\'];uid=meta.get(\'uid\');rv=meta.get(\'resourceVersion\')\n if not uid or not rv:raise DiskMonitorUpgradeError(\'missing UID/resourceVersion\')\n if not (generated/\'12-postgres-statefulset.yaml\').is_file():raise DiskMonitorUpgradeError(\'generated PostgreSQL manifest absent\')\n manifest_hashes={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in (generated/\'kustomization.yaml\',generated/\'12-postgres-statefulset.yaml\')}\n patch=[{\'op\':\'test\',\'path\':\'/metadata/uid\',\'value\':uid},{\'op\':\'test\',\'path\':\'/metadata/resourceVersion\',\'value\':rv},{\'op\':\'add\',\'path\':\'/spec/template/spec/containers/-\',\'value\':sidecar}]\n data={\'schema\':\'quorivio-db-disk-monitor-v1\',\'namespace\':namespace,\'statefulset\':app_name+\'-postgres\',\'context\':_context(kubectl),\'uid\':uid,\'resourceVersion\':rv,\'generatedDir\':str(generated),\'generatedHashes\':manifest_hashes,\'patchSha256\':hashlib.sha256(json.dumps(patch,sort_keys=True).encode()).hexdigest()}\n output.mkdir(parents=True,exist_ok=True,mode=0o700)\n _safe_write(output/PLAN,(json.dumps(data,indent=2,sort_keys=True)+\'\\n\').encode());_safe_write(output/PATCH,(json.dumps(patch,indent=2,sort_keys=True)+\'\\n\').encode())\n return data\n\ndef apply_disk_monitor(output:Path,ack_restart:bool,kubectl=\'kubectl\')->dict:\n if not ack_restart:raise DiskMonitorUpgradeError(\'explicit --acknowledge-db-restart is required: a StatefulSet rollout restarts PostgreSQL\')\n output=Path(output).absolute();plan=json.loads((output/PLAN).read_text());patch=json.loads((output/PATCH).read_text())\n if plan.get(\'schema\')!=\'quorivio-db-disk-monitor-v1\' or plan.get(\'patchSha256\')!=hashlib.sha256(json.dumps(patch,sort_keys=True).encode()).hexdigest():raise DiskMonitorUpgradeError(\'invalid or modified disk-monitor plan\')\n if _context(kubectl)!=plan[\'context\']:raise DiskMonitorUpgradeError(\'Kubernetes context changed\')\n state=_statefulset(plan[\'namespace\'],plan[\'statefulset\'],kubectl)\n if state[\'metadata\'].get(\'uid\')!=plan[\'uid\'] or state[\'metadata\'].get(\'resourceVersion\')!=plan[\'resourceVersion\']:raise DiskMonitorUpgradeError(\'PostgreSQL StatefulSet changed since planning\')\n directory=Path(plan[\'generatedDir\'])\n for name,digest in plan[\'generatedHashes\'].items():\n  source=directory/name\n  if source.is_symlink() or not source.is_file() or hashlib.sha256(source.read_bytes()).hexdigest()!=digest:raise DiskMonitorUpgradeError(\'generated manifests changed since planning\')\n _run([\'-n\',plan[\'namespace\'],\'patch\',\'statefulset\',plan[\'statefulset\'],\'--type=json\',\'--patch-file=\'+str(output/PATCH),\'--dry-run=server\',\'-o\',\'name\'],kubectl)\n _run([\'-n\',plan[\'namespace\'],\'patch\',\'statefulset\',plan[\'statefulset\'],\'--type=json\',\'--patch-file=\'+str(output/PATCH)],kubectl)\n _run([\'-n\',plan[\'namespace\'],\'rollout\',\'status\',\'statefulset/\'+plan[\'statefulset\'],\'--timeout=300s\'],kubectl,timeout=330)\n return sync_disk_monitor(plan[\'namespace\'],plan[\'statefulset\'].removesuffix(\'-postgres\'),directory,kubectl)\n\ndef sync_disk_monitor(namespace:str,app_name:str,generated:Path,kubectl=\'kubectl\')->dict:\n namespace=valid_name(namespace);app_name=valid_name(app_name)\n live=_statefulset(namespace,app_name+\'-postgres\',kubectl)\n probes=[c for c in live[\'spec\'][\'template\'][\'spec\'][\'containers\'] if c.get(\'name\')==PROBE_NAME]\n if len(probes)!=1:raise DiskMonitorUpgradeError(\'no unique live PostgreSQL disk probe\')\n expected=disk_probe_sidecar(live)\n if probes[0]!=expected:raise DiskMonitorUpgradeError(\'live disk probe security/image/volumes drift; refusing manifest overwrite\')\n _generated(Path(generated),namespace,app_name,expected)\n return {\'namespace\':namespace,\'statefulset\':app_name+\'-postgres\',\'generatedDir\':str(Path(generated).absolute())}\n',
     'k8s_converter_upgrade': r'''#!/usr/bin/env python3
 """Safe, narrowly scoped conversion sidecar upgrade for wizard-created Deployments.
 
@@ -1038,6 +1072,30 @@ def _manifest_overlay(deployment: dict, secret_name: str) -> str:
     return json.dumps(overlay,indent=2,ensure_ascii=False,sort_keys=True)+'\n'
 
 
+def _only_converter_image_changed(previous: dict, live: dict) -> bool:
+    """Allow a reviewed live image rollout to be synced back to Kustomize.
+
+    Every field other than converter.image must match byte-for-byte after
+    JSON parsing. Never bless drift in resources, mounts, security, Secrets,
+    probes, application image, or other sidecar properties.
+    """
+    old = copy.deepcopy(previous)
+    try:
+        old_containers = old['spec']['template']['spec']['containers']
+        new_containers = live['spec']['template']['spec']['containers']
+        older = [c for c in old_containers if c.get('name') == CONVERTER_NAME]
+        newer = [c for c in new_containers if c.get('name') == CONVERTER_NAME]
+        if len(older) != 1 or len(newer) != 1:
+            return False
+        if older[0].get('image') == newer[0].get('image'):
+            return False
+        # _manifest_overlay() has already validated the live image string.
+        older[0]['image'] = newer[0]['image']
+        return old == live
+    except (KeyError, TypeError, AttributeError):
+        return False
+
+
 def _generated_reconciliation_changes(directory: Path, namespace: str, deployment_name: str,
                                        secret_name: str, deployment: dict, live_secret: dict,
                                        expected_hashes: dict | None=None) -> tuple[dict[str,bytes],dict[str,bytes]]:
@@ -1075,8 +1133,9 @@ def _generated_reconciliation_changes(directory: Path, namespace: str, deploymen
         # Do not silently replace operator-customized overlays.
         try:old=json.loads(existing_patch.read_text(encoding='utf8'))
         except ValueError as exc:raise UpgradeError('existing converter overlay is not valid JSON') from exc
-        if old!=json.loads(patch):
-            raise UpgradeError('generated converter overlay differs from live; manual reconciliation required')
+        live_overlay=json.loads(patch)
+        if old!=live_overlay and not _only_converter_image_changed(old,live_overlay):
+            raise UpgradeError('generated converter overlay differs from live beyond converter image; manual reconciliation required')
     secret=_generated_secret_with_token(original['05-app-secret.yaml'].decode('utf8'),live_secret)
     edits={ '05-app-secret.yaml':secret.encode('utf8'),
             CONVERTER_OVERLAY:patch.encode('utf8'),
@@ -1393,7 +1452,8 @@ def save_report(output:Path,report:dict):
 ''',
 }
 _STANDALONE_COMPONENT_SHA256 = {
-    'k8s_converter_upgrade': '4475d499da4408b5bd8306768e5059a86d2e3a9e759202499c9c40bc1d3a50ee',
+    'k8s_disk_monitor_upgrade': '4d8e3bd68e7074e7eeb37616029fef85f1da2ec74d6ee6c78988f2c47f205773',
+    'k8s_converter_upgrade': 'ad258373e4a01186555d78316af4f28eb2c4a303b9d0175875dac745087374dc',
     'k8s_cluster_inspection': '8af9c08dd1ef6fabc3a6bbfe3730a1cdedf879dc2eda7fdb4364dfd6d42730f7',
 }
 _COMPONENT_CACHE={}
@@ -1449,6 +1509,10 @@ def main(argv=None):
     modes.add_argument('--apply-converter',action='store_true',help='Explicitly apply a previously generated and revalidated converter-only JSON Patch')
     modes.add_argument('--ensure-converter-token',action='store_true',help='Explicitly add a private 32-byte converter token ONLY when the existing app Secret lacks one')
     modes.add_argument('--sync-generated',action='store_true',help='Reconcile existing generated Kustomize manifests from a verified live converter (no cluster writes)')
+    modes.add_argument('--plan-disk-monitor',action='store_true',help='Prepare an audited PostgreSQL filesystem probe upgrade (no cluster writes)')
+    modes.add_argument('--apply-disk-monitor',action='store_true',help='Apply a pre-reviewed PostgreSQL disk probe plan; restarts the PostgreSQL StatefulSet')
+    modes.add_argument('--sync-disk-monitor',action='store_true',help='Read-only reconciliation of a live PostgreSQL probe into generated manifests')
+    a.add_argument('--acknowledge-db-restart',action='store_true',help='Explicit acknowledgment that PostgreSQL StatefulSet rollout restarts the database')
     a.add_argument('--generated-dir',help='Original wizard-generated Kustomize directory, e.g. ./generated; auto-discovered if unambiguous')
     a.add_argument('--converter-image',help='Published converter-specific image, e.g. your-registry/quorivio-converter:tag; required for --upgrade-converter')
     a.add_argument('--converter-deployment',help='Existing Deployment name (defaults to --set name=...)')
@@ -1460,6 +1524,40 @@ def main(argv=None):
     if args.self_update_only:
         print('Quorivio Kubernetes wizard '+WIZARD_VERSION+' (update check completed or explicitly skipped)')
         return 0
+    if args.plan_disk_monitor or args.apply_disk_monitor or args.sync_disk_monitor:
+        component=_standalone_component('k8s_disk_monitor_upgrade')
+        try:
+            if args.values or args.converter_image or args.converter_secret or args.app_container or args.converter_deployment:
+                a.error('disk monitoring mode may not change app credentials or converter settings')
+            if args.apply_disk_monitor:
+                if args.set or args.generated_dir:
+                    a.error('--apply-disk-monitor takes only the reviewed --output plan and explicit DB restart acknowledgment')
+                if not any(x=='--output' or x.startswith('--output=') for x in (argv if argv is not None else sys.argv[1:])):
+                    a.error('--apply-disk-monitor requires --output PATH')
+                result=component.apply_disk_monitor(Path(args.output),args.acknowledge_db_restart,kubectl=args.kubectl)
+                print('PostgreSQL disk probe deployed, rollout verified, and manifests reconciled:',result['generatedDir']);return 0
+            if args.acknowledge_db_restart:a.error('--acknowledge-db-restart belongs only to --apply-disk-monitor')
+            options={}
+            for entry in args.set:
+                if '=' not in entry:a.error('--set requires KEY=VALUE')
+                key,value=entry.split('=',1)
+                if key not in ('namespace','name'):a.error('disk monitoring modes allow only --set namespace/name')
+                options[key]=value
+            ns=options.get('namespace','quorivio');name=options.get('name','quorivio')
+            directory=_generated_directory_from_args(args.generated_dir)
+            if directory is None:a.error('original generated manifests not found; use --generated-dir PATH')
+            if args.sync_disk_monitor:
+                result=component.sync_disk_monitor(ns,name,directory,kubectl=args.kubectl)
+                print('PostgreSQL probe manifests synchronized from the live StatefulSet:',result['generatedDir'])
+            else:
+                if not any(x=='--output' or x.startswith('--output=') for x in (argv if argv is not None else sys.argv[1:])):
+                    a.error('--plan-disk-monitor requires --output PATH')
+                plan=component.plan_disk_monitor(ns,name,Path(args.output),directory,kubectl=args.kubectl)
+                print('Read-only PostgreSQL disk monitor plan:',Path(args.output).absolute())
+                print('WARNING: applying this plan restarts PostgreSQL, possibly interrupting the application.')
+                print('Review plan and server-side dry run, then run --apply-disk-monitor --acknowledge-db-restart --output PATH')
+            return 0
+        except (ValueError,OSError,KeyError) as exc:a.error(str(exc))
     cfg=dict(DEFAULTS);out=Path(args.output)
     if args.upgrade_converter or args.apply_converter or args.ensure_converter_token or args.sync_generated:
         component=_standalone_component('k8s_converter_upgrade')

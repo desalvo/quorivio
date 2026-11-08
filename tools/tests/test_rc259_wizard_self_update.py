@@ -34,7 +34,11 @@ class WizardSelfUpdate(unittest.TestCase):
         self.local=Path(self.temp.name)/'k8s_wizard.py'
         shutil.copy2(ROOT/'tools/k8s_wizard.py',self.local)
         self.original=self.local.read_bytes()
-        self.new=self.original.replace(b"WIZARD_VERSION = '0.1.0-dev-rc260'",b"WIZARD_VERSION = '0.1.0-dev-rc261'",1)
+        self.current=wizard.WIZARD_VERSION
+        self.cycle=int(self.current.rsplit('rc',1)[1])
+        self.marker=("WIZARD_VERSION = '"+self.current+"'").encode()
+        self.new=self.original.replace(self.marker,
+            ("WIZARD_VERSION = '0.1.0-dev-rc"+str(self.cycle+1)+"'").encode(),1)
         assert self.new != self.original
 
     def _download(self,body:bytes,url:str=wizard.WIZARD_UPSTREAM_URL):
@@ -44,14 +48,14 @@ class WizardSelfUpdate(unittest.TestCase):
         with mock.patch.object(wizard.urllib.request,'urlopen',side_effect=AssertionError('network not allowed')):
             result=subprocess.run([sys.executable,str(self.local),'--version'],capture_output=True,text=True,timeout=6)
         self.assertEqual(result.returncode,0,result.stderr)
-        self.assertIn('0.1.0-dev-rc260',result.stdout)
+        self.assertIn(self.current,result.stdout)
         self.assertIn('Quorivio Kubernetes wizard',result.stdout)
 
     def test_offline_optout_and_no_repository_dependency(self):
         result=subprocess.run([sys.executable,str(self.local),'--no-self-update','--self-update-only'],
             cwd=self.temp.name,capture_output=True,text=True,timeout=6,env={**os.environ,'PYTHONPATH':''})
         self.assertEqual(result.returncode,0,result.stderr)
-        self.assertIn('0.1.0-dev-rc260',result.stdout)
+        self.assertIn(self.current,result.stdout)
         self.assertEqual(self.local.read_bytes(),self.original)
 
     def test_publishes_a_newer_release_atomically_and_preserves_permissions(self):
@@ -70,8 +74,10 @@ class WizardSelfUpdate(unittest.TestCase):
         self.assertEqual(self.local.read_bytes(),self.original)
 
     def test_never_downgrades_or_installs_unversioned_old_upstream(self):
-        previous=self.original.replace(b"WIZARD_VERSION = '0.1.0-dev-rc260'",b"WIZARD_VERSION = '0.1.0-dev-rc259'",1)
-        for candidate in (previous,self.original.replace(b"WIZARD_VERSION = '0.1.0-dev-rc260'",b"LEGACY_RELEASE = '0.1.0-dev-rc259'",1)):
+        previous=self.original.replace(self.marker,
+            ("WIZARD_VERSION = '0.1.0-dev-rc"+str(self.cycle-1)+"'").encode(),1)
+        for candidate in (previous,self.original.replace(self.marker,
+            ("LEGACY_RELEASE = '0.1.0-dev-rc"+str(self.cycle-1)+"'").encode(),1)):
             with self.subTest(candidate=candidate[:100]),self._download(candidate):
                 self.assertFalse(wizard._maybe_install_official_update(self.local))
                 self.assertEqual(self.local.read_bytes(),self.original)

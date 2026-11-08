@@ -195,7 +195,11 @@ def convert(source, dest):
     source_hash = _sha256_file(source)
     output = pathlib.Path(dest)
     _safe_destination(output)
-    with tempfile.TemporaryDirectory(prefix='quorivio-import-') as scratch:
+    # The completed pages directory is published with an atomic rename into
+    # output.parent (/conversions/<job> in Kubernetes). The renderer scratch
+    # MUST be on that same filesystem: /tmp is a different emptyDir mount in
+    # the hardened sidecar and rename(/tmp, /conversions) raises EXDEV.
+    with tempfile.TemporaryDirectory(prefix='.quorivio-import-', dir=output.parent) as scratch:
         tmp = pathlib.Path(scratch)
         pdf = source
         if ext == '.pptx':

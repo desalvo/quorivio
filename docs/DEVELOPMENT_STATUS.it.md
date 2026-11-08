@@ -1,3 +1,13 @@
+# Quorivio 0.1.0-dev — RC262 — Monitoraggio spazio disco e allarmi email
+
+**RC262:** Nuova sezione *Configurazione server → Spazio disco e allarmi* per allegati, volume temporaneo converter e dati PostgreSQL. Statfs nei pod API e sonda read-only `db-disk-probe` sul PVC PostgreSQL; `pg_database_size` visualizzata solo come informazione, non come percentuale. Soglia email SMTP agli amministratori di piattaforma approvati: 90%, riarmo ≤85%, deduplicazione fra repliche via lock DB, campioni scaduti non validi. Wizard Kubernetes standalone RC262: nuova generazione DB con sonda, piano + applicazione esplicita del monitor per installazioni esistenti (rollout PostgreSQL richiede conferma), overlay e backup persistenti in `k8s-generated`. Test mirati, build e SHA-256; full CI GitHub ancora non verificata. **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. `docs/RC_CYCLE262_DISK_CAPACITY_MONITORING.it.md`.
+
+---
+
+# Quorivio 0.1.0-dev — RC261 — Importazione PDF/PPTX e Trivy del converter
+
+**RC261:** Esecuzione reale RC260 `OSError errno=18` (`EXDEV`) riprodotta con `/tmp` e `/conversions` su filesystem distinti; l'output viene ora preparato e pubblicato atomicamente nello stesso volume. PDF e PPTX reali superati localmente. Run GitHub [42486677344](https://github.com/desalvo/quorivio/actions/runs/42486677344): qualità verde, container gate rosso su CVE-2026-76844 e CVE-2026-85091 in `zlib1g`; obbligo aggiornamento `deb13u1` senza eccezioni Trivy. L'interfaccia ora distingue `conversion_failed` da `internal_error`; wizard standalone `--sync-generated` accetta solo modifica dell'immagine converter già distribuita e preserva il resto dei manifest e i backup. Test e inventario RC261; **full CI RC261 da eseguire**; **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag eseguito dall'assistente. `docs/RC_CYCLE261_CONVERTER_CROSS_MOUNT_AND_ZLIB_CI.it.md`.
+
 # Quorivio 0.1.0-dev — RC260 — Riconciliazione Kubernetes `generated`
 
 **RC260:** Wizard standalone auto-aggiornante: `--generated-dir` per associare il Deployment ai manifest originali, `--sync-generated` per installazioni converter già esistenti. I piani contengono checksum dei file; dopo il rollout si aggiornano la patch Kustomize e il token nel Secret locale in modalità `0600`, con backup privato. `generate()` conserva token e overlay, senza mutare PostgreSQL/PVC/Ingress/Service. Test con cluster simulato e standalone; inventario RC259 conservato, inventario RC260 nuovo. Full CI RC260 in attesa; **85,25%** (43 accettati/17 parziali); nessun commit/push/tag effettuato. `docs/RC_CYCLE260_KUBERNETES_GENERATED_RECONCILIATION.it.md`.

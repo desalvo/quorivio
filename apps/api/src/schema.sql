@@ -316,6 +316,25 @@ CREATE TABLE IF NOT EXISTS session_schedule_dates(session_id uuid NOT NULL REFER
 -- SMTP credentials encrypted using AUTH_SECRET, never returned by API.
 CREATE TABLE IF NOT EXISTS smtp_configuration(id integer PRIMARY KEY CHECK(id=1), encrypted_config text NOT NULL, updated_at timestamptz NOT NULL DEFAULT now());
 
+
+-- Disk monitoring: only real filesystem capacity probes are eligible for alerts.
+-- The PostgreSQL data-PVC probe reports once every five minutes. Samples older
+-- than fifteen minutes are unavailable and must never be treated as 0% used.
+CREATE TABLE IF NOT EXISTS disk_monitor_samples (
+ source text PRIMARY KEY CHECK(source='database'),
+ total_bytes bigint NOT NULL CHECK(total_bytes>0),
+ available_bytes bigint NOT NULL CHECK(available_bytes>=0 AND available_bytes<=total_bytes),
+ observed_at timestamptz NOT NULL DEFAULT now()
+);
+-- Shared across all Quorivio API replicas: each threshold crossing sends one
+-- SMTP message to approved platform administrators, re-armed below 85%.
+CREATE TABLE IF NOT EXISTS disk_monitor_alert_state (
+ source text PRIMARY KEY CHECK(source IN ('application','database') OR (source LIKE 'conversion:%' AND length(source)<=96)),
+ state text NOT NULL CHECK(state IN ('normal','alert')),
+ notified_at timestamptz,
+ updated_at timestamptz NOT NULL DEFAULT now()
+);
+
 -- Scheduled appointments with explicit local wall-clock time, duration and IANA timezone.
 CREATE TABLE IF NOT EXISTS session_appointments(id uuid PRIMARY KEY,session_id uuid NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,scheduled_date date NOT NULL,start_time time NOT NULL,duration_minutes integer NOT NULL CHECK(duration_minutes BETWEEN 5 AND 1440),time_zone text NOT NULL DEFAULT 'Europe/Rome',created_at timestamptz NOT NULL DEFAULT now());
 CREATE INDEX IF NOT EXISTS session_appointments_user_calendar ON session_appointments(scheduled_date,start_time,session_id);

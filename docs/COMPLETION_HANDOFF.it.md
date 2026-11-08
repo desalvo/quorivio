@@ -1,3 +1,13 @@
+# Quorivio 0.1.0-dev — RC262 — Allarmi spazio disco e monitor PostgreSQL
+
+**RC262:** Nuova sezione *Configurazione server → Spazio disco e allarmi* per allegati, volume temporaneo converter e dati PostgreSQL. Statfs nei pod API e sonda read-only `db-disk-probe` sul PVC PostgreSQL; `pg_database_size` visualizzata solo come informazione, non come percentuale. Soglia email SMTP agli amministratori di piattaforma approvati: 90%, riarmo ≤85%, deduplicazione fra repliche via lock DB, campioni scaduti non validi. Wizard Kubernetes standalone RC262: nuova generazione DB con sonda, piano + applicazione esplicita del monitor per installazioni esistenti (rollout PostgreSQL richiede conferma), overlay e backup persistenti in `k8s-generated`. Test mirati, build e SHA-256; full CI GitHub ancora non verificata. **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. `docs/RC_CYCLE262_DISK_CAPACITY_MONITORING.it.md`.
+
+---
+
+# Quorivio 0.1.0-dev — RC261 — Conversione PDF/PPTX su volumi separati
+
+**RC261:** Corretto `EXDEV errno=18` durante l'importazione PDF/PPTX nel worker Kubernetes: scratch privato sul medesimo filesystem dell'output. Scanner Trivy rimane bloccante, con aggiornamento richiesto `zlib1g deb13u1` per le due CVE HIGH. L'API distingue gli errori di conversione; il wizard standalone RC261 consente di sincronizzare l'aggiornamento della sola immagine converter su `k8s-generated`, rifiutando ogni altra modifica al deployment. CI completa RC261 da confermare; **85,25%**, `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. `docs/RC_CYCLE261_CONVERTER_CROSS_MOUNT_AND_ZLIB_CI.it.md`.
+
 # Quorivio 0.1.0-dev — RC260 — Riconciliazione Kubernetes `generated`
 
 **RC260:** Wizard standalone auto-aggiornante: `--generated-dir` per associare il Deployment ai manifest originali, `--sync-generated` per installazioni converter già esistenti. I piani contengono checksum dei file; dopo il rollout si aggiornano la patch Kustomize e il token nel Secret locale in modalità `0600`, con backup privato. `generate()` conserva token e overlay, senza mutare PostgreSQL/PVC/Ingress/Service. Test con cluster simulato e standalone; inventario RC259 conservato, inventario RC260 nuovo. Full CI RC260 in attesa; **85,25%** (43 accettati/17 parziali); nessun commit/push/tag effettuato. `docs/RC_CYCLE260_KUBERNETES_GENERATED_RECONCILIATION.it.md`.

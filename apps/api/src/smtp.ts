@@ -28,3 +28,16 @@ export async function sendEmailOtp(c:SmtpConfig,to:string,code:string,validMinut
  const transport=mailer.createTransport({host:c.host,port:c.port,secure:c.secure,requireTLS:!c.secure,auth:{user:c.user,pass:c.password},connectionTimeout:10000,greetingTimeout:10000,socketTimeout:15000,tls:{rejectUnauthorized:true}});
  try{await transport.sendMail({from:c.senderName?{name:c.senderName,address:c.from}:c.from,to,subject:'Quorivio - Verification code',text:`Your Quorivio verification code is ${code}. It expires in ${validMinutes} minutes. If you did not request this code, ignore this message.`})}finally{transport.close()}
 }
+
+/** Platform-wide disk capacity warning. Only backend-selected platform admins
+ * receive this message; request inputs never control recipients or content. */
+export async function sendDiskCapacityAlert(c:SmtpConfig,recipients:string[],volume:'application'|'conversion'|'database',percent:number,usedBytes:number,totalBytes:number){
+ if(!recipients.length||!Number.isFinite(percent)||percent<90||percent>100||!Number.isSafeInteger(usedBytes)||!Number.isSafeInteger(totalBytes)||usedBytes>totalBytes||usedBytes<0)throw Error('invalid_disk_alert');
+ const safe=recipients.filter(r=>/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(r));
+ if(safe.length!==recipients.length)throw Error('invalid_disk_alert_recipient');
+ const {default:mailer}=await import('nodemailer');
+ const transport=mailer.createTransport({host:c.host,port:c.port,secure:c.secure,requireTLS:!c.secure,auth:{user:c.user,pass:c.password},connectionTimeout:10000,greetingTimeout:10000,socketTimeout:15000,tls:{rejectUnauthorized:true}});
+ const label=volume==='database'?'PostgreSQL data volume':volume==='conversion'?'Quorivio conversion temporary volume':'Quorivio application asset volume';
+ const gib=(bytes:number)=>(bytes/1073741824).toFixed(2);
+ try{const delivery=await transport.sendMail({from:c.senderName?{name:c.senderName,address:c.from}:c.from,to:safe,subject:`[Quorivio] DISK SPACE ALERT: ${label} at ${percent.toFixed(1)}%`,text:`Quorivio detected that ${label} is ${percent.toFixed(1)}% full (threshold: 90%).\nUsed: ${gib(usedBytes)} GiB of ${gib(totalBytes)} GiB.\n\nPlease check free disk space and storage provisioning promptly. The warning is re-armed after utilization falls to 85% or below.\n`});if(delivery.rejected?.length||!delivery.accepted?.length)throw Error('disk_alert_delivery_not_accepted')}finally{transport.close()}
+}

@@ -232,7 +232,12 @@ class Handler(BaseHTTPRequestHandler):
                 return self.reply(400, {'error': 'invalid_request'})
             return self.reply(200, execute_job(request['job']) if self.path == '/convert' else execute_portable_job(request['job'], 'import' if self.path == '/portable-import' else 'export-pdf' if self.path == '/portable-export-pdf' else 'export'))
         except (ValueError, OSError, RuntimeError, TimeoutError, json.JSONDecodeError) as exc:
-            self.log_error('conversion rejected: %s', type(exc).__name__)
+            # Print only a stable POSIX errno (never untrusted paths, PDF
+            # contents or converter stderr), to distinguish EXDEV from EACCES.
+            if isinstance(exc, OSError):
+                self.log_error('conversion rejected: OSError errno=%s', exc.errno)
+            else:
+                self.log_error('conversion rejected: %s', type(exc).__name__)
             return self.reply(422, {'error': 'conversion_failed'})
 
     def reply(self, status, payload):
