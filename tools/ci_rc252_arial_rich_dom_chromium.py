@@ -7,7 +7,9 @@ widget said Arial, so historical tests that inspected the parent passed while
 users saw the fallback font in the real new-widget title and answer options.
 
 An offline Chromium harness injects the production Vite bundle into a page with
-an in-memory API fixture; no network, credentials or production DB are required.
+an in-memory API and WebSocket fixture; no network, credentials or production DB
+are required. The socket shim is scoped to the about:blank test URL, without
+filtering any browser console/page errors.
 """
 import asyncio
 import json
@@ -56,6 +58,36 @@ BOOTSTRAP = r"""arg => {
    configurable:true,get:()=>cookie,set:v=>{cookie+=(cookie?'; ':'')+v}});
  let seq=0;Object.defineProperty(window.crypto,'randomUUID',{
    configurable:true,value:()=>`00000000-0000-4000-8000-${String(++seq).padStart(12,'0')}`});
+ // RC253: about:blank resolves the app's /live socket as ws://live/?session=...
+ // There is no live server in the self-contained typography fixture. Replace
+ // ONLY that synthetic test URL BEFORE React imports the production bundle.
+ // Never suppress console/pageerror: unrelated errors must still fail the gate.
+ const sockets=[];
+ class OfflineFixtureWebSocket {
+   static CONNECTING=0;static OPEN=1;static CLOSING=2;static CLOSED=3;
+   constructor(url){
+     this.url=String(url);
+     if(!/^ws:\/\/live\/\?session=[0-9a-f-]+$/.test(this.url)){
+       throw new Error('Unexpected WebSocket URL in offline React fixture: '+this.url);
+     }
+     this.readyState=OfflineFixtureWebSocket.CONNECTING;
+     this.onopen=null;this.onclose=null;this.onerror=null;this.onmessage=null;
+     sockets.push(this.url);
+     queueMicrotask(()=>{
+       if(this.readyState!==OfflineFixtureWebSocket.CONNECTING)return;
+       this.readyState=OfflineFixtureWebSocket.OPEN;
+       this.onopen?.(new Event('open'));
+     });
+   }
+   close(){
+     if(this.readyState===OfflineFixtureWebSocket.CLOSED)return;
+     this.readyState=OfflineFixtureWebSocket.CLOSED;
+     this.onclose?.(new CloseEvent('close',{code:1000,wasClean:true}));
+   }
+   send(){if(this.readyState!==OfflineFixtureWebSocket.OPEN)throw new Error('Fixture socket not open')}
+ }
+ window.WebSocket=OfflineFixtureWebSocket;
+ window.__rc253_offline_socket_urls=sockets;
  const model={session:arg.session,activity:arg.activity,widgets:arg.widgets,revision:1,saves:0};
  window.__rc252=model;
  window.fetch=async(input,options={})=>{
@@ -100,6 +132,20 @@ async def check(browser, width, height):
         assert len(css) == 1 and len(js) == 1, 'Build the actual frontend before this test'
         await page.add_style_tag(content=css[0].read_text(encoding='utf-8'))
         await page.evaluate(BOOTSTRAP, {'session': SES, 'activity': ACT, 'widgets': BASE_WIDGETS})
+        # Prove the offline socket actually opens/closes inside Chromium, while
+        # unexpected real endpoints are rejected instead of silently ignored.
+        socket_probe = await page.evaluate('''expected => {
+          const socket = new WebSocket(expected);
+          return new Promise(resolve => queueMicrotask(() => {
+            const opened = socket.readyState === WebSocket.OPEN;
+            socket.close();
+            let rejected = false;
+            try { new WebSocket('ws://unrelated.invalid/live?session=other'); }
+            catch { rejected = true; }
+            resolve({opened, closed:socket.readyState === WebSocket.CLOSED, rejected});
+          }));
+        }''', f'ws://live/?session={SES["id"]}')
+        assert socket_probe == {'opened': True, 'closed': True, 'rejected': True}, socket_probe
         await page.add_script_tag(content=js[0].read_text(encoding='utf-8'), type='module')
         await expect(page.locator('#root .app')).to_be_visible(timeout=25000)
         await acknowledge_functional_cookie_notice(page)
@@ -138,6 +184,13 @@ async def check(browser, width, height):
         assert created[0]['computed'] == 'Arial' and not created[0]['inline'], created
         assert await new.evaluate('el => getComputedStyle(el).fontFamily') == 'Arial'
         assert await page.evaluate("getComputedStyle(document.documentElement).zoom") == '0.8', 'Studio compact zoom regressed'
+        fixture_sockets = await page.evaluate('window.__rc253_offline_socket_urls')
+        # A dormant session need not open a socket on every browser/runner.
+        # Any socket it does open must use the one explicitly isolated URL.
+        assert fixture_sockets and all(
+            url == f'ws://live/?session={SES["id"]}' for url in fixture_sockets
+        ), ('Unexpected isolated test socket', fixture_sockets)
+        assert await page.evaluate('window.WebSocket.name') == 'OfflineFixtureWebSocket' 
         assert not errors, ('Compiled React errors', errors[:3])
         print(f'PASS RC252 compiled React Chromium {width}x{height}: native insertion, Arial title and options, preserved marked Georgia/Trebuchet, no undefined CSS font')
     finally:

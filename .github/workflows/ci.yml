@@ -828,8 +828,9 @@ jobs:
           python3 tools/ci_rc250_thumbnail_zoom_chromium.py
           # Regression for actual 44px physical public phone controls (not CSS-only pixels).
           python3 tools/ci_rc251_public_zoom_chromium.py
-          # RC252: mount the compiled React editor with real question widgets
-          # and inspect the rendered glyph font faces, including new insertion.
+          # RC252/RC253: verify real compiled editor glyph fonts on actual
+          # widget insertion; isolate only the synthetic offline WebSocket
+          # host while retaining fail-closed console/pageerror checking.
           python3 tools/ci_rc252_arial_rich_dom_chromium.py
           # RC162: compact QR URL must remain visible when resized; no URL row when hidden.
           python3 tools/ci_rc162_qr_resizing_chromium.py
@@ -1555,7 +1556,8 @@ jobs:
           python3 tools/verify_rc_cycle249_inventory.py --historical
           python3 tools/verify_rc_cycle250_inventory.py --historical
           python3 tools/verify_rc_cycle251_inventory.py --historical
-          python3 tools/verify_rc_cycle252_inventory.py
+          python3 tools/verify_rc_cycle252_inventory.py --historical
+          python3 tools/verify_rc_cycle253_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:
