@@ -157,12 +157,36 @@ def apply_disk_monitor(output:Path,ack_restart:bool,kubectl='kubectl')->dict:
  _run(['-n',plan['namespace'],'rollout','status','statefulset/'+plan['statefulset'],'--timeout=300s'],kubectl,timeout=330)
  return sync_disk_monitor(plan['namespace'],plan['statefulset'].removesuffix('-postgres'),directory,kubectl)
 
+# The Kubernetes API server defaults these two harmless Container fields when
+# it persists a StatefulSet. They are absent from the JSON Patch submitted by
+# the wizard. Compare security-sensitive properties EXACTLY after removing ONLY
+# these precisely valued API defaults, never by partial dict/subset matching.
+_API_CONTAINER_DEFAULTS={
+ 'terminationMessagePath':'/dev/termination-log',
+ 'terminationMessagePolicy':'File',
+}
+
+def _verified_live_probe(live_probe:dict,expected:dict)->None:
+ if not isinstance(live_probe,dict):
+  raise DiskMonitorUpgradeError('invalid live disk probe structure')
+ actual=dict(live_probe)
+ for key,allowed in _API_CONTAINER_DEFAULTS.items():
+  if key in actual:
+   if actual[key]!=allowed:
+    raise DiskMonitorUpgradeError('live disk probe '+key+' drift; refusing manifest overwrite')
+   del actual[key]
+ if actual!=expected:
+  # Do not print the live value: some future admission controllers may inject
+  # sensitive data into an env entry. Only expose non-secret property names.
+  differences=sorted(k for k in set(actual)|set(expected) if actual.get(k)!=expected.get(k))
+  raise DiskMonitorUpgradeError('live disk probe security/image/volumes drift; refusing manifest overwrite (fields: '+','.join(differences)+')')
+
 def sync_disk_monitor(namespace:str,app_name:str,generated:Path,kubectl='kubectl')->dict:
  namespace=valid_name(namespace);app_name=valid_name(app_name)
  live=_statefulset(namespace,app_name+'-postgres',kubectl)
  probes=[c for c in live['spec']['template']['spec']['containers'] if c.get('name')==PROBE_NAME]
  if len(probes)!=1:raise DiskMonitorUpgradeError('no unique live PostgreSQL disk probe')
  expected=disk_probe_sidecar(live)
- if probes[0]!=expected:raise DiskMonitorUpgradeError('live disk probe security/image/volumes drift; refusing manifest overwrite')
+ _verified_live_probe(probes[0],expected)
  _generated(Path(generated),namespace,app_name,expected)
  return {'namespace':namespace,'statefulset':app_name+'-postgres','generatedDir':str(Path(generated).absolute())}

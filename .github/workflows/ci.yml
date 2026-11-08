@@ -369,6 +369,15 @@ jobs:
             tools.tests.test_rc260_generated_manifest_reconciliation \
             tools.tests.test_rc246_converter_upgrade \
             tools.tests.test_rc258_standalone_wizard_rollout
+      # RC263: the PDF regression uses a synthetic subprocess runner and must
+      # not require Poppler on GitHub's early runner; Kubernetes adds harmless
+      # terminationMessage* defaults to StatefulSet containers post-apply.
+      - name: RC263 host-independent converter fixture and Kubernetes drift reconciliation before npm
+        run: |
+          python3 -m unittest -q \
+            tools.tests.test_rc263_kube_defaults_and_ci \
+            tools.tests.test_rc261_conversion_mount_and_zlib \
+            tools.tests.test_rc262_disk_monitor_wizard
       # RC261: converting PDF/PPTX on separate Kubernetes /tmp and /conversions
       # mounts must publish pages with same-filesystem atomic rename. The
       # converter image must patch the two Trivy HIGH zlib1g CVEs, never waive.
@@ -1643,7 +1652,8 @@ jobs:
           python3 tools/verify_rc_cycle259_inventory.py --historical
           python3 tools/verify_rc_cycle260_inventory.py --historical
           python3 tools/verify_rc_cycle261_inventory.py --historical
-          python3 tools/verify_rc_cycle262_inventory.py
+          python3 tools/verify_rc_cycle262_inventory.py --historical
+          python3 tools/verify_rc_cycle263_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

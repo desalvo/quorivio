@@ -41,7 +41,10 @@ class DiskMonitorTests(unittest.TestCase):
   if 'patch' in args:
    planfile=next(x.split('=',1)[1] for x in args if x.startswith('--patch-file='))
    operations=json.loads(Path(planfile).read_text())
-   self.s['spec']['template']['spec']['containers'].append(operations[-1]['value'])
+   new_container=copy.deepcopy(operations[-1]['value'])
+   new_container['terminationMessagePath']='/dev/termination-log'
+   new_container['terminationMessagePolicy']='File'
+   self.s['spec']['template']['spec']['containers'].append(new_container)
    self.s['metadata']['resourceVersion']='124'
    return 'statefulset.apps/quorivio-postgres patched\n'
   if 'rollout' in args:return 'statefulset rolling update complete\n'
@@ -67,6 +70,8 @@ class DiskMonitorTests(unittest.TestCase):
   overlay=json.loads((self.generated/'97-postgres-disk-probe-patch.json').read_text())
   self.assertEqual(overlay['spec']['template']['spec']['containers'][0]['name'],'db-disk-probe')
   self.assertEqual(len([a for a in self.actions if 'patch' in a and '--dry-run=server' not in a]),1)
+  monitor.sync_disk_monitor('quorivio','quorivio',self.generated)
+  self.assertEqual(len([a for a in self.actions if 'patch' in a and '--dry-run=server' not in a]),1)
  def test_identity_drift_rejected_before_live_change(self):
   directory=self.root/'plan'
   monitor.plan_disk_monitor('quorivio','quorivio',directory,self.generated)
@@ -86,6 +91,77 @@ class DiskMonitorTests(unittest.TestCase):
   self.s['spec']['template']['spec']['containers'][-1]['securityContext']['allowPrivilegeEscalation']=True
   with self.assertRaisesRegex(monitor.DiskMonitorUpgradeError,'security'):
    monitor.sync_disk_monitor('quorivio','quorivio',self.generated)
+ def test_api_defaulted_termination_fields_are_only_accepted_exactly(self):
+  probe=monitor.disk_probe_sidecar(self.s)
+  probe['terminationMessagePath']='/dev/termination-log'
+  probe['terminationMessagePolicy']='File'
+  self.s['spec']['template']['spec']['containers'].append(probe)
+  monitor.sync_disk_monitor('quorivio','quorivio',self.generated)
+  for key,value in [('terminationMessagePath','/var/log/evil'),('terminationMessagePolicy','FallbackToLogsOnError')]:
+   with self.subTest(key=key):
+    probe[key]=value
+    with self.assertRaisesRegex(monitor.DiskMonitorUpgradeError,'drift'):
+     monitor.sync_disk_monitor('quorivio','quorivio',self.generated)
+    probe[key]={'terminationMessagePath':'/dev/termination-log','terminationMessagePolicy':'File'}[key]
+
+ def test_unexpected_added_fields_refused_even_when_defaults_are_valid(self):
+  probe=monitor.disk_probe_sidecar(self.s)
+  probe['terminationMessagePath']='/dev/termination-log'
+  probe['terminationMessagePolicy']='File'
+  self.s['spec']['template']['spec']['containers'].append(probe)
+  probe['workingDir']='/unexpected'
+  with self.assertRaisesRegex(monitor.DiskMonitorUpgradeError,'workingDir'):
+   monitor.sync_disk_monitor('quorivio','quorivio',self.generated)
+
+ def test_standalone_embedded_sync_accepts_kubernetes_defaults(self):
+  standalone=wizard._standalone_component('k8s_disk_monitor_upgrade')
+  expected=standalone.disk_probe_sidecar(self.s)
+  with_defaults=copy.deepcopy(expected)
+  with_defaults.update({'terminationMessagePath':'/dev/termination-log','terminationMessagePolicy':'File'})
+  standalone._verified_live_probe(with_defaults,expected)
+  with_defaults['securityContext']['allowPrivilegeEscalation']=True
+  with self.assertRaisesRegex(standalone.DiskMonitorUpgradeError,'security'):
+   standalone._verified_live_probe(with_defaults,expected)
+
+ def test_standalone_sync_recovers_applied_probe_without_kubectl_writes(self):
+  # Model the user's scenario: rollout already succeeded, the older wizard
+  # rejected Kubernetes-defaulted termination fields, and only local
+  # generated manifests need reconciliation. The CLI runs in a fresh folder
+  # containing ONLY k8s_wizard.py and a fake kubectl executable.
+  existing=monitor.disk_probe_sidecar(self.s)
+  existing.update({'terminationMessagePath':'/dev/termination-log','terminationMessagePolicy':'File'})
+  self.s['spec']['template']['spec']['containers'].append(existing)
+  with tempfile.TemporaryDirectory() as temp:
+   isolated=Path(temp)
+   standalone=isolated/'k8s_wizard.py'
+   standalone.write_bytes((ROOT/'tools/k8s_wizard.py').read_bytes())
+   tool=isolated/'kubectl'
+   fixture=isolated/'statefulset.json'
+   fixture.write_text(json.dumps(self.s))
+   audit=isolated/'kubectl-calls.txt'
+   tool.write_text("""#!/usr/bin/env python3
+import json,sys,pathlib
+args=sys.argv[1:]
+with (pathlib.Path(__file__).parent/'kubectl-calls.txt').open('a') as stream:
+ stream.write(' '.join(args)+'\\n')
+if args==['config','current-context']:
+ print('cluster-staging')
+elif 'get' in args and 'statefulset' in args:
+ print((pathlib.Path(__file__).parent/'statefulset.json').read_text())
+else:
+ print('unexpected kubectl write',file=sys.stderr)
+ sys.exit(9)
+""")
+   tool.chmod(0o700)
+   result=subprocess.run([sys.executable,str(standalone),'--no-self-update','--sync-disk-monitor',
+       '--generated-dir',str(self.generated),'--set','namespace=quorivio','--set','name=quorivio',
+       '--kubectl',str(tool)],capture_output=True,text=True,cwd=isolated)
+   self.assertEqual(result.returncode,0,result.stderr)
+   self.assertTrue((self.generated/'97-postgres-disk-probe-patch.json').is_file())
+   calls=audit.read_text()
+   self.assertNotIn('patch',calls)
+   self.assertNotIn('rollout',calls)
+
  def test_probe_script_posix_shell_syntax(self):
   r=subprocess.run(['/bin/sh','-n'],input=monitor.PROBE_SCRIPT,text=True,capture_output=True)
   self.assertEqual(r.returncode,0,r.stderr)
@@ -95,7 +171,7 @@ class DiskMonitorTests(unittest.TestCase):
   with tempfile.TemporaryDirectory() as temp:
    target=Path(temp)/'k8s_wizard.py';target.write_bytes((ROOT/'tools/k8s_wizard.py').read_bytes())
    r=subprocess.run([sys.executable,str(target),'--version'],capture_output=True,text=True)
-   self.assertEqual(r.returncode,0,r.stderr);self.assertIn('rc262',r.stdout)
+   self.assertEqual(r.returncode,0,r.stderr);self.assertIn('rc263',r.stdout)
    import importlib.util
    spec=importlib.util.spec_from_file_location('single_disk_wizard',str(target));module=importlib.util.module_from_spec(spec);sys.modules[spec.name]=module;spec.loader.exec_module(module)
    embedded=module._standalone_component('k8s_disk_monitor_upgrade')

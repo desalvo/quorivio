@@ -45,6 +45,13 @@ def _render_mock(args,timeout=90):
     raise AssertionError('Unexpected converter subprocess')
 
 
+def _fake_tools(binary):
+    # The synthetic test renderer replaces subprocess calls; an external
+    # Poppler installation is therefore not a test prerequisite. The real
+    # converter still fail-closes if the executable is missing in production.
+    return '/mock/bin/'+binary if binary in ('pdfinfo','pdftoppm') else None
+
+
 class ConverterMountBoundary(unittest.TestCase):
     def test_stage_and_atomic_publish_use_same_device_even_with_tmp_override(self):
         with tempfile.TemporaryDirectory(prefix='quorivio-rc261-') as td:
@@ -60,6 +67,7 @@ class ConverterMountBoundary(unittest.TestCase):
                 staged.append(Path(directory.name))
                 return directory
             with patch.object(converter.tempfile,'TemporaryDirectory',side_effect=track),\
+                 patch.object(converter.shutil,'which',side_effect=_fake_tools),\
                  patch.object(converter,'run',side_effect=_render_mock):
                 result=converter.convert(source,parent/'pages')
             self.assertEqual(result['page_count'],1)
@@ -76,7 +84,8 @@ class ConverterMountBoundary(unittest.TestCase):
             parent=Path(td)
             source=parent/'source.pdf'
             source.write_bytes(b'%PDF-1.4\n% synthetic fixture\n')
-            with patch.object(converter,'run',side_effect=_render_mock):
+            with patch.object(converter.shutil,'which',side_effect=_fake_tools),\
+                 patch.object(converter,'run',side_effect=_render_mock):
                 result=converter.convert(source,parent/'pages')
             self.assertEqual(result['page_count'],1)
             self.assertTrue((parent/'pages/page-0001.png').is_file())

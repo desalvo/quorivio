@@ -1,0 +1,9 @@
+# Quorivio RC263 — CI Poppler e riconciliazione sonda PostgreSQL
+
+- La full CI RC262 (`42495326713`) si arrestava perché due test con subprocess fittizi richiedevano il vero Poppler sul runner. I test ora simulano esplicitamente anche la disponibilità di `pdfinfo` e `pdftoppm`; il converter in produzione continua a rifiutare le richieste senza i binari.
+- Kubernetes aggiunge al container della sonda `terminationMessagePath: /dev/termination-log` e `terminationMessagePolicy: File`. La RC262 confrontava il dizionario completo con quello preparato dal wizard e rifiutava la sincronizzazione a rollout concluso. La RC263 ignora esclusivamente quei due campi e solo con i valori predefiniti esatti; image, env, secret, securityContext, volumeMounts, risorse e qualunque altro campo continuano ad essere controllati strettamente.
+- Se il comando RC262 `--apply-disk-monitor` ha già effettuato il rollout ma poi ha segnalato `live disk probe security/image/volumes drift`, **non rieseguire apply**. Verificare `kubectl -n quorivio get statefulset quorivio-postgres -o jsonpath='{.spec.template.spec.containers[*].name}{"\n"}'` e `kubectl -n quorivio rollout status statefulset/quorivio-postgres`. Se `db-disk-probe` è presente e il rollout sano, usare il wizard RC263 con `--sync-disk-monitor --generated-dir ./k8s-generated --set namespace=quorivio --set name=quorivio`. Non esegue patch sul cluster e non riavvia PostgreSQL.
+- Usare `--version` per controllare la versione. L’autoaggiornamento legge GitHub main; se non include ancora RC263, mantiene il file locale. `--no-self-update` è disponibile per l’esecuzione deliberatamente offline.
+- I manifest originali sono riconciliati da una patch Kustomize dedicata e da backup privati. Verificare `kubectl kustomize ./k8s-generated > /dev/null`.
+
+Nessuna modifica al container di produzione o alle credenziali del database.
