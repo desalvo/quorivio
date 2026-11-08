@@ -370,6 +370,10 @@ jobs:
         run: |
           python3 -m unittest tools.tests.test_rc251_public_live_zoom_ci -q
           node --experimental-strip-types --test apps/web/test/rc251-public-live-zoom.test.ts
+      # RC252: DOM CSSStyleDeclaration converts `undefined` fontFamily to a
+      # literal CSS font name, overriding even correct Arial widget defaults.
+      - name: RC252 real new-widget Arial DOM inheritance before npm
+        run: node --experimental-strip-types --test apps/web/test/rc252-rich-dom-aria-default.test.ts
       - name: RC218 real editor thumbnail rename browser contract before npm
         run: python3 -m unittest tools.tests.test_rc218_browser_postgres_thumbnail_rename -q
       # RC215: RC141 compared a glyph Range top with an output border-box
@@ -824,6 +828,9 @@ jobs:
           python3 tools/ci_rc250_thumbnail_zoom_chromium.py
           # Regression for actual 44px physical public phone controls (not CSS-only pixels).
           python3 tools/ci_rc251_public_zoom_chromium.py
+          # RC252: mount the compiled React editor with real question widgets
+          # and inspect the rendered glyph font faces, including new insertion.
+          python3 tools/ci_rc252_arial_rich_dom_chromium.py
           # RC162: compact QR URL must remain visible when resized; no URL row when hidden.
           python3 tools/ci_rc162_qr_resizing_chromium.py
           # RC152: mutation-tested current long-label wrapping and attached [count]
@@ -1547,7 +1554,8 @@ jobs:
           python3 tools/verify_rc_cycle248_inventory.py --historical
           python3 tools/verify_rc_cycle249_inventory.py --historical
           python3 tools/verify_rc_cycle250_inventory.py --historical
-          python3 tools/verify_rc_cycle251_inventory.py
+          python3 tools/verify_rc_cycle251_inventory.py --historical
+          python3 tools/verify_rc_cycle252_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

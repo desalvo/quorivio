@@ -1,7 +1,7 @@
 /** Inline rich-text editor that keeps the exact plain-text + bounded-mark contract
  * used by PostgreSQL, presenter and participant projection. Never persists HTML. */
 import React,{useLayoutEffect,useRef} from 'react';
-import {styledSegments,inlineMarkCss,type TextMark} from './widget-text-marks.js';
+import {styledSegments,inlineMarkDomCss,type TextMark} from './widget-text-marks.js';
 
 export type TextRange={start:number;end:number};
 export function domTextRange(root:HTMLElement):TextRange|null {
@@ -50,7 +50,9 @@ export function RichWidgetText({value,marks,field,active,onChange,onSelection,on
   const fragment=document.createDocumentFragment();
   for(const part of parts){
    const span=document.createElement('span');span.textContent=part.text;
-   const css=inlineMarkCss(part.style);
+   // A new unmarked title/answer must not acquire `font-family: undefined`.
+   // Keep only explicit marks; inherit the widget's Arial (or authored) face.
+   const css=inlineMarkDomCss(part.style);
    Object.assign(span.style,css);
    if(css['--q-inline-phone-font-size'])span.style.setProperty('--q-inline-phone-font-size',css['--q-inline-phone-font-size']);
    fragment.appendChild(span);

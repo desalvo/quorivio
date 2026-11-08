@@ -57,6 +57,15 @@ export function inlineMarkCss(s:InlineStyle):Record<string,string|undefined>{
   '--q-inline-phone-font-size':s.fontSize!==undefined?`${s.fontSize}px`:undefined,color:s.color,fontWeight:s.bold?'bold':s.bold===false?'normal':undefined,fontStyle:s.italic?'italic':s.italic===false?'normal':undefined,textDecoration:[s.underline?'underline':'',s.strikethrough?'line-through':''].filter(Boolean).join(' ')||(s.underline===false||s.strikethrough===false?'none':undefined)};
 }
 
+/** DOM CSSStyleDeclaration differs from React.CSSProperties: assigning an
+ * `undefined` fontFamily becomes the literal, valid CSS font name "undefined".
+ * Strip absent properties before the imperative rich-text DOM renderer uses
+ * them, so an unformatted answer/title inherits its widget's Arial baseline.
+ */
+export function inlineMarkDomCss(s:InlineStyle):Record<string,string>{
+ return Object.fromEntries(Object.entries(inlineMarkCss(s)).filter((entry):entry is [string,string]=>entry[1]!==undefined));
+}
+
 
 /** Compute the effective text style from the widget base and ordered inline marks.
  * A toggle is active only if EVERY character of the selected range has the flag.
