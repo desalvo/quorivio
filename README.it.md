@@ -1,3 +1,5 @@
+> **RC260 — Kubernetes:** il wizard sincronizza i manifest originari in `generated` dopo un upgrade del converter; per converter esistente usare `--sync-generated --generated-dir ./generated`. Vedi [`docs/RC_CYCLE260_KUBERNETES_GENERATED_RECONCILIATION.it.md`](docs/RC_CYCLE260_KUBERNETES_GENERATED_RECONCILIATION.it.md).
+
 > **RC259 — Wizard Kubernetes standalone auto-aggiornante.** `python3 k8s_wizard.py --version` mostra la versione installata; ogni comando operativo controlla l’ultima versione su GitHub `desalvo/quorivio`, aggiorna atomicamente lo script e riavvia automaticamente gli argomenti originali. `--no-self-update` abilita esplicitamente la manutenzione offline. Non serve il repository. Dettagli: [`docs/RC_CYCLE259_WIZARD_GITHUB_AUTOUPDATE_AND_PPTX_CI.it.md`](docs/RC_CYCLE259_WIZARD_GITHUB_AUTOUPDATE_AND_PPTX_CI.it.md).
 
 # Quorivio 0.1.0-dev

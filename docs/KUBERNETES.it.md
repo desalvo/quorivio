@@ -1,3 +1,5 @@
+**RC260 — Manifest sincronizzati:** il wizard standalone riconcilia i manifest originali in `generated`/`k8s-generated` dopo un rollout del converter riuscito e aggiorna il token locale con permessi privati. Per un converter già installato usare `--sync-generated --generated-dir ./generated`. Vedi `docs/RC_CYCLE260_KUBERNETES_GENERATED_RECONCILIATION.it.md`.
+
 # Wizard Kubernetes con Kustomize
 
 **RC258 — Wizard standalone:** copiare soltanto `tools/k8s_wizard.py` sul nodo con Python 3 e `kubectl` (quest’ultimo richiesto per interagire con Kubernetes). Creazione Kustomize, ispezione read-only, provisioning token e aggiornamento sidecar converter non richiedono altri moduli Quorivio. Il controllo `maxUnavailable: 25%` usa l'arrotondamento Kubernetes sulle repliche effettive; i rollout realmente interruttivi restano bloccati. Procedura: `docs/RC_CYCLE258_STANDALONE_K8S_WIZARD.it.md`.

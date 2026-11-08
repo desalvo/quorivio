@@ -1,3 +1,5 @@
+> **RC260 — Kubernetes:** the standalone wizard keeps original `generated` Kustomize manifests aligned with converter rollout; for an existing converter use `--sync-generated --generated-dir ./generated`. See [`docs/RC_CYCLE260_KUBERNETES_GENERATED_RECONCILIATION.en.md`](docs/RC_CYCLE260_KUBERNETES_GENERATED_RECONCILIATION.en.md).
+
 > **RC259 — Self-updating standalone Kubernetes wizard.** `python3 k8s_wizard.py --version` reports the installed version. Every operational command checks official GitHub `desalvo/quorivio`, atomically updates the single file and re-executes with original arguments. Explicit `--no-self-update` permits air-gapped operation; no repository checkout is required. [RC259 release notes](docs/RC_CYCLE259_WIZARD_GITHUB_AUTOUPDATE_AND_PPTX_CI.en.md).
 
 # Quorivio 0.1.0-dev

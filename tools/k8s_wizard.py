@@ -8,7 +8,7 @@ import urllib.error
 
 # This single-file wizard is the release unit.  Its upstream is intentionally
 # fixed to the official public repository: never accept a URL from CLI input.
-WIZARD_VERSION = '0.1.0-dev-rc259'
+WIZARD_VERSION = '0.1.0-dev-rc260'
 WIZARD_UPSTREAM_URL = 'https://raw.githubusercontent.com/desalvo/quorivio/main/tools/k8s_wizard.py'
 WIZARD_MAX_DOWNLOAD_BYTES = 2 * 1024 * 1024
 _WIZARD_RESTART_GUARD = 'QUORIVIO_WIZARD_RESTARTED_AFTER_UPDATE'
@@ -256,6 +256,30 @@ def guarded_output_directory(out):
 
 def generate(cfg,out):
     out=guarded_output_directory(out)
+    # Preserve converter overlay/token when regenerating the wizard's original
+    # manifest directory. These two files are not re-created from defaults.
+    converter_overlay=out/'95-converter-sidecar-patch.json'
+    converter_enabled=converter_overlay.is_file()
+    if converter_overlay.is_symlink():
+        raise ValueError('Unsafe converter overlay in generated manifests')
+    saved_token=None
+    if converter_enabled:
+        try:
+            overlay=json.loads(converter_overlay.read_text(encoding='utf8'))
+        except (ValueError,OSError) as exc:
+            raise ValueError('Cannot preserve malformed converter overlay') from exc
+        if (overlay.get('kind')!='Deployment' or
+            overlay.get('metadata',{}).get('name')!=cfg['name'] or
+            overlay.get('metadata',{}).get('namespace')!=cfg['namespace']):
+            raise ValueError('Existing converter overlay targets a different Deployment')
+        old_secret=out/'05-app-secret.yaml'
+        checked_file(old_secret)
+        if not old_secret.is_file():
+            raise ValueError('Existing converter overlay requires the original Secret manifest')
+        match=re.search(r'(?m)^  QUORIVIO_WORKER_TOKEN: ([A-Za-z0-9+/=]+)$',old_secret.read_text(encoding='utf8'))
+        if match is None or len(base64.b64decode(match.group(1),validate=True)) < 32:
+            raise ValueError('Existing converter overlay requires an initialized worker token')
+        saved_token=base64.b64decode(match.group(1),validate=True).decode('ascii')
     cfg=resolve_credentials(cfg,out)
     name=cfg['name'];ns=cfg['namespace'];port=int(cfg['container_port'])
     klass=cfg['ingress_class'] or cfg['ingress_controller']
@@ -267,6 +291,7 @@ def generate(cfg,out):
     db_url=('postgresql://'+urllib.parse.quote(cfg['postgres_user'],safe='')+':'+urllib.parse.quote(cfg['postgres_password'],safe='')+'@'+dbhost+':'+str(cfg['postgres_port'])+'/'+urllib.parse.quote(cfg['postgres_database'],safe='')+'?sslmode='+('disable' if cfg['postgres_mode']=='internal' else cfg['postgres_sslmode']))
     secret_data={'DATABASE_URL':db_url,'AUTH_SECRET':cfg['auth_secret'],'ADMIN_EMAIL':cfg['admin_email'],'ADMIN_PASSWORD':cfg['admin_password']}
     if cfg['postgres_mode']=='internal':secret_data['POSTGRES_PASSWORD']=cfg['postgres_password']
+    if saved_token is not None:secret_data['QUORIVIO_WORKER_TOKEN']=saved_token
     files={
       '00-namespace.yaml':f'apiVersion: v1\nkind: Namespace\nmetadata:\n  name: {ns}\n',
       '05-app-secret.yaml':'apiVersion: v1\nkind: Secret\nmetadata:\n  name: '+name.replace('\n','')+'-PLACEHOLDER\n',
@@ -450,6 +475,8 @@ spec:
         (out/'25-disruption-budget.yaml').unlink(missing_ok=True)
     files['05-app-secret.yaml']='apiVersion: v1\nkind: Secret\nmetadata:\n  name: '+cfg['secret_name']+'\n  namespace: '+ns+'\ntype: Opaque\ndata:\n'+''.join('  '+k+': '+base64.b64encode(v.encode()).decode()+'\n' for k,v in sorted(secret_data.items()))
     files['kustomization.yaml']=files['kustomization.yaml'].replace('  - 10-configmap.yaml\n','  - 05-app-secret.yaml\n  - 10-configmap.yaml\n')
+    if converter_enabled:
+        files['kustomization.yaml']+='patches:\n  - path: 95-converter-sidecar-patch.json\n'
     if cfg['postgres_mode']=='internal':
         files.update(postgres_resources(cfg,name,ns))
         files['kustomization.yaml']=files['kustomization.yaml'].replace('  - 10-configmap.yaml\n','  - 10-configmap.yaml\n  - 11-postgres-service.yaml\n  - 12-postgres-statefulset.yaml\n')
@@ -663,11 +690,14 @@ import re
 import secrets
 import stat
 import subprocess
+import tempfile
+import time
 from pathlib import Path
 
 NAME = re.compile(r'[a-z0-9]([-a-z0-9]*[a-z0-9])?\Z')
 IMAGE = re.compile(r'[A-Za-z0-9][A-Za-z0-9._:/@+\-]*\Z')
 PLAN_SCHEMA = 'quorivio-k8s-converter-upgrade-v1'
+CONVERTER_OVERLAY = '95-converter-sidecar-patch.json'
 CONVERTER_NAME = 'converter'
 ENV = {
     'QUORIVIO_ENABLE_CONVERTER': 'true',
@@ -901,6 +931,242 @@ def build_patch(deployment: dict, app_container: str | None, secret_name: str, i
     return patch, {'deployment_uid':uid,'deployment_resource_version':version,'app_container':app['name'],'secret_name':secret_name}
 
 
+def _generated_input(directory: Path, namespace: str, deployment_name: str,
+                     secret_name: str) -> tuple[Path, dict[str, bytes]]:
+    """Fail closed unless this is the original, owned wizard Kustomize directory.
+
+    Inspect exact metadata and files without evaluating YAML tags, following
+    symlinks or reading any credentials into logs. All unrelated resources,
+    operator customizations and overrides are preserved byte-for-byte.
+    """
+    directory=Path(directory).absolute()
+    if any(part.is_symlink() for part in (directory,*directory.parents)):
+        raise UpgradeError('generated manifest path or parent is a symlink')
+    if not directory.is_dir():
+        raise UpgradeError('generated manifest directory does not exist')
+    names=('kustomization.yaml','20-deployment.yaml','05-app-secret.yaml','quorivio-overrides.json')
+    data={}
+    for name in names:
+        file=directory/name
+        if file.is_symlink() or not file.is_file() or not stat.S_ISREG(file.stat().st_mode):
+            raise UpgradeError('generated directory must contain a regular wizard file: '+name)
+        data[name]=file.read_bytes()
+    k=data['kustomization.yaml'].decode('utf-8')
+    d=data['20-deployment.yaml'].decode('utf-8')
+    secret=data['05-app-secret.yaml'].decode('utf-8')
+    if not all(re.search(r'^  - '+re.escape(entry)+r'$',k,re.M) for entry in ('20-deployment.yaml','05-app-secret.yaml')):
+        raise UpgradeError('generated Kustomization does not include Deployment and Secret')
+    for value,kind,name in ((d,'Deployment',deployment_name),(secret,'Secret',secret_name)):
+        # The original generator emits apiVersion/kind/metadata in this order.
+        if not re.search(r'(?m)^kind: '+kind+r'\nmetadata:\n  name: '+re.escape(name)+r'\n  namespace: '+re.escape(namespace)+r'\s*$',value):
+            raise UpgradeError('generated '+kind+' identity differs from live Kubernetes')
+    try: overrides=json.loads(data['quorivio-overrides.json'])
+    except ValueError as exc:raise UpgradeError('generated wizard override record is not valid JSON') from exc
+    if not isinstance(overrides,dict) or any(k in overrides and overrides[k]!=v for k,v in (('namespace',namespace),('name',deployment_name))):
+        raise UpgradeError('generated override name/namespace differs from live Deployment')
+    return directory,data
+
+
+def _secret_data_yaml(source: str) -> dict[str,str]:
+    """Read only the simple base64 data block emitted by the wizard."""
+    if not re.search(r'(?m)^type: Opaque\n^data:\n',source):
+        raise UpgradeError('generated Secret does not use the expected Opaque/data format')
+    tail=source.split('\ndata:\n',1)[1]
+    result={}
+    for line in tail.splitlines():
+        if not line.strip():continue
+        match=re.fullmatch(r'  ([A-Z][A-Z0-9_]*): ([A-Za-z0-9+/=]+)',line)
+        if not match:
+            raise UpgradeError('generated Secret contains unsupported data encoding or annotations')
+        key,value=match.groups()
+        if key in result:raise UpgradeError('duplicate Secret key in generated manifest')
+        try: base64.b64decode(value,validate=True)
+        except ValueError as exc:raise UpgradeError('invalid base64 value in generated Secret') from exc
+        result[key]=value
+    if not result:raise UpgradeError('generated Secret has no data entries')
+    return result
+
+
+def _generated_secret_with_token(source: str, live_secret: dict) -> str:
+    check_token(live_secret)
+    live=live_secret.get('data') or {}
+    recorded=_secret_data_yaml(source)
+    for key,value in recorded.items():
+        if key in live and live[key]!=value:
+            raise UpgradeError('generated Secret differs from live for '+key+'; refuse overwriting credentials')
+    token=live['QUORIVIO_WORKER_TOKEN']
+    if 'QUORIVIO_WORKER_TOKEN' in recorded:
+        return source
+    return source.rstrip('\n')+'\n  QUORIVIO_WORKER_TOKEN: '+token+'\n'
+
+
+def _manifest_overlay(deployment: dict, secret_name: str) -> str:
+    """Strategic merge patch: do not replace the original Deployment template.
+
+    Kubernetes Kustomize merges containers by name, env by name and mounts by
+    mountPath.  This is declarative and reusable; live JSON Patch preconditions
+    such as UID and resourceVersion must never appear in generated manifests.
+    """
+    spec=deployment['spec']['template']['spec']
+    _,app=find_api_container(deployment,None)
+    hits=[c for c in spec['containers'] if c['name']==CONVERTER_NAME]
+    if len(hits)!=1:raise UpgradeError('live converter sidecar is absent or ambiguous')
+    sidecar=hits[0]
+    if not IMAGE.fullmatch(sidecar.get('image','')) or not '/' in sidecar['image']:
+        raise UpgradeError('invalid live converter image')
+    expected_env=[{'name':key,'value':value} for key,value in ENV.items()]
+    expected_env.append({'name':'QUORIVIO_WORKER_TOKEN','valueFrom':{'secretKeyRef':{'name':secret_name,'key':'QUORIVIO_WORKER_TOKEN'}}})
+    app_env={x.get('name'):x for x in app.get('env',[]) or []}
+    for item in expected_env:
+        if app_env.get(item['name'])!=item:
+            raise UpgradeError('live converter app environment has drifted: '+item['name'])
+    if {'name':'conversions','mountPath':'/conversions'} not in (app.get('volumeMounts') or []):
+        raise UpgradeError('live converter app mount is absent')
+    required_volumes=[{'name':'conversions','emptyDir':{'sizeLimit':'2Gi'}},{'name':'converter-tmp','emptyDir':{'sizeLimit':'1Gi'}}]
+    for volume in required_volumes:
+        if volume not in (spec.get('volumes') or []):
+            raise UpgradeError('live converter volume has unexpected specification')
+    if sidecar.get('env') is None or not any(x.get('name')=='QUORIVIO_WORKER_TOKEN' and x.get('valueFrom',{}).get('secretKeyRef',{})=={'name':secret_name,'key':'QUORIVIO_WORKER_TOKEN'} for x in sidecar.get('env',[])):
+        raise UpgradeError('live converter Secret reference differs')
+    if any(c.get('name')==CONVERTER_NAME for c in spec['containers'] if c is not sidecar):
+        raise UpgradeError('duplicate converter container')
+    overlay={'apiVersion':'apps/v1','kind':'Deployment',
+      'metadata':{'name':deployment['metadata']['name'],'namespace':deployment['metadata']['namespace']},
+      'spec':{'template':{'spec':{'containers':[
+         {'name':app['name'],'env':expected_env,'volumeMounts':[{'name':'conversions','mountPath':'/conversions'}]},
+         sidecar], 'volumes':required_volumes}}}}
+    return json.dumps(overlay,indent=2,ensure_ascii=False,sort_keys=True)+'\n'
+
+
+def _generated_reconciliation_changes(directory: Path, namespace: str, deployment_name: str,
+                                       secret_name: str, deployment: dict, live_secret: dict,
+                                       expected_hashes: dict | None=None) -> tuple[dict[str,bytes],dict[str,bytes]]:
+    directory,original=_generated_input(directory,namespace,deployment_name,secret_name)
+    if expected_hashes is not None:
+        for name,digest in expected_hashes.items():
+            if name==CONVERTER_OVERLAY:
+                file=directory/name
+                if file.is_symlink() or (hashlib.sha256(file.read_bytes()).hexdigest() if file.is_file() else None)!=digest:
+                    raise UpgradeError('generated converter overlay changed since planning; regenerate plan')
+            elif name not in original or hashlib.sha256(original[name]).hexdigest()!=digest:
+                raise UpgradeError('generated manifest changed since planning: '+name+'; regenerate plan')
+    k=original['kustomization.yaml'].decode('utf8')
+    if CONVERTER_OVERLAY not in k:
+        if re.search(r'(?m)^patches:\s*$',k):
+            # Preserve unrelated operator-authored Kustomize patches. Insert
+            # before the next root-level key rather than clobbering the list.
+            lines=k.splitlines(keepends=True)
+            matches=[i for i,line in enumerate(lines) if line.strip()=='patches:' and line.startswith('patches:')]
+            if len(matches)!=1:raise UpgradeError('ambiguous generated Kustomize patches')
+            insert=matches[0]+1
+            while insert<len(lines) and (lines[insert].startswith(' ') or not lines[insert].strip()):insert+=1
+            lines.insert(insert,'  - path: '+CONVERTER_OVERLAY+'\n')
+            k=''.join(lines)
+        else:
+            if not k.endswith('\n'):k+='\n'
+            k+='patches:\n  - path: '+CONVERTER_OVERLAY+'\n'
+    elif not re.search(r'(?m)^  - path: '+re.escape(CONVERTER_OVERLAY)+r'$',k):
+        raise UpgradeError('generated converter overlay reference is malformed')
+    patch=_manifest_overlay(deployment,secret_name)
+    existing_patch=directory/CONVERTER_OVERLAY
+    if existing_patch.is_symlink() or (existing_patch.exists() and not existing_patch.is_file()):
+        raise UpgradeError('unsafe generated converter overlay file')
+    if existing_patch.is_file():
+        # Do not silently replace operator-customized overlays.
+        try:old=json.loads(existing_patch.read_text(encoding='utf8'))
+        except ValueError as exc:raise UpgradeError('existing converter overlay is not valid JSON') from exc
+        if old!=json.loads(patch):
+            raise UpgradeError('generated converter overlay differs from live; manual reconciliation required')
+    secret=_generated_secret_with_token(original['05-app-secret.yaml'].decode('utf8'),live_secret)
+    edits={ '05-app-secret.yaml':secret.encode('utf8'),
+            CONVERTER_OVERLAY:patch.encode('utf8'),
+            'kustomization.yaml':k.encode('utf8') }
+    return original,edits
+
+
+def _atomic_generated_write(path:Path, data:bytes, mode:int)->None:
+    if path.is_symlink() or (path.exists() and not path.is_file()):
+        raise UpgradeError('unsafe generated manifest destination')
+    fd,temp=tempfile.mkstemp(prefix='.quorivio-sync-',dir=str(path.parent))
+    try:
+        os.fchmod(fd,mode)
+        with os.fdopen(fd,'wb') as f:
+            f.write(data);f.flush();os.fsync(f.fileno())
+        os.replace(temp,path)
+    finally:
+        if os.path.exists(temp):os.unlink(temp)
+
+
+def _commit_generated_edits(directory: Path, original: dict[str,bytes], edits:dict[str,bytes]) -> str:
+    """Backup first; publish Kustomization last to activate complete overlay."""
+    directory=Path(directory).absolute()
+    backup_root=directory/'.quorivio-manifest-backups'
+    if backup_root.is_symlink():raise UpgradeError('unsafe generated backup directory')
+    backup_root.mkdir(mode=0o700,exist_ok=True)
+    if not backup_root.is_dir():raise UpgradeError('invalid generated backup directory')
+    backup=Path(tempfile.mkdtemp(prefix='converter-',dir=str(backup_root)))
+    backup.chmod(0o700)
+    for name in ('05-app-secret.yaml','kustomization.yaml'):
+        (backup/name).write_bytes(original[name]);(backup/name).chmod(0o600)
+    current_patch=directory/CONVERTER_OVERLAY
+    if current_patch.exists():
+        (backup/CONVERTER_OVERLAY).write_bytes(current_patch.read_bytes())
+        (backup/CONVERTER_OVERLAY).chmod(0o600)
+    # Check for concurrent/manual edits immediately before replacement.
+    for name,content in original.items():
+        if (directory/name).read_bytes()!=content:
+            raise UpgradeError('generated files modified concurrently; backup kept at '+str(backup))
+    written=[]
+    try:
+        for name in ('05-app-secret.yaml',CONVERTER_OVERLAY,'kustomization.yaml'):
+            if name not in edits or (name in original and edits[name]==original[name]):continue
+            if name==CONVERTER_OVERLAY and edits[name]==b'':continue
+            path=directory/name
+            if path.is_symlink() or (path.exists() and not path.is_file()):
+                raise UpgradeError('unsafe generated file during synchronization')
+            _atomic_generated_write(path,edits[name],0o600 if name=='05-app-secret.yaml' else 0o644)
+            written.append(name)
+    except (OSError,UpgradeError) as exc:
+        for name in reversed(written):
+            path=directory/name
+            if name in original:
+                _atomic_generated_write(path,original[name],0o600 if name=='05-app-secret.yaml' else 0o644)
+            elif (backup/name).exists():
+                _atomic_generated_write(path,(backup/name).read_bytes(),0o644)
+            else:path.unlink(missing_ok=True)
+        raise UpgradeError('generated synchronization failed; original files restored; backup at '+str(backup)) from exc
+    return str(backup)
+
+
+def reconcile_generated(directory: Path, namespace: str, deployment_name: str,
+                        *, kubectl: str='kubectl', expected_hashes: dict | None=None) -> str:
+    """Read validated live converter state; update only Kustomize overlay and token."""
+    deployment=get_object(namespace,'deployment',deployment_name,kubectl)
+    _,app=find_api_container(deployment,None)
+    secret_name=discover_secret(app,None)
+    secret=get_object(namespace,'secret',secret_name,kubectl)
+    check_token(secret)
+    original,edits=_generated_reconciliation_changes(directory,namespace,deployment_name,
+      secret_name,deployment,secret,expected_hashes)
+    return _commit_generated_edits(directory,original,edits)
+
+
+def reconcile_generated_token(directory:Path,namespace:str,deployment_name:str,*,kubectl:str='kubectl') -> str:
+    """After --ensure-converter-token, keep the original Kustomize Secret safe."""
+    deployment=get_object(namespace,'deployment',deployment_name,kubectl)
+    _,app=find_api_container(deployment,None)
+    secret_name=discover_secret(app,None)
+    secret=get_object(namespace,'secret',secret_name,kubectl)
+    _,original=_generated_input(directory,namespace,deployment_name,secret_name)
+    updated=_generated_secret_with_token(original['05-app-secret.yaml'].decode('utf8'),secret).encode('utf8')
+    if updated==original['05-app-secret.yaml']:
+        return 'already synchronized'
+    return _commit_generated_edits(Path(directory),original,{
+       '05-app-secret.yaml':updated,
+       CONVERTER_OVERLAY:(Path(directory)/CONVERTER_OVERLAY).read_bytes() if (Path(directory)/CONVERTER_OVERLAY).is_file() else b'',
+       'kustomization.yaml':original['kustomization.yaml'],
+    })
+
 def _fresh_directory(output: Path) -> Path:
     # Do not overlay the original wizard-generated manifests: that could
     # accidentally remove PostgreSQL/ingress or regenerate admin credentials.
@@ -921,7 +1187,8 @@ def _write_private(p: Path, value: str) -> None:
 
 def prepare_upgrade(namespace: str, deployment_name: str, output: Path,
                     image: str, *, app_container: str | None=None,
-                    secret_name: str | None=None, kubectl: str='kubectl') -> dict:
+                    secret_name: str | None=None, kubectl: str='kubectl',
+                    generated_dir: Path | None=None) -> dict:
     valid_name(namespace,'Namespace');valid_name(deployment_name,'Deployment')
     current_context=kube_context(kubectl)
     deployment=get_object(namespace,'deployment',deployment_name,kubectl)
@@ -931,10 +1198,21 @@ def prepare_upgrade(namespace: str, deployment_name: str, output: Path,
     if not check_token(secret):
         raise UpgradeError('existing app Secret lacks QUORIVIO_WORKER_TOKEN; run --ensure-converter-token first')
     patch,identity=build_patch(deployment,app_container,secret_name,image)
+    generated_hashes=None
+    if generated_dir is not None:
+        original=_generated_input(generated_dir,namespace,deployment_name,secret_name)[1]
+        # Planning is read only. No missing token or converter patch is written yet.
+        _generated_secret_with_token(original['05-app-secret.yaml'].decode('utf8'),secret)
+        generated_hashes={key:hashlib.sha256(value).hexdigest() for key,value in original.items()}
+        overlay_file=Path(generated_dir)/CONVERTER_OVERLAY
+        if overlay_file.is_symlink():raise UpgradeError('unsafe generated converter overlay')
+        generated_hashes[CONVERTER_OVERLAY]=hashlib.sha256(overlay_file.read_bytes()).hexdigest() if overlay_file.is_file() else None
     output=_fresh_directory(output)
     encoded=json.dumps(patch,indent=2,ensure_ascii=False)+'\n'
     plan={'schema':PLAN_SCHEMA,'context':current_context,'namespace':namespace,'deployment':deployment_name,
-          'converter_image':image,**identity,'patch_sha256':hashlib.sha256(encoded.encode('utf8')).hexdigest()}
+          'converter_image':image,**identity,'patch_sha256':hashlib.sha256(encoded.encode('utf8')).hexdigest(),
+          'generated_dir':str(Path(generated_dir).absolute()) if generated_dir is not None else None,
+          'generated_sha256':generated_hashes}
     _write_private(output/'converter-patch.json',encoded)
     _write_private(output/'converter-plan.json',json.dumps(plan,indent=2,ensure_ascii=False)+'\n')
     _write_private(output/'LEGGIMI.txt',
@@ -945,7 +1223,7 @@ def prepare_upgrade(namespace: str, deployment_name: str, output: Path,
         'Dry-run: kubectl -n '+namespace+' patch deployment '+deployment_name+
         ' --type=json --patch-file='+str((output/'converter-patch.json').resolve())+' --dry-run=server -o name\n'
         'Apply explicitly using: python3 tools/k8s_wizard.py --apply-converter --output '+str(output.resolve())+'\n'
-        'The wizard never edits the initial Kustomize base or its Secrets.\n')
+        'After successful rollout the wizard reconciles the original generated Kustomize base, if configured.\n')
     return plan
 
 
@@ -977,12 +1255,29 @@ def apply_upgrade(output: Path, *, kubectl: str='kubectl') -> dict:
         raise UpgradeError('worker token disappeared from Secret')
     expected,_=build_patch(deployment,plan['app_container'],plan['secret_name'],plan['converter_image'])
     if patch!=expected:raise UpgradeError('upgrade JSON Patch does not match allowlisted Deployment modifications')
+    generated_dir=plan.get('generated_dir')
+    if generated_dir:
+        original=_generated_input(Path(generated_dir),ns,name,plan['secret_name'])[1]
+        for filename,checksum in (plan.get('generated_sha256') or {}).items():
+            if filename==CONVERTER_OVERLAY:
+                p=Path(generated_dir)/filename
+                if p.is_symlink() or (hashlib.sha256(p.read_bytes()).hexdigest() if p.is_file() else None)!=checksum:
+                    raise UpgradeError('generated overlay changed since planning; refuse to patch live cluster')
+            elif filename not in original or hashlib.sha256(original[filename]).hexdigest()!=checksum:
+                raise UpgradeError('generated files changed since planning; refuse to patch live cluster')
+        _generated_secret_with_token(original['05-app-secret.yaml'].decode('utf8'),get_object(ns,'secret',plan['secret_name'],kubectl))
     # Server validation before the single atomic patch, then verify the
     # rollout; no secret, PostgreSQL, PVC, Service or Ingress operations.
     cmd=['-n',ns,'patch','deployment',name,'--type=json','--patch-file='+str((output/'converter-patch.json').resolve()),'-o','name']
     run_kubectl(cmd+['--dry-run=server'],kubectl=kubectl)
     run_kubectl(cmd,kubectl=kubectl)
     run_kubectl(['-n',ns,'rollout','status','deployment/'+name,'--timeout=180s'],kubectl=kubectl,timeout=190)
+    if generated_dir:
+        try:
+            plan['generated_backup']=reconcile_generated(Path(generated_dir),ns,name,kubectl=kubectl,
+                expected_hashes=plan.get('generated_sha256'))
+        except (UpgradeError,OSError) as exc:
+            raise UpgradeError('Live converter deployed, but generated manifest sync failed; run --sync-generated with --generated-dir after resolving: '+str(exc)) from exc
     return plan
 ''',
     'k8s_cluster_inspection': r'''"""Read-only discovery for importing an existing Quorivio Kubernetes installation.
@@ -1098,7 +1393,7 @@ def save_report(output:Path,report:dict):
 ''',
 }
 _STANDALONE_COMPONENT_SHA256 = {
-    'k8s_converter_upgrade': '0143e83d65c030366bc92da9f3d9d181df90ad31ec01bd6277bf0c8d4d368783',
+    'k8s_converter_upgrade': '4475d499da4408b5bd8306768e5059a86d2e3a9e759202499c9c40bc1d3a50ee',
     'k8s_cluster_inspection': '8af9c08dd1ef6fabc3a6bbfe3730a1cdedf879dc2eda7fdb4364dfd6d42730f7',
 }
 _COMPONENT_CACHE={}
@@ -1126,6 +1421,20 @@ def _standalone_component(name):
     _COMPONENT_CACHE[name]=module
     return module
 
+def _generated_directory_from_args(explicit):
+    if explicit:
+        return Path(explicit).absolute()
+    candidates=[]
+    for base in (Path.cwd(),Path(__file__).absolute().parent,Path(__file__).absolute().parent.parent):
+        for name in ('generated','k8s-generated'):
+            path=(base/name).absolute()
+            if (path/'kustomization.yaml').is_file() and (path/'quorivio-overrides.json').is_file() and path not in candidates:
+                candidates.append(path)
+    if len(candidates)>1:
+        raise ValueError('Multiple generated manifest directories; specify --generated-dir explicitly')
+    return candidates[0] if candidates else None
+
+
 def main(argv=None):
     a=argparse.ArgumentParser(description=__doc__)
     a.add_argument('--version',action='version',version='Quorivio Kubernetes wizard '+WIZARD_VERSION)
@@ -1139,6 +1448,8 @@ def main(argv=None):
     modes.add_argument('--upgrade-converter',action='store_true',help='Plan ONLY a converter sidecar addition to a live Deployment; never apply automatically')
     modes.add_argument('--apply-converter',action='store_true',help='Explicitly apply a previously generated and revalidated converter-only JSON Patch')
     modes.add_argument('--ensure-converter-token',action='store_true',help='Explicitly add a private 32-byte converter token ONLY when the existing app Secret lacks one')
+    modes.add_argument('--sync-generated',action='store_true',help='Reconcile existing generated Kustomize manifests from a verified live converter (no cluster writes)')
+    a.add_argument('--generated-dir',help='Original wizard-generated Kustomize directory, e.g. ./generated; auto-discovered if unambiguous')
     a.add_argument('--converter-image',help='Published converter-specific image, e.g. your-registry/quorivio-converter:tag; required for --upgrade-converter')
     a.add_argument('--converter-deployment',help='Existing Deployment name (defaults to --set name=...)')
     a.add_argument('--app-container',help='Existing Quorivio API container name, otherwise discover from Deployment')
@@ -1150,24 +1461,29 @@ def main(argv=None):
         print('Quorivio Kubernetes wizard '+WIZARD_VERSION+' (update check completed or explicitly skipped)')
         return 0
     cfg=dict(DEFAULTS);out=Path(args.output)
-    if args.upgrade_converter or args.apply_converter or args.ensure_converter_token:
+    if args.upgrade_converter or args.apply_converter or args.ensure_converter_token or args.sync_generated:
         component=_standalone_component('k8s_converter_upgrade')
         UpgradeError=component.UpgradeError
         prepare_upgrade=component.prepare_upgrade
         apply_upgrade=component.apply_upgrade
         plan_token_provision=component.plan_token_provision
+        reconcile_generated=component.reconcile_generated
+        reconcile_generated_token=component.reconcile_generated_token
         valid_name=component.valid_name
         # Converter modes inspect the LIVE Deployment, never old wizard
         # overrides which could replace credentials or storage configuration.
         if args.values:a.error('--values cannot regenerate or replace existing credentials in converter mode')
         if args.apply_converter:
-            if args.set or args.converter_image or args.converter_secret or args.converter_deployment or args.app_container:
+            if args.set or args.converter_image or args.converter_secret or args.converter_deployment or args.app_container or args.generated_dir:
                 a.error('--apply-converter uses ONLY the already reviewed plan; do not add override options')
             if not any(x == '--output' or x.startswith('--output=') for x in (argv if argv is not None else sys.argv[1:])):
                 a.error('--apply-converter requires explicit --output PATH to reviewed converter plan')
             try:report=apply_upgrade(out,kubectl=args.kubectl)
             except (UpgradeError, KeyError, OSError) as exc:a.error(str(exc))
             print('Converter-only Deployment patch applied and rollout verified:',report['namespace'],report['deployment'])
+            if report.get('generated_dir'):
+                print('Generated Kustomize overlay and Secret reconciled:',report['generated_dir'])
+                print('Private backup:',report.get('generated_backup'))
             print('Open platform admin -> Server configuration -> PDF/PowerPoint converter -> Check worker -> Enable.')
             return 0
         overrides={}
@@ -1178,25 +1494,37 @@ def main(argv=None):
             overrides[key]=value
         ns=overrides.get('namespace',cfg['namespace'])
         deployment=args.converter_deployment or overrides.get('name',cfg['name'])
+        try: generated_dir=_generated_directory_from_args(args.generated_dir)
+        except ValueError as exc:a.error(str(exc))
+        if generated_dir is None:
+            a.error('original generated manifests not found; specify --generated-dir PATH to avoid future drift')
         try:
             valid_name(ns,'Namespace');valid_name(deployment,'Deployment')
             if args.ensure_converter_token:
                 if args.converter_image:a.error('--ensure-converter-token does not accept --converter-image')
                 secret,created=plan_token_provision(ns,deployment,args.app_container,args.converter_secret,kubectl=args.kubectl)
                 print('Private worker token', 'provisioned in' if created else 'already valid in', 'existing Secret:',secret)
-                print('No other Secret fields or Kubernetes resources changed; token not printed or stored locally.')
+                print('No other Secret fields or Kubernetes resources changed; token not printed in output.')
+                backup=reconcile_generated_token(generated_dir,ns,deployment,kubectl=args.kubectl)
+                print('Generated Secret reconciled, private backup:',backup)
+            elif args.sync_generated:
+                if args.converter_image or args.converter_secret or args.app_container:
+                    a.error('--sync-generated reads live converter; no override flags permitted')
+                backup=reconcile_generated(generated_dir,ns,deployment,kubectl=args.kubectl)
+                print('Generated Kustomize manifests reconciled from live converter:',generated_dir)
+                print('Private backup:',backup)
             else:
                 if not args.converter_image:a.error('--upgrade-converter requires --converter-image with a published and accessible converter-specific image')
                 if not any(x == '--output' or x.startswith('--output=') for x in (argv if argv is not None else sys.argv[1:])):
                     a.error('--upgrade-converter requires explicit --output PATH different from original wizard manifests')
-                plan=prepare_upgrade(ns,deployment,out,args.converter_image,app_container=args.app_container,secret_name=args.converter_secret,kubectl=args.kubectl)
+                plan=prepare_upgrade(ns,deployment,out,args.converter_image,app_container=args.app_container,secret_name=args.converter_secret,kubectl=args.kubectl,generated_dir=generated_dir)
                 print('Converter-only upgrade plan prepared in:',out)
                 print('Context:',plan['context'],'Deployment:',plan['namespace']+'/'+plan['deployment'])
-                print('Only Deployment pod template will change; no apply, database, PVC, Ingress or Secret modifications.')
+                print('Plan will update only live Deployment. After successful rollout, the original generated Kustomization and Secret will be reconciled.')
                 print('Inspect the patch, then use --apply-converter --output',out)
         except (UpgradeError, OSError, KeyError) as exc:a.error(str(exc))
         return 0
-    if args.converter_image or args.converter_deployment or args.app_container or args.converter_secret:
+    if args.converter_image or args.converter_deployment or args.app_container or args.converter_secret or args.generated_dir:
         a.error('converter-specific flags require --upgrade-converter or --ensure-converter-token')
     if args.inspect_cluster:
         component=_standalone_component('k8s_cluster_inspection')

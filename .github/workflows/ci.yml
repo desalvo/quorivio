@@ -360,6 +360,15 @@ jobs:
             tools.tests.test_rc258_standalone_wizard_rollout \
             tools.tests.test_k8s_ha_hardening
           node --experimental-strip-types --test apps/web/test/rc254-all-widget-schema-fonts.test.ts
+      # RC260: original generated manifests and live converter must remain
+      # consistent across token provisioning, successful rollout and later
+      # regeneration. Validate path drift, private backups and standalone sync.
+      - name: RC260 generated Kubernetes manifest reconciliation before npm
+        run: |
+          python3 -m unittest -q \
+            tools.tests.test_rc260_generated_manifest_reconciliation \
+            tools.tests.test_rc246_converter_upgrade \
+            tools.tests.test_rc258_standalone_wizard_rollout
       # RC242: Arial on widget text, compact master commands, persistent global zoom.
       - name: RC242 Arial and app-wide zoom contract before npm
         run: |
@@ -1613,7 +1622,8 @@ jobs:
           python3 tools/verify_rc_cycle256_inventory.py --historical
           python3 tools/verify_rc_cycle257_inventory.py --historical
           python3 tools/verify_rc_cycle258_inventory.py --historical
-          python3 tools/verify_rc_cycle259_inventory.py
+          python3 tools/verify_rc_cycle259_inventory.py --historical
+          python3 tools/verify_rc_cycle260_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

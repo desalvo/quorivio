@@ -287,7 +287,7 @@ if __name__=='__main__':unittest.main()
 class WizardCli(unittest.TestCase):
     def test_upgrader_does_not_call_legacy_generate(self):
         import k8s_wizard
-        with patch.object(upgrade,'prepare_upgrade',return_value={'context':'mock','namespace':'quorivio','deployment':'quorivio'}) as p, patch.object(k8s_wizard,'generate',side_effect=AssertionError('legacy manifest overwrite')):
+        with patch.object(upgrade,'prepare_upgrade',return_value={'context':'mock','namespace':'quorivio','deployment':'quorivio'}) as p, patch.object(k8s_wizard,'generate',side_effect=AssertionError('legacy manifest overwrite')), patch.object(k8s_wizard,'_generated_directory_from_args',return_value=Path('/tmp/test-rc246-generated')):
             from contextlib import redirect_stdout
             from io import StringIO
             with redirect_stdout(StringIO()):
@@ -318,7 +318,7 @@ class WizardCli(unittest.TestCase):
         from contextlib import redirect_stdout
         from io import StringIO
         output=StringIO()
-        with patch.object(upgrade,'plan_token_provision',return_value=('quorivio-app-secrets',True)) as p:
+        with patch.object(upgrade,'plan_token_provision',return_value=('quorivio-app-secrets',True)) as p, patch.object(k8s_wizard,'_generated_directory_from_args',return_value=Path('/tmp/test-rc246-generated')), patch.object(upgrade,'reconcile_generated_token',return_value='/tmp/test-private-backup'):
             with redirect_stdout(output):result=k8s_wizard.main(['--ensure-converter-token'])
         self.assertEqual(result,0);self.assertEqual(p.call_count,1)
         self.assertNotIn(TOKEN,output.getvalue())

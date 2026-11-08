@@ -158,6 +158,18 @@ class SingleFileWizard(unittest.TestCase):
   self.state=self.dir/'state.json'
   self.state.write_text(json.dumps(fixture()))
   self.env={**os.environ,'FAKE_KUBECTL_STATE':str(self.state),'PYTHONPATH':''}
+  # The converter upgrade must reconcile the original generated manifests.
+  # Keep the fake live DATABASE_URL equal to the generated Secret to model an
+  # actual installation, without ever printing or re-creating credentials.
+  self.generated=self.dir/'generated'
+  result=self.run_cli('--unattended','--output',str(self.generated))
+  self.assertIn('Generated Kustomize base',result.stdout)
+  match=__import__('re').search(r'(?m)^  DATABASE_URL: ([A-Za-z0-9+/=]+)$',
+      (self.generated/'05-app-secret.yaml').read_text())
+  assert match
+  live=json.loads(self.state.read_text())
+  live['secret/quorivio-app-secrets']['data']['DATABASE_URL']=match.group(1)
+  self.state.write_text(json.dumps(live))
 
  def run_cli(self,*args,ok=True):
   result=subprocess.run([sys.executable,str(self.wizard),'--no-self-update',*args],cwd=self.dir,env=self.env,
