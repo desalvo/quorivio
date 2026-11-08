@@ -1,3 +1,5 @@
+> **RC267 — Node CI hotfix:** fixes shell exit 126 in the RC266 early preflight and verifies its actual test runner invocation. All RC266 docking/resize and RC265 full-bleed import features preserved. [`RC267 notes`](docs/RC_CYCLE267_CI_NODE_RUNNER_CONTINUATION.en.md).
+
 > **RC266 — Participant CI hotfix:** align legacy RC173/RC227 background assertion with RC265 full-bleed stage; no runtime changes. [`RC266 notes`](docs/RC_CYCLE266_PARTICIPANT_BACKGROUND_CI_FIX.en.md). **Editor update:** floating panels now dock to viewport edges and support pointer/keyboard resizing. Docking also respects 70–120% global UI zoom.
 
 > **RC265 — PDF/PPTX full canvas:** import as pictures with `cover` default, `contain` or forced `fill`; hide inherited title/footer/page number by default; real page thumbnails. [`RC265 notes`](docs/RC_CYCLE265_PDF_FULL_BLEED_IMPORT.en.md).
