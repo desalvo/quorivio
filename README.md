@@ -1,3 +1,5 @@
+> **RC259 — Self-updating standalone Kubernetes wizard.** `python3 k8s_wizard.py --version` reports the installed version. Every operational command checks official GitHub `desalvo/quorivio`, atomically updates the single file and re-executes with original arguments. Explicit `--no-self-update` permits air-gapped operation; no repository checkout is required. [RC259 release notes](docs/RC_CYCLE259_WIZARD_GITHUB_AUTOUPDATE_AND_PPTX_CI.en.md).
+
 # Quorivio 0.1.0-dev
 
 > **RC220:** RC219 is the last full-green CI baseline (run `42197607753`). RC220 adds the **Server configuration → Isolated PDF/PowerPoint converter** administrator panel and separate linked-results source title/answers. See `docs/RC_CYCLE220_PDF_WORKER_AND_LINKED_RESULTS.en.md`. Full RC220 CI remains pending.

@@ -1,3 +1,5 @@
+> **RC259 — Wizard Kubernetes standalone auto-aggiornante.** `python3 k8s_wizard.py --version` mostra la versione installata; ogni comando operativo controlla l’ultima versione su GitHub `desalvo/quorivio`, aggiorna atomicamente lo script e riavvia automaticamente gli argomenti originali. `--no-self-update` abilita esplicitamente la manutenzione offline. Non serve il repository. Dettagli: [`docs/RC_CYCLE259_WIZARD_GITHUB_AUTOUPDATE_AND_PPTX_CI.it.md`](docs/RC_CYCLE259_WIZARD_GITHUB_AUTOUPDATE_AND_PPTX_CI.it.md).
+
 # Quorivio 0.1.0-dev
 
 > **RC220:** La RC219 è la baseline full CI verde (run `42197607753`). In RC220 è disponibile **Configurazione server → Convertitore PDF / PowerPoint** per amministratori. Le opzioni dei risultati collegati per titolo e risposte sono indipendenti. Vedi `docs/RC_CYCLE220_PDF_WORKER_AND_LINKED_RESULTS.it.md`. La nuova RC220 necessita ancora della CI.

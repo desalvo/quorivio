@@ -10,7 +10,9 @@ class ProjectionTextFidelity(unittest.TestCase):
         self.assertIn("whiteSpace:'pre-wrap'", WEB)
 
     def test_pptx_text_style_is_applied_on_presenter_projection(self):
-        self.assertIn("const textStyle={fontFamily:widget.style?.fontFamily", WEB)
+        self.assertIn('const textStyle={fontFamily:explicitWidgetFontFamily(widget.style?.fontFamily)', WEB)
+        self.assertIn("import {explicitWidgetFontFamily,widgetTextDefaults", WEB)
+        self.assertNotIn('const textStyle={fontFamily:widget.style?.fontFamily', WEB)
         self.assertIn("{...textStyle,textAlign:widget.style?.textAlign", WEB)
 
     def test_audience_renders_full_editable_text_without_duplication(self):

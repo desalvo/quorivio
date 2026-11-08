@@ -343,6 +343,23 @@ jobs:
         run: |
           python3 -m unittest -q tools.tests.test_rc257_full_arial_preflight tools.tests.test_rc193_focus_and_font
           node --experimental-strip-types --test apps/web/test/rc254-all-widget-schema-fonts.test.ts
+      # RC258: k8s_wizard.py is a single file: its embedded inspection and
+      # converter upgrade libraries must match the canonical stdlib sources.
+      # Check real standalone subprocesses with fake kubectl, rollout default
+      # maxUnavailable 25% rounding, and no cross-resource mutations.
+      - name: RC258 standalone Kubernetes wizard and safe converter rollout before npm
+        run: python3 -m unittest tools.tests.test_rc258_standalone_wizard_rollout -q
+      # RC259: the complete Python suite found a stale PPTX projection source-
+      # literal assertion after the RC258 wizard tests. Check the secure
+      # font serializer and standalone GitHub updater before expensive gates.
+      - name: RC259 PPTX projection font and standalone wizard self-update before npm
+        run: |
+          python3 -m unittest -q \
+            tools.tests.test_pptx_projection_text_fidelity \
+            tools.tests.test_rc259_wizard_self_update \
+            tools.tests.test_rc258_standalone_wizard_rollout \
+            tools.tests.test_k8s_ha_hardening
+          node --experimental-strip-types --test apps/web/test/rc254-all-widget-schema-fonts.test.ts
       # RC242: Arial on widget text, compact master commands, persistent global zoom.
       - name: RC242 Arial and app-wide zoom contract before npm
         run: |
@@ -1594,7 +1611,9 @@ jobs:
           python3 tools/verify_rc_cycle254_inventory.py --historical
           python3 tools/verify_rc_cycle255_inventory.py --historical
           python3 tools/verify_rc_cycle256_inventory.py --historical
-          python3 tools/verify_rc_cycle257_inventory.py
+          python3 tools/verify_rc_cycle257_inventory.py --historical
+          python3 tools/verify_rc_cycle258_inventory.py --historical
+          python3 tools/verify_rc_cycle259_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

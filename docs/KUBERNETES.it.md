@@ -1,5 +1,7 @@
 # Wizard Kubernetes con Kustomize
 
+**RC258 — Wizard standalone:** copiare soltanto `tools/k8s_wizard.py` sul nodo con Python 3 e `kubectl` (quest’ultimo richiesto per interagire con Kubernetes). Creazione Kustomize, ispezione read-only, provisioning token e aggiornamento sidecar converter non richiedono altri moduli Quorivio. Il controllo `maxUnavailable: 25%` usa l'arrotondamento Kubernetes sulle repliche effettive; i rollout realmente interruttivi restano bloccati. Procedura: `docs/RC_CYCLE258_STANDALONE_K8S_WIZARD.it.md`.
+
 Esecuzione unattended, dalla root del progetto:
 
 ```bash

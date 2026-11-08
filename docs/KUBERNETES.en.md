@@ -1,5 +1,7 @@
 # Kubernetes Kustomize wizard
 
+**RC258 — Standalone wizard:** copy only `tools/k8s_wizard.py` to an operator host with Python 3 and `kubectl` (the latter needed for live Kubernetes operations). Kustomize generation, read-only inspection, token provisioning and converter sidecar upgrade no longer need other Quorivio modules. `maxUnavailable: 25%` is resolved against actual replicas using Kubernetes rounding; genuinely disruptive rollouts remain blocked. Procedure: `docs/RC_CYCLE258_STANDALONE_K8S_WIZARD.en.md`.
+
 Run the stdlib-only standalone generator from the root repository:
 
 ```bash

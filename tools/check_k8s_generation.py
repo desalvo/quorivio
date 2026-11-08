@@ -13,7 +13,7 @@ WIZARD = ROOT / 'tools' / 'k8s_wizard.py'
 
 
 def render(out: Path) -> None:
-    run = subprocess.run([sys.executable, str(WIZARD), '--unattended', '--output', str(out), '--set', 'host=quorivio.example.org'], cwd=ROOT, capture_output=True, text=True)
+    run = subprocess.run([sys.executable, str(WIZARD), '--no-self-update', '--unattended', '--output', str(out), '--set', 'host=quorivio.example.org'], cwd=ROOT, capture_output=True, text=True)
     if run.returncode:
         raise RuntimeError('Kubernetes wizard failed (output suppressed to protect secrets)')
 

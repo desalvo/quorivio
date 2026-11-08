@@ -62,7 +62,7 @@ class KubernetesHA(unittest.TestCase):
 
     def test_cli_typed_numeric_overrides_persist(self):
         with tempfile.TemporaryDirectory() as root:
-            cmd=[sys.executable,str(ROOT/'tools/k8s_wizard.py'),'--unattended',
+            cmd=[sys.executable,str(ROOT/'tools/k8s_wizard.py'),'--no-self-update','--unattended',
                  '--output',root,'--set','replicas=2','--set','asset_access_mode=ReadWriteMany',
                  '--set','max_upload_mb=150','--set','container_port=8085']
             process=subprocess.run(cmd,capture_output=True,text=True,timeout=10)

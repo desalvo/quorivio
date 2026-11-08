@@ -12,6 +12,7 @@ import base64
 import copy
 import hashlib
 import json
+import math
 import os
 import re
 import secrets
@@ -140,6 +141,49 @@ def _append_list(ops: list[dict], obj: dict, key: str, prefix: str, entries: lis
     else:raise UpgradeError('malformed Kubernetes array '+key)
 
 
+def _rollout_int_or_percent(value: object, replicas: int, *, round_up: bool, label: str) -> int:
+    """Resolve an IntOrString using Kubernetes RollingUpdate rounding rules.
+
+    maxUnavailable percentages round DOWN; maxSurge percentages round UP.
+    Python booleans are not valid Kubernetes integer quantities.
+    """
+    if type(value) is int and value >= 0:
+        return value
+    if isinstance(value, str) and re.fullmatch(r'[0-9]+%', value):
+        pct = int(value[:-1])
+        if pct > 100:
+            raise UpgradeError(f'invalid {label} percentage')
+        count = replicas * pct
+        return (count + 99) // 100 if round_up else count // 100
+    # Kubernetes emits JSON numbers for integer IntOrString and strings for
+    # percentages. Conservatively reject malformed/missing representations.
+    raise UpgradeError(f'invalid {label}; expected nonnegative integer or 0..100%')
+
+
+def effective_rollout_unavailability(deployment: dict) -> int:
+    """Evaluate live API Deployment rollout constraints without altering them."""
+    spec = deployment.get('spec') or {}
+    replicas = spec.get('replicas', 1)
+    if type(replicas) is not int or replicas < 1:
+        raise UpgradeError('Deployment requires at least one replica for availability-safe converter upgrade')
+    strategy = spec.get('strategy') or {}
+    kind = strategy.get('type', 'RollingUpdate')
+    if kind == 'Recreate':
+        raise UpgradeError('Recreate strategy; refuse potential availability disruption')
+    if kind != 'RollingUpdate':
+        raise UpgradeError('unsupported Deployment rollout strategy')
+    rolling = strategy.get('rollingUpdate') or {}
+    unavailable = _rollout_int_or_percent(
+        rolling.get('maxUnavailable', '25%'), replicas, round_up=False,
+        label='maxUnavailable')
+    surge = _rollout_int_or_percent(
+        rolling.get('maxSurge', '25%'), replicas, round_up=True,
+        label='maxSurge')
+    if surge == 0 and unavailable == 0:
+        raise UpgradeError('maxUnavailable and maxSurge are both effectively zero; rollout would stall')
+    return unavailable
+
+
 def build_patch(deployment: dict, app_container: str | None, secret_name: str, image: str) -> tuple[list[dict],dict]:
     if not IMAGE.fullmatch(image) or '://' in image or '/' not in image:
         raise UpgradeError('converter image must be a valid repository with explicit tag or digest')
@@ -154,10 +198,11 @@ def build_patch(deployment: dict, app_container: str | None, secret_name: str, i
     group=pod_sec.get('fsGroup')
     if type(group) is not int or group<1:
         raise UpgradeError('existing pod needs an fsGroup for shared writable emptyDir; refuse to alter PVC ownership')
-    strategy=deployment.get('spec',{}).get('strategy') or {}
-    unavailable=(strategy.get('rollingUpdate') or {}).get('maxUnavailable',0)
-    if strategy.get('type') == 'Recreate' or unavailable not in (0,'0','0%'):
-        raise UpgradeError('non-zero maxUnavailable or Recreate strategy; refuse potential availability disruption')
+    # Kubernetes defaults RollingUpdate to 25% maxUnavailable and rounds
+    # percentage values DOWN. For 1..3 replicas, the effective unavailability
+    # is zero. Reject only plans that could actually remove a ready replica.
+    if effective_rollout_unavailability(deployment) != 0:
+        raise UpgradeError('effective maxUnavailable is non-zero; refuse potential availability disruption')
     if deployment.get('metadata',{}).get('labels',{}).get('app.kubernetes.io/managed-by')=='Helm':
         raise UpgradeError('Helm-managed Deployment: use helm upgrade instead of patching')
     version=deployment.get('metadata',{}).get('resourceVersion')
