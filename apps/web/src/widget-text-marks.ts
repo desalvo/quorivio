@@ -3,6 +3,7 @@
  * Range offsets are UTF-16 string offsets, like HTMLInputElement selectionStart.
  */
 import type {WidgetTextStyle} from '../../api/src/domain';
+import {explicitWidgetFontFamily} from './widget-typography-defaults.ts';
 export type InlineStyle=Pick<WidgetTextStyle,'fontFamily'|'fontSize'|'color'|'bold'|'italic'|'underline'|'strikethrough'>;
 export type TextMark={field:string;start:number;end:number;style:InlineStyle};
 export const inlineKeys=['fontFamily','fontSize','color','bold','italic','underline','strikethrough'] as const;
@@ -53,7 +54,7 @@ export function styledSegments(text:string,marks:TextMark[]|undefined,field:stri
  return points.slice(0,-1).map((start,index)=>({text:text.slice(start,points[index+1]),style:Object.assign({},...relevant.filter(m=>m.start<=start&&m.end>=points[index+1]).map(m=>m.style))}));
 }
 export function inlineMarkCss(s:InlineStyle):Record<string,string|undefined>{
- return {fontFamily:s.fontFamily,fontSize:s.fontSize!==undefined?`${(s.fontSize/1280*100).toFixed(5)}cqw`:undefined,
+ return {fontFamily:explicitWidgetFontFamily(s.fontFamily),fontSize:s.fontSize!==undefined?`${(s.fontSize/1280*100).toFixed(5)}cqw`:undefined,
   '--q-inline-phone-font-size':s.fontSize!==undefined?`${s.fontSize}px`:undefined,color:s.color,fontWeight:s.bold?'bold':s.bold===false?'normal':undefined,fontStyle:s.italic?'italic':s.italic===false?'normal':undefined,textDecoration:[s.underline?'underline':'',s.strikethrough?'line-through':''].filter(Boolean).join(' ')||(s.underline===false||s.strikethrough===false?'none':undefined)};
 }
 

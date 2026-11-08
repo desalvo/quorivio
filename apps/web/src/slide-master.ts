@@ -1,4 +1,5 @@
 import type {WidgetTextStyle} from '../../api/src/domain';
+import {safeWidgetFontFamily} from './widget-typography-defaults.ts';
 /** Presentation master and contextual widgets: numbering is derived from current order, never stored. */
 export type SlideWidget = {id:string;kind:string;label?:string;style?:WidgetTextStyle;position?:{x:number;y:number;width:number;height:number;rotation:number};titleFollowPage?:boolean;titleUseMaster?:boolean;footerShowSessionTitle?:boolean;footerShowPageNumber?:boolean;footerSeparator?:boolean;footerSeparatorColor?:string;footerNumberX?:number;footerNumberY?:number};
 export const DEFAULT_TITLE_STYLE={fontFamily:'Arial',fontSize:24,color:'#000000',bold:true,textAlign:'center' as const};
@@ -24,7 +25,7 @@ export function widgetDisplay(w:SlideWidget,context:{pageTitle?:string;sessionTi
 export function footerPageNumber(widgets:ReadonlyArray<SlideWidget>,pageNumber:number){
  const footer=widgets.find(w=>w.kind==='footer');
  if(!footer||footer.footerShowPageNumber===false||!Number.isSafeInteger(pageNumber)||pageNumber<=0)return null;
- return {text:String(pageNumber),fontFamily:footer.style?.footerNumberFontFamily||footer.style?.fontFamily||DEFAULT_FOOTER_STYLE.fontFamily,
+ return {text:String(pageNumber),fontFamily:safeWidgetFontFamily(footer.style?.footerNumberFontFamily,safeWidgetFontFamily(footer.style?.fontFamily)),
   fontSize:footer.style?.footerNumberFontSize||footer.style?.fontSize||DEFAULT_FOOTER_STYLE.fontSize,
   color:footer.style?.footerNumberColor||footer.style?.color||DEFAULT_FOOTER_STYLE.color,bold:footer.style?.footerNumberBold??footer.style?.bold??false,italic:footer.style?.footerNumberItalic??footer.style?.italic??false,underline:footer.style?.footerNumberUnderline??footer.style?.underline??false,strikethrough:footer.style?.footerNumberStrikethrough??footer.style?.strikethrough??false,
   paddingRight:footer.style?.footerNumberPaddingRight??5,paddingBottom:footer.style?.footerNumberPaddingBottom??5,

@@ -374,6 +374,10 @@ jobs:
       # literal CSS font name, overriding even correct Arial widget defaults.
       - name: RC252 real new-widget Arial DOM inheritance before npm
         run: node --experimental-strip-types --test apps/web/test/rc252-rich-dom-aria-default.test.ts
+      # RC254: enforce a single font allowlist across all 20 widget kinds,
+      # master title/footer, responses, projected results and rich-text marks.
+      - name: RC254 all widget and slide-master Arial safety before npm
+        run: node --experimental-strip-types --test apps/web/test/rc254-all-widget-schema-fonts.test.ts
       - name: RC218 real editor thumbnail rename browser contract before npm
         run: python3 -m unittest tools.tests.test_rc218_browser_postgres_thumbnail_rename -q
       # RC215: RC141 compared a glyph Range top with an output border-box
@@ -832,6 +836,9 @@ jobs:
           # widget insertion; isolate only the synthetic offline WebSocket
           # host while retaining fail-closed console/pageerror checking.
           python3 tools/ci_rc252_arial_rich_dom_chromium.py
+          # RC254: exercise all 14 text-bearing widget kinds in both compiled
+          # page and slide-master editors, on phone and desktop viewports.
+          python3 tools/ci_rc254_widget_schema_fonts_chromium.py
           # RC162: compact QR URL must remain visible when resized; no URL row when hidden.
           python3 tools/ci_rc162_qr_resizing_chromium.py
           # RC152: mutation-tested current long-label wrapping and attached [count]
@@ -1557,7 +1564,8 @@ jobs:
           python3 tools/verify_rc_cycle250_inventory.py --historical
           python3 tools/verify_rc_cycle251_inventory.py --historical
           python3 tools/verify_rc_cycle252_inventory.py --historical
-          python3 tools/verify_rc_cycle253_inventory.py
+          python3 tools/verify_rc_cycle253_inventory.py --historical
+          python3 tools/verify_rc_cycle254_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

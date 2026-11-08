@@ -1,4 +1,5 @@
 import type {CSSProperties} from 'react';
+import {explicitWidgetFontFamily} from './widget-typography-defaults.ts';
 /** Bounded per-element presentation styles. Values are persisted as data, never CSS source. */
 export type ResultTextStyle={fontFamily?:string;fontSize?:number;color?:string;bold?:boolean;italic?:boolean;underline?:boolean;strikethrough?:boolean};
 export type ResultTextStyles=Record<string,ResultTextStyle>;
@@ -18,7 +19,7 @@ export function validResultTextStyles(value:unknown):value is ResultTextStyles {
 }
 export function resultTextCss(styles:ResultTextStyles|undefined,key:string,defaults:ResultTextStyle={}):CSSProperties{
  const x={...defaults,...(styles?.[key]||{})};
- return {fontFamily:x.fontFamily,fontSize:x.fontSize?`${(x.fontSize/12.8).toFixed(5)}cqw`:undefined,color:x.color,fontWeight:x.bold===undefined?undefined:x.bold?700:400,fontStyle:x.italic===undefined?undefined:x.italic?'italic':'normal',textDecoration:[x.underline?'underline':'',x.strikethrough?'line-through':''].filter(Boolean).join(' ')||undefined};
+ return {fontFamily:explicitWidgetFontFamily(x.fontFamily),fontSize:x.fontSize?`${(x.fontSize/12.8).toFixed(5)}cqw`:undefined,color:x.color,fontWeight:x.bold===undefined?undefined:x.bold?700:400,fontStyle:x.italic===undefined?undefined:x.italic?'italic':'normal',textDecoration:[x.underline?'underline':'',x.strikethrough?'line-through':''].filter(Boolean).join(' ')||undefined};
 }
 export function resultElementKey(kind:'option'|'row',questionId:string,optionId:string):string{
  return kind+':'+(questionId?questionId+':':'')+optionId;
