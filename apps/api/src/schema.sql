@@ -396,3 +396,64 @@ CREATE UNIQUE INDEX IF NOT EXISTS uq_sessions_owner_demo_template
 
 -- RC185: independent presenter and audience projection pointers.
 ALTER TABLE sessions ADD COLUMN IF NOT EXISTS presenter_activity_id uuid;
+
+-- RC269: immutable primary-ownership transfer audit (GDPR minimization: UUIDs only).
+CREATE TABLE IF NOT EXISTS session_ownership_transfers(
+ id uuid PRIMARY KEY, session_id uuid NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
+ from_user_id uuid REFERENCES users(id) ON DELETE SET NULL,
+ to_user_id uuid REFERENCES users(id) ON DELETE SET NULL,
+ transferred_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_session_ownership_transfers_session ON session_ownership_transfers(session_id,transferred_at DESC);
+
+-- Directory identities are never linked by matching email alone.
+CREATE TABLE IF NOT EXISTS ldap_identities(
+ provider text NOT NULL DEFAULT 'default', subject text NOT NULL,
+ user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+ linked_at timestamptz NOT NULL DEFAULT now(),
+ PRIMARY KEY(provider,subject), UNIQUE(provider,user_id)
+);
+
+
+-- RC270: privacy-minimal operations audit, searchable and subject to retention.
+CREATE TABLE IF NOT EXISTS operation_audit (
+ id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+ occurred_at timestamptz NOT NULL DEFAULT now(),
+ actor_id uuid REFERENCES users(id) ON DELETE SET NULL,
+ action text NOT NULL,
+ resource_type text NOT NULL,
+ resource_id uuid,
+ status smallint NOT NULL CHECK(status BETWEEN 200 AND 399),
+ details jsonb NOT NULL DEFAULT '{}'::jsonb
+);
+CREATE INDEX IF NOT EXISTS idx_operation_audit_occurred ON operation_audit(occurred_at DESC,id DESC);
+CREATE INDEX IF NOT EXISTS idx_operation_audit_actor ON operation_audit(actor_id,occurred_at DESC);
+CREATE TABLE IF NOT EXISTS audit_settings (id int PRIMARY KEY CHECK(id=1),retention_days int NOT NULL DEFAULT 365 CHECK(retention_days BETWEEN 7 AND 3650));
+INSERT INTO audit_settings(id,retention_days) VALUES (1,365) ON CONFLICT DO NOTHING;
+-- Scheduled backups and their execution history (never store plaintext secrets).
+CREATE TABLE IF NOT EXISTS backup_config (
+ id int PRIMARY KEY CHECK(id=1),
+ enabled boolean NOT NULL DEFAULT false,
+ backend text NOT NULL DEFAULT 'posix',
+ config_encrypted text,
+ interval_hours int NOT NULL DEFAULT 24 CHECK(interval_hours BETWEEN 1 AND 720),
+ next_run_at timestamptz,
+ updated_at timestamptz NOT NULL DEFAULT now()
+);
+INSERT INTO backup_config(id) VALUES(1) ON CONFLICT DO NOTHING;
+CREATE TABLE IF NOT EXISTS backup_runs (
+ id uuid PRIMARY KEY,
+ triggered_by uuid REFERENCES users(id) ON DELETE SET NULL,
+ backend text NOT NULL,
+ state text NOT NULL CHECK(state IN ('running','success','failure')),
+ started_at timestamptz NOT NULL DEFAULT now(),
+ completed_at timestamptz,
+ bytes bigint,
+ sha256 text,
+ error_code text
+);
+CREATE INDEX IF NOT EXISTS idx_backup_runs_started ON backup_runs(started_at DESC);
+
+-- Additive upgrade for audit resource lookup.
+ALTER TABLE operation_audit ADD COLUMN IF NOT EXISTS resource_id uuid;
+CREATE INDEX IF NOT EXISTS idx_operation_audit_resource ON operation_audit(resource_id,occurred_at DESC);

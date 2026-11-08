@@ -1,4 +1,4 @@
-FROM node:22-alpine AS build
+FROM node:22-alpine3.23 AS build
 WORKDIR /app
 COPY package*.json ./
 COPY apps/api/package.json apps/api/package.json
@@ -6,7 +6,7 @@ COPY apps/web/package.json apps/web/package.json
 RUN npm install --no-audit --no-fund
 COPY apps/ apps/
 RUN npm run build
-FROM node:22-alpine
+FROM node:22-alpine3.23
 ENV NODE_ENV=production PORT=8080
 WORKDIR /app
 COPY --from=build /app/package*.json ./
@@ -15,7 +15,7 @@ COPY --from=build /app/apps/web/package.json apps/web/package.json
 # Install only application runtime dependencies. The Node official image bundles
 # npm tooling that is not required to execute Quorivio; keeping it increases
 # the runtime attack surface and can introduce avoidable CVEs.
-RUN npm install --omit=dev --no-audit --no-fund \
+RUN apk add --no-cache postgresql18-client tar \n    && npm install --omit=dev --no-audit --no-fund \
     && npm cache clean --force \
     && rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack \
               /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack \

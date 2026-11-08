@@ -3560,3 +3560,21 @@ body .editor-floating-panel.widget-selection-palette .palette-ribbon-groups{min-
 .rehearsal-phone-widescreen-frame{width:min(390px,100%);box-sizing:border-box;border:9px solid #1f2937;border-radius:20px;overflow:hidden;background:#fff;box-shadow:0 15px 35px #101a2d40}
 .rehearsal-phone-widescreen-frame .rehearsal-desktop-viewport{width:100%!important;height:auto!important;max-width:100%!important;overflow:hidden!important}
 .rehearsal-phone-widescreen-frame .rehearsal-desktop-sizer{max-width:100%}
+
+/* RC269: phone editor options have legible physical pixels, regardless of author's
+ * 1280px desktop cqw style. QR codes and page-number widgets are unaffected. */
+.editor-ux-v2 .canvas-editor-group[data-canvas-device="phone"] .widget-canvas-item
+ :is(.canvas-widget-answer-preview[data-answer-mode],.canvas-subquestion-option,.widget-answer-option){
+ font-size:clamp(17px,calc(18px / var(--quorivio-ui-scale,1)),32px)!important;
+ line-height:1.4!important;
+ letter-spacing:normal!important;
+}
+.editor-ux-v2 .canvas-editor-group[data-canvas-device="phone"] .widget-canvas-item
+ :is(.canvas-widget-answer-preview[data-answer-mode],.canvas-subquestion-option,.widget-answer-option)
+ :is(.widget-rich-inline,.widget-rich-inline>span){
+ font-size:inherit!important;line-height:inherit!important;
+ min-width:0!important;white-space:pre-wrap!important;overflow-wrap:anywhere!important;
+}
+
+/* RC270: readable optional labels, shared by editor and live projection. */
+.linked-results-pie .linked-pie-label{position:absolute;transform:translate(-50%,-50%);z-index:1;font-size:clamp(8px,.75em,14px);font-weight:750;color:white;text-shadow:0 1px 2px #000b;white-space:nowrap;pointer-events:none}

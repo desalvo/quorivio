@@ -1,0 +1,14 @@
+{{- if and .Values.backup.posix.enabled (not .Values.backup.posix.existingClaim) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-backup-posix
+spec:
+  accessModes: [{{ .Values.backup.posix.accessMode }}]
+  {{- if .Values.backup.posix.storageClassName }}
+  storageClassName: {{ .Values.backup.posix.storageClassName | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.backup.posix.size }}
+{{- end }}

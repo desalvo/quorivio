@@ -1,0 +1,24 @@
+# Example overlay for Helm: change PVC and NFS endpoints to your cluster.
+# Never store S3/WebDAV passwords or access keys in a plaintext values file.
+replicaCount: 2
+assets:
+  accessMode: ReadWriteMany
+backup:
+  tmpSize: 30Gi
+  allowedBackends: [s3, webdav]
+  posix:
+    enabled: true
+    existingClaim: quorivio-backups-rwx
+    accessMode: ReadWriteMany
+  nfs:
+    enabled: true
+    server: nfs.example.org
+    path: /exports/quorivio-backups
+  bootstrap:
+    enabled: true
+    intervalHours: 24
+    existingSecret: quorivio-backup-bootstrap
+    targetKey: BACKUP_TARGET_JSON
+# Secret example (create separately in Kubernetes, not committed):
+# data key BACKUP_TARGET_JSON decoded JSON:
+# {"backend":"s3","bucket":"bucket-name","region":"eu-west-1","prefix":"quorivio","accessKey":"...","secretKey":"..."}

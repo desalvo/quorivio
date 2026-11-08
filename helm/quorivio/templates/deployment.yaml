@@ -26,6 +26,15 @@ spec:
 {{- if and .Values.enforceNodeDiversity (lt (int .Values.replicaCount) 2) }}
 {{- fail "enforceNodeDiversity requires at least two replicas" }}
 {{- end }}
+{{- if and (gt (int .Values.replicaCount) 1) .Values.backup.posix.enabled (ne .Values.backup.posix.accessMode "ReadWriteMany") }}
+{{- fail "multi-replica POSIX backup volume must be ReadWriteMany" }}
+{{- end }}
+{{- if and .Values.backup.nfs.enabled (not .Values.backup.nfs.existingClaim) (or (not .Values.backup.nfs.server) (not .Values.backup.nfs.path)) }}
+{{- fail "NFS backup requires an existingClaim or both server and path" }}
+{{- end }}
+{{- if and .Values.backup.bootstrap.enabled (not .Values.backup.bootstrap.existingSecret) (not .Values.backup.bootstrap.target) }}
+{{- fail "backup bootstrap schedule requires an existingSecret or a target" }}
+{{- end }}
 {{- if gt (int .Values.replicaCount) 1 }}
       topologySpreadConstraints:
         - maxSkew: 1
@@ -90,6 +99,30 @@ spec:
               value: /conversions
             - name: QUORIVIO_WORKER_TOKEN
               valueFrom: {secretKeyRef: {name: {{ .Values.existingSecret }}, key: QUORIVIO_WORKER_TOKEN}}
+            - name: QUORIVIO_BACKUP_BOOTSTRAP_ENABLED
+              value: {{ .Values.backup.bootstrap.enabled | quote }}
+            - name: QUORIVIO_BACKUP_BOOTSTRAP_INTERVAL_HOURS
+              value: {{ .Values.backup.bootstrap.intervalHours | quote }}
+{{- if .Values.backup.bootstrap.existingSecret }}
+            - name: QUORIVIO_BACKUP_BOOTSTRAP_TARGET_JSON
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.backup.bootstrap.existingSecret | quote }}
+                  key: {{ .Values.backup.bootstrap.targetKey | quote }}
+{{- else if .Values.backup.bootstrap.target }}
+            - name: QUORIVIO_BACKUP_BOOTSTRAP_TARGET_JSON
+              value: {{ toJson .Values.backup.bootstrap.target | quote }}
+{{- end }}
+            - name: QUORIVIO_BACKUP_ALLOWED_BACKENDS
+              value: {{ join "," (concat .Values.backup.allowedBackends (ternary (list "posix") (list) .Values.backup.posix.enabled) (ternary (list "nfs") (list) .Values.backup.nfs.enabled)) | quote }}
+{{- if .Values.backup.posix.enabled }}
+            - name: QUORIVIO_BACKUP_POSIX_ROOT
+              value: /app/backups-posix
+{{- end }}
+{{- if .Values.backup.nfs.enabled }}
+            - name: QUORIVIO_BACKUP_NFS_ROOT
+              value: /app/backups-nfs
+{{- end }}
             - name: QUORIVIO_AV_REQUIRED
               value: "true"
             - name: CLAMAV_HOST
@@ -112,8 +145,17 @@ spec:
               valueFrom: {secretKeyRef: {name: {{ .Values.existingSecret }}, key: ADMIN_PASSWORD}}
           volumeMounts:
             - {name: conversions, mountPath: /conversions}
+            - {name: app-tmp, mountPath: /tmp}
             - name: assets
               mountPath: /app/assets
+{{- if .Values.backup.posix.enabled }}
+            - name: backup-posix
+              mountPath: /app/backups-posix
+{{- end }}
+{{- if .Values.backup.nfs.enabled }}
+            - name: backup-nfs
+              mountPath: /app/backups-nfs
+{{- end }}
           readinessProbe:
             httpGet: {path: /api/health/ready, port: http}
             initialDelaySeconds: 5
@@ -133,6 +175,25 @@ spec:
           emptyDir: {}
         - name: converter-tmp
           emptyDir: {}
+        - name: app-tmp
+          emptyDir:
+            sizeLimit: {{ .Values.backup.tmpSize | quote }}
         - name: assets
           persistentVolumeClaim:
             claimName: {{ default (printf "%s-assets" .Release.Name) .Values.assets.existingClaim }}
+{{- if .Values.backup.posix.enabled }}
+        - name: backup-posix
+          persistentVolumeClaim:
+            claimName: {{ default (printf "%s-backup-posix" .Release.Name) .Values.backup.posix.existingClaim }}
+{{- end }}
+{{- if .Values.backup.nfs.enabled }}
+        - name: backup-nfs
+{{- if .Values.backup.nfs.existingClaim }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.backup.nfs.existingClaim | quote }}
+{{- else }}
+          nfs:
+            server: {{ .Values.backup.nfs.server | quote }}
+            path: {{ .Values.backup.nfs.path | quote }}
+{{- end }}
+{{- end }}

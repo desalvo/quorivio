@@ -61,6 +61,8 @@ services:
       PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://localhost:8080}
       PORT: "8080"
       QUORIVIO_ASSET_DIR: /app/assets
+      QUORIVIO_BACKUP_ALLOWED_BACKENDS: posix,s3,webdav
+      QUORIVIO_BACKUP_POSIX_ROOT: /app/backups-posix
       QUORIVIO_AV_REQUIRED: "true"
       CLAMAV_HOST: clamav
       CLAMAV_PORT: "3310"
@@ -71,10 +73,11 @@ services:
     ports: ["127.0.0.1:8080:8080"]
     volumes:
       - asset-data:/app/assets
+      - backup-data:/app/backups-posix
+      - backup-tmp:/tmp
       - conversion-tmp:/conversions
     security_opt: ["no-new-privileges:true"]
     read_only: true
-    tmpfs: [/tmp]
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://localhost:8080/api/health/ready').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 15s
@@ -83,5 +86,7 @@ services:
 volumes:
   db-data:
   asset-data:
+  backup-data:
+  backup-tmp:
   clamav-signatures:
   conversion-tmp:

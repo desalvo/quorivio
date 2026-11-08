@@ -1,3 +1,5 @@
+> **RC269 — Autenticazione e gestione sessioni:** login automatico alla scadenza, pulizia conservativa ogni 12 ore, trasferimento proprietà, LDAP/LDAPS opzionale e correzioni sidebar/risposte smartphone. [Note RC269](docs/RC_CYCLE269_LDAP_OWNERSHIP_HOUSEKEEPING.it.md).
+
 > **RC267 — Hotfix CI Node:** risolve l’errore shell 126 nel preflight RC266 e verifica l’esatta invocazione dei test. Funzionalità di finestre flottanti RC266 e importazione full-bleed RC265 invariate. [`Note RC267`](docs/RC_CYCLE267_CI_NODE_RUNNER_CONTINUATION.it.md).
 
 > **RC266 — Hotfix CI partecipante:** adeguato il contratto RC173/RC227 al canvas full-bleed RC265, senza modificare il runtime. [`Note RC266`](docs/RC_CYCLE266_PARTICIPANT_BACKGROUND_CI_FIX.it.md). **Aggiornamento editor:** finestre flottanti spostabili fino ai bordi e ridimensionabili (mouse/touch/tastiera). Corrette anche le coordinate con zoom UI al 70–120%.
@@ -169,3 +171,8 @@ La CI full 40215782964 falliva perché la dashboard intercettava il clic di conf
 
 Un push su `main` con commit ordinario avvia la CI standard; `[full-ci]` avvia direttamente tutti i gate automatici estesi, senza pubblicare. Il marker esplicito `[publish-docker]` avvia la stessa campagna estesa e **solo quando tutti i gate risultano verdi** pubblica `desalvo/quorivio:sha-<12>` e `desalvo/quorivio:latest` nell'environment protetto `production`. Non usare questo marker se non vuoi aggiornare `latest`. La pubblicazione manuale `workflow_dispatch` rimane separata; mai pubblicazione da PR, branch diversi da `main` o test falliti. Configura la variabile `DOCKERHUB_USERNAME` e il segreto `DOCKERHUB_TOKEN`, più eventuali revisori richiesti nell'environment `production`.
 **Novità RC221:** scegliere prima dell’import PDF/PPTX tra **immagini fedeli** nella sessione corrente e **elementi modificabili parzialmente** in una nuova sessione, con estrazione di testo nativo e immagini tramite worker isolato. Nei risultati: switch privato per risposte vere e formattazione autonoma di domande, risposte e righe statistiche. Vedi `docs/RC_CYCLE221_RESULTS_GRADING_AND_PDF_IMPORT.it.md`.
+
+
+## RC270 — Backup, LDAP, audit, risultati
+
+Le impostazioni per backup completi di istanza, destinazioni POSIX/NFS/S3/WebDAV, pianificazione, registro audit e retention sono in **Dashboard amministratore → Configurazione server**. L’approvazione delle registrazioni LDAP e la ricerca utenti directory sono nella sezione Utenti. Per Helm e wizard Kubernetes, e per i controlli richiesti prima di un restore, leggere `docs/RC_CYCLE270_FULL_BACKUP_LDAP_AUDIT_RESULTS.it.md`.

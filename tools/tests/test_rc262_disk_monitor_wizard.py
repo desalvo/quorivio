@@ -171,9 +171,11 @@ else:
   with tempfile.TemporaryDirectory() as temp:
    target=Path(temp)/'k8s_wizard.py';target.write_bytes((ROOT/'tools/k8s_wizard.py').read_bytes())
    r=subprocess.run([sys.executable,str(target),'--version'],capture_output=True,text=True)
-   self.assertEqual(r.returncode,0,r.stderr);self.assertIn('rc263',r.stdout)
+   self.assertEqual(r.returncode,0,r.stderr)
    import importlib.util
    spec=importlib.util.spec_from_file_location('single_disk_wizard',str(target));module=importlib.util.module_from_spec(spec);sys.modules[spec.name]=module;spec.loader.exec_module(module)
+   self.assertIn(module.WIZARD_VERSION,r.stdout)
+   self.assertGreaterEqual(int(module.WIZARD_VERSION.rsplit('rc',1)[-1]),263)
    embedded=module._standalone_component('k8s_disk_monitor_upgrade')
    self.assertEqual(embedded.PROBE_SCRIPT,monitor.PROBE_SCRIPT)
 if __name__=='__main__':unittest.main()

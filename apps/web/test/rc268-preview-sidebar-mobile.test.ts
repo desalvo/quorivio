@@ -46,8 +46,10 @@ test('RC268 fullscreen fits desktop canvas to viewport height and width, hides c
 
 test('RC268 every thumbnail gap is a drop zone and empty rail opens a contextual menu',()=>{
  assert.match(main,/function openSidebarEmptyMenu\(/);
- assert.match(main,/onContextMenu=\{e=>\{if\(\(e\.target as HTMLElement\)\.closest\('\.page-editor-thumb-row/);
- assert.match(main,/onClick=\{e=>\{if\(\(e\.target as HTMLElement\)\.closest\('button,input/);
+ assert.match(main,/onContextMenu=\{e=>\{clearSidebarLongPress\(\);if\(\(e\.target as HTMLElement\)\.closest\('\.page-editor-thumb-row/);
+ const rail=main.match(/<aside className="page-editor-sidebar"[^\n]*/)?.[0]||'';
+ assert.match(rail,/onTouchStart=/);
+ assert.doesNotMatch(rail,/onClick=/);
  assert.match(main,/data-insert-index=\{i\}/);
  assert.match(main,/data-insert-index=\{snap\.activities\.length\}/);
  assert.match(main,/dropPageAtSlot\(id,i\)/);

@@ -48,3 +48,30 @@ converter:
   resources:
     requests: {cpu: 100m, memory: 256Mi}
     limits: {cpu: "2", memory: 2Gi}
+
+# RC270 full-instance backup configuration. Volume sources are Helm-time settings;
+# the administrator wizard chooses destinations and schedules inside mounted roots.
+backup:
+  tmpSize: 20Gi # disk-backed scratch for PostgreSQL dump + compressed archive
+  allowedBackends: [s3, webdav]
+  posix:
+    enabled: false
+    existingClaim: ""
+    accessMode: ReadWriteOnce
+    size: 20Gi
+    storageClassName: ""
+  nfs:
+    enabled: false
+    existingClaim: ""
+    server: ""
+    path: ""
+
+  # Bootstrap only when there is no existing saved backup target. Prefer a
+  # Kubernetes Secret containing JSON key BACKUP_TARGET_JSON (credentials).
+  # target values must not include credentials; they appear in Helm releases.
+  bootstrap:
+    enabled: false
+    intervalHours: 24
+    existingSecret: ""
+    targetKey: BACKUP_TARGET_JSON
+    target: {}

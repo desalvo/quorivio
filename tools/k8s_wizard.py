@@ -8,7 +8,7 @@ import urllib.error
 
 # This single-file wizard is the release unit.  Its upstream is intentionally
 # fixed to the official public repository: never accept a URL from CLI input.
-WIZARD_VERSION = '0.1.0-dev-rc263'
+WIZARD_VERSION = '0.1.0-dev-rc270'
 WIZARD_UPSTREAM_URL = 'https://raw.githubusercontent.com/desalvo/quorivio/main/tools/k8s_wizard.py'
 WIZARD_MAX_DOWNLOAD_BYTES = 2 * 1024 * 1024
 _WIZARD_RESTART_GUARD = 'QUORIVIO_WIZARD_RESTARTED_AFTER_UPDATE'
@@ -118,7 +118,7 @@ def _run_standalone_cli():
             return 3
     return main(args)
 
-DEFAULTS = {'namespace':'quorivio','name':'quorivio','image':'desalvo/quorivio:latest','host':'quorivio.example.org','replicas':1,'enforce_node_diversity':False,'max_upload_mb':100,'antivirus_mode':'managed','antivirus_image':'clamav/clamav:stable','antivirus_host':'','container_port':8080,'postgres_mode':'internal','postgres_image':'postgres:18.6-alpine','postgres_host':'postgresql','postgres_port':5432,'postgres_sslmode':'require','ingress_controller':'nginx','haproxy_variant':'community','ingress_class':'','postgres_host':'postgresql','postgres_database':'quorivio','postgres_user':'quorivio','secret_name':'quorivio-app-secrets','tls_secret':'','tls_termination':True,'app_node_selector':'','postgres_node_selector':'','admin_email':'admin@example.org','admin_password':'','auth_secret':'','postgres_password':'','storage_class':'','asset_storage_class':'','asset_storage_size':'10Gi','asset_access_mode':'ReadWriteOnce','cpu_request':'100m','memory_request':'256Mi','cpu_limit':'1000m','memory_limit':'1Gi'}
+DEFAULTS = {'namespace':'quorivio','name':'quorivio','image':'desalvo/quorivio:latest','host':'quorivio.example.org','replicas':1,'enforce_node_diversity':False,'max_upload_mb':100,'antivirus_mode':'managed','antivirus_image':'clamav/clamav:stable','antivirus_host':'','container_port':8080,'postgres_mode':'internal','postgres_image':'postgres:18.6-alpine','postgres_host':'postgresql','postgres_port':5432,'postgres_sslmode':'require','ingress_controller':'nginx','haproxy_variant':'community','ingress_class':'','postgres_host':'postgresql','postgres_database':'quorivio','postgres_user':'quorivio','secret_name':'quorivio-app-secrets','tls_secret':'','tls_termination':True,'app_node_selector':'','postgres_node_selector':'','admin_email':'admin@example.org','admin_password':'','auth_secret':'','postgres_password':'','storage_class':'','asset_storage_class':'','asset_storage_size':'10Gi','asset_access_mode':'ReadWriteOnce','cpu_request':'100m','memory_request':'256Mi','cpu_limit':'1000m','memory_limit':'1Gi','ldap_enabled':False,'ldap_url':'','ldap_starttls':False,'ldap_bind_dn':'','ldap_bind_password':'','ldap_base_dn':'','ldap_user_filter':'(uid={login})','ldap_id_attribute':'entryUUID','ldap_email_attribute':'mail','ldap_group_attribute':'memberOf','ldap_admin_group_dn':'','ldap_presenter_group_dn':'','ldap_auto_provision':False,'ldap_organization_id':'','ldap_tls_ca_file':'','ldap_label':'LDAP / Active Directory','backup_posix_enabled':False,'backup_posix_claim':'','backup_posix_size':'20Gi','backup_tmp_size':'20Gi','backup_posix_storage_class':'','backup_posix_access_mode':'ReadWriteOnce','backup_nfs_enabled':False,'backup_nfs_claim':'','backup_nfs_host':'','backup_nfs_path':'','backup_s3_enabled':True,'backup_webdav_enabled':True,'backup_default_backend':'','backup_directory':'','backup_bucket':'','backup_region':'us-east-1','backup_endpoint':'','backup_prefix':'','backup_access_key':'','backup_secret_key':'','backup_webdav_url':'','backup_webdav_user':'','backup_webdav_password':'','backup_schedule_enabled':False,'backup_schedule_hours':24}
 FIELDS = tuple(DEFAULTS)
 def quote(s): return json.dumps(str(s), ensure_ascii=False)
 def validate(cfg):
@@ -161,6 +161,58 @@ def validate(cfg):
         parse_node_selector(cfg[key])
     if cfg['tls_secret'] and not re.fullmatch(r'[a-z0-9]([-a-z0-9]*[a-z0-9])?',cfg['tls_secret']): raise ValueError('Invalid TLS secret')
     if not re.fullmatch(r'[^@\s]+@[^@\s]+\.[^@\s]+',cfg['admin_email']): raise ValueError('Invalid admin_email')
+    for key in ('ldap_enabled','ldap_starttls','ldap_auto_provision','backup_posix_enabled','backup_nfs_enabled','backup_s3_enabled','backup_webdav_enabled','backup_schedule_enabled'):
+        if type(cfg[key]) is not bool:raise ValueError(f'{key} requires true/false')
+    if cfg['ldap_enabled']:
+        import urllib.parse
+        u=urllib.parse.urlsplit(cfg['ldap_url'])
+        if u.scheme not in ('ldap','ldaps') or not u.hostname or u.username or u.password or u.query or u.fragment or u.path not in ('','/'):
+            raise ValueError('LDAP requires a clean LDAP(S) URL')
+        if (u.scheme=='ldap' and not cfg['ldap_starttls']) or (u.scheme=='ldaps' and cfg['ldap_starttls']):
+            raise ValueError('LDAP requires StartTLS or LDAPS (not both)')
+        if not cfg['ldap_bind_dn'] or not cfg['ldap_bind_password'] or not cfg['ldap_base_dn']:
+            raise ValueError('LDAP bind DN/password and base DN are required')
+        if cfg['ldap_user_filter'].count('{login}')!=1 or len(cfg['ldap_user_filter'])>512:
+            raise ValueError('LDAP filter must contain exactly one {login}')
+        for key in ('ldap_id_attribute','ldap_email_attribute','ldap_group_attribute'):
+            if not re.fullmatch('[A-Za-z][A-Za-z0-9-]{0,63}',cfg[key]):raise ValueError(f'Invalid {key}')
+        if cfg['ldap_auto_provision'] and not re.fullmatch('[a-fA-F0-9-]{36}',cfg['ldap_organization_id']):
+            raise ValueError('LDAP auto provisioning needs an explicit organization UUID')
+        if any('\n' in cfg[key] or '\r' in cfg[key] for key in ('ldap_bind_dn','ldap_bind_password','ldap_base_dn','ldap_user_filter','ldap_label','ldap_tls_ca_file')):
+            raise ValueError('Invalid LDAP config newline')
+    for key in ('backup_posix_enabled','backup_nfs_enabled','backup_s3_enabled','backup_webdav_enabled','backup_schedule_enabled'):
+        if type(cfg[key]) is not bool: raise ValueError(f'{key} requires true/false')
+    if not re.fullmatch(r'[1-9][0-9]*(Mi|Gi|Ti)',cfg['backup_posix_size']):raise ValueError('Invalid backup PVC size')
+    if not re.fullmatch(r'[1-9][0-9]*(Mi|Gi|Ti)',cfg['backup_tmp_size']):raise ValueError('Invalid ephemeral backup scratch size')
+    if cfg['backup_posix_access_mode'] not in ('ReadWriteOnce','ReadWriteMany'):raise ValueError('Invalid backup PVC access mode')
+    if cfg['replicas']>1 and cfg['backup_posix_enabled'] and cfg['backup_posix_access_mode']!='ReadWriteMany':raise ValueError('Replicated POSIX backup requires RWX')
+    for key in ('backup_posix_claim','backup_nfs_claim','backup_posix_storage_class'):
+        if cfg[key] and not re.fullmatch(r'[a-z0-9]([-a-z0-9.]*[a-z0-9])?',cfg[key]):raise ValueError(f'Invalid {key}')
+    if cfg['backup_nfs_enabled'] and not cfg['backup_nfs_claim']:
+        if not re.fullmatch(r'[A-Za-z0-9.-]{1,253}',cfg['backup_nfs_host']) or not cfg['backup_nfs_path'].startswith('/') or '..' in cfg['backup_nfs_path'].split('/'):
+            raise ValueError('NFS backup requires a safe server and absolute export path')
+    if cfg['backup_default_backend'] not in ('','posix','nfs','s3','webdav'):raise ValueError('Invalid initial backup backend')
+    enabled={'posix':cfg['backup_posix_enabled'],'nfs':cfg['backup_nfs_enabled'],'s3':cfg['backup_s3_enabled'],'webdav':cfg['backup_webdav_enabled']}
+    if cfg['backup_default_backend'] and not enabled[cfg['backup_default_backend']]:raise ValueError('Initial backup backend must be enabled')
+    if type(cfg['backup_schedule_hours']) is not int or not 1<=cfg['backup_schedule_hours']<=720:raise ValueError('Invalid backup interval (hours)')
+    if cfg['backup_schedule_enabled'] and not cfg['backup_default_backend']:raise ValueError('Enabled backup schedule requires an initial backup backend')
+    if len(cfg['backup_directory'])>160 or len(cfg['backup_prefix'])>240:raise ValueError('Backup directory or prefix too long')
+    if cfg['backup_directory'] and not re.fullmatch(r'[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}(?:/[a-zA-Z0-9][a-zA-Z0-9._-]{0,79})*',cfg['backup_directory']):raise ValueError('Backup directory must be safe and relative to mount')
+    if cfg['backup_prefix'] and not re.fullmatch(r'[a-zA-Z0-9][a-zA-Z0-9._-]{0,79}(?:/[a-zA-Z0-9][a-zA-Z0-9._-]{0,79})*',cfg['backup_prefix']):raise ValueError('S3 prefix must be safe')
+    if cfg['backup_default_backend']=='s3':
+        if not re.fullmatch(r'[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]',cfg['backup_bucket']) or not re.fullmatch(r'[-a-z0-9]{2,40}',cfg['backup_region']):raise ValueError('Invalid S3 bucket or region')
+        if bool(cfg['backup_access_key']) != bool(cfg['backup_secret_key']):raise ValueError('S3 credentials must provide access and secret key together')
+        if cfg['backup_endpoint']:
+            url=urllib.parse.urlsplit(cfg['backup_endpoint'])
+            if url.scheme!='https' or not url.hostname or url.username or url.password or url.query or url.fragment:raise ValueError('S3 endpoint must be HTTPS')
+    if cfg['backup_default_backend']=='webdav':
+        url=urllib.parse.urlsplit(cfg['backup_webdav_url'])
+        if url.scheme!='https' or not url.hostname or url.username or url.password or url.query or url.fragment:raise ValueError('WebDAV endpoint must be clean HTTPS')
+
+    for key in ('backup_directory','backup_bucket','backup_region','backup_endpoint','backup_prefix','backup_access_key','backup_secret_key','backup_webdav_url','backup_webdav_user','backup_webdav_password'):
+        if '\r' in cfg[key] or '\n' in cfg[key]:raise ValueError('Invalid backup field newline')
+    if cfg['backup_default_backend']=='s3' and not cfg['backup_bucket']:raise ValueError('S3 backup bucket required')
+    if cfg['backup_default_backend']=='webdav' and not cfg['backup_webdav_url'].startswith('https://'):raise ValueError('WebDAV requires HTTPS')
     for k in ('admin_password','auth_secret','postgres_password'):
         if cfg[k] and (len(cfg[k]) < (32 if k=='auth_secret' else 12) or any(x in cfg[k] for x in '\r\n')): raise ValueError(f'Invalid or short {k}')
     for k in ('postgres_host','postgres_database','postgres_user','secret_name','cpu_request','memory_request','cpu_limit','memory_limit'):
@@ -292,6 +344,45 @@ def generate(cfg,out):
     secret_data={'DATABASE_URL':db_url,'AUTH_SECRET':cfg['auth_secret'],'ADMIN_EMAIL':cfg['admin_email'],'ADMIN_PASSWORD':cfg['admin_password']}
     if cfg['postgres_mode']=='internal':secret_data['POSTGRES_PASSWORD']=cfg['postgres_password']
     if saved_token is not None:secret_data['QUORIVIO_WORKER_TOKEN']=saved_token
+    if cfg['ldap_enabled']:secret_data['LDAP_BIND_PASSWORD']=cfg['ldap_bind_password']
+    backup_backend=cfg['backup_default_backend']
+    if backup_backend:
+        backup_target={
+            'posix':lambda:{'backend':'posix','directory':cfg['backup_directory']},
+            'nfs':lambda:{'backend':'nfs','directory':cfg['backup_directory']},
+            's3':lambda:{'backend':'s3','bucket':cfg['backup_bucket'],'region':cfg['backup_region'],'endpoint':cfg['backup_endpoint'],'prefix':cfg['backup_prefix'],'accessKey':cfg['backup_access_key'],'secretKey':cfg['backup_secret_key']},
+            'webdav':lambda:{'backend':'webdav','url':cfg['backup_webdav_url'],'username':cfg['backup_webdav_user'],'password':cfg['backup_webdav_password']},
+        }[backup_backend]()
+        secret_data['QUORIVIO_BACKUP_BOOTSTRAP_TARGET_JSON']=json.dumps(backup_target,ensure_ascii=False)
+    allowed_backends=[k for k,enabled in (('posix',cfg['backup_posix_enabled']),('nfs',cfg['backup_nfs_enabled']),('s3',cfg['backup_s3_enabled']),('webdav',cfg['backup_webdav_enabled'])) if enabled]
+    backup_environment={'QUORIVIO_BACKUP_ALLOWED_BACKENDS':','.join(allowed_backends),'QUORIVIO_BACKUP_BOOTSTRAP_ENABLED':str(cfg['backup_schedule_enabled']).lower(),'QUORIVIO_BACKUP_BOOTSTRAP_INTERVAL_HOURS':str(cfg['backup_schedule_hours'])}
+    if cfg['backup_posix_enabled']:backup_environment['QUORIVIO_BACKUP_POSIX_ROOT']='/app/backups-posix'
+    if cfg['backup_nfs_enabled']:backup_environment['QUORIVIO_BACKUP_NFS_ROOT']='/app/backups-nfs'
+    backup_config_yaml=''.join('  '+k+': '+quote(v)+'\n' for k,v in backup_environment.items())
+    backup_mounts=''
+    backup_volumes=''
+    if cfg['backup_posix_enabled']:
+        backup_mounts+='            - name: backup-posix\n              mountPath: /app/backups-posix\n'
+        backup_volumes+='        - name: backup-posix\n          persistentVolumeClaim:\n            claimName: '+(cfg['backup_posix_claim'] or name+'-backup-posix')+'\n'
+    if cfg['backup_nfs_enabled']:
+        backup_mounts+='            - name: backup-nfs\n              mountPath: /app/backups-nfs\n'
+        if cfg['backup_nfs_claim']:
+            backup_volumes+='        - name: backup-nfs\n          persistentVolumeClaim:\n            claimName: '+cfg['backup_nfs_claim']+'\n'
+        else:
+            backup_volumes+='        - name: backup-nfs\n          nfs:\n            server: '+quote(cfg['backup_nfs_host'])+'\n            path: '+quote(cfg['backup_nfs_path'])+'\n'
+
+    ldap_environment={
+      'LDAP_URL':cfg['ldap_url'],'LDAP_STARTTLS':str(cfg['ldap_starttls']).lower(),'LDAP_BIND_DN':cfg['ldap_bind_dn'],
+      'LDAP_BASE_DN':cfg['ldap_base_dn'],'LDAP_USER_FILTER':cfg['ldap_user_filter'],
+      'LDAP_ID_ATTRIBUTE':cfg['ldap_id_attribute'],'LDAP_EMAIL_ATTRIBUTE':cfg['ldap_email_attribute'],
+      'LDAP_GROUP_ATTRIBUTE':cfg['ldap_group_attribute'],'LDAP_ADMIN_GROUP_DN':cfg['ldap_admin_group_dn'],
+      'LDAP_PRESENTER_GROUP_DN':cfg['ldap_presenter_group_dn'],'LDAP_AUTO_PROVISION':str(cfg['ldap_auto_provision']).lower(),
+      'LDAP_ORGANIZATION_ID':cfg['ldap_organization_id'],'LDAP_TLS_CA_FILE':cfg['ldap_tls_ca_file'],'LDAP_LABEL':cfg['ldap_label']
+    } if cfg['ldap_enabled'] else {}
+    ldap_config_yaml=''.join('  '+k+': '+quote(v)+'\n' for k,v in ldap_environment.items())
+    image_pull='Always' if cfg['image'].endswith(':latest') else 'IfNotPresent'
+    deployment_strategy=('  strategy:\n    type: Recreate\n' if cfg['asset_access_mode']=='ReadWriteOnce' else
+       '  strategy:\n    type: RollingUpdate\n    rollingUpdate:\n      maxUnavailable: 0\n      maxSurge: 1\n')
     files={
       '00-namespace.yaml':f'apiVersion: v1\nkind: Namespace\nmetadata:\n  name: {ns}\n',
       '05-app-secret.yaml':'apiVersion: v1\nkind: Secret\nmetadata:\n  name: '+name.replace('\n','')+'-PLACEHOLDER\n',
@@ -314,7 +405,7 @@ data:
   PGDATABASE: {quote(cfg['postgres_database'])}
   PGUSER: {quote(cfg['postgres_user'])}
   PGSSLMODE: {quote('disable' if cfg['postgres_mode']=='internal' else cfg['postgres_sslmode'])}
-''',
+{ldap_config_yaml}{backup_config_yaml}''',
       '20-deployment.yaml':f'''apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -322,12 +413,7 @@ metadata:
   namespace: {ns}
 spec:
   replicas: {cfg['replicas']}
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxUnavailable: 0
-      maxSurge: 1
-  selector:
+{deployment_strategy}  selector:
     matchLabels:
       app: {name}
   template:
@@ -347,7 +433,7 @@ spec:
       containers:
         - name: {name}
           image: {cfg['image']}
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: {image_pull}
           ports:
             - name: http
               containerPort: {port}
@@ -382,7 +468,9 @@ spec:
           volumeMounts:
             - name: assets
               mountPath: /app/assets
-          resources:
+            - name: app-tmp
+              mountPath: /tmp
+{backup_mounts}          resources:
             requests:
               cpu: {quote(cfg['cpu_request'])}
               memory: {quote(cfg['memory_request'])}
@@ -390,10 +478,13 @@ spec:
               cpu: {quote(cfg['cpu_limit'])}
               memory: {quote(cfg['memory_limit'])}
       volumes:
+        - name: app-tmp
+          emptyDir:
+            sizeLimit: {cfg['backup_tmp_size']}
         - name: assets
           persistentVolumeClaim:
             claimName: {name}-assets
-''',
+{backup_volumes}''',
       '15-assets-pvc.yaml':f'''apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -450,6 +541,21 @@ resources:
   - 40-ingress.yaml
 '''
     }
+    if cfg['backup_posix_enabled'] and not cfg['backup_posix_claim']:
+        files['17-backup-pvc.yaml']=f'''apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {name}-backup-posix
+  namespace: {ns}
+spec:
+  accessModes: [{cfg['backup_posix_access_mode']}]
+{('  storageClassName: '+cfg['backup_posix_storage_class']+chr(10)) if cfg['backup_posix_storage_class'] else ''}  resources:
+    requests:
+      storage: {cfg['backup_posix_size']}
+'''
+        files['kustomization.yaml']=files['kustomization.yaml'].replace('  - 20-deployment.yaml\n','  - 17-backup-pvc.yaml\n  - 20-deployment.yaml\n')
+    else:
+        (out/'17-backup-pvc.yaml').unlink(missing_ok=True)
     if cfg['antivirus_mode']=='managed':
         files.update(antivirus_resources(cfg,name,ns))
         files['kustomization.yaml']=files['kustomization.yaml'].replace(
@@ -1646,7 +1752,7 @@ def main(argv=None):
     if saved.is_file(): cfg.update(json.loads(saved.read_text()))
     if args.values:cfg.update(json.loads(Path(args.values).read_text()))
     print('Quorivio Kubernetes defaults + existing overrides:')
-    for k in FIELDS:print(f'  {k}: '+ ('[configured]' if cfg[k] else '[auto-generated]') if k in ('admin_password','auth_secret','postgres_password') else f'  {k}: {cfg[k]}')
+    for k in FIELDS:print(f'  {k}: '+ ('[configured]' if cfg[k] else '[auto-generated]') if k in ('admin_password','auth_secret','postgres_password','ldap_bind_password','backup_secret_key','backup_webdav_password') else f'  {k}: {cfg[k]}')
     if not args.unattended:
         if not sys.stdin.isatty():a.error('Interactive mode requires a TTY; use --unattended')
         for k in FIELDS:
@@ -1655,10 +1761,10 @@ def main(argv=None):
     for entry in args.set:
         if '=' not in entry:a.error('--set requires KEY=VALUE')
         k,v=entry.split('=',1)
-        if k in ('tls_termination','enforce_node_diversity'):
+        if k in ('tls_termination','enforce_node_diversity','ldap_enabled','ldap_starttls','ldap_auto_provision','backup_posix_enabled','backup_nfs_enabled','backup_s3_enabled','backup_webdav_enabled','backup_schedule_enabled'):
             if v.lower() not in ('true','false'):a.error(f'{k} requires true/false')
             cfg[k]=v.lower()=='true'
-        elif k in ('replicas','max_upload_mb','container_port','postgres_port'):
+        elif k in ('replicas','max_upload_mb','container_port','postgres_port','backup_schedule_hours'):
             try: cfg[k]=int(v)
             except ValueError: a.error(f'{k} must be an integer')
         else: cfg[k]=v

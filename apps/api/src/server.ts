@@ -35,8 +35,14 @@ import {widgetAnswerShapeChanged,aggregateWidgetAnswerRevisions,aggregateShortTe
 import {answerKeyIds,gradeChoiceAnswer} from './widget-answer-key.js';
 import {normalizeWord,validateQuestion,moderationStatus,safeFrequency,parseModerationQueueQuery,parseModerationBulk} from './audience-tools.js';
 import {validPageOrder} from './page-sequence.js';
+import {HOUSEKEEPING_PERIOD_MS,removeExpiredConversionJobs,removeOrphanSessionAssetFiles} from './temporary-housekeeping.js';
+import {ldapSettingsFromEnv,authenticateDirectory,searchDirectory} from './ldap-auth.js';
+import {auditOperation,validAuditRetention} from './operation-audit.js';
+import {sendRegistrationReviewEmail} from './smtp.js';
+import {allowedBackupBackends,validateBackupTarget,sealBackupConfig,openBackupConfig,publicBackupConfig,type BackupTarget} from './backup-storage.js';
+import {buildFullBackup,uploadBackup} from './full-backup.js';
 import express from 'express';import helmet from 'helmet';import pg from 'pg';import bcrypt from 'bcryptjs';import QRCode from 'qrcode';import {WebSocketServer,WebSocket} from 'ws';import {liveSessionActive,livePresenterAuthorized,liveParticipantAuthorized} from './live-socket-policy.js';import {createLiveSnapshotQueue} from './live-snapshot-queue.js';import {createLivePeriodicRefresh} from './live-periodic-refresh.js';import {deliverLiveSnapshot} from './live-broadcast.js';import {shouldDropSlowSocket} from './live-delivery-policy.js';import {createServer} from 'node:http';import {randomUUID,randomBytes,createHash,createHmac,timingSafeEqual} from 'node:crypto';import {readFileSync,existsSync} from 'node:fs';import {mkdir,writeFile,readFile,unlink,rm,copyFile} from 'node:fs/promises';import {validAsset} from './asset-policy.js';import {normalizedFileName,findAvailableFileName} from './file-display-names.js';import {receiveAssetStream} from './stream-upload.js';import {scanUploadedFile} from './malware-scan.js';import {classifyBackgroundUploadFailure,backgroundUploadLog,type BackgroundUploadPhase} from './background-upload-failure.js';import {readdir,stat} from 'node:fs/promises';import path from 'node:path';import {fileURLToPath} from 'node:url';import {validTransition,validateOptions,checkAnswer,publicActivity,publicTheme,escapeCsvCell,validRetentionDays,validPageDesign,validPseudonym,validAnswerMode,validateSubmittedAnswer,validReaction,type Activity,type SessionStatus} from './domain.js';
-const db=new pg.Pool({connectionString:process.env.DATABASE_URL});const secret=process.env.AUTH_SECRET||'';if(secret.length<32)throw new Error('AUTH_SECRET must have >= 32 characters');
+const ldapSettings=ldapSettingsFromEnv();const db=new pg.Pool({connectionString:process.env.DATABASE_URL});const secret=process.env.AUTH_SECRET||'';if(secret.length<32)throw new Error('AUTH_SECRET must have >= 32 characters');
 const base=process.env.PUBLIC_BASE_URL||'http://localhost:8080';let publicBase=base;const app=express();app.disable('x-powered-by');
 // Vite HMR is used only in development; production serves precompiled local assets.
 // Keep CSP active even behind HTTP-to-HTTPS reverse proxies (PUBLIC_BASE_URL is
@@ -70,6 +76,22 @@ async function throttle(req:express.Request,res:express.Response,next:express.Ne
  if(Number(r.rows[0].hits)>limit){res.setHeader('Retry-After',String(60-Math.floor(Date.now()/1000)%60));res.status(429).json({error:'rate_limited'});return}next();
  }catch(e){console.error('rate limiter unavailable',e instanceof Error?e.message:'unknown');res.status(503).json({error:'rate_limiter_unavailable'})}}
 app.use('/api',throttle);
+app.use('/api', (req,res,next)=>{
+ const actor=auth(req);
+ if(actor&&['POST','PATCH','PUT','DELETE'].includes(req.method))res.once('finish',()=>{
+  const matched=typeof req.route?.path==='string'?req.route.path:req.path;
+  const operation=auditOperation(req.method,matched.startsWith('/api/')?matched:'/api'+matched,res.statusCode);
+  if(operation)void db.query('INSERT INTO operation_audit(actor_id,action,resource_type,resource_id,status) VALUES($1,$2,$3,$4,$5)',[actor,operation.action,operation.resource_type,/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(req.params?.id||'')?req.params.id:null,res.statusCode]).catch(e=>console.error('audit insert failed',e instanceof Error?e.name:'unknown'));
+ });next();
+});
+async function notifyRegistration(email:string,backend:'local'|'ldap'){
+ try{const config=await activeSmtpConfig();if(!config){console.warn('registration notification requires SMTP');return}
+ const result=await db.query("SELECT email FROM users WHERE role='platform_admin' AND approved=true ORDER BY email");
+ const recipients=result.rows.map(r=>String(r.email)).filter(v=>/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v));
+ if(recipients.length)await sendRegistrationReviewEmail(config,recipients,email,backend);
+ }catch(e){console.error('registration notification failed',e instanceof Error?e.name:'unknown')}
+}
+
 // Page countdowns are authoritative in PostgreSQL, not just a disabled browser
 // button. A page-wide timer blocks all mutating audience widget routes, across
 // all API replicas. Joining/viewing remain available after the deadline.
@@ -288,7 +310,7 @@ async function ensureLoadDemoForUser(userId:string){
  }catch(e){await cx.query('ROLLBACK');throw e}finally{cx.release()}
 }
 
-app.post('/api/auth/register',async(req,res)=>{const cx=await db.connect();try{const email=String(req.body?.email||'').trim().toLowerCase(),password=req.body?.password;if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)||email.length>254||typeof password!=='string'||password.length<12||password.length>256){res.status(400).json({error:'invalid_registration'});return}await cx.query('BEGIN');const org=(await cx.query('SELECT id FROM organizations ORDER BY id LIMIT 1')).rows[0];if(!org){await cx.query('ROLLBACK');res.status(503).json({error:'organization_unavailable'});return}const uid=randomUUID();await cx.query('INSERT INTO users(id,organization_id,email,password_hash,role,approved) VALUES($1,$2,$3,$4,$5,false)',[uid,org.id,email,await bcrypt.hash(password,12),'user']);await provisionDemo(cx,uid,org.id);await provisionLoadDemo(cx,uid,org.id);await cx.query('COMMIT');res.status(202).json({status:'pending_admin_approval'})}catch(e){await cx.query('ROLLBACK');if((e as any)?.code==='23505'){res.status(409).json({error:'account_exists'});return}sendError(res,e)}finally{cx.release()}});
+app.post('/api/auth/register',async(req,res)=>{const cx=await db.connect();try{const email=String(req.body?.email||'').trim().toLowerCase(),password=req.body?.password;if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)||email.length>254||typeof password!=='string'||password.length<12||password.length>256){res.status(400).json({error:'invalid_registration'});return}await cx.query('BEGIN');const org=(await cx.query('SELECT id FROM organizations ORDER BY id LIMIT 1')).rows[0];if(!org){await cx.query('ROLLBACK');res.status(503).json({error:'organization_unavailable'});return}const uid=randomUUID();await cx.query('INSERT INTO users(id,organization_id,email,password_hash,role,approved) VALUES($1,$2,$3,$4,$5,false)',[uid,org.id,email,await bcrypt.hash(password,12),'user']);await provisionDemo(cx,uid,org.id);await provisionLoadDemo(cx,uid,org.id);await cx.query('COMMIT');void notifyRegistration(email,'local');res.status(202).json({status:'pending_admin_approval'})}catch(e){await cx.query('ROLLBACK');if((e as any)?.code==='23505'){res.status(409).json({error:'account_exists'});return}sendError(res,e)}finally{cx.release()}});
 // Password recovery does not reveal account existence. SMTP must be configured to deliver tokens.
 app.post('/api/auth/password-reset/request',async(req,res)=>{try{
  const email=normalizeResetEmail(req.body?.email);if(!email){res.status(400).json({error:'invalid_email'});return}
@@ -400,6 +422,83 @@ app.get('/api/auth/social/:provider/callback',async(req,res)=>{
  const expires=Date.now()+8*3600*1000;const body=`${u.id}.${expires}`;
  res.cookie('q_auth',`${body}.${sign(body)}`,{httpOnly:true,sameSite:'strict',secure:true,maxAge:8*3600*1000,path:'/'});await refreshGravatarForUser(u.id);res.redirect('/?oidc_login=1');
  }catch(e){console.error('social oauth callback',e instanceof Error?e.message:'error');res.status(502).json({error:'social_authentication_failed'})}
+});
+/** LDAP/LDAPS is opt-in and *separate* from local authentication. An LDAP
+ * search is not authentication: the user's own DN must successfully bind.
+ * Email matches never create implicit links to existing local/SSO accounts. */
+app.get('/api/auth/ldap/status',(_req,res)=>res.json({enabled:!!ldapSettings,label:ldapSettings?.label||'LDAP / Active Directory'}));
+app.post('/api/auth/ldap/register',async(req,res)=>{
+ if(!ldapSettings){res.status(404).json({error:'ldap_not_configured'});return}
+ const login=req.body?.email,password=req.body?.password;
+ if(typeof login!=='string'||typeof password!=='string'||!login.trim()||login.length>254){res.status(400).json({error:'invalid_request'});return}
+ try{
+  const verified=await authenticateDirectory(ldapSettings,login.trim(),password);
+  if(!verified){res.status(401).json({error:'invalid_credentials'});return}
+  const cx=await db.connect();let begun=false;
+  try{await cx.query('BEGIN');begun=true;
+   if((await cx.query('SELECT 1 FROM users WHERE lower(email)=$1',[verified.email])).rowCount||
+      (await cx.query('SELECT 1 FROM ldap_identities WHERE provider=$1 AND subject=$2',['default',verified.subject])).rowCount){await cx.query('ROLLBACK');begun=false;res.status(409).json({error:'account_exists'});return}
+   const orgId=ldapSettings.organizationId||(await cx.query('SELECT id FROM organizations ORDER BY id LIMIT 1')).rows[0]?.id;
+   if(!orgId){await cx.query('ROLLBACK');begun=false;res.status(503).json({error:'organization_unavailable'});return}
+   const id=randomUUID();await cx.query('INSERT INTO users(id,organization_id,email,password_hash,role,approved,must_change_password) VALUES($1,$2,$3,$4,$5,false,false)',[id,orgId,verified.email,await bcrypt.hash(randomBytes(32).toString('base64url'),12),'user']);
+   await cx.query('INSERT INTO ldap_identities(provider,subject,user_id) VALUES($1,$2,$3)',['default',verified.subject,id]);
+   await cx.query('COMMIT');begun=false;
+   void notifyRegistration(verified.email,'ldap');res.status(202).json({status:'pending_admin_approval'});
+  }finally{if(begun)await cx.query('ROLLBACK').catch(()=>{});cx.release()}
+ }catch(e){if((e as any)?.code==='23505'){res.status(409).json({error:'account_exists'});return}console.error('ldap registration unavailable',e instanceof Error?e.name:'unknown');res.status(503).json({error:'ldap_registration_unavailable'})}
+});
+app.post('/api/auth/ldap/login',async(req,res)=>{
+ if(!ldapSettings){res.status(404).json({error:'ldap_not_configured'});return}
+ const login=req.body?.email,password=req.body?.password;
+ if(typeof login!=='string'||typeof password!=='string'||login.length>254||!login.trim()||password.length>1024){res.status(400).json({error:'invalid_request'});return}
+ try{
+  const verified=await authenticateDirectory(ldapSettings,login.trim(),password);
+  if(!verified){res.status(401).json({error:'invalid_credentials'});return}
+  const cx=await db.connect();let user:any;let started=false;
+  try{
+   await cx.query('BEGIN');started=true;
+   const linked=await cx.query('SELECT u.id,u.email,u.role,u.approved,u.must_change_password,u.totp_enabled,u.email_mfa_enabled FROM ldap_identities li JOIN users u ON u.id=li.user_id WHERE li.provider=$1 AND li.subject=$2 FOR UPDATE OF u',['default',verified.subject]);
+   if(linked.rowCount){
+    user=linked.rows[0];
+    // Directory groups never overwrite administrator-assigned Quorivio roles.
+   }else if(ldapSettings.autoProvision){
+    const collision=await cx.query('SELECT id FROM users WHERE lower(email)=$1',[verified.email]);
+    if(collision.rowCount){res.status(403).json({error:'ldap_explicit_link_required'});return}
+    const org=await cx.query('SELECT id FROM organizations WHERE id=$1',[ldapSettings.organizationId]);
+    if(!org.rowCount){res.status(503).json({error:'ldap_organization_unavailable'});return}
+    const id=randomUUID();const passwordHash=await bcrypt.hash(randomBytes(32).toString('base64url'),12);
+    await cx.query('INSERT INTO users(id,organization_id,email,password_hash,role,approved,must_change_password) VALUES($1,$2,$3,$4,$5,false,false)',[id,ldapSettings.organizationId,verified.email,passwordHash,'user']);
+    await cx.query('INSERT INTO ldap_identities(provider,subject,user_id) VALUES($1,$2,$3)',['default',verified.subject,id]);
+    user={id,email:verified.email,role:'user',approved:false,must_change_password:false,totp_enabled:false,email_mfa_enabled:false};
+    // Notification only after a successful commit below.
+   }else{res.status(403).json({error:'ldap_account_not_provisioned'});return}
+   if(!user.approved){await cx.query('COMMIT');started=false;if(!linked.rowCount)void notifyRegistration(verified.email,'ldap');res.status(403).json({error:'account_pending_approval'});return}
+   if(user.must_change_password){res.status(403).json({error:'password_change_required'});return}
+   await cx.query('COMMIT');started=false;
+  }finally{if(started)await cx.query('ROLLBACK').catch(()=>{});cx.release()}
+  if(user.totp_enabled||user.email_mfa_enabled){
+   const id=randomUUID();await db.query(`INSERT INTO email_mfa_challenges(id,user_id,digest,expires_at) VALUES($1,$2,$3,now()+interval '5 minutes') ON CONFLICT(user_id) DO UPDATE SET id=EXCLUDED.id,digest=EXCLUDED.digest,expires_at=EXCLUDED.expires_at,attempts=0,created_at=now()`,[id,user.id,hash(randomUUID())]);
+   res.json({mfa_required:true,challenge_id:id,methods:[...(user.totp_enabled?['totp']:[]),...(user.email_mfa_enabled?['email']:[])]});return;
+  }
+  const expires=Date.now()+8*3600*1000,body=`${user.id}.${expires}`;
+  res.cookie('q_auth',`${body}.${sign(body)}`,{httpOnly:true,sameSite:'strict',secure:base.startsWith('https:'),maxAge:8*3600*1000,path:'/'});
+  await refreshGravatarForUser(user.id);res.json({email:user.email,role:user.role,must_change_password:false});
+ }catch(e){console.error('ldap authentication unavailable',e instanceof Error?e.name:'error');res.status(503).json({error:'ldap_authentication_unavailable'})}
+});
+/* Explicit account linking requires an already authenticated presenter AND a
+ * fresh successful directory bind. Never link identities based on email alone. */
+app.post('/api/auth/ldap/link',requireAuth,async(req,res)=>{
+ if(!ldapSettings){res.status(404).json({error:'ldap_not_configured'});return}
+ const login=req.body?.email,password=req.body?.password;
+ if(typeof login!=='string'||typeof password!=='string'||!login.trim()||login.length>254){res.status(400).json({error:'invalid_request'});return}
+ try{
+  const verified=await authenticateDirectory(ldapSettings,login.trim(),password);
+  if(!verified){res.status(401).json({error:'invalid_credentials'});return}
+  const self=await db.query('SELECT email FROM users WHERE id=$1',[auth(req)]);
+  if(!self.rowCount||self.rows[0].email.toLowerCase()!==verified.email){res.status(403).json({error:'ldap_verified_email_mismatch'});return}
+  await db.query('INSERT INTO ldap_identities(provider,subject,user_id) VALUES($1,$2,$3)',['default',verified.subject,auth(req)]);
+  res.status(201).json({ok:true});
+ }catch(e){if(e&&typeof e==='object'&&(e as any).code==='23505'){res.status(409).json({error:'ldap_identity_already_linked'});return}console.error('ldap link failed',e instanceof Error?e.name:'error');res.status(503).json({error:'ldap_authentication_unavailable'})}
 });
 app.post('/api/auth/login',async(req,res)=>{try{const {email,password}=req.body||{};if(typeof email!=='string'||typeof password!=='string'){res.status(400).json({error:'invalid_request'});return}const r=await db.query('SELECT id,email,password_hash,approved,must_change_password,role,totp_enabled,totp_secret,email_mfa_enabled FROM users WHERE lower(email)=$1 OR lower(nickname)=$1',[email.trim().toLowerCase()]);if(!r.rowCount||!await bcrypt.compare(password,r.rows[0].password_hash)){res.status(401).json({error:'invalid_credentials'});return}if(!r.rows[0].approved){res.status(403).json({error:'account_pending_approval'});return}if(r.rows[0].totp_enabled||r.rows[0].email_mfa_enabled){
  const id=randomUUID();
@@ -677,6 +776,29 @@ app.patch('/api/admin/users/:id/identity',requireAuth,requireAdmin,async(req,res
  const result=await db.query('UPDATE users SET email=$2 WHERE id=$1 RETURNING id,email,nickname,is_primary_admin',[req.params.id,email]);
  if(!result.rowCount){res.status(404).end();return}res.json(result.rows[0]);
  }catch(e){if((e as any)?.code==='23505'){res.status(409).json({error:'email_already_taken'});return}sendError(res,e)}});
+app.get('/api/admin/ldap/search',requireAuth,requireAdmin,async(req,res)=>{
+ if(!ldapSettings){res.status(404).json({error:'ldap_not_configured'});return}
+ const q=String(req.query.q||'').trim();if(q.length<2||q.length>120){res.status(400).json({error:'invalid_search'});return}
+ try{res.setHeader('Cache-Control','private, no-store');res.json({items:await searchDirectory(ldapSettings,q)})}
+ catch(e){console.error('ldap search failed',e instanceof Error?e.name:'unknown');res.status(503).json({error:'directory_unavailable'})}
+});
+app.post('/api/admin/ldap/users',requireAuth,requireAdmin,async(req,res)=>{
+ if(!ldapSettings){res.status(404).json({error:'ldap_not_configured'});return}
+ const q=String(req.body?.query||'').trim(),subject=req.body?.subject,role=req.body?.role;
+ if(q.length<2||q.length>120||typeof subject!=='string'||!['user','presenter','moderator','org_admin','platform_admin'].includes(role)){res.status(400).json({error:'invalid_user'});return}
+ try{
+  const matches=await searchDirectory(ldapSettings,q);const found=matches.find(u=>u.subject===subject);
+  if(!found){res.status(404).json({error:'ldap_identity_not_found'});return}
+  const org=(await db.query('SELECT organization_id FROM users WHERE id=$1',[auth(req)])).rows[0];
+  const cx=await db.connect();let begun=false;
+  try{await cx.query('BEGIN');begun=true;
+   if((await cx.query('SELECT 1 FROM users WHERE lower(email)=$1',[found.email])).rowCount){await cx.query('ROLLBACK');begun=false;res.status(409).json({error:'account_exists'});return}
+   const uid=randomUUID();await cx.query('INSERT INTO users(id,organization_id,email,password_hash,role,approved,must_change_password) VALUES($1,$2,$3,$4,$5,true,false)',[uid,org.organization_id,found.email,await bcrypt.hash(randomBytes(32).toString('base64url'),12),role]);
+   await cx.query('INSERT INTO ldap_identities(provider,subject,user_id) VALUES($1,$2,$3)',['default',subject,uid]);
+   await cx.query('COMMIT');begun=false;res.status(201).json({id:uid,email:found.email,role,approved:true,backend:'ldap'});
+  }finally{if(begun)await cx.query('ROLLBACK').catch(()=>{});cx.release()}
+ }catch(e){if((e as any)?.code==='23505'){res.status(409).json({error:'account_exists'});return}sendError(res,e)}
+});
 app.post('/api/admin/users',requireAuth,requireAdmin,async(req,res)=>{const cx=await db.connect();try{const email=String(req.body?.email||'').trim().toLowerCase(),role=req.body?.role,password=req.body?.temporary_password,nickname=req.body?.nickname?String(req.body.nickname).trim().toLowerCase():null;if(nickname&&(!/^[a-z][a-z0-9_.-]{2,31}$/.test(nickname)||nickname==='admin')){res.status(400).json({error:'invalid_nickname'});return}if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)||!['user','presenter','moderator','org_admin','platform_admin'].includes(role)||typeof password!=='string'||password.length<12||password.length>256){res.status(400).json({error:'invalid_user'});return}const org=(await db.query('SELECT organization_id FROM users WHERE id=$1',[auth(req)])).rows[0];await cx.query('BEGIN');const r=await cx.query('INSERT INTO users(id,organization_id,email,password_hash,role,approved,must_change_password,nickname) VALUES($1,$2,$3,$4,$5,true,true,$6) RETURNING id,email,nickname,role,approved',[randomUUID(),org.organization_id,email,await bcrypt.hash(password,12),role,nickname]);await provisionDemo(cx,r.rows[0].id,org.organization_id);await provisionLoadDemo(cx,r.rows[0].id,org.organization_id);await cx.query('COMMIT');res.status(201).json(r.rows[0])}catch(e){await cx.query('ROLLBACK');if((e as any)?.code==='23505'){res.status(409).json({error:'account_exists'});return}sendError(res,e)}finally{cx.release()}});
 app.patch('/api/admin/users/:id/nickname',requireAuth,requireAdmin,async(req,res)=>{try{const nickname=req.body?.nickname==null||req.body.nickname===''?null:String(req.body.nickname).trim().toLowerCase();if(nickname&&(!/^[a-z][a-z0-9_.-]{2,31}$/.test(nickname)||nickname==='admin')){res.status(400).json({error:'invalid_nickname'});return}const r=await db.query('UPDATE users SET nickname=$2 WHERE id=$1 AND is_primary_admin=false RETURNING id,nickname',[req.params.id,nickname]);if(!r.rowCount){res.status(409).json({error:'primary_admin_immutable_or_missing'});return}res.json(r.rows[0])}catch(e){if((e as any)?.code==='23505'){res.status(409).json({error:'nickname_already_taken'});return}sendError(res,e)}});
 app.get('/api/admin/users',requireAuth,requireAdmin,async(req,res)=>{try{
@@ -808,6 +930,97 @@ async function runDiskCapacityAudit(){
   const {application,conversion,database}=await collectDiskStatus();
   await Promise.all([applyDiskThresholdAlert('application',application),applyDiskThresholdAlert('conversion',conversion),applyDiskThresholdAlert('database',database)]);
  }catch(e){console.error('disk capacity monitor unavailable',e instanceof Error?e.message:'unknown')}
+}
+app.get('/api/admin/audit',requireAuth,requireAdmin,async(req,res)=>{try{
+ const limit=Math.min(100,Math.max(1,Number(req.query.limit)||50)),offset=Math.max(0,Number(req.query.offset)||0);
+ if(!Number.isSafeInteger(limit)||!Number.isSafeInteger(offset)||offset>100000){res.status(400).json({error:'invalid_pagination'});return}
+ const term=String(req.query.search||'').trim().slice(0,120),action=String(req.query.action||'').trim().slice(0,20);
+ const r=await db.query(`SELECT a.id,a.occurred_at,a.actor_id,u.email AS actor_email,a.action,a.resource_type,a.status
+ FROM operation_audit a LEFT JOIN users u ON a.actor_id=u.id
+ WHERE ($1='' OR a.resource_type ILIKE '%'||$1||'%' OR u.email ILIKE '%'||$1||'%' OR a.resource_id::text ILIKE '%'||$1||'%') AND ($2='' OR a.action=$2)
+ ORDER BY a.occurred_at DESC,a.id DESC LIMIT $3 OFFSET $4`,[term,action,limit,offset]);
+ res.setHeader('Cache-Control','private, no-store');res.json({items:r.rows,limit,offset});
+ }catch(e){sendError(res,e)}});
+app.get('/api/admin/audit/settings',requireAuth,requireAdmin,async(_req,res)=>{try{const r=await db.query('SELECT retention_days FROM audit_settings WHERE id=1');res.json(r.rows[0])}catch(e){sendError(res,e)}});
+app.put('/api/admin/audit/settings',requireAuth,requireAdmin,async(req,res)=>{const days=req.body?.retention_days;if(!validAuditRetention(days)){res.status(400).json({error:'invalid_retention'});return}try{await db.query('UPDATE audit_settings SET retention_days=$1 WHERE id=1',[days]);res.json({retention_days:days})}catch(e){sendError(res,e)}});
+app.post('/api/admin/audit/purge',requireAuth,requireAdmin,async(req,res)=>{try{
+ const configured=(await db.query('SELECT retention_days FROM audit_settings WHERE id=1')).rows[0].retention_days;
+ const days=req.body?.older_than_days??configured;if(!validAuditRetention(days)){res.status(400).json({error:'invalid_retention'});return}
+ const r=await db.query("DELETE FROM operation_audit WHERE occurred_at<now()-($1::integer*interval '1 day')",[days]);res.json({deleted:r.rowCount});
+ }catch(e){sendError(res,e)}});
+/** Full-instance archives are administration-only. The POSIX/NFS path is
+ * always a deployment-mounted root, never an arbitrary wizard-provided path. */
+async function currentBackupConfig(){const r=await db.query('SELECT * FROM backup_config WHERE id=1');const row=r.rows[0];return {row,target:row.config_encrypted?openBackupConfig(row.config_encrypted,secret):null}}
+app.get('/api/admin/backups',requireAuth,requireAdmin,async(_req,res)=>{try{
+ const {row,target}=await currentBackupConfig();
+ const runs=await db.query('SELECT id,triggered_by,backend,state,started_at,completed_at,bytes,sha256,error_code FROM backup_runs ORDER BY started_at DESC LIMIT 25');
+ res.setHeader('Cache-Control','private, no-store');res.json({allowed_backends:allowedBackupBackends(),enabled:row.enabled,backend:row.backend,interval_hours:row.interval_hours,next_run_at:row.next_run_at,target:publicBackupConfig(target),runs:runs.rows});
+ }catch(e){sendError(res,e)}});
+app.put('/api/admin/backups',requireAuth,requireAdmin,async(req,res)=>{try{
+ const body=req.body||{},enabled=body.enabled,interval=body.interval_hours;
+ if(typeof enabled!=='boolean'||!Number.isInteger(interval)||interval<1||interval>720){res.status(400).json({error:'invalid_backup_schedule'});return}
+ const previous=await currentBackupConfig();
+ const raw=body.target;
+ const cleaned=raw?Object.fromEntries(Object.entries(raw).filter(([k,v])=>!(v===''&&['secretKey','password'].includes(k)))):null;
+ const merged=cleaned&&previous.target&&cleaned.backend===previous.target.backend?{...previous.target,...cleaned}:cleaned;
+ let target:BackupTarget|null=null;
+ if(merged)target=validateBackupTarget(merged);
+ if(enabled&&!target){res.status(400).json({error:'backup_target_required'});return}
+ // Never save an enabled backup with a disabled mount / backend.
+ await db.query(`UPDATE backup_config SET enabled=$1,backend=$2,config_encrypted=$3,interval_hours=$4,
+ next_run_at=CASE WHEN $1 THEN now()+($4::integer*interval '1 hour') ELSE NULL END,updated_at=now() WHERE id=1`,
+ [enabled,target?.backend||previous.row.backend,target?sealBackupConfig(target,secret):null,interval]);
+ res.json({ok:true,enabled,backend:target?.backend||previous.row.backend,interval_hours:interval,target:publicBackupConfig(target)});
+ }catch(e){if(String(e).includes('invalid_')||String(e).includes('backup_backend')||String(e).includes('backup_volume')){res.status(400).json({error:(e as Error).message});return}sendError(res,e)}});
+async function executeBackupRun(backend:BackupTarget,actorId:string|null){
+ const id=randomUUID();await db.query('INSERT INTO backup_runs(id,triggered_by,backend,state) VALUES($1,$2,$3,$4)',[id,actorId,backend.backend,'running']);
+ let generated:Awaited<ReturnType<typeof buildFullBackup>>|null=null;
+ try{
+  generated=await buildFullBackup(process.env.DATABASE_URL||'',assetRoot);
+  await uploadBackup(backend,generated);
+  await db.query("UPDATE backup_runs SET state='success',completed_at=now(),bytes=$2,sha256=$3 WHERE id=$1",[id,generated.size,generated.sha256]);
+ }catch(e){
+  await db.query("UPDATE backup_runs SET state='failure',completed_at=now(),error_code=$2 WHERE id=$1",[id,e instanceof Error?e.message.slice(0,80):'backup_failed']).catch(()=>{});
+  console.error('full instance backup failed',e instanceof Error?e.name:'unknown');
+ }finally{if(generated)await rm(generated.directory,{recursive:true,force:true}).catch(()=>{})}
+ return id;
+}
+app.post('/api/admin/backups/run',requireAuth,requireAdmin,async(req,res)=>{try{
+ const {target}=await currentBackupConfig();if(!target){res.status(409).json({error:'backup_target_required'});return}
+ try{validateBackupTarget(target)}catch{res.status(409).json({error:'backup_backend_disabled_or_unavailable'});return}
+ // Respond immediately to a long-running backup; history provides completion status.
+ const jobId=randomUUID();
+ const claimed=await db.query(`INSERT INTO backup_runs(id,triggered_by,backend,state) VALUES($1,$2,$3,'running') RETURNING id`,[jobId,auth(req),target.backend]);
+ res.status(202).json({id:claimed.rows[0].id,state:'running'});
+ void (async()=>{
+  let generated:Awaited<ReturnType<typeof buildFullBackup>>|null=null;
+  try{generated=await buildFullBackup(process.env.DATABASE_URL||'',assetRoot);await uploadBackup(target,generated);await db.query("UPDATE backup_runs SET state='success',completed_at=now(),bytes=$2,sha256=$3 WHERE id=$1",[jobId,generated.size,generated.sha256])}
+  catch(e){await db.query("UPDATE backup_runs SET state='failure',completed_at=now(),error_code=$2 WHERE id=$1",[jobId,e instanceof Error?e.message.slice(0,80):'backup_failed']).catch(()=>{});console.error('manual backup failed',e instanceof Error?e.name:'unknown')}
+  finally{if(generated)await rm(generated.directory,{recursive:true,force:true}).catch(()=>{})}
+ })();
+ }catch(e){sendError(res,e)}});
+app.get('/api/admin/backups/download',requireAuth,requireAdmin,async(req,res)=>{
+ let generated:Awaited<ReturnType<typeof buildFullBackup>>|null=null;
+ try{
+  generated=await buildFullBackup(process.env.DATABASE_URL||'',assetRoot);
+  await db.query("INSERT INTO backup_runs(id,triggered_by,backend,state,completed_at,bytes,sha256) VALUES($1,$2,'browser','success',now(),$3,$4)",[randomUUID(),auth(req),generated.size,generated.sha256]);
+  await db.query("INSERT INTO operation_audit(actor_id,action,resource_type,status) VALUES($1,'export','/api/admin/backups/download',200)",[auth(req)]);
+  res.setHeader('Cache-Control','no-store, private');res.setHeader('Content-Type','application/gzip');
+  res.setHeader('Content-Disposition',`attachment; filename="${generated.name}"`);
+  res.setHeader('Content-Length',String(generated.size));
+  res.setHeader('X-Backup-SHA256',generated.sha256);
+  const {createReadStream}=await import('node:fs');const archive=generated;
+  const stream=createReadStream(archive.archive);const cleanup=()=>{void rm(archive.directory,{recursive:true,force:true}).catch(()=>{})};
+  res.on('close',cleanup);stream.on('error',()=>{if(!res.headersSent)res.status(500).end();else res.destroy();cleanup()});stream.pipe(res);
+ }catch(e){if(generated)await rm(generated.directory,{recursive:true,force:true}).catch(()=>{});console.error('backup download failed',e instanceof Error?e.name:'unknown');if(!res.headersSent)res.status(503).json({error:'backup_generation_failed'})}
+});
+async function runScheduledFullBackup(){
+ await db.query("UPDATE backup_runs SET state='failure',completed_at=now(),error_code='interrupted_or_timed_out' WHERE state='running' AND started_at<now()-interval '2 hours'");
+ // Claim due work with one atomic UPDATE across replicas. No overlapping schedules.
+ const result=await db.query(`UPDATE backup_config SET next_run_at=now()+(interval_hours*interval '1 hour')
+ WHERE id=1 AND enabled=true AND next_run_at<=now() AND NOT EXISTS (SELECT 1 FROM backup_runs WHERE state='running' AND started_at>now()-interval '2 hours')
+ RETURNING config_encrypted`);
+ if(result.rowCount&&result.rows[0].config_encrypted){const target=validateBackupTarget(openBackupConfig(result.rows[0].config_encrypted,secret));await executeBackupRun(target,null)}
 }
 app.get('/api/admin/settings',requireAuth,requireAdmin,async(_req,res)=>{try{const r=await db.query('SELECT key,value FROM platform_settings');res.json(Object.fromEntries(r.rows.map(x=>[x.key,x.value])))}catch(e){sendError(res,e)}});
 app.patch('/api/admin/settings',requireAuth,requireAdmin,async(req,res)=>{
@@ -1427,6 +1640,31 @@ app.post('/api/sessions/:id/duplicate',requireAuth,async(req,res)=>{try{
  }catch(e){sendError(res,e)}});
 app.get('/api/sessions/:id/presenters',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}const r=await db.query('SELECT u.id,u.email FROM users u JOIN session_presenters sp ON u.id=sp.user_id WHERE sp.session_id=$1',[s.id]);res.json(r.rows)}catch(e){sendError(res,e)}});
 app.post('/api/sessions/:id/presenters',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}if(s.owner_id!==auth(req)){res.status(403).json({error:'owner_required'});return}const email=String(req.body?.email||'').toLowerCase();const r=await db.query("SELECT id FROM users WHERE organization_id=$1 AND email=$2 AND approved=true AND must_change_password=false AND role IN ('presenter','org_admin','platform_admin')",[s.organization_id,email]);if(!r.rowCount){res.status(404).json({error:'eligible_presenter_not_found'});return}await db.query('INSERT INTO session_presenters(session_id,user_id) VALUES($1,$2) ON CONFLICT DO NOTHING',[s.id,r.rows[0].id]);res.status(201).json({ok:true})}catch(e){sendError(res,e)}});
+/** Primary ownership may be transferred only by the current owner. A row lock
+ * serializes concurrent transfers, with an immutable UUID-only audit trail. */
+app.post('/api/sessions/:id/transfer-owner',requireAuth,requirePresenter,async(req,res)=>{
+ const targetEmail=req.body?.email,keepPrevious=req.body?.keep_previous_as_collaborator!==false;
+ if(typeof targetEmail!=='string'||targetEmail.length>254||!/^\S+@\S+\.\S+$/.test(targetEmail.trim())){res.status(400).json({error:'invalid_target_email'});return}
+ const cx=await db.connect();let started=false;let sid:string|undefined;
+ try{
+  await cx.query('BEGIN');started=true;
+  const session=await cx.query('SELECT id,organization_id,owner_id FROM sessions WHERE id=$1 FOR UPDATE',[req.params.id]);
+  if(!session.rowCount){res.status(404).json({error:'session_not_found'});return}
+  const current=session.rows[0];if(current.owner_id!==auth(req)){res.status(403).json({error:'owner_required'});return}
+  const user=await cx.query("SELECT id,email FROM users WHERE organization_id=$1 AND lower(email)=$2 AND approved=true AND must_change_password=false AND role IN ('presenter','org_admin','platform_admin')",[current.organization_id,targetEmail.trim().toLowerCase()]);
+  if(!user.rowCount){res.status(404).json({error:'eligible_presenter_not_found'});return}
+  const next=user.rows[0];if(next.id===current.owner_id){res.status(409).json({error:'already_primary_owner'});return}
+  // The new owner was possibly a collaborator already; avoid dual membership.
+  await cx.query('DELETE FROM session_presenters WHERE session_id=$1 AND user_id=$2',[current.id,next.id]);
+  await cx.query('UPDATE sessions SET owner_id=$2 WHERE id=$1',[current.id,next.id]);
+  if(keepPrevious)await cx.query('INSERT INTO session_presenters(session_id,user_id) VALUES($1,$2) ON CONFLICT DO NOTHING',[current.id,current.owner_id]);
+  else await cx.query('DELETE FROM session_presenters WHERE session_id=$1 AND user_id=$2',[current.id,current.owner_id]);
+  await cx.query('INSERT INTO session_ownership_transfers(id,session_id,from_user_id,to_user_id) VALUES($1,$2,$3,$4)',[randomUUID(),current.id,current.owner_id,next.id]);
+  await cx.query('COMMIT');started=false;sid=current.id;
+  res.json({ok:true,owner_id:next.id,owner_email:next.email,previous_owner_collaborator:keepPrevious});
+ }catch(e){sendError(res,e)}finally{if(started)await cx.query('ROLLBACK').catch(()=>{});cx.release()}
+ if(sid)await broadcast(sid).catch(e=>console.error('ownership notification pending',e instanceof Error?e.message:'error'));
+});
 app.delete('/api/sessions/:id/presenters/:uid',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}if(s.owner_id!==auth(req)){res.status(403).end();return}await db.query('DELETE FROM session_presenters WHERE session_id=$1 AND user_id=$2',[s.id,req.params.uid]);res.status(204).end()}catch(e){sendError(res,e)}});
 app.patch('/api/sessions/:id/activities/:aid',requireAuth,async(req,res)=>{const cx=await db.connect();try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}if(s.status==='closed'){res.status(409).json({error:'session_closed'});return}const {title,options,correct_option_id}=req.body||{};if(typeof title!=='string'||!title.trim()||title.length>240||!validateOptions(options)){res.status(400).json({error:'invalid_activity'});return}await cx.query('BEGIN');const a=await cx.query('SELECT * FROM activities WHERE id=$1 AND session_id=$2 FOR UPDATE',[req.params.aid,s.id]);if(!a.rowCount){await cx.query('ROLLBACK');res.status(404).end();return}if(['quiz','timed_quiz'].includes(a.rows[0].type)&&!options.some((o:any)=>o.id===correct_option_id)){await cx.query('ROLLBACK');res.status(400).json({error:'invalid_correct_option'});return}const newIds=new Set(options.map((o:any)=>o.id));const historical=(await cx.query('SELECT DISTINCT option_id FROM responses WHERE activity_id=$1',[req.params.aid])).rows.map(x=>x.option_id);if(['quiz','timed_quiz'].includes(a.rows[0].type) && correct_option_id!==a.rows[0].correct_option_id && (await cx.query('SELECT 1 FROM responses WHERE activity_id=$1 AND invalidated_at IS NULL LIMIT 1',[req.params.aid])).rowCount){await cx.query('ROLLBACK');res.status(409).json({error:'invalidate_answers_before_changing_correct_option'});return}if(historical.some(x=>!newIds.has(x))){await cx.query('ROLLBACK');res.status(409).json({error:'existing_response_option_must_remain'});return}await cx.query('UPDATE activities SET title=$3,options=$4,correct_option_id=$5,revision=revision+1 WHERE id=$1 AND session_id=$2',[req.params.aid,s.id,title,JSON.stringify(options),['quiz','timed_quiz'].includes(a.rows[0].type)?correct_option_id:null]);await cx.query('COMMIT');await broadcast(s.id);res.json({ok:true})}catch(e){await cx.query('ROLLBACK');sendError(res,e)}finally{cx.release()}});
 // Rename a single page without rewriting answer options, votes, or its widget layout.
@@ -2308,7 +2546,36 @@ wss.on('connection',(ws:WebSocket,_req:unknown,sid:string)=>{
 });
 function participantSnapshot(data:any){if(!data)return data;const presenterId=data.session.presenter_activity_id||data.session.current_activity_id;const visibleIndex=(data.activities||[]).filter((a:any)=>a.page_design?.presenterHidden!==true).findIndex((a:any)=>a.id===presenterId);const presenterNumber=visibleIndex>=0?visibleIndex+1:1;const aid=data.session.status==='active'?data.session.current_activity_id:null;const published=aid?data.activities.find((a:Activity)=>a.id===aid&&a.status==='open'):null;return {session:{id:data.session.id,title:data.session.title,status:data.session.status,current_activity_id:published?aid:null,presenter_page_number:presenterNumber},activities:published?[publicActivity(published)]:[],results:published&&data.session.show_results?data.results.filter((r:any)=>r.activity_id===aid):[],totals:published&&data.session.show_results?data.totals.filter((r:any)=>r.activity_id===aid):[]}}
 const webRoot=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../../web/dist');if(existsSync(webRoot)){app.use(express.static(webRoot));app.get('*',(_,res)=>res.sendFile(path.join(webRoot,'index.html')))}
-async function initialize(){await withBootstrapLock(db,async bootstrap=>{const schema=readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)),'../src/schema.sql'),'utf8');await bootstrap.query(schema);publicBase=(await bootstrap.query("SELECT value FROM platform_settings WHERE key='public_base_url'")).rows[0]?.value||base;const email=process.env.ADMIN_EMAIL?.toLowerCase(),password=process.env.ADMIN_PASSWORD;if(email&&password){if(password.length<12&&!(process.env.ALLOW_INSECURE_DEV_BOOTSTRAP==='true'&&process.env.NODE_ENV!=='production'&&password==='000000'))throw new Error('ADMIN_PASSWORD must be >=12 characters (insecure demo bootstrap allowed only outside production)');const count=await bootstrap.query('SELECT count(*)::int AS n FROM users');if(count.rows[0].n===0){const oid=randomUUID(),uid=randomUUID();await bootstrap.query('BEGIN');try{await bootstrap.query('INSERT INTO organizations(id,name) VALUES($1,$2)',[oid,'Default']);await bootstrap.query('INSERT INTO users(id,organization_id,email,password_hash,role) VALUES($1,$2,$3,$4,$5)',[uid,oid,email,await bcrypt.hash(password,12),'platform_admin']);await bootstrap.query('UPDATE users SET approved=true,must_change_password=true,is_primary_admin=true,nickname=$2 WHERE id=$1',[uid,'admin']);await provisionDemo(bootstrap,uid,oid);await provisionLoadDemo(bootstrap,uid,oid);await bootstrap.query('COMMIT')}catch(e){await bootstrap.query('ROLLBACK');throw e}console.log('Initial admin provisioned; password change required')}}await bootstrap.query("UPDATE users SET is_primary_admin=true,nickname='admin' WHERE id=(SELECT id FROM users WHERE role='platform_admin' AND approved=true ORDER BY created_at ASC LIMIT 1) AND NOT EXISTS (SELECT 1 FROM users WHERE is_primary_admin=true)");});startSessionBus(async()=>{const client=new pg.Client({connectionString:process.env.DATABASE_URL});await client.connect();return client},broadcastLocal,console.error,async()=>{await Promise.all([...sockets.keys()].map(sid=>broadcastLocal(sid)))});await db.query("DELETE FROM live_connections WHERE last_seen<now()-interval '2 minutes'");setInterval(()=>db.query("DELETE FROM live_connections WHERE last_seen<now()-interval '2 minutes'").catch(()=>{}),60000).unref();await purgeExpiredSessions();setInterval(()=>purgeExpiredSessions().catch(e=>console.error('retention purge error',e instanceof Error?e.message:'unknown')),3600000).unref();setInterval(()=>cleanupPendingSessionFiles().catch(()=>console.error('session asset cleanup worker retry pending')),60000).unref();setInterval(()=>drainAssetErasureJobs(db,assetRoot).catch(()=>console.error('asset erasure worker retry pending')),60000).unref();setInterval(()=>drainProfileErasureJobs(db,assetRoot).catch(()=>console.error('profile erasure worker retry pending')),60000).unref();setInterval(()=>db.query("DELETE FROM auth_flows WHERE expires_at<now(); DELETE FROM email_mfa_challenges WHERE expires_at<now(); DELETE FROM email_mfa_enrollments WHERE expires_at<now(); DELETE FROM api_rate_windows WHERE bucket<floor(extract(epoch from now())/60)-3").catch(e=>console.error('auth cleanup error',e instanceof Error?e.message:'unknown')),3600000).unref();setTimeout(()=>{void runDiskCapacityAudit()},30000).unref();setInterval(()=>{void runDiskCapacityAudit()},DISK_MONITOR_INTERVAL_MS).unref();server.listen(Number(process.env.PORT||8080),'0.0.0.0',()=>console.log('Quorivio API ready'))}
+/** Each pod reclaims its own ephemeral conversion volume. The persistent
+ * asset PVC is handled separately; library and referenced assets are retained. */
+let housekeepingInProgress=false;
+async function runHousekeeping(){
+ if(housekeepingInProgress)return;
+ housekeepingInProgress=true;
+ try{
+  const conversion=await removeExpiredConversionJobs(process.env.QUORIVIO_CONVERSION_DIR||'/conversions');
+  const orphan=await removeOrphanSessionAssetFiles(assetRoot,async(sid,aid)=>{
+   const r=await db.query('SELECT 1 FROM session_assets WHERE id=$1 AND session_id=$2 LIMIT 1',[aid,sid]);return !!r.rowCount;
+  });
+  console.log('12h housekeeping completed',JSON.stringify({conversionWorkspacesRemoved:conversion,unregisteredOldMediaRemoved:orphan}));
+ }finally{housekeepingInProgress=false}
+}
+async function initialize(){await withBootstrapLock(db,async bootstrap=>{const schema=readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)),'../src/schema.sql'),'utf8');await bootstrap.query(schema);publicBase=(await bootstrap.query("SELECT value FROM platform_settings WHERE key='public_base_url'")).rows[0]?.value||base;// Helm and Kubernetes wizard may bootstrap a first backup target via a Kubernetes Secret.
+ // Existing admin-managed backup settings are never overwritten by redeployments.
+ const bootstrapTargetRaw=process.env.QUORIVIO_BACKUP_BOOTSTRAP_TARGET_JSON;
+ if(bootstrapTargetRaw){
+  const current=await bootstrap.query('SELECT config_encrypted FROM backup_config WHERE id=1');
+  if(!current.rows[0]?.config_encrypted){
+   const target=validateBackupTarget(JSON.parse(bootstrapTargetRaw));
+   const enabled=process.env.QUORIVIO_BACKUP_BOOTSTRAP_ENABLED==='true';
+   const interval=Number(process.env.QUORIVIO_BACKUP_BOOTSTRAP_INTERVAL_HOURS||24);
+   if(!Number.isSafeInteger(interval)||interval<1||interval>720)throw Error('invalid_backup_bootstrap_interval');
+   await bootstrap.query(`UPDATE backup_config SET backend=$1,config_encrypted=$2,enabled=$3,interval_hours=$4,
+    next_run_at=CASE WHEN $3 THEN now()+($4::integer*interval '1 hour') ELSE NULL END,updated_at=now() WHERE id=1`,
+    [target.backend,sealBackupConfig(target,secret),enabled,interval]);
+  }
+ }
+const email=process.env.ADMIN_EMAIL?.toLowerCase(),password=process.env.ADMIN_PASSWORD;if(email&&password){if(password.length<12&&!(process.env.ALLOW_INSECURE_DEV_BOOTSTRAP==='true'&&process.env.NODE_ENV!=='production'&&password==='000000'))throw new Error('ADMIN_PASSWORD must be >=12 characters (insecure demo bootstrap allowed only outside production)');const count=await bootstrap.query('SELECT count(*)::int AS n FROM users');if(count.rows[0].n===0){const oid=randomUUID(),uid=randomUUID();await bootstrap.query('BEGIN');try{await bootstrap.query('INSERT INTO organizations(id,name) VALUES($1,$2)',[oid,'Default']);await bootstrap.query('INSERT INTO users(id,organization_id,email,password_hash,role) VALUES($1,$2,$3,$4,$5)',[uid,oid,email,await bcrypt.hash(password,12),'platform_admin']);await bootstrap.query('UPDATE users SET approved=true,must_change_password=true,is_primary_admin=true,nickname=$2 WHERE id=$1',[uid,'admin']);await provisionDemo(bootstrap,uid,oid);await provisionLoadDemo(bootstrap,uid,oid);await bootstrap.query('COMMIT')}catch(e){await bootstrap.query('ROLLBACK');throw e}console.log('Initial admin provisioned; password change required')}}await bootstrap.query("UPDATE users SET is_primary_admin=true,nickname='admin' WHERE id=(SELECT id FROM users WHERE role='platform_admin' AND approved=true ORDER BY created_at ASC LIMIT 1) AND NOT EXISTS (SELECT 1 FROM users WHERE is_primary_admin=true)");});startSessionBus(async()=>{const client=new pg.Client({connectionString:process.env.DATABASE_URL});await client.connect();return client},broadcastLocal,console.error,async()=>{await Promise.all([...sockets.keys()].map(sid=>broadcastLocal(sid)))});await db.query("DELETE FROM live_connections WHERE last_seen<now()-interval '2 minutes'");setInterval(()=>db.query("DELETE FROM live_connections WHERE last_seen<now()-interval '2 minutes'").catch(()=>{}),60000).unref();await purgeExpiredSessions();setTimeout(()=>void runHousekeeping().catch(e=>console.error('housekeeping failed',e instanceof Error?e.message:'unknown')),45000).unref();setInterval(()=>void runHousekeeping().catch(e=>console.error('housekeeping failed',e instanceof Error?e.message:'unknown')),HOUSEKEEPING_PERIOD_MS).unref();setInterval(()=>purgeExpiredSessions().catch(e=>console.error('retention purge error',e instanceof Error?e.message:'unknown')),3600000).unref();setInterval(()=>cleanupPendingSessionFiles().catch(()=>console.error('session asset cleanup worker retry pending')),60000).unref();setInterval(()=>drainAssetErasureJobs(db,assetRoot).catch(()=>console.error('asset erasure worker retry pending')),60000).unref();setInterval(()=>drainProfileErasureJobs(db,assetRoot).catch(()=>console.error('profile erasure worker retry pending')),60000).unref();setInterval(()=>{void runScheduledFullBackup().catch(e=>console.error('backup scheduler error',e instanceof Error?e.name:'unknown'))},60000).unref();setInterval(()=>db.query("DELETE FROM operation_audit WHERE occurred_at<now()-((SELECT retention_days FROM audit_settings WHERE id=1)*interval '1 day')").catch(e=>console.error('audit retention cleanup error',e instanceof Error?e.name:'unknown')),3600000).unref();setInterval(()=>db.query("DELETE FROM auth_flows WHERE expires_at<now(); DELETE FROM email_mfa_challenges WHERE expires_at<now(); DELETE FROM email_mfa_enrollments WHERE expires_at<now(); DELETE FROM api_rate_windows WHERE bucket<floor(extract(epoch from now())/60)-3").catch(e=>console.error('auth cleanup error',e instanceof Error?e.message:'unknown')),3600000).unref();setTimeout(()=>{void runDiskCapacityAudit()},30000).unref();setInterval(()=>{void runDiskCapacityAudit()},DISK_MONITOR_INTERVAL_MS).unref();server.listen(Number(process.env.PORT||8080),'0.0.0.0',()=>console.log('Quorivio API ready'))}
 // Rolling Kubernetes replacement: fail readiness before closing connections so
 // Services can stop routing new traffic. WebSocket 1012 instructs clients to
 // reconnect to another ready replica; do not invalidate sessions or votes.

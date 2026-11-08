@@ -41,3 +41,11 @@ export async function sendDiskCapacityAlert(c:SmtpConfig,recipients:string[],vol
  const gib=(bytes:number)=>(bytes/1073741824).toFixed(2);
  try{const delivery=await transport.sendMail({from:c.senderName?{name:c.senderName,address:c.from}:c.from,to:safe,subject:`[Quorivio] DISK SPACE ALERT: ${label} at ${percent.toFixed(1)}%`,text:`Quorivio detected that ${label} is ${percent.toFixed(1)}% full (threshold: 90%).\nUsed: ${gib(usedBytes)} GiB of ${gib(totalBytes)} GiB.\n\nPlease check free disk space and storage provisioning promptly. The warning is re-armed after utilization falls to 85% or below.\n`});if(delivery.rejected?.length||!delivery.accepted?.length)throw Error('disk_alert_delivery_not_accepted')}finally{transport.close()}
 }
+
+/** Registration requests are sent to all approved platform administrators. */
+export async function sendRegistrationReviewEmail(c:SmtpConfig,recipients:string[],email:string,backend:'local'|'ldap'){
+ if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)||!recipients.length)return;
+ const {default:mailer}=await import('nodemailer');
+ const transport=mailer.createTransport({host:c.host,port:c.port,secure:c.secure,requireTLS:!c.secure,auth:{user:c.user,pass:c.password},tls:{rejectUnauthorized:true},connectionTimeout:10000,socketTimeout:15000});
+ try{await transport.sendMail({from:c.senderName?{name:c.senderName,address:c.from}:c.from,to:recipients,subject:'[Quorivio] Nuova richiesta di registrazione',text:`L'utente ${email} ha richiesto accesso con backend ${backend.toUpperCase()}. L'account resta disabilitato finché un amministratore non lo approva nella sezione Utenti.`})}finally{transport.close()}
+}

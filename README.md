@@ -1,3 +1,5 @@
+> **RC269 — Authentication and session management:** automatic expired-login redirect, safe 12-hour cleanup, ownership transfer, opt-in LDAP/LDAPS and sidebar/phone-answer fixes. [RC269 notes](docs/RC_CYCLE269_LDAP_OWNERSHIP_HOUSEKEEPING.en.md).
+
 > **RC267 — Node CI hotfix:** fixes shell exit 126 in the RC266 early preflight and verifies its actual test runner invocation. All RC266 docking/resize and RC265 full-bleed import features preserved. [`RC267 notes`](docs/RC_CYCLE267_CI_NODE_RUNNER_CONTINUATION.en.md).
 
 > **RC266 — Participant CI hotfix:** align legacy RC173/RC227 background assertion with RC265 full-bleed stage; no runtime changes. [`RC266 notes`](docs/RC_CYCLE266_PARTICIPANT_BACKGROUND_CI_FIX.en.md). **Editor update:** floating panels now dock to viewport edges and support pointer/keyboard resizing. Docking also respects 70–120% global UI zoom.
@@ -209,3 +211,8 @@ On a push to `main`, the message controls which checks run:
 
 Manual `workflow_dispatch` with `rc_acceptance_suite=true` never publishes, even if a publish checkbox was previously selected. Manual `publish_image` remains separate. PRs, non-main pushes and incomplete checks cannot trigger publication. Configure `DOCKERHUB_USERNAME` (variable) and `DOCKERHUB_TOKEN` (secret) and any desired required reviewers on the `production` environment.
 **RC221:** choose **visual-fidelity image slides** or **partially editable elements** before PDF/PPTX import. Native PDF text and extractable raster images use the isolated worker. Presenter result widgets now offer private true-answer highlighting and per-text typography. See `docs/RC_CYCLE221_RESULTS_GRADING_AND_PDF_IMPORT.en.md`.
+
+
+## RC270 full-instance backup and directory governance
+
+Platform administrators can download PostgreSQL + persistent assets as a full `.tar.gz` archive or schedule periodic backups to POSIX/NFS, S3-compatible storage, or HTTPS WebDAV. Enable backend mounts through Helm/Kubernetes wizard and edit the destination under server settings. LDAP self-registration requires a successful directory bind and remains pending until approval; the admin user panel supports directory lookup and assignment of a Quorivio role. Operational audit retention is configurable under server settings. Results pie percentages/option numbers and color-aware slices, plus optional bar hit gradients, are set in *Format widget*. See `docs/RC_CYCLE270_FULL_BACKUP_LDAP_AUDIT_RESULTS.it.md` for constraints and restore instructions.
