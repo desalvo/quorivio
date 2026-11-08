@@ -1,3 +1,5 @@
+> **RC266 — Participant CI hotfix:** align legacy RC173/RC227 background assertion with RC265 full-bleed stage; no runtime changes. [`RC266 notes`](docs/RC_CYCLE266_PARTICIPANT_BACKGROUND_CI_FIX.en.md). **Editor update:** floating panels now dock to viewport edges and support pointer/keyboard resizing. Docking also respects 70–120% global UI zoom.
+
 > **RC265 — PDF/PPTX full canvas:** import as pictures with `cover` default, `contain` or forced `fill`; hide inherited title/footer/page number by default; real page thumbnails. [`RC265 notes`](docs/RC_CYCLE265_PDF_FULL_BLEED_IMPORT.en.md).
 
 > **RC264 — Pillow CI fix:** synthetic PDF staging regressions no longer require Pillow or Poppler before npm; production full PNG validation remains mandatory. See [`docs/RC_CYCLE264_PILLOW_CI_FIX.en.md`](docs/RC_CYCLE264_PILLOW_CI_FIX.en.md).

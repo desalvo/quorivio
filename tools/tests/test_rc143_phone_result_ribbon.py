@@ -8,7 +8,7 @@ DOMAIN=(ROOT/'apps/api/src/domain.ts').read_text()
 
 class RC143PhoneResultsRibbon(unittest.TestCase):
  def test_ribbon_close_is_visible_and_persisted_selection(self):
-  for marker in ('aria-label="Chiudi Formato widget"','setRibbonDismissed(true)','resize.observe(panel.current)',
+  for marker in ('aria-label="Chiudi Formato widget"','setRibbonDismissed(true)','new ResizeObserver(constrain)','observer?.observe(panel.current)',
                  'flex-wrap:wrap!important;align-content:flex-start!important','overflow-x:hidden!important;overflow-y:auto!important'):
    self.assertIn(marker,MAIN+CSS)
  def test_cloud_top_five_are_configurable_and_wrappable(self):

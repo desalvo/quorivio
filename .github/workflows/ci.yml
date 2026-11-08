@@ -299,6 +299,14 @@ jobs:
       # authenticated Chromium/PostgreSQL tests must expand the real summary.
       - name: RC236 page thumbnail browser disclosure compatibility before npm
         run: python3 -m unittest tools.tests.test_rc236_page_menu_disclosures -q
+      # RC266: guard the correct participant canvas background composition before
+      # reaching historical RC227, including inherited scheme suppression.
+      - name: RC266 participant stage background and legacy assertion compatibility before npm
+        run: |
+          node --experimental-strip-types --test \
+            apps/web/test/rc173-public-slide-fidelity.test.ts \
+            apps/web/test/rc266-participant-background-legacy-contract.test.ts
+            apps/web/test/rc266-floating-window-docking.test.ts
       # RC227: accessible compact master background chooser and responsive
       # participant rotation, preserving explicit manual screen mode selection.
       - name: RC227 schema backgrounds and mobile participant mode before npm
@@ -1672,7 +1680,8 @@ jobs:
           python3 tools/verify_rc_cycle262_inventory.py --historical
           python3 tools/verify_rc_cycle263_inventory.py --historical
           python3 tools/verify_rc_cycle264_inventory.py --historical
-          python3 tools/verify_rc_cycle265_inventory.py
+          python3 tools/verify_rc_cycle265_inventory.py --historical
+          python3 tools/verify_rc_cycle266_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

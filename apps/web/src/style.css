@@ -3411,3 +3411,31 @@ html,body,#root,.app{min-height:calc(100dvh / var(--quorivio-ui-scale))}
 
 .page-editor-preview-real-image{position:absolute;inset:0;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:cover;display:block;}
 .page-editor-preview-widget:has(>.page-editor-preview-real-image){border:0!important;padding:0!important;background:none!important;}
+
+/* RC266: floating palettes are dockable along the real viewport edges.
+ * The React position clamp keeps the title bar reachable even when a large
+ * window is mostly off-screen. CSS custom dimensions supersede the legacy
+ * hard-coded !important widths (including narrow-screen overrides). */
+body .editor-floating-panel.widget-selection-palette{
+ width:var(--editor-floating-width,min(860px,calc(100vw - 16px)))!important;
+ height:var(--editor-floating-height,auto)!important;
+ min-width:min(320px,calc(100vw - 16px))!important;
+ min-height:0!important;
+}
+.editor-ux-v2 .editor-context-drawer.editor-floating-panel{
+ width:var(--editor-floating-width,min(420px,calc(100vw - 16px)))!important;
+ height:var(--editor-floating-height,auto)!important;
+ min-width:min(280px,calc(100vw - 16px))!important;
+ min-height:0!important;
+}
+.editor-floating-panel{isolation:isolate}
+.editor-floating-panel>.editor-floating-resize-handle{
+ position:absolute!important;right:1px!important;bottom:1px!important;left:auto!important;top:auto!important;
+ box-sizing:border-box!important;display:block!important;width:28px!important;height:28px!important;min-width:28px!important;min-height:28px!important;
+ padding:0!important;margin:0!important;border:0!important;border-radius:0 0 8px 0!important;
+ background:linear-gradient(135deg,transparent 49%,#c4f3fc 50%,#c4f3fc 56%,transparent 57%,transparent 68%,#c4f3fc 69%,#c4f3fc 76%,transparent 77%)!important;
+ opacity:.9!important;cursor:nwse-resize!important;touch-action:none!important;z-index:10!important;
+}
+.editor-floating-panel>.editor-floating-resize-handle:hover{background-color:#23658c!important}
+.editor-floating-panel>.editor-floating-resize-handle:focus-visible{outline:3px solid #fbcf58!important;outline-offset:-3px!important}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-groups{min-height:0!important;overflow-y:auto!important}

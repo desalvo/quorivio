@@ -1,3 +1,7 @@
+# Quorivio 0.1.0-dev — RC266 — Participant canvas legacy CI hotfix
+
+**RC266:** Fix historical RC173 test and add pre-RC227 CI guard for the RC265 participant stage background spread; preserve accessible reading and imported-image suppression. The committed RC265 full CI [42506410487](https://github.com/desalvo/quorivio/actions/runs/42506410487) failed on this obsolete assertion. No runtime, Kubernetes or Docker changes. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; RC266 full CI pending; no commit/push/tag. `docs/RC_CYCLE266_PARTICIPANT_BACKGROUND_CI_FIX.en.md`. **Additional RC266 runtime fix:** allow floating format, page and widget-properties panels to dock at viewport edges with a reachable title strip, and resize them with an accessible pointer/keyboard corner grip. Real Chromium desktop/mobile CSS regression and early CI preflight added. Kubernetes/database/converter unchanged.
+
 # Quorivio 0.1.0-dev — RC265 — Full-canvas raster PDF/PPTX import
 
 **RC265:** Imported PDF/PPTX image pages now support `cover`, `contain` and forced `fill`, opt-out inherited scheme/title/footer/page number suppression, genuine private page backgrounds, and real page thumbnails. RC264 full CI green [42498365156](https://github.com/desalvo/quorivio/actions/runs/42498365156), manual app/converter Docker publication succeeded; full RC265 CI pending. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag. `docs/RC_CYCLE265_PDF_FULL_BLEED_IMPORT.en.md`.

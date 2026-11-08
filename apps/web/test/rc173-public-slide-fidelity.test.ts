@@ -26,7 +26,11 @@ test('RC173 result widgets and their exact unlabelled background fills leave no 
 
 test('RC173 participant page paints the authored background once (stage only), not on the page wrapper',()=>{
  assert.match(participant,/style=\{\{backgroundColor:"transparent",backgroundImage:"none"\}\}/);
- assert.match(participant,/:slideBackgroundCss\(entry\.activity\.page_design/);
+ // RC265: stage backgrounds are composed with optional phone geometry and
+ // an explicit imported full-canvas background; the former bare ternary
+ // branch is no longer present. The authored image still paints on stage only.
+ assert.match(participant,/\.\.\.slideBackgroundCss\(entry\.activity\.page_design,entry\.theme,/);
+ assert.equal((participant.match(/slideBackgroundCss\(entry\.activity\.page_design/g)||[]).length,1,'participant stage must paint its authored background exactly once');
  assert.doesNotMatch(participant,/participant-live-view" style=\{window\.matchMedia/);
  assert.match(css,/main\.participant-live-view\{background-image:none!important;background-color:transparent!important\}/);
 });

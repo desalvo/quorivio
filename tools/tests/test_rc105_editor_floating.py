@@ -19,8 +19,8 @@ class FloatingEditorContract(unittest.TestCase):
         self.assertIn("closest('.palette-ribbon-head,.editor-drawer-heading')",TSX)
         self.assertIn("closest('button,input,textarea,select,a,[contenteditable=true]')",TSX)
         self.assertIn('e.currentTarget.setPointerCapture(e.pointerId)',TSX)
-        self.assertIn('window.innerWidth-width-8',TSX)
-        self.assertIn('window.innerHeight-height-8',TSX)
+        self.assertIn('boundFloatingPosition(',TSX)
+        self.assertIn('editor-floating-resize-handle',TSX)
     def test_selection_only_resize_and_absolute_edges(self):
         self.assertRegex(CSS,re.compile(r'\.widget-canvas-item\[data-selected="true"\] > \.widget-resize-edge'))
         self.assertIn('position:absolute!important;display:none!important;visibility:hidden!important;',CSS)

@@ -42,6 +42,7 @@ import {startsWidgetSelectionOnPointerDown} from './editor-context-input';
 import {activateRehearsalDialog} from './rehearsal-dialog';
 import {questionModeOptions,invalidPageWidgetReason} from './editor-save-safety';
 import {contextMenuCoordinates,floatingWidgetMenuPosition} from './editor-context-menu';
+import {boundFloatingPosition,boundFloatingSize,floatingLogicalViewport} from './editor-floating-geometry';
 import {thumbnailMenuPosition} from './thumbnail-menu-layout';
 import {WidgetShapeOutline} from './widget-shape-outline';
 import {WidgetGraphic} from './widget-graphic';
@@ -68,40 +69,65 @@ import {movePageId} from './page-order';
 import {presenterPageIndex,presenterAdjacentPage,presenterKeyboardDirection,presenterVisiblePages} from './presenter-navigation';
 import {commitAndReconcilePageOrder} from './page-order-recovery';
 import React,{useEffect,useState,useRef} from 'react';import{createPortal}from'react-dom';import{createRoot}from'react-dom/client';import{ArrowRight,BarChart3,Download,ExternalLink,LogOut,Play,Plus,Radio,ShieldCheck,Square,Users,Wifi,Type,Image as ImageIcon,Clock3,MessageCircle,FileText,Minus,MoreVertical,Settings2,Undo2,Redo2,Save,Maximize2,Star,Smile,StickyNote,UserCircle,Video,QrCode,Timer,MessageSquareText,BadgeCheck,Gauge,Heading1,PanelBottom,Presentation,BarChartHorizontal,FileQuestion,Vote,Hash,BookImage,Bold as BoldIcon,Italic as ItalicIcon,Underline as UnderlineIcon,Strikethrough as StrikethroughIcon,AlignLeft,AlignCenter,AlignRight,PaintBucket,Palette as PaletteIcon,SlidersHorizontal,X,MoveHorizontal,MoveVertical,Scissors,Copy,ClipboardPaste,Info}from'lucide-react';import './style.css';
-// Editor windows live outside the slide flow. Only their title bars initiate a drag:
-// inputs and typography controls keep their focus and text selections.
+// RC266: title-bar docking stays reachable at the bottom and right of the
+// editor; a separate corner handle resizes format and widget properties windows.
 function EditorFloatingWindow({children,className,ariaLabel,role='region',placement='properties',portal=false,onMouseDownCapture}:{children:React.ReactNode;className:string;ariaLabel:string;role?:'toolbar'|'region';placement?:'palette'|'properties'|'page';portal?:boolean;onMouseDownCapture?:React.MouseEventHandler<HTMLDivElement>}){
  const panel=useRef<HTMLDivElement|null>(null);
- const pointer=useRef<{id:number;startX:number;startY:number;left:number;top:number}|null>(null);
+ // The studio applies CSS zoom on <html>: fixed offsets are in logical
+ // pixels, but window.innerWidth/Height remain physical. Root clientWidth can
+ // also be physical with overflow rules, so divide by the computed CSS zoom.
+ const viewport=()=>floatingLogicalViewport(window.innerWidth,window.innerHeight,Number.parseFloat(getComputedStyle(document.documentElement).zoom));
+ const pointer=useRef<{id:number;kind:'move'|'resize';startX:number;startY:number;left:number;top:number;width:number;height:number}|null>(null);
+ const [size,setSize]=useState<{width:number;height:number}|null>(null);
  const [point,setPoint]=useState<{left:number;top:number}>(()=>{
-  const vw=typeof window==='undefined'?1440:window.innerWidth, vh=typeof window==='undefined'?900:window.innerHeight;
+  const vp=typeof document==='undefined'?{width:1440,height:900}:viewport();
+  const vw=vp.width,vh=vp.height;
   if(placement==='palette')return {left:Math.max(12,Math.round((vw-Math.min(850,vw-24))/2)),top:Math.max(12,Math.round(vh-Math.min(190,vh/3)-22))};
   return {left:Math.max(12,vw-Math.min(440,vw-24)-28),top:Math.max(12,Math.min(110,vh/8))};
  });
  const bound=(left:number,top:number)=>{
-  const width=panel.current?.offsetWidth||Math.min(850,window.innerWidth-24);
-  const height=panel.current?.offsetHeight||180;
-  return {left:Math.max(8,Math.min(left,Math.max(8,window.innerWidth-width-8))),top:Math.max(8,Math.min(top,Math.max(8,window.innerHeight-height-8)))};
+  const vp=viewport();
+  return boundFloatingPosition(left,top,panel.current?.offsetWidth||Math.min(850,vp.width-24),panel.current?.offsetHeight||180,vp.width,vp.height);
  };
  useEffect(()=>{
-  const constrain=()=>setPoint(previous=>{const next=bound(previous.left,previous.top);return next.left===previous.left&&next.top===previous.top?previous:next});
+  const constrain=()=>{
+   setPoint(previous=>{const next=bound(previous.left,previous.top);return next.left===previous.left&&next.top===previous.top?previous:next});
+   const vp=viewport();
+   setSize(previous=>{if(!previous)return previous;const next=boundFloatingSize(previous.width,previous.height,vp.width,vp.height,placement);return previous.width===next.width&&previous.height===next.height?previous:next});
+  };
   constrain();window.addEventListener('resize',constrain);
-   const resize=new ResizeObserver(constrain);if(panel.current)resize.observe(panel.current);
-   return ()=>{window.removeEventListener('resize',constrain);resize.disconnect()};
- },[]);
+  const observer=typeof ResizeObserver==='undefined'?null:new ResizeObserver(constrain);
+  if(panel.current)observer?.observe(panel.current);
+  observer?.observe(document.documentElement); // react to global CSS zoom without a window resize
+  return ()=>{window.removeEventListener('resize',constrain);observer?.disconnect()};
+ },[placement]);
  const start=(e:React.PointerEvent<HTMLDivElement>)=>{
-  if(e.button!==0||!((e.target as HTMLElement).closest('.palette-ribbon-head,.editor-drawer-heading')))return;
-  if((e.target as HTMLElement).closest('button,input,textarea,select,a,[contenteditable=true]'))return;
-  pointer.current={id:e.pointerId,startX:e.clientX,startY:e.clientY,left:point.left,top:point.top};
+  if(e.button!==0)return;
+  const target=e.target as HTMLElement;
+  const resize=!!target.closest('.editor-floating-resize-handle');
+  if(!resize&&!target.closest('.palette-ribbon-head,.editor-drawer-heading'))return;
+  if(!resize&&target.closest('button,input,textarea,select,a,[contenteditable=true]'))return;
+  pointer.current={id:e.pointerId,kind:resize?'resize':'move',startX:e.clientX,startY:e.clientY,left:point.left,top:point.top,width:panel.current?.offsetWidth||360,height:panel.current?.offsetHeight||240};
   e.currentTarget.setPointerCapture(e.pointerId);
   e.preventDefault();
  };
  const move=(e:React.PointerEvent<HTMLDivElement>)=>{
   const drag=pointer.current;if(!drag||drag.id!==e.pointerId)return;
-  setPoint(bound(drag.left+e.clientX-drag.startX,drag.top+e.clientY-drag.startY));
+  const dx=e.clientX-drag.startX,dy=e.clientY-drag.startY;
+  if(drag.kind==='resize'){const vp=viewport();setSize(boundFloatingSize(drag.width+dx,drag.height+dy,vp.width,vp.height,placement));}
+  else setPoint(bound(drag.left+dx,drag.top+dy));
  };
- const stop=(e:React.PointerEvent<HTMLDivElement>)=>{if(pointer.current?.id===e.pointerId)pointer.current=null};
- const content=<div ref={panel} className={className+' editor-floating-panel'} data-floating-editor={placement} role={role} aria-label={ariaLabel} style={{left:point.left,top:point.top}} onMouseDownCapture={onMouseDownCapture} onKeyDownCapture={e=>{if((e.target as HTMLElement).closest('input,select,textarea,[contenteditable=true]'))e.stopPropagation()}} onPointerDown={start} onPointerMove={move} onPointerUp={stop} onPointerCancel={stop} onLostPointerCapture={stop}>{children}</div>;
+ const stop=(e:React.PointerEvent<HTMLDivElement>)=>{if(pointer.current?.id===e.pointerId){pointer.current=null;if(e.currentTarget.hasPointerCapture(e.pointerId))e.currentTarget.releasePointerCapture(e.pointerId)}};
+ const resizeWithKeyboard=(e:React.KeyboardEvent<HTMLButtonElement>)=>{
+  if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;
+  e.preventDefault();e.stopPropagation();
+  const step=e.shiftKey?48:16;
+  const base=size||{width:panel.current?.offsetWidth||360,height:panel.current?.offsetHeight||240};
+  const vp=viewport();
+  setSize(boundFloatingSize(base.width+(e.key==='ArrowRight'?step:e.key==='ArrowLeft'?-step:0),base.height+(e.key==='ArrowDown'?step:e.key==='ArrowUp'?-step:0),vp.width,vp.height,placement));
+ };
+ const customSize=size?({'--editor-floating-width':size.width+'px','--editor-floating-height':size.height+'px'} as React.CSSProperties):{};
+ const content=<div ref={panel} className={className+' editor-floating-panel'} data-floating-editor={placement} role={role} aria-label={ariaLabel} style={{left:point.left,top:point.top,...customSize}} onMouseDownCapture={onMouseDownCapture} onKeyDownCapture={e=>{if((e.target as HTMLElement).closest('input,select,textarea,[contenteditable=true]'))e.stopPropagation()}} onPointerDown={start} onPointerMove={move} onPointerUp={stop} onPointerCancel={stop} onLostPointerCapture={stop}>{children}<button type="button" className="editor-floating-resize-handle" aria-label={'Ridimensiona '+ariaLabel+' (trascina o usa le frecce)'} title="Ridimensiona: trascina l’angolo o usa le frecce; Maiusc per passi più grandi" onKeyDown={resizeWithKeyboard} /></div>;
  return portal?createPortal(placement==='palette'?content:<div className="editor-ux-v2 editor-floating-scope">{content}</div>,document.body):content;
 }
 

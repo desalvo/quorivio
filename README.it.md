@@ -1,3 +1,5 @@
+> **RC266 — Hotfix CI partecipante:** adeguato il contratto RC173/RC227 al canvas full-bleed RC265, senza modificare il runtime. [`Note RC266`](docs/RC_CYCLE266_PARTICIPANT_BACKGROUND_CI_FIX.it.md). **Aggiornamento editor:** finestre flottanti spostabili fino ai bordi e ridimensionabili (mouse/touch/tastiera). Corrette anche le coordinate con zoom UI al 70–120%.
+
 > **RC265 — PDF/PPTX full canvas:** importazione come immagini con `cover` predefinito, `contain` o `fill` forzato; schema, titoli, footer e numero pagina nascosti di default; miniature reali. [`Documentazione RC265`](docs/RC_CYCLE265_PDF_FULL_BLEED_IMPORT.it.md).
 
 > **RC264 — Correzione CI Pillow:** la suite pre-npm non richiede Pillow né Poppler per i test sintetici di pubblicazione PDF; la verifica dei PNG reali rimane obbligatoria. Vedi [`docs/RC_CYCLE264_PILLOW_CI_FIX.it.md`](docs/RC_CYCLE264_PILLOW_CI_FIX.it.md).
