@@ -37,7 +37,7 @@ class MobileBackgroundFontParity(unittest.TestCase):
 
     def test_editor_projection_arial_heading_and_rich_text_parity(self):
         typography = read('apps/web/src/widget-appearance.ts')
-        self.assertIn("fontFamily:style?.fontFamily||'Arial'", typography)
+        self.assertIn("fontFamily:safeWidgetFontFamily(style?.fontFamily)", typography)
         self.assertIn('font-family:inherit!important;font-weight:inherit!important;', self.css)
         self.assertIn(' :is(h1,h2,h3,h4){font-family:inherit;}', self.css)
         self.assertIn("...widgetTypographyStyle(w.kind==='title'?widgetDisplay(w,{pageTitle,masterTitleStyle}).style:widgetTextDefaults(w.kind,w.style))", self.ui)

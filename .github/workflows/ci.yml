@@ -323,6 +323,19 @@ jobs:
         run: |
           python3 -m unittest tools.tests.test_rc241_widget_editor_contract -q
           node --experimental-strip-types --test apps/web/test/rc241-editable-widget-numbers.test.ts apps/web/test/rc241-ui-feature-contract.test.ts
+      # RC256: historical Arial fixtures must track the validated font allowlist,
+      # not the obsolete raw style?.fontFamily||'Arial' source literal. Run all
+      # previous font gates AND runtime Node CSS serialization before RC242/195.
+      - name: RC256 reconciled historical Arial widget and master tests before npm
+        run: |
+          python3 -m unittest -q \
+            tools.tests.test_rc256_historical_arial_compat \
+            tools.tests.test_rc242_arial_master_zoom \
+            tools.tests.test_rc194_question_typography \
+            tools.tests.test_rc195_master_typography_ci \
+            tools.tests.test_rc161_master_background_graphics \
+            tools.tests.test_rc145_mobile_background_font
+          node --experimental-strip-types --test apps/web/test/rc254-all-widget-schema-fonts.test.ts
       # RC242: Arial on widget text, compact master commands, persistent global zoom.
       - name: RC242 Arial and app-wide zoom contract before npm
         run: |
@@ -1572,7 +1585,8 @@ jobs:
           python3 tools/verify_rc_cycle252_inventory.py --historical
           python3 tools/verify_rc_cycle253_inventory.py --historical
           python3 tools/verify_rc_cycle254_inventory.py --historical
-          python3 tools/verify_rc_cycle255_inventory.py
+          python3 tools/verify_rc_cycle255_inventory.py --historical
+          python3 tools/verify_rc_cycle256_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

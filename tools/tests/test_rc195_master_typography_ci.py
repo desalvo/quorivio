@@ -22,11 +22,11 @@ class RC195MasterTypographyCI(unittest.TestCase):
   self.assertIn("DEFAULT_TITLE_STYLE={fontFamily:'Arial'",MASTER)
   self.assertIn("DEFAULT_FOOTER_STYLE={fontFamily:'Arial'",MASTER)
   self.assertIn('...DEFAULT_TITLE_STYLE,...(w.titleUseMaster!==false?context.masterTitleStyle:{}),...w.style',MASTER)
-  self.assertIn("fontFamily:style?.fontFamily||'Arial'",APPEARANCE)
+  self.assertIn("fontFamily:safeWidgetFontFamily(style?.fontFamily)",APPEARANCE)
   self.assertIn('widgetTextDefaults(widget.kind,widget.style)',STAGE)
   self.assertIn("widget.kind==='title'?widgetDisplay(widget,context).style",STAGE)
   self.assertIn('widgetTextDefaults(w.kind,w.style)',UI)
-  self.assertIn("answerFontFamily:style?.answerFontFamily||style?.fontFamily||'Arial'",DEFAULTS)
+  self.assertIn("answerFontFamily:safeWidgetFontFamily(style?.answerFontFamily,safeWidgetFontFamily(style?.fontFamily))",DEFAULTS)
 
  def test_historical_presentation_contracts_follow_independent_page_routing(self):
   ui=UI;typography=STAGE
@@ -60,8 +60,15 @@ class RC195MasterTypographyCI(unittest.TestCase):
   self.assertNotIn("DEFAULT_TITLE_STYLE={fontFamily:'Arial'",damaged)
   damaged=MASTER.replace('...w.style}:w.style||{}','}:w.style||{}')
   self.assertNotIn('...w.style}:w.style||{}',damaged)
-  damaged=APPEARANCE.replace("fontFamily:style?.fontFamily||'Arial'","fontFamily:'Arial'")
-  self.assertNotIn("fontFamily:style?.fontFamily||'Arial'",damaged)
+  original="fontFamily:safeWidgetFontFamily(style?.fontFamily)"
+  self.assertIn(original,APPEARANCE)
+  damaged=APPEARANCE.replace(original,"fontFamily:'Arial'")
+  self.assertNotIn(original,damaged)
+  # A raw fallback no longer protects imported `fontFamily:'undefined'`.
+  self.assertNotIn("fontFamily:style?.fontFamily||'Arial'",APPEARANCE)
+  answer="answerFontFamily:safeWidgetFontFamily(style?.answerFontFamily,safeWidgetFontFamily(style?.fontFamily))"
+  self.assertIn(answer,DEFAULTS)
+  self.assertNotIn(answer,DEFAULTS.replace(answer,"answerFontFamily:style?.answerFontFamily||style?.fontFamily||'Arial'"))
   damaged=STAGE.replace("widget.kind==='title'?widgetDisplay(widget,context).style",'widget.style')
   self.assertNotIn("widget.kind==='title'?widgetDisplay(widget,context).style",damaged)
 

@@ -1,0 +1,7 @@
+# RC256 — Reconcile historical Arial checks with the safe font renderer
+
+RC255 full CI [https://github.com/desalvo/quorivio/actions/runs/42478213918](https://github.com/desalvo/quorivio/actions/runs/42478213918) on commit `22ced8d3f9bd09e228fa63e1034d7f57837867de` failed at **Production quality gate**, step “RC242 Arial and app-wide zoom contract before npm”. The historical test asserted the obsolete source literal `fontFamily:style?.fontFamily||'Arial'`, which RC254 intentionally replaced with `safeWidgetFontFamily(...)` to reject literal `undefined` and invalid CSS font families.
+
+Updated historical RC145, RC161, RC194, RC195 and RC242 tests, including footer page-number and independent answer-font inheritance. They now require the **centralized validated font contract** and retain negative-mutation checks against unsafe fallback. A new RC256 early gate runs these Python suites and RC254 native Node tests on 20 widget kinds, validating default Arial, custom faces and malformed imported values. Production application, style and domain files are unchanged; only test, CI and documentation source is updated.
+
+The RC255 checksum inventory is byte-identical, a complete RC256 SHA-256 inventory is added. **85.25%** (43 accepted/17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag or Docker publication. RC256 GitHub full CI remains to be run after the maintainer commit.

@@ -14,8 +14,9 @@ class RC242ArialMasterZoom(unittest.TestCase):
     def test_widget_font_defaults_are_arial_without_mutating_custom_faces(self):
         typography=(ROOT/'apps/web/src/widget-typography-defaults.ts').read_text()
         appearance=(ROOT/'apps/web/src/widget-appearance.ts').read_text()
-        self.assertIn("fontFamily:style?.fontFamily||'Arial'",typography)
-        self.assertIn("fontFamily:style?.fontFamily||'Arial'",appearance)
+        self.assertIn("fontFamily:safeWidgetFontFamily(style?.fontFamily)",typography)
+        self.assertIn("answerFontFamily:safeWidgetFontFamily(style?.answerFontFamily,safeWidgetFontFamily(style?.fontFamily))",typography)
+        self.assertIn("fontFamily:safeWidgetFontFamily(style?.fontFamily)",appearance)
         self.assertIn('font-family:inherit;',self.css)
         self.assertIn('RC242: the application theme',self.css)
         self.assertIn('initialWidgetTextStyle(kind)',self.main)

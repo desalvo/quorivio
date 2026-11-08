@@ -16,7 +16,7 @@ class RC194QuestionTypography(unittest.TestCase):
     def test_question_default_hierarchy_is_same_everywhere(self):
         self.assertIn('QUESTION_TITLE_SIZE=22',DEFAULTS)
         self.assertIn('QUESTION_ANSWER_SIZE=16',DEFAULTS)
-        self.assertIn("fontFamily:style?.fontFamily||'Arial'",DEFAULTS)
+        self.assertIn("fontFamily:safeWidgetFontFamily(style?.fontFamily)",DEFAULTS)
         self.assertIn('bold:style?.bold??true',DEFAULTS)
         self.assertIn('answerBold:style?.answerBold??false',DEFAULTS)
         self.assertIn('widgetTextDefaults(widget.kind,widget.style)',STAGE)
@@ -24,7 +24,7 @@ class RC194QuestionTypography(unittest.TestCase):
 
     def test_existing_user_styles_are_not_reset(self):
         self.assertIn('fontSize:style?.fontSize??QUESTION_TITLE_SIZE',DEFAULTS)
-        self.assertIn("answerFontFamily:style?.answerFontFamily||style?.fontFamily||'Arial'",DEFAULTS)
+        self.assertIn("answerFontFamily:safeWidgetFontFamily(style?.answerFontFamily,safeWidgetFontFamily(style?.fontFamily))",DEFAULTS)
 
     def test_all_widget_faces_reach_answers_and_subquestions(self):
         self.assertIn('answerFontFamily:change.fontFamily',MARKS)
