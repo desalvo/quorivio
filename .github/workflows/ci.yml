@@ -299,6 +299,15 @@ jobs:
       # authenticated Chromium/PostgreSQL tests must expand the real summary.
       - name: RC236 page thumbnail browser disclosure compatibility before npm
         run: python3 -m unittest tools.tests.test_rc236_page_menu_disclosures -q
+      # RC270: backup archive, audit and LDAP approval, including wizard mount
+      # checks; keep these tests in CI so new functionality cannot regress.
+      - name: RC270 full backup, LDAP audit, and Kubernetes wizard before npm
+        run: |
+          node --experimental-strip-types --test apps/api/test/rc270-backup-audit.test.ts
+          python3 -m unittest tools.test_rc270_wizard_backup -q
+      # RC271: guard against stale current-inventory promotion of RC270 docs.
+      - name: RC271 metadata and current inventory promotion before npm
+        run: python3 -m unittest tools.tests.test_rc271_release_promotion -q
       # RC269: auth redirect, ownership transfer, LDAP TLS, ephemeral space
       # reclamation and right-click-only sidebar before npm dependencies.
       - name: RC269 auth LDAP ownership housekeeping and sidebar before npm
@@ -1698,7 +1707,8 @@ jobs:
           python3 tools/verify_rc_cycle266_inventory.py --historical
           python3 tools/verify_rc_cycle267_inventory.py --historical
           python3 tools/verify_rc_cycle268_inventory.py --historical
-          python3 tools/verify_rc_cycle269_inventory.py
+          python3 tools/verify_rc_cycle269_inventory.py --historical
+          python3 tools/verify_rc_cycle271_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

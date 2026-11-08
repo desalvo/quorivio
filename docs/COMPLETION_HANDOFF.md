@@ -1,3 +1,11 @@
+# Quorivio 0.1.0-dev — RC271 — Current inventory and CI preflight hotfix
+
+**RC271:** repair RC270 full CI [42535872914](https://github.com/desalvo/quorivio/actions/runs/42535872914), blocked by RC269 inventory still active when RC270 headers were published. Promote RC269 inventory to immutable historical, create RC271 source/ZIP SHA-256 manifest and current verifier; add backup/audit and wizard RC270 regressions to CI. No runtime behavior changed. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; new GitHub CI and real restore remain pending; no assistant commit/push/tag. `docs/RC_CYCLE271_INVENTORY_CI_PROMOTION.en.md`.
+
+# Quorivio 0.1.0-dev — RC270 — Full backup, LDAP approval, audit and result charts
+
+**RC270:** cumulative PostgreSQL and persistent-asset full backup with admin download, periodic POSIX/NFS/S3/WebDAV destinations, Helm/wizard storage wiring, pending LDAP self-registration and admin directory lookup, operational audit and result-chart formatting. CI gate broke on unpromoted inventory; see RC271. **85.25%** baseline unchanged; `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
 # Quorivio 0.1.0-dev — RC269 — LDAP, ownership and housekeeping handoff
 
 **RC269:** RC268 GitHub full CI [42525045176](https://github.com/desalvo/quorivio/actions/runs/42525045176) and manual image publish [42527052932](https://github.com/desalvo/quorivio/actions/runs/42527052932) green. Add automatic presenter reauthentication redirect, 12-hour fail-closed cleanup, transactional primary ownership transfer with audit, LDAP/LDAPS TLS service/user binds and explicit account linking, RWO-safe wizard, contextual sidebar right-click/long-press and readable smartphone answer text. LDAP directory end-to-end and cluster still to be validated. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; RC269 full CI pending; no commit/push/tag. `docs/RC_CYCLE269_LDAP_OWNERSHIP_HOUSEKEEPING.en.md`.

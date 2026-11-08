@@ -1,3 +1,7 @@
+# Quorivio 0.1.0-dev — RC271 — Hotfix CI inventario e copertura test RC270
+
+**RC271:** risolto fallimento full CI RC270 [42535872914](https://github.com/desalvo/quorivio/actions/runs/42535872914) dovuto a inventario corrente rimasto a RC269. RC269 promosso a storico immutabile, inventario SHA-256 RC271 corrente, test API backup/audit e wizard RC270 inclusi nel preflight CI. Invariate le funzionalità della RC270; **85,25%** (43 gate accettati/17 parziali), `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nuova full CI e ripristino reale da verificare; nessun commit/push/tag dell’assistente. `docs/RC_CYCLE271_INVENTORY_CI_PROMOTION.it.md`.
+
 # Quorivio 0.1.0-dev — RC270 — Backup di istanza, audit, LDAP e grafici risultati
 
 **RC270** introduce archivio PostgreSQL+asset, download browser, scheduler e target POSIX/NFS/S3/WebDAV configurabili via Helm/wizard/admin, autenticazione LDAP con auto-registrazione pending e creazione admin dalla directory, notifiche SMTP, audit con retention e ricerca, grafici risultati con numero/percentuale torta, colori opzioni e gradienti barre. Scratch `/tmp` per API in Kubernetes e client `pg_dump` PostgreSQL 18. **85,25%** baseline precedente (43 accettati/17 parziali, senza nuova certificazione); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; CI completa e restore reale ancora da eseguire; nessun commit/push/tag. Dettagli: `docs/RC_CYCLE270_FULL_BACKUP_LDAP_AUDIT_RESULTS.it.md`.

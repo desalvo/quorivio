@@ -1,3 +1,11 @@
+# Quorivio 0.1.0-dev — RC271 — Metadati CI e inventario corrente
+
+**RC271:** sistemato preflight della full CI RC270 [42535872914](https://github.com/desalvo/quorivio/actions/runs/42535872914): inventario RC269 storico immutabile, nuovo inventario RC271 corrente, test nuovi API backup/audit e wizard eseguiti prima di npm. Nessun cambiamento al runtime RC270. **85,25%** (43 gate accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; full CI di RC271 e collaudo operativo pendenti. Nessun commit/push/tag eseguito dall’assistente. `docs/RC_CYCLE271_INVENTORY_CI_PROMOTION.it.md`.
+
+# Quorivio 0.1.0-dev — RC270 — Backup, LDAP, audit e risultati
+
+**RC270:** backup integrale PostgreSQL/asset, destinazioni S3/NFS/POSIX/WebDAV, LDAP approval, audit con retention e miglioramenti grafici risultati. La CI della RC270 non ha raggiunto i nuovi test a causa dell’inventario RC269 non promosso. **85,25%**; `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
 # Quorivio 0.1.0-dev — RC269 — Login, LDAP, pulizia spazio e ownership
 
 **RC269:** CI completa RC268 [42525045176](https://github.com/desalvo/quorivio/actions/runs/42525045176) e pubblicazione Docker [42527052932](https://github.com/desalvo/quorivio/actions/runs/42527052932) verdi. Reindirizzamento automatico al login su autenticazione scaduta, pulizia ogni 12 ore di conversioni vecchie e allegati orfani non referenziati, trasferimento di proprietà auditato, backend LDAP/LDAPS TLS opzionale e Secret Kubernetes; menu sidebar solo con clic destro/pressione prolungata; opzioni smartphone leggibili. **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; full CI RC269 e test LDAP reale pendenti. Nessun commit/push/tag. `docs/RC_CYCLE269_LDAP_OWNERSHIP_HOUSEKEEPING.it.md`.

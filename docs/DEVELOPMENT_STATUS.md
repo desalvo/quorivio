@@ -1,3 +1,11 @@
+# Quorivio 0.1.0-dev — RC271 — Fix release inventory promotion
+
+**RC271:** fix committed RC270 full CI [42535872914](https://github.com/desalvo/quorivio/actions/runs/42535872914) blocked by current inventory referencing RC269. Preserve immutable RC269 historical receipt and create RC271 current inventory + pre-npm regression tests for RC270 backup/audit and Kubernetes wizard. No RC270 runtime changes. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; full CI and storage restore validation pending; no assistant commit/push/tag. `docs/RC_CYCLE271_INVENTORY_CI_PROMOTION.en.md`.
+
+# Quorivio 0.1.0-dev — RC270 — Full backup, LDAP, audit and result charts
+
+**RC270:** PostgreSQL+assets full archive, download and scheduled POSIX/NFS/S3/WebDAV targets, LDAP approval, searchable audit retention and chart options. Its first full CI was blocked at inventory promotion, before new feature testing. **85.25%**; `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
 # Quorivio 0.1.0-dev — RC269 — Authentication, LDAP, housekeeping and ownership
 
 **RC269:** RC268 full CI [42525045176](https://github.com/desalvo/quorivio/actions/runs/42525045176) and Docker Hub publication [42527052932](https://github.com/desalvo/quorivio/actions/runs/42527052932) green. Auto-login redirect for expired bearer cookies, 12-hour safe stale conversion/orphan cleanup, audited primary owner transfer, opt-in LDAP/LDAPS TLS login/linking and Kubernetes Secret config; sidebar blank-area right-click only; readable mobile editor answers. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; RC269 full CI and live LDAP acceptance pending. No commit/push/tag. `docs/RC_CYCLE269_LDAP_OWNERSHIP_HOUSEKEEPING.en.md`.
