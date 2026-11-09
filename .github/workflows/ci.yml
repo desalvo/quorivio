@@ -342,6 +342,10 @@ jobs:
       # RC290: don't mistake a naturally auto-sized tab for a broken manually
       # resized window. Validate the browser capture drives the real keyboard-
       # accessible resize handle before checking unchanged outer dimensions.
+      # RC291: side-by-side preview exposes TWO legitimate Smartphone controls.
+      # Scope the device toggle and the preview-mode toggle independently.
+      - name: RC291 real side-by-side and smartphone preview screenshot preflight
+        run: python3 -m unittest tools.tests.test_rc291_rehearsal_smartphone_capture -q
       - name: RC290 real screenshot formatting-resize acceptance preflight
         run: python3 -m unittest tools.tests.test_rc290_manual_format_capture -q
       - name: RC287 answer borders, floating format tabs, gradient schema and navigation contracts before npm
@@ -1828,7 +1832,8 @@ jobs:
           python3 tools/verify_rc_cycle287_inventory.py --historical
           python3 tools/verify_rc_cycle288_inventory.py --historical
           python3 tools/verify_rc_cycle289_inventory.py --historical
-          python3 tools/verify_rc_cycle290_inventory.py
+          python3 tools/verify_rc_cycle290_inventory.py --historical
+          python3 tools/verify_rc_cycle291_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

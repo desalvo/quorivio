@@ -190,7 +190,24 @@ async def main():
             await dialog.get_by_role('button',name='Affiancate').click()
             await expect(dialog.locator('.rehearsal-mode-both')).to_be_visible(timeout=12000)
             await shot('rehearsal-side-by-side',editor)
-            await dialog.get_by_role('button',name='Smartphone').click()
+            # RC291: TWO different accessible 'Smartphone' buttons exist in
+            # side-by-side rehearsal. One changes the device of the participant
+            # pane, the other changes the entire preview mode. The unscoped
+            # locator is an accessibility strict-mode violation in real CI.
+            devices=dialog.get_by_role('group',name='Dispositivo partecipante')
+            device_phone=devices.get_by_role('button',name='Smartphone',exact=True)
+            await expect(device_phone).to_have_count(1,timeout=12000)
+            await expect(device_phone).to_be_enabled(timeout=12000)
+            await device_phone.click(timeout=12000)
+            await expect(device_phone).to_have_attribute('aria-pressed','true',timeout=12000)
+            await expect(dialog.locator('.rehearsal-mode-both .rehearsal-pane-phone')).to_be_visible(timeout=12000)
+            await shot('rehearsal-side-by-side-smartphone',editor)
+            modes=dialog.get_by_role('group',name='Modalità anteprima')
+            phone_mode=modes.get_by_role('button',name='Smartphone',exact=True)
+            await expect(phone_mode).to_have_count(1,timeout=12000)
+            await expect(phone_mode).to_be_enabled(timeout=12000)
+            await phone_mode.click(timeout=12000)
+            await expect(phone_mode).to_have_attribute('aria-pressed','true',timeout=12000)
             await expect(dialog.locator('.rehearsal-mode-mobile')).to_be_visible(timeout=12000)
             await shot('rehearsal-smartphone',editor)
             await dialog.get_by_role('button',name='Chiudi anteprima').click()

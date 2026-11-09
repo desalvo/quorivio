@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC291 — Real rehearsal Smartphone screenshot contract
+
+**RC291:** [Full CI 42674623251](https://github.com/desalvo/quorivio/actions/runs/42674623251) passed RC290 resizing and captured 15 real app screens, then stopped because the side-by-side rehearsal displays two independent Smartphone buttons (preview mode and participant device). Scoped both selectors to their respective accessible groups, captured both states and added strict regression checks plus bilingual catalog captions. [Details](RC_CYCLE291_REHEARSAL_SMARTPHONE_CI.en.md). No runtime changes; full downstream CI pending. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag.
+
+---
+
 # Quorivio 0.1.0-dev — RC290 — Real screenshot format-window resize acceptance
 
 **RC290:** [Full CI 42670034364](https://github.com/desalvo/quorivio/actions/runs/42670034364) advanced through PDF inspection but stopped in real screenshot capture after ten frames. The capture compared naturally auto-sized Format widget tabs without resizing; corrected to explicitly resize via the real keyboard-accessible handle, verify both dimensions increase, then check dimensions stay stable after changing tabs. Added fail-closed regression tests and an extra authenticated screenshot; no runtime changes. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag. Full CI pending.

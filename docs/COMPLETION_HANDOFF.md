@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC291 — Unambiguous smartphone rehearsal capture
+
+**RC291:** Scoped the real Chromium screenshot capture separately to the participant-device Smartphone toggle in side-by-side mode and the global Smartphone preview-mode toggle. Captures an additional real side-by-side mobile preview, verifies both pressed states and rejects ambiguous selectors. No runtime changes. [Details](RC_CYCLE291_REHEARSAL_SMARTPHONE_CI.en.md). **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag; full CI pending.
+
+---
+
 # Quorivio 0.1.0-dev — RC290 — Real post-resize format-tab acceptance
 
 **RC290:** Fixed false-positive live screenshot failure caused by comparing two auto-sized tabs without resizing. The browser now drives the real resize handle, proves both dimensions change, and checks persistence across the tab switch. Extra verified screenshot and negative regression checks; no runtime changes. [Details](RC_CYCLE290_FORMAT_WINDOW_CAPTURE_CI.en.md). **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag; full CI pending.

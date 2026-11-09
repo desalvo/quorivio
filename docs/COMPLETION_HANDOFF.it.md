@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC291 — Acquisizione Smartphone senza ambiguità
+
+**RC291:** Acquisizione Chromium corretta: «Smartphone» del dispositivo partecipante nell'anteprima affiancata e «Smartphone» della modalità generale sono controlli diversi. Nuova immagine reale dell'affiancata mobile, verifica degli stati selezionati e test negativi sui selettori ambigui; runtime invariato. [Dettagli](RC_CYCLE291_REHEARSAL_SMARTPHONE_CI.it.md). **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag; full CI in attesa.
+
+---
+
 # Quorivio 0.1.0-dev — RC290 — Prova del tab dopo resize reale
 
 **RC290:** Risolto il falso positivo dello screenshot browser che confrontava l’altezza automatica dei tab senza fare il resize. La procedura aziona il vero comando di ridimensionamento, verifica che larghezza e altezza crescano e controlla che restino stabili cambiando tab. Screenshot ulteriore e test negativi; runtime invariato. [Dettagli](RC_CYCLE290_FORMAT_WINDOW_CAPTURE_CI.it.md). **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag; full CI da confermare.

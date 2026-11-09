@@ -1,3 +1,5 @@
+**RC291:** Scoped both distinct Smartphone controls in the real presenter/participant rehearsal and added side-by-side mobile screenshot evidence. [RC291 notes](docs/RC_CYCLE291_REHEARSAL_SMARTPHONE_CI.en.md).
+
 **RC290:** Corrected genuine Chromium screenshot acceptance so it resizes Format widget before asserting size persistence across tabs. [RC290 notes](docs/RC_CYCLE290_FORMAT_WINDOW_CAPTURE_CI.en.md).
 
 **RC289:** Fixed the full-CI PDF gate provisioning order (PyMuPDF before early manual contracts); [RC289 notes](docs/RC_CYCLE289_PDF_INSPECTOR_CI.en.md).

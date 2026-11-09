@@ -1,8 +1,8 @@
 # Administrator guide
 
-**Quorivio 0.1.0-dev · Documentation build RC290 · 9 November 2026**
+**Quorivio 0.1.0-dev · Documentation build RC291 · 9 November 2026**
 
-Technical and operational manual for installation, configuration, identity management, backups, monitoring, audit logging, maintenance and disaster recovery. Procedures reflect the RC290 source and deployment charts; they do **not** certify a production environment. **Explanatory UI illustrations in earlier chapters are reconstructions**, labelled as such. When the CI-produced PDF includes the final gallery, it contains genuine screenshots of the disposable live application, verified against hashes and commit. Independent D5 editorial review remains required.
+Technical and operational manual for installation, configuration, identity management, backups, monitoring, audit logging, maintenance and disaster recovery. Procedures reflect the RC291 source and deployment charts; they do **not** certify a production environment. **Explanatory UI illustrations in earlier chapters are reconstructions**, labelled as such. When the CI-produced PDF includes the final gallery, it contains genuine screenshots of the disposable live application, verified against hashes and commit. Independent D5 editorial review remains required.
 
 ## 1. Architecture and responsibilities
 
@@ -455,7 +455,7 @@ A `.quo` file copies **one session**, not the whole instance. In the dashboard, 
 <figure><img src="../assets/manual-illustrations/workflow-local-quo-rc286.png" alt="CONCEPTUAL DIAGRAM — portable `.quo` versus full-instance backup."/><figcaption>CONCEPTUAL DIAGRAM — portable `.quo` versus full-instance backup.</figcaption></figure>
 
 
-## Appendix P. RC290 graphical acceptance and regression checklist
+## Appendix P. RC291 graphical acceptance and regression checklist
 
 Before publication, exercise the **R** control of results linked to a graded question, first using Arial 16 px and then a different font up to 48–96 px. Verify that green/red outlines remain visible, do not obscure characters or touch adjacent frames, and that the old strip underneath the widget never reappears. Check presenter projection and participant preview without exposing answer keys to the audience.
 
