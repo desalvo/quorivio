@@ -81,7 +81,14 @@ app.use('/api', (req,res,next)=>{
  if(actor&&['POST','PATCH','PUT','DELETE'].includes(req.method))res.once('finish',()=>{
   const matched=typeof req.route?.path==='string'?req.route.path:req.path;
   const operation=auditOperation(req.method,matched.startsWith('/api/')?matched:'/api'+matched,res.statusCode);
-  if(operation)void db.query('INSERT INTO operation_audit(actor_id,action,resource_type,resource_id,status) VALUES($1,$2,$3,$4,$5)',[actor,operation.action,operation.resource_type,/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(req.params?.id||'')?req.params.id:null,res.statusCode]).catch(e=>console.error('audit insert failed',e instanceof Error?e.name:'unknown'));
+  if(operation){
+   // Express route parameters are resolved by the endpoint after this middleware.
+   // Record only a valid UUID and never trust an arbitrary request parameter.
+   const routeParams=req.params as Record<string,string|undefined>|undefined;
+   const candidate=routeParams?.id;
+   const resourceId=typeof candidate==='string'&&/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(candidate)?candidate:null;
+   void db.query('INSERT INTO operation_audit(actor_id,action,resource_type,resource_id,status) VALUES($1,$2,$3,$4,$5)',[actor,operation.action,operation.resource_type,resourceId,res.statusCode]).catch(e=>console.error('audit insert failed',e instanceof Error?e.name:'unknown'));
+  }
  });next();
 });
 async function notifyRegistration(email:string,backend:'local'|'ldap'){

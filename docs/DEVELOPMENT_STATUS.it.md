@@ -1,3 +1,7 @@
+# Quorivio 0.1.0-dev — RC273 — Correzione TypeScript backup e audit
+
+**RC273:** corretti quattro errori di tipo TypeScript nella full CI RC272 [42547239843](https://github.com/desalvo/quorivio/actions/runs/42547239843): il buffer S3 è convertito in `Uint8Array` per `fetch`, l'upload WebDAV preserva lo stream Node e `duplex: 'half'` con cast circoscritto al confine Node/DOM, e il parametro Express `id` è tipizzato e validato prima della registrazione audit. RC272 conservata come inventario storico e RC273 corrente. Test RC270 per i trasferimenti e typecheck isolato eseguiti localmente, build API completa e full CI GitHub da verificare. **85,25%** (43 gate accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag eseguito dall'assistente. `docs/RC_CYCLE273_API_TYPECHECK_HOTFIX.it.md`.
+
 # Quorivio 0.1.0-dev — RC272 — Riparazione preflight risultati e inventario
 
 **RC272:** individuato e corretto falso negativo del contratto RC241 su `resultTextCss` nella riga del risultato (composizione stile + colore torta introdotta in RC270); test di rimozione intenzionale dello stile aggiunto. RC271 storico immutabile, RC272 inventario sorgenti/ZIP corrente. **85,25%** (43 gate accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; full CI GitHub da ricontrollare. Nessun commit/push/tag. `docs/RC_CYCLE272_UI_CONTRACT_CI_HOTFIX.it.md`.

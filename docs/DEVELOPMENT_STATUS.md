@@ -1,3 +1,7 @@
+# Quorivio 0.1.0-dev — RC273 — Backup and audit TypeScript fix
+
+**RC273:** fix four API TypeScript errors in the RC272 full CI [42547239843](https://github.com/desalvo/quorivio/actions/runs/42547239843): convert S3 payloads to web-compatible `Uint8Array` for `fetch`, preserve streaming Node WebDAV uploads and `duplex: 'half'` with a narrowly scoped Node/DOM boundary cast, and safely type and validate Express route parameter `id` for audit logging. RC272 becomes an immutable historical inventory, RC273 is current. Local RC270 transport tests and isolated API module typecheck passed; full API build and GitHub CI still need validation. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. `docs/RC_CYCLE273_API_TYPECHECK_HOTFIX.en.md`.
+
 # Quorivio 0.1.0-dev — RC272 — RC241 source contract and inventory gate hotfix
 
 **RC272:** fix strict RC241 per-result style guard to allow RC270 composed pie-color style, retain negative row-format removal detection; archive RC271 inventory, promote RC272 source/ZIP receipt; generalize historical promotion test. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; full GitHub CI pending, no assistant commit/push/tag. `docs/RC_CYCLE272_UI_CONTRACT_CI_HOTFIX.en.md`.

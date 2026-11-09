@@ -60,7 +60,11 @@ export async function uploadBackup(target:BackupTarget,file:{archive:string;name
   if(target.username&&target.password)headers.Authorization='Basic '+Buffer.from(`${target.username}:${target.password}`).toString('base64');
   // No redirects: prevent credential or data exfiltration to a different host.
   const url=target.url!.replace(/\/$/,'')+'/'+encodeURIComponent(file.name);
-  const reply=await fetch(url,{method:'PUT',headers,body:createReadStream(file.archive),duplex:'half',redirect:'manual',signal:AbortSignal.timeout(30*60*1000)} as RequestInit);
+  // Node's fetch supports streaming Node Readable bodies with duplex:'half'.
+  // DOM RequestInit typings do not describe this Node-specific extension,
+  // so validate the runtime fields and narrow only at the fetch boundary.
+  const request={method:'PUT',headers,body:createReadStream(file.archive),duplex:'half' as const,redirect:'manual' as const,signal:AbortSignal.timeout(30*60*1000)};
+  const reply=await fetch(url,request as unknown as RequestInit);
   if(![200,201,204].includes(reply.status))throw Error('webdav_upload_failed_'+reply.status);
  }else throw Error('unsupported_backup_backend');
 }

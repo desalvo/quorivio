@@ -31,7 +31,10 @@ async function s3Fetch(target:BackupTarget,method:string,url:string,data:Buffer)
  const accessKey=target.accessKey||process.env.AWS_ACCESS_KEY_ID||'',secretKey=target.secretKey||process.env.AWS_SECRET_ACCESS_KEY||'';
  if(!accessKey||!secretKey)throw Error('s3_credentials_required');
  const headers=signS3Request({method,url,region:target.region||'us-east-1',accessKey,secretKey,payload:data,date:new Date(),token:process.env.AWS_SESSION_TOKEN});
- const response=await fetch(url,{method,headers,body:method==='PUT'||method==='POST'?data:undefined,redirect:'manual',signal:AbortSignal.timeout(120000)});
+ // A plain Uint8Array is a web BodyInit across Node/DOM typings, while Buffer's
+ // generic backing-array type is not assignable in some TypeScript versions.
+ const requestBody=method==='PUT'||method==='POST'?Uint8Array.from(data):undefined;
+ const response=await fetch(url,{method,headers,body:requestBody,redirect:'manual',signal:AbortSignal.timeout(120000)});
  if(!response.ok)throw Error('s3_request_failed_'+response.status);
  return response;
 }
