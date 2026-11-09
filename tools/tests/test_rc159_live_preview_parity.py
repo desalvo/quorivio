@@ -36,5 +36,5 @@ class LivePreviewParity(unittest.TestCase):
     def test_ci_preflight_and_browser(self):
         self.assertIn('tools.tests.test_rc159_live_preview_parity',CI)
         self.assertIn('tools/ci_rc159_live_preview_parity_chromium.py',CI)
-        self.assertLess(CI.index('tools.tests.test_rc159_live_preview_parity'),CI.index('npm install --ignore-scripts'))
+        self.assertLess(CI.index('tools.tests.test_rc159_live_preview_parity'),CI.index('npm ci --ignore-scripts'))
 if __name__=='__main__':unittest.main()

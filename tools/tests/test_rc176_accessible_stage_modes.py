@@ -53,7 +53,7 @@ class RC176AccessibleModes(unittest.TestCase):
         self.assertIn('python3 tools/ci_browser_participant.py',WORKFLOW)
         self.assertIn('tools.tests.test_rc176_accessible_stage_modes',WORKFLOW)
         self.assertLess(WORKFLOW.index('tools.tests.test_rc176_accessible_stage_modes'),
-                        WORKFLOW.index('npm install --ignore-scripts'))
+                        WORKFLOW.index('npm ci --ignore-scripts'))
 
 
 if __name__=='__main__': unittest.main()

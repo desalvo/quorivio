@@ -30,7 +30,7 @@ class ErasureContracts(unittest.TestCase):
   self.assertIn('primary_admin',route)
   self.assertIn('user_has_dependent_data',route)
  def test_admin_metrics_authenticated_without_personal_ids(self):
-  route=SRC.split("app.get('/api/admin/privacy/erasure-status'",1)[1].split("app.get('/api/admin/settings'",1)[0]
+  route=SRC.split("app.get('/api/admin/privacy/erasure-status'",1)[1].split("});",1)[0]
   self.assertIn('requireAuth,requireAdmin',route)
   self.assertIn("Cache-Control','private, no-store",route)
   self.assertNotIn('SELECT *',route)

@@ -34,7 +34,7 @@ class GroupSelectionAcceptance(unittest.TestCase):
         self.assertFalse(safe_selection(BROWSER.replace("set(selected_ids)=={'widget-a','widget-b'}","len(selected_ids)>=2",1)))
     def test_mandatory_browser_gate_and_preflight(self):
         self.assertIn('test_rc_cycle116_exact_group_selection',WORKFLOW)
-        self.assertLess(WORKFLOW.index('test_rc_cycle116_exact_group_selection'),WORKFLOW.index('npm install --ignore-scripts'))
+        self.assertLess(WORKFLOW.index('test_rc_cycle116_exact_group_selection'),WORKFLOW.index('npm ci --ignore-scripts'))
         self.assertIn('python3 tools/ci_browser_editor.py',WORKFLOW)
         self.assertIn('python3 tools/verify_rc_cycle116_inventory.py',WORKFLOW)
 

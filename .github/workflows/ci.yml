@@ -299,6 +299,11 @@ jobs:
       # authenticated Chromium/PostgreSQL tests must expand the real summary.
       - name: RC236 page thumbnail browser disclosure compatibility before npm
         run: python3 -m unittest tools.tests.test_rc236_page_menu_disclosures -q
+      # RC274: inline answer correctness and reproducible dependency preflight.
+      - name: RC274 answer truth, privacy and npm lockfile regression before npm
+        run: |
+          node --experimental-strip-types --test apps/web/test/rc274-answer-truth.test.ts
+          python3 -m unittest tools.tests.test_rc274_ci_integrity -q
       # RC270: backup archive, audit and LDAP approval, including wizard mount
       # checks; keep these tests in CI so new functionality cannot regress.
       - name: RC270 full backup, LDAP audit, and Kubernetes wizard before npm
@@ -814,7 +819,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22'} # npm caching requires a committed package-lock.json
       - name: Install reproducibly
-        run: npm install --ignore-scripts --no-audit --no-fund
+        run: npm ci --ignore-scripts --no-audit --no-fund
       # RC189: run the actual strict API compiler immediately after npm so a
       # typed cross-page import defect cannot hide behind 100+ later steps.
       - name: RC189 strict API TypeScript typecheck before extended CI
@@ -1710,7 +1715,8 @@ jobs:
           python3 tools/verify_rc_cycle269_inventory.py --historical
           python3 tools/verify_rc_cycle271_inventory.py --historical
           python3 tools/verify_rc_cycle272_inventory.py --historical
-          python3 tools/verify_rc_cycle273_inventory.py
+          python3 tools/verify_rc_cycle273_inventory.py --historical
+          python3 tools/verify_rc_cycle274_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:
@@ -1728,7 +1734,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
       - name: Install reproducibly
-        run: npm install --ignore-scripts --no-audit --no-fund
+        run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Install native Firefox and WebKit with Playwright dependencies
         timeout-minutes: 10
         run: |

@@ -1,0 +1,7 @@
+# Quorivio RC274 — CI correction and inline answer truth
+
+GitHub Actions [42548617989](https://github.com/desalvo/quorivio/actions/runs/42548617989/job/128938965495) passed strict API typechecks but failed late Python tests: npm install mutated the lockfile after the SHA-256 inventory had been verified, and the asset-erasure route test accidentally traversed the unrelated backup routes containing SELECT *. Replaced npm install with non-mutating npm ci; migrated 33 historical pre-install ordering checks without weakening their assertions. Scope the privacy test to the intended endpoint.
+
+Participants see their graded feedback inline after a successful submission, with correct options framed green/check and wrong options red/cross; removed the separate solution list. The presenter and editor use a round green R toggle on linked results to display and hide correct/incorrect markings; real, editor and rehearsal views reuse the same chart. Rehearsal participants receive local grading after simulated submission. Both main and independent choice questions support grading via properties and Format Widget → Content. Keys remain absent from unsubmitted public page data.
+
+Locally covered by Node behavior and historical tests, Python CI/privacy tests and TypeScript syntax checks. Full application build, GitHub CI and physical-browser/live-service acceptance remain pending. **85.25%**, no added accepted gates; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag.

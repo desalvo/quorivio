@@ -54,7 +54,7 @@ class RC237RenameScopeGuard(unittest.TestCase):
     def test_preflight_command_runs_before_npm(self):
         command = 'python3 -m unittest tools.tests.test_rc237_rename_scope_guard -q'
         self.assertIn(command, WORKFLOW)
-        self.assertLess(WORKFLOW.index(command), WORKFLOW.index('npm install --ignore-scripts'))
+        self.assertLess(WORKFLOW.index(command), WORKFLOW.index('npm ci --ignore-scripts'))
         self.assertIn('python3 -m unittest tools.tests.test_rc218_browser_postgres_thumbnail_rename -q', WORKFLOW)
         self.assertIn('python3 tools/ci_browser_editor_postgres.py', WORKFLOW)
 

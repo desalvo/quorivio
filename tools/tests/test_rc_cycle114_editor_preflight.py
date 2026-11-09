@@ -77,7 +77,7 @@ class RC114EditorPreflight(unittest.TestCase):
 
     def test_preflight_runs_before_npm_and_current_inventory_is_only_current(self):
         self.assertIn('test_rc_cycle114_editor_preflight',CI)
-        self.assertLess(CI.index('test_rc_cycle114_editor_preflight'),CI.index('npm install --ignore-scripts'))
+        self.assertLess(CI.index('test_rc_cycle114_editor_preflight'),CI.index('npm ci --ignore-scripts'))
         self.assertIn('verify_rc_cycle113_inventory.py --historical',CI)
         self.assertIn('verify_rc_cycle114_inventory.py',CI)
 

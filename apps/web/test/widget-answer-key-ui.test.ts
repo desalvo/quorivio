@@ -18,8 +18,9 @@ test('feedback is sourced from response API, displayed only after success, not f
  assert.match(ui,/setFeedback\(r.feedback\|\|null\)/);
  assert.match(ui,/submitted&&feedback&&/);
  assert.match(ui,/Risposta corretta!/);
- assert.match(ui,/Risposta errata\./);
- assert.match(ui,/o.correct\?'Vero':'Falso'/);
+ assert.match(ui,/Risposta sbagliata\./);
+ assert.match(ui,/feedbackOptionVerdict\(feedback,o.id\)/);
+ assert.doesNotMatch(ui,/>Soluzione:<\/p>/);
  assert.doesNotMatch(ui.slice(ui.indexOf('function QuestionWidgetSingle('),ui.indexOf('type RehearsalMode=')),/answerKeyIds\(/);
  assert.match(css,/widget-answer-feedback\[data-answer-correct="true"\]/);
  assert.match(css,/widget-answer-feedback\[data-answer-correct="false"\]/);

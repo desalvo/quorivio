@@ -43,7 +43,7 @@ class RC216ExpiredAuthBrowserContract(unittest.TestCase):
         workflow = (Path(__file__).resolve().parents[2] / '.github/workflows/ci.yml').read_text(encoding='utf8')
         marker = 'tools.tests.test_rc216_expired_auth_browser_contract'
         self.assertIn(marker, workflow)
-        self.assertLess(workflow.index(marker), workflow.index('run: npm install --ignore-scripts --no-audit --no-fund'))
+        self.assertLess(workflow.index(marker), workflow.index('run: npm ci --ignore-scripts --no-audit --no-fund'))
 
     def test_current_scenario(self):
         _validate(SCRIPT)

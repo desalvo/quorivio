@@ -35,7 +35,7 @@ class RC149BackgroundContracts(unittest.TestCase):
         self.assertIn('tools/verify_rc_cycle148_inventory.py --historical', WORKFLOW)
         self.assertIn('tools/verify_rc_cycle149_inventory.py', WORKFLOW)
         self.assertIn('tools.tests.test_rc149_background_contracts', WORKFLOW)
-        self.assertLess(WORKFLOW.index('test_rc149_background_contracts'), WORKFLOW.index('npm install --ignore-scripts'))
+        self.assertLess(WORKFLOW.index('test_rc149_background_contracts'), WORKFLOW.index('npm ci --ignore-scripts'))
 
 
 if __name__ == '__main__':

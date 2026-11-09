@@ -59,6 +59,6 @@ class ParticipantWidgetOwnership(unittest.TestCase):
     def test_ci_has_early_and_live_chromium_parity(self):
         self.assertIn('tools.tests.test_rc160_participant_widget_ownership',CI)
         self.assertIn('tools/ci_rc160_participant_layout_chromium.py',CI)
-        self.assertLess(CI.index('tools.tests.test_rc160_participant_widget_ownership'),CI.index('npm install --ignore-scripts'))
+        self.assertLess(CI.index('tools.tests.test_rc160_participant_widget_ownership'),CI.index('npm ci --ignore-scripts'))
 
 if __name__=='__main__':unittest.main()

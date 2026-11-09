@@ -60,7 +60,7 @@ class RC117AtomicUndo(unittest.TestCase):
 
     def test_mandatory_preflight_and_histories(self):
         self.assertIn('test_rc_cycle117_autofit_atomic_undo',WORKFLOW)
-        self.assertLess(WORKFLOW.index('test_rc_cycle117_autofit_atomic_undo'),WORKFLOW.index('npm install --ignore-scripts'))
+        self.assertLess(WORKFLOW.index('test_rc_cycle117_autofit_atomic_undo'),WORKFLOW.index('npm ci --ignore-scripts'))
         self.assertIn('python3 tools/ci_browser_editor.py',WORKFLOW)
         self.assertIn('python3 tools/verify_rc_cycle117_inventory.py',WORKFLOW)
 

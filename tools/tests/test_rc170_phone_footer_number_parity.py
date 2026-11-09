@@ -48,7 +48,7 @@ class RC170PhoneFooterParity(unittest.TestCase):
 
     def test_early_ci_and_real_chromium_acceptance(self):
         self.assertIn('tools.tests.test_rc170_phone_footer_number_parity',CI)
-        self.assertLess(CI.index('tools.tests.test_rc170_phone_footer_number_parity'),CI.index('npm install --ignore-scripts'))
+        self.assertLess(CI.index('tools.tests.test_rc170_phone_footer_number_parity'),CI.index('npm ci --ignore-scripts'))
         self.assertIn('python3 tools/ci_rc170_phone_footer_number_chromium.py',CI)
         self.assertIn('tools/verify_rc_cycle169_inventory.py --historical',CI)
         self.assertIn('tools/verify_rc_cycle170_inventory.py',CI)

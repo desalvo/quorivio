@@ -42,5 +42,5 @@ class RC86WidgetPalette(unittest.TestCase):
   self.assertIn("await page.get_by_role('button',name='Aggiungi widget: Testo').click()",PROBE)
  def test_preflight_runs_before_expensive_ci_jobs_and_keeps_real_browser(self):
   self.assertIn('tools.tests.test_rc_cycle86_palette_acceptance',WORKFLOW)
-  self.assertLess(WORKFLOW.index('tools.tests.test_rc_cycle86_palette_acceptance'),WORKFLOW.index('npm install --ignore-scripts'))
+  self.assertLess(WORKFLOW.index('tools.tests.test_rc_cycle86_palette_acceptance'),WORKFLOW.index('npm ci --ignore-scripts'))
   self.assertIn('python3 tools/ci_browser_editor.py',WORKFLOW)

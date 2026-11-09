@@ -77,7 +77,7 @@ def validate_contract(source: str, app: str, workflow: str) -> None:
     browser = 'python3 tools/ci_browser_participant.py'
     if early not in workflow or browser not in workflow:
         raise AssertionError('mandatory early preflight or real PostgreSQL Chromium acceptance removed')
-    if not workflow.index(early) < workflow.index('npm install --ignore-scripts') < workflow.index(browser):
+    if not workflow.index(early) < workflow.index('npm ci --ignore-scripts') < workflow.index(browser):
         raise AssertionError('RC238 regression or end-to-end acceptance is in the wrong CI phase')
 
 

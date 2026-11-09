@@ -50,6 +50,6 @@ class RC177HistoricalLivePreflight(unittest.TestCase):
         for cycle in (144,167,168,169,176):
             token=f'tools.tests.test_rc{cycle}_'
             self.assertIn(token, CI)
-        self.assertLess(CI.index('tools.tests.test_rc177_historical_live_preflight'), CI.index('npm install --ignore-scripts'))
+        self.assertLess(CI.index('tools.tests.test_rc177_historical_live_preflight'), CI.index('npm ci --ignore-scripts'))
 
 if __name__=='__main__':unittest.main()

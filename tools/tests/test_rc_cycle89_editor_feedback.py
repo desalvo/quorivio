@@ -90,7 +90,7 @@ class RC89EditorFeedback(unittest.TestCase):
 
  def test_preflight_is_early_and_integrity_is_retained(self):
   self.assertIn('test_rc_cycle89_editor_feedback',CI)
-  self.assertLess(CI.index('test_rc_cycle89_editor_feedback'),CI.index('npm install --ignore-scripts'))
+  self.assertLess(CI.index('test_rc_cycle89_editor_feedback'),CI.index('npm ci --ignore-scripts'))
   self.assertIn('verify_rc_cycle88_inventory.py --historical',CI)
   self.assertIn('verify_rc_cycle89_inventory.py',CI)
 

@@ -26,7 +26,7 @@ class StableWidgetPointerRC81(unittest.TestCase):
         wf=(ROOT/'.github/workflows/ci.yml').read_text()
         test='python3 -m unittest tools.tests.test_rc_cycle81_stable_widget_pointer -q'
         self.assertIn(test,wf)
-        self.assertLess(wf.index(test),wf.index('npm install --ignore-scripts'))
+        self.assertLess(wf.index(test),wf.index('npm ci --ignore-scripts'))
         self.assertIn('python3 tools/ci_browser_editor.py',wf)
 
 if __name__=='__main__': unittest.main()

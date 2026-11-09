@@ -3578,3 +3578,30 @@ body .editor-floating-panel.widget-selection-palette .palette-ribbon-groups{min-
 
 /* RC270: readable optional labels, shared by editor and live projection. */
 .linked-results-pie .linked-pie-label{position:absolute;transform:translate(-50%,-50%);z-index:1;font-size:clamp(8px,.75em,14px);font-weight:750;color:white;text-shadow:0 1px 2px #000b;white-space:nowrap;pointer-events:none}
+
+/* RC274: shared inline grading for participant, presenter and editor/rehearsal. */
+.widget-answer-option.linked-source-answer-true,.linked-results-row.linked-source-answer-true,
+.widget-answer-option[data-answer-verdict="correct"],.linked-results-row[data-answer-verdict="correct"]{
+ border:2px solid #15803d!important;border-radius:8px!important;background:rgba(22,163,74,.09)!important;
+ box-sizing:border-box;padding:.25em .4em!important;min-width:0;
+}
+.widget-answer-option.linked-source-answer-false,.linked-results-row.linked-source-answer-false,
+.widget-answer-option[data-answer-verdict="incorrect"],.linked-results-row[data-answer-verdict="incorrect"]{
+ border:2px solid #b91c1c!important;border-radius:8px!important;background:rgba(220,38,38,.07)!important;
+ box-sizing:border-box;padding:.25em .4em!important;min-width:0;
+}
+.answer-verdict-icon{display:inline-flex;flex:none;align-items:center;justify-content:center;
+ font:800 1.15em/1 Arial,sans-serif;margin-left:.4em;white-space:nowrap}
+[data-answer-verdict="correct"] .answer-verdict-icon{color:#15803d!important}
+[data-answer-verdict="incorrect"] .answer-verdict-icon{color:#b91c1c!important}
+.linked-results{position:relative;}
+.result-answer-key-toggle{position:absolute;top:.25em;right:.25em;z-index:3;
+ display:inline-flex!important;align-items:center!important;justify-content:center!important;
+ width:2.1em!important;height:2.1em!important;min-width:2.1em!important;min-height:2.1em!important;
+ padding:0!important;margin:0!important;border:2px solid #15803d!important;border-radius:50%!important;
+ background:#fff!important;color:#15803d!important;font:800 1em/1 Arial,sans-serif!important;
+ cursor:pointer;pointer-events:auto}
+.result-answer-key-toggle.is-active{background:#dcfce7!important;box-shadow:0 0 0 2px rgba(21,128,61,.18)!important}
+.result-answer-key-toggle:focus-visible{outline:3px solid #2563eb;outline-offset:2px}
+.linked-result-pair .answer-verdict-icon{margin-left:.5em}
+@media (prefers-reduced-motion:reduce){.result-answer-key-toggle{transition:none}}

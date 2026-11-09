@@ -41,7 +41,7 @@ def contract(browser=BROWSER,historical=HISTORICAL,planner=PLANNER,chromium=CHRO
   raise AssertionError('RC245 early and real browser gates required')
  if 'python3 tools/ci_browser_participant.py' not in workflow:
   raise AssertionError('authenticated real PostgreSQL/React acceptance was removed')
- if workflow.index('tools.tests.test_rc245_compact_phone_stage_ci')>workflow.index('npm install --ignore-scripts'):
+ if workflow.index('tools.tests.test_rc245_compact_phone_stage_ci')>workflow.index('npm ci --ignore-scripts'):
   raise AssertionError('RC245 regression must run before npm')
  return True
 

@@ -100,7 +100,7 @@ class RC115StrictTypeContracts(unittest.TestCase):
         self.assertFalse(graphic_type_narrowing(UI.replace("strokeDash:e.target.value as WidgetTextStyle['strokeDash']",'strokeDash:e.target.value',1),DOMAIN))
     def test_preflight_and_strict_build_remain_mandatory(self):
         self.assertIn('test_rc_cycle115_typescript_strict',CI)
-        self.assertLess(CI.index('test_rc_cycle115_typescript_strict'),CI.index('npm install --ignore-scripts'))
+        self.assertLess(CI.index('test_rc_cycle115_typescript_strict'),CI.index('npm ci --ignore-scripts'))
         self.assertIn('npm run build',CI)
         self.assertIn('tsc --noEmit && vite build',(ROOT/'apps/web/package.json').read_text())
         self.assertIn('"strict":true',(ROOT/'apps/web/tsconfig.json').read_text().replace(' ',''))

@@ -64,7 +64,7 @@ class RC169RatingTypographyParity(unittest.TestCase):
 
     def test_ci_preflight_before_npm_browser_check_and_cumulative_manifest(self):
         self.assertIn('tools.tests.test_rc169_rating_typography_parity',CI)
-        self.assertLess(CI.index('tools.tests.test_rc169_rating_typography_parity'),CI.index('npm install --ignore-scripts'))
+        self.assertLess(CI.index('tools.tests.test_rc169_rating_typography_parity'),CI.index('npm ci --ignore-scripts'))
         self.assertIn('python3 tools/ci_rc169_rating_typography_chromium.py',CI)
         self.assertIn('python3 tools/verify_rc_cycle168_inventory.py --historical',CI)
         self.assertIn('python3 tools/verify_rc_cycle169_inventory.py',CI)

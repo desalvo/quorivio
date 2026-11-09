@@ -43,7 +43,7 @@ class RC166CICredentials(unittest.TestCase):
         self.assertNotIn('ci-only-federated-password',FED)
     def test_preflight_runs_before_npm_and_keeps_secret_scanners(self):
         self.assertIn('tools.tests.test_rc166_ci_credentials',CI)
-        self.assertLess(CI.index('tools.tests.test_rc166_ci_credentials'),CI.index('npm install --ignore-scripts'))
+        self.assertLess(CI.index('tools.tests.test_rc166_ci_credentials'),CI.index('npm ci --ignore-scripts'))
         for marker in ('Detect credential leaks','gitleaks'):
             self.assertIn(marker,CI)
     def test_negative_mutations_rejected(self):

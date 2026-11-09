@@ -92,7 +92,7 @@ class RC165AuthoredParticipantChromium(unittest.TestCase):
 
     def test_preflight_precedes_npm_and_preserves_real_chromium_job(self):
         self.assertIn('tools.tests.test_rc165_authored_participant_chromium',CI)
-        self.assertLess(CI.index('tools.tests.test_rc165_authored_participant_chromium'),CI.index('npm install --ignore-scripts'))
+        self.assertLess(CI.index('tools.tests.test_rc165_authored_participant_chromium'),CI.index('npm ci --ignore-scripts'))
         self.assertIn('Chromium participant UI and PostgreSQL lifecycle (opt-in)',CI)
 
 if __name__=='__main__':unittest.main()

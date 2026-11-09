@@ -66,7 +66,7 @@ def verify_contract(script: str, app: str, workflow: str) -> None:
     if ("tools.tests.test_rc218_browser_postgres_thumbnail_rename" not in workflow or
         "python3 tools/ci_browser_editor_postgres.py" not in workflow):
         raise AssertionError('early preflight or real PostgreSQL Chromium acceptance missing')
-    if workflow.index('tools.tests.test_rc218_browser_postgres_thumbnail_rename') > workflow.index('npm install --ignore-scripts'):
+    if workflow.index('tools.tests.test_rc218_browser_postgres_thumbnail_rename') > workflow.index('npm ci --ignore-scripts'):
         raise AssertionError('preflight must occur before npm/PostgreSQL acceptance')
 
 

@@ -21,5 +21,5 @@ class RC85SecondaryPointerContext(unittest.TestCase):
  def test_existing_context_menu_and_live_chromium_contract_remain_mandatory(self):
   wf=(ROOT/'.github/workflows/ci.yml').read_text()
   self.assertIn('tools.tests.test_rc_cycle85_secondary_pointer_context',wf)
-  self.assertLess(wf.index('tools.tests.test_rc_cycle85_secondary_pointer_context'),wf.index('npm install --ignore-scripts'))
+  self.assertLess(wf.index('tools.tests.test_rc_cycle85_secondary_pointer_context'),wf.index('npm ci --ignore-scripts'))
   self.assertIn('python3 tools/ci_browser_editor.py',wf)

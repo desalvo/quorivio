@@ -34,7 +34,7 @@ class WidgetContextHitRC80(unittest.TestCase):
         wf = (ROOT / '.github/workflows/ci.yml').read_text(encoding='utf8')
         guard='python3 -m unittest tools.tests.test_rc_cycle80_widget_context_hit -q'
         self.assertIn(guard, wf)
-        self.assertLess(wf.index(guard), wf.index('npm install --ignore-scripts'))
+        self.assertLess(wf.index(guard), wf.index('npm ci --ignore-scripts'))
         self.assertIn('python3 tools/ci_browser_editor.py', wf)
 
 

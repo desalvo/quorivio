@@ -44,7 +44,7 @@ class RC151StrictTypesMutation(unittest.TestCase):
         self.assertIn('tools.tests.test_rc151_strict_types_mutation',CI)
         self.assertIn('tools/verify_rc_cycle150_inventory.py --historical',CI)
         self.assertIn('tools/verify_rc_cycle151_inventory.py',CI)
-        self.assertLess(CI.index('test_rc151_strict_types_mutation'),CI.index('npm install --ignore-scripts'))
+        self.assertLess(CI.index('test_rc151_strict_types_mutation'),CI.index('npm ci --ignore-scripts'))
         self.assertIn('tsc --noEmit && vite build',(ROOT/'apps/web/package.json').read_text(encoding='utf8'))
 
 if __name__=='__main__':

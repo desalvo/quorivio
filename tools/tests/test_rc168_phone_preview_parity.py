@@ -60,7 +60,7 @@ class RC168PhoneParity(unittest.TestCase):
     def test_ci_runs_regressions_before_npm_and_chromium_with_other_stages(self):
         self.assertIn('tools.tests.test_rc168_phone_preview_parity', CI)
         self.assertLess(CI.index('tools.tests.test_rc168_phone_preview_parity'),
-                        CI.index('npm install --ignore-scripts'))
+                        CI.index('npm ci --ignore-scripts'))
         self.assertIn('python3 tools/ci_rc168_phone_footer_chromium.py', CI)
         self.assertIn('python3 tools/ci_browser_participant.py', CI)
         self.assertIn('python3 tools/verify_rc_cycle167_inventory.py --historical', CI)

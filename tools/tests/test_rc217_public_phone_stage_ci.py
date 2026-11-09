@@ -42,7 +42,7 @@ def check_public_phone_contract(browser:str, policy:str, layout:str, workflow:st
         'node --experimental-strip-types --test apps/web/test/rc217-public-phone-stage.test.ts',
         'python3 tools/ci_browser_participant.py',
     )
-    if any(x not in workflow for x in required) or workflow.index(required[0])>workflow.index('npm install --ignore-scripts'):
+    if any(x not in workflow for x in required) or workflow.index(required[0])>workflow.index('npm ci --ignore-scripts'):
         raise AssertionError('CI must check public-phone geometry early and in real Chromium')
 
 

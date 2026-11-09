@@ -66,6 +66,6 @@ class RC159PresenterControls(unittest.TestCase):
  def test_ci_preflights_and_browser_acceptance(self):
   self.assertIn('tools.tests.test_rc159_presenter_controls',CI)
   self.assertIn('tools/ci_rc159_presenter_visual_chromium.py',CI)
-  self.assertLess(CI.index('tools.tests.test_rc159_presenter_controls'),CI.index('npm install --ignore-scripts'))
+  self.assertLess(CI.index('tools.tests.test_rc159_presenter_controls'),CI.index('npm ci --ignore-scripts'))
 
 if __name__=='__main__':unittest.main()

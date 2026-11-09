@@ -42,7 +42,7 @@ class RC148PhoneAtomicUndo(unittest.TestCase):
         self.assertIn('tools.tests.test_rc148_phone_atomic_undo', WORKFLOW)
         self.assertIn('tools/verify_rc_cycle147_inventory.py --historical', WORKFLOW)
         self.assertIn('tools/verify_rc_cycle148_inventory.py', WORKFLOW)
-        self.assertLess(WORKFLOW.index('test_rc148_phone_atomic_undo'), WORKFLOW.index('npm install --ignore-scripts'))
+        self.assertLess(WORKFLOW.index('test_rc148_phone_atomic_undo'), WORKFLOW.index('npm ci --ignore-scripts'))
 
 
 if __name__ == '__main__':

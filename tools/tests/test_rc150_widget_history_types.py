@@ -45,7 +45,7 @@ class RC150WidgetHistoryTypes(unittest.TestCase):
         self.assertIn('tools.tests.test_rc150_widget_history_types',workflow)
         self.assertIn('tools/verify_rc_cycle149_inventory.py --historical',workflow)
         self.assertIn('tools/verify_rc_cycle150_inventory.py',workflow)
-        self.assertLess(workflow.index('test_rc150_widget_history_types'),workflow.index('npm install --ignore-scripts'))
+        self.assertLess(workflow.index('test_rc150_widget_history_types'),workflow.index('npm ci --ignore-scripts'))
 
 
 if __name__=='__main__':

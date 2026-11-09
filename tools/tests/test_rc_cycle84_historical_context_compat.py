@@ -18,7 +18,7 @@ class Cycle84HistoricalContextCompat(unittest.TestCase):
   wf=(ROOT/'.github/workflows/ci.yml').read_text()
   cmd='tools.tests.test_rc_cycle37_editor_ux'
   self.assertIn(cmd,wf)
-  self.assertLess(wf.index(cmd),wf.index('npm install --ignore-scripts'))
+  self.assertLess(wf.index(cmd),wf.index('npm ci --ignore-scripts'))
   self.assertIn('python3 -m unittest discover -s tools/tests -v',wf)
  def test_real_widget_menu_is_not_replaced_by_page_background_menu(self):
   ui=(ROOT/'apps/web/src/main.tsx').read_text()

@@ -32,6 +32,6 @@ class RealWidgetContextRC83(unittest.TestCase):
   wf=(ROOT/'.github/workflows/ci.yml').read_text()
   guard='python3 -m unittest tools.tests.test_rc_cycle83_real_widget_context -q'
   self.assertIn(guard,wf)
-  self.assertLess(wf.index(guard),wf.index('npm install --ignore-scripts'))
+  self.assertLess(wf.index(guard),wf.index('npm ci --ignore-scripts'))
 
 if __name__=='__main__':unittest.main()

@@ -94,7 +94,7 @@ class RC167LivePreviewFidelity(unittest.TestCase):
 
  def test_early_preflight_and_inventories(self):
   self.assertIn('tools.tests.test_rc167_live_preview_fidelity',CI)
-  self.assertLess(CI.index('tools.tests.test_rc167_live_preview_fidelity'),CI.index('npm install --ignore-scripts'))
+  self.assertLess(CI.index('tools.tests.test_rc167_live_preview_fidelity'),CI.index('npm ci --ignore-scripts'))
   self.assertIn('python3 tools/verify_rc_cycle166_inventory.py --historical',CI)
   self.assertIn('python3 tools/verify_rc_cycle167_inventory.py',CI)
 

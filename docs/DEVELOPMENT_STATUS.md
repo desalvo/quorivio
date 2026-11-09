@@ -1,3 +1,7 @@
+# Quorivio 0.1.0-dev — RC274 — Inline grading and CI integrity
+
+**RC274:** green/red framed ✓/✕ choices after participant submission, round green R toggle beside results in editor/live/previews, truth config in Format Widget. GitHub CI [42548617989](https://github.com/desalvo/quorivio/actions/runs/42548617989) exposed lockfile mutation from npm install; switch to npm ci, update 33 pre-install ordering tests, scope asset-erasure privacy test to its own route. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full RC274 CI and browser acceptance pending; no assistant commit/push/tag. `docs/RC_CYCLE274_TRUTH_FEEDBACK_CI_FIX.en.md`.
+
 # Quorivio 0.1.0-dev — RC273 — Backup and audit TypeScript fix
 
 **RC273:** fix four API TypeScript errors in the RC272 full CI [42547239843](https://github.com/desalvo/quorivio/actions/runs/42547239843): convert S3 payloads to web-compatible `Uint8Array` for `fetch`, preserve streaming Node WebDAV uploads and `duplex: 'half'` with a narrowly scoped Node/DOM boundary cast, and safely type and validate Express route parameter `id` for audit logging. RC272 becomes an immutable historical inventory, RC273 is current. Local RC270 transport tests and isolated API module typecheck passed; full API build and GitHub CI still need validation. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No assistant commit/push/tag. `docs/RC_CYCLE273_API_TYPECHECK_HOTFIX.en.md`.

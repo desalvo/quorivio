@@ -35,6 +35,6 @@ class RC197IntegrationContracts(unittest.TestCase):
   self.assertIn('test_rc_presenter_linked_preview_20261028',CI)
   self.assertIn('test_rehearsal_send_parity_20261028',CI)
   self.assertIn('test_visual_parity_rehearsal_20261028',CI)
-  self.assertLess(CI.index('RC197 reconcile Kubernetes Python integration contracts before npm'),CI.index('run: npm install --ignore-scripts --no-audit --no-fund'))
+  self.assertLess(CI.index('RC197 reconcile Kubernetes Python integration contracts before npm'),CI.index('run: npm ci --ignore-scripts --no-audit --no-fund'))
 
 if __name__=='__main__':unittest.main()
