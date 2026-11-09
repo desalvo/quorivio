@@ -11,15 +11,18 @@ ROOT=Path(__file__).resolve().parents[2]
 
 class RC271ReleasePromotion(unittest.TestCase):
     def test_current_inventory_matches_active_docs(self):
-        self.assertEqual(current_verifier_module().__name__, 'verify_rc_cycle271_inventory')
+        self.assertRegex(current_verifier_module().__name__, r'^verify_rc_cycle[0-9]+_inventory$')
+        current_cycle=re.search(r'cycle([0-9]+)',current_verifier_module().__name__).group(1)
         self.assertEqual(verify_headers(ROOT),len(FILES))
         for name in FILES:
             title=(ROOT/'docs'/name).read_text(encoding='utf8').splitlines()[0]
-            self.assertRegex(title,r'(?<![A-Za-z0-9])RC271(?![0-9])')
+            self.assertRegex(title,rf'(?<![A-Za-z0-9])RC{current_cycle}(?![0-9])')
     def test_rc269_historical_and_rc271_current(self):
         workflow=(ROOT/'.github/workflows/ci.yml').read_text(encoding='utf8')
         commands=COMMAND.findall(workflow)
-        self.assertEqual(commands[-2:], [('verify_rc_cycle269_inventory.py','--historical'),('verify_rc_cycle271_inventory.py','')])
+        self.assertIn(('verify_rc_cycle269_inventory.py','--historical'), commands)
+        self.assertIn(('verify_rc_cycle271_inventory.py','--historical'), commands)
+        self.assertEqual(commands[-1],(current_verifier_module().__name__+'.py',''))
         self.assertEqual(verify_references(ROOT,enforce_git=False),len(commands))
     def test_rc270_tests_run_before_npm(self):
         w=(ROOT/'.github/workflows/ci.yml').read_text(encoding='utf8')

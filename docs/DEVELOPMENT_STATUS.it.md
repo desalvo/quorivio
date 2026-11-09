@@ -1,3 +1,7 @@
+# Quorivio 0.1.0-dev — RC272 — Riparazione preflight risultati e inventario
+
+**RC272:** individuato e corretto falso negativo del contratto RC241 su `resultTextCss` nella riga del risultato (composizione stile + colore torta introdotta in RC270); test di rimozione intenzionale dello stile aggiunto. RC271 storico immutabile, RC272 inventario sorgenti/ZIP corrente. **85,25%** (43 gate accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; full CI GitHub da ricontrollare. Nessun commit/push/tag. `docs/RC_CYCLE272_UI_CONTRACT_CI_HOTFIX.it.md`.
+
 # Quorivio 0.1.0-dev — RC271 — Metadati CI e inventario corrente
 
 **RC271:** sistemato preflight della full CI RC270 [42535872914](https://github.com/desalvo/quorivio/actions/runs/42535872914): inventario RC269 storico immutabile, nuovo inventario RC271 corrente, test nuovi API backup/audit e wizard eseguiti prima di npm. Nessun cambiamento al runtime RC270. **85,25%** (43 gate accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; full CI di RC271 e collaudo operativo pendenti. Nessun commit/push/tag eseguito dall’assistente. `docs/RC_CYCLE271_INVENTORY_CI_PROMOTION.it.md`.

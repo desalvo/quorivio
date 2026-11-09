@@ -1,3 +1,7 @@
+# Quorivio 0.1.0-dev — RC272 — RC241 source contract and inventory gate hotfix
+
+**RC272:** fix strict RC241 per-result style guard to allow RC270 composed pie-color style, retain negative row-format removal detection; archive RC271 inventory, promote RC272 source/ZIP receipt; generalize historical promotion test. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; full GitHub CI pending, no assistant commit/push/tag. `docs/RC_CYCLE272_UI_CONTRACT_CI_HOTFIX.en.md`.
+
 # Quorivio 0.1.0-dev — RC271 — Fix release inventory promotion
 
 **RC271:** fix committed RC270 full CI [42535872914](https://github.com/desalvo/quorivio/actions/runs/42535872914) blocked by current inventory referencing RC269. Preserve immutable RC269 historical receipt and create RC271 current inventory + pre-npm regression tests for RC270 backup/audit and Kubernetes wizard. No RC270 runtime changes. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; full CI and storage restore validation pending; no assistant commit/push/tag. `docs/RC_CYCLE271_INVENTORY_CI_PROMOTION.en.md`.

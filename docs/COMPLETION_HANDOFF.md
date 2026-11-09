@@ -1,3 +1,7 @@
+# Quorivio 0.1.0-dev — RC272 — CI RC241 result-row contract compatibility
+
+**RC272:** RC241 test now accepts the direct or composed row style expression used by RC270 pie text color mapping; negative regressions ensure row formatting still cannot disappear. Full CI [42537006971](https://github.com/desalvo/quorivio/actions/runs/42537006971) stopped at that historic lexical guard, not at an observed runtime defect. RC271 inventory stays historical; RC272 is current. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. New full CI pending; no assistant commit/push/tag. `docs/RC_CYCLE272_UI_CONTRACT_CI_HOTFIX.en.md`.
+
 # Quorivio 0.1.0-dev — RC271 — Current inventory and CI preflight hotfix
 
 **RC271:** repair RC270 full CI [42535872914](https://github.com/desalvo/quorivio/actions/runs/42535872914), blocked by RC269 inventory still active when RC270 headers were published. Promote RC269 inventory to immutable historical, create RC271 source/ZIP SHA-256 manifest and current verifier; add backup/audit and wizard RC270 regressions to CI. No runtime behavior changed. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; new GitHub CI and real restore remain pending; no assistant commit/push/tag. `docs/RC_CYCLE271_INVENTORY_CI_PROMOTION.en.md`.

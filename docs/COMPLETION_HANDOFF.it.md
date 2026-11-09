@@ -1,3 +1,7 @@
+# Quorivio 0.1.0-dev — RC272 — Correzione contratto UI RC241 e gate CI
+
+**RC272:** corretta la verifica RC241 sulla formattazione delle righe nei grafici risultati (`style={resultTextCss(...)}` e `style={{...resultTextCss(...)}}`), con test negativi per la perdita dello stile. Full CI [42537006971](https://github.com/desalvo/quorivio/actions/runs/42537006971) bloccata al test storico, senza evidenze di regressioni runtime. RC271 conservato come inventario storico, RC272 inventario corrente. **85,25%** (43 gate accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nuova full CI pendente; nessun commit/push/tag. `docs/RC_CYCLE272_UI_CONTRACT_CI_HOTFIX.it.md`.
+
 # Quorivio 0.1.0-dev — RC271 — Hotfix CI inventario e copertura test RC270
 
 **RC271:** risolto fallimento full CI RC270 [42535872914](https://github.com/desalvo/quorivio/actions/runs/42535872914) dovuto a inventario corrente rimasto a RC269. RC269 promosso a storico immutabile, inventario SHA-256 RC271 corrente, test API backup/audit e wizard RC270 inclusi nel preflight CI. Invariate le funzionalità della RC270; **85,25%** (43 gate accettati/17 parziali), `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nuova full CI e ripristino reale da verificare; nessun commit/push/tag dell’assistente. `docs/RC_CYCLE271_INVENTORY_CI_PROMOTION.it.md`.
