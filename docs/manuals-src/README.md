@@ -1,4 +1,4 @@
-# Quorivio RC278 — bilingual release-controlled manuals
+# Quorivio RC279 — bilingual release-controlled manuals
 
 The six editable Markdown files (`user`, `presenter`, `admin` × Italian/English) are the editorial sources. The official logo, name, author **Alessandro De Salvo**, contact **braket71@gmail.com**, **EUPL-1.2**, GitHub URL, software version, build and publication date come from `LICENSE`, `package.json` and `tools/manual_release_metadata.py` — not separately typed in each PDF. The cover also states supported environments and *indicative* evaluation resources; these are **not production-certified minima**.
 

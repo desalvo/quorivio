@@ -20,7 +20,7 @@ class ManualScreenshotContracts(unittest.TestCase):
   self.assertEqual(meta['version'],json.loads((ROOT/'package.json').read_text())['version'])
   self.assertEqual(meta['license'],'EUPL-1.2')
   self.assertIn(meta['email'],(ROOT/'LICENSE').read_text())
-  self.assertIn('RC278',meta['build'])
+  self.assertIn(meta['cycle'],meta['build'])
   self.assertEqual(meta['published'],'2026-11-09')
   self.assertTrue((ROOT/'docs/assets/quorivio-logo.svg').is_file())
   self.assertIn('github.com/desalvo/quorivio',meta['repository'])
@@ -54,7 +54,7 @@ class ManualScreenshotContracts(unittest.TestCase):
    for role in ('user','presenter','admin'):
     text=(ROOT/f'docs/manuals-src/{role}-guide.{lang}.md').read_text()
     self.assertIn('<!-- REAL_SCREENSHOT_GALLERY -->',text)
-    self.assertIn('RC278',text)
+    self.assertIn(metadata(ROOT)['cycle'],text)
     self.assertGreaterEqual(text.count('\n## '),18)
     self.assertGreaterEqual(len([k for k,v in CATALOG.items() if role in v]),4)
   for term in ('Disaster Recovery','RPO','RTO','pg_restore','replicaCount','ReadWriteMany','backup'):

@@ -233,6 +233,8 @@ jobs:
         run: python3 -m unittest tools.tests.test_rc277_manuals -q
       - name: RC278 manual identity, real screenshot provenance and CI capture contracts
         run: python3 -m unittest tools.tests.test_rc278_manual_screenshots -q
+      - name: RC279 OAuth HA documentation and legacy manual contracts preflight
+        run: python3 -m unittest tools.tests.test_rc279_oauth_ha_manual tools.tests.test_rc154_load_gravatar -q
       - name: RC276 presenter cross-page R toggle consistency before npm
         run: |
           python3 -m unittest tools.tests.test_rc191_crosspage_live_rehearsal tools.tests.test_rc275_source_renderer_contract -q
@@ -1763,7 +1765,8 @@ jobs:
           python3 tools/verify_rc_cycle275_inventory.py --historical
           python3 tools/verify_rc_cycle276_inventory.py --historical
           python3 tools/verify_rc_cycle277_inventory.py --historical
-          python3 tools/verify_rc_cycle278_inventory.py
+          python3 tools/verify_rc_cycle278_inventory.py --historical
+          python3 tools/verify_rc_cycle279_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

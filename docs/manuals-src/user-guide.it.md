@@ -1,6 +1,6 @@
 # Guida del partecipante
 
-**Quorivio 0.1.0-dev · Build documentale RC278 · 9 novembre 2026**
+**Quorivio 0.1.0-dev · Build documentale RC279 · 9 novembre 2026**
 
 Questa guida spiega come partecipare a una sessione interattiva, rispondere ai diversi tipi di domanda, interpretare gli esiti e usare correttamente le funzioni disponibili da smartphone o computer. È riferita al codice della RC276 e alla revisione editoriale RC278. Le prime figure sono ricostruzioni etichettate; la galleria finale nei PDF generati dalla CI usa screenshot autentici acquisiti sull'istanza di prova temporanea, **non su un server di produzione**.
 

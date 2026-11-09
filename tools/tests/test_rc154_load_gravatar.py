@@ -51,9 +51,15 @@ class RC154Contracts(unittest.TestCase):
   self.assertIn('https://gravatar.com/',WEB)
   self.assertIn('profile_photo_source',API)
  def test_manuals_include_cli_and_privacy(self):
-  manuals=(ROOT/'tools/generate_manuals.py').read_text()
-  self.assertIn('live_500_answers.py',manuals)
-  self.assertIn('Gravatar',manuals)
-  self.assertIn('--reset-before',manuals)
+  generator=(ROOT/'tools/generate_manuals.py').read_text()
+  self.assertIn('SOURCE / f',generator)
+  for lang in ('it','en'):
+   manuals=(ROOT/f'docs/manuals-src/admin-guide.{lang}.md').read_text()
+   self.assertIn('live_500_answers.py',manuals)
+   self.assertIn('Gravatar',manuals)
+   self.assertIn('--reset-before',manuals)
+   self.assertIn('--confirm-run',manuals)
+   self.assertIn('--open-test-question',manuals)
+   self.assertIn('HTTPS',manuals)
 
 if __name__=='__main__':unittest.main()

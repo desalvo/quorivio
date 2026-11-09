@@ -1,6 +1,6 @@
 # Participant guide
 
-**Quorivio 0.1.0-dev · Documentation build RC278 · 9 November 2026**
+**Quorivio 0.1.0-dev · Documentation build RC279 · 9 November 2026**
 
 This guide explains how to join an interactive session, answer questions, understand feedback and use the available features on a phone or computer. It documents the RC276 application code as reviewed for documentation cycle RC278. The earlier illustrated screens are labelled reconstructions; the final gallery in CI-produced PDFs contains real captures of a disposable test instance, **never production captures**.
 

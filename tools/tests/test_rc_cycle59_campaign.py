@@ -55,9 +55,16 @@ class CampaignContracts(unittest.TestCase):
   self.assertEqual(sum(g['weight'] for g in report['pending']), sum(g['weight'] for g in __import__('json').loads((ROOT/'docs/RC_GATE_MATRIX.json').read_text())['gates'] if g['status']!='accepted'))
   self.assertTrue(report['external_signoff_required'])
  def test_manual_generator_corrects_oauth_cross_replica_state(self):
-  s=(ROOT/'tools/generate_manuals.py').read_text()
-  self.assertIn('OAuth state is stored in PostgreSQL and consumed once across replicas',s)
-  self.assertNotIn('OAuth state is process-local',s)
+  generator=(ROOT/'tools/generate_manuals.py').read_text()
+  manual=(ROOT/'docs/manuals-src/admin-guide.en.md').read_text()
+  italian=(ROOT/'docs/manuals-src/admin-guide.it.md').read_text()
+  self.assertIn('SOURCE / f',generator)
+  self.assertIn('OAuth state is stored in PostgreSQL and consumed once across replicas',manual)
+  self.assertIn('Lo stato OAuth è conservato in PostgreSQL',italian)
+  self.assertNotIn('OAuth state is process-local',manual)
+  self.assertNotIn('OAuth state is process-local',generator)
+  self.assertIn('DELETE FROM auth_flows',manual)
+  self.assertIn('DELETE FROM auth_flows',italian)
  def test_bounded_provider_json(self):
   for p in ('apps/api/src/oidc.ts','apps/api/src/social-oauth.ts','apps/api/src/server.ts'):
    self.assertIn('boundedFederatedJson',(ROOT/p).read_text())

@@ -1,6 +1,6 @@
 # Manuale dell'amministratore
 
-**Quorivio 0.1.0-dev · Build documentale RC278 · 9 novembre 2026**
+**Quorivio 0.1.0-dev · Build documentale RC279 · 9 novembre 2026**
 
 Manuale tecnico-operativo per installazione, configurazione, autenticazione, autorizzazioni, backup, monitoraggio, audit, manutenzione e ripristino. Le procedure sono desunte dal sorgente e dai chart della RC276; non costituiscono certificazione di un deployment reale. **Le illustrazioni esplicative presenti nei primi capitoli sono ricostruzioni**, etichettate come tali. La galleria finale, quando presente nel PDF generato dalla CI, contiene esclusivamente screenshot reali dell'istanza temporanea verificati tramite hash e commit; la revisione editoriale D5 resta separata.
 
@@ -216,6 +216,8 @@ In gestione utenti selezionare **Cerca nella directory**, cercare per login/nome
 
 SMTP serve per richieste di approvazione, recupero credenziali e notifiche operative. Configurare host, porta, TLS, indirizzo mittente e autenticazione; provare recapito effettivo e gestione degli errori, senza registrare password nei log.
 
+**Stato di autorizzazione tra repliche (sicurezza e HA).** Lo stato OAuth è conservato in PostgreSQL e consumato una sola volta tra tutte le repliche. Per OIDC e OAuth social il server inserisce nella tabella `auth_flows` esclusivamente l’hash dello `state` casuale, il provider e una scadenza di cinque minuti. Al callback il record è consumato atomicamente con `DELETE FROM auth_flows ... RETURNING`: si verificano anche il cookie di stato del browser e il provider e si rifiutano stati scaduti, mancanti o già utilizzati. **Lo stato non deve essere custodito soltanto nella memoria di un processo**, perché l’ingress può inviare il callback a un’altra replica. Durante una prova di rolling restart/failover verificare che una richiesta OAuth/OIDC iniziata su una replica possa terminare su un’altra e che il riutilizzo del medesimo callback venga rifiutato. Tutte le repliche devono raggiungere PostgreSQL; mantenere HTTPS e cookie sicuri e non registrare codici, segreti o valori di stato nei log. Questo è un contratto del software, non una certificazione dei provider esterni.
+
 OAuth/OIDC può usare provider configurati come Google, GitHub, Facebook o provider generici, con callback HTTPS e segreti specifici. Verificare `state`, redirect URI e collegamento esplicito dell'identità: la coincidenza della mail non è un proof-of-ownership. MFA TOTP e codici di recupero vanno gestiti secondo la policy dell'istanza. I reset MFA amministrativi richiedono autorizzazione forte e revoca delle sessioni pertinenti.
 
 ## 13. Audit delle operazioni e retention
@@ -248,6 +250,17 @@ Il sistema può inviare allarmi su soglie di utilizzo dello storage agli amminis
 Configurare HTTPS end-to-end, Secret protetti, segregazione organizzativa e privilegi minimi, sessioni protette, audit e retention coerenti. Disabilitare credenziali demo e provider non utilizzati. Gli allegati devono passare dai controlli di scansione; non forzare la disattivazione dell'antivirus in produzione. Riesaminare policy di backup con dati personali e procedure di cancellazione.
 
 Il titolare del trattamento deve predisporre informativa, base giuridica, tempi di conservazione, eventuale DPIA, contratti con responsabili/subprocessori e canali per esercizio dei diritti. I controlli del software sono strumenti, **non una certificazione GDPR o AgID**. Aggiornare periodicamente dipendenze e analizzare risultati `npm audit`, Trivy e dei test security.
+
+**Prova di carico autorizzata con 500 partecipanti (solo staging).** Utilizzare `tools/live_500_answers.py` esclusivamente su un'istanza amministrata e per cui si è ottenuta un'autorizzazione esplicita al carico. Prerequisiti: sessione demo dedicata del presentatore, cookie di autenticazione fornito solo tramite `QUORIVIO_LOAD_PRESENTER_COOKIE`, risorse sufficienti, finestra concordata e piano di ripristino. La CLI richiede `--base-url`, `--confirm-host` esattamente uguale al nome host e `--confirm-run`; fuori da loopback è obbligatorio HTTPS. `--open-test-question` può aprire la domanda demo designata. L'opzione distruttiva `--reset-before` è consentita **solo insieme a** `--open-test-question`: azzera i voti demo precedenti e ruota l'invito, perciò non va usata con dati reali dei partecipanti. Esempio controllato:
+
+```bash
+# Eseguire solo sullo staging autorizzato; il cookie non va mai incollato qui.
+python3 tools/live_500_answers.py --base-url https://staging.example.org \
+  --confirm-host staging.example.org --confirm-run --users 500 \
+  --open-test-question --ramp-seconds 900 --json-out load-summary.json
+```
+
+Accettare il risultato soltanto se le risposte confermate dal server sono effettivamente 500; verificare anche contatore del presentatore, latenza ed errori. Le sole richieste HTTP tentate non dimostrano voti accettati. Lo strumento `tools/load_500.py` verifica separatamente la contemporaneità delle connessioni WebSocket. Conservare esclusivamente report aggregati privi di credenziali, token di accesso, nomi o identificativi di sessione. Le foto Gravatar seguono le politiche di autorizzazione, retention e diritti d'immagine: non usare fotografie reali in prove sintetiche.
 
 ## 17. Aggiornamenti, CI e pubblicazione immagini
 

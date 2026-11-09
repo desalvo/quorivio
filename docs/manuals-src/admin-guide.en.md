@@ -1,6 +1,6 @@
 # Administrator guide
 
-**Quorivio 0.1.0-dev · Documentation build RC278 · 9 November 2026**
+**Quorivio 0.1.0-dev · Documentation build RC279 · 9 November 2026**
 
 Technical and operational manual for installation, configuration, identity management, backups, monitoring, audit logging, maintenance and disaster recovery. Procedures reflect the RC276 source and deployment charts; they do **not** certify a production environment. **Explanatory UI illustrations in earlier chapters are reconstructions**, labelled as such. When the CI-produced PDF includes the final gallery, it contains genuine screenshots of the disposable live application, verified against hashes and commit. Independent D5 editorial review remains required.
 
@@ -216,6 +216,8 @@ In user administration, choose **Search LDAP**, find the account using the servi
 
 SMTP supports approval notices, recovery and operational alerts. Configure host, port, TLS, sender identity and authentication; test actual delivery and failure handling without logging secrets.
 
+**Cross-replica authorization state (security and HA).** OAuth state is stored in PostgreSQL and consumed once across replicas. For both OIDC and social OAuth, the server inserts only a hash of the random `state` in the `auth_flows` table, with an expiration time of five minutes and the provider identity. A callback consumes the record atomically using `DELETE FROM auth_flows ... RETURNING`, checks the matching browser state cookie and provider, and rejects expired, missing or reused state. Never store this state only in a worker's memory: callbacks can reach any API replica through the ingress. Confirm during a rolling restart/failover drill that an OAuth/OIDC flow can complete through another replica, while replaying the same callback is rejected. Keep the PostgreSQL connection available on every replica, HTTPS callbacks and secure cookies enabled, and never record authorization codes, secrets or state values in logs. This is an implementation contract, not evidence that a particular external identity provider has been certified.
+
 OAuth/OIDC supports configured providers such as Google, GitHub, Facebook or generic identity providers, subject to HTTPS callbacks and provider-specific credentials. Validate `state`, redirect URIs and explicit account linking: matching email addresses is not evidence of identity ownership. TOTP MFA and recovery codes must follow the deployment's security policy. Administrative MFA reset must include strong authorization and relevant session revocation.
 
 ## 13. Operation audit and retention
@@ -248,6 +250,17 @@ Disk alerts can be emailed to administrators if SMTP works. Test multi-pod behav
 Enforce TLS, protected Secrets, organizational isolation, least privileges, session controls, audited operations and appropriate retention. Disable demo credentials and unused providers. Uploads must be scanned; do not bypass antivirus in production. Review archive privacy, backup access, retention and erasure procedures.
 
 The controller must provide notices, lawful basis, retention policies, appropriate contracts with processors/subprocessors and any required DPIA. Software controls can assist but are **not GDPR or AGID certification**. Regularly review `npm audit`, Trivy scans and security test results.
+
+**Authorized 500-participant load exercise (staging only).** Use `tools/live_500_answers.py` only against an installation that you administer and have explicitly approved for load testing. Prerequisites: a dedicated owner's demo session, a valid presenter login cookie supplied through `QUORIVIO_LOAD_PRESENTER_COOKIE`, sufficient capacity, a test window and an agreed rollback plan. The CLI requires `--base-url`, the exact `--confirm-host` and `--confirm-run`; outside loopback, HTTPS is mandatory. Optionally `--open-test-question` starts the designated demo question. The destructive `--reset-before` flag is allowed **only together with** `--open-test-question` and clears old demo votes/rotates the demo invitation: never use it on production participant data. A typical controlled exercise is:
+
+```bash
+# Run on your authorized staging host only; do not paste the presenter cookie here.
+python3 tools/live_500_answers.py --base-url https://staging.example.org \
+  --confirm-host staging.example.org --confirm-run --users 500 \
+  --open-test-question --ramp-seconds 900 --json-out load-summary.json
+```
+
+Review success by comparing server-confirmed submissions to the expected 500 responses, watching presenter-visible counters, error rate and latency. Never interpret HTTP attempts alone as successful votes. Use `tools/load_500.py` separately for simultaneous WebSocket presence. Store only the sanitized aggregate report; **do not** include credentials, join tokens, names or session IDs in archived evidence. Optional Gravatar profile photos remain subject to user permissions, retention and image rights; avoid using real profile photos in synthetic load scenarios.
 
 ## 17. Upgrades, CI and image publication
 
