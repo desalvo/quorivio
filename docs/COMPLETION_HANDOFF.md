@@ -1,3 +1,7 @@
+# Quorivio 0.1.0-dev — RC275 — Linked source truth toggle CI fix
+
+**RC275:** corrected RC274 GitHub CI [42551661125](https://github.com/desalvo/quorivio/actions/runs/42551661125): outdated RC192 and RC196 checks expected `result={widget}` despite deliberate `result={viewWidget}` to apply answer truth R. New RC275 source-renderer regression ensures toggle and source-question synchronization, with no runtime changes. Historical RC274 retained; RC275 source inventory active. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; full CI/browser acceptance pending. No assistant commit/push/tag. `docs/RC_CYCLE275_LINKED_RESULTS_UI_CONTRACT.en.md`. 
+
 # Quorivio 0.1.0-dev — RC274 — Answer grading and deterministic CI
 
 **RC274:** fix late RC273 CI [42548617989](https://github.com/desalvo/quorivio/actions/runs/42548617989) from npm install lockfile mutation and privacy-test scope mismatch, switch to npm ci with historical preflight updates. Inline verified correct/incorrect answers after submission, R toggle on linked results in editor/presenter/previews, answers configured from properties or Format Widget → Content. RC273 now historic; RC274 active. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; full CI pending. No assistant commit/push/tag. `docs/RC_CYCLE274_TRUTH_FEEDBACK_CI_FIX.en.md`.

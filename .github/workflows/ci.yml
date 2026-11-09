@@ -222,6 +222,11 @@ jobs:
             test_rc_cycle198_answer_decorations.py; do
             PYTHONPATH=tools python3 -m unittest discover -s tools/tests -p "$case" -q
           done
+      # RC275: RC274 truth-result toggle must keep source-question styling
+      # on the same shared chart in live, editor and simulated views.
+      - name: RC275 linked-result source and truth toggle regression before npm
+        run: |
+          python3 -m unittest tools.tests.test_rc275_source_renderer_contract tools.tests.test_rc192_source_and_delete tools.tests.test_rc196_frontend_results_types -q
       # RC220: catch missing private converter prerequisites and linked-results
       # schema/visual contract drift before npm and browser integration.
       - name: RC220 PDF worker administration and linked result rendering before npm
@@ -1716,7 +1721,8 @@ jobs:
           python3 tools/verify_rc_cycle271_inventory.py --historical
           python3 tools/verify_rc_cycle272_inventory.py --historical
           python3 tools/verify_rc_cycle273_inventory.py --historical
-          python3 tools/verify_rc_cycle274_inventory.py
+          python3 tools/verify_rc_cycle274_inventory.py --historical
+          python3 tools/verify_rc_cycle275_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

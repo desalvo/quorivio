@@ -1,3 +1,7 @@
+# Quorivio 0.1.0-dev — RC275 — Risultati condivisi e gate CI
+
+**RC275:** corretto fallimento full CI RC274 [42551661125](https://github.com/desalvo/quorivio/actions/runs/42551661125): test RC192 e RC196 obsoleti cercavano il renderer `result={widget}` mentre RC274 utilizza `result={viewWidget}` per il pulsante R. Nuovo test negativo protegge applicazione del toggle, sicurezza dell’answer key, compatibilità presenter/editor/anteprima. Nessuna modifica runtime. RC274 storico, RC275 corrente. **85,25%** (43 gate accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; full CI e collaudo ancora richiesti. Nessun commit/push/tag. `docs/RC_CYCLE275_LINKED_RESULTS_UI_CONTRACT.it.md`. 
+
 # Quorivio 0.1.0-dev — RC274 — Vero/falso in-linea e hardening CI
 
 **RC274:** corretto il problema della CI RC273 [42548617989](https://github.com/desalvo/quorivio/actions/runs/42548617989): lockfile mutato da `npm install`, ora `npm ci`, e falso positivo test privacy sul blocco backup. Visualizzazione partecipante delle risposte corrette/sbagliate con bordi ✓/✕ in linea (senza elenco soluzione), toggle circolare verde R sul widget risultati in editor/live/anteprime, gestione V/F da Formato widget. Inventario RC273 storico, RC274 corrente. **85,25%** (43 gate accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; full CI GitHub e runtime completo da certificare. Nessun commit/push/tag dell’assistente. `docs/RC_CYCLE274_TRUTH_FEEDBACK_CI_FIX.it.md`.

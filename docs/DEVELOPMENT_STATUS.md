@@ -1,3 +1,7 @@
+# Quorivio 0.1.0-dev — RC275 — Shared result renderer CI contract
+
+**RC275:** GitHub CI RC274 [42551661125](https://github.com/desalvo/quorivio/actions/runs/42551661125) failed at RC192 source renderer textual contract (`result={widget}` versus the intentional `result={viewWidget}` bridge to the green R toggle). Updated historical RC192/RC196 checks, added negative mutation tests, preserved the app runtime. RC274 historical inventory, RC275 current. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full RC275 CI and browser verification pending; no assistant commit/push/tag. `docs/RC_CYCLE275_LINKED_RESULTS_UI_CONTRACT.en.md`. 
+
 # Quorivio 0.1.0-dev — RC274 — Inline grading and CI integrity
 
 **RC274:** green/red framed ✓/✕ choices after participant submission, round green R toggle beside results in editor/live/previews, truth config in Format Widget. GitHub CI [42548617989](https://github.com/desalvo/quorivio/actions/runs/42548617989) exposed lockfile mutation from npm install; switch to npm ci, update 33 pre-install ordering tests, scope asset-erasure privacy test to its own route. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full RC274 CI and browser acceptance pending; no assistant commit/push/tag. `docs/RC_CYCLE274_TRUTH_FEEDBACK_CI_FIX.en.md`.

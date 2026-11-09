@@ -1,3 +1,7 @@
+# Quorivio 0.1.0-dev — RC275 — Correzione contratto risultati RC192/RC196
+
+**RC275:** full CI RC274 [42551661125](https://github.com/desalvo/quorivio/actions/runs/42551661125) fallita prima di npm al controllo RC192: il renderer condiviso dei risultati usa intenzionalmente `viewWidget` per applicare il toggle R, ma i contratti storici RC192/RC196 richiedevano ancora `widget`. Adeguati entrambi e aggiunto test RC275 con regressioni negative; nessuna modifica al runtime. Inventario RC274 storico e RC275 corrente. **85,25%** (43 gate accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full CI RC275 e browser da verificare; nessun commit/push/tag. `docs/RC_CYCLE275_LINKED_RESULTS_UI_CONTRACT.it.md`. 
+
 # Quorivio 0.1.0-dev — RC274 — Evidenziazione risposte e correzione CI
 
 **RC274:** opzioni vero/falso evidenziate con bordo verde/rosso e simbolo nelle viste partecipante dopo invio, pulsante circolare R sul widget risultati in editor/anteprima/presentatore, Formato widget → Contenuti; `npm ci` per integrità `package-lock.json`, 33 contratti di ordine CI aggiornati e correzione ambito del test privacy. CI precedente [42548617989](https://github.com/desalvo/quorivio/actions/runs/42548617989) fallita nei test Python finali. **85,25%** (43 gate accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full CI RC274 da verificare; nessun commit/push/tag. `docs/RC_CYCLE274_TRUTH_FEEDBACK_CI_FIX.it.md`.
