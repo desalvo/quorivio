@@ -1,6 +1,6 @@
 # Administrator guide
 
-**Quorivio 0.1.0-dev · Documentation build RC282 · 9 November 2026**
+**Quorivio 0.1.0-dev · Documentation build RC283 · 9 November 2026**
 
 Technical and operational manual for installation, configuration, identity management, backups, monitoring, audit logging, maintenance and disaster recovery. Procedures reflect the RC276 source and deployment charts; they do **not** certify a production environment. **Explanatory UI illustrations in earlier chapters are reconstructions**, labelled as such. When the CI-produced PDF includes the final gallery, it contains genuine screenshots of the disposable live application, verified against hashes and commit. Independent D5 editorial review remains required.
 

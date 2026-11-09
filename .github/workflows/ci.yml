@@ -324,6 +324,10 @@ jobs:
         run: |
           node --experimental-strip-types --test apps/web/test/rc274-answer-truth.test.ts
           python3 -m unittest tools.tests.test_rc274_ci_integrity -q
+      # RC283: screenshot acquisition must target the enabled presenter toolbar
+      # opener, not an unrelated disabled submit-button preview on the canvas.
+      - name: RC283 real Chromium manual capture selector regression before npm
+        run: python3 -m unittest tools.tests.test_rc283_manual_capture_selector -q
       # RC282: choice order + truth markers in both participant and rehearsal.
       # This whole legacy interaction suite runs before npm to fail early if a
       # JSX refactor accidentally reverses inputs/captions or drops grading.
@@ -1780,7 +1784,8 @@ jobs:
           python3 tools/verify_rc_cycle279_inventory.py --historical
           python3 tools/verify_rc_cycle280_inventory.py --historical
           python3 tools/verify_rc_cycle281_inventory.py --historical
-          python3 tools/verify_rc_cycle282_inventory.py
+          python3 tools/verify_rc_cycle282_inventory.py --historical
+          python3 tools/verify_rc_cycle283_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

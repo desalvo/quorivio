@@ -26,6 +26,23 @@ ROOT=Path(__file__).resolve().parents[1]
 DEST=ROOT/'docs/assets/manual-screenshots'
 BASE=os.environ.get('QUORIVIO_CI_BASE_URL','http://127.0.0.1:8080')
 
+# RC283: only the real editor toolbar opener is allowed. A generic accessible
+# name containing 'Anteprima' also matches a disabled answer-submit mock inside
+# the canvas; selecting that mock caused the RC282 GitHub CI timeout.
+PRESENTER_REHEARSAL_OPENER='button.editor-preview-open.preview-presenter[aria-haspopup="dialog"]'
+
+
+async def open_presenter_rehearsal(editor):
+    button=editor.locator(PRESENTER_REHEARSAL_OPENER)
+    await expect(button).to_have_count(1, timeout=12000)
+    await expect(button).to_be_visible(timeout=12000)
+    await expect(button).to_be_enabled(timeout=12000)
+    await button.click(timeout=12000)
+    dialog=editor.get_by_role('dialog',name='Anteprima interattiva della sessione')
+    await expect(dialog).to_be_visible(timeout=12000)
+    return dialog
+
+
 
 async def dismiss_cookies(page):
     dlg=page.get_by_role('dialog',name='Informativa cookie funzionali')
@@ -106,20 +123,27 @@ async def main():
             editor=await ctx.new_page()
             await open_editor(editor,'CI Chromium real audience acceptance')
             await shot('editor-canvas',editor)
-            # When a widget is selected, capture its genuinely rendered inspector.
+            # Select an authored widget and open the *real* inspector with
+            # its own toolbar button; do not claim an unopened panel exists.
             await editor.locator('.widget-canvas-item').first.click()
-            if await editor.get_by_role('region',name='Proprietà widget').count():
+            inspector_opener=editor.get_by_role('button',name='Mostra proprietà complete del widget')
+            if await inspector_opener.count() and await inspector_opener.first.is_visible():
+                await inspector_opener.first.click()
+                inspector=editor.get_by_role('region',name='Proprietà widget selezionato')
+                await expect(inspector).to_be_visible(timeout=12000)
                 await shot('editor-widget-properties',editor)
-            # Rehearsal is a genuine app dialog, never screenshot a fake fixture.
-            preview=editor.get_by_role('button',name=re.compile('Anteprima',re.I)).first
-            if await preview.count():
-                await preview.click()
-                dialog=editor.get_by_role('dialog',name='Anteprima interattiva della sessione')
-                if await dialog.is_visible():
-                    await shot('rehearsal-presenter',editor)
-                    await dialog.get_by_role('button',name='Smartphone').click()
-                    await shot('rehearsal-smartphone',editor)
-                    await dialog.get_by_role('button',name='Chiudi anteprima').click()
+                # Dismiss this floating region before opening the rehearsal;
+                # it may overlay toolbar click targets on smaller viewports.
+                await inspector.get_by_role('button',name='Chiudi proprietà widget').click()
+                await expect(inspector).to_have_count(0,timeout=12000)
+            # Capture the actual session-rehearsal dialog, not a disabled
+            # 'Anteprima' submit-button drawn as part of the widget canvas.
+            dialog=await open_presenter_rehearsal(editor)
+            await shot('rehearsal-presenter',editor)
+            await dialog.get_by_role('button',name='Smartphone').click()
+            await expect(dialog.locator('.rehearsal-mode-mobile')).to_be_visible(timeout=12000)
+            await shot('rehearsal-smartphone',editor)
+            await dialog.get_by_role('button',name='Chiudi anteprima').click()
 
             live=await ctx.new_page()
             await live.goto(BASE+'/screen/'+sid,wait_until='domcontentloaded')

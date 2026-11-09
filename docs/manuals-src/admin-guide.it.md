@@ -1,6 +1,6 @@
 # Manuale dell'amministratore
 
-**Quorivio 0.1.0-dev · Build documentale RC282 · 9 novembre 2026**
+**Quorivio 0.1.0-dev · Build documentale RC283 · 9 novembre 2026**
 
 Manuale tecnico-operativo per installazione, configurazione, autenticazione, autorizzazioni, backup, monitoraggio, audit, manutenzione e ripristino. Le procedure sono desunte dal sorgente e dai chart della RC276; non costituiscono certificazione di un deployment reale. **Le illustrazioni esplicative presenti nei primi capitoli sono ricostruzioni**, etichettate come tali. La galleria finale, quando presente nel PDF generato dalla CI, contiene esclusivamente screenshot reali dell'istanza temporanea verificati tramite hash e commit; la revisione editoriale D5 resta separata.
 
