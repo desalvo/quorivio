@@ -12,7 +12,7 @@ from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-CYCLE = 281
+CYCLE = 282
 PUBLICATION = '2026-11-09'
 REPOSITORY = 'https://github.com/desalvo/quorivio'
 

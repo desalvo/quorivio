@@ -27,11 +27,44 @@ test('presenter rehearsal uses neutral projection components, never shared draft
  assert.match(source,/rehearsalFreeTextRows\(source,submittedAnswers/);
  assert.doesNotMatch(server,/\/api\/join\/.*\/reactions\/stats/);
 });
+/** A choice must retain its input first, even when RC274 grading adds dynamic
+ * green/red border classes and an after-submit verdict icon. Check both the
+ * participant renderer (marks) and interactive rehearsal renderer (w).
+ * Do not assume a literal, ungraded className or remove the actual ordering
+ * contract: that would pass a markup regression with inaccessible labels.
+ */
+function correctlyOrderedChoice(sourceText:string,style:'marks'|'w'){
+ const opening=`<label className={'widget-answer-option'+truthVerdictClass(verdict)} data-answer-verdict={verdict||undefined} style={answerOptionStyle(${style}.style)} key={o.id}>`;
+ const start=sourceText.indexOf(opening);
+ if(start<0||sourceText.indexOf(opening,start+opening.length)>=0)return false;
+ const end=sourceText.indexOf('</label>',start+opening.length);
+ if(end<0)return false;
+ const body=sourceText.slice(start+opening.length,end);
+ const input=body.indexOf('<input type=');
+ const caption=body.indexOf('<WidgetStyledText text={o.label}');
+ return input===0&&caption>input&&body.includes('answer-verdict-icon')&&body.includes('truthVerdictSymbol(verdict)');
+}
 test('choice control is ordered before its caption in the participant and rehearsal',()=>{
- assert.match(source,/<label className="widget-answer-option" style=\{answerOptionStyle\((?:marks|w)\.style\)\} key=\{o\.id\}><input type=/);
+ assert.ok(correctlyOrderedChoice(source,'marks'),'participant input must precede option caption');
+ assert.ok(correctlyOrderedChoice(source,'w'),'rehearsal input must precede option caption');
  assert.match(css,/\.widget-question \.widget-answer-option>input/);
  assert.match(css,/order:-1!important/);
  assert.match(css,/gap:\.35em!important/);
+});
+test('choice ordering guard rejects regressions in participant and rehearsal',()=>{
+ for(const style of ['marks','w'] as const){
+  const opening=`<label className={'widget-answer-option'+truthVerdictClass(verdict)} data-answer-verdict={verdict||undefined} style={answerOptionStyle(${style}.style)} key={o.id}>`;
+  const moved=source.replace(opening+'<input type=',opening+'<WidgetStyledText text={o.label}/><input type=');
+  assert.equal(correctlyOrderedChoice(moved,style),false,`a caption before the input must fail (${style})`);
+  const removed=source.replace(opening,opening.replace('+truthVerdictClass(verdict)',''));
+  assert.equal(correctlyOrderedChoice(removed,style),false,`missing grading classes must fail (${style})`);
+  // The full file includes other verdict symbols; slice out this choice element to
+  // mutate only the relevant occurrence and assert that the guard still rejects it.
+  const anchor=source.indexOf(opening);
+  const end=source.indexOf('</label>',anchor);
+  const altered=source.slice(0,anchor)+source.slice(anchor,end).replace('truthVerdictSymbol(verdict)','void 0')+source.slice(end);
+  assert.equal(correctlyOrderedChoice(altered,style),false,`missing verdict icon must fail (${style})`);
+ }
 });
 test('one rehearsal participant can replace a reaction, not increase the total number of votes',()=>{
  const pageKey=REHEARSAL_REACTION_PREFIX+'page-one';
