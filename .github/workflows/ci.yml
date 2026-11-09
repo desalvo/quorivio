@@ -324,6 +324,19 @@ jobs:
         run: |
           node --experimental-strip-types --test apps/web/test/rc274-answer-truth.test.ts
           python3 -m unittest tools.tests.test_rc274_ci_integrity -q
+      # RC285: ensure session-local import/export remains available from the
+      # navigation sidebar and remains a validated, privacy-safe portable ZIP.
+      - name: RC287 answer borders, floating format tabs, gradient schema and navigation contracts before npm
+        run: |
+          node --experimental-strip-types --test apps/web/test/rc287-format-results-ui.test.ts apps/api/test/rc287-gradient-domain.test.ts
+          python3 -m unittest tools.tests.test_rc287_result_formatting -q
+      - name: RC286 portable session, rich thumbnails and manual visual contracts before npm
+        run: |
+          node --experimental-strip-types --test apps/web/test/rc286-thumbnail-content.test.ts apps/web/test/rc285-local-session-transfer.test.ts
+          python3 -m unittest tools.tests.test_rc286_authoring_manuals -q
+      - name: RC285 local session export and import sidebar regression before npm
+        run: |
+          node --experimental-strip-types --test apps/web/test/rc285-local-session-transfer.test.ts apps/api/test/portable-bundle.test.ts
       # RC284: all OCI, Docker, Podman and KIND builds share this runtime RUN.
       # Detect accidental escaped-newline characters before expensive builders.
       - name: RC284 production Dockerfile package command regression before npm
@@ -1791,7 +1804,10 @@ jobs:
           python3 tools/verify_rc_cycle281_inventory.py --historical
           python3 tools/verify_rc_cycle282_inventory.py --historical
           python3 tools/verify_rc_cycle283_inventory.py --historical
-          python3 tools/verify_rc_cycle284_inventory.py
+          python3 tools/verify_rc_cycle284_inventory.py --historical
+          python3 tools/verify_rc_cycle285_inventory.py --historical
+          python3 tools/verify_rc_cycle286_inventory.py --historical
+          python3 tools/verify_rc_cycle287_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

@@ -1,8 +1,8 @@
 # Administrator guide
 
-**Quorivio 0.1.0-dev · Documentation build RC284 · 9 November 2026**
+**Quorivio 0.1.0-dev · Documentation build RC287 · 9 November 2026**
 
-Technical and operational manual for installation, configuration, identity management, backups, monitoring, audit logging, maintenance and disaster recovery. Procedures reflect the RC284 source and deployment charts; they do **not** certify a production environment. **Explanatory UI illustrations in earlier chapters are reconstructions**, labelled as such. When the CI-produced PDF includes the final gallery, it contains genuine screenshots of the disposable live application, verified against hashes and commit. Independent D5 editorial review remains required.
+Technical and operational manual for installation, configuration, identity management, backups, monitoring, audit logging, maintenance and disaster recovery. Procedures reflect the RC287 source and deployment charts; they do **not** certify a production environment. **Explanatory UI illustrations in earlier chapters are reconstructions**, labelled as such. When the CI-produced PDF includes the final gallery, it contains genuine screenshots of the disposable live application, verified against hashes and commit. Independent D5 editorial review remains required.
 
 ## 1. Architecture and responsibilities
 
@@ -376,14 +376,14 @@ A successfully parsed Kubernetes manifest is not evidence of a functioning clust
 
 ## Appendix H. Release-candidate change-management workflow
 
-For every cumulative package: start from verified source, record changes since the latest acknowledged commit, regenerate docs, promote the current SHA-256 inventory, verify public manual copies, run preflight/TypeScript checks and then full CI. Distinguish **locally passed tests**, **GitHub Actions gates** and **real infrastructure acceptance evidence**.
+For every cumulative package: start from verified source, record changes since the previous release, regenerate docs, promote the current SHA-256 inventory, verify public manual copies, run preflight/TypeScript checks and then full CI. Distinguish **locally passed tests**, **GitHub Actions gates** and **real infrastructure acceptance evidence**.
 
 When CI fails, identify the first failed step rather than only the summary job. Never disable meaningful safety tests to obtain a green status. A documentation cycle does not certify the runtime behavior it describes; a reconstructed UI screenshot is not live browser proof.
 
 
 ## Appendix I. Authentic screenshots and quick reference
 
-This gallery includes only genuine Chromium captures of a running Quorivio CI instance using disposable database records and synthetic identities. SHA-256 evidence ties them to the source commit. They are not illustration composites and do not imply production security or functional certification.
+This gallery includes only genuine Chromium captures of a running Quorivio CI instance using disposable database records and synthetic identities. SHA-256 evidence ties them to the source revision. They are not illustration composites and do not imply production security or functional certification.
 
 <!-- REAL_SCREENSHOT_GALLERY -->
 
@@ -393,7 +393,7 @@ Editorial note: initial rewritten edition RC277; live screenshot/metadata workfl
 
 **Prerequisites:** two schedulable nodes, an actually functional RWX CSI backend for media, a shared PostgreSQL service, WebSocket-capable ingress and a sound backup destination. Declaring RWX in Helm cannot by itself provision RWX storage.
 
-1. Take a verified full backup and perform a staging restore, recording the source commit, image tag and backup checksum.
+1. Take a verified full backup and perform a staging restore, recording the source release, image tag and backup checksum.
 2. Measure application, ClamAV and converter CPU/memory, WebSocket churn, PostgreSQL connections, p95 latency, media volume and scratch usage.
 3. Prove read/write access on shared assets across **different** nodes with disposable test pods.
 4. Review staging values, for example:
@@ -429,6 +429,41 @@ The chart currently exposes `replicaCount` and resource requests/limits; this do
 | Cut over | Change ingress/DNS only with operator approval and rollback plan | Actual RTO and data-loss measurement |
 
 A full application archive is **not** an atomic snapshot of database plus asset files. Reconcile time boundaries. Keep off-site encrypted backup retention outside the app, and preserve a protected backup of historic encryption keys if required for restoring encrypted configuration. Never run destructive `pg_restore` flags against live production. Use `pg_restore --list dump.backup` for inventory first and `pg_restore --no-owner --no-privileges --dbname=quorivio_test dump.backup` only against a prepared disposable database.
+
+## Appendix N. Operations atlas: backup, scaling and restore
+
+<figure><img src="../assets/manual-illustrations/backup-lifecycle.png" alt="CONCEPTUAL DIAGRAM — full backup and verified restore."/><figcaption>CONCEPTUAL DIAGRAM — full backup and verified restore.</figcaption></figure>
+
+<figure><img src="../assets/manual-evidence-rc283/admin-backups.png" alt="ARCHIVED REAL SCREENSHOT — configured instance backup panel."/><figcaption>ARCHIVED REAL SCREENSHOT — configured instance backup panel.</figcaption></figure>
+
+**Daily checks:** verify the selected POSIX/NFS/S3/WebDAV target, latest state and archive size. Full backups cover database plus private assets but do not amount to a distributed atomic snapshot. Keep archive credentials outside the source volume, with independent retention and verification.
+
+**Restore drill:** provision an isolated staging instance; stop public traffic; verify hashes, schema compatibility and encryption keys; restore PostgreSQL and media, reconcile references/permissions/migrations; test identity, saved sessions, media and audit. Record measured RPO/RTO. Do not accept a DR drill based on successful archive extraction alone.
+
+**Horizontal scaling:** prove a healthy single replica first. Require shared PostgreSQL, a correctly mounted RWX asset backend and valid NGINX/HAProxy ingress behavior. Increase replicas only after authenticated API, websocket reconnection, rolling update and failover checks. A ReadWriteOnce-only PVC cannot serve concurrent mutable writers.
+
+<figure><img src="../assets/manual-illustrations/workflow-scheme-editor-rc286.png" alt="CONCEPTUAL DIAGRAM — verifying inherited and local elements after restore."/><figcaption>CONCEPTUAL DIAGRAM — verifying inherited and local elements after restore.</figcaption></figure>
+
+## Appendix O. Identities, audit and local session archives
+
+<figure><img src="../assets/manual-evidence-rc283/admin-users.png" alt="ARCHIVED REAL SCREENSHOT — account approvals."/><figcaption>ARCHIVED REAL SCREENSHOT — account approvals.</figcaption></figure>
+
+<figure><img src="../assets/manual-evidence-rc283/admin-audit.png" alt="ARCHIVED REAL SCREENSHOT — administrative audit."/><figcaption>ARCHIVED REAL SCREENSHOT — administrative audit.</figcaption></figure>
+
+A `.quo` file copies **one session**, not the whole instance. In the dashboard, **Session attachments** starts collapsed; expand it to upload, rename or remove files. Verify presenter rights before any import or export. The `.quo` archive deliberately excludes participant data, responses, credentials and statistics. Use administrator backups for true disaster recovery, audit retention and instance configuration.
+
+<figure><img src="../assets/manual-illustrations/workflow-local-quo-rc286.png" alt="CONCEPTUAL DIAGRAM — portable `.quo` versus full-instance backup."/><figcaption>CONCEPTUAL DIAGRAM — portable `.quo` versus full-instance backup.</figcaption></figure>
+
+
+## Appendix P. RC287 graphical acceptance and regression checklist
+
+Before publication, exercise the **R** control of results linked to a graded question, first using Arial 16 px and then a different font up to 48–96 px. Verify that green/red outlines remain visible, do not obscure characters or touch adjacent frames, and that the old strip underneath the widget never reappears. Check presenter projection and participant preview without exposing answer keys to the audience.
+
+For bar results, select distinct start/end gradient colours and verify that they survive save and reload. Resize Widget Formatting to approximately 700 × 500 px, change tabs and check that **the outer dimensions stay fixed**, with the middle content scrolling inside. Repeat with global UI zoom and a narrow viewport. The updated midnight-blue/teal navigation uses Lucide icons but still requires checks for contrast, keyboard focus and phone legibility.
+
+Local Chromium styling checks do **not** certify pixel identity to editorial mock-ups or replace full application/database acceptance. Review CI real-application captures against the reference design before the final sign-off.
+
+<figure><img src="../assets/manual-illustrations/workflow-widget-context-rc286.png" alt="Conceptual widget editing and contextual menu diagram"/><figcaption>Conceptual diagram: widget selection, contextual actions and formatting controls are separate tools. This is not a real app screenshot.</figcaption></figure>
 
 ## Compatibility and indicative hardware planning sheet
 

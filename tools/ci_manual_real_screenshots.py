@@ -123,6 +123,33 @@ async def main():
             editor=await ctx.new_page()
             await open_editor(editor,'CI Chromium real audience acceptance')
             await shot('editor-canvas',editor)
+            await expect(editor.locator('.page-editor-thumbnails')).to_be_visible(timeout=12000)
+            await shot('editor-thumbnails-widgets',editor)
+            # A true right-click (not an SVG or disabled mock action) must keep
+            # the portaled, independently scrollable menu visible.
+            first_widget=editor.locator('.widget-canvas-item').first
+            await first_widget.click(button='right')
+            context_menu=editor.locator('.canvas-context-menu')
+            await expect(context_menu).to_be_visible(timeout=12000)
+            await shot('editor-widget-context',editor)
+            format_opener=context_menu.get_by_role('button',name='Formato widget')
+            if await format_opener.count():
+                await format_opener.click()
+                floating=editor.get_by_role('toolbar',name='Formattazione rapida widget selezionato')
+                await expect(floating).to_be_visible(timeout=12000)
+                await shot('editor-widget-format',editor)
+                contents=floating.get_by_role('tab',name='Contenuti')
+                if await contents.count():
+                    before=await floating.bounding_box()
+                    await contents.click()
+                    after=await floating.bounding_box()
+                    if before and after and (round(before['width'])!=round(after['width']) or round(before['height'])!=round(after['height'])):
+                        raise RuntimeError('Widget Formatting changed outer size when switching tabs')
+                    await shot('editor-widget-format-tabs',editor)
+                await floating.get_by_role('button',name='Chiudi Formato widget').click()
+            else:
+                await editor.keyboard.press('Escape')
+            await expect(context_menu).to_have_count(0,timeout=12000)
             # Select an authored widget and open the *real* inspector with
             # its own toolbar button; do not claim an unopened panel exists.
             await editor.locator('.widget-canvas-item').first.click()
@@ -140,15 +167,42 @@ async def main():
             # 'Anteprima' submit-button drawn as part of the widget canvas.
             dialog=await open_presenter_rehearsal(editor)
             await shot('rehearsal-presenter',editor)
+            await dialog.get_by_role('button',name='Partecipante').click()
+            await expect(dialog.locator('.rehearsal-mode-participant')).to_be_visible(timeout=12000)
+            await shot('rehearsal-participant',editor)
+            await dialog.get_by_role('button',name='Affiancate').click()
+            await expect(dialog.locator('.rehearsal-mode-both')).to_be_visible(timeout=12000)
+            await shot('rehearsal-side-by-side',editor)
             await dialog.get_by_role('button',name='Smartphone').click()
             await expect(dialog.locator('.rehearsal-mode-mobile')).to_be_visible(timeout=12000)
             await shot('rehearsal-smartphone',editor)
             await dialog.get_by_role('button',name='Chiudi anteprima').click()
+            # Master editor is a genuinely separate work surface: capture it
+            # through the real toolbar instead of drawing a simulated flowchart.
+            await editor.locator('button.editor-schemes-open').click(timeout=12000)
+            scheme=editor.get_by_role('region',name='Editor degli schemi PowerPoint')
+            await expect(scheme).to_be_visible(timeout=12000)
+            await shot('editor-schema',editor)
+            master_widgets=scheme.locator('.widget-canvas-item')
+            if await master_widgets.count():
+                await master_widgets.first.click()
+                await shot('editor-schema-inspector',editor)
+            await scheme.get_by_role('button',name='Esci dagli schemi').click()
+            attachments=editor.locator('details.dashboard-attachments-collapsible')
+            if await attachments.count() and await attachments.is_visible():
+                if await attachments.evaluate('(el)=>el.open'):
+                    raise AssertionError('Session attachments must start collapsed')
+                await shot('session-attachments-collapsed',editor)
+                await attachments.locator('summary').click()
+                await expect(attachments).to_have_attribute('open','',timeout=12000)
+                await shot('session-attachments-expanded',editor)
 
             live=await ctx.new_page()
             await live.goto(BASE+'/screen/'+sid,wait_until='domcontentloaded')
             await live.wait_for_timeout(900)
             await shot('presenter-live',live)
+            await live.wait_for_timeout(350)
+            await shot('presenter-live-secondary',live)
 
             mob=await browser.new_context(viewport={'width':390,'height':844},device_scale_factor=1,is_mobile=True,has_touch=True,locale='it-IT',extra_http_headers=headers)
             phone=await mob.new_page()
@@ -160,6 +214,7 @@ async def main():
             await phone.get_by_role('button',name='Layout smartphone').click()
             await shot('participant-question-smartphone',phone)
             await phone.get_by_role('button',name='Diapositiva 16:9').click()
+            await shot('participant-widescreen',phone)
             await vote(phone,'Yes')
             await shot('participant-feedback-smartphone',phone)
             await mob.close();await ctx.close()
@@ -170,9 +225,9 @@ async def main():
               'captured_at':datetime.now(timezone.utc).isoformat(),
               'shots':shots}
     (DEST/'capture.json').write_text(json.dumps(manifest,sort_keys=True,indent=2)+'\n',encoding='utf8')
-    evidence(DEST,expected_commit=md['commit'] or None,minimum=9)
+    evidence(DEST,expected_commit=md['commit'] or None,minimum=18)
     role_counts={r:sum(r in CATALOG[s] for s in shots) for r in ('user','presenter','admin')}
-    if min(role_counts.values())<3:raise AssertionError('Insufficient manual screenshot coverage: '+str(role_counts))
+    if min(role_counts.values())<4:raise AssertionError('Insufficient manual screenshot coverage: '+str(role_counts))
     print('CAPTURE SUCCESS',len(shots),role_counts,flush=True)
 
 if __name__=='__main__': asyncio.run(main())

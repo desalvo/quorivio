@@ -1,3 +1,19 @@
+# Quorivio 0.1.0-dev — RC287 — Contorni risultati, Formato widget e grafica menu
+
+**RC287:** Bordi delle risposte vere/false più spessi e spaziosi, separati anche con font personalizzati; rimossa la barra «Evidenzia vere» sotto il widget (resta il tasto R). La finestra «Formato widget» conserva le dimensioni dopo il resize e dopo il cambio tab, senza il limite CSS di 390 px; aggiunti colori iniziale/finale del gradiente per le barre, persistenti e validati dall'API. Sidebar e menu armonizzati alla palette blu notte/verde petrolio dei mock, con vere icone Lucide e navigazione accessibile. Test web e API locali, browser di controllo per layout; verifica browser reale completa e parità pixel dei mock ancora da fare. **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag.
+
+---
+
+# Quorivio 0.1.0-dev — RC286 — Miniature complete e manuali illustrati
+
+**RC286:** Archivi di sessione definitivamente `.quo`, allegati della dashboard collassati per default, miniature rappresentative dei contenuti dei widget anche in bozza, menu contestuali scorrevoli con V/F compatto. Estesa la cattura reale Chromium e ampliati i sei manuali bilingui con diagrammi, foto sintetiche etichettate e screenshot autentici verificati; nessun commit stampato nei PDF. Test locali web 473/473, API 652/652; CI estesa e nuove acquisizioni da verificare. **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. `docs/RC_CYCLE286_AUTHORING_VISUAL_MANUALS.it.md`.
+
+---
+
+# Quorivio 0.1.0-dev — RC285 — Export e import locale della sessione dalla sidebar
+
+**RC285:** Aggiunti alla sidebar i comandi **Esporta in locale (.quo)** per la sessione aperta e **Importa da locale (.quo)** (anche quando nessuna sessione è aperta). L’archivio comprende definizioni, schemi, date/appuntamenti e **tutti gli allegati privati della libreria**, compresi quelli non ancora usati. L’import genera una nuova sessione con nuovi identificativi, senza sovrascrivere l’originale; restano esclusi risposte, partecipanti, statistiche e credenziali. Limiti: 100 MiB archivio, 80 MiB media, 300 file; scansione antivirus e controlli integrità invariati. Test Node, HTTP/PostgreSQL CI esteso, documentazione presentatore IT/EN e manuali RC285 aggiornati. Full CI [42632517672](https://github.com/desalvo/quorivio/actions/runs/42632517672) e pubblicazione [42638566933](https://github.com/desalvo/quorivio/actions/runs/42638566933) verdi per RC284; verifiche GitHub RC285 ancora da svolgere. **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. `docs/RC_CYCLE285_LOCAL_SESSION_TRANSFER.it.md`.
+
 # Quorivio 0.1.0-dev — RC284 — Docker runtime: correzione build OCI/Kubernetes
 
 **RC284:** La [full CI 42624246307](https://github.com/desalvo/quorivio/actions/runs/42624246307) ha superato Production quality gate, ClamAV, Firefox/WebKit e il controllo manifest Kubernetes. I job di build Docker/Podman/OCI/KIND fallivano per `\n` letterale nella linea `apk` del `Dockerfile`, interpretato come pacchetto inesistente `n`. Corretto il comando e aggiunti quattro test di regressione anticipati. Recuperato e verificato l'artefatto GitHub con **13 screenshot veri** (commit `0bb89e6ac79e`, utenti sintetici e SHA-256); rilevato un ulteriore difetto nel generatore PDF che stampava i tag `<figure>` invece di incorporarli. Corretto il renderer HTML e limitata l'altezza delle figure mobile; archiviate le immagini vere RC283 con provenienza esplicita per i sei manuali locali **RC284, 214 pagine complessive**, senza attribuirle al nuovo commit. La CI continua a richiedere immagini **nuove** del commit corrente; nuove verifiche automatiche controllano immagini realmente incorporate, didascalie e impossibilità di usare l'archivio storico al posto della cattura corrente. Storico RC283 immutato, RC284 corrente. **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. `docs/RC_CYCLE284_DOCKER_RUNTIME_BUILD.it.md`.
@@ -397,7 +413,7 @@
 ---
 # Quorivio 0.1.0-dev — RC200 — Import/export editor e portabilità sessione
 
-**RC200:** Dalla RC199 con full CI GitHub verde (run [42096705867](https://github.com/desalvo/quorivio/actions/runs/42096705867)), nome della presentazione e proprietario primario sotto i comandi, eliminato il tasto schemi duplicato, aggiunta importazione PDF/PPTX dalle miniature dopo la pagina selezionata, completato il bundle `.quorivio` tra proprietari anche per immagini delle slide, esportazione PDF e statistiche CSV/XLSX con anonimizzazione esplicita. Controlli locali mirati superati; CI integrata RC200 da verificare. **85,25%** certificato (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag dell’assistente. Vedi `docs/RC_CYCLE200_EDITOR_PORTABILITY.it.md`. 
+**RC200:** Dalla RC199 con full CI GitHub verde (run [42096705867](https://github.com/desalvo/quorivio/actions/runs/42096705867)), nome della presentazione e proprietario primario sotto i comandi, eliminato il tasto schemi duplicato, aggiunta importazione PDF/PPTX dalle miniature dopo la pagina selezionata, completato il bundle `.quo` tra proprietari anche per immagini delle slide, esportazione PDF e statistiche CSV/XLSX con anonimizzazione esplicita. Controlli locali mirati superati; CI integrata RC200 da verificare. **85,25%** certificato (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag dell’assistente. Vedi `docs/RC_CYCLE200_EDITOR_PORTABILITY.it.md`. 
 
 ---
 
@@ -3250,7 +3266,7 @@ Aggiunti confronto tra layout corrente e salvato, indicatore delle modifiche, co
 - RC invariata al **37,5%**; rimangono aperti i contenuti PPTX complessi, la fruizione mobile, la sincronizzazione multi-replica end-to-end e l'accessibilità.
 
 ## Ciclo formato Quorivio portabile (2026-10-24)
-Implementati import/export ZIP `.quorivio` con manifest degli asset, verifica SHA-256, convalida rigorosa dell’archivio, nuovi codici di accesso e comandi dashboard. Il JSON legacy senza allegati resta compatibile. Verifiche locali: 190 test Python e 116 test Node superati. Mancano collaudo browser/database su istanze distinte e build completa TypeScript/Vite. Gate RC invariato al 37,5%.
+Implementati import/export ZIP `.quo` con manifest degli asset, verifica SHA-256, convalida rigorosa dell’archivio, nuovi codici di accesso e comandi dashboard. Il JSON legacy senza allegati resta compatibile. Verifiche locali: 190 test Python e 116 test Node superati. Mancano collaudo browser/database su istanze distinte e build completa TypeScript/Vite. Gate RC invariato al 37,5%.
 
 ### 2026-10-24 — Stabilizzazione geometria editor
 - Allineati i limiti di ridimensionamento con mouse/touch e tastiera allo 0,01% già supportato da backend e convertitore PPTX. Conservati quattro decimali per non ingrandire involontariamente gli oggetti molto piccoli.
@@ -3302,7 +3318,7 @@ Implementati import/export ZIP `.quorivio` con manifest degli asset, verifica SH
 - Matrice invariata a 40,0/100, nessuna dichiarazione RC, nessuna modifica ai servizi reali.
 
 ### 2026-10-24 ulteriore rafforzamento integrato
-- Import `.quorivio`: controllo della quota complessiva dichiarata prima della decompressione e lettura UTF-8 rigorosa del manifest; export con limite sull'archivio ZIP risultante.
+- Import `.quo`: controllo della quota complessiva dichiarata prima della decompressione e lettura UTF-8 rigorosa del manifest; export con limite sull'archivio ZIP risultante.
 - Aggiunti test di rifiuto degli archivi anomali. PostgreSQL, browser/dispositivi reali, SSO e carico live di 500 partecipanti **non** collaudati qui.
 - Compilazione TypeScript API e suite Node/Python eseguite; bundle Vite bloccato dal binario esbuild non compatibile nell'archivio dipendenze disponibile. Nessun gate RC promosso senza prove.
 

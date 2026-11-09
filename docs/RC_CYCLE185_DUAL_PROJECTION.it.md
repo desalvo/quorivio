@@ -11,7 +11,7 @@ La RC184 ha ottenuto CI verde in GitHub Actions [41993094578](https://github.com
 - **Navigazione atomica**: la route autenticata controlla le revisioni concorrenti e verifica le destinazioni all'interno della stessa sessione. Cambia i due puntatori in un'unica transazione PostgreSQL, mantenendo **una sola pagina aperta alle risposte**. Se la pagina del pubblico resta la stessa attraverso più slide dei risultati, non viene reimpostata inutilmente l'ora di apertura.
 - **Widget Risultati tra pagine**: nelle proprietà si scelgono pagina sorgente, widget sorgente ed eventuale singola domanda. Lo schermo del presentatore usa gli endpoint autenticati e l'ID della pagina sorgente per statistiche e risposte in tempo reale: quiz, testo libero, gradimento, reazioni, domande sul tema e quiz a tempo.
 - **Salvataggio**: le proprietà entrano nell'autosalvataggio, nelle bozze JSON, nel merge collaborativo e nelle verifiche server. La cancellazione di una pagina ancora referenziata da un'altra viene bloccata con errore esplicito.
-- **Portabilità**: import/export .quorivio rimappano gli ID delle pagine e i riferimenti dei widget; non è possibile importare involontariamente riferimenti alla sessione originale.
+- **Portabilità**: import/export .quo rimappano gli ID delle pagine e i riferimenti dei widget; non è possibile importare involontariamente riferimenti alla sessione originale.
 
 ## Caso d'uso
 

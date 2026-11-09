@@ -1,3 +1,19 @@
+# Quorivio 0.1.0-dev — RC287 — Widget formatting and results UI
+
+**RC287:** R answer verdicts use larger non-overlapping coloured frames, and the footer-overlapping authoring strip is removed. Widget Formatting retains explicitly resized bounds across tabs, result bars accept validated start/end gradient colours, and navigation adopts mock-inspired midnight-blue/teal menus with actual icons. All six manuals describe the revised workflows; isolated Chromium layout checks passed, but full frontend visual parity requires live CI review. **85.25%** (43 accepted/17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag.
+
+---
+
+# Quorivio 0.1.0-dev — RC286 — Authoring UX and visual documentation
+
+**RC286:** Portable `.quo`, native collapsed attachments, faithful current-draft widget thumbnails and scroll-safe portaled context menu. Expanded Chromium screenshot plan; updated six PDF manuals with actual archived evidence, schematic diagrams, labelled editorial illustrations and no public commit IDs. Web 473/473 and API 652/652 local tests passed; CI full acceptance pending. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag.
+
+---
+
+# Quorivio 0.1.0-dev — RC285 — Local session portability
+
+**RC285:** Sidebar `.quo` import and export with all slides, master schemes, widgets, calendar appointments, presenter-owned media library (including unused assets). Import creates a separate draft with new IDs and credentials; no participant data, answers or statistics. Pre-npm tests, extended PostgreSQL HTTP smoke and presenter manuals updated. RC284 complete quality/container/Kubernetes/browser and publication CI succeeded (runs 42632517672 and 42638566933); RC285 full CI pending. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag.
+
 # Quorivio 0.1.0-dev — RC284 — Docker build hotfix: runtime apk and authentic screenshots
 
 **RC284:** Full CI 42624246307 passed quality, ClamAV, Firefox/WebKit, real screenshot acquisition and manifest validation, while Docker/Podman/KIND/OCI builds failed on a literal `\n` in `apk`. Fixed the Dockerfile and added early regression. Inspected RC283 Chromium/PostgreSQL artifact: 13 authentic PNGs were verified, but PDF documents printed figure markup instead of pictures. Fixed Markdown/HTML rendering and smartphone image size, preserved all 13 RC283 authenticated screenshots as historical examples and embedded them in six **RC284 PDF manuals totaling 214 pages**, clearly attributed to the original commit. Next CI must capture screenshots from its own commit and validate that images are embedded inside PDFs. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag.
@@ -397,7 +413,7 @@
 ---
 # Quorivio 0.1.0-dev — RC200 — Editor portability handoff
 
-**RC200 handoff:** RC199 has full green CI (run `42096705867`). New compact editor title/owner row, no duplicate sidebar scheme command; thumbnail menu can insert PDF/PPTX after selected slide using the isolated worker; transferable `.quorivio` now includes referenced slide snapshots with owner-independent asset remapping; native PPTX/PDF export preserves imported raster slides; owner-only identifiable statistics or default anonymized aggregated CSV/XLSX. Local targeted tests pass; CI of RC200 pending. Certified **85.25%** (43 accepted, 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag. `docs/RC_CYCLE200_EDITOR_PORTABILITY.en.md`. 
+**RC200 handoff:** RC199 has full green CI (run `42096705867`). New compact editor title/owner row, no duplicate sidebar scheme command; thumbnail menu can insert PDF/PPTX after selected slide using the isolated worker; transferable `.quo` now includes referenced slide snapshots with owner-independent asset remapping; native PPTX/PDF export preserves imported raster slides; owner-only identifiable statistics or default anonymized aggregated CSV/XLSX. Local targeted tests pass; CI of RC200 pending. Certified **85.25%** (43 accepted, 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. No commit/push/tag. `docs/RC_CYCLE200_EDITOR_PORTABILITY.en.md`. 
 
 ---
 

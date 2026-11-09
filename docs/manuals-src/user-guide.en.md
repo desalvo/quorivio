@@ -1,8 +1,8 @@
 # Participant guide
 
-**Quorivio 0.1.0-dev · Documentation build RC284 · 9 November 2026**
+**Quorivio 0.1.0-dev · Documentation build RC287 · 9 November 2026**
 
-This guide explains how to join an interactive session, answer questions, understand feedback and use the available features on a phone or computer. It documents the RC284 application code as reviewed for documentation cycle RC278. The earlier illustrated screens are labelled reconstructions; the final gallery in CI-produced PDFs contains real captures of a disposable test instance, **never production captures**.
+This guide explains how to join an interactive session, answer questions, understand feedback and use the available features on a phone or computer. It documents the RC287 application code as reviewed for documentation cycle RC278. The earlier illustrated screens are labelled reconstructions; the final gallery in CI-produced PDFs contains real captures of a disposable test instance, **never production captures**.
 
 ## 1. What is Quorivio?
 
@@ -132,7 +132,7 @@ Before a live event, join a test invitation, enter a nickname, submit a single-c
 
 **Session:** event pages and controls. **Page:** one presenter-selected display. **Widget:** one visual or interactive component. **Preview:** simulation that does not replace live acceptance. **Confirmed submission:** answer accepted by the server. **Moderation:** approval of publishable content. **Retention:** configured period during which records are kept.
 
-**Validation scope:** this guide documents intended behavior in the RC284 codebase. It does not certify particular browsers, physical devices, LDAP/SMTP servers or Kubernetes clusters.
+**Validation scope:** this guide documents intended behavior in the RC287 codebase. It does not certify particular browsers, physical devices, LDAP/SMTP servers or Kubernetes clusters.
 
 ## Appendix A. Worked example of correct and incorrect answers
 
@@ -172,7 +172,7 @@ Do not submit answers for other people, share private login credentials or publi
 
 ## Appendix F. Authentic screenshots from the tutorial
 
-This gallery includes only genuine Chromium captures of a running Quorivio CI instance using disposable database records and synthetic identities. SHA-256 evidence ties them to the source commit. They are not illustration composites and do not imply production security or functional certification.
+This gallery includes only genuine Chromium captures of a running Quorivio CI instance using disposable database records and synthetic identities. SHA-256 evidence ties them to the source revision. They are not illustration composites and do not imply production security or functional certification.
 
 <!-- REAL_SCREENSHOT_GALLERY -->
 
@@ -183,6 +183,38 @@ Editorial note: initial rewritten edition RC277; live screenshot/metadata workfl
 Follow the screenshot gallery in sequence: login (for registered users), **mobile session entry** using a code or link, **mobile question**, and **submission feedback**. Use a pseudonym rather than unnecessary personal details. Select an answer, submit once, and wait for server confirmation. In graded single/multiple-choice questions, green/red option outlines apply **after** submission; the interface must not add a separate full answer-key list below the choices.
 
 CI screenshots use fictional data, not real event participants. If your mobile layout differs, check the “Phone layout / 16:9 slide” control and report the browser version to the presenter.
+
+## Appendix H. Visual walkthrough of a live session
+
+<figure><img src="../assets/manual-illustrations/workflow-live-presenter-user-rc286.png" alt="CONCEPTUAL DIAGRAM — participant journey during a live event."/><figcaption>CONCEPTUAL DIAGRAM — participant journey during a live event.</figcaption></figure>
+
+<figure><img src="../assets/manual-evidence-rc283/participant-entry-smartphone.png" alt="ARCHIVED REAL SCREENSHOT — entering an event from a phone."/><figcaption>ARCHIVED REAL SCREENSHOT — entering an event from a phone.</figcaption></figure>
+
+<figure><img src="../assets/manual-evidence-rc283/participant-question-smartphone.png" alt="ARCHIVED REAL SCREENSHOT — an interactive question on the phone."/><figcaption>ARCHIVED REAL SCREENSHOT — an interactive question on the phone.</figcaption></figure>
+
+**Join:** scan the displayed QR code or open the link and enter the event code. Choose the requested nickname and verify the event title. **Question:** read carefully, then select one or several answers as instructed. **Submit:** press the submission button once and await confirmation if the network is slow. **Feedback:** with a grading key enabled, correct choices gain a green ✓ and an outline, and wrong choices receive a red ✕ and outline *at the choice itself*, without a separate answer-key section.
+
+<figure><img src="../assets/manual-evidence-rc283/participant-feedback-smartphone.png" alt="ARCHIVED REAL SCREENSHOT — submission confirmation; contents depend on question settings."/><figcaption>ARCHIVED REAL SCREENSHOT — submission confirmation; contents depend on question settings.</figcaption></figure>
+
+A rehearsal preview is different from the live event: only live submissions enter real results. When switching between mobile reading layout and a 16:9 slide, check that options remain readable. Reaction changes may be permitted. If the screen appears stale, check network status before resubmitting.
+
+## Appendix I. Three worked exercises
+
+| Exercise | Participant action | Expected result |
+|---|---|---|
+| Single choice | Select exactly one answer, submit | One registered response and optional visual grading |
+| Multiple choice | Select every intended answer | Grading outlines after submission, if enabled |
+| Rating / reactions | Set a score and reaction | Acknowledgment and updated presenter data |
+
+<figure><img src="../assets/manual-illustrations/workflow-preview-live-rc286.png" alt="CONCEPTUAL DIAGRAM — rehearsal, live submission and presenter results."/><figcaption>CONCEPTUAL DIAGRAM — rehearsal, live submission and presenter results.</figcaption></figure>
+
+The presenter may show a different slide on the projector from the slide currently assigned to participant devices; follow the participant page. Never share screenshots displaying another attendee's personal information.
+
+## Appendix L. Reading the updated answer-verdict frames
+
+When the presenter reveals answer keys in the results, a prominent **green** border marks a correct choice and a **red** border marks an incorrect choice. Each border leaves room for larger text and stays separated from adjacent choices. The **R** control belongs to the presenter's results widget; it is not a control for changing your submitted answer. Custom bar-chart gradient colours describe response counts and do not themselves indicate whether a choice is correct.
+
+On a phone, use the participant view and read choices carefully before submission. If the presenter allows response changes, use the usual answer controls; do not treat a coloured result border as an interactive answer button.
 
 ## Compatibility and indicative hardware planning sheet
 

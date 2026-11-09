@@ -1,8 +1,8 @@
 # Presenter guide
 
-**Quorivio 0.1.0-dev · Documentation build RC284 · 9 November 2026**
+**Quorivio 0.1.0-dev · Documentation build RC287 · 9 November 2026**
 
-An end-to-end guide to preparing, designing, rehearsing, conducting, exporting and archiving a Quorivio event. It reflects the RC284 codebase, including answer grading and the green **R** toggle. Earlier illustrative figures are **labelled browser-rendered reconstructions**. The final gallery in CI-built PDFs contains genuine screenshots of the running disposable application, verified against source commit and SHA-256.
+An end-to-end guide to preparing, designing, rehearsing, conducting, exporting and archiving a Quorivio event. It reflects the RC287 codebase, including answer grading and the green **R** toggle. Earlier illustrative figures are **labelled browser-rendered reconstructions**. The final gallery in CI-built PDFs contains genuine screenshots of the running disposable application, verified against source commit and SHA-256.
 
 ## 1. The complete event workflow
 
@@ -169,7 +169,11 @@ Always check QR links after public URL changes, including QR already exported to
 
 ## 15. Import/export and retention
 
-Depending on the enabled workspace features, session definitions may be exported/imported without responses, alongside PDF/PPTX and CSV/Excel result exports. Complete instance backups belong to administrators, not individual presenters. Inspect data exports for personal information before sharing; apply organizational anonymization and access rules.
+In the **sidebar** of an opened session, select **Export locally (.quo)** (*Esporta in locale*). Your browser downloads a self-contained, reimportable file containing slides, widgets, text, master schemes, **scheduled dates and calendar appointments**, settings and **all presenter-owned files in the session library**, even files not yet used on a slide. The server enforces an overall 100 MiB archive limit, 80 MiB in media and up to 300 attachments; reduce media before retrying if the limit is reached.
+
+To **Import locally (.quo)** (*Importa da locale*), use the sidebar action (available even without an opened session), select a previously exported file and confirm the import. Quorivio **creates a new draft**, remaps all page/asset IDs, generates fresh access credentials and opens the imported copy. The original session is never overwritten. The server rejects invalid or tampered ZIP bundles. Check slide thumbnails, master schemes, media and linked results after import.
+
+**A portable session is not an audience-data backup:** it deliberately excludes participant identities, responses, votes, analytics, history, original joining credentials and authentication secrets. Use separate CSV/Excel exports for statistics and administrator instance backups for full disaster recovery. Treat local archives as confidential if they contain copyrighted or sensitive uploaded media. PDF/PPTX and CSV/Excel exports remain available separately where supported. Complete instance backups belong to administrators, not individual presenters. Inspect data exports for personal information before sharing; apply organizational anonymization and access rules.
 
 Deleting, resetting or invalidating an activity can affect reports. Record the reason for invalidation and communicate changes to aggregate results. Retention and erasure must follow the deployment's privacy policy.
 
@@ -255,7 +259,7 @@ Document differences in placement, fonts, size, contrast, interaction, wrapping 
 
 ## Appendix H. Real screenshots and visual checks
 
-This gallery includes only genuine Chromium captures of a running Quorivio CI instance using disposable database records and synthetic identities. SHA-256 evidence ties them to the source commit. They are not illustration composites and do not imply production security or functional certification.
+This gallery includes only genuine Chromium captures of a running Quorivio CI instance using disposable database records and synthetic identities. SHA-256 evidence ties them to the source revision. They are not illustration composites and do not imply production security or functional certification.
 
 <!-- REAL_SCREENSHOT_GALLERY -->
 
@@ -268,6 +272,77 @@ Editorial note: initial rewritten edition RC277; live screenshot/metadata workfl
 3. Compare the **Presenter** rehearsal to the **Smartphone** rehearsal: participants must see legible content without presenter-only widgets.
 4. During a dual-browser test inspect the live chart, the R toggle, the absence of early answer-key disclosure and the option-level verdict after submission.
 5. Report visual differences using the exact build, browser, OS and screenshots. CI sample content does not reflect site-specific settings.
+
+## Appendix L. Illustrated lab: editor, master and thumbnails
+
+Use a disposable draft session with no real audience. Insert a multiple-choice question with three authored options. The left-hand thumbnails should reflect the **actual question text and options**, not just placeholder rectangles. Charts without live data remain schematic; a thumbnail must never claim fabricated response counts.
+
+<figure><img src="../assets/manual-illustrations/workflow-page-editor-rc286.png" alt="CONCEPTUAL DIAGRAM — page editor > widget > properties > thumbnail > rehearsal."/><figcaption>CONCEPTUAL DIAGRAM — page editor > widget > properties > thumbnail > rehearsal.</figcaption></figure>
+
+<figure><img src="../assets/manual-evidence-rc283/editor-canvas.png" alt="ARCHIVED REAL SCREENSHOT — authoring interface on disposable sample data."/><figcaption>ARCHIVED REAL SCREENSHOT — authoring interface on disposable sample data.</figcaption></figure>
+
+### L.1 Build and inspect a page
+
+1. Open the page editor, insert **Question** and fill in its title, answer mode and choices.
+2. Check the thumbnail for captions, option labels, geometry, colors and media; the active page also reflects unsaved changes.
+3. Add linked **Results**. Without a response dataset, the miniature shows a clearly schematic chart, never invented counts.
+4. Insert timer, rating, reactions, image and shape; all must be visually distinguishable.
+5. Compare the canvas, properties panel, formatting and thumbnail after editing each widget.
+
+### L.2 Long widget context menus
+
+<figure><img src="../assets/manual-illustrations/workflow-widget-context-rc286.png" alt="CONCEPTUAL DIAGRAM — independently scrolling widget context menu."/><figcaption>CONCEPTUAL DIAGRAM — independently scrolling widget context menu.</figcaption></figure>
+
+Right-click or long-press a widget. When the menu grows taller than the viewport, scroll *inside the menu* with mouse wheel or touch; it must remain open. True/false choices have compact **V/F** indicators, while complete question text remains available in widget properties. Press Escape or click outside to dismiss it.
+
+### L.3 Global schemes and local overrides
+
+<figure><img src="../assets/manual-illustrations/workflow-scheme-editor-rc286.png" alt="CONCEPTUAL DIAGRAM — global master styles and independent page content."/><figcaption>CONCEPTUAL DIAGRAM — global master styles and independent page content.</figcaption></figure>
+
+Open **Schemi** from the editor. Insert master Title and Footer; configure alignment, logo and global background, then save. Verify two distinct pages and any explicit local overrides. Test the smartphone background independently from the desktop background.
+
+## Appendix M. Four rehearsal views
+
+<figure><img src="../assets/manual-illustrations/workflow-preview-live-rc286.png" alt="CONCEPTUAL DIAGRAM — presenter, participant, side-by-side, smartphone and live."/><figcaption>CONCEPTUAL DIAGRAM — presenter, participant, side-by-side, smartphone and live.</figcaption></figure>
+
+<figure><img src="../assets/manual-evidence-rc283/rehearsal-presenter.png" alt="ARCHIVED REAL SCREENSHOT — presenter rehearsal."/><figcaption>ARCHIVED REAL SCREENSHOT — presenter rehearsal.</figcaption></figure>
+
+<figure><img src="../assets/manual-evidence-rc283/rehearsal-smartphone.png" alt="ARCHIVED REAL SCREENSHOT — mobile rehearsal."/><figcaption>ARCHIVED REAL SCREENSHOT — mobile rehearsal.</figcaption></figure>
+
+1. **Presenter:** check slide design, linked results and the green R disclosure toggle.
+2. **Participant:** submit rehearsal answers and verify direct green/red option outlines, without a separate answer-key disclosure block.
+3. **Side by side:** compare views and test independent navigation without starting a live activity.
+4. **Smartphone:** check responsive placement and mobile-specific background/typography.
+
+Rehearsal submissions must not enter production statistics. Repeat all views after significant master or widget changes.
+
+## Appendix N. Run a live session step by step
+
+<figure><img src="../assets/manual-illustrations/workflow-live-presenter-user-rc286.png" alt="CONCEPTUAL DIAGRAM — prepare, connect, interact, close."/><figcaption>CONCEPTUAL DIAGRAM — prepare, connect, interact, close.</figcaption></figure>
+
+<figure><img src="../assets/manual-evidence-rc283/presenter-live.png" alt="ARCHIVED REAL SCREENSHOT — presenter projection."/><figcaption>ARCHIVED REAL SCREENSHOT — presenter projection.</figcaption></figure>
+
+<figure><img src="../assets/manual-illustrations/editorial-live-presentation-rc286.jpg" alt="SYNTHETIC EDITORIAL PHOTOGRAPHIC ILLUSTRATION — not a screenshot."/><figcaption>SYNTHETIC EDITORIAL PHOTOGRAPHIC ILLUSTRATION — not a screenshot.</figcaption></figure>
+
+**Before opening:** check HTTPS endpoint, code/QR updates, audience connectivity, and projector screen. **During:** invite participants, display relevant pages, monitor submissions, activate result charts and the R toggle as appropriate. If live connectivity drops, do not assume chart figures are fresh; verify reconnection. **Afterwards:** close the session, inspect outcomes, apply anonymization settings and observe GDPR retention.
+
+## Appendix O. Export and import a complete .quo session
+
+<figure><img src="../assets/manual-illustrations/workflow-local-quo-rc286.png" alt="CONCEPTUAL DIAGRAM — local .quo portable session transfer."/><figcaption>CONCEPTUAL DIAGRAM — local .quo portable session transfer.</figcaption></figure>
+
+<figure><img src="../assets/manual-illustrations/editorial-collaborative-workflow-rc286.jpg" alt="SYNTHETIC EDITORIAL PHOTOGRAPHIC ILLUSTRATION — collaborators, not application UI."/><figcaption>SYNTHETIC EDITORIAL PHOTOGRAPHIC ILLUSTRATION — collaborators, not application UI.</figcaption></figure>
+
+Use **Export locally (.quo)** in the session sidebar. The file contains pages, widgets, masters, calendar entries and session-library assets including unused attachments; it excludes participants, credentials and responses. **Import locally (.quo)** creates a separate draft. Inspect thumbnails, media links, result sources and appointments. Portable sessions are not substitutes for administrator disaster-recovery backups.
+
+## Appendix P. R answer highlights, Widget Formatting and bar gradients
+
+**Correct/incorrect answer outlines.** In the editor, create a graded question and link a Results widget. In presenter preview, press the **circular R** in the widget's top-right corner: correct options show a thick green frame and incorrect options show a red frame. The frame has internal spacing that scales with the text, even with custom fonts and large font sizes, and adjacent frames must not overlap. Press **R** again to hide the verdicts. The old «Highlight correct» strip below the widget was removed because it could overlap the footer.
+
+**Widget Formatting window.** Select a widget, open Format from its contextual menu and drag the window's corner to resize it. Switch between **Text**, **Borders**, **Effects**, **Contents** and **Links**: its outer width and height remain unchanged while the active tab's contents scroll inside. For bar results, open Contents, enable the **Gradient** option and choose the **Start colour** and **End colour** pickers. Intensity still reflects the response distribution; changing colours never changes counts. Save and verify the desktop preview with a second, deliberately large font.
+
+**Navigation styling.** The sidebar uses visual icons for sessions, calendar, presenters, settings and `.quo` import. The active item uses a teal-green highlight. Commands remain accessible on desktop and adapted mobile layouts via keyboard or long press.
+
+<figure><img src="../assets/manual-illustrations/workflow-widget-context-rc286.png" alt="Conceptual widget editing and contextual menu diagram"/><figcaption>Conceptual diagram: widget selection, contextual actions and formatting controls are separate tools. This is not a real app screenshot.</figcaption></figure>
 
 ## Compatibility and indicative hardware planning sheet
 

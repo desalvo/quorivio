@@ -14,7 +14,7 @@ This ZIP is **a cumulative development checkpoint, NOT a release candidate**. Th
 2. Complete live authoring-to-scoring/browser flows with real PostgreSQL and concurrent clients.
 3. Unified MFA/email/TOTP policy controls and end-to-end SSO/recovery verification.
 4. Mobile/editor cross-browser interactions and accessibility acceptance.
-5. Portable `.quorivio` cross-instance data/media round-trip under real storage conditions.
+5. Portable `.quo` cross-instance data/media round-trip under real storage conditions.
 6. Clean reproducible dependency lockfile, builds, security/license/GDPR and CI on the final revision.
 7. IT/EN manuals reflecting complete supported feature boundaries and verified deployment procedures.
 

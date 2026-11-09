@@ -71,6 +71,20 @@ test('portable import remaps every theme, page and result reference consistently
  assert.throws(()=>remapPortableAssets(source,[id,other,'../secret']),/invalid_import_assets/);
 });
 
+test('complete local archive preserves unused presenter library assets, with fresh IDs on import',()=>{
+ const unused=randomUUID(),secondMedia=Buffer.from(bytes);
+ const complete={...manifest,assets:[...manifest.assets,{id:unused,mime:'image/png',bytes:secondMedia.length,sha256:createHash('sha256').update(secondMedia).digest('hex')}]};
+ const encoded=encodeBundle(complete,new Map([[id,bytes],[unused,secondMedia]]));
+ const unpacked=decodeBundle(encoded);
+ assert.equal(unpacked.media.size,2);
+ assert.deepEqual(referencedAssets(unpacked.manifest.definition),new Set([id]));
+ const imported=remapPortableAssets(unpacked.manifest.definition,[id,unused]);
+ assert.equal(imported.ids.size,2);
+ assert.notEqual(imported.ids.get(unused),unused);
+ assert.ok(!referencedAssets(imported.definition).has(imported.ids.get(unused)!));
+ assert.throws(()=>remapPortableAssets(unpacked.manifest.definition,[unused]),/unmatched_import_assets/);
+});
+
 test('portable bundle can be independently imported twice with fresh UUID assignments',()=>{
  const zip=encodeBundle(manifest,new Map([[id,bytes]]));
  const a=remapPortableAssets(decodeBundle(zip).manifest.definition,[id]);

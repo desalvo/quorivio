@@ -34,6 +34,18 @@ CATALOG = {
  'participant-question-smartphone': ('user',),
  'participant-feedback-smartphone': ('user',),
  'presenter-live': ('presenter',),
+ 'editor-thumbnails-widgets': ('presenter',),
+ 'editor-widget-context': ('presenter',),
+ 'editor-widget-format': ('presenter',),
+ 'editor-widget-format-tabs': ('presenter',),
+ 'editor-schema': ('presenter',),
+ 'editor-schema-inspector': ('presenter',),
+ 'rehearsal-participant': ('presenter','user'),
+ 'rehearsal-side-by-side': ('presenter','user'),
+ 'participant-widescreen': ('user',),
+ 'presenter-live-secondary': ('presenter',),
+ 'session-attachments-collapsed': ('presenter','admin'),
+ 'session-attachments-expanded': ('presenter','admin'),
 }
 CAPTIONS = {
  'login-desktop': ('Accesso alla vera interfaccia; credenziali di prova non mostrate.', 'Actual sign-in interface; test credentials are not displayed.'),
@@ -50,6 +62,18 @@ CAPTIONS = {
  'participant-question-smartphone': ('Risposta a una domanda sullo smartphone.', 'Answering a question on a phone.'),
  'participant-feedback-smartphone': ('Conferma di invio visualizzata dal partecipante.', 'Submission confirmation visible to the participant.'),
  'presenter-live': ('Schermo reale di proiezione del presentatore.', 'Actual presenter projection screen.'),
+ 'editor-thumbnails-widgets': ('Le miniature riproducono domanda, opzioni, tempo e altri contenuti di esempio.', 'Page thumbnails reproduce the sample question, choices, timer and other authored widgets.'),
+ 'editor-widget-context': ('Menu contestuale reale con scorrimento indipendente e V/F sintetico.', 'Actual independently scrollable widget context menu with compact true/false choices.'),
+ 'editor-widget-format': ('Finestra reale di formattazione del widget prima del cambio scheda.', 'Actual widget-formatting window before a tab change.'),
+ 'editor-widget-format-tabs': ('Finestra di formattazione con Contenuti selezionato e dimensioni esterne conservate.', 'Widget Formatting after selecting Contents, with its original outer dimensions preserved.'),
+ 'editor-schema': ('Editor degli schemi e barra di formattazione master.', 'Master scheme editor and master formatting ribbon.'),
+ 'editor-schema-inspector': ('Pannello delle proprietà delle widget nello schema.', 'Widget inspector in the master editor.'),
+ 'rehearsal-participant': ('Anteprima del partecipante con input simulati.', 'Participant rehearsal with simulated inputs.'),
+ 'rehearsal-side-by-side': ('Confronto reale delle viste presentatore e partecipante.', 'Real side-by-side presenter and audience preview.'),
+ 'participant-widescreen': ('Pagina 16:9 sul telefono del partecipante.', '16:9 session slide on a participant phone.'),
+ 'presenter-live-secondary': ('Seconda vista di proiezione dal vivo con sessione sintetica.', 'Second real live-projection view using a synthetic session.'),
+ 'session-attachments-collapsed': ('Pannello allegati chiuso per impostazione predefinita.', 'Session attachment panel collapsed by default.'),
+ 'session-attachments-expanded': ('Pannello allegati aperto per aggiungere o gestire risorse.', 'Attachment panel expanded to add or manage files.'),
 }
 
 
@@ -111,7 +135,7 @@ def gallery(role: str, lang: str, path: Path = SCREENSHOTS, *, require: bool = F
         raise ValueError('Current-build screenshots must come from the active CI capture directory')
     # Local checked-in manuals keep genuinely photographed examples with their
     # original RC283 commit provenance. This can never satisfy CI --require-real.
-    historic = False
+    historic = path == HISTORIC_SCREENSHOTS
     if not require and path == SCREENSHOTS and not (path / 'capture.json').is_file() and HISTORIC_SCREENSHOTS.is_dir():
         path = HISTORIC_SCREENSHOTS
         historic = True
@@ -125,7 +149,7 @@ def gallery(role: str, lang: str, path: Path = SCREENSHOTS, *, require: bool = F
         label=('SCHERMATA REALE' if lang=='it' else 'REAL APP SCREENSHOT')
         source_dir = 'manual-evidence-rc283' if historic else 'manual-screenshots'
         provenance = ('ARCHIVIO RC283' if lang=='it' else 'RC283 ARCHIVE') if historic else ('BUILD CORRENTE' if lang=='it' else 'CURRENT BUILD')
-        images.append(f'<figure><img src="../assets/{source_dir}/{stem}.png" alt="{caption}"/><figcaption>{label} · {provenance} · {caption} · Commit {data.get("commit", "")[:12] or "local disposable"}.</figcaption></figure>')
+        images.append(f'<figure><img src="../assets/{source_dir}/{stem}.png" alt="{caption}"/><figcaption>{label} · {provenance} · {caption}</figcaption></figure>')
     if require and len(images)<3:
         raise ValueError(f'Too few screenshot examples for {role}')
     return '\n'.join(images)

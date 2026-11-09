@@ -12,7 +12,7 @@ from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-CYCLE = 284
+CYCLE = 287
 PUBLICATION = '2026-11-09'
 REPOSITORY = 'https://github.com/desalvo/quorivio'
 
@@ -29,7 +29,7 @@ def metadata(root: Path = ROOT, *, commit: str | None = None) -> dict[str, str]:
         raise ValueError('Build commit must be a full 40-digit hexadecimal Git SHA')
     return {
         'name': 'Quorivio', 'version': package['version'],
-        'build': f'RC{CYCLE}' + (f' · {sha[:12]}' if sha else ' · commit not recorded'),
+        'build': f'RC{CYCLE}',
         'cycle': f'RC{CYCLE}', 'commit': sha or '', 'published': PUBLICATION,
         'author': match.group(1).strip(), 'email': match.group(2),
         'license': spdx.group(1), 'repository': REPOSITORY,

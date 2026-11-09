@@ -1,8 +1,8 @@
 # Manuale del presentatore
 
-**Quorivio 0.1.0-dev · Build documentale RC284 · 9 novembre 2026**
+**Quorivio 0.1.0-dev · Build documentale RC287 · 9 novembre 2026**
 
-Guida di lavoro completa per creare, progettare, provare, condurre ed esportare una sessione. Descrive il codice RC284 con le correzioni vero/falso e il pulsante **R**. Le immagini illustrative dei capitoli principali sono **ricostruzioni esplicitamente etichettate**; la galleria finale dei PDF CI utilizza screenshot autentici acquisiti su un ambiente di prova e verificati per commit.
+Guida di lavoro completa per creare, progettare, provare, condurre ed esportare una sessione. Descrive il codice RC287 con le correzioni vero/falso e il pulsante **R**. Le immagini illustrative dei capitoli principali sono **ricostruzioni esplicitamente etichettate**; la galleria finale dei PDF CI utilizza screenshot autentici acquisiti su un ambiente di prova e verificati tramite manifest e SHA-256.
 
 ## 1. La sequenza operativa completa
 
@@ -171,7 +171,11 @@ Durante la sessione il presentatore può avanzare o tornare di pagina e, dove co
 
 ## 15. Esportazioni, importazioni e ciclo di vita
 
-La gestione delle sessioni può comprendere **esportazione/importazione delle definizioni** (senza statistiche), PDF/PPTX e dati in CSV/Excel secondo i formati effettivamente presenti in dashboard. La copia completa dell'istanza non è responsabilità del singolo presentatore: è operazione amministrativa. Controllare sempre il contenuto di un file prima di condividerlo; le esportazioni dei risultati possono contenere dati riferibili ai partecipanti e richiedono anonimizzazione.
+Dalla **sidebar** della sessione aperta, premere **Esporta in locale (.quo)**. Il browser scarica un unico archivio reimportabile con pagine, widget, testi, schemi, **date e appuntamenti del calendario**, impostazioni e **tutti gli allegati privati della libreria della sessione**, inclusi quelli non ancora usati. Il formato mantiene le risorse originali senza dipendere da URL remoti; il server controlla integrità e dimensione (massimo 100 MiB per archivio, 80 MiB di allegati, 300 file). Se supera i limiti, ridurre i media prima di ripetere l'operazione.
+
+Per **Importa da locale (.quo)**, usare il pulsante nella sidebar (disponibile anche senza sessione aperta), selezionare un archivio esportato in precedenza e attendere la conferma. L'importazione **crea una nuova sessione in bozza**, rimappa tutti gli identificativi di pagine e allegati, genera nuove credenziali di accesso e apre la copia; non sovrascrive la sessione precedente. In caso di archivio corrotto o non valido, il server rifiuta l'importazione. Verificare dopo l'operazione miniature, schemi, media e collegamenti dei risultati tra pagine. Non cambiare estensione a uno ZIP generico e non rinominare i file interni.
+
+**Portabilità non significa backup dei partecipanti:** l'archivio non contiene identità, risposte, voti, statistiche, cronologia, codici QR originali o segreti. Per dati statistici usare gli export CSV/Excel separati; per disaster recovery completo dell'istanza usare i backup amministrativi. Salvare l'archivio su un dispositivo protetto, poiché può contenere immagini e documenti soggetti a copyright o vincoli organizzativi. La gestione delle sessioni supporta inoltre PDF/PPTX e dati in CSV/Excel secondo i formati effettivamente presenti in dashboard. La copia completa dell'istanza non è responsabilità del singolo presentatore: è operazione amministrativa. Controllare sempre il contenuto di un file prima di condividerlo; le esportazioni dei risultati possono contenere dati riferibili ai partecipanti e richiedono anonimizzazione.
 
 La modifica della retention o la cancellazione della sessione deve rispettare gli obblighi dell'organizzazione. Prima di invalidare una domanda o azzerare risultati, registrare la ragione dell'intervento e comunicare l'effetto sui grafici.
 
@@ -257,7 +261,7 @@ Registrare le incongruenze per ogni vista: posizione, font, dimensione, contrast
 
 ## Appendice H. Schermate reali e controlli visuali
 
-La galleria mostra soltanto acquisizioni genuine da un Quorivio avviato in CI, con database e identità di prova. Le schermate sono correlate al commit con SHA-256. Non derivano da composizioni illustrate. Le schermate sono una guida all’uso, non prove di certificazione funzionale o di sicurezza.
+La galleria mostra soltanto acquisizioni genuine da un Quorivio avviato in CI, con database e identità di prova. Le schermate sono correlate alla versione sorgente tramite SHA-256. Non derivano da composizioni illustrate. Le schermate sono una guida all’uso, non prove di certificazione funzionale o di sicurezza.
 
 <!-- REAL_SCREENSHOT_GALLERY -->
 
@@ -272,6 +276,77 @@ Nota editoriale: riscrittura iniziale in RC277; revisione metadati e processo sc
 5. Conservare il report e comunicare all'amministratore eventuali differenze fra screenshot CI e installazione operativa indicando build, browser e sistema operativo.
 
 **Dati di prova:** i contenuti nelle immagini raccolte in CI sono sintetici e possono avere etichette in inglese. Non usare screenshot CI per dedurre la configurazione effettiva della propria organizzazione.
+
+## Appendice L. Laboratorio illustrato: editor, schema e miniature
+
+Questa esercitazione usa una sessione di prova senza partecipanti reali. **Prima di tutto** creare una sessione in bozza, aprire l'editor delle pagine e aggiungere una domanda a scelta multipla con tre risposte. Le miniature della colonna sinistra devono aggiornarsi con il titolo e le risposte del widget: non soltanto mostrare un rettangolo generico. Il contenuto del grafico Risultati, quando non esistono risposte reali, è *schematico*, non un numero di voti inventato.
+
+<figure><img src="../assets/manual-illustrations/workflow-page-editor-rc286.png" alt="DIAGRAMMA CONCETTUALE — ciclo editor > widget > proprietà > miniatura > anteprima."/><figcaption>DIAGRAMMA CONCETTUALE — ciclo editor > widget > proprietà > miniatura > anteprima.</figcaption></figure>
+
+<figure><img src="../assets/manual-evidence-rc283/editor-canvas.png" alt="VISTA AUTENTICA ARCHIVIATA — editor grafico su istanza di prova; il layout può evolvere in versioni successive."/><figcaption>VISTA AUTENTICA ARCHIVIATA — editor grafico su istanza di prova; il layout può evolvere in versioni successive.</figcaption></figure>
+
+### L.1 Creazione e controllo delle miniature
+
+1. Aprire la pagina e fare clic sulla palette **Domanda**. Inserire testo e opzioni e confermare il salvataggio automatico.
+2. Verificare il contenuto della miniatura: titolo, opzioni, posizione, dimensione, colori ed eventuale immagine sono riprodotti in una forma compatta; anche le modifiche non ancora salvate vengono mostrate nella pagina attiva.
+3. Aggiungere **Risultati** e collegarli alla domanda. Nelle miniature il grafico è un segnaposto visivo, *non* una statistica della sessione.
+4. Inserire timer, rating, reazioni, immagine e forma: ogni widget deve essere distinguibile anche nella miniatura.
+5. Selezionare un widget, aprire **Proprietà widget** e **Formato**, quindi confrontare il rendering dopo ogni modifica.
+
+### L.2 Menu contestuale accessibile
+
+<figure><img src="../assets/manual-illustrations/workflow-widget-context-rc286.png" alt="DIAGRAMMA CONCETTUALE — menu contestuale su desktop o touchscreen."/><figcaption>DIAGRAMMA CONCETTUALE — menu contestuale su desktop o touchscreen.</figcaption></figure>
+
+Aprire il menu con il tasto destro oppure con la pressione prolungata. Se contiene molti comandi, scorrere *al suo interno*: la rotellina e il trascinamento verticale non devono chiuderlo. Nelle domande con verifica attiva, le opzioni V/F usano etichette brevi **V** e **F**, con descrizione completa disponibile in Proprietà widget. Premere **Esc** o fare clic all'esterno per chiudere.
+
+### L.3 Schemi e precedenza dello stile
+
+<figure><img src="../assets/manual-illustrations/workflow-scheme-editor-rc286.png" alt="DIAGRAMMA CONCETTUALE — schema globale e contenuti locali nelle singole pagine."/><figcaption>DIAGRAMMA CONCETTUALE — schema globale e contenuti locali nelle singole pagine.</figcaption></figure>
+
+Aprire **Schemi** dall'editor. Utilizzare i controlli Titolo, Footer, allineamenti e sfondo globale; selezionare un widget dello schema per aprirne le proprietà. Salvare lo schema e controllare due pagine differenti: gli elementi globali si propagano, ma una personalizzazione locale esplicita resta distinta. Verificare gli sfondi separati per desktop e smartphone.
+
+## Appendice M. Quattro anteprime prima dell'evento
+
+<figure><img src="../assets/manual-illustrations/workflow-preview-live-rc286.png" alt="DIAGRAMMA CONCETTUALE — le quattro anteprime e il comportamento live."/><figcaption>DIAGRAMMA CONCETTUALE — le quattro anteprime e il comportamento live.</figcaption></figure>
+
+<figure><img src="../assets/manual-evidence-rc283/rehearsal-presenter.png" alt="VISTA AUTENTICA ARCHIVIATA — simulazione presentatore."/><figcaption>VISTA AUTENTICA ARCHIVIATA — simulazione presentatore.</figcaption></figure>
+
+<figure><img src="../assets/manual-evidence-rc283/rehearsal-smartphone.png" alt="VISTA AUTENTICA ARCHIVIATA — simulazione su smartphone."/><figcaption>VISTA AUTENTICA ARCHIVIATA — simulazione su smartphone.</figcaption></figure>
+
+1. **Presentatore:** verificare intestazione, risultato collegato e possibilità di attivare/disattivare il pulsante **R**.
+2. **Partecipante:** rispondere a ciascuna domanda nella simulazione; dopo l'invio verificare il bordo verde/rosso accanto alle opzioni, senza blocco soluzione sotto la domanda.
+3. **Affiancate:** confrontare le due viste e controllare pagine diverse senza confondere l'anteprima con una sessione realmente attiva.
+4. **Smartphone:** provare le due modalità di disposizione, leggibilità delle opzioni e sfondo mobile indipendente.
+
+Le risposte di prova non devono creare statistiche di produzione. Ripetere i controlli dopo ogni modifica importante allo schema o ai widget.
+
+## Appendice N. Sessione live: procedura per il presentatore
+
+<figure><img src="../assets/manual-illustrations/workflow-live-presenter-user-rc286.png" alt="DIAGRAMMA CONCETTUALE — preparazione, accesso, interazione e chiusura della sessione."/><figcaption>DIAGRAMMA CONCETTUALE — preparazione, accesso, interazione e chiusura della sessione.</figcaption></figure>
+
+<figure><img src="../assets/manual-evidence-rc283/presenter-live.png" alt="VISTA AUTENTICA ARCHIVIATA — schermo di proiezione del presentatore."/><figcaption>VISTA AUTENTICA ARCHIVIATA — schermo di proiezione del presentatore.</figcaption></figure>
+
+<figure><img src="../assets/manual-illustrations/editorial-live-presentation-rc286.jpg" alt="ILLUSTRAZIONE FOTOGRAFICA SINTETICA — presentazione davanti al pubblico, non schermata del software."/><figcaption>ILLUSTRAZIONE FOTOGRAFICA SINTETICA — presentazione davanti al pubblico, non schermata del software.</figcaption></figure>
+
+**Prima dell'apertura:** predisporre una pagina di attesa, verificare la URL esterna HTTPS, aggiornare il QR, controllare che la sala abbia connettività e aprire separatamente lo schermo del presentatore. **Durante:** invitare tramite QR/codice, mostrare le pagine destinate al pubblico, raccogliere risposte, attivare il grafico e il toggle R soltanto quando appropriato. Se la rete si interrompe, non assumere che i dati siano aggiornati: verificare l'avviso di disconnessione e attendere il ripristino. **Dopo:** fermare la sessione, verificare le statistiche, scegliere esportazione anonima o nominativa secondo i permessi e applicare retention e policy GDPR.
+
+## Appendice O. Copia locale della sessione .quo
+
+<figure><img src="../assets/manual-illustrations/workflow-local-quo-rc286.png" alt="DIAGRAMMA CONCETTUALE — esportazione e reimportazione di una sessione .quo."/><figcaption>DIAGRAMMA CONCETTUALE — esportazione e reimportazione di una sessione .quo.</figcaption></figure>
+
+<figure><img src="../assets/manual-illustrations/editorial-collaborative-workflow-rc286.jpg" alt="ILLUSTRAZIONE FOTOGRAFICA SINTETICA — collaborazione tra presentatori, non schermata del software."/><figcaption>ILLUSTRAZIONE FOTOGRAFICA SINTETICA — collaborazione tra presentatori, non schermata del software.</figcaption></figure>
+
+Nel menu laterale della sessione, usare **Esporta in locale (.quo)** e salvare l'archivio. Il file contiene pagine, widget, schemi, allegati anche non utilizzati e calendario, ma non i dati dei partecipanti. Con **Importa da locale (.quo)** creare una copia indipendente in bozza; verificare miniature, background, collegamenti a risultati, media e appuntamenti. Le copie di sessione non sostituiscono il backup completo dell'istanza.
+
+## Appendice P. Evidenziazione R, Formato widget e barre con gradiente
+
+**Verifica delle risposte vere e false.** Nell'editor, inserisci una domanda con chiave corretta e collega un widget «Risultati». In anteprima presentatore, premi la **R circolare** in alto a destra del widget: le risposte vere acquistano un bordo verde spesso e le false un bordo rosso. L'evidenziazione è interna alla risposta, con margini proporzionati al testo, anche se hai scelto un font o una dimensione grande; i riquadri non devono toccarsi. Premi di nuovo **R** per nasconderla. Non cercare più il riquadro «Evidenzia vere» sotto il widget: è stato eliminato perché si sovrapponeva al footer.
+
+**Finestra «Formato widget».** Seleziona il widget, apri «Formato» dal menu contestuale e trascina l'angolo della finestra alla dimensione desiderata. Passa tra **Testo**, **Bordi**, **Effetti**, **Contenuti** e **Collegamenti**: la finestra conserva larghezza e altezza finché rimane aperta; scorre soltanto il contenuto della scheda. Per risultati a barre, scegli «Contenuti», abilita **Gradiente** e imposta i campioni «Colore iniziale» e «Colore finale». La differenza di colore è proporzionale alle risposte relative, senza cambiare i valori statistici. Salva, passa alla preview desktop e verifica un secondo font di dimensione elevata.
+
+**Grafica della navigazione.** La sidebar usa icone per riconoscere rapidamente sessioni, calendario, presentatori, impostazioni e importazione `.quo`. La voce attiva è evidenziata con verde petrolio. La struttura del menu rimane la stessa su desktop e nei layout mobile adattati; tutti i comandi restano disponibili con tastiera e pressione prolungata.
+
+<figure><img src="../assets/manual-illustrations/workflow-widget-context-rc286.png" alt="Diagramma concettuale dell’editing delle widget e dei menu"/><figcaption>Diagramma concettuale: la selezione del widget, il menu contestuale e i controlli di formattazione sono strumenti distinti. Non è una schermata reale.</figcaption></figure>
 
 ## Scheda tecnica di compatibilità e requisiti indicativi
 

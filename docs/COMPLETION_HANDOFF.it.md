@@ -1,3 +1,19 @@
+# Quorivio 0.1.0-dev — RC287 — Formato widget e risultati
+
+**RC287:** Resa robusta l'evidenziazione R con bordi verdi/rossi separati e distanziati dal testo, eliminata la barra sotto la widget che copriva il footer. Risolto il ridimensionamento della finestra Formato fra tab, aggiunti due colori selezionabili del gradiente di risultati e aggiornati i menu a tema blu notte/verde petrolio con icone. I manuali IT/EN includono procedure RC287; collaudo Chromium isolato superato ma niente certificazione visiva 100% del frontend completo. **85,25%** (43 accettati/17 parziali), `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag.
+
+---
+
+# Quorivio 0.1.0-dev — RC286 — UX editor e documentazione visuale
+
+**RC286:** Portabilità `.quo`, allegati collassati nativamente, miniature con contenuti effettivi e modifiche in bozza, menu widget indipendentemente scorrevole. Aggiornata la cattura Chromium; sei PDF con screenshot d’archivio autentici, diagrammi, illustrazioni editoriali etichettate e nessun identificativo commit stampato. Test locali web 473/473, API 652/652; full CI da verificare. **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag.
+
+---
+
+# Quorivio 0.1.0-dev — RC285 — Portabilità locale delle sessioni
+
+**RC285:** Sidebar con import/export `.quo` completo di pagine, schemi, widget, calendario e libreria media privata, anche se i file non sono referenziati. Import = nuova sessione in bozza, credenziali e ID nuovi. Esclusi partecipanti, risposte, statistiche e credenziali. Contratti prima di npm; prova PostgreSQL HTTP estesa; manuali presentatore e PDF aggiornati. CI RC284 verde per qualità, container, Kubernetes, browser e pubblicazione: run 42632517672, 42638566933. CI RC285 da verificare. **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag.
+
 # Quorivio 0.1.0-dev — RC284 — Hotfix build Docker: RUN apk e screenshot reali
 
 **RC284:** La full CI 42624246307 supera qualità, ClamAV, Firefox/WebKit, screenshot reali e la convalida dei manifest; i job Docker/Podman/KIND/OCI falliscono per `\n` letterale in `apk`. Corretto il Dockerfile e aggiunto test CI. Analizzati i PDF RC283 acquisiti su Chromium/PostgreSQL: 13 PNG autentici verificati, ma i PDF stampavano i tag delle figure. Corretta la conversione Markdown/HTML e la dimensione delle immagini smartphone, conservate le 13 immagini reali come archivio verificato RC283 e inserite nei sei nuovi PDF **RC284 con 214 pagine**, chiaramente attribuite al commit storico. Nuova CI deve catturare immagini fresche del proprio commit e controllare che siano realmente inserite nei PDF. **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag.
@@ -397,7 +413,7 @@
 ---
 # Quorivio 0.1.0-dev — RC200 — Handoff editor e sessioni portatili
 
-**RC200 handoff:** CI completa RC199 verde (`42096705867`). Metadati editor più compatti sotto la barra dei comandi, nessun «Modifica schemi» duplicato nella sidebar; menu miniature con import PDF/PPTX dopo la pagina corrente; `.quorivio` reimportabile da altro proprietario con asset rimappati e immagini delle slide conservate; export PPTX/PDF con slide raster preservate; statistiche CSV/XLSX aggregate anonime predefinite o nominative riservate al proprietario primario. Test locali mirati superati; CI integrata RC200 ancora da verificare. **85,25%** certificato (43 accettati, 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. `docs/RC_CYCLE200_EDITOR_PORTABILITY.it.md`. 
+**RC200 handoff:** CI completa RC199 verde (`42096705867`). Metadati editor più compatti sotto la barra dei comandi, nessun «Modifica schemi» duplicato nella sidebar; menu miniature con import PDF/PPTX dopo la pagina corrente; `.quo` reimportabile da altro proprietario con asset rimappati e immagini delle slide conservate; export PPTX/PDF con slide raster preservate; statistiche CSV/XLSX aggregate anonime predefinite o nominative riservate al proprietario primario. Test locali mirati superati; CI integrata RC200 ancora da verificare. **85,25%** certificato (43 accettati, 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag. `docs/RC_CYCLE200_EDITOR_PORTABILITY.it.md`. 
 
 ---
 
@@ -1803,7 +1819,7 @@ Baseline: `quorivio-0.1.0-dev-accessibility-integration-cumulative.zip`.
 - Editor mobile completo e accessibilità visiva, partecipazione adattiva.
 - Verifica indipendente dei metodi MFA e controllo generale di attivazione.
 - Flusso pubblicazione/risposta/risultati widget; replica multipod e test 500 partecipanti.
-- Importazione bundle `.quorivio` tra istanze con PostgreSQL e asset privati reali.
+- Importazione bundle `.quo` tra istanze con PostgreSQL e asset privati reali.
 - Build pulita riproducibile, sicurezza, licenze, GDPR e manuali IT/EN.
 - Collaudi Kubernetes dell'utente.
 

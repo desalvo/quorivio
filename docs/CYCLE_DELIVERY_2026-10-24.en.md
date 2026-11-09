@@ -4,7 +4,7 @@
 This package is a complete source distribution based on the user's CI-green `ci-jsx-build-hotfix-cumulative` baseline. It is **not** an approved Release Candidate. No repository or server was modified and no version bump was made.
 
 ## Implemented since last confirmed commit
-- Portable `.quorivio` import assigns fresh global asset identifiers and rewrites theme/page/result references; prevents cross-session primary-key collisions on re-import.
+- Portable `.quo` import assigns fresh global asset identifiers and rewrites theme/page/result references; prevents cross-session primary-key collisions on re-import.
 - Session duplication copies the underlying asset records and blobs, retaining independently usable shared media references.
 - Media bundle validation checks embedded bytes against declared MIME signatures and cryptographic digests and rejects malformed archives.
 - Email MFA enablement requires a delivered one-time code confirmation; authenticator MFA remains independent of SMTP. Settings, profile photo lifecycle and transactional admin changes hardened.

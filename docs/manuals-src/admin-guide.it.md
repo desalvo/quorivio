@@ -1,8 +1,8 @@
 # Manuale dell'amministratore
 
-**Quorivio 0.1.0-dev · Build documentale RC284 · 9 novembre 2026**
+**Quorivio 0.1.0-dev · Build documentale RC287 · 9 novembre 2026**
 
-Manuale tecnico-operativo per installazione, configurazione, autenticazione, autorizzazioni, backup, monitoraggio, audit, manutenzione e ripristino. Le procedure sono desunte dal sorgente e dai chart della RC284; non costituiscono certificazione di un deployment reale. **Le illustrazioni esplicative presenti nei primi capitoli sono ricostruzioni**, etichettate come tali. La galleria finale, quando presente nel PDF generato dalla CI, contiene esclusivamente screenshot reali dell'istanza temporanea verificati tramite hash e commit; la revisione editoriale D5 resta separata.
+Manuale tecnico-operativo per installazione, configurazione, autenticazione, autorizzazioni, backup, monitoraggio, audit, manutenzione e ripristino. Le procedure sono desunte dal sorgente e dai chart della RC287; non costituiscono certificazione di un deployment reale. **Le illustrazioni esplicative presenti nei primi capitoli sono ricostruzioni**, etichettate come tali. La galleria finale, quando presente nel PDF generato dalla CI, contiene esclusivamente screenshot reali dell'istanza temporanea verificati tramite hash e commit; la revisione editoriale D5 resta separata.
 
 ## 1. Architettura e responsabilità
 
@@ -376,14 +376,14 @@ Non confondere la validazione dello schema dei manifest con una prova di funzion
 
 ## Appendice H. Piano di change management per una nuova RC
 
-Per ogni cumulativo: ricostruire dai sorgenti integri, registrare le modifiche dopo l'ultimo commit, generare la nuova documentazione, aggiornare gli inventari SHA-256, verificare che le copie pubbliche dei manuali corrispondano, eseguire preflight e controlli TypeScript, poi full CI. Distinguere **gate superati localmente**, **gate superati in GitHub Actions** e **prove reali su infrastruttura**.
+Per ogni cumulativo: ricostruire dai sorgenti integri, registrare le modifiche dopo la precedente versione, generare la nuova documentazione, aggiornare gli inventari SHA-256, verificare che le copie pubbliche dei manuali corrispondano, eseguire preflight e controlli TypeScript, poi full CI. Distinguere **gate superati localmente**, **gate superati in GitHub Actions** e **prove reali su infrastruttura**.
 
 Dopo una CI fallita leggere il **primo step fallito**, non limitarsi al job di riepilogo; non disabilitare test per ottenere un risultato verde. Un nuovo ciclo di documentazione non certifica le funzioni che illustra: una screenshot simulata non equivale a prova real-browser.
 
 
 ## Appendice I. Schermate autentiche e riferimenti rapidi
 
-La galleria mostra soltanto acquisizioni genuine da un Quorivio avviato in CI, con database e identità di prova. Le schermate sono correlate al commit con SHA-256. Non derivano da composizioni illustrate. Le schermate sono una guida all’uso, non prove di certificazione funzionale o di sicurezza.
+La galleria mostra soltanto acquisizioni genuine da un Quorivio avviato in CI, con database e identità di prova. Le schermate sono correlate alla versione sorgente tramite SHA-256. Non derivano da composizioni illustrate. Le schermate sono una guida all’uso, non prove di certificazione funzionale o di sicurezza.
 
 <!-- REAL_SCREENSHOT_GALLERY -->
 
@@ -393,7 +393,7 @@ Nota editoriale: riscrittura iniziale in RC277; revisione metadati e processo sc
 
 **Prerequisiti:** due o più nodi schedulabili, driver CSI con RWX effettivo per `assets`, connettività TCP al DB condiviso, ingress con WebSocket e storage backup coerente. La dichiarazione `ReadWriteMany` in Helm **non crea** una classe RWX: occorre verificarne capacità e permessi sul cluster. L'installazione con singolo nodo e PVC RWO non è sufficiente per qualificare l'alta disponibilità.
 
-1. Prendere un backup completo e verificare restore su ambiente separato; annotare commit, tag immagine, stato migratorio e SHA-256 del backup.
+1. Prendere un backup completo e verificare restore su ambiente separato; annotare versione, tag immagine, stato migratorio e SHA-256 del backup.
 2. Misurare utilizzo medio e di picco: CPU/RAM API, ClamAV e converter, numero di WebSocket, latenza p95, DB connessioni, spazio asset e scratch.
 3. Predisporre lo storage condiviso reale, verificando con pod di prova scrittura su un nodo e lettura da un altro.
 4. Salvare un file valori di staging, ad esempio:
@@ -431,6 +431,41 @@ backup:
 **Attenzione:** esportazione DB e asset avvengono in fasi diverse. L'archivio completo non è uno snapshot perfettamente atomico e può richiedere riconciliazione. Conservare backup off-site con cifratura e lifecycle gestiti fuori da Quorivio; la configurazione applicativa cifrata può richiedere lo storico della chiave originale, custodito in modo indipendente dai backup. La procedura deve essere collaudata **senza** dati reali e senza sostituire dati produttivi.
 
 **Esempio prudenziale di verifica:** controllare che `pg_restore --list dump.backup` elenchi gli oggetti attesi prima di procedere. Per il ripristino applicare `pg_restore --no-owner --no-privileges --dbname=quorivio_test dump.backup` a un database vuoto e poi eseguire query di controllo coerenti con lo schema. Non applicare opzioni distruttive a un'istanza di produzione.
+
+## Appendice N. Atlante operativo: backup, scaling e ripristino
+
+<figure><img src="../assets/manual-illustrations/backup-lifecycle.png" alt="DIAGRAMMA CONCETTUALE — backup completo e verifica del ripristino."/><figcaption>DIAGRAMMA CONCETTUALE — backup completo e verifica del ripristino.</figcaption></figure>
+
+<figure><img src="../assets/manual-evidence-rc283/admin-backups.png" alt="VISTA AUTENTICA ARCHIVIATA — configurazione dei backup."/><figcaption>VISTA AUTENTICA ARCHIVIATA — configurazione dei backup.</figcaption></figure>
+
+**Procedura giornaliera:** verificare in Gestione server che sia disponibile la destinazione POSIX/NFS/S3/WebDAV configurata, controllare l'ultima esecuzione, la dimensione e lo stato. Un backup completo comprende database e file privati; non sostituisce uno snapshot atomico distribuito. Proteggere credenziali e archivi fuori dal volume sorgente e applicare retention esterna.
+
+**Ripristino di prova:** predisporre una nuova istanza isolata; bloccare invii e accesso pubblico; verificare checksum, compatibilità di versione e disponibilità delle chiavi; ripristinare database e asset; riconciliare riferimenti, permessi e migrazioni; avviare test di login, sessioni, media e cronologia; documentare RPO e RTO misurati. Non dichiarare concluso il DR sulla sola riuscita del comando di copia.
+
+**Scaling:** avviare prima una sola replica sana, provare API e websocket; abilitare storage RWX e sincronizzare ingress NGINX/HAProxy. Passare a due o più repliche solo dopo verifica accesso condiviso a PostgreSQL e asset, scadenza connessioni, rolling update e failover. Non utilizzare PVC ReadWriteOnce per scritture concorrenti da più pod.
+
+<figure><img src="../assets/manual-illustrations/workflow-scheme-editor-rc286.png" alt="DIAGRAMMA CONCETTUALE — elementi globali e locali, utile per il controllo delle sessioni ripristinate."/><figcaption>DIAGRAMMA CONCETTUALE — elementi globali e locali, utile per il controllo delle sessioni ripristinate.</figcaption></figure>
+
+## Appendice O. Account, audit e dati locali
+
+<figure><img src="../assets/manual-evidence-rc283/admin-users.png" alt="VISTA AUTENTICA ARCHIVIATA — gestione approvazioni e utenti."/><figcaption>VISTA AUTENTICA ARCHIVIATA — gestione approvazioni e utenti.</figcaption></figure>
+
+<figure><img src="../assets/manual-evidence-rc283/admin-audit.png" alt="VISTA AUTENTICA ARCHIVIATA — audit e retention."/><figcaption>VISTA AUTENTICA ARCHIVIATA — audit e retention.</figcaption></figure>
+
+L'importazione `.quo` è un trasferimento **della sola sessione** e non va confusa con il backup di un'istanza. Nella dashboard i file privati della sessione sono nella sezione **Allegati della sessione**, chiusa per impostazione predefinita. Aprirla per caricare o eliminare i media. Verificare i permessi del presentatore prima di importare, esportare o rinominare file. L'archivio `.quo` non include risposte e statistiche, account, segreti o token; l'amministratore deve quindi utilizzare backup separati per DR, audit e configurazione dell'istanza.
+
+<figure><img src="../assets/manual-illustrations/workflow-local-quo-rc286.png" alt="DIAGRAMMA CONCETTUALE — copia `.quo` portabile, diversa da backup amministrativo."/><figcaption>DIAGRAMMA CONCETTUALE — copia `.quo` portabile, diversa da backup amministrativo.</figcaption></figure>
+
+
+## Appendice P. Collaudo grafico e regressioni RC287
+
+Prima della pubblicazione, prova la **R** di un risultato collegato a una domanda con chiavi V/F, prima con Arial 16 px e poi con un altro font fino a 48–96 px. Controlla che il bordo verde/rosso sia visibile, non nasconda lettere, non tocchi altri bordi e che non compaia più alcuna barra sotto la widget. La prova deve includere schermo del presentatore e anteprima partecipante senza divulgare le chiavi di valutazione.
+
+Nel formato di un risultato a barre, seleziona due colori distinti per il gradiente e verifica che vengano conservati dopo salvataggio e riapertura. Ridimensiona «Formato widget» a circa 700 × 500 px, cambia scheda e accertati che **i bordi esterni restino fermi** e che l'area centrale possa scorrere; verifica lo stesso con zoom globale e in viewport compatta. La nuova sidebar riprende la palette blu notte / verde petrolio con icone, ma gli operatori devono sempre verificare contrasto, focus da tastiera e leggibilità su smartphone.
+
+Il collaudo Chromium locale della finestra è un controllo di stile; **non** certifica la parità pixel dei mock né sostituisce test end-to-end con frontend e database avviati. Confrontare le schermate reali della CI con i mock editoriali prima dell'approvazione finale.
+
+<figure><img src="../assets/manual-illustrations/workflow-widget-context-rc286.png" alt="Diagramma concettuale dell’editing delle widget e dei menu"/><figcaption>Diagramma concettuale: la selezione del widget, il menu contestuale e i controlli di formattazione sono strumenti distinti. Non è una schermata reale.</figcaption></figure>
 
 ## Scheda tecnica di compatibilità e requisiti indicativi
 

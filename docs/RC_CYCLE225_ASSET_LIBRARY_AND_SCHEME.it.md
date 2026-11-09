@@ -8,7 +8,7 @@
 - La libreria degli sfondi supporta rinomina e cancellazione con conferma e controllo delle immagini in uso; anche le immagini prese in prestito dai collaboratori hanno nomi distinguibili.
 - I selettori di sfondi nel canvas, nella pagina, nei risultati, nello smartphone e negli schemi mostrano **miniature e nomi sotto le immagini**, selezionabili con tastiera e touch; elenco scorrevole su schermi piccoli.
 - Corretto il CSS dell'editor degli schemi affinché mostri lo sfondo globale già prima del salvataggio. Lo sfondo continua a essere propagato alle pagine al salvataggio dello schema.
-- Le copie dello sfondo in sessione mantengono i propri metadati anche dopo rimozione della libreria. Lo schema migra eventuali vecchie etichette duplicate. L'archivio `.quorivio` conserva il nome delle risorse referenziate; resta compatibile con gli archivi senza nomi.
+- Le copie dello sfondo in sessione mantengono i propri metadati anche dopo rimozione della libreria. Lo schema migra eventuali vecchie etichette duplicate. L'archivio `.quo` conserva il nome delle risorse referenziate; resta compatibile con gli archivi senza nomi.
 - Per gli allegati caricati dai partecipanti viene conservato il filename sanificato, senza includerli nel vincolo di unicità degli allegati dei presentatori.
 
 ## Verifiche e limiti

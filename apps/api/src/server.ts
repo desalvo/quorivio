@@ -1279,6 +1279,10 @@ app.post('/api/sessions',requireAuth,requirePresenter,async(req,res)=>{try{const
 // Portable definition exports intentionally omit participant data and join credentials.
 async function portableSession(id:string){
  const session=(await db.query('SELECT title,reference_date::text AS reference_date,theme,allow_anonymous,show_results FROM sessions WHERE id=$1',[id])).rows[0];
+ // Dates and appointments are part of the authored session, not audience data.
+ // Preserve the local IANA timezone without converting the wall-clock time.
+ session.schedule_dates=(await db.query('SELECT scheduled_date::text AS date FROM session_schedule_dates WHERE session_id=$1 ORDER BY scheduled_date',[id])).rows.map((row:any)=>row.date);
+ session.appointments=(await db.query("SELECT scheduled_date::text AS date,to_char(start_time,'HH24:MI') AS start_time,duration_minutes,time_zone FROM session_appointments WHERE session_id=$1 ORDER BY scheduled_date,start_time",[id])).rows;
  const activities=(await db.query(`SELECT a.id AS portable_id,a.type,a.title,a.options,a.correct_option_id,a.correct_option_ids,
  a.answer_mode,a.answer_required,a.duration_seconds,a.page_design,a.result_design,psa.asset_id AS slide_asset_id
  FROM activities a LEFT JOIN presentation_slide_assets psa ON psa.activity_id=a.id
@@ -1294,7 +1298,9 @@ async function portableSession(id:string){
  }
  return {format:'quorivio-session',version:1,session,activities};
 }
-function validPortable(x:any){return x?.format==='quorivio-session'&&x.version===1&&typeof x.session?.title==='string'&&x.session.title.trim().length>0&&x.session.title.length<=160&&validDate(String(x.session.reference_date))&&validPageDesign(x.session.theme)&&typeof x.session.allow_anonymous==='boolean'&&typeof x.session.show_results==='boolean'&&Array.isArray(x.activities)&&x.activities.length<=200&&validPortablePageRouting(x.activities)&&x.activities.every((a:any)=>['slide','poll','quiz','timed_quiz'].includes(a.type)&&typeof a.title==='string'&&a.title.trim().length>0&&a.title.length<=240&&(a.type==='slide'?Array.isArray(a.options)&&a.options.length===0:validateOptions(a.options))&&validAnswerMode(a.answer_mode||'single')&&typeof (a.answer_required??true)==='boolean'&& (a.correct_option_ids===undefined||Array.isArray(a.correct_option_ids)&&a.correct_option_ids.every((v:any)=>typeof v==='string'&&a.options.some((o:any)=>o.id===v)))&&(a.portable_id===undefined||typeof a.portable_id==='string'&&PAGE_UUID.test(a.portable_id))&&(a.slide_asset_id===undefined||a.type==='slide'&&typeof a.slide_asset_id==='string'&&PAGE_UUID.test(a.slide_asset_id))&&validPageDesign(a.page_design)&&validPageDesign(a.result_design)&&(!['quiz','timed_quiz'].includes(a.type)||!['single','multiple'].includes(a.answer_mode||'single')||(a.answer_mode==='multiple'?Array.isArray(a.correct_option_ids)&&a.correct_option_ids.length>0:a.options.some((o:any)=>o.id===a.correct_option_id)))&&(a.type!=='timed_quiz'||['single','multiple'].includes(a.answer_mode||'single')&&Number.isInteger(a.duration_seconds)&&a.duration_seconds>=5&&a.duration_seconds<=600)&&(a.duration_seconds==null||Number.isInteger(a.duration_seconds)&&a.duration_seconds>=5&&a.duration_seconds<=600));}
+function validPortable(x:any){return x?.format==='quorivio-session'&&x.version===1&&typeof x.session?.title==='string'&&x.session.title.trim().length>0&&x.session.title.length<=160&&validDate(String(x.session.reference_date))&&validPageDesign(x.session.theme)&&typeof x.session.allow_anonymous==='boolean'&&typeof x.session.show_results==='boolean'&&
+ (x.session.schedule_dates===undefined||Array.isArray(x.session.schedule_dates)&&x.session.schedule_dates.length<=100&&x.session.schedule_dates.every((d:any)=>typeof d==='string'&&validDate(d))&&new Set(x.session.schedule_dates).size===x.session.schedule_dates.length)&&
+ (x.session.appointments===undefined||Array.isArray(x.session.appointments)&&x.session.appointments.length<=100&&x.session.appointments.every(appointmentValid))&&Array.isArray(x.activities)&&x.activities.length<=200&&validPortablePageRouting(x.activities)&&x.activities.every((a:any)=>['slide','poll','quiz','timed_quiz'].includes(a.type)&&typeof a.title==='string'&&a.title.trim().length>0&&a.title.length<=240&&(a.type==='slide'?Array.isArray(a.options)&&a.options.length===0:validateOptions(a.options))&&validAnswerMode(a.answer_mode||'single')&&typeof (a.answer_required??true)==='boolean'&& (a.correct_option_ids===undefined||Array.isArray(a.correct_option_ids)&&a.correct_option_ids.every((v:any)=>typeof v==='string'&&a.options.some((o:any)=>o.id===v)))&&(a.portable_id===undefined||typeof a.portable_id==='string'&&PAGE_UUID.test(a.portable_id))&&(a.slide_asset_id===undefined||a.type==='slide'&&typeof a.slide_asset_id==='string'&&PAGE_UUID.test(a.slide_asset_id))&&validPageDesign(a.page_design)&&validPageDesign(a.result_design)&&(!['quiz','timed_quiz'].includes(a.type)||!['single','multiple'].includes(a.answer_mode||'single')||(a.answer_mode==='multiple'?Array.isArray(a.correct_option_ids)&&a.correct_option_ids.length>0:a.options.some((o:any)=>o.id===a.correct_option_id)))&&(a.type!=='timed_quiz'||['single','multiple'].includes(a.answer_mode||'single')&&Number.isInteger(a.duration_seconds)&&a.duration_seconds>=5&&a.duration_seconds<=600)&&(a.duration_seconds==null||Number.isInteger(a.duration_seconds)&&a.duration_seconds>=5&&a.duration_seconds<=600));}
 async function createFromPortable(data:any,uid:string,importMediaDir?:string,bundleMode=false){
  const imported=importMediaDir?remapPortableAssets(data,(data.import_assets||[]).map((a:any)=>a?.id)):null;
  const definition=imported?.definition||data;
@@ -1305,6 +1311,10 @@ async function createFromPortable(data:any,uid:string,importMediaDir?:string,bun
   if(!u)throw Error('missing_user');
   const importedJoinSecret=randomBytes(20).toString('base64url');
   await cx.query(`INSERT INTO sessions(id,organization_id,owner_id,title,reference_date,join_code,join_secret,expires_at,theme,allow_anonymous,show_results,retention_days) VALUES($1,$2,$3,$4,$5,$6,$7,now()+interval '1 day',$8,$9,$10,${SESSION_RETENTION_DEFAULT_SQL})`,[sid,u.organization_id,uid,definition.session.title,definition.session.reference_date,randomBytes(5).toString('hex').toUpperCase(),importedJoinSecret,JSON.stringify(definition.session.theme),definition.session.allow_anonymous,definition.session.show_results]);
+  for(const date of definition.session.schedule_dates||[])
+   await cx.query('INSERT INTO session_schedule_dates(session_id,scheduled_date) VALUES($1,$2)',[sid,date]);
+  for(const a of definition.session.appointments||[])
+   await cx.query('INSERT INTO session_appointments(id,session_id,scheduled_date,start_time,duration_minutes,time_zone) VALUES($1,$2,$3,$4,$5,$6)',[randomUUID(),sid,a.date,a.start_time,a.duration_minutes,a.time_zone]);
   // Portable page links must be remapped as a group. Never retain an ID
   // pointing into the original session when a session is imported/copied.
   const importedIds=definition.activities.map((a:any)=>a.portable_id).filter((id:unknown)=>typeof id==='string');
@@ -1596,12 +1606,14 @@ app.get('/api/sessions/:id/assets/:assetId',requireAuth,async(req,res)=>{try{
 app.get('/api/sessions/:id/export.json',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}res.setHeader('Content-Disposition','attachment; filename="quorivio-session.json"');res.json(await portableSession(s.id))}catch(e){sendError(res,e)}});
 app.post('/api/sessions/import',requireAuth,requirePresenter,async(req,res)=>{try{if(!validPortable(req.body)){res.status(400).json({error:'invalid_import'});return}const id=await createFromPortable(req.body,auth(req)!);res.status(201).json({id})}catch(e){sendError(res,e)}});
 // Self-contained Quorivio v1 bundle: no participants, responses, credentials or secrets.
-app.get('/api/sessions/:id/export.quorivio',requireAuth,async(req,res)=>{try{
+app.get('/api/sessions/:id/export.quo',requireAuth,async(req,res)=>{try{
  const session=await owner(req.params.id,auth(req)!);if(!session){res.status(404).end();return}
- const definition=await portableSession(session.id),refs=[...referencedAssets(definition)];
- if(refs.length>300){res.status(413).json({error:'too_many_assets'});return}
- const rows=refs.length?(await db.query('SELECT id,display_name,background_library_copy,mime_type,byte_size,sha256 FROM session_assets WHERE session_id=$1 AND participant_id IS NULL AND id=ANY($2::uuid[])',[session.id,refs])).rows:[];
- if(rows.length!==refs.length){res.status(409).json({error:'missing_session_assets'});return}
+ const definition=await portableSession(session.id),refs=referencedAssets(definition);
+ // Preserve the complete presenter-owned media library, not only files that
+ // are currently referenced by widgets. Never export participant uploads.
+ const rows=(await db.query('SELECT id,display_name,background_library_copy,mime_type,byte_size,sha256 FROM session_assets WHERE session_id=$1 AND participant_id IS NULL ORDER BY id',[session.id])).rows;
+ if(rows.length>300){res.status(413).json({error:'too_many_assets'});return}
+ if([...refs].some(id=>!rows.some((row:any)=>row.id===id))){res.status(409).json({error:'missing_session_assets'});return}
  let total=0;const assets:BundleAsset[]=[],media=new Map<string,Buffer>();
  for(const row of rows){const bytes=Number(row.byte_size);total+=bytes;
   if(total>80*1024*1024||bytes>50*1024*1024){res.status(413).json({error:'bundle_media_limit'});return}
@@ -1611,15 +1623,15 @@ app.get('/api/sessions/:id/export.quorivio',requireAuth,async(req,res)=>{try{
  }
  const bundle=encodeBundle({format:'quorivio-bundle',version:1,definition,assets},media);
  if(bundle.length>MAX_BUNDLE_BYTES){res.status(413).json({error:'bundle_too_large'});return}
- res.setHeader('Content-Type',BUNDLE_MIME);res.setHeader('Content-Disposition','attachment; filename="quorivio-session.quorivio"');res.setHeader('Cache-Control','private, no-store');res.send(bundle);
+ res.setHeader('Content-Type',BUNDLE_MIME);res.setHeader('Content-Disposition','attachment; filename="quorivio-session.quo"');res.setHeader('Cache-Control','private, no-store');res.send(bundle);
  }catch(e){sendError(res,e)}});
-app.post('/api/sessions/import.quorivio',requireAuth,requirePresenter,async(req,res)=>{
+app.post('/api/sessions/import.quo',requireAuth,requirePresenter,async(req,res)=>{
  if(String(req.headers['content-type']||'').split(';')[0].trim().toLowerCase()!==BUNDLE_MIME){res.status(415).json({error:'quorivio_bundle_required'});return}
  const size=Number(req.headers['content-length']);if(!Number.isSafeInteger(size)||size<22||size>MAX_BUNDLE_BYTES){res.status(413).json({error:'invalid_bundle_size'});return}
  const scratch=path.join(process.env.QUORIVIO_CONVERSION_DIR||'/conversions',randomBytes(16).toString('hex'));
  try{
   await mkdir(scratch,{recursive:true,mode:0o700});
-  const upload=await receiveAssetStream(req,scratch,'import.quorivio',BUNDLE_MIME,MAX_BUNDLE_BYTES,size);
+  const upload=await receiveAssetStream(req,scratch,'import.quo',BUNDLE_MIME,MAX_BUNDLE_BYTES,size);
   const {manifest,media}=decodeBundle(await readFile(upload.destination));
   if(!validPortable(manifest.definition)){res.status(400).json({error:'invalid_bundle_definition'});return}
   const importDir=path.join(scratch,'media');await mkdir(importDir,{mode:0o700});

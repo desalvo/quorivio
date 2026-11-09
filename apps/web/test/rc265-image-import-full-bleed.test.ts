@@ -55,7 +55,7 @@ test('RC265 suppresses inherited title/footer/number overlays on imported pages 
 
 test('RC265 thumbnails render actual image pixels instead of text placeholder',()=>{
  assert.match(ui,/page-editor-preview-real-image/);
- assert.match(ui,/src=\{assets\.find\(asset=>asset\.id===w\.assetId\)/);
+ assert.match(ui,/<ThumbnailWidgetContent widget=\{w\} assetUrl=\{w\.assetId\?\(assets\.find\(asset=>asset\.id===w\.assetId\)/);
  assert.match(ui,/data-imported-image=\{/);
  assert.match(ui,/!\(a as any\)\.page_design\?\.importedImageFit&&<span className="page-editor-preview-title"/);
  assert.match(css,/page-editor-preview\[data-imported-image="true"\]::after\{display:none!important;/);

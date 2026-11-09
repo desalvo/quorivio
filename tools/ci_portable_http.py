@@ -137,6 +137,9 @@ def run():
         'title': 'Image and responses', 'type': 'poll',
         'options': [{'id': 'yes', 'label': 'Yes'}, {'id': 'no', 'label': 'No'}]
     }, expected=201)
+    api('PUT', f'/api/sessions/{sid}/schedule', {'dates':['2026-12-15','2026-12-16']})
+    appointment={'date':'2026-12-15','start_time':'14:30','duration_minutes':90,'time_zone':'Europe/Rome'}
+    api('PUT', f'/api/sessions/{sid}/appointments', {'appointments':[appointment]})
     image = api('POST', f'/api/sessions/{sid}/assets', PNG, 'image/png', 201)
     src = image['id']
     api('PATCH', f'/api/sessions/{sid}/activities/{act["id"]}/design', {
@@ -144,6 +147,10 @@ def run():
                                     'position': {'x': 5, 'y': 5, 'width': 40, 'height': 40}}]},
         'result_design': {'backgroundAssetId': src}
     })
+    # Unused presenter-owned files must be included in a truly complete local
+    # session copy, even before they are placed on a page or master scheme.
+    spare = api('POST', f'/api/sessions/{sid}/assets', PNG, 'image/png', 201)
+    assert spare['id'] != src
     original = api('GET', f'/api/sessions/{sid}')
     assert asset_id(original) == src
     assert original['activities'][0]['result_design']['backgroundAssetId'] == src
@@ -152,17 +159,28 @@ def run():
     exported_json = api('GET', f'/api/sessions/{sid}/export.json')
     assert exported_json['session']['reference_date'] == session['reference_date'][:10], 'portable reference date changed during export'
     assert len(exported_json['session']['reference_date']) == 10, 'portable reference date must use YYYY-MM-DD'
-    archive = api('GET', f'/api/sessions/{sid}/export.quorivio')
+    assert exported_json['session']['schedule_dates']==['2026-12-15','2026-12-16']
+    assert exported_json['session']['appointments']==[appointment]
+    archive = api('GET', f'/api/sessions/{sid}/export.quo')
     assert archive[:4] == b'PK\x03\x04'
     ids = []
     for _ in range(2):
-        imported = api('POST', '/api/sessions/import.quorivio', archive,
+        imported = api('POST', '/api/sessions/import.quo', archive,
                        'application/vnd.quorivio.session+zip', 201)
         view = api('GET', f'/api/sessions/{imported["id"]}')
+        assert api('GET', f'/api/sessions/{imported["id"]}/schedule')==['2026-12-15','2026-12-16']
+        imported_appointments=api('GET', f'/api/sessions/{imported["id"]}/appointments')
+        assert len(imported_appointments)==1
+        assert {k:v for k,v in imported_appointments[0].items() if k in appointment}==appointment
         iid = asset_id(view)
         assert iid != src and iid not in ids, 'asset primary key reused'
         assert iid == view['activities'][0]['result_design']['backgroundAssetId'], 'shared reference broken'
         assert api('GET', f'/api/sessions/{imported["id"]}/assets/{iid}') == PNG
+        library = api('GET', f'/api/sessions/{imported["id"]}/assets')
+        assert len(library) == 2, 'unused presenter library asset not restored by local import'
+        spare_id = next(item['id'] for item in library if item['id'] != iid)
+        assert spare_id not in (src, spare['id'])
+        assert api('GET', f'/api/sessions/{imported["id"]}/assets/{spare_id}') == PNG
         ids.append(iid)
 
     # A closed source is explicitly duplicable by its owner/collaborator;
@@ -187,7 +205,7 @@ def run():
 
     malformed = bytearray(archive)
     malformed[-1] ^= 0x10
-    api('POST', '/api/sessions/import.quorivio', bytes(malformed),
+    api('POST', '/api/sessions/import.quo', bytes(malformed),
         'application/vnd.quorivio.session+zip', expected=400)
     print('PASS PostgreSQL HTTP: atomic profile, photo dimensions, anonymous session avatars, revocation, bundle import/duplication, invalid ZIP')
 

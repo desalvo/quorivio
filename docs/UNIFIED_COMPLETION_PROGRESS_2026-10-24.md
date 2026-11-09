@@ -18,7 +18,7 @@ This checkpoint is a **partial implementation** and **not a Release Candidate**.
 2. Widget authoring-to-publication-to-anonymous-response-to-scoring-to-live-results, concurrency/integration evidence on real PostgreSQL and browser.
 3. MFA email/TOTP independent enrollment + disable flows, master switch, complete SSO browser administration and recovery acceptance.
 4. Editor/mobile accessibility and visual QA on multiple browsers and physical touch devices.
-5. `.quorivio` transfer between independent installations and compatibility hardening.
+5. `.quo` transfer between independent installations and compatibility hardening.
 6. Fresh clean dependency installation/build, security and license audit, GDPR proof and full deployment smoke tests.
 7. Full IT/EN user/admin manuals and reproducible load results for 500 simultaneous participants.
 

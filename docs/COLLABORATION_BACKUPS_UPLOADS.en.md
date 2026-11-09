@@ -16,3 +16,7 @@
 - Full UI for co-presenters, duplicating/import/export and live edits.
 - HAProxy community upload-size configuration must be validated for the exact controller distribution; `haproxy.org/max-body-size` applies to HAProxy Technologies.
 - PostgreSQL integration, multi-presenter WebSocket and migration verification.
+
+## RC285 local session transfer
+
+The session sidebar now exposes the `.quo` download for the currently opened session, and the import picker both there and in general navigation. A bundle includes all presenter-owned session assets, including unused library files; participant uploads, votes, analytics and access secrets are intentionally excluded. Import creates a new draft and remaps IDs. Each bundle remains subject to strict validation, ClamAV scanning and the 100 MiB archive / 80 MiB media / 300-file caps.

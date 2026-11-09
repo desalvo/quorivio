@@ -1,3 +1,5 @@
+**Novità RC287:** Evidenziazioni delle risposte più ampie, finestra «Formato widget» stabile fra schede, colori iniziale/finale delle barre e menu blu notte/verde petrolio con icone. Manuali IT/EN aggiornati.
+
 > **RC277 — Manuali completi:** sei guide IT/EN riscritte e ampliate con workflow, 21 widget, backup/LDAP/audit, tabelle e illustrazioni dichiarate. [Dettagli](docs/RC_CYCLE277_EXPANDED_MANUALS.it.md).
 
 > **RC269 — Autenticazione e gestione sessioni:** login automatico alla scadenza, pulizia conservativa ogni 12 ore, trasferimento proprietà, LDAP/LDAPS opzionale e correzioni sidebar/risposte smartphone. [Note RC269](docs/RC_CYCLE269_LDAP_OWNERSHIP_HOUSEKEEPING.it.md).
@@ -178,3 +180,7 @@ Un push su `main` con commit ordinario avvia la CI standard; `[full-ci]` avvia d
 ## RC270 — Backup, LDAP, audit, risultati
 
 Le impostazioni per backup completi di istanza, destinazioni POSIX/NFS/S3/WebDAV, pianificazione, registro audit e retention sono in **Dashboard amministratore → Configurazione server**. L’approvazione delle registrazioni LDAP e la ricerca utenti directory sono nella sezione Utenti. Per Helm e wizard Kubernetes, e per i controlli richiesti prima di un restore, leggere `docs/RC_CYCLE270_FULL_BACKUP_LDAP_AUDIT_RESULTS.it.md`.
+
+## Copia locale di una sessione (RC285)
+
+Nella sidebar di una sessione aperta scegli **Esporta in locale (.quorivio)** per scaricare una copia portabile con pagine, widget, schemi, date/appuntamenti e tutti gli allegati privati, anche non ancora utilizzati. Dalla sidebar scegli **Importa da locale (.quorivio)** (anche senza sessione aperta) e seleziona il file: il server verifica integrità e antivirus, quindi crea una **nuova** sessione, senza sovrascrivere l'originale. Il pacchetto non contiene partecipanti, risposte, statistiche o segreti; usa backup server separati per il Disaster Recovery. Limiti: 100 MiB archivio, 80 MiB media, 300 allegati.

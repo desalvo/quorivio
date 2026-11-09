@@ -19,7 +19,8 @@ class RC284ManualPDFGallery(unittest.TestCase):
         self.assertEqual(data['fixture'],'synthetic-only')
         # Local PDFs may include these images only with the original build id.
         content=gallery('admin','it',path=HISTORIC_SCREENSHOTS)
-        self.assertIn('Commit 0bb89e6ac79e',content)
+        self.assertNotIn('Commit ',content)
+        self.assertIn('ARCHIVIO RC283',content)
         self.assertNotIn('CURRENT BUILD',content)
 
     def test_historical_screenshots_cannot_satisfy_current_ci_capture(self):

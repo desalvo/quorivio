@@ -4,7 +4,7 @@
 Archivio completo dei sorgenti basato sulla baseline `ci-jsx-build-hotfix-cumulative` con CI verde confermata dall'utente. **Non è una Release Candidate approvata**. Nessun commit, push, tag o intervento sui server; versione invariata.
 
 ## Implementazioni successive all'ultimo commit confermato
-- Import `.quorivio` con nuovi UUID globali degli asset e rimappatura dei riferimenti in tema, pagine e risultati; prevenzione delle collisioni nelle reimportazioni.
+- Import `.quo` con nuovi UUID globali degli asset e rimappatura dei riferimenti in tema, pagine e risultati; prevenzione delle collisioni nelle reimportazioni.
 - Duplicazione di sessione con copia indipendente dei media e dei record associati.
 - Controlli degli archivi su MIME effettivo, hash crittografici, integrità e percorsi.
 - Attivazione MFA email solo dopo conferma del codice recapitato; TOTP indipendente da SMTP. Rafforzamento dei cambiamenti transazionali delle impostazioni amministrative e della gestione delle foto profilo.

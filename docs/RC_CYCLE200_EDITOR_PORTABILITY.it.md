@@ -9,7 +9,7 @@ Full CI RC199 verde: https://github.com/desalvo/quorivio/actions/runs/4209670586
 - Menu contestuale miniature «Importa PDF/PPTX»: importa da file locale con convertitore isolato e inserisce le nuove pagine dopo quella selezionata. Necessario attivare il convertitore.
 
 ## Sessione portatile
-- Il file standalone `.quorivio` include asset binari con checksum e immagini raster delle slide convertite. Reimportazione su altro account crea sessione, pagine, asset, link d’accesso e proprietà nuovi; non importa partecipanti, risposte, statistiche o segreti della vecchia sessione.
+- Il file standalone `.quo` include asset binari con checksum e immagini raster delle slide convertite. Reimportazione su altro account crea sessione, pagine, asset, link d’accesso e proprietà nuovi; non importa partecipanti, risposte, statistiche o segreti della vecchia sessione.
 - Esportazioni PDF/PPTX tramite worker isolato; le immagini di slide importate vengono conservate e sotto i widget Quorivio. La fedeltà native PowerPoint resta parziale per alcuni widget avanzati.
 
 ## Privacy GDPR e statistiche

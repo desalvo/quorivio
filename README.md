@@ -1,3 +1,5 @@
+**RC287 update:** Enlarged result-verdict frames and removed the overlapping editor strip; preserved Widget Formatting size across tabs; author-selected bar-gradient endpoints and refreshed midnight-blue/teal menus.  Six manuals include the new workflow.
+
 > **RC277 — Rewritten manuals:** six expanded IT/EN guides covering full workflows, 21 widgets, backups/LDAP/audit, charts and clearly identified illustrative visuals. [Details](docs/RC_CYCLE277_EXPANDED_MANUALS.en.md).
 
 > **RC269 — Authentication and session management:** automatic expired-login redirect, safe 12-hour cleanup, ownership transfer, opt-in LDAP/LDAPS and sidebar/phone-answer fixes. [RC269 notes](docs/RC_CYCLE269_LDAP_OWNERSHIP_HOUSEKEEPING.en.md).
@@ -218,3 +220,7 @@ Manual `workflow_dispatch` with `rc_acceptance_suite=true` never publishes, even
 ## RC270 full-instance backup and directory governance
 
 Platform administrators can download PostgreSQL + persistent assets as a full `.tar.gz` archive or schedule periodic backups to POSIX/NFS, S3-compatible storage, or HTTPS WebDAV. Enable backend mounts through Helm/Kubernetes wizard and edit the destination under server settings. LDAP self-registration requires a successful directory bind and remains pending until approval; the admin user panel supports directory lookup and assignment of a Quorivio role. Operational audit retention is configurable under server settings. Results pie percentages/option numbers and color-aware slices, plus optional bar hit gradients, are set in *Format widget*. See `docs/RC_CYCLE270_FULL_BACKUP_LDAP_AUDIT_RESULTS.it.md` for constraints and restore instructions.
+
+## Local session copies (RC285)
+
+In the sidebar of an open session, choose **Export locally (.quo)** to download a portable copy containing slides, widgets, master schemes, scheduled dates/appointments and all presenter-owned media, including unused library files. Choose **Import locally (.quo)** in the sidebar (also without an open session) to select a file; the server checks archive integrity and antivirus, then creates a **new** session without overwriting the original. Participant identities, submissions, statistics and secrets are excluded; use independent administrator backups for instance-wide disaster recovery. Limits: 100 MiB bundle, 80 MiB media, 300 attachments.

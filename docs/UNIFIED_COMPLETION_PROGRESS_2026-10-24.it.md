@@ -5,7 +5,7 @@ Questo cumulativo rappresenta **un completamento parziale**, **non una Release C
 ## Modifiche realizzate
 - PPTX: attraversamento delle forme raggruppate e annidate, recuperando testo, figure compatibili e media come widget indipendenti con coordinate trasformate. I gruppi nativi, le geometrie di rotazioni complesse e gli effetti OOXML non sono conservati: il rapporto di fedeltà segnala esplicitamente la perdita.
 - Test su gruppi, dimensionamento, annidamento e limite di 16 widget per pagina.
-- Conservate le precedenti correzioni relative a TOTP senza SMTP, integrità degli archivi `.quorivio`, recupero delle celle PowerPoint e interfaccia mobile.
+- Conservate le precedenti correzioni relative a TOTP senza SMTP, integrità degli archivi `.quo`, recupero delle celle PowerPoint e interfaccia mobile.
 
 ## Evidenze di test
 - Python: **223 test superati**.
@@ -18,7 +18,7 @@ Questo cumulativo rappresenta **un completamento parziale**, **non una Release C
 2. Ciclo end-to-end dei widget: creazione, pubblicazione, risposta anonima, punteggio e risultati live su database e browser reali.
 3. MFA email/TOTP e switch generale, amministrazione SSO, recupero account.
 4. Accessibilità e QA visivo editor/mobile sui dispositivi fisici.
-5. Trasferimento `.quorivio` tra installazioni indipendenti.
+5. Trasferimento `.quo` tra installazioni indipendenti.
 6. Installazione pulita e build completa, audit sicurezza/licenze, prove GDPR e deployment.
 7. Manualistica completa IT/EN e benchmark distribuito di 500 partecipanti.
 

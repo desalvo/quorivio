@@ -34,7 +34,7 @@ export function remapPortableAssets(definition:any,sourceAssetIds:string[]):{def
  const source=new Set(sourceAssetIds);
  if(source.size!==sourceAssetIds.length||sourceAssetIds.some(id=>typeof id!=='string'||!UUID_RE.test(id)))throw Error('invalid_import_assets');
  const refs=referencedAssets(definition);
- if(refs.size!==source.size||[...refs].some(id=>!source.has(id)))throw Error('unmatched_import_assets');
+ if([...refs].some(id=>!source.has(id)))throw Error('unmatched_import_assets');
  const ids=new Map(sourceAssetIds.map(id=>[id,randomUUID()]));
  const copy=structuredClone(definition);
  const rewrite=(design:any)=>{
@@ -54,7 +54,9 @@ export function validateBundleManifest(m:any):m is BundleManifest{
  const ids=new Set<string>();let total=0;
  for(const a of m.assets){if(!a||typeof a.id!=='string'||!UUID_RE.test(a.id)||ids.has(a.id)||!['image/png','image/jpeg','image/gif','image/webp','application/pdf','video/mp4','video/webm'].includes(a.mime)||!Number.isSafeInteger(a.bytes)||a.bytes<1||a.bytes>50*1024*1024||! /^[a-f0-9]{64}$/.test(a.sha256)||(a.display_name!==undefined&&(typeof a.display_name!=='string'||a.display_name.length<1||a.display_name.length>120||/[\x00-\x1f\x7f]/.test(a.display_name)))||(a.background_library_copy!==undefined&&typeof a.background_library_copy!=='boolean'))return false;ids.add(a.id);total+=a.bytes;}
  if(total>MAX_MEDIA_BYTES)return false;
- const refs=referencedAssets(m.definition);return refs.size===ids.size&&[...refs].every(id=>ids.has(id));
+ // A complete local copy may also contain presenter-owned library assets that
+ // have not yet been placed on any slide. References must still be present.
+ const refs=referencedAssets(m.definition);return [...refs].every(id=>ids.has(id));
 }
 const write16=(b:Buffer,o:number,n:number)=>b.writeUInt16LE(n,o),write32=(b:Buffer,o:number,n:number)=>b.writeUInt32LE(n>>>0,o);
 export function encodeBundle(manifest:BundleManifest,media:Map<string,Buffer>):Buffer{

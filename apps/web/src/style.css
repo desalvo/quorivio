@@ -3605,3 +3605,183 @@ body .editor-floating-panel.widget-selection-palette .palette-ribbon-groups{min-
 .result-answer-key-toggle:focus-visible{outline:3px solid #2563eb;outline-offset:2px}
 .linked-result-pair .answer-verdict-icon{margin-left:.5em}
 @media (prefers-reduced-motion:reduce){.result-answer-key-toggle{transition:none}}
+
+/* RC286: native collapsed-by-default attachments in the session dashboard. */
+.dashboard-attachments-collapsible>summary{cursor:pointer;font-weight:750;font-size:1.06rem;list-style:revert;padding:5px 2px}
+.dashboard-attachments-collapsible>summary:focus-visible{outline:3px solid #5048b6;outline-offset:3px}
+.dashboard-attachments-count{display:inline-block;border-radius:20px;background:#edf0f9;padding:1px 8px;margin-left:8px;font-size:.82rem;color:#38446f}
+.dashboard-attachments-body{padding-top:12px}
+/* Portaled context menu stays in viewport even for huge V/F configurations.
+   Its own wheel/touch scrolling must never dismiss the menu. */
+.canvas-context-menu{position:fixed!important;z-index:5000;max-height:min(78dvh,calc(100dvh - 16px));overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;scrollbar-gutter:stable}
+.canvas-context-menu .widget-truth-context{min-width:0;padding:4px 2px;margin:4px 0;border:1px solid #cbd5e1;display:grid;gap:3px}
+.canvas-context-menu .widget-truth-context legend{font-size:12px;font-weight:750}
+.canvas-context-menu .widget-truth-context label{display:flex;align-items:center;gap:5px;font-size:11px;min-width:0;max-width:100%;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.canvas-context-menu .widget-truth-context label input[type=checkbox]{flex:0 0 auto}
+.canvas-context-menu .widget-truth-context select{margin-left:auto;max-width:48px;min-width:43px;font-size:11px;padding:2px}
+.canvas-context-menu .widget-truth-context button{font-size:11px;min-height:27px}
+/* Read-only authoring thumbnails show real questions, captions and widget shapes.
+   Bars are schematic: never present fabricated live response counts. */
+.page-editor-preview-widget{padding:1px;align-items:stretch;justify-content:stretch;white-space:normal;text-overflow:clip}
+.page-editor-preview-widget .thumb-content{display:flex;flex-direction:column;width:100%;height:100%;overflow:hidden;font-size:clamp(3px,.34vw,6px);line-height:1.18;gap:1px;min-width:0}
+.page-editor-preview-widget .thumb-content strong{color:inherit;font-size:1.1em;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.page-editor-preview-widget .thumb-option{display:flex;gap:2px;min-width:0;line-height:1.1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.page-editor-preview-widget .thumb-option i{font-style:normal;flex:0 0 auto}
+.page-editor-preview-widget .thumb-option span{overflow:hidden;text-overflow:ellipsis}
+.page-editor-preview-widget .thumb-chart-bars{display:flex;flex-direction:column;gap:2px;justify-content:space-evenly;flex:1}
+.page-editor-preview-widget .thumb-chart-bars i{display:block;height:3px;border-radius:2px;background:#8273d7;width:70%}
+.page-editor-preview-widget .thumb-chart-bars i:nth-child(2){width:44%;background:#57acb3}
+.page-editor-preview-widget .thumb-chart-bars i:nth-child(3){width:86%;background:#e5aa6d}
+.page-editor-preview-widget .thumb-timer b{font-size:1.7em;text-align:center;margin:auto}
+.page-editor-preview-widget .thumb-rating span,.page-editor-preview-widget .thumb-reaction span{font-size:1.25em;align-self:center;margin:auto}
+.page-editor-preview-widget .thumb-qr>span{font-size:3.4em;line-height:1;margin:auto}
+.page-editor-preview-widget .thumb-line{width:100%;height:50%;border-top:2px solid;align-self:center}
+.page-editor-preview-widget .thumb-media-label{margin:auto;overflow:hidden;text-overflow:ellipsis;font-size:6px}
+.page-editor-preview-widget .thumb-text,.page-editor-preview-widget .thumb-title,.page-editor-preview-widget .thumb-footer,.page-editor-preview-widget .thumb-postit{justify-content:center;overflow-wrap:anywhere}
+.page-editor-preview-widget .thumb-content small{font-size:.85em;overflow:hidden}
+
+
+/* RC287 — mock-aligned studio chrome. Keep all actual controls; icons are Lucide. */
+.editor-ux-v2,.editor-ux-v2:fullscreen{
+ --q-navy:#111d32;--q-navy-deep:#0a1427;--q-teal:#0f9d88;--q-blue:#2563eb;
+ --editor-glass:rgba(12,24,44,.97);--editor-line:rgba(170,197,228,.24);
+ background:linear-gradient(125deg,#111e33,#172943 55%,#0d1729)!important;
+}
+.editor-ux-v2 .page-editor-sidebar,.editor-ux-v2 .editor-widget-rail{
+ background:linear-gradient(160deg,#142740,#0c172a)!important;
+ border-color:#34475f!important;color:#f3f8ff!important;
+}
+.editor-ux-v2 .page-editor-thumb-row{border:1px solid #3f5878;border-radius:10px;box-shadow:0 3px 13px #03091477}
+.editor-ux-v2 .page-editor-thumb-row.is-active{border-color:#45dbca;box-shadow:0 0 0 2px #45dbca66,0 8px 24px #02071288}
+.editor-ux-v2 .editor-icon-tool,.editor-ux-v2 .editor-widget-grid .editor-icon-tool{border-radius:12px!important;transition:background .12s,border-color .12s,transform .12s;box-shadow:0 3px 11px #03091445}
+.editor-ux-v2 .editor-icon-tool:is(:hover,:focus-visible){background:#20526a!important;border-color:#6ee6de!important;transform:translateY(-1px)}
+.editor-ux-v2 .editor-canvas-slot{border-radius:13px;box-shadow:0 20px 50px #050c2166}
+/* The selected tab changes only scrollable contents, never the manually resized outer frame. */
+body .editor-floating-panel.widget-selection-palette{
+ display:flex!important;flex-direction:column!important;align-items:stretch!important;
+ justify-content:flex-start!important;
+ background:#eff5fc!important;color:#172c48!important;
+ border:1px solid #8da9c9!important;border-radius:12px!important;
+ box-shadow:0 16px 54px #06162d99!important;overflow:hidden!important;
+}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-head{
+ background:linear-gradient(105deg,#10283e,#155064)!important;color:white!important;
+ flex:0 0 auto!important;border-radius:10px 10px 0 0!important;border-bottom:1px solid #4b8f9f!important;
+}
+body .editor-floating-panel.widget-selection-palette .widget-format-tabs{
+ background:#e5eef8!important;flex:0 0 auto!important;
+}
+body .editor-floating-panel.widget-selection-palette .widget-format-tabs button{
+ color:#294765!important;border-radius:7px!important;min-height:28px!important;
+}
+body .editor-floating-panel.widget-selection-palette .widget-format-tabs button[aria-selected="true"]{
+ background:#fff!important;color:#076c71!important;border-color:#8ec6cb!important;
+ box-shadow:0 2px 6px #183b551f!important;
+}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-groups[role="tabpanel"]{
+ flex:1 1 0%!important;min-height:0!important;max-height:none!important;
+ height:auto!important;align-self:stretch!important;align-content:flex-start!important;
+ justify-content:flex-start!important;overflow-y:auto!important;overflow-x:auto!important;
+ background:#f5f9ff!important;color:#1b3552!important;
+ scrollbar-gutter:stable;
+}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-group{
+ background:#fff;border:1px solid #dbe5f0!important;border-radius:9px!important;
+ box-shadow:0 1px 4px #1c3c5e12!important;
+}
+body .editor-floating-panel.widget-selection-palette .palette-ribbon-groups input[type="color"]{
+ cursor:pointer;border-radius:6px;border:1px solid #aebfd4;padding:1px;
+}
+body .editor-floating-panel.widget-selection-palette .results-gradient-colors{
+ display:inline-flex;flex-wrap:wrap;align-items:center;gap:10px;
+ border-radius:8px;padding:4px 8px;background:#e9f5f3;border:1px solid #9bd6cd;
+}
+body .editor-floating-panel.widget-selection-palette .results-gradient-colors>label{
+ display:inline-flex;align-items:center;gap:5px;white-space:nowrap;color:#183f4e;
+}
+/* An enlarged verdict frame must occupy its own layout box even with custom fonts.
+   Avoid outlines (which don't reserve space) and fixed row heights. */
+.linked-source-answers{gap:clamp(7px,.55em,18px)!important;align-items:stretch!important}
+.linked-results-items{row-gap:clamp(7px,.55em,18px)!important;align-items:stretch!important}
+.widget-answer-option[data-answer-verdict],.linked-results-row[data-answer-verdict]{
+ border-width:3px!important;border-style:solid!important;border-radius:10px!important;
+ padding:clamp(7px,.55em,18px) clamp(10px,.75em,22px)!important;
+ margin:2px 0!important;min-height:max-content!important;height:auto!important;
+ line-height:1.5!important;box-sizing:border-box!important;overflow:visible!important;
+}
+.widget-answer-option[data-answer-verdict="correct"],.linked-results-row[data-answer-verdict="correct"]{
+ border-color:#16834d!important;box-shadow:0 1px 5px #16834d26!important;
+}
+.widget-answer-option[data-answer-verdict="incorrect"],.linked-results-row[data-answer-verdict="incorrect"]{
+ border-color:#bf303f!important;box-shadow:0 1px 5px #bf303f25!important;
+}
+.linked-source-answers .widget-answer-option[data-answer-verdict] strong{
+ min-width:0!important;max-width:100%!important;line-height:1.45!important;
+ overflow-wrap:anywhere!important;white-space:pre-wrap!important;
+}
+.linked-results-row[data-answer-verdict] .linked-result-pair{line-height:1.45!important}
+/* A decorative truth switch under the editor canvas used to overlay the footer.
+   The real R toggle remains in the result widget itself. */
+.canvas-results-truth-toggle{display:none!important}
+/* Mock-style context menu while retaining accessible scrolling and all commands. */
+.canvas-context-menu{
+ border-radius:13px!important;border:1px solid #9eb9d1!important;
+ background:#fdfefe!important;color:#16314e!important;
+ box-shadow:0 19px 54px #08142a55!important;padding:6px!important;
+ scrollbar-color:#9aaec6 #eef2f8;
+}
+.canvas-context-menu>button{border-radius:8px!important;min-height:34px!important;
+ background:transparent!important;color:#1d3651!important;font-weight:600!important}
+.canvas-context-menu>button:is(:hover,:focus-visible){background:#e4f4f2!important;color:#006f70!important}
+@media(max-width:520px){
+ body .editor-floating-panel.widget-selection-palette .palette-ribbon-groups[role="tabpanel"]{overflow-y:auto!important;overflow-x:hidden!important}
+ .canvas-context-menu{max-width:min(340px,calc(100vw - 16px))!important}
+}
+
+
+/* RC287 — left navigation follows the documented navy/teal Quorivio mock. */
+@media(min-width:741px){
+ .dashboard{grid-template-columns:clamp(235px,19vw,292px) minmax(0,1fr)!important}
+ .dashboard>.aside{background:linear-gradient(168deg,#142a42,#0c192e 62%,#091427)!important;
+   border-right:1px solid #2a4561!important;box-shadow:8px 0 25px #040d1a26;
+   padding:19px 11px 22px!important}
+}
+.dashboard>.aside .dashboard-nav{background:transparent!important;border:0!important;
+ box-shadow:none!important;margin:0 0 12px!important;padding:10px 3px!important}
+.dashboard>.aside .dashboard-nav h3{font-size:12px!important;font-weight:750!important;
+ text-transform:uppercase;letter-spacing:.09em;color:#94b1c9;margin:0 7px 12px!important}
+.dashboard>.aside .dashboard-nav .session{
+ display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;
+ gap:12px!important;text-align:left!important;border:1px solid transparent!important;
+ background:transparent!important;color:#d3e5f1!important;min-height:42px!important;
+ padding:9px 11px!important;margin-bottom:4px!important;letter-spacing:0!important;
+ border-radius:9px!important;white-space:normal!important;
+}
+.dashboard>.aside .dashboard-nav .session svg{color:#9ec3db;flex:0 0 18px}
+.dashboard>.aside .dashboard-nav .session.selected,
+.dashboard>.aside .dashboard-nav .session[aria-current="page"]{
+ background:linear-gradient(100deg,#0c816f,#0c705f)!important;
+ color:#fff!important;border-color:#3cb3a0!important;box-shadow:0 3px 10px #040f1d59!important;
+}
+.dashboard>.aside .dashboard-nav .session.selected svg{color:#fff!important}
+.dashboard>.aside .dashboard-nav .session:is(:hover,:focus-visible):not(.selected){
+ background:#1b3952!important;color:#fff!important;border-color:#476e89!important}
+.dashboard>.aside .dashboard-nav .local-session-import{
+ margin-top:17px!important;border:1px solid #577189!important;
+ background:#1a3048!important;box-shadow:0 3px 12px #06132550;
+}
+.dashboard>.aside .current-session-actions{border-color:#48617c!important;
+ background:linear-gradient(160deg,#182e46,#14253c)!important;border-radius:13px!important}
+.dashboard>.aside .current-session-actions button{justify-content:flex-start!important;gap:9px!important;
+ border-radius:8px!important;min-height:35px!important}
+.dashboard>.aside .current-session-actions button:is(:hover,:focus-visible){
+ background:#1c5862!important;color:white!important;border-color:#58b9b5!important}
+@media(max-width:740px){
+ .dashboard>.aside{background:#101f35!important}
+ .dashboard>.aside .dashboard-nav{padding:6px!important}
+ .dashboard>.aside .dashboard-nav .session{flex:1 1 160px!important}
+}
+/* RC287: remove the legacy 390px cap; it defeated explicit user resizing. */
+body .editor-floating-panel.widget-selection-palette{
+ max-height:calc(100dvh - 16px)!important;
+}

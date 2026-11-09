@@ -1,8 +1,8 @@
 # Quorivio portable session archive (v1)
 
-The `.quorivio` file is a bounded ZIP archive with `manifest.json` plus `media/<UUID>` members. The manifest carries a v1 `quorivio-session` definition and a media manifest with MIME, byte count and SHA-256 for each embedded file. The exporter includes only session-owned, non-participant assets actually referenced by page or result widgets, backgrounds, or the theme. It does **not** contain participant identities, submissions, responses, access cookies, join codes, passwords or MFA secrets. Import always creates a new draft session with fresh join credentials.
+The `.quo` file is a bounded ZIP archive with `manifest.json` plus `media/<UUID>` members. The manifest carries a v1 `quorivio-session` definition and a media manifest with MIME, byte count and SHA-256 for each embedded file. The exporter includes only session-owned, non-participant assets actually referenced by page or result widgets, backgrounds, or the theme. It does **not** contain participant identities, submissions, responses, access cookies, join codes, passwords or MFA secrets. Import always creates a new draft session with fresh join credentials.
 
-The authenticated API endpoints are `GET /api/sessions/:id/export.quorivio` and `POST /api/sessions/import.quorivio` (Content-Type: `application/vnd.quorivio.session+zip`). The frontend presents these alongside legacy JSON and PPTX workflows. Import can use PNG, JPEG, GIF, WebP, PDF, MP4 and WebM assets, with up to 300 embedded files / 80 MiB uncompressed media / 100 MiB archive. The ZIP parser rejects paths outside the exact manifest/media layout, duplicate members, encryption, unsupported compression, corrupted checksums and excess sizes. The API checks the session's asset ownership and hashes on export, and creates new asset records within an import transaction.
+The authenticated API endpoints are `GET /api/sessions/:id/export.quo` and `POST /api/sessions/import.quo` (Content-Type: `application/vnd.quorivio.session+zip`). The frontend presents these alongside legacy JSON and PPTX workflows. Import can use PNG, JPEG, GIF, WebP, PDF, MP4 and WebM assets, with up to 300 embedded files / 80 MiB uncompressed media / 100 MiB archive. The ZIP parser rejects paths outside the exact manifest/media layout, duplicate members, encryption, unsupported compression, corrupted checksums and excess sizes. The API checks the session's asset ownership and hashes on export, and creates new asset records within an import transaction.
 
 ## Compatibility and limitations
 
@@ -10,7 +10,7 @@ The original `export.json` and `POST /api/sessions/import` remain supported as a
 
 ## Acceptance checks
 
-1. Create a session with image/logo/video/PDF widgets and page/result backgrounds; export `.quorivio`.
+1. Create a session with image/logo/video/PDF widgets and page/result backgrounds; export `.quo`.
 2. Import on a separate Quorivio deployment, verify new credentials and that pages/assets render, and edit/save each page.
 3. Confirm no participant data or old QR/join code is present.
 4. Tamper with an asset hash, member name, ZIP header and manifest; each must fail without leaving an imported session.
@@ -18,6 +18,6 @@ The original `export.json` and `POST /api/sessions/import` remain supported as a
 
 ## October 2026 hardening: safe repeat imports and cloning
 
-Each imported asset now gets a **fresh database-global UUID** even if the same `.quorivio` file is imported multiple times. References in session theme, page widgets/backgrounds, and result widgets/backgrounds are remapped consistently, including multiple references to one file. The `POST /api/sessions/:id/duplicate` operation copies referenced media bytes into the new session rather than retaining references to the source session. Both paths check length, digest, content signature, and the configured anti-malware policy before persisting media. PostgreSQL `BIGINT` asset sizes are normalized to safe numeric values before validation during cloning.
+Each imported asset now gets a **fresh database-global UUID** even if the same `.quo` file is imported multiple times. References in session theme, page widgets/backgrounds, and result widgets/backgrounds are remapped consistently, including multiple references to one file. The `POST /api/sessions/:id/duplicate` operation copies referenced media bytes into the new session rather than retaining references to the source session. Both paths check length, digest, content signature, and the configured anti-malware policy before persisting media. PostgreSQL `BIGINT` asset sizes are normalized to safe numeric values before validation during cloning.
 
 The new CI step `PostgreSQL-backed portable and profile lifecycle E2E` exercises repeated imports, collision resistance, shared references, asset cloning, and rejection of a corrupted ZIP. **The step is authored but has not been run against PostgreSQL in this environment.** A real cross-instance and multi-media round trip is still required for RC sign-off.

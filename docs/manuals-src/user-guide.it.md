@@ -1,8 +1,8 @@
 # Guida del partecipante
 
-**Quorivio 0.1.0-dev · Build documentale RC284 · 9 novembre 2026**
+**Quorivio 0.1.0-dev · Build documentale RC287 · 9 novembre 2026**
 
-Questa guida spiega come partecipare a una sessione interattiva, rispondere ai diversi tipi di domanda, interpretare gli esiti e usare correttamente le funzioni disponibili da smartphone o computer. È riferita al codice della RC284 e alla revisione editoriale RC278. Le prime figure sono ricostruzioni etichettate; la galleria finale nei PDF generati dalla CI usa screenshot autentici acquisiti sull'istanza di prova temporanea, **non su un server di produzione**.
+Questa guida spiega come partecipare a una sessione interattiva, rispondere ai diversi tipi di domanda, interpretare gli esiti e usare correttamente le funzioni disponibili da smartphone o computer. È riferita al codice della RC287 e alla revisione editoriale RC278. Le prime figure sono ricostruzioni etichettate; la galleria finale nei PDF generati dalla CI usa screenshot autentici acquisiti sull'istanza di prova temporanea, **non su un server di produzione**.
 
 ## 1. Conoscere Quorivio
 
@@ -132,7 +132,7 @@ Per l'accessibilità, usare l'ingrandimento del browser, orientare correttamente
 
 **Sessione:** insieme delle pagine e dei controlli dell'evento. **Pagina:** schermata presentata durante la sessione. **Widget:** componente visuale o interattivo della pagina. **Anteprima:** simulazione che non sostituisce il collaudo dal vivo. **Risposta confermata:** invio accettato dal server. **Moderazione:** decisione del presentatore su contenuti pubblicabili. **Retention:** durata di conservazione stabilita dall'installazione.
 
-**Stato di collaudo:** questa guida descrive il comportamento previsto dal codice della RC284. Non rappresenta una certificazione degli specifici browser, dispositivi, server LDAP/SMTP o cluster Kubernetes.
+**Stato di collaudo:** questa guida descrive il comportamento previsto dal codice della RC287. Non rappresenta una certificazione degli specifici browser, dispositivi, server LDAP/SMTP o cluster Kubernetes.
 
 ## Appendice A. Esempio completo di quiz corretto e sbagliato
 
@@ -172,7 +172,7 @@ Non inviare più risposte per conto di terzi, non condividere i propri codici di
 
 ## Appendice F. Schermate autentiche da esercitazione
 
-La galleria mostra soltanto acquisizioni genuine da un Quorivio avviato in CI, con database e identità di prova. Le schermate sono correlate al commit con SHA-256. Non derivano da composizioni illustrate. Le schermate sono una guida all’uso, non prove di certificazione funzionale o di sicurezza.
+La galleria mostra soltanto acquisizioni genuine da un Quorivio avviato in CI, con database e identità di prova. Le schermate sono correlate alla versione sorgente tramite SHA-256. Non derivano da composizioni illustrate. Le schermate sono una guida all’uso, non prove di certificazione funzionale o di sicurezza.
 
 <!-- REAL_SCREENSHOT_GALLERY -->
 
@@ -183,6 +183,38 @@ Nota editoriale: riscrittura iniziale in RC277; revisione metadati e processo sc
 Nella galleria seguire nell'ordine: schermata di login (solo per utenti registrati), **accesso smartphone** tramite link/codice, **domanda smartphone** e **feedback**. Inserire un nome convenzionale, non dati personali non necessari. Selezionare una risposta e inviarla una sola volta; attendere un messaggio di ricezione. Nei quiz che prevedono la valutazione vero/falso, i bordi verdi e rossi indicano l'esito delle singole opzioni **dopo** l'invio; non viene aggiunto sotto alle opzioni un elenco separato delle soluzioni.
 
 La schermata della CI contiene risposte dimostrative e non dati di un evento reale. Se il dispositivo mostra un layout diverso, controllare l'eventuale selettore «Layout smartphone / Diapositiva 16:9» e segnalare al presentatore la versione del browser.
+
+## Appendice H. Percorso visuale durante una sessione live
+
+<figure><img src="../assets/manual-illustrations/workflow-live-presenter-user-rc286.png" alt="DIAGRAMMA CONCETTUALE — il percorso del partecipante in una sessione live."/><figcaption>DIAGRAMMA CONCETTUALE — il percorso del partecipante in una sessione live.</figcaption></figure>
+
+<figure><img src="../assets/manual-evidence-rc283/participant-entry-smartphone.png" alt="VISTA AUTENTICA ARCHIVIATA — accesso del partecipante da telefono."/><figcaption>VISTA AUTENTICA ARCHIVIATA — accesso del partecipante da telefono.</figcaption></figure>
+
+<figure><img src="../assets/manual-evidence-rc283/participant-question-smartphone.png" alt="VISTA AUTENTICA ARCHIVIATA — domanda sul telefono del partecipante."/><figcaption>VISTA AUTENTICA ARCHIVIATA — domanda sul telefono del partecipante.</figcaption></figure>
+
+**Ingresso:** inquadrare il QR della sessione oppure aprire il link e inserire il codice. Scegliere il nickname richiesto e controllare il titolo dell'evento. **Domanda:** leggere il testo e selezionare una o più opzioni secondo l'istruzione. **Invio:** premere una sola volta Invia risposta; in caso di rete lenta attendere la conferma. **Feedback:** quando il presentatore ha configurato una chiave vero/falso, osservare direttamente sui pulsanti della domanda il bordo verde con ✓ per l'opzione corretta e il bordo rosso con ✕ per quella sbagliata; non compare una sezione con la soluzione separata.
+
+<figure><img src="../assets/manual-evidence-rc283/participant-feedback-smartphone.png" alt="VISTA AUTENTICA ARCHIVIATA — conferma dell’invio; il contenuto dipende dalla configurazione della domanda."/><figcaption>VISTA AUTENTICA ARCHIVIATA — conferma dell’invio; il contenuto dipende dalla configurazione della domanda.</figcaption></figure>
+
+Durante l'evento non confondere la **prova nell'anteprima** con la sessione live: soltanto gli invii in live entrano nelle statistiche. Se si passa dall'orientamento verticale alla diapositiva 16:9, controllare che tutte le opzioni rimangano leggibili. Le reazioni possono essere aggiornate quando consentito. Se la schermata è obsoleta, verificare la connessione prima di reinviare.
+
+## Appendice I. Tre esempi guidati
+
+| Esempio | Azione del partecipante | Risultato atteso |
+|---|---|---|
+| Quiz singolo | Selezionare una sola risposta e inviare | Una risposta registrata e, se attivata, una valutazione visiva |
+| Quiz multiplo | Selezionare tutte le opzioni richieste | Evidenziazione dopo invio secondo la chiave configurata |
+| Gradimento e reazioni | Selezionare una valutazione e una reazione | Conferma e aggiornamento nel grafico del presentatore |
+
+<figure><img src="../assets/manual-illustrations/workflow-preview-live-rc286.png" alt="DIAGRAMMA CONCETTUALE — simulazione, invio reale e visualizzazione dei risultati."/><figcaption>DIAGRAMMA CONCETTUALE — simulazione, invio reale e visualizzazione dei risultati.</figcaption></figure>
+
+Ricordare che il presentatore può mostrare una pagina diversa sullo schermo principale e sul telefono del pubblico; seguire sempre la pagina indicata nell'interfaccia partecipante. Non condividere screenshot con dati personali di altri partecipanti.
+
+## Appendice L. Interpretare la nuova evidenziazione delle risposte
+
+Quando il presentatore sceglie di mostrare le risposte corrette nei risultati, un bordo **verde** più evidente indica la risposta vera e uno **rosso** la risposta falsa. I bordi sono separati e lasciano spazio alle lettere anche se la domanda usa caratteri più grandi. Il tasto **R** appartiene alla vista dei risultati gestita dal presentatore, non è un comando per modificare la propria risposta. I colori personalizzati delle barre statistiche riguardano la rappresentazione dei conteggi, non il giudizio di correttezza.
+
+Da smartphone, usa la vista partecipante e controlla il testo delle scelte prima di inviare. Se la sessione consente la modifica del voto, cambia soltanto la risposta tramite i normali pulsanti: non usare la cornice colorata come controllo interattivo.
 
 ## Scheda tecnica di compatibilità e requisiti indicativi
 

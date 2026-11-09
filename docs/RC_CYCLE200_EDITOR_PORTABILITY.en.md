@@ -9,7 +9,7 @@ RC199 full GitHub Actions CI green: https://github.com/desalvo/quorivio/actions/
 - Thumbnail contextual "Import PDF/PPTX" uses existing authenticated isolated converter, inserts converted pages after the selected thumbnail and persists the order. Converter activation is required.
 
 ## Portable session
-- Standalone `.quorivio` is a versioned private bundle with checksummed binary assets and slide raster snapshots. Import into a different account creates fresh session, page, and asset identifiers, new join secret and ownership; excludes participants, individual responses and aggregates. Inherited live QR bearer data is not preserved.
+- Standalone `.quo` is a versioned private bundle with checksummed binary assets and slide raster snapshots. Import into a different account creates fresh session, page, and asset identifiers, new join secret and ownership; excludes participants, individual responses and aggregates. Inherited live QR bearer data is not preserved.
 - PDF/PPTX exports use the isolated LibreOffice/PowerPoint worker and private stage; export of imported media slides embeds verified snapshot pixels as a background before overlaid native widgets. PowerPoint widget fidelity remains subject to the worker's documented native feature limits.
 
 ## GDPR statistics
