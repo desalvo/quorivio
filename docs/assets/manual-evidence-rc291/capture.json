@@ -1,0 +1,135 @@
+{
+  "build": "RC291",
+  "captured_at": "2026-11-09T18:56:20.730688+00:00",
+  "commit": "1501e9f4250161d43d8e928142a31406a75b56b8",
+  "fixture": "synthetic-only",
+  "shots": {
+    "admin-audit": {
+      "height": 923,
+      "sha256": "3a30e40b85b5bdbea36ecd12bbd98d6c08b2378ce70d2bb96126d601bae071c3",
+      "width": 1130
+    },
+    "admin-backups": {
+      "height": 791,
+      "sha256": "ac9fc0c62e87e6a93556015c0bdcea456ecbff8f87ab2a22b513e7ae4257a4b5",
+      "width": 1130
+    },
+    "admin-server-settings": {
+      "height": 940,
+      "sha256": "13c79df1185aadfd9fd3bd6771d94384a43ee8c8d71651b27b5bca48fa35cfab",
+      "width": 1440
+    },
+    "admin-users": {
+      "height": 940,
+      "sha256": "f39ccd1506dd7155b5197251fb589c85ba83ec4f804ae09290e07dec3496cfc1",
+      "width": 1440
+    },
+    "editor-canvas": {
+      "height": 940,
+      "sha256": "0055aff6566964c82bb20e7edd7e89c815280cbb2ac26e2a0dbf39edc3fd7c57",
+      "width": 1440
+    },
+    "editor-schema": {
+      "height": 940,
+      "sha256": "713b70e10fa1da7db287534291509c196cae64281c236f45f3268c7e7c9b6998",
+      "width": 1440
+    },
+    "editor-schema-inspector": {
+      "height": 940,
+      "sha256": "e9d8772c322019ce34f4b5adea2afe34bd10057e78ec67459646d7b88a210147",
+      "width": 1440
+    },
+    "editor-thumbnails-widgets": {
+      "height": 940,
+      "sha256": "0055aff6566964c82bb20e7edd7e89c815280cbb2ac26e2a0dbf39edc3fd7c57",
+      "width": 1440
+    },
+    "editor-widget-context": {
+      "height": 940,
+      "sha256": "7dca830b4adac635240750b9426c9624b4be5013d771a62e2baa0a89918d37a6",
+      "width": 1440
+    },
+    "editor-widget-format": {
+      "height": 940,
+      "sha256": "6a76a36806040e05c05ede07759f939698ae004861096eab8d78481b46f74559",
+      "width": 1440
+    },
+    "editor-widget-format-resized": {
+      "height": 940,
+      "sha256": "1d615f2063e917ddbd6554216a8cd44453e2f857375c63be29a1245c4e7c3ca6",
+      "width": 1440
+    },
+    "editor-widget-format-tabs": {
+      "height": 940,
+      "sha256": "5cf47746477c7a3e91f4bded363cf30cbee7f5756c7e4a236cba37c83dd76b17",
+      "width": 1440
+    },
+    "login-desktop": {
+      "height": 940,
+      "sha256": "822ce4648ec6799d4dbd3a69c83fc0a627f35f36eb07a5afdcae70cfd74bc200",
+      "width": 1440
+    },
+    "participant-entry-smartphone": {
+      "height": 844,
+      "sha256": "ad512c295a7d5c0e57f1503d746299222a3933c9e6cf5c3ced3316eab5a71716",
+      "width": 390
+    },
+    "participant-feedback-smartphone": {
+      "height": 844,
+      "sha256": "19df11d6f7fbd090d6c6752500e9bdf7e0ef87c2ca3b62acff1153f852720325",
+      "width": 390
+    },
+    "participant-question-smartphone": {
+      "height": 844,
+      "sha256": "bb5563ba155d5a70a400290d52c1eae81a0a1326517f1aa0d47f001ac5014ca5",
+      "width": 390
+    },
+    "participant-widescreen": {
+      "height": 844,
+      "sha256": "6a4411bf3a75a72f1d162bbf8cfd3f9a41222d2ce87ff6d101895628287906a7",
+      "width": 390
+    },
+    "presenter-live": {
+      "height": 940,
+      "sha256": "4677bb492455530885938a828923b7a1b81e88f3d83c331fc9425c45c119b576",
+      "width": 1440
+    },
+    "presenter-live-secondary": {
+      "height": 940,
+      "sha256": "d9a5fdeed3dc2882a514888efcd3505d4dc8977889a69bc52454b1a809e7c71d",
+      "width": 1440
+    },
+    "rehearsal-participant": {
+      "height": 940,
+      "sha256": "bf3055bd560622431318fb1c484daa13422d9739a80298360f8b56793d2a858a",
+      "width": 1440
+    },
+    "rehearsal-presenter": {
+      "height": 940,
+      "sha256": "b28e91eac3763b407aef3d0f559382bbe6cae6cc36012745f7fa04c245e8f791",
+      "width": 1440
+    },
+    "rehearsal-side-by-side": {
+      "height": 940,
+      "sha256": "93e4af6eebc59f4316bda631c88377ca74e7d57ffbde680e411a991033259e43",
+      "width": 1440
+    },
+    "rehearsal-side-by-side-smartphone": {
+      "height": 940,
+      "sha256": "e9bee10e6318540d63b4f9391b6573dc7f1b06987c26188fdad008f1218af1df",
+      "width": 1440
+    },
+    "rehearsal-smartphone": {
+      "height": 940,
+      "sha256": "f23440630b6c7a6d834478ad3cea8287fab17af488324294956292d51522e6a3",
+      "width": 1440
+    },
+    "workspace-desktop": {
+      "height": 940,
+      "sha256": "a7b701af8a8335cbdae740f59dd90ad078f52146a9ba00178672c795a8acb5a1",
+      "width": 1440
+    }
+  },
+  "source": "disposable-postgresql-chromium-live-app",
+  "version": "0.1.0-dev"
+}

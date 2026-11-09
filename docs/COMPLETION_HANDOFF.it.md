@@ -1,3 +1,11 @@
+# Quorivio 0.1.0-dev — RC292 — Corrispondenza tra PDF e screenshot in full CI
+
+**RC292:** La [full CI 42677602865](https://github.com/desalvo/quorivio/actions/runs/42677602865) ha acquisito **25 schermate Chromium autentiche** e creato correttamente i sei PDF aggiornati (9 didascalie per il partecipante, 17 per il presentatore e 6 per l’amministratore in ciascuna lingua). La suite di integrazione Kubernetes successiva ha confrontato erroneamente il manifest nuovo con i PDF RC291 versionati, che contenevano soltanto cinque/sei schermate. Il gate predefinito ora verifica i PDF nel repository contro le rispettive immagini **archiviate RC291**; il gate CI dedicato `--require-real` controlla rigorosamente PDF e immagini dell'ultimo commit. Archivio RC283 preservato, 25 PNG autentici RC291 verificati con SHA-256 e archiviati a parte, sei manuali RC292 ampliati. Aggiunti test negativi e preflight anticipato; nessuna modifica al runtime. **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Full CI successiva ancora da verificare.
+
+Il commit sorgente resta solo nel manifest tecnico per la verifica, senza essere stampato nei manuali. I test OCI/Kubernetes HA e pubblicazione attendono la conferma del quality gate.
+
+---
+
 # Quorivio 0.1.0-dev — RC291 — Acquisizione Smartphone senza ambiguità
 
 **RC291:** Acquisizione Chromium corretta: «Smartphone» del dispositivo partecipante nell'anteprima affiancata e «Smartphone» della modalità generale sono controlli diversi. Nuova immagine reale dell'affiancata mobile, verifica degli stati selezionati e test negativi sui selettori ambigui; runtime invariato. [Dettagli](RC_CYCLE291_REHEARSAL_SMARTPHONE_CI.it.md). **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag; full CI in attesa.

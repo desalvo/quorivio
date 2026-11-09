@@ -1,3 +1,11 @@
+# Quorivio 0.1.0-dev — RC292 — Screenshot/PDF provenance pairing in full CI
+
+**RC292:** [Full CI 42677602865](https://github.com/desalvo/quorivio/actions/runs/42677602865) captured all **25 authentic Chromium screenshots** and generated correct six new PDFs (9 participant, 17 presenter, six administrator image captions in each language), but the broad Kubernetes/integration unittest discovery mixed the active 25-image capture with the older checked-in RC291 PDFs (five/six captions). Restored strict pairing: the default published PDF gate validates the latest **archived RC291 screenshots** while the dedicated CI `--require-real` gate validates current screenshot evidence and its current output directory. Preserved original RC283 archive, added all 25 checksum-verified RC291 screenshots as a separate historic collection, and republished six RC292 manuals with the enlarged gallery. Added negative regression tests and an early CI preflight. No application runtime changes. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag. Full downstream CI remains to be verified.
+
+The archive manifest retains its exact originating commit for integrity checks; no commit string is printed in public manuals. The full native OCI, Kubernetes HA, and publication tests are still gated on the next passing quality job.
+
+---
+
 # Quorivio 0.1.0-dev — RC291 — Real rehearsal Smartphone screenshot contract
 
 **RC291:** [Full CI 42674623251](https://github.com/desalvo/quorivio/actions/runs/42674623251) passed RC290 resizing and captured 15 real app screens, then stopped because the side-by-side rehearsal displays two independent Smartphone buttons (preview mode and participant device). Scoped both selectors to their respective accessible groups, captured both states and added strict regression checks plus bilingual catalog captions. [Details](RC_CYCLE291_REHEARSAL_SMARTPHONE_CI.en.md). No runtime changes; full downstream CI pending. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag.

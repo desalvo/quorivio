@@ -1,3 +1,5 @@
+**RC292:** Fixed broad integration test PDF gallery mix-up, archived 25 authentic RC291 images and regenerated the bilingual manuals. [RC292 notes](docs/RC_CYCLE292_PDF_GALLERY_PAIRING.en.md).
+
 **RC291:** Scoped both distinct Smartphone controls in the real presenter/participant rehearsal and added side-by-side mobile screenshot evidence. [RC291 notes](docs/RC_CYCLE291_REHEARSAL_SMARTPHONE_CI.en.md).
 
 **RC290:** Corrected genuine Chromium screenshot acceptance so it resizes Format widget before asserting size persistence across tabs. [RC290 notes](docs/RC_CYCLE290_FORMAT_WINDOW_CAPTURE_CI.en.md).

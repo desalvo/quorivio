@@ -8,7 +8,8 @@ import fitz
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT/'tools'))
-from manual_screenshot_catalog import CATALOG, SCREENSHOTS, HISTORIC_SCREENSHOTS, evidence, gallery
+from manual_screenshot_catalog import CATALOG, SCREENSHOTS, HISTORIC_SCREENSHOTS, LATEST_ARCHIVED_SCREENSHOTS, LATEST_ARCHIVED_COMMIT, evidence, gallery
+from manual_release_metadata import metadata
 
 
 class RC284ManualPDFGallery(unittest.TestCase):
@@ -33,29 +34,43 @@ class RC284ManualPDFGallery(unittest.TestCase):
         self.assertIn('generate_manuals.py --require-real',
                       (ROOT/'.github/workflows/ci.yml').read_text())
 
+    @staticmethod
+    def paired_evidence(output_override: str | None, commit: str | None):
+        """Never pair immutable published PDFs with an unrelated active CI manifest.
+
+        The fresh CI PDF and current capture are validated together in the
+        dedicated --require-real step. The broad integration discovery has no
+        output override and must check checked-in manuals against the archived
+        evidence that actually generated those files.
+        """
+        if output_override:
+            if not commit:
+                raise ValueError('Current-build PDF validation requires a Git SHA')
+            return Path(output_override), SCREENSHOTS, commit
+        return ROOT/'docs/manuals', LATEST_ARCHIVED_SCREENSHOTS, LATEST_ARCHIVED_COMMIT
+
     def test_published_pdf_has_large_images_next_to_real_captions(self):
-        root=Path(os.environ.get('QUORIVIO_MANUAL_OUTPUT_DIR',str(ROOT/'docs/manuals')))
-        shotroot=SCREENSHOTS if (SCREENSHOTS/'capture.json').is_file() else HISTORIC_SCREENSHOTS
-        data=evidence(shotroot,minimum=9)
+        pdfroot, shotroot, source_commit = self.paired_evidence(
+            os.environ.get('QUORIVIO_MANUAL_OUTPUT_DIR'), metadata()['commit'])
+        data = evidence(shotroot, expected_commit=source_commit, minimum=9)
         for role in ('user','presenter','admin'):
             expected=sum(role in CATALOG[stem] for stem in data['shots'])
             for lang in ('it','en'):
                 with self.subTest(role=role,lang=lang):
-                    path=root/f'{role}-guide.{lang}.pdf'
-                    doc=fitz.open(path)
-                    label='SCHERMATA REALE' if lang=='it' else 'REAL APP SCREENSHOT'
-                    text='\n'.join(p.get_text() for p in doc)
-                    self.assertEqual(text.count(label),expected)
-                    self.assertNotIn('<figure',text)
-                    self.assertNotIn('<img src=',text)
-                    for page in doc:
-                        if label in page.get_text():
-                            self.assertTrue(any(
-                                im['bbox'][2]-im['bbox'][0]>160 and
-                                im['bbox'][3]-im['bbox'][1]>110
-                                for im in page.get_image_info()),
-                                'Genuine screenshot caption without visible PDF image')
-                    doc.close()
+                    path=pdfroot/f'{role}-guide.{lang}.pdf'
+                    with fitz.open(path) as doc:
+                        label='SCHERMATA REALE' if lang=='it' else 'REAL APP SCREENSHOT'
+                        text='\n'.join(p.get_text() for p in doc)
+                        self.assertEqual(text.count(label),expected)
+                        self.assertNotIn('<figure',text)
+                        self.assertNotIn('<img src=',text)
+                        for page in doc:
+                            if label in page.get_text():
+                                self.assertTrue(any(
+                                    im['bbox'][2]-im['bbox'][0]>160 and
+                                    im['bbox'][3]-im['bbox'][1]>110
+                                    for im in page.get_image_info()),
+                                    'Genuine screenshot caption without visible PDF image')
 
 
 if __name__ == '__main__':

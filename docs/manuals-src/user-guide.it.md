@@ -1,8 +1,8 @@
 # Guida del partecipante
 
-**Quorivio 0.1.0-dev · Build documentale RC291 · 9 novembre 2026**
+**Quorivio 0.1.0-dev · Build documentale RC292 · 9 novembre 2026**
 
-Questa guida spiega come partecipare a una sessione interattiva, rispondere ai diversi tipi di domanda, interpretare gli esiti e usare correttamente le funzioni disponibili da smartphone o computer. È riferita al codice della RC291 e alla revisione editoriale RC278. Le prime figure sono ricostruzioni etichettate; la galleria finale nei PDF generati dalla CI usa screenshot autentici acquisiti sull'istanza di prova temporanea, **non su un server di produzione**.
+Questa guida spiega come partecipare a una sessione interattiva, rispondere ai diversi tipi di domanda, interpretare gli esiti e usare correttamente le funzioni disponibili da smartphone o computer. È riferita al codice della RC292 e alla revisione editoriale RC278. Le prime figure sono ricostruzioni etichettate; la galleria finale nei PDF generati dalla CI usa screenshot autentici acquisiti sull'istanza di prova temporanea, **non su un server di produzione**.
 
 ## 1. Conoscere Quorivio
 
@@ -132,7 +132,7 @@ Per l'accessibilità, usare l'ingrandimento del browser, orientare correttamente
 
 **Sessione:** insieme delle pagine e dei controlli dell'evento. **Pagina:** schermata presentata durante la sessione. **Widget:** componente visuale o interattivo della pagina. **Anteprima:** simulazione che non sostituisce il collaudo dal vivo. **Risposta confermata:** invio accettato dal server. **Moderazione:** decisione del presentatore su contenuti pubblicabili. **Retention:** durata di conservazione stabilita dall'installazione.
 
-**Stato di collaudo:** questa guida descrive il comportamento previsto dal codice della RC291. Non rappresenta una certificazione degli specifici browser, dispositivi, server LDAP/SMTP o cluster Kubernetes.
+**Stato di collaudo:** questa guida descrive il comportamento previsto dal codice della RC292. Non rappresenta una certificazione degli specifici browser, dispositivi, server LDAP/SMTP o cluster Kubernetes.
 
 ## Appendice A. Esempio completo di quiz corretto e sbagliato
 

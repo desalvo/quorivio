@@ -344,6 +344,11 @@ jobs:
       # accessible resize handle before checking unchanged outer dimensions.
       # RC291: side-by-side preview exposes TWO legitimate Smartphone controls.
       # Scope the device toggle and the preview-mode toggle independently.
+      # RC292: the integration unittest discovery must compare published PDFs
+      # to their archived screenshot provenance, not new active CI captures.
+      # A separate --require-real build checks current PDF+capture as a pair.
+      - name: RC292 archived and live manual PDF pairing preflight
+        run: python3 -m unittest tools.tests.test_rc292_gallery_pairing -q
       - name: RC291 real side-by-side and smartphone preview screenshot preflight
         run: python3 -m unittest tools.tests.test_rc291_rehearsal_smartphone_capture -q
       - name: RC290 real screenshot formatting-resize acceptance preflight
@@ -1833,7 +1838,8 @@ jobs:
           python3 tools/verify_rc_cycle288_inventory.py --historical
           python3 tools/verify_rc_cycle289_inventory.py --historical
           python3 tools/verify_rc_cycle290_inventory.py --historical
-          python3 tools/verify_rc_cycle291_inventory.py
+          python3 tools/verify_rc_cycle291_inventory.py --historical
+          python3 tools/verify_rc_cycle292_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

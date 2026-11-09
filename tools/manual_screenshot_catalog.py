@@ -18,6 +18,8 @@ CAPTURE_FILE = SCREENSHOTS / 'capture.json'
 # A verified historic gallery may illustrate local PDFs. Current-commit CI
 # builds MUST use SCREENSHOTS and --require-real instead of this fallback.
 HISTORIC_SCREENSHOTS = ROOT / 'docs/assets/manual-evidence-rc283'
+LATEST_ARCHIVED_SCREENSHOTS = ROOT / 'docs/assets/manual-evidence-rc291'
+LATEST_ARCHIVED_COMMIT = '1501e9f4250161d43d8e928142a31406a75b56b8'
 # Figures are included only for roles where they explain an actual workflow.
 CATALOG = {
  'login-desktop': ('user','presenter','admin'),
@@ -139,20 +141,25 @@ def gallery(role: str, lang: str, path: Path = SCREENSHOTS, *, require: bool = F
         raise ValueError('Current-build screenshots must come from the active CI capture directory')
     # Local checked-in manuals keep genuinely photographed examples with their
     # original RC283 commit provenance. This can never satisfy CI --require-real.
-    historic = path == HISTORIC_SCREENSHOTS
-    if not require and path == SCREENSHOTS and not (path / 'capture.json').is_file() and HISTORIC_SCREENSHOTS.is_dir():
-        path = HISTORIC_SCREENSHOTS
-        historic = True
+    if not require and path == SCREENSHOTS and not (path / 'capture.json').is_file():
+        path = LATEST_ARCHIVED_SCREENSHOTS if LATEST_ARCHIVED_SCREENSHOTS.is_dir() else HISTORIC_SCREENSHOTS
+    historic = path in (HISTORIC_SCREENSHOTS, LATEST_ARCHIVED_SCREENSHOTS)
     if path == SCREENSHOTS and (path / 'capture.json').is_file() and not commit:
         raise ValueError('Active screenshot evidence requires a matching source Git commit')
-    data = evidence(path, expected_commit=commit if path == SCREENSHOTS else None, minimum=9 if require else 0)
+    # Archived images keep their original provenance, never the current build.
+    source_commit = (LATEST_ARCHIVED_COMMIT if path == LATEST_ARCHIVED_SCREENSHOTS else
+                     '0bb89e6ac79ed57493130f06fc5042182a166ed6' if path == HISTORIC_SCREENSHOTS else commit)
+    data = evidence(path, expected_commit=source_commit, minimum=9 if require else 0)
     images=[]
     for stem in CATALOG:
         if role not in CATALOG[stem] or stem not in data['shots']:continue
         caption=CAPTIONS[stem][0 if lang=='it' else 1]
         label=('SCHERMATA REALE' if lang=='it' else 'REAL APP SCREENSHOT')
-        source_dir = 'manual-evidence-rc283' if historic else 'manual-screenshots'
-        provenance = ('ARCHIVIO RC283' if lang=='it' else 'RC283 ARCHIVE') if historic else ('BUILD CORRENTE' if lang=='it' else 'CURRENT BUILD')
+        source_dir = ('manual-evidence-rc291' if path == LATEST_ARCHIVED_SCREENSHOTS else
+                      'manual-evidence-rc283' if historic else 'manual-screenshots')
+        provenance = (('ARCHIVIO RC291' if lang=='it' else 'RC291 ARCHIVE') if path == LATEST_ARCHIVED_SCREENSHOTS else
+                      ('ARCHIVIO RC283' if lang=='it' else 'RC283 ARCHIVE') if historic else
+                      ('BUILD CORRENTE' if lang=='it' else 'CURRENT BUILD'))
         images.append(f'<figure><img src="../assets/{source_dir}/{stem}.png" alt="{caption}"/><figcaption>{label} · {provenance} · {caption}</figcaption></figure>')
     if require and len(images)<3:
         raise ValueError(f'Too few screenshot examples for {role}')
