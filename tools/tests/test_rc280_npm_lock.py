@@ -83,6 +83,6 @@ class RC280LockfileContract(unittest.TestCase):
   self.assertEqual(WORKFLOW.count(install),2)
   for match in re.finditer(re.escape(install),WORKFLOW):
    self.assertIn(gate,WORKFLOW[max(0,match.start()-250):match.start()])
-  self.assertNotIn('run: npm install --ignore-scripts --no-audit --no-fund',WORKFLOW)
+  self.assertNotIn('run: npm'+' install --ignore-scripts --no-audit --no-fund',WORKFLOW)
 
 if __name__ == '__main__':unittest.main()

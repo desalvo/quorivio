@@ -1,6 +1,6 @@
 # Presenter guide
 
-**Quorivio 0.1.0-dev · Documentation build RC280 · 9 November 2026**
+**Quorivio 0.1.0-dev · Documentation build RC281 · 9 November 2026**
 
 An end-to-end guide to preparing, designing, rehearsing, conducting, exporting and archiving a Quorivio event. It reflects the RC276 codebase, including answer grading and the green **R** toggle. Earlier illustrative figures are **labelled browser-rendered reconstructions**. The final gallery in CI-built PDFs contains genuine screenshots of the running disposable application, verified against source commit and SHA-256.
 

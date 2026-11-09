@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Quorivio RC280 manual publication pipeline.
+"""Quorivio RC281 manual publication pipeline.
 
 Six role-specific bilingual Markdown sources are the editorial source of truth.
 This renders their tables, diagrams and labelled illustrative UI captures into
@@ -34,7 +34,7 @@ ROLES = {'user': {'it':'Partecipante','en':'Participant'},
 CSS = r'''@page {
     size: A4;
     margin: 17mm 16mm 18mm 16mm;
-    @bottom-left { content: 'Quorivio | RC280 documentation'; font-size: 8pt; color: #5b6680; }
+    @bottom-left { content: 'Quorivio | RC281 documentation'; font-size: 8pt; color: #5b6680; }
     @bottom-right { content: counter(page) ' / ' counter(pages); font-size: 8pt; color: #5b6680; }
 }
 @page:first { margin: 0; @bottom-left {content:normal} @bottom-right{content:normal} }
@@ -120,7 +120,7 @@ def render_one(role: str, lang: str, *, require_real: bool = False) -> tuple[Pat
     info=('Documentazione tecnica | 9 novembre 2026' if lang=='it' else 'Technical documentation | 9 November 2026')
     subtitle=('Guida operativa illustrata' if lang=='it' else 'Illustrated operational guide')
     toc_title='Indice' if lang=='it' else 'Contents'
-    note=('Edizione RC280; certificazioni di sicurezza e infrastrutture reali restano separate.' if lang=='it' else 'RC280 edition; security and real infrastructure certifications remain separate.')
+    note=('Edizione RC281; certificazioni di sicurezza e infrastrutture reali restano separate.' if lang=='it' else 'RC281 edition; security and real infrastructure certifications remain separate.')
     contact=html.escape(meta['author'])
     platform=('Server Linux amd64/arm64 (Docker, Podman, Kubernetes). Client via browser su Windows, macOS, Linux, iOS e Android.' if lang=='it' else 'Linux amd64/arm64 server (Docker, Podman, Kubernetes). Web clients on Windows, macOS, Linux, iOS and Android.')
     minimum=('Minimo indicativo per valutazione: 2 vCPU, 4 GiB RAM, 20 GiB disco oltre ai dati persistenti; dimensionare la produzione con misure.' if lang=='it' else 'Indicative evaluation minimum: 2 vCPU, 4 GiB RAM, 20 GiB disk plus persistent data; benchmark production sizing.')
@@ -133,7 +133,7 @@ def render_one(role: str, lang: str, *, require_real: bool = False) -> tuple[Pat
     <section class="cover"><div class="cover-head"><div class="brand"><img class="cover-brand-logo" src="{brand_logo}" alt="Logo ufficiale Quorivio"/> Quorivio</div><div class="cover-kicker">{html.escape(subtitle)} · {html.escape(role_label)}</div><div class="cover-title">{html.escape(title)}</div><div class="cover-version">{html.escape(meta['version'])} • {html.escape(meta['build'])} • {info}</div></div>
     <img class="cover-picture" src="{cover_image}" alt="Quorivio event illustration"/>
     <div class="cover-details">{details}</div><div class="cover-disclaimer">{caption}<br>{note}</div></section>
-    <section class="toc"><h1>{toc_title}</h1><p>{len(anchors)} {"capitoli" if lang=='it' else 'chapters'} · {"Edizione" if lang=='it' else 'Edition'} RC280</p><ul>{toc}</ul></section>
+    <section class="toc"><h1>{toc_title}</h1><p>{len(anchors)} {"capitoli" if lang=='it' else 'chapters'} · {"Edizione" if lang=='it' else 'Edition'} RC281</p><ul>{toc}</ul></section>
     <main class="content">{markup}</main></body></html>'''
     OUTPUT.mkdir(parents=True,exist_ok=True)
     dest=OUTPUT/f'{role}-guide.{lang}.pdf'
@@ -164,8 +164,8 @@ def main():
             pages=pdf.page_count
             if pages<14 or not any('Quorivio' in p.get_text() for p in pdf):
                 raise ValueError('Broken or unexpectedly short PDF: '+str(dest))
-            if not any('RC280' in p.get_text() for p in pdf):
-                raise ValueError('Missing RC280 build identification: '+str(dest))
+            if not any('RC281' in p.get_text() for p in pdf):
+                raise ValueError('Missing RC281 build identification: '+str(dest))
             print(dest.name,'chapters',chapters,'pages',pages,'bytes',dest.stat().st_size)
             total+=pages
             pdf.close()

@@ -324,6 +324,10 @@ jobs:
         run: |
           node --experimental-strip-types --test apps/web/test/rc274-answer-truth.test.ts
           python3 -m unittest tools.tests.test_rc274_ci_integrity -q
+      # RC281: regression for RC280 negative npm-install assertion vs the historic
+      # RC274 raw-source scan; keep forbidden actual install commands rejected.
+      - name: RC281 npm legacy guard compatibility before npm
+        run: python3 -m unittest tools.tests.test_rc274_ci_integrity tools.tests.test_rc280_npm_lock tools.tests.test_rc281_npm_guard -q
       # RC270: backup archive, audit and LDAP approval, including wizard mount
       # checks; keep these tests in CI so new functionality cannot regress.
       - name: RC270 full backup, LDAP audit, and Kubernetes wizard before npm
@@ -1769,7 +1773,8 @@ jobs:
           python3 tools/verify_rc_cycle277_inventory.py --historical
           python3 tools/verify_rc_cycle278_inventory.py --historical
           python3 tools/verify_rc_cycle279_inventory.py --historical
-          python3 tools/verify_rc_cycle280_inventory.py
+          python3 tools/verify_rc_cycle280_inventory.py --historical
+          python3 tools/verify_rc_cycle281_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:
