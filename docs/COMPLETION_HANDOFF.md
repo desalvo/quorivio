@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC289 — Pre-install PDF inspection dependency
+
+**RC289:** Supply pinned PyMuPDF before the early RC287/RC286 PDF quality gates, preserving fail-closed image inspection and retaining later current-build screenshot verification. Five new regression tests check ordering and missing/relocated dependency. No runtime changes. Six manuals rebuilt and RC289 inventory promoted. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag. [Details](RC_CYCLE289_PDF_INSPECTOR_CI.en.md).
+
+---
+
 # Quorivio 0.1.0-dev — RC288 — R result grading legacy test reconciliation
 
 **RC288:** Replaced obsolete RC221 editor footer strip assertion with current conditional R result widget and private formatting controls. Six negative/positive regression checks and early CI preflight prevent regressions. No runtime changes. Rebuilt six IT/EN manuals and promoted inventory. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag; full CI pending. [Details](RC_CYCLE288_GRADING_R_CI.en.md).

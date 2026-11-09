@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC289 — PDF inspector CI dependency ordering
+
+**RC289:** [Full CI 42666096697](https://github.com/desalvo/quorivio/actions/runs/42666096697) failed in the RC287 manual-PDF contract because `fitz` (PyMuPDF) was installed later than the early pre-npm tests. Pinned PyMuPDF 1.26.7 and provisioned it before the RC287 and RC286 gates, retaining strict image and PDF checks. Added five ordering and mutation tests; no application runtime changes. Six manuals republished for RC289. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag. Full CI unverified.
+
+---
+
 # Quorivio 0.1.0-dev — RC288 — Historical RC221 R-button contract hotfix
 
 **RC288:** [Full CI 42662034657](https://github.com/desalvo/quorivio/actions/runs/42662034657) failed at the stale RC221 assertion for the removed footer-overlapping “highlight true answers below results” strip. The R button remains in the results widget with answer-key gating, and the formatting switch remains inside Widget Formatting. Reconciled historical contract without weakening PDF conversion/privacy assertions, added negative-case RC288 regression tests and early CI gate. No runtime changes. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag. Full CI unverified.

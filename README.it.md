@@ -1,3 +1,5 @@
+**RC289:** Corretta la sequenza delle dipendenze del controllo PDF in CI (PyMuPDF prima dei test dei manuali); [note RC289](docs/RC_CYCLE289_PDF_INSPECTOR_CI.it.md).
+
 **RC288:** Riconciliato il test storico RC221 con il tasto R dei risultati; dettagli in [RC288](docs/RC_CYCLE288_GRADING_R_CI.it.md).
 
 **Novità RC287:** Evidenziazioni delle risposte più ampie, finestra «Formato widget» stabile fra schede, colori iniziale/finale delle barre e menu blu notte/verde petrolio con icone. Manuali IT/EN aggiornati.

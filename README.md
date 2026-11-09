@@ -1,3 +1,5 @@
+**RC289:** Fixed the full-CI PDF gate provisioning order (PyMuPDF before early manual contracts); [RC289 notes](docs/RC_CYCLE289_PDF_INSPECTOR_CI.en.md).
+
 **RC288:** Historical RC221 CI gate reconciled with the R-button truth overlay; see [RC288 notes](docs/RC_CYCLE288_GRADING_R_CI.en.md).
 
 **RC287 update:** Enlarged result-verdict frames and removed the overlapping editor strip; preserved Widget Formatting size across tabs; author-selected bar-gradient endpoints and refreshed midnight-blue/teal menus.  Six manuals include the new workflow.

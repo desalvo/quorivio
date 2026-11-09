@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC289 — Dipendenza PyMuPDF anticipata nella CI
+
+**RC289:** La [full CI 42666096697](https://github.com/desalvo/quorivio/actions/runs/42666096697) si è fermata nel controllo PDF RC287 perché `fitz` (PyMuPDF) veniva installato soltanto dopo i controlli anticipati. Installazione fissata a PyMuPDF 1.26.7 prima dei gate RC287 e RC286, senza indebolire i controlli su immagini e PDF. Aggiunti cinque test di ordine e regressione; runtime invariato. Sei manuali aggiornati RC289. **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Full CI da verificare.
+
+---
+
 # Quorivio 0.1.0-dev — RC288 — Correzione CI del contratto storico RC221 per il tasto R
 
 **RC288:** La [full CI 42662034657](https://github.com/desalvo/quorivio/actions/runs/42662034657) è fallita perché RC221 richiedeva la barra «Evidenzia le risposte vere» rimossa intenzionalmente nella RC287, che copriva il footer. Il pulsante R resta nel widget risultati con chiave obbligatoria e lo switch di configurazione resta in «Formato widget». Contratto storico riconciliato mantenendo i controlli di conversione PDF e privacy, nuovi test RC288 negativi e gate anticipato nella CI. Nessuna modifica runtime. **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Full CI da verificare.

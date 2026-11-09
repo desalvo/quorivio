@@ -331,6 +331,14 @@ jobs:
           python3 -m unittest tools.tests.test_rc274_ci_integrity -q
       # RC285: ensure session-local import/export remains available from the
       # navigation sidebar and remains a validated, privacy-safe portable ZIP.
+      # RC289: RC287 and RC286 inspect real illustrated PDFs before npm.
+      # Their fitz import must be provisioned before either gate (the earlier
+      # CI failed with ModuleNotFoundError and never reached containers).
+      - name: RC289 provision PyMuPDF before manual PDF contracts
+        run: |
+          python3 -m unittest tools.tests.test_rc289_pdf_ci_order -q
+          python3 -m pip install --disable-pip-version-check --break-system-packages 'pymupdf==1.26.7'
+          python3 -c 'import fitz; assert hasattr(fitz, "open"); print("PyMuPDF PDF-inspection API available")'
       - name: RC287 answer borders, floating format tabs, gradient schema and navigation contracts before npm
         run: |
           node --experimental-strip-types --test apps/web/test/rc287-format-results-ui.test.ts apps/api/test/rc287-gradient-domain.test.ts
@@ -1813,7 +1821,8 @@ jobs:
           python3 tools/verify_rc_cycle285_inventory.py --historical
           python3 tools/verify_rc_cycle286_inventory.py --historical
           python3 tools/verify_rc_cycle287_inventory.py --historical
-          python3 tools/verify_rc_cycle288_inventory.py
+          python3 tools/verify_rc_cycle288_inventory.py --historical
+          python3 tools/verify_rc_cycle289_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:
