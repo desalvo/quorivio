@@ -838,6 +838,8 @@ jobs:
         run: python3 -m unittest tools.tests.test_rc_cycle64_credential_fixture -q
       - uses: actions/setup-node@v4
         with: {node-version: '22'} # npm caching requires a committed package-lock.json
+      - name: RC280 fail-closed npm lockfile and LDAP dependency preflight
+        run: python3 -m unittest tools.tests.test_rc280_npm_lock -q
       - name: Install reproducibly
         run: npm ci --ignore-scripts --no-audit --no-fund
       # RC189: run the actual strict API compiler immediately after npm so a
@@ -1766,7 +1768,8 @@ jobs:
           python3 tools/verify_rc_cycle276_inventory.py --historical
           python3 tools/verify_rc_cycle277_inventory.py --historical
           python3 tools/verify_rc_cycle278_inventory.py --historical
-          python3 tools/verify_rc_cycle279_inventory.py
+          python3 tools/verify_rc_cycle279_inventory.py --historical
+          python3 tools/verify_rc_cycle280_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:
@@ -1783,6 +1786,8 @@ jobs:
         with: {persist-credentials: false}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
+      - name: RC280 fail-closed npm lockfile and LDAP dependency preflight
+        run: python3 -m unittest tools.tests.test_rc280_npm_lock -q
       - name: Install reproducibly
         run: npm ci --ignore-scripts --no-audit --no-fund
       - name: Install native Firefox and WebKit with Playwright dependencies
