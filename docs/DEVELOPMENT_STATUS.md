@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC278 — Evidence-backed live screenshot manuals
+
+**RC278:** six IT/EN manuals with centrally sourced app/build, logo, creator/email, EUPL-1.2, indicative supported platforms/hardware; additional scaling and disaster recovery runbooks. Actual running-app Chromium/PostgreSQL screenshots embed in the PDFs only with verified source commit and SHA-256. GitHub CI publishes a separate screenshot/PDF artifact without mutating committed manuals. No real screenshots have been captured locally (npm registry unavailable); full CI screenshot acceptance remains pending. **85.25%** (43 accepted/17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no assistant commit/push/tag. `docs/RC_CYCLE278_LIVE_MANUALS.en.md`.
+
+# Quorivio 0.1.0-dev — RC277 — Expanded bilingual operational manuals
+
+**RC277:** Six fully rewritten guides, 164 total PDF pages, editable Markdown sources, 21 widget types, administrator Helm/Kubernetes/backup/LDAP/audit procedures, clearly labelled illustrative figures, and identical published PDF checks. Live screenshots and independent review remain pending. **85.25%** (43 gate accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; No commit/push/tag. `docs/RC_CYCLE277_EXPANDED_MANUALS.en.md`.
+
+# Quorivio 0.1.0-dev — RC276 — RC191 live result toggle preflight
+
+**RC276:** committed RC275 GitHub full CI [42565597725](https://github.com/desalvo/quorivio/actions/runs/42565597725) failed at stale RC191 assertions requiring a separate `showCorrectLive` state instead of the shared `LinkedResultChart` local R toggle. Updated RC191 to verify live source page routing, centrally gated truth visibility and button interaction. Added five negative/positive RC276 tests and a pre-npm gate. No application runtime change. RC275 historical receipt intact; RC276 current. **85.25%** (43 accepted/17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`; GitHub full CI and browser testing pending. No commit/push/tag. `docs/RC_CYCLE276_LIVE_RESULTS_TRUTH_CI.en.md`.
+
 # Quorivio 0.1.0-dev — RC275 — Shared result renderer CI contract
 
 **RC275:** GitHub CI RC274 [42551661125](https://github.com/desalvo/quorivio/actions/runs/42551661125) failed at RC192 source renderer textual contract (`result={widget}` versus the intentional `result={viewWidget}` bridge to the green R toggle). Updated historical RC192/RC196 checks, added negative mutation tests, preserved the app runtime. RC274 historical inventory, RC275 current. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full RC275 CI and browser verification pending; no assistant commit/push/tag. `docs/RC_CYCLE275_LINKED_RESULTS_UI_CONTRACT.en.md`. 

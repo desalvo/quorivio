@@ -1,3 +1,5 @@
+> **RC277 — Rewritten manuals:** six expanded IT/EN guides covering full workflows, 21 widgets, backups/LDAP/audit, charts and clearly identified illustrative visuals. [Details](docs/RC_CYCLE277_EXPANDED_MANUALS.en.md).
+
 > **RC269 — Authentication and session management:** automatic expired-login redirect, safe 12-hour cleanup, ownership transfer, opt-in LDAP/LDAPS and sidebar/phone-answer fixes. [RC269 notes](docs/RC_CYCLE269_LDAP_OWNERSHIP_HOUSEKEEPING.en.md).
 
 > **RC267 — Node CI hotfix:** fixes shell exit 126 in the RC266 early preflight and verifies its actual test runner invocation. All RC266 docking/resize and RC265 full-bleed import features preserved. [`RC267 notes`](docs/RC_CYCLE267_CI_NODE_RUNNER_CONTINUATION.en.md).

@@ -63,8 +63,15 @@ test('live projection uses the same cross-page resolver with the source activity
  assert.match(live,/results temporarily|Risultati temporaneamente non disponibili/);
  assert.match(live,/window\.setInterval\(\(\)=>void load\(\),3000\)/);
  assert.doesNotMatch(live,/liveRevision/,'live snapshot updates must not cancel every in-flight source stats HTTP request');
- assert.match(live,/LinkedResultChart widget=\{\{\.\.\.widget,showCorrectAnswers:showCorrectLive\}\}/);
- assert.match(live,/resultHasAnswerKey\(source,widget\.targetQuestionId/);
- assert.match(live,/setShowCorrectLive\(e\.target\.checked\)/);
+ // RC276: R state now lives inside the common LinkedResultChart renderer.
+ // Never require a second live-only state: it would desynchronize rehearsals.
+ assert.match(live,/<LinkedResultChart widget=\{widget\} widgets=\{sourceWidgets\} rows=\{rows\} emptyLabel="live"\/>/);
+ const shared=main.split('function LinkedResultChart(',2)[1].split('function PresenterLinkedResult(',1)[0];
+ assert.match(shared,/const \[truthVisible,setTruthVisible\]=useState\(widget\.showCorrectAnswers===true\)/);
+ assert.match(shared,/resultHasAnswerKey\(source,widget\.targetQuestionId/);
+ assert.match(shared,/showCorrectAnswers:hasKey&&truthVisible/);
+ assert.match(shared,/aria-pressed=\{truthVisible\}/);
+ assert.match(shared,/setTruthVisible\(v=>!v\)/);
+ assert.doesNotMatch(live,/showCorrectLive/);
 
 });

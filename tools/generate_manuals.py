@@ -1,295 +1,174 @@
 #!/usr/bin/env python3
-"""Generate bilingual role-specific Quorivio PDFs from verified feature inventory.
-Requires reportlab; run: python3 tools/generate_manuals.py
+"""Quorivio RC277 manual publication pipeline.
+
+Six role-specific bilingual Markdown sources are the editorial source of truth.
+This renders their tables, diagrams and labelled illustrative UI captures into
+PDFs in *both* published locations. Run only on a controlled authoring host:
+    python3 tools/manual_visual_assets.py
+    python3 tools/generate_manuals.py
+
+Requires mistune 3, WeasyPrint, and the checked-in visual assets. Generating PDFs
+is explicit; application startup does not rewrite the documents.
 """
+from __future__ import annotations
 from pathlib import Path
-from xml.sax.saxutils import escape
-from reportlab.platypus import BaseDocTemplate,PageTemplate,Frame,Paragraph,Spacer,Image,PageBreak,Flowable,KeepTogether
-from reportlab.platypus.tableofcontents import TableOfContents
-from reportlab.lib.styles import getSampleStyleSheet,ParagraphStyle
-from reportlab.lib.enums import TA_CENTER
-from reportlab.lib.colors import HexColor,white
-from reportlab.lib.pagesizes import A4
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
+import html
+import re
+import shutil
+import hashlib
+from manual_release_metadata import metadata, validate_release
+from manual_screenshot_catalog import gallery
 
-ROOT=Path(__file__).resolve().parents[1]; OUT=ROOT/'docs/manuals'; OUT.mkdir(parents=True,exist_ok=True)
-ASSETS=ROOT/'docs/assets'; PHOTO=ASSETS/'quorivio-manual-cover.png'
-font='/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
-if Path(font).exists():pdfmetrics.registerFont(TTFont('Q',font));FONT='Q'
-else: FONT='Helvetica'
-B=HexColor('#262957');ACC=HexColor('#6055D6');MUT=HexColor('#596275')
-styles=getSampleStyleSheet(); styles.add(ParagraphStyle(name='QTitle',fontName=FONT,fontSize=24,leading=32,textColor=B,spaceAfter=16));styles.add(ParagraphStyle(name='QH1',fontName=FONT,fontSize=16,leading=23,textColor=B,spaceBefore=12,spaceAfter=10,keepWithNext=True));styles.add(ParagraphStyle(name='QH2',fontName=FONT,fontSize=11.5,leading=17,textColor=ACC,spaceBefore=12,spaceAfter=7,keepWithNext=True));styles.add(ParagraphStyle(name='QBody',fontName=FONT,fontSize=9,leading=15,spaceAfter=9));styles.add(ParagraphStyle(name='QSmall',fontName=FONT,fontSize=8,leading=12,textColor=MUT,spaceAfter=7));styles.add(ParagraphStyle(name='QCover',fontName=FONT,fontSize=26,leading=34,textColor=B,spaceAfter=16));styles.add(ParagraphStyle(name='QTOC',fontName=FONT,fontSize=10,leading=16,leftIndent=14,firstLineIndent=-10,spaceBefore=5));
-class Diagram(Flowable):
- def __init__(self,kind):super().__init__();self.kind=kind;self.width=468;self.height=180
- def draw(self):
-  c=self.canv;c.setFillColor(HexColor('#F1F2FC'));c.roundRect(0,0,self.width,180,13,stroke=0,fill=1)
-  c.setFont('Helvetica-Bold',11);c.setFillColor(B)
-  if self.kind=='results':
-   for j,(lab,val) in enumerate([('A',72),('B',43),('C',20)]):
-    y=123-j*43;c.setFillColor(B);c.setFont('Helvetica',10);c.drawString(18,y,lab);c.setFillColor(white);c.roundRect(45,y-5,375,20,5,stroke=0,fill=1);c.setFillColor(ACC);c.roundRect(45,y-5,val*3.3,20,5,stroke=0,fill=1);c.setFillColor(B);c.setFont('Helvetica',9);c.drawRightString(445,y,str(val))
-  elif self.kind=='flow':
-   labels=['QR / link','Smartphone','PostgreSQL','Live charts']
-   for i,l in enumerate(labels):
-    x=14+i*115;c.setFillColor(white);c.roundRect(x,69,101,62,8,stroke=0,fill=1);c.setFillColor(ACC);c.roundRect(x,110,101,21,7,stroke=0,fill=1);c.setFillColor(B);c.setFont('Helvetica',9);c.drawCentredString(x+50,86,l)
-    if i<3:c.setFillColor(ACC);c.drawString(x+104,95,'>')
-   c.setFillColor(MUT);c.setFont('Helvetica',9);c.drawString(18,29,'Concept diagram - persisted responses, broadcast updates')
-  else:
-   labels={'join':['Session title','Join session','Choose an answer','Submit'], 'presenter':['Sessions / controls','Invite: QR / code','Poll & quiz activities','Results / export'], 'admin':['Settings & secrets','Database / TLS','CI gate / Docker Hub','Backup / retention']}[self.kind]
-   for i,l in enumerate(labels):
-    x=16+(i%2)*230;y=99-(i//2)*76;c.setFillColor(white);c.roundRect(x,y,210,65,7,stroke=0,fill=1);c.setFillColor(ACC);c.roundRect(x,y+43,210,22,7,stroke=0,fill=1);c.setFillColor(B);c.setFont('Helvetica',9);c.drawString(x+12,y+18,l)
+import mistune
+from weasyprint import HTML
 
-CONTENT={
- 'it':{
- 'common':{'contents':'Indice','version':'Versione 0.1.0-dev · Build dev-20261024 · 24 ottobre 2026','foot':'Quorivio | Guida operativa','append':'Appendici e limiti noti'},
- 'user':('Manuale del partecipante',[
- ('Prima di iniziare',[('Prerequisiti','Per partecipare bastano uno smartphone, un browser moderno e la connessione alla rete dove è esposto Quorivio. Non è necessario installare componenti PowerPoint e, nelle sessioni anonime, non serve effettuare il login.'),('Ruoli e dati','Il presentatore controlla quando è aperta un’attività. Le risposte confermate sono conservate dal servizio secondo la configurazione di conservazione; non confondere anonimato nell’interfaccia con assenza di dati tecnici.')]),
- ('Accesso alla sessione',[('Con QR code','1. Apri la fotocamera dello smartphone. 2. Inquadra il QR code mostrato dal presentatore. 3. Tocca il collegamento. 4. Premi «Entra». Il QR contiene esclusivamente il collegamento di partecipazione.'),('Con codice','1. Apri la pagina principale del servizio. 2. Immetti il codice sessione mostrato dal presentatore. 3. Premi «Partecipa» e poi «Entra». Se il codice è scaduto o revocato, richiedine uno aggiornato.')]),
- ('Rispondere a sondaggi e quiz',[('Sondaggio','Quando la domanda risulta aperta, seleziona un’opzione e premi «Invia risposta». Verifica il messaggio di registrazione; il voto viene confermato sul server.'),('Quiz','Scegli una sola risposta e inviala prima della chiusura. Il timer, se presente, è gestito dal server. La risposta corretta non viene divulgata al partecipante prima della chiusura.'),('Ritardi e riconnessioni','In caso di interruzione della rete, riapri lo stesso collegamento sullo stesso browser per conservare, ove possibile, l’identità partecipante. Non inviare più volte se il server ha già confermato la risposta.')]),
- ('Privacy, problemi e accessibilità',[('Privacy','Non inserire dati personali nelle attività se non richiesto e autorizzato dall’organizzatore. Per richieste relative ai dati, rivolgiti al titolare del trattamento indicato dall’installazione.'),('Problemi comuni','Sessione non disponibile: verifica link e scadenza. Attività chiusa: chiedi al presentatore. Nessun aggiornamento: verifica connettività e ricarica. Usare tastiera e funzioni di ingrandimento del browser dove necessario.')])]),
- 'presenter':('Manuale del presentatore',[
- ('Introduzione operativa',[('Panoramica','Accedi con le credenziali locali predisposte dall’amministratore. Nel workspace puoi creare sessioni, predisporre sondaggi e quiz, invitare il pubblico e mostrare i risultati live. I provider SSO non sono ancora operativi.'),('Sessioni indipendenti','La presentazione PowerPoint o PDF può rimanere aperta in un programma esterno: Quorivio fornisce un QR code di sessione e il controllo separato via browser.')]),
- ('Creazione di una sessione',[('Aprire il workspace','1. Effettua il login. 2. Digita il titolo in «Nuova sessione». 3. Premi «Crea». 4. Seleziona la sessione nella colonna sinistra.'),('Invitare il pubblico','Nella sezione «Invito alla sessione» copia il collegamento o scarica il QR code in PNG o SVG. Inserisci il QR nella diapositiva esterna. Prova l’accesso con un secondo dispositivo prima di iniziare.')]),
- ('Creare e condurre attività',[('Sondaggi','Nella sezione «Nuova attività» scegli «Sondaggio», scrivi la domanda e un’opzione per ogni riga. Premi «Aggiungi attività».'),('Quiz','Scegli «Quiz», crea le opzioni e indica la risposta corretta. Nella versione attuale il tempo predefinito del quiz è impostato dal backend e la classifica non è disponibile.'),('Avvio e chiusura','1. Premi «Avvia» sulla sessione. 2. Premi «Apri» sull’attività da proporre. 3. Osserva i risultati. 4. Premi «Chiudi» per fermare la raccolta, oppure apri l’attività seguente. 5. Premi «Termina» alla fine.'),('Schermo pubblico','Apri «Schermo pubblico» in una scheda separata e condividila con videoproiettore o videoconferenza. Le barre riflettono le risposte confermate conservate nel database.')]),
- ('Privacy, esportazione e gestione',[('Esportare i risultati','Nella scheda «Dati della sessione» scegli «Esporta CSV». Conserva il file in modo appropriato e limita la distribuzione ai destinatari autorizzati.'),('Conservazione','Nella sezione «Privacy e ciclo di vita» modifica i giorni di retention (da 1 a 3650) e sposta il focus dal campo per salvare. La pulizia programmata si applica alle sessioni chiuse o scadute.'),('Revoca e cancellazione','«Revoca accessi» chiude la sessione e invalida gli inviti, dopo conferma. «Elimina sessione» cancella definitivamente la sessione e le risposte associate, dopo conferma. Verifica gli obblighi di conservazione prima di usare questa funzione.')]),
- ('Diagnostica e limiti',[('Problemi ricorrenti','QR non valido: rigenera l’invito. Risultati assenti: verifica attività aperta e risposte confermate. Accesso negato: controlla l’account proprietario. Il multi-replica WebSocket non è ancora validato.'),('Funzioni pianificate','Nuvole di parole, Q&A moderato, importazione di documenti, collaboratori, classifiche, esportazioni PDF/XLSX e SSO non devono essere considerate disponibili.')])]),
- 'admin':('Manuale amministratore',[
- ('Architettura e responsabilità',[('Componenti','Frontend React/Vite, backend Node/Express, PostgreSQL come fonte autorevole, WebSocket per risultati in tempo reale, Kustomize e Compose per deployment. Redis/multi-replica non validati.'),('Ambito e limiti','Questa release è 0.1.0-dev. La CI verde confermata si riferisce al package precedente. Non rappresenta certificazione AgID o conformità GDPR verificata.')]),
- ('Installazione e configurazione',[('Repository e segreti','Recupera github.com/desalvo/quorivio. Configura PUBLIC_BASE_URL, DATABASE_URL e i segreti richiesti fuori dal controllo versione. Usa HTTPS, privilegi minimi e backup testati.'),('Docker e Podman','Consulta compose.yaml e .env.compose.example. Preparare i valori delle credenziali prima del deployment. Le prove complete rootless Podman restano da effettuare.'),('Wizard Kubernetes','Esegui python3 tools/k8s_wizard.py --unattended --output ./k8s-generated --set host=quorivio.example.org. Il wizard crea manifest Kustomize separati e memorizza le modifiche ai default; non genera password.'),('Ingress','Configura ingressClassName per NGINX, HAProxy community o HAProxy Technologies. I vecchi controller HAProxy possono richiedere annotazioni legacy specifiche; evita di applicare contemporaneamente configurazioni incompatibili.'),('PostgreSQL','Il wizard supporta DB interno StatefulSet/PVC oppure DB esterno. Per DB esterno configura Secret DATABASE_URL e TLS verificato. Migrazioni maggiori PostgreSQL 17→18 richiedono procedura dedicata e backup: non sostituire soltanto l’immagine.')]),
- ('CI/CD e controllo rilascio',[('GitHub Actions','La pipeline esegue controlli di qualità, build immagini e scansione Trivy HIGH/CRITICAL prima del job di pubblicazione. Proteggi main con ruleset e check richiesti.'),('Docker Hub','Configura ambiente GitHub production, DOCKERHUB_USERNAME=desalvo e DOCKERHUB_TOKEN. Il push su main genera latest; il push di un tag v* genera il tag corrispondente. Non mettere credenziali nel repository.'),('Versionamento','Quorivio resta 0.1.0-dev. Nessun commit/push/tag/release deve essere automatizzato dall’assistente; solo GitHub Actions esegue la pubblicazione in seguito ad azioni dell’operatore autorizzato.')]),
- ('Gestione operativa e GDPR',[('Controlli operativi','Verifica liveness e readiness, log di applicazione, TLS e spazio disco PostgreSQL. Effettua test di ripristino, non soltanto backup. Una replica applicativa finché la sincronizzazione WebSocket multi-replica non sarà comprovata.'),('Privacy e conservazione','Configura informative, ruoli di titolare/responsabile, basi giuridiche e retention. Definisci procedure per accesso, cancellazione e data breach. I controlli tecnici non sostituiscono le valutazioni legali e organizzative.'),('Sicurezza','Segreti in secret manager/Kubernetes Secret esterni al repository; esegui scansioni dipendenze e container e conserva SBOM. Esegui prove di isolamento organizzativo e penetration test prima della produzione.')]),
- ('Appendici tecniche',[('Ripristino','Documenta RPO/RTO, esercita restore su ambiente separato, verifica consistenza dei dati e ripartenza della gestione sessioni prima di approvare il ripristino.'),('Problemi comuni','503 readiness: controlla DATABASE_URL/TLS e disponibilità PostgreSQL. Errore Docker Hub: controlla ambiente production e secret. Errori Ingress: verifica controller, DNS e TLS. Manca risultato live: controlla connessioni WebSocket.')])])
- },
- 'en':{
- 'common':{'contents':'Contents','version':'Version 0.1.0-dev · Build dev-20261024 · 22 October 2026','foot':'Quorivio | Operations guide','append':'Appendices and known limitations'},
- 'user':('Participant guide',[
- ('Getting started',[('Requirements','Use a modern browser on a smartphone and a connection to the Quorivio service. No PowerPoint plugin is needed, and anonymous participation does not require signing in.'),('Roles and privacy','The presenter determines when activities are open. Confirmed responses are retained subject to configured retention rules. Anonymous display does not imply that all technical data is absent.')]),
- ('Joining a session',[('Scan a QR code','1. Open your phone camera. 2. Scan the QR code shown by the presenter. 3. Open the link. 4. Tap Join. The QR code contains only a participation URL.'),('Enter a code','1. Open the service landing page. 2. Type the session code shown by the presenter. 3. Select Join, then enter the session. Expired or revoked access codes must be replaced.')]),
- ('Polls and quizzes',[('Respond to a poll','Select one option while the activity is open and tap Submit answer. Wait for the confirmation message; the response is validated and saved server-side.'),('Take a quiz','Select and submit an answer before the quiz is closed. Where enabled, timing is checked on the server. Correct answers are not exposed to participants prematurely.'),('Connection issues','If disconnected, reopen the same invitation in the same browser to preserve your participation identity where possible. Avoid duplicate submissions if the server has already acknowledged the answer.')]),
- ('Privacy and troubleshooting',[('Personal information','Do not provide unnecessary personal data. For data-rights requests, contact the controller identified by the organization operating Quorivio.'),('Common issues','Unavailable session: check the link and expiry. Closed question: contact the presenter. Missing updates: check connectivity and reload. Use browser zoom and keyboard navigation as needed.')])]),
- 'presenter':('Presenter guide',[
- ('Overview',[('Presenter workspace','Sign in using administrator-provided local credentials. Create sessions, author polls and quizzes, invite participants and view live results. External SSO providers are not yet operational.'),('External presentation workflow','Keep PowerPoint or PDF in your usual presentation application. Insert a Quorivio session QR code and control questions from a separate browser or device.')]),
- ('Create a session',[('Start a workspace','1. Sign in. 2. Enter a title in New session. 3. Click Create. 4. Select the new session in the sidebar.'),('Invite participants','In Session invitation, copy the join URL or download the QR code as PNG or SVG. Insert it into your external slides and test the participant experience before the event.')]),
- ('Build and run activities',[('Poll creation','Under New activity choose Poll, enter a question, write one answer option per line and click Add activity.'),('Quiz creation','Choose Quiz, enter options and designate the correct option. A server-side default timer is used; leaderboards are not available in this build.'),('Session flow','1. Click Start. 2. Open the desired question. 3. Watch live results. 4. Close the current question or open the next one. 5. Click End to close the session.'),('Public display','Open Public screen in a second browser tab or projected display. Bars show confirmed answers persisted in PostgreSQL.')]),
- ('Exports and lifecycle',[('CSV export','Click Export CSV under Session data. Store the file securely and limit access to authorized recipients.'),('Retention control','Under Privacy and lifecycle, change retention days (1–3650) and leave the field to save. Background deletion applies only once sessions are closed or expired.'),('Revoke and delete','Revoke access closes a session and rotates invitations after confirmation. Delete session permanently removes the session and associated responses after confirmation. Review retention obligations first.')]),
- ('Troubleshooting and roadmap',[('Common problems','Expired QR: renew invitations. Missing charts: verify an open activity and submitted responses. Access denied: verify session ownership. Multi-replica WebSocket operation is not validated.'),('Planned functions','Word clouds, moderated Q&A, document import, collaborators, leaderboards, PDF/XLSX export and SSO are not implemented yet.')])]),
- 'admin':('Administrator guide',[
- ('Architecture and responsibility',[('System components','React/Vite frontend; Node/Express backend; PostgreSQL as authoritative data store; WebSockets for live updates; Kubernetes Kustomize generator and Compose. Multi-replica coordination is not validated.'),('Release boundaries','This is a development build (0.1.0-dev). User-confirmed green CI applies to the preceding package, not untested changes. No AgID or GDPR certification is claimed.')]),
- ('Installation',[('Repository and secrets','Source: github.com/desalvo/quorivio. Configure PUBLIC_BASE_URL, DATABASE_URL and other secrets outside source control. Use HTTPS, least privilege and tested backups.'),('Container deployment','Review compose.yaml and .env.compose.example; populate credentials before startup. Rootless Podman has not undergone complete runtime verification.'),('Kubernetes wizard','Run python3 tools/k8s_wizard.py --unattended --output ./k8s-generated --set host=quorivio.example.org. This writes segmented Kustomize manifests and persists only non-default settings; it does not generate passwords.'),('Ingress controllers','Select NGINX, HAProxy community or HAProxy Technologies with the proper ingressClassName. Older HAProxy implementations may require controller-specific legacy annotations.'),('PostgreSQL','Choose an internal PostgreSQL StatefulSet/PVC or external database. External mode requires a supplied DATABASE_URL Secret and verified TLS. Major upgrades from PostgreSQL 17 to 18 require a planned migration and backup, not an image swap.')]),
- ('CI/CD and releases',[('Actions gate','GitHub Actions runs quality checks, container build and blocking Trivy HIGH/CRITICAL scanning prior to publication. Configure required branch checks and rulesets.'),('Docker Hub','Within environment production set DOCKERHUB_USERNAME=desalvo and secret DOCKERHUB_TOKEN. Push to main yields latest; a release tag v* yields the matching tag. Never store tokens in git.'),('Versioning','Version remains 0.1.0-dev. Commit/push/tag/release are operator actions; GitHub may publish automatically only after an authorized repository event and passing gate.')]),
- ('Operations and GDPR',[('Monitoring','Inspect liveness/readiness, application logs, database capacity and TLS. Test restores, not only backups. Restrict runtime to a single application replica until multi-instance WebSockets work reliably.'),('Data protection','Configure privacy notices, controller/processor roles, processing legal bases and retention. Define data-subject request and breach procedures. Technical checks do not replace organizational and legal assessments.'),('Security','Use external Secret management, dependency/container scans and SBOM records. Perform tenancy isolation testing and penetration testing before production use.')]),
- ('Technical appendices',[('Disaster recovery','Specify RPO/RTO, rehearse restore into a separate environment, verify application data consistency and session availability before sign-off.'),('Troubleshooting','Readiness 503: check PostgreSQL TLS/URL and availability. Docker Hub auth failure: inspect production secrets. Ingress issues: check controller, DNS and TLS. Missing live results: inspect WebSocket connections.')])])
- }}
+ROOT = Path(__file__).resolve().parents[1]
+SOURCE = ROOT / 'docs/manuals-src'
+OUTPUT = ROOT / 'docs/manuals'
+WEB = ROOT / 'apps/web/public/docs/manuals'
+ASSETS = ROOT / 'docs/assets'
+ROLES = {'user': {'it':'Partecipante','en':'Participant'},
+         'presenter':{'it':'Presentatore','en':'Presenter'},
+         'admin':{'it':'Amministratore','en':'Administrator'}}
 
-# Verified source-cycle notes, included as dedicated indexed chapters.
-DOC_UPDATES={
- 'it':{
-  'user':('Identità, pseudonimo e cookie funzionali',[('Partecipa come anonimo','Se la sessione ammette utenti anonimi, inserisci uno pseudonimo di 2-40 caratteri e accetta i cookie tecnici richiesti per mantenere l’identità e prevenire doppie risposte. Il servizio non registra il solo pseudonimo come garanzia di unicità reale.'),('Account registrati','La registrazione locale è disponibile come API, ma il modulo web e l’ingresso con account verificato alle sessioni devono ancora essere completati. L’admin deve approvare ogni account registrato.')]),
-  'presenter':('Stili, contenuti e partecipazione',[('Personalizzazione preliminare','Nel workspace è disponibile un modulo per salvare URL HTTPS per sfondo e logo comune e un media (immagine, video o PDF) collegato alla domanda corrente. La configurazione strutturata delle pagine è predisposta; editor libero, template multipli e upload dei file non sono ancora disponibili.'),('Ammissione anonimi','Il presentatore può abilitare o disabilitare dalla sezione Privacy la partecipazione anonima e la pubblicazione dei risultati live ai partecipanti. Per gli anonimi, lo pseudonimo e il cookie tecnico sono necessari; la partecipazione con account registrato è pianificata.'),('Conservazione dati','Le sessioni chiuse sono soggette alla policy globale amministrativa, impostata inizialmente a 60 giorni dopo la chiusura. Le modifiche di retention proprietario esistenti vanno riallineate con tale policy prima della produzione.')]),
-  'admin':('Approvazioni e impostazioni della piattaforma',[('Gestire le approvazioni','Apri Amministrazione e carica utenti e impostazioni. Puoi creare un account con password temporanea di almeno 12 caratteri. Per gli utenti visualizzati scegli ruolo e approvazione, poi salva. I presentatori non approvati non possono creare sessioni. Controllare la gestione account esistenti con test end-to-end prima dell’uso.'),('URL pubblica e conservazione','Imposta un indirizzo HTTPS assoluto usato nei QR e nei link delle sessioni. Configura i giorni di conservazione globale dalla chiusura (valore predefinito 60). L’aggiornamento degli URL non rende automaticamente validi vecchi QR già scaricati.'),('Credenziali iniziali','La password demo 000000 è ammessa solo esplicitamente in ambiente NON production e deve essere cambiata al primo accesso. In produzione configura password forte iniziale. Le nuove registrazioni non sono attive fino ad approvazione admin.'),('Non ancora disponibili','SMTP/SMTPS con email di prova, MFA via email/TOTP, provider SSO, export XLSX e gestione documenti caricati sono in roadmap; non configurarli come se fossero completati.')])
- },
- 'en':{
-  'user':('Identity, pseudonyms and necessary cookies',[('Join anonymously','When anonymous access is enabled, provide a 2–40 character pseudonym and accept the necessary functional cookies to preserve participation identity and avoid duplicate submissions. A pseudonym alone does not ensure one vote per real person.'),('Registered accounts','Local registration is currently an API; the web registration form and signed-in participant workflow are unfinished. Registered accounts require administrator approval.')]),
-  'presenter':('Themes, media and audience access',[('Preliminary appearance controls','The workspace includes inputs for HTTPS background and logo URLs shared across a session, and an image, video or PDF attached to the current question. Typed page configuration is in place; multiple templates, WYSIWYG customization and uploads remain pending.'),('Anonymous admissions','The presenter can enable or disable anonymous access and publishing live participant results in the Privacy section. Anonymous participation uses pseudonyms and necessary cookies; registered-user participation is still planned.'),('Data retention','Closed sessions follow an administrator-wide deletion policy initially set to 60 days after closure. Earlier owner retention settings must be reconciled before production.')]),
-  'admin':('Approvals and platform configuration',[('Approving presenters','Open Administration and load accounts and settings. Create an account with a temporary 12+ character password, or select role and approval for an existing account, then save. Unapproved presenters cannot create sessions; test the flow end-to-end before deployment.'),('Public address and retention','Set an absolute HTTPS address to use in session QR codes and URLs. Set the global closed-session retention in days (default 60). Updating the URL does not retroactively update downloaded QR codes.'),('Initial credentials','Demo password 000000 may be used only with explicit non-production opt-in and must be changed at first login. Use strong initial credentials in production. New accounts remain pending admin approval.'),('Not yet implemented','SMTP/SMTPS settings and test message, email/TOTP MFA, SSO providers, XLSX exports and uploaded-file management are still planned, not available.')])
- }}
-ADDITIONAL={
- 'it':{
- 'presenter':('Collaborazione ed editing delle sessioni',[('Co-presentatori','Il proprietario puo aggiungere presentatori approvati della stessa organizzazione con API POST /api/sessions/{id}/presenters. I collaboratori hanno accesso al contenuto delle sessioni; la gestione visuale completa e i test multiutente sono ancora in corso.'),('Copia e importazione delle definizioni','Gli endpoint export.json, import e duplicate permettono di conservare o riprodurre domande e temi senza includere risposte o dati personali. Il duplicato e una nuova bozza con nuovo QR. L’interfaccia visuale dedicata e in sviluppo.'),('Modifiche live e invalidazione','Titoli e opzioni possono cambiare live senza rimuovere identificativi di opzioni gia votate. Invalidare le risposte e una operazione tracciata: i dati invalidati non compaiono nei risultati, ma restano per audit. La possibilita di votare nuovamente dopo invalidazione e ancora da completare.')]),
- 'admin':('Backup completo e limiti dei file',[('Backup e restore','Il backup completo del database e degli allegati non e ancora disponibile via UI. Usare procedure PostgreSQL esterne affidabili, backup coerenti dello storage e prove di ripristino in un ambiente isolato. Non caricare dump provenienti da fonti non attendibili.'),('Massimo upload','Il valore iniziale e 100 MB. La voce max_upload_mb e configurabile nell’API amministrativa: il wizard Kubernetes supporta --set max_upload_mb=100 e genera le annotazioni NGINX e HAProxy Technologies. Il cambio di impostazione nell’app non modifica automaticamente un Ingress esistente.'),('Funzioni non concluse','L’upload reale di file, la scansione malware, le quote, il ripristino completo automatico e l’interfaccia dedicata rimangono da implementare e testare.')])},
- 'en':{
- 'presenter':('Collaboration and live session editing',[('Co-presenters','An owner can add approved presenters from the same organization via POST /api/sessions/{id}/presenters. Shared session authoring is in the API; complete UI and multi-user testing are pending.'),('Copy and definition import/export','The export.json, import and duplicate endpoints preserve activities and themes without answers or personal data. Duplicates are new drafts with new QR links. Visual controls are not yet complete.'),('Live edits and invalidation','Question text and options may be changed live without removing answered option IDs. Invalidation preserves an audit trail and excludes marked responses from results. Re-answering after invalidation is not yet supported.')]),
- 'admin':('Full backup and upload limits',[('Backup and restore','Full database and attachment backups are not available in the UI. Use trusted PostgreSQL backup procedures, consistent media backups and isolated recovery tests; never import untrusted database dumps.'),('Upload maximum','The initial limit is 100 MB. The admin API supports max_upload_mb; the Kubernetes wizard accepts --set max_upload_mb=100 and renders NGINX and HAProxy Technologies ingress annotations. Settings changes cannot automatically change a running ingress.'),('Outstanding work','Actual uploads, malware scanning, quotas, complete automated restoration and related UI remain pending.')])}
+CSS = r'''@page {
+    size: A4;
+    margin: 17mm 16mm 18mm 16mm;
+    @bottom-left { content: 'Quorivio | RC278 documentation'; font-size: 8pt; color: #5b6680; }
+    @bottom-right { content: counter(page) ' / ' counter(pages); font-size: 8pt; color: #5b6680; }
 }
-# Add a maintained import workflow chapter per edition rather than a one-off PDF patch.
-for _lang in ('it','en'):
- if _lang=='it':
-  CONTENT[_lang]['presenter'][1].append(('Importare pagine slide',[('Da PDF e PowerPoint','Converti preventivamente il documento tramite python3 tools/import_presentation.py origine.pdf /tmp/pagine. Le animazioni e i video incorporati non sono conservati.'),('Inserimento dalla web interface','Nel workspace seleziona una sessione, apri Allegati e seleziona insieme le immagini PNG generate. Ogni immagine diventa una pagina slide nella sequenza. Puoi anche usare Crea pagina slide accanto a un’immagine caricata. Verifica e riordina le pagine prima della sessione.'),('Visualizzazione al pubblico','Quando la pagina slide viene aperta come attività corrente, l’immagine diventa consultabile dal pubblico con il collegamento della sessione. La pagina informativa non richiede una risposta.'),('Limiti verificati','La conversione PDF/PPTX è per ora offline; il worker isolato e i collaudi su browser e database reali restano aperti. Non eliminare asset collegati a slide attive.')]))
-  CONTENT[_lang]['admin'][1].append(('Gestire le slide integrate',[('Prerequisiti','Il convertitore offline usa Poppler (pdfinfo/pdftoppm) e LibreOffice per PPTX. Eseguilo isolato dai servizi web, soprattutto con documenti non attendibili.'),('Migrazioni e media','Lo schema aggiunge il tipo attività slide e la tabella presentation_slide_assets. Verifica la migrazione su una copia del database prima della produzione. I file rimangono su storage persistente privato.'),('Sicurezza','Gli asset slide sono serviti pubblicamente solo quando la rispettiva pagina è corrente in una sessione attiva. Gli altri asset rimangono riservati. Non considerare la funzionalità collaudata fino ai test integrati.')]))
- else:
-  CONTENT[_lang]['presenter'][1].append(('Importing slide pages',[('PDF and PowerPoint','First convert the document with python3 tools/import_presentation.py slides.pdf /tmp/pages. Animations and embedded video are not preserved.'),('Web import','In the presenter workspace select a session, then choose the generated PNG files together from the Attachments section. Each image creates a slide page; individual uploaded images also offer Create slide page. Confirm ordering before presenting.'),('Audience playback','When a slide is opened as the current activity, participants can view its image. It is informational and requires no vote.'),('Known limits','PDF/PPTX conversion remains offline; isolated background worker and end-to-end browser/database verification are outstanding.')]))
-  CONTENT[_lang]['admin'][1].append(('Integrated slide administration',[('Conversion dependencies','The offline converter uses Poppler and LibreOffice for PPTX. Execute it in an isolated environment, especially for untrusted documents.'),('Database and storage','The additive schema creates a slide activity type and presentation_slide_assets references. Rehearse migrations and backups before production. Media remain in private persistent storage.'),('Audience isolation','Only the image belonging to the current slide in an active session is served to participants; other attachments remain private. Integrated security testing remains pending.')]))
-for _lang in ('it','en'):
- for _role in ('user','presenter','admin'):
-  CONTENT[_lang][_role][1].append(DOC_UPDATES[_lang][_role])
-  if _role in ADDITIONAL[_lang]:CONTENT[_lang][_role][1].append(ADDITIONAL[_lang][_role])
+@page:first { margin: 0; @bottom-left {content:normal} @bottom-right{content:normal} }
+html{font-size: 10pt;}body{font-family: 'DejaVu Sans',Arial,sans-serif;color:#1f293b;margin:0;line-height:1.53}
+h1,h2,h3{font-family:'DejaVu Sans',Arial,sans-serif;line-height:1.25;color:#1f2854}
+h2{font-size:17.5pt;margin:0 0 14pt;break-before:page;border-bottom:2px solid #5f56d9;padding-bottom:8pt}
+h3{font-size:11.5pt;color:#5746bc;margin:17pt 0 8pt;break-after:avoid}
+h2 + h3{margin-top:11pt}p{margin:0 0 9pt;text-align:left;orphans:2;widows:2}strong{color:#1e2850}
+li{margin-bottom:5pt}ul,ol{padding-left:19pt;margin:7pt 0 12pt}li>ul{margin:4pt 0}
+table{width:100%;border-collapse:collapse;margin:12pt 0 16pt;table-layout:fixed;break-inside:auto;font-size:8.25pt}
+thead{display:table-header-group}tr{break-inside:avoid}th{background:#262a68;color:#fff;text-align:left;font-weight:bold}
+th,td{vertical-align:top;padding:7pt 7pt;border:1px solid #dbe0ed;overflow-wrap:anywhere;word-wrap:break-word}
+tbody tr:nth-child(even){background:#f5f6fc}tbody tr:nth-child(odd){background:#fff}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:8.4pt;line-height:1.4;background:#f3f5fa;border-left:4px solid #5c50cd;border-radius:3px;padding:12pt;margin:12pt 0 17pt;break-inside:avoid}
+code{font-family:'DejaVu Sans Mono',monospace;font-size:0.90em;color:#28345f}
+a{color:#5446d0;text-decoration:none}
+figure{margin:13pt 0 18pt;break-inside:avoid;background:#f7f8fd;border:1px solid #e2e5f0;padding:5pt;border-radius:6pt}
+figure img{display:block;max-width:100%;width:100%;height:auto;object-fit:contain}
+figcaption{font-size:7.8pt;color:#576278;padding:6pt 5pt 2pt;line-height:1.4}
+hr{margin:14pt 0;border:none;border-top:1px solid #ddd}
+.cover{break-after:page;height:277mm;position:relative;padding:0;background:#fff}
+.cover-head{padding:22mm 17mm 6mm;background:linear-gradient(130deg,#f5f5ff,#fff);border-bottom:4pt solid #604cdc}
+.brand{font-weight:900;font-size:24pt;color:#5446ce;letter-spacing:-1pt}
+.cover-kicker{color:#5d6b7e;font-size:9pt;margin-top:7mm;text-transform:uppercase;letter-spacing:1.8pt}
+.cover-title{font-size:31pt;font-weight:900;color:#22285a;line-height:1.24;margin-top:6mm}
+.cover-version{font-size:11pt;color:#4c556c;margin-top:7mm}
+.cover-picture{margin:8mm 17mm 0;width:176mm;height:auto;border-radius:7pt}
+.cover-foot{margin:10mm 17mm;color:#5b6780;font-size:9pt}
+.cover-details{margin:3mm 17mm 0;font-size:8pt;line-height:1.5;color:#34405c;background:#f8f9fe;border:1px solid #eceef8;padding:6pt 9pt;border-radius:4pt}
+.cover-brand-logo{vertical-align:middle;width:41mm;max-height:16mm;object-fit:contain;margin:0 5mm 0 0}
+.cover-disclaimer{margin:8mm 17mm;padding:9pt 12pt;background:#fdf6e9;color:#7c531a;border-left:4px solid #e3b866;font-size:9pt}
+.toc{break-after:page;padding-top:12mm}
+.toc h1{font-size:22pt;color:#1d2854}
+.toc ul{list-style:none;margin:20pt 0 0;padding:0}
+.toc li{padding:2pt 0;margin:0;border-bottom:1px dotted #d3d7e5;font-size:9pt;line-height:1.22}
+.toc a{display:block;color:#2b305e}
+.toc a::after{content:leader('.') target-counter(attr(href),page);font-size:9pt;color:#79829a}
+.content{margin:0}
+.content>p:first-of-type{font-size:10pt}
+.section-mark{font-size:8pt;color:#6b7280}
+'''
 
-# RC154: administrator procedures are generated into both published PDF manuals.
-CONTENT['it']['admin'][1].append(('Prova reale di carico: 500 utenti e widget live',[
- ('Presentazione tecnica predefinita','Ogni account possiede Quorivio · Prova tecnica 500 partecipanti. Se viene cancellata, l’applicazione la ricrea vuota al successivo accesso. La presentazione è privata e non parte automaticamente. Contiene il contatore partecipanti connessi, una domanda principale, una seconda domanda facoltativa, widget gradimento 0–9, reazioni e risultati.'),
- ('Avvio e contatore','Accedi come proprietario, seleziona la presentazione tecnica, premi Avvia e apri la seconda pagina. Apri Schermo presentatore e lascia visibile il contatore Utenti connessi. Il valore live richiede che i partecipanti mantengano una connessione WebSocket aperta; 500 sole risposte HTTP non equivalgono a 500 utenti simultaneamente connessi.'),
- ('CLI e credenziali','Da un checkout GitHub contenente tools/live_500_answers.py, installa aiohttp. Nel terminale esporta QUORIVIO_LOAD_PRESENTER_COOKIE con il cookie q_auth del solo presentatore e non inserirlo nei comandi, log o report. Usa un server autorizzato HTTPS e il suo hostname esatto in --base-url e --confirm-host.'),
- ('Esecuzione consigliata','Esegui python3 tools/live_500_answers.py --base-url https://quorivio.example.org --confirm-host quorivio.example.org --confirm-run --open-test-question --live-presence --users 500 --concurrency 30 --ramp-seconds 900 --hold-seconds 90 --json-out ./load-results.json. Il generatore apre connessioni WebSocket indipendenti, invia una risposta alla domanda principale da ogni partecipante e verifica 500 risposte confermate nonché il picco nel contatore presentatore.'),
- ('Reset e ripetizione','Dalla sessione in stato Avviata o Pausa, usa Riporta a non avviata e conferma. Questo cancella partecipanti e interazioni, conserva le pagine e ruota il QR. In alternativa ripeti il comando CLI aggiungendo --reset-before insieme a --open-test-question; lo script aggiorna il codice di ingresso. Non riutilizzare i vecchi QR o cookie.'),
- ('Analisi e sicurezza','Confronta report JSON, conteggio WebSocket sullo Schermo presentatore, risposte confermate e p50/p95/p99. Esegui solo su server di cui sei amministratore, con consenso organizzativo, finestra di collaudo, monitoraggio PostgreSQL/CPU/memoria, backup, TLS e nessun partecipante reale. Non collocare segreti né identificativi personali nei report. Se mancano connessioni o risposte, il test termina con esito negativo. Lancia la prova di 500 WebSocket separata con tools/load_500.py solo quando opportuno.')
-]))
-CONTENT['en']['admin'][1].append(('Real 500-user response and connected-presence test',[
- ('Per-account official demo','Every account has a private Quorivio · Prova tecnica 500 partecipanti presentation, automatically recreated empty if deleted. It remains unpublished until the owner starts it. Its pages include a live connected-participant counter, primary and optional secondary questions, 0–9 ratings, reactions and question results.'),
- ('Starting and observing','Sign in as owner, open the test presentation, select Start, publish the second page and open Presenter screen. Keep Connected participants visible. The count reflects open WebSockets, not successful HTTP votes alone.'),
- ('Authentication and CLI','Install aiohttp and use the version-controlled tools/live_500_answers.py from GitHub. Set QUORIVIO_LOAD_PRESENTER_COOKIE to the presenter q_auth cookie in the shell environment. Never paste the cookie into command arguments or stored reports. Require an authorized HTTPS host and exact --confirm-host.'),
- ('Suggested run','Run python3 tools/live_500_answers.py --base-url https://quorivio.example.org --confirm-host quorivio.example.org --confirm-run --open-test-question --live-presence --users 500 --concurrency 30 --ramp-seconds 900 --hold-seconds 90 --json-out ./load-results.json. The CLI holds independent WebSockets and validates both 500 server-confirmed answers and the presenter-visible peak.'),
- ('Reset and repeat','Choose Reset to ready in an active or paused test session and confirm. The operation erases responses and participant identities, retains authored pages, and rotates the join QR. For a CLI-managed rerun supply --reset-before together with --open-test-question; old QR links and visitor cookies become invalid.'),
- ('Safe interpretation','Review JSON totals, live participant count, response time p50/p95/p99, error counters, and infrastructure telemetry. Run only against infrastructure you administer, with permission, TLS, isolated synthetic data, monitoring, backups and a bounded test window. Use tools/load_500.py separately for the standalone simultaneous-WebSocket scenario.')
-]))
-CONTENT['it']['admin'][1].append(('Gravatar opzionale per account e dati personali',[
- ('Attivazione personale','Ogni utente approvato può entrare in Profilo e selezionare Usa Gravatar per la foto del mio account. La sincronizzazione è disattivata di default e la modifica riguarda solo il proprio account.'),
- ('Creazione e importazione','Usa il collegamento Aggiungi o modifica una foto su Gravatar per caricare il ritratto presso gravatar.com (l’upload al servizio esterno non è delegato a Quorivio). Torna in Quorivio e premi Importa / aggiorna Gravatar. Se la stessa email dispone già di un avatar lo importerà automaticamente.'),
- ('Aggiornamento login','Al completamento del login Quorivio verifica via HTTPS la foto Gravatar, confronta SHA-256 e importa nell’archivio privato la foto nuova o modificata. Non scarica avatar esterni direttamente sul browser pubblico. Se non disponibile, l’autenticazione locale resta funzionante. Gli upload manuali disattivano la sincronizzazione Gravatar.'),
- ('Privacy, cancellazione e replica','L’attivazione comunica a Gravatar l’hash SHA-256 derivato dalla email dell’account: fornire informativa e base giuridica adeguate; non attivare per altri utenti senza consenso. Un immagine sostituita viene cancellata con l’outbox prevista; volume condiviso, backup, ClamAV e verifica malware sono necessari. Per interrompere la sincronizzazione togli la spunta nel proprio Profilo.')
-]))
-CONTENT['en']['admin'][1].append(('Opt-in account Gravatar and privacy',[
- ('User-specific preference','Every approved user may choose Use Gravatar for my account photo in Profile. The integration is disabled by default and cannot be enabled silently by a presenter or administrator on another account.'),
- ('Create or import','Follow the Add or update photo on Gravatar link to upload on the external Gravatar website. Return to Quorivio and select Import / refresh Gravatar. Existing avatars attached to the registered account email are imported into local Quorivio storage.'),
- ('Login synchronization','On successful login the server checks the fixed HTTPS Gravatar avatar endpoint, compares the content SHA-256 and imports changed photos. Browser clients receive only private Quorivio photo URLs. Third-party outages never block login. Uploading a local profile photo disables automatic Gravatar refresh.'),
- ('Privacy and retention','Opting in exposes a SHA-256 identifier derived from the account email to Gravatar. Update privacy information and obtain an appropriate legal basis. Use shared protected storage, antivirus scanning and durable old-photo erasure. Uncheck the preference in Profile to disable further synchronization.')
-]))
 
-from manuals_extra import EXTRA
-for _lang, _role_sets in EXTRA.items():
- for _role, _chapters in _role_sets.items():
-  CONTENT[_lang][_role][1].extend(_chapters)
+def render_one(role: str, lang: str, *, require_real: bool = False) -> tuple[Path,int]:
+    source = SOURCE / f'{role}-guide.{lang}.md'
+    md = source.read_text(encoding='utf-8')
+    meta = metadata()
+    validate_release(meta)
+    real_gallery = gallery(role, lang, require=require_real, commit=meta['commit'] or None)
+    no_live = ('Le schermate autentiche vengono generate dalla CI su un server temporaneo e distribuite come allegato al job; questa edizione locale non contiene immagini non verificate.' if lang == 'it' else 'Authentic screenshots are generated by CI on a disposable server and published as job artifacts; this local edition embeds no unverified images.')
+    md = md.replace('<!-- REAL_SCREENSHOT_GALLERY -->', real_gallery if real_gallery else '<p>'+no_live+'</p>')
+    title_match = re.search(r'^# (.+)$',md,re.M)
+    if not title_match:raise ValueError(f'Missing top title: {source}')
+    title=title_match.group(1)
+    headings = re.findall(r'^## (.+)$',md,re.M)
+    if len(headings)<10:raise ValueError(f'Manual unexpectedly short: {source}')
+    img_names=re.findall(r'<img\s+src="([^"]+)"',md)
+    for uri in img_names:
+        if uri.startswith('http') or not (SOURCE/uri).resolve().is_file():
+            raise ValueError(f'Invalid or missing local manual image: {uri}')
+    markup=mistune.create_markdown(plugins=['table','strikethrough','task_lists','url'])(md)
+    # The separate cover carries title and build metadata; avoid duplicate mastheads.
+    markup=re.sub(r'^<h1>.*?</h1>\s*','',markup,count=1,flags=re.S)
+    anchors=[]
+    def anchor(m):
+        index=len(anchors)+1
+        anchors.append((f'chapter-{index}',headings[index-1]))
+        return f'<h2 id="chapter-{index}">{m.group(1)}</h2>'
+    markup=re.sub(r'<h2>(.*?)</h2>',anchor,markup)
+    if len(anchors)!=len(headings):raise ValueError('Heading mismatch')
+    # The cover already identifies this guide. Move the Markdown lead-in below
+    # chapter 1 so its mandatory chapter page break does not strand a near-empty
+    # introductory page between the index and the first chapter.
+    first_heading=markup.find('<h2 id="chapter-1">')
+    if first_heading>0:
+        lead,chapters_markup=markup[:first_heading],markup[first_heading:]
+        close=chapters_markup.index('</h2>')+len('</h2>')
+        markup=chapters_markup[:close]+lead+chapters_markup[close:]
+    toc=''.join(f'<li><a href="#{id}">{html.escape(head)}</a></li>' for id,head in anchors)
+    cover_image=(ASSETS/'quorivio-manual-cover.png').as_uri()
+    role_label=ROLES[role][lang]
+    caption=('FIGURE: ricostruzioni etichettate; screenshot reali solo con prove verificate' if lang=='it' else 'FIGURES: labelled reconstructions; live screenshots only with verified evidence')
+    info=('Documentazione tecnica | 9 novembre 2026' if lang=='it' else 'Technical documentation | 9 November 2026')
+    subtitle=('Guida operativa illustrata' if lang=='it' else 'Illustrated operational guide')
+    toc_title='Indice' if lang=='it' else 'Contents'
+    note=('Edizione RC278; certificazioni di sicurezza e infrastrutture reali restano separate.' if lang=='it' else 'RC278 edition; security and real infrastructure certifications remain separate.')
+    contact=html.escape(meta['author'])
+    platform=('Server Linux amd64/arm64 (Docker, Podman, Kubernetes). Client via browser su Windows, macOS, Linux, iOS e Android.' if lang=='it' else 'Linux amd64/arm64 server (Docker, Podman, Kubernetes). Web clients on Windows, macOS, Linux, iOS and Android.')
+    minimum=('Minimo indicativo per valutazione: 2 vCPU, 4 GiB RAM, 20 GiB disco oltre ai dati persistenti; dimensionare la produzione con misure.' if lang=='it' else 'Indicative evaluation minimum: 2 vCPU, 4 GiB RAM, 20 GiB disk plus persistent data; benchmark production sizing.')
+    brand_logo=(ASSETS/'quorivio-logo.svg').as_uri()
+    details=(f'<strong>{html.escape(meta["name"])} · {html.escape(meta["version"])} · Build {html.escape(meta["build"])}</strong>'
+      f'<div>{contact} · <a href="mailto:{html.escape(meta["email"])}">{html.escape(meta["email"])}</a></div>'
+      f'<div>{html.escape(meta["published"])} · {html.escape(meta["license"])} · <a href="{html.escape(meta["repository"])}">{html.escape(meta["repository"])}</a></div>'
+      f'<div>{html.escape(platform)}</div><div>{html.escape(minimum)}</div>')
+    document=f'''<!DOCTYPE html><html lang="{lang}"><head><meta charset="utf-8"><title>{html.escape(title)} | Quorivio</title><style>{CSS}</style></head><body>
+    <section class="cover"><div class="cover-head"><div class="brand"><img class="cover-brand-logo" src="{brand_logo}" alt="Logo ufficiale Quorivio"/> Quorivio</div><div class="cover-kicker">{html.escape(subtitle)} · {html.escape(role_label)}</div><div class="cover-title">{html.escape(title)}</div><div class="cover-version">{html.escape(meta['version'])} • {html.escape(meta['build'])} • {info}</div></div>
+    <img class="cover-picture" src="{cover_image}" alt="Quorivio event illustration"/>
+    <div class="cover-details">{details}</div><div class="cover-disclaimer">{caption}<br>{note}</div></section>
+    <section class="toc"><h1>{toc_title}</h1><p>{len(anchors)} {"capitoli" if lang=='it' else 'chapters'} · {"Edizione" if lang=='it' else 'Edition'} RC278</p><ul>{toc}</ul></section>
+    <main class="content">{markup}</main></body></html>'''
+    OUTPUT.mkdir(parents=True,exist_ok=True)
+    dest=OUTPUT/f'{role}-guide.{lang}.pdf'
+    HTML(string=document,base_url=str(SOURCE)).write_pdf(dest)
+    WEB.mkdir(parents=True,exist_ok=True)
+    shutil.copy2(dest,WEB/dest.name)
+    if hashlib.sha256(dest.read_bytes()).digest()!=hashlib.sha256((WEB/dest.name).read_bytes()).digest():
+        raise ValueError('Published PDF mismatch')
+    return dest,len(anchors)
 
-# Social provider linkage supplement: no live federation certification implied.
-CONTENT['it']['presenter'][1].append(('Identità sociali GitHub e Facebook',[('Collegare il provider','Accedi prima con l’account locale approvato, apri Identità federate / SSO e seleziona Collega GITHUB o Collega FACEBOOK. Completa il consenso sul provider. Il collegamento avviene con identificativo provider immutabile, non per email.'),('Accedere con OAuth','Dopo il collegamento, nella schermata di accesso scegli il provider configurato. Se TOTP è attivo, per ora resta necessario il login locale con MFA: il provider non deve aggirare il secondo fattore.'),('Limiti','Sono richiesti client OAuth con callback HTTPS. I provider reali, multi-replica e test integrati non sono ancora collaudati. Vedi docs/SOCIAL_OAUTH.it.md.')]))
-CONTENT['en']['presenter'][1].append(('GitHub and Facebook linked identities',[('Linking a provider','First sign in with an approved local account. Under Federated identities / SSO select Link GITHUB or Link FACEBOOK and complete provider authorization. Identity matching uses the immutable provider subject, never an email address.'),('OAuth sign-in','After linking, select the configured provider on the login screen. Accounts using TOTP must continue signing in locally with MFA; federation must not bypass the second factor.'),('Limitations','OAuth clients require registered HTTPS callbacks. Live providers, multi-replica and end-to-end flows are unverified. See docs/SOCIAL_OAUTH.en.md.')]))
-CONTENT['it']['admin'][1].append(('Configurazione OAuth GitHub e Facebook',[('Credenziali','Imposta OAUTH_GITHUB_CLIENT_ID, OAUTH_GITHUB_CLIENT_SECRET, OAUTH_GITHUB_REDIRECT_URI, e i corrispondenti OAUTH_FACEBOOK_*. Registrare callback HTTPS /api/auth/social/<provider>/callback.'),('Vincoli','Non è consentito il collegamento silenzioso tramite email; serve un account locale approvato già autenticato. Lo stato OAuth è in PostgreSQL e consumato una sola volta tra repliche: verificare redirect/callback, MFA e database condiviso prima della produzione.')]))
-CONTENT['en']['admin'][1].append(('GitHub and Facebook OAuth deployment',[('Client credentials','Set OAUTH_GITHUB_CLIENT_ID, OAUTH_GITHUB_CLIENT_SECRET, OAUTH_GITHUB_REDIRECT_URI and their OAUTH_FACEBOOK_* counterparts. Register HTTPS callbacks /api/auth/social/<provider>/callback.'),('Security boundaries','Never link accounts silently by email; local approved-user authentication is required first. OAuth state is stored in PostgreSQL and consumed once across replicas; verify provider redirects and callback host, MFA policy, and shared database operation before production.')]))
 
-# Operations introduced in the collaboration UI cycle; use verified browser labels.
-CONTENT['it']['presenter'][1].append(('Portabilità e collaborazione dalla web interface',[
- ('Duplicazione di una sessione','1. Accedi come presentatore approvato. 2. Seleziona la sessione. 3. Apri Portabilità e collaborazione. 4. Premi Duplica sessione. 5. Seleziona il nuovo elemento e verifica il nuovo codice QR. Le risposte della sessione originale non vengono copiate.'),
- ('Esportare e importare JSON','Per esportare seleziona Esporta definizione JSON. Il file non contiene risposte o allegati. Per importare scegli un file .json nella stessa sezione; la nuova sessione appare nell’elenco. Non importare file da fonti non affidabili.'),
- ('Co-presentatori','Il proprietario immette l’email di un presentatore approvato della stessa organizzazione, preme Aggiungi presentatore e aggiorna l’elenco tramite Mostra collaboratori. La rimozione richiede conferma. Le autorizzazioni sono applicate sul server.'),
- ('Modifica live e invalidazione','Nell’elenco attività scegli Modifica live. Le opzioni hanno formato ID|testo: conserva l’ID delle risposte già raccolte e non cambiarne semanticamente il significato. Premi Salva modifiche. Usa Invalida risposte solo se necessario, dopo conferma; i risultati invalidati restano tracciati e sono esclusi dagli aggregati validi.'),
- ('Limiti operativi','Non è ancora presente un archivio completo sessione con risultati e allegati, né un editor rich-media WYSIWYG. Verificare la CI, la migrazione PostgreSQL e i test multiutente prima di utilizzare queste operazioni in produzione.')]))
-CONTENT['en']['presenter'][1].append(('Portability and collaboration in the web interface',[
- ('Duplicate a session','1. Sign in as an approved presenter. 2. Select a session. 3. Open Portability and collaboration. 4. Choose Duplicate session. 5. Select the new entry and verify its fresh QR code. Prior responses are not copied.'),
- ('Export and import JSON','Choose Export definition JSON for a definition-only export; responses and uploaded files are excluded. To import, choose a .json file in the same panel. The imported session appears in the list. Never import untrusted files.'),
- ('Co-presenters','The session owner supplies the email address of an approved presenter within the same organization, selects Add presenter and refreshes the list with Show collaborators. Removing a presenter requires confirmation. Permissions are enforced by the server.'),
- ('Live edits and invalidation','Choose Live edit alongside an activity. Each option uses ID|text: retain existing IDs to preserve historical responses, and do not silently change an option’s meaning. Select Save changes. Use Invalidate responses only when necessary after explicit confirmation; invalidated results remain auditable and do not count as valid votes.'),
- ('Operational boundaries','Complete session archives including answers and assets and a rich-media WYSIWYG editor are not implemented. Verify CI, PostgreSQL migrations and multiuser flows before production use.')]))
-CONTENT['it']['admin'][1].append(('Nuovi comandi e verifiche di sessione',[
- ('Import/export e sicurezza','I presentatori approvati possono duplicare sessioni e trasferirne le sole definizioni JSON. L’amministratore deve distinguere queste esportazioni dal backup completo dell’istanza, che è ancora da sviluppare.'),
- ('Collaborazione e audit','Verificare che ogni co-presentatore appartenga alla stessa organizzazione e abbia ruolo e approvazione validi. Registrare e riesaminare le invalidazioni di risposte. Non equiparare una semplice modifica live alla cancellazione dei dati storici.'),
- ('Controlli di messa in esercizio','La CI verde del package precedente non copre le nuove schermate. Richiedere test integrazione API/PostgreSQL, verifica browser, isolamento di organizzazioni e scansione delle dipendenze prima della promozione a produzione.')]))
-CONTENT['en']['admin'][1].append(('New session operations and verification',[
- ('Import/export safety','Approved presenters can duplicate sessions and transfer definition-only JSON. Administrators must distinguish these exports from the still-unimplemented full-instance backup and restore capability.'),
- ('Collaboration and audit','Verify that each co-presenter belongs to the same organization and has an approved presenter role. Review response invalidation events. Do not confuse live editing with deletion of historic records.'),
- ('Release checks','The prior green CI does not validate the newly added screens. Require API/PostgreSQL integration tests, browser verification, cross-tenant isolation tests and dependency scans before production deployment.')]))
-class NumberedCanvas(__import__('reportlab').pdfgen.canvas.Canvas):
- def __init__(self,*args,**kwargs):super().__init__(*args,**kwargs);self._saved=[]
- def showPage(self):self._saved.append(dict(self.__dict__));self._startPage()
- def save(self):
-  total=len(self._saved)
-  for state in self._saved:
-   self.__dict__.update(state);self.setFont('Helvetica',8);self.setFillColor(MUT);self.drawRightString(A4[0]-46,30,f'{self._pageNumber} / {total}');super().showPage()
-  super().save()
-class ManualDoc(BaseDocTemplate):
- def __init__(self,file,lang,**kw):super().__init__(file,pagesize=A4,leftMargin=54,rightMargin=54,topMargin=58,bottomMargin=58,**kw);self.lang=lang;self.addPageTemplates(PageTemplate(id='normal',frames=Frame(self.leftMargin,self.bottomMargin,self.width,self.height,leftPadding=0,rightPadding=0,topPadding=0,bottomPadding=0),onPage=self.decorate))
- def decorate(self,c,doc):
-  c.setStrokeColor(HexColor('#E1E3F0'));c.line(54,46,A4[0]-54,46);c.setFont('Helvetica',8);c.setFillColor(MUT);c.drawString(54,31,'Quorivio 0.1.0-dev | Build dev-20261024')
- def afterFlowable(self,flow):
-  if isinstance(flow,Paragraph) and hasattr(flow,'_toc_title'):
-   self.notify('TOCEntry',(0,flow._toc_title,self.page));self.canv.bookmarkPage('h'+str(self.page))
-def P(txt,style='QBody'):return Paragraph(escape(txt),styles[style])
-def create(lang,role):
- title,chapters=CONTENT[lang][role];doc=ManualDoc(str(OUT/f'{"user" if role=="user" else role}-guide.{lang}.pdf'),lang,title=title,author='Alessandro De Salvo',subject='Quorivio operational manual')
- story=[]
- story.append(Spacer(1,24));story.append(P('QUORIVIO','QTitle'));story.append(P(title,'QCover'));story.append(P(CONTENT[lang]['common']['version'],'QSmall'))
- if PHOTO.exists():
-  from PIL import Image as PILImage
-  with PILImage.open(PHOTO) as im:w,h=im.size
-  width=doc.width;story.append(Image(str(PHOTO),width=width,height=width*h/w))
- story.extend([Spacer(1,18),P('Alessandro De Salvo · github.com/desalvo/quorivio','QSmall'),P('Documented features match the development build; unverified and planned operations are explicitly marked.' if lang=='en' else 'Le procedure riguardano le funzioni del codice di sviluppo; operazioni non verificate o pianificate sono indicate esplicitamente.','QSmall'),PageBreak()])
- story.append(P(CONTENT[lang]['common']['contents'],'QTitle'));toc=TableOfContents();toc.levelStyles=[styles['QTOC']];story.append(toc);story.append(PageBreak())
- diagram={'user':'join','presenter':'presenter','admin':'admin'}[role]
- for ci,(chapter,items) in enumerate(chapters):
-  h=P(chapter,'QH1');h._toc_title=chapter;story.append(h)
-  if ci==0:story.append(Diagram(diagram));story.append(Spacer(1,12))
-  for subtitle,body in items:
-   story.append(P(subtitle,'QH2'));story.append(P(body))
-  if ci==1:story.append(Diagram('flow'));story.append(Spacer(1,12))
-  if ci==2 and role!='admin':story.append(Diagram('results'));story.append(P('Example chart — illustrative values, not live data.' if lang=='en' else 'Grafico di esempio — valori illustrativi, non dati reali.','QSmall'))
-  if ci<len(chapters)-1:story.append(PageBreak())
- # Dedicated operational chapter on page widgets; avoids undocumented API-only functionality.
- story.append(PageBreak())
- if lang=='it':
-  title_widget='Widget, gradimento e composizione delle pagine'
-  details=[('Identificazione del manuale','Versione applicativa: 0.1.0-dev. Build documentale: dev-20261024. Il tag Git non viene riportato nei manuali; una nuova revisione o un tag non richiedono rigenerazione se interfacce e build documentale non cambiano.'),('Widget disponibili','La palette comprende gradimento da 0 a 10, reazioni con emoticon, blocco testo, divisore, timer indicativo e richiamo QR. I widget non sostituiscono la raccolta delle risposte di quiz e sondaggi.'),('Istruzioni presentatore','Apri una sessione, scegli Layout pagina per una domanda, seleziona + rating (oppure un altro widget), personalizza l’etichetta, riordina gli elementi trascinandoli o tramite le frecce e premi Salva layout. La configurazione viene salvata per attività. Il salvataggio non elimina risposte pregresse.'),('Istruzioni partecipante','Entra usando il QR e lo pseudonimo. Quando una pagina include la scala di gradimento, seleziona un numero tra 0 e 10. Si registra una sola valutazione per partecipante e attività; non è una risposta al quiz. Le emoticon continuano a essere gestite separatamente.'),('Statistiche','Il presentatore seleziona Gradimento 0–10 nella vista sessione e consulta media e numero di valutazioni complessive e per pagina. Gli estremi e la distribuzione sono disponibili tramite API autorizzata; non esporre i dati identificativi sullo schermo pubblico.'),('Limitazioni','L’editor a coordinate permette spostamento, ridimensionamento, rotazione e controlli da tastiera; la precisione e i gesti touch devono ancora essere collaudati su dispositivi reali. Gli elementi timer e QR hanno comportamenti dipendenti dalla pagina e non sono equivalenti a un PowerPoint interattivo.')]
- else:
-  title_widget='Widgets, satisfaction scores and page composition'
-  details=[('Manual identity','Application version: 0.1.0-dev. Documentation build: dev-20261024. Git release tags and revision numbers are excluded; they do not require rebuilding manuals if the documented application build is unchanged.'),('Widget palette','The palette includes a 0–10 satisfaction rating, emoji reactions, text, divider, indicative timer and QR placeholder. Widgets complement rather than replace poll or quiz answers.'),('Presenter workflow','Open the session, choose Page layout for an activity, select + rating or another widget, edit its label, reorder by drag and drop or keyboard-friendly arrow buttons, then save the layout. Existing answers remain untouched.'),('Participant workflow','Join with the session QR and pseudonym. Where enabled, choose a number from 0 to 10. One satisfaction response per participant per activity is stored separately from quiz answers and emoji reactions.'),('Statistics','Use Satisfaction 0–10 in the session view to see an overall count and average and a per-page breakdown. Minimum, maximum and distribution are available through the protected API. Do not disclose participant identities on public screens.'),('Known limitations','The freeform canvas supports move, resize, rotation and keyboard operations; device-specific touch and visual acceptance remain pending. Timer/QR behavior depends on page context and is not equivalent to an interactive PowerPoint. Real browser/PostgreSQL acceptance remains pending.')]
- h=P(title_widget,'QH1');h._toc_title=title_widget;story.append(h)
- for subtitle,body in details:story.append(P(subtitle,'QH2'));story.append(P(body))
- # Presenter profiles and independent rating widgets, documented on a dedicated page.
- story.append(PageBreak())
- if lang=='it':
-  addon=[('Apertura dei progetti','Il workspace distingue Autore / proprietario da Invitato alla collaborazione direttamente nell’elenco delle sessioni.'),('Profilo del presentatore','Carica il profilo nell’area Profilo presentatore, imposta il nome pubblico e un URL HTTPS della foto, quindi salva. Il caricamento diretto di PNG, JPEG e WebP fino a 5 MiB è disponibile: il file sostituito viene eliminato; verificare sempre l’autorizzazione al ritratto e la persistenza del volume condiviso.'),('Widget profilo','Apri Layout pagina, aggiungi + profile, seleziona il presentatore della sessione e salva. Ripeti per più profili e usa Rimuovi per eliminare singoli widget.'),('Gradimenti indipendenti','Aggiungi più widget rating con identificativi diversi. Scegli Domanda, Quiz, Sessione o Presentatore; nel caso del presentatore seleziona la persona. Un partecipante può votare ciascun widget una sola volta.'),('Statistiche e limiti','Il report del presentatore include media e numero di valutazioni per widget. Il collegamento quiz fa attualmente riferimento all’attività; la gestione di quiz composti resta da completare. È necessaria la prova della migrazione PostgreSQL.')]
- else:
-  addon=[('Project opening','The workspace clearly distinguishes Author / owner and Invited collaborator for each listed session.'),('Presenter profile','Load the profile in the Presenter profile area, set the public display name and an HTTPS photo URL, then save. Direct PNG, JPEG and WebP upload up to 5 MiB is supported: the previous file is removed. Verify image rights, consent and shared volume persistence.'),('Profile widget','Open Page layout, add + profile, choose a session presenter, and save. Repeat for multiple profiles; Remove deletes individual widgets.'),('Independent ratings','Insert multiple rating widgets, selecting Question, Quiz, Session or Presenter as their target. Select the presenter where applicable. A participant can score each widget once.'),('Statistics and limitations','Presenter statistics include a count and average for each widget. The quiz target currently maps to an activity rather than a multi-question quiz. The PostgreSQL schema migration requires live validation.')]
- h=P('Profili, collaborazione e gradimenti multipli' if lang=='it' else 'Profiles, collaboration and multiple ratings','QH1');h._toc_title=h.text;story.append(h)
- for subtitle,body in addon:story.append(P(subtitle,'QH2'));story.append(P(body))
- # Rich widgets: documented behavior and supported limits.
- story.append(PageBreak())
- rich_title='Editor grafico, formattazione e commenti' if lang=='it' else 'Visual editing, formatting and comments'
- h=P(rich_title,'QH1');h._toc_title=rich_title;story.append(h)
- rich_items=([('Opzioni del widget','Nel pannello Layout pagina aggiungi più widget, imposta un titolo per ogni gradimento, aggiungi una descrizione facoltativa e apri Stile e animazioni per scegliere font, dimensione 10–96, colore, grassetto, corsivo, sottolineato, barrato e animazione fade/slide.'),('Modifica del testo','Fai doppio clic nel campo titolo per selezionarlo e modificarlo; salva il layout per rendere persistente la modifica. Trascina gli oggetti per riordinarli o usa ↑ e ↓.'),('Gradimento con commento','Ogni widget rating richiede un titolo. Il partecipante può aggiungere un commento facoltativo fino a 1000 caratteri e selezionare il punteggio 0–10. Il commento resta privato e non viene mostrato negli aggregati pubblici.'),('Domanda come widget','È possibile aggiungere un widget domanda con modalità singola, multipla, libera o file. Nella build corrente il widget aggiuntivo è un blocco visuale: non dispone ancora di invio indipendente rispetto alla domanda principale.'),('Limiti','La sequenza delle attività non ha ancora un canvas grafico completo. Il posizionamento libero nel canvas è disponibile in modalità sperimentale; non è completato l’editor di media per singolo widget. Verificare PostgreSQL/browser prima della produzione.')] if lang=='it' else [('Widget options','In Page layout add multiple widgets. Rating widgets require a title and support an optional description. Expand Style and animations to choose font, size (10–96), color, bold, italic, underline, strikethrough, and fade/slide.'),('Text editing','Double-click the title input to select and edit the text, then save the page. Drag to reorder or use the accessible up/down controls.'),('Rating comment','Each rating widget requires a title. Participants may write an optional comment up to 1,000 characters alongside a 0–10 rating. Comments remain private and are not included in public aggregates.'),('Question widgets','Add a question widget in single, multiple, free-text or file mode. In this build it is an additional visual block, not yet an independent response channel.'),('Limits','A freeform widget canvas is available experimentally; production browser validation is pending, as is fully integrated per-widget media editing. Browser/PostgreSQL verification remains required.')])
- for subtitle,body in rich_items:story.append(P(subtitle,'QH2'));story.append(P(body))
- if role=='presenter':
-  story.append(PageBreak())
-  sequence_title='Sequenza delle pagine e duplicazione' if lang=='it' else 'Page sequence and duplication'
-  h=P(sequence_title,'QH1');h._toc_title=sequence_title;story.append(h)
-  for title,body in ([('Spostare una pagina','Apri la sessione nel workspace e, nell’elenco delle attività, usa ↑ e ↓ per modificare l’ordine. La modifica viene salvata immediatamente; i voti storici e la domanda attualmente aperta rimangono associati alla medesima attività.'),('Duplicare una pagina','Seleziona Duplica pagina. Una nuova attività con testo, impostazioni e widget uguali viene aggiunta in fondo all’elenco, senza trasferire voti o informazioni dei partecipanti.'),('Restrizioni e collaudi','Una sessione chiusa non può essere riordinata né duplicata. Le operazioni richiedono autorizzazione di presentatore. Il canvas libero è ancora in sviluppo; servono test con PostgreSQL reale e più browser.')] if lang=='it' else [('Reorder a page','Open the session workspace and use the up/down buttons in the activity list. The order is saved immediately; historic votes and the currently open activity keep their identifiers.'),('Duplicate a page','Choose Duplicate page. A new activity with the same definitions, options and widgets is appended without copying votes or participant information.'),('Restrictions and verification','Closed sessions cannot be reordered or duplicated. Presenter authorization is required. The freeform canvas is still under development; real PostgreSQL and multi-browser tests are pending.')]):
-   story.append(P(title,'QH2'));story.append(P(body))
- if role in ('presenter','admin'):
-  story.append(PageBreak())
-  import_title='Importazione PDF/PPTX dal workspace' if lang=='it' else 'PDF/PPTX import from the workspace'
-  h=P(import_title,'QH1');h._toc_title=import_title;story.append(h)
-  if lang=='it':
-   entries=[('Prerequisiti','La conversione PDF/PPTX utilizza un worker isolato: l’amministratore di piattaforma controlla e abilita il servizio in Configurazione server → Convertitore PDF / PowerPoint. Occorrono il container converter, un token privato valido, il volume condiviso e la relativa configurazione del deployment.'),('Procedura presentatore','1. Apri una sessione di cui sei autore o collaboratore. 2. Nella sezione Allegati scegli Importa direttamente PDF/PPTX. 3. Seleziona un file fino a 100 MiB. 4. Attendi il risultato dell’operazione. 5. Controlla le pagine slide nella sequenza e apri la prima per il pubblico.'),('Controlli e limiti','Fino a 200 pagine. La conversione crea slide-immagine; transizioni, video e animazioni non sono mantenuti. Il convertitore funziona solo con QUORIVIO_ENABLE_CONVERTER=true, worker isolato configurato, token forte e health check disponibile. Le impostazioni sono amministrabili dalla dashboard.'),('Gestione degli errori','HTTP 503: convertitore non configurato. HTTP 415: formato non supportato. HTTP 413: documento troppo grande. HTTP 500: consultare log riservati e dipendenze del convertitore; la transazione delle slide viene annullata.')]
-  else:
-   entries=[('Prerequisites','PDF/PPTX conversion runs in a dedicated isolated worker. Platform administrators can check and enable it in Server configuration → PDF/PowerPoint converter. The deployment must provide the converter container, shared volume, a strong private token, and a functioning health endpoint.'),('Presenter procedure','1. Open a session you own or co-present. 2. In Attachments select Import PDF/PPTX directly. 3. Select a file up to 100 MiB. 4. Wait for the result. 5. Verify inserted slide pages and open the first one for participants.'),('Limits','Maximum 200 pages. Slides are flattened to images; animation, video and transitions are not preserved. A disabled deployment flag or missing worker configuration returns 503. The administrator switch never starts missing containers or bypasses deployment security.'),('Troubleshooting','HTTP 503: worker not configured. 415: unsupported file. 413: oversized file. 500: inspect restricted server logs and conversion dependencies. Slide insertion rolls back on failure.')]
-  for a,b in entries:story.append(P(a,'QH2'));story.append(P(b))
- if role in ('presenter','admin'):
-  h=P('Sequenza pagine con trascinamento' if lang=='it' else 'Drag-and-drop page sequence','QH1');h._toc_title='Sequenza pagine con trascinamento' if lang=='it' else 'Drag-and-drop page sequence';story.append(h)
-  if lang=='it':
-   story.append(P('Nel workspace apri la sessione: trascina una riga della sequenza su un’altra pagina per cambiarne la posizione. In alternativa usa i pulsanti Su/Giù, accessibili da tastiera. Premi Duplica pagina per aggiungere un nuovo oggetto senza risposte precedenti. Il salvataggio mantiene gli identificativi delle pagine, le risposte e la pagina correntemente aperta. In una sessione chiusa il riordino è disabilitato.'))
-   story.append(P('Il riordino richiede un browser con HTML5 drag-and-drop e la connessione al server. In caso di errore la sequenza viene ricaricata dal backend.','QSmall'))
-  else:
-   story.append(P('In the presenter workspace, drag a page row onto another page to change sequence order. Keyboard users can use Up/Down controls instead. Duplicate page creates a new page without historical responses. The operation preserves page IDs, existing answers and the currently open page. Closed sessions cannot be reordered.'))
-   story.append(P('Drag-and-drop requires HTML5 support and a connection to the backend; reload the session if an error occurs.','QSmall'))
- if role in ('presenter','admin'):
-  story.append(PageBreak())
-  title='Canvas di posizionamento widget' if lang=='it' else 'Widget positioning canvas'
-  h=P(title,'QH1');h._toc_title=title;story.append(h)
-  if lang=='it':
-   steps=[('Utilizzo','Apri Layout pagina. Nel canvas grafico trascina i widget dal loro interno, ridimensionali dai bordi, ruotali con la maniglia circolare e modifica il titolo con doppio clic. Il canvas bianco 16:9 dispone di righelli e di modalita a schermo intero.'),('Rimozione e persistenza','Il pulsante Rimuovi elimina solo il widget selezionato. Premi Salva layout per registrare le coordinate percentuali nel database; alla riapertura la pagina mantiene la disposizione salvata.'),('Tastiera e accessibilità','L’elenco ordinabile con frecce e i menu di proprietà restano disponibili senza drag-and-drop. La manipolazione spaziale avanzata con tastiera e l’accessibilità completa del canvas richiedono ulteriori collaudi.'),('Avvertenze','Il comportamento su browser mobili, la migrazione PostgreSQL e le modifiche ai layout sono in attesa di collaudo. Domande per argomento: ogni widget consente al presentatore di consultare 10 domande alla volta.')]
-  else:
-   steps=[('Using the canvas','Open Page layout. Drag widgets by their bodies, resize from the edges, rotate using the circular handle and double-click to edit titles. The white 16:9 slide has rulers and fullscreen editing.'),('Removal and persistence','Remove deletes only the selected widget. Choose Save layout to store percent-based positions; saved arrangements reappear when the page is opened.'),('Keyboard access','The widget list, Up/Down buttons and configuration menus remain available independently from dragging. Advanced spatial keyboard controls require accessibility testing.'),('Limitations','Real mobile browsers, PostgreSQL migration and layout interactions remain unverified. Topic-question widgets provide independently paginated streams of ten questions per presenter page.')]
-  for heading,body in steps:story.append(P(heading,'QH2'));story.append(P(body))
- if role in ('presenter','admin'):
-  story.append(PageBreak())
-  federated_title='Accesso federato OIDC (sperimentale)' if lang=='it' else 'Federated OIDC sign-in (experimental)'
-  h=P(federated_title,'QH1');h._toc_title=federated_title;story.append(h)
-  if lang=='it':
-   entries=[('Disponibilità','L’accesso Google, generic OIDC o tramite provider OIDC custom compare soltanto se il gestore configura tutti i parametri HTTPS. GitHub e Facebook sono disponibili come flussi OAuth2 sperimentali; SAML non è ancora integrato.'),('Collegamento identità','Accedi con l’account locale approvato, quindi usa Collega nella pagina del profilo. Autenticati presso il provider e verifica che la pagina confermi il collegamento. Non è sufficiente che gli indirizzi email coincidano.'),('Login federato','Dopo il collegamento, dalla pagina di login seleziona il provider configurato. Chi ha MFA TOTP attivo deve continuare ad accedere con password e codice MFA locali.'),('Limitazioni di produzione','Occorrono prove con l’identity provider reale, la migrazione PostgreSQL, state condiviso multi-replica e security review. Leggi docs/OIDC_SSO.it.md e non considerare questo flusso certificato o production-ready.')]
-  else:
-   entries=[('Availability','Google, generic OIDC or custom OIDC sign-in is only displayed when the administrator configures all HTTPS provider parameters. GitHub and Facebook offer experimental OAuth2 flows; SAML is not yet integrated.'),('Link identity','Sign in with your approved local account and choose Link in your profile. Authenticate at the IdP and confirm success. Matching email alone never links an identity.'),('Federated login','After linking, choose the configured IdP from the sign-in page. Users with local TOTP MFA enabled must continue using their local password and MFA code.'),('Production limitations','Real IdP tests, PostgreSQL migration checks, multi-replica shared state and security review remain open. See docs/OIDC_SSO.en.md; this flow is not production certified.')]
-  for heading,body in entries:story.append(P(heading,'QH2'));story.append(P(body))
- if role=='admin':
-  story.append(PageBreak())
-  title='Notifiche multi-replica e storage condiviso' if lang=='it' else 'Cross-replica notifications and shared storage'
-  h=P(title,'QH1');h._toc_title=title;story.append(h)
-  if lang=='it':
-   points=[('Sincronizzazione','Il backend usa PostgreSQL LISTEN/NOTIFY per propagare aggiornamenti WebSocket tra istanze; i payload contengono solo identificativi, non dati personali.'),('Archiviazione','Più repliche richiedono un PVC ReadWriteMany realmente supportato dal cluster. Helm può usare un claim esistente.'),('Limitazioni','La limitazione HTTP usa finestre PostgreSQL condivise, ma stato OAuth/OIDC e sessioni di provider richiedono prove multi-replica; evitare di distribuire senza convalida. Non sono stati eseguiti collaudi cluster o browser.')]
-  else:
-   points=[('Synchronization','PostgreSQL LISTEN/NOTIFY propagates WebSocket updates across instances. Payloads carry IDs only, not personal data.'),('Storage','Multiple replicas require an actual ReadWriteMany PVC supported by the cluster. Helm can mount an existing claim.'),('Limitations','HTTP rate limits use shared PostgreSQL windows, but OAuth/OIDC state and provider flows still need multi-replica validation; do not deploy untested replicas. Real cluster/browser validation is pending.')]
-  for heading,body in points:story.append(P(heading,'QH2'));story.append(P(body))
- story.append(PageBreak());h=P(CONTENT[lang]['common']['append'],'QH1');h._toc_title=CONTENT[lang]['common']['append'];story.append(h)
- story.append(P('Status: development. Before operational deployment, review docs/DEVELOPMENT_STATUS.md, docs/GDPR.en.md and docs/SECURITY.md.' if lang=='en' else 'Stato: sviluppo. Prima della produzione consultare docs/DEVELOPMENT_STATUS.md, docs/GDPR.it.md e docs/SECURITY.it.md.'))
- story.append(P('Visual diagrams are illustrative reproductions of workflows, not browser screenshots.' if lang=='en' else 'I diagrammi sono ricostruzioni illustrative dei flussi, non screenshot acquisiti da browser.','QSmall'))
- doc.multiBuild(story,canvasmaker=NumberedCanvas)
-if __name__=='__main__':
- for language in ('it','en'):
-  for role in ('user','presenter','admin'):create(language,role)
- print('Created 6 bilingual role-specific manuals')
+def main():
+    import argparse
+    global OUTPUT, WEB
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--require-real',action='store_true',help='Require verified real screenshots for every manual')
+    parser.add_argument('--output-dir',type=Path,help='Write PDF artifacts here rather than mutating the checked-in release')
+    args=parser.parse_args()
+    if args.output_dir:
+        OUTPUT=args.output_dir.resolve()
+        WEB=OUTPUT/'public-copies'
+    import fitz
+    total=0
+    for lang in ('it','en'):
+        for role in ('user','presenter','admin'):
+            dest,chapters=render_one(role,lang,require_real=args.require_real)
+            pdf=fitz.open(dest)
+            pages=pdf.page_count
+            if pages<14 or not any('Quorivio' in p.get_text() for p in pdf):
+                raise ValueError('Broken or unexpectedly short PDF: '+str(dest))
+            if not any('RC278' in p.get_text() for p in pdf):
+                raise ValueError('Missing RC278 build identification: '+str(dest))
+            print(dest.name,'chapters',chapters,'pages',pages,'bytes',dest.stat().st_size)
+            total+=pages
+            pdf.close()
+    print('Generated six fully bilingual manuals,',total,'PDF pages total')
+
+if __name__=='__main__':main()

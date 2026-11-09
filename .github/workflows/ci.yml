@@ -227,6 +227,19 @@ jobs:
       - name: RC275 linked-result source and truth toggle regression before npm
         run: |
           python3 -m unittest tools.tests.test_rc275_source_renderer_contract tools.tests.test_rc192_source_and_delete tools.tests.test_rc196_frontend_results_types -q
+      # RC276: the live cross-page presenter uses the R toggle owned by the
+      # common LinkedResultChart. Detect stale live-only contracts early.
+      - name: RC277 bilingual manual publication and workflow documentation
+        run: python3 -m unittest tools.tests.test_rc277_manuals -q
+      - name: RC278 manual identity, real screenshot provenance and CI capture contracts
+        run: python3 -m unittest tools.tests.test_rc278_manual_screenshots -q
+      - name: RC276 presenter cross-page R toggle consistency before npm
+        run: |
+          python3 -m unittest tools.tests.test_rc191_crosspage_live_rehearsal tools.tests.test_rc275_source_renderer_contract -q
+          node --experimental-strip-types --test \
+            apps/web/test/rc191-cross-page-preview.test.ts \
+            apps/web/test/rc276-live-truth-toggle.test.ts \
+            apps/web/test/rc274-answer-truth.test.ts
       # RC220: catch missing private converter prerequisites and linked-results
       # schema/visual contract drift before npm and browser integration.
       - name: RC220 PDF worker administration and linked result rendering before npm
@@ -1174,6 +1187,31 @@ jobs:
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
         run: python3 tools/ci_browser_media_picker_postgres.py
+      # Fresh, genuine production-web captures are made against the disposable
+      # PostgreSQL instance and synthetic users, not an isolated DOM mock.
+      # Never upload private logins, bearer URLs or screenshot data from production.
+      - name: Capture real app screenshots for the manuals
+        timeout-minutes: 4
+        env:
+          QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
+          QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
+        run: python3 tools/ci_manual_real_screenshots.py
+      - name: Generate IT/EN PDF manuals with verified real screenshots
+        timeout-minutes: 4
+        run: |
+          python3 -m pip install --disable-pip-version-check --break-system-packages 'mistune>=3,<4' 'weasyprint>=62,<70' 'pymupdf>=1.24,<2' 'Pillow>=10,<13'
+          python3 tools/generate_manuals.py --require-real --output-dir /tmp/quorivio-manual-build
+          python3 -m unittest tools.tests.test_rc278_manual_screenshots -q
+      - name: Publish build-matched real screenshots and six manuals
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quorivio-live-manuals-${{ github.sha }}
+          path: |
+            docs/assets/manual-screenshots/
+            /tmp/quorivio-manual-build/*.pdf
+          if-no-files-found: ignore
+          retention-days: 14
       - name: PostgreSQL RC71 session reset and one-shot timer lifecycle acceptance
         env:
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
@@ -1722,7 +1760,10 @@ jobs:
           python3 tools/verify_rc_cycle272_inventory.py --historical
           python3 tools/verify_rc_cycle273_inventory.py --historical
           python3 tools/verify_rc_cycle274_inventory.py --historical
-          python3 tools/verify_rc_cycle275_inventory.py
+          python3 tools/verify_rc_cycle275_inventory.py --historical
+          python3 tools/verify_rc_cycle276_inventory.py --historical
+          python3 tools/verify_rc_cycle277_inventory.py --historical
+          python3 tools/verify_rc_cycle278_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

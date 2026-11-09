@@ -1,3 +1,15 @@
+# Quorivio 0.1.0-dev — RC278 — Manuali con schermate live da CI e metadati verificati
+
+**RC278:** sei manuali IT/EN con identità di release, logo, autore e mail da LICENSE, EUPL-1.2, requisiti indicativi di piattaforme/hardware; procedure aggiuntive di scaling e Disaster Recovery; screenshot veri integrabili nei PDF solo se acquisiti su PostgreSQL/Chromium di CI e verificati tramite commit/SHA-256. La generazione in CI produce artifact separato senza alterare i PDF versionati. Nessuna schermata live ancora acquisita localmente (npm registry non raggiungibile); full CI screenshot gate da eseguire. **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. `docs/RC_CYCLE278_LIVE_MANUALS.it.md`.
+
+# Quorivio 0.1.0-dev — RC277 — Manuali operativi IT/EN
+
+**RC277:** Sei guide completamente riscritte, 164 pagine PDF complessive, Markdown di origine, 21 widget documentati, procedure admin Helm/Kubernetes/backup/LDAP/audit, figure dimostrative, test di parità delle copie web. Le schermate sono ricostruzioni e la validazione indipendente rimane necessaria. **85,25%** (43 gate accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; Nessun commit/push/tag. `docs/RC_CYCLE277_EXPANDED_MANUALS.it.md`.
+
+# Quorivio 0.1.0-dev — RC276 — Contratto risultati live RC191
+
+**RC276:** la full CI RC275 [42565597725](https://github.com/desalvo/quorivio/actions/runs/42565597725) falliva nel gate RC191: un'asserzione cercava `showCorrectLive` e una proprietà di `LinkedResultChart` non presenti perché la gestione del toggle R è già centralizzata nel renderer. Aggiornato il test RC191 senza eliminare la verifica della sorgente cross-page; cinque nuovi test Node e gate pre-npm. Nessuna modifica runtime. RC275 storico, RC276 inventario corrente. **85,25%** (43/60 gate accettati/parziali come RC275); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; full CI e browser da ricontrollare. Nessun commit/push/tag. `docs/RC_CYCLE276_LIVE_RESULTS_TRUTH_CI.it.md`.
+
 # Quorivio 0.1.0-dev — RC275 — Correzione contratto risultati RC192/RC196
 
 **RC275:** full CI RC274 [42551661125](https://github.com/desalvo/quorivio/actions/runs/42551661125) fallita prima di npm al controllo RC192: il renderer condiviso dei risultati usa intenzionalmente `viewWidget` per applicare il toggle R, ma i contratti storici RC192/RC196 richiedevano ancora `widget`. Adeguati entrambi e aggiunto test RC275 con regressioni negative; nessuna modifica al runtime. Inventario RC274 storico e RC275 corrente. **85,25%** (43 gate accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full CI RC275 e browser da verificare; nessun commit/push/tag. `docs/RC_CYCLE275_LINKED_RESULTS_UI_CONTRACT.it.md`. 

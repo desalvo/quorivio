@@ -23,3 +23,6 @@ k8s-generated/
 # Private RC acceptance artefacts and reviewer identity data: never commit.
 rc-operator-evidence/
 operator-evidence/
+# Build-specific live captures are distributable CI artifacts, not release sources.
+# Avoid mixing screenshots tied to older source commits into new manifests.
+docs/assets/manual-screenshots/

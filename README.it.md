@@ -1,3 +1,5 @@
+> **RC277 — Manuali completi:** sei guide IT/EN riscritte e ampliate con workflow, 21 widget, backup/LDAP/audit, tabelle e illustrazioni dichiarate. [Dettagli](docs/RC_CYCLE277_EXPANDED_MANUALS.it.md).
+
 > **RC269 — Autenticazione e gestione sessioni:** login automatico alla scadenza, pulizia conservativa ogni 12 ore, trasferimento proprietà, LDAP/LDAPS opzionale e correzioni sidebar/risposte smartphone. [Note RC269](docs/RC_CYCLE269_LDAP_OWNERSHIP_HOUSEKEEPING.it.md).
 
 > **RC267 — Hotfix CI Node:** risolve l’errore shell 126 nel preflight RC266 e verifica l’esatta invocazione dei test. Funzionalità di finestre flottanti RC266 e importazione full-bleed RC265 invariate. [`Note RC267`](docs/RC_CYCLE267_CI_NODE_RUNNER_CONTINUATION.it.md).
