@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC288 — Correzione CI del contratto storico RC221 per il tasto R
+
+**RC288:** La [full CI 42662034657](https://github.com/desalvo/quorivio/actions/runs/42662034657) è fallita perché RC221 richiedeva la barra «Evidenzia le risposte vere» rimossa intenzionalmente nella RC287, che copriva il footer. Il pulsante R resta nel widget risultati con chiave obbligatoria e lo switch di configurazione resta in «Formato widget». Contratto storico riconciliato mantenendo i controlli di conversione PDF e privacy, nuovi test RC288 negativi e gate anticipato nella CI. Nessuna modifica runtime. **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Full CI da verificare.
+
+---
+
 # Quorivio 0.1.0-dev — RC287 — Contorni risultati, Formato widget e grafica menu
 
 **RC287:** Bordi delle risposte vere/false più spessi e spaziosi, separati anche con font personalizzati; rimossa la barra «Evidenzia vere» sotto il widget (resta il tasto R). La finestra «Formato widget» conserva le dimensioni dopo il resize e dopo il cambio tab, senza il limite CSS di 390 px; aggiunti colori iniziale/finale del gradiente per le barre, persistenti e validati dall'API. Sidebar e menu armonizzati alla palette blu notte/verde petrolio dei mock, con vere icone Lucide e navigazione accessibile. Test web e API locali, browser di controllo per layout; verifica browser reale completa e parità pixel dei mock ancora da fare. **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nessun commit/push/tag.

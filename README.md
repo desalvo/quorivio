@@ -1,3 +1,5 @@
+**RC288:** Historical RC221 CI gate reconciled with the R-button truth overlay; see [RC288 notes](docs/RC_CYCLE288_GRADING_R_CI.en.md).
+
 **RC287 update:** Enlarged result-verdict frames and removed the overlapping editor strip; preserved Widget Formatting size across tabs; author-selected bar-gradient endpoints and refreshed midnight-blue/teal menus.  Six manuals include the new workflow.
 
 > **RC277 — Rewritten manuals:** six expanded IT/EN guides covering full workflows, 21 widgets, backups/LDAP/audit, charts and clearly identified illustrative visuals. [Details](docs/RC_CYCLE277_EXPANDED_MANUALS.en.md).

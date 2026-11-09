@@ -251,6 +251,11 @@ jobs:
             apps/api/test/converter-admission.test.ts \
             apps/api/test/rc220-results-configuration.test.ts \
             apps/web/test/rc220-source-sections.test.ts
+      # RC288: the author-only R button replaced the obsolete footer strip.
+      # Keep the historical RC221 PDF/grading privacy checks, but enforce
+      # current rendering and negative cases before they can regress.
+      - name: RC288 private R result grading UI contract before legacy PDF test
+        run: python3 -m unittest tools.tests.test_rc288_grading_contract -q
       # RC221: validate PDF editable/import-as-image choice, bounded private
       # Poppler worker, author-only truth overlay and independently saved styles.
       - name: RC221 PDF editable choices and per-result grading formatting before npm
@@ -1807,7 +1812,8 @@ jobs:
           python3 tools/verify_rc_cycle284_inventory.py --historical
           python3 tools/verify_rc_cycle285_inventory.py --historical
           python3 tools/verify_rc_cycle286_inventory.py --historical
-          python3 tools/verify_rc_cycle287_inventory.py
+          python3 tools/verify_rc_cycle287_inventory.py --historical
+          python3 tools/verify_rc_cycle288_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

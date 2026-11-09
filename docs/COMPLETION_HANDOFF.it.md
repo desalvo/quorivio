@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC288 — Riconciliazione test storico R dei risultati
+
+**RC288:** Aggiornato RC221 per controllare il tasto R condizionato alla chiave e la riservatezza, senza reintrodurre la barra sopra il footer. Sei controlli positivi/negativi e gate CI anticipato. Runtime invariato. Sei manuali IT/EN rigenerati e inventario promosso. **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag; full CI in attesa. [Dettagli](RC_CYCLE288_GRADING_R_CI.it.md).
+
+---
+
 # Quorivio 0.1.0-dev — RC287 — Formato widget e risultati
 
 **RC287:** Resa robusta l'evidenziazione R con bordi verdi/rossi separati e distanziati dal testo, eliminata la barra sotto la widget che copriva il footer. Risolto il ridimensionamento della finestra Formato fra tab, aggiunti due colori selezionabili del gradiente di risultati e aggiornati i menu a tema blu notte/verde petrolio con icone. I manuali IT/EN includono procedure RC287; collaudo Chromium isolato superato ma niente certificazione visiva 100% del frontend completo. **85,25%** (43 accettati/17 parziali), `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag.

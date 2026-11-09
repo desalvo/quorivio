@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC288 — R result grading legacy test reconciliation
+
+**RC288:** Replaced obsolete RC221 editor footer strip assertion with current conditional R result widget and private formatting controls. Six negative/positive regression checks and early CI preflight prevent regressions. No runtime changes. Rebuilt six IT/EN manuals and promoted inventory. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag; full CI pending. [Details](RC_CYCLE288_GRADING_R_CI.en.md).
+
+---
+
 # Quorivio 0.1.0-dev — RC287 — Widget formatting and results UI
 
 **RC287:** R answer verdicts use larger non-overlapping coloured frames, and the footer-overlapping authoring strip is removed. Widget Formatting retains explicitly resized bounds across tabs, result bars accept validated start/end gradient colours, and navigation adopts mock-inspired midnight-blue/teal menus with actual icons. All six manuals describe the revised workflows; isolated Chromium layout checks passed, but full frontend visual parity requires live CI review. **85.25%** (43 accepted/17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag.

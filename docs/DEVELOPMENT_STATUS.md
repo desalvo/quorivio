@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC288 — Historical RC221 R-button contract hotfix
+
+**RC288:** [Full CI 42662034657](https://github.com/desalvo/quorivio/actions/runs/42662034657) failed at the stale RC221 assertion for the removed footer-overlapping “highlight true answers below results” strip. The R button remains in the results widget with answer-key gating, and the formatting switch remains inside Widget Formatting. Reconciled historical contract without weakening PDF conversion/privacy assertions, added negative-case RC288 regression tests and early CI gate. No runtime changes. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag. Full CI unverified.
+
+---
+
 # Quorivio 0.1.0-dev — RC287 — Result answer frames, formatting geometry and menu polish
 
 **RC287:** Stronger spacious correct/incorrect outlines with gap-safe typography; removed the editor's footer-overlapping «Highlight correct» strip while retaining the R control. Widget Formatting preserves explicit user resizing and tab-scoped scrolling (legacy 390 px cap removed); bar gradients expose persisted start/end colours with strict API validation. Dashboard/sidebar and context menus use the mock-inspired midnight-blue/teal styling and actual accessible Lucide icons. Local web/API tests and isolated Chromium layout verification; full live-browser pixel comparison remains pending. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag.

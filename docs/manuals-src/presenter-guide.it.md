@@ -1,8 +1,8 @@
 # Manuale del presentatore
 
-**Quorivio 0.1.0-dev · Build documentale RC287 · 9 novembre 2026**
+**Quorivio 0.1.0-dev · Build documentale RC288 · 9 novembre 2026**
 
-Guida di lavoro completa per creare, progettare, provare, condurre ed esportare una sessione. Descrive il codice RC287 con le correzioni vero/falso e il pulsante **R**. Le immagini illustrative dei capitoli principali sono **ricostruzioni esplicitamente etichettate**; la galleria finale dei PDF CI utilizza screenshot autentici acquisiti su un ambiente di prova e verificati tramite manifest e SHA-256.
+Guida di lavoro completa per creare, progettare, provare, condurre ed esportare una sessione. Descrive il codice RC288 con le correzioni vero/falso e il pulsante **R**. Le immagini illustrative dei capitoli principali sono **ricostruzioni esplicitamente etichettate**; la galleria finale dei PDF CI utilizza screenshot autentici acquisiti su un ambiente di prova e verificati tramite manifest e SHA-256.
 
 ## 1. La sequenza operativa completa
 

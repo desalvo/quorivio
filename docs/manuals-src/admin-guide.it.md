@@ -1,8 +1,8 @@
 # Manuale dell'amministratore
 
-**Quorivio 0.1.0-dev · Build documentale RC287 · 9 novembre 2026**
+**Quorivio 0.1.0-dev · Build documentale RC288 · 9 novembre 2026**
 
-Manuale tecnico-operativo per installazione, configurazione, autenticazione, autorizzazioni, backup, monitoraggio, audit, manutenzione e ripristino. Le procedure sono desunte dal sorgente e dai chart della RC287; non costituiscono certificazione di un deployment reale. **Le illustrazioni esplicative presenti nei primi capitoli sono ricostruzioni**, etichettate come tali. La galleria finale, quando presente nel PDF generato dalla CI, contiene esclusivamente screenshot reali dell'istanza temporanea verificati tramite hash e commit; la revisione editoriale D5 resta separata.
+Manuale tecnico-operativo per installazione, configurazione, autenticazione, autorizzazioni, backup, monitoraggio, audit, manutenzione e ripristino. Le procedure sono desunte dal sorgente e dai chart della RC288; non costituiscono certificazione di un deployment reale. **Le illustrazioni esplicative presenti nei primi capitoli sono ricostruzioni**, etichettate come tali. La galleria finale, quando presente nel PDF generato dalla CI, contiene esclusivamente screenshot reali dell'istanza temporanea verificati tramite hash e commit; la revisione editoriale D5 resta separata.
 
 ## 1. Architettura e responsabilità
 
@@ -457,7 +457,7 @@ L'importazione `.quo` è un trasferimento **della sola sessione** e non va confu
 <figure><img src="../assets/manual-illustrations/workflow-local-quo-rc286.png" alt="DIAGRAMMA CONCETTUALE — copia `.quo` portabile, diversa da backup amministrativo."/><figcaption>DIAGRAMMA CONCETTUALE — copia `.quo` portabile, diversa da backup amministrativo.</figcaption></figure>
 
 
-## Appendice P. Collaudo grafico e regressioni RC287
+## Appendice P. Collaudo grafico e regressioni RC288
 
 Prima della pubblicazione, prova la **R** di un risultato collegato a una domanda con chiavi V/F, prima con Arial 16 px e poi con un altro font fino a 48–96 px. Controlla che il bordo verde/rosso sia visibile, non nasconda lettere, non tocchi altri bordi e che non compaia più alcuna barra sotto la widget. La prova deve includere schermo del presentatore e anteprima partecipante senza divulgare le chiavi di valutazione.
 

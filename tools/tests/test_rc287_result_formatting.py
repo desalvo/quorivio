@@ -1,5 +1,6 @@
 """RC287 results UI and editorial release contracts (before npm)."""
 from pathlib import Path
+from tools.manual_release_metadata import CYCLE
 import re
 import unittest
 
@@ -35,7 +36,7 @@ class RC287ResultFormatting(unittest.TestCase):
   for role in ('admin','presenter','user'):
    for lang in ('it','en'):
     text=(ROOT/f'docs/manuals-src/{role}-guide.{lang}.md').read_text()
-    self.assertIn('RC287',text)
+    self.assertIn(f'RC{CYCLE}',text)
     self.assertIn('<!-- REAL_SCREENSHOT_GALLERY -->',text)
     self.assertNotRegex(text,r'\b[0-9a-f]{40}\b')
     self.assertIn('Appendice' if lang=='it' else 'Appendix',text)
@@ -48,7 +49,7 @@ class RC287ResultFormatting(unittest.TestCase):
     self.assertEqual(pdf.read_bytes(),web.read_bytes())
     with fitz.open(pdf) as doc:
      body='\n'.join(page.get_text() for page in doc)
-     self.assertIn('RC287',body)
+     self.assertIn(f'RC{CYCLE}',body)
      self.assertNotRegex(body,r'\b(?:commit|Commit)\s+[0-9a-f]{8,40}\b')
      self.assertGreaterEqual(sum(len(page.get_image_info()) for page in doc),10)
      self.assertIn(('colori' if lang=='it' else 'colours') if role=='user' else ('gradiente' if lang=='it' else 'gradient'),body.lower())

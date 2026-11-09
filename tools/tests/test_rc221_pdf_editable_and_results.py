@@ -9,6 +9,32 @@ ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT/'tools'))
 from pdf_portable import pdf_to_portable
 
+def assert_private_grading_contract(ui: str, domain: str) -> None:
+ """Validate the current result widget without reviving the obsolete footer strip.
+
+ The R button is the sole canvas affordance. The separate configuration switch
+ remains inside Widget Formatting and does not expose answer keys to participants.
+ """
+ required_ui = (
+  'Evidenzia le risposte vere nei risultati',
+  "className={'result-answer-key-toggle'",
+  'hasKey&&<button',
+  'setTruthVisible(v=>!v)',
+  'resultHasAnswerKey(',
+  'resultElementKey(',
+  'data-answer-verdict={verdict||undefined}',
+ )
+ for item in required_ui:
+  if item not in ui:
+   raise AssertionError('missing result grading contract: '+item)
+ for removed in ('Evidenzia le risposte vere sotto la widget risultati',
+                 'className="canvas-results-truth-toggle"'):
+  if removed in ui:
+   raise AssertionError('obsolete footer-overlapping editor control: '+removed)
+ for item in ('showCorrectAnswers?:boolean', 'resultTextStyles?:Record'):
+  if item not in domain:
+   raise AssertionError('missing private grading schema: '+item)
+
 class RC221PDFAndResults(unittest.TestCase):
  def test_pdf_text_is_editable_and_page_positions_are_bounded(self):
   xml=b'''<?xml version="1.0"?><!DOCTYPE pdf2xml SYSTEM "pdf2xml.dtd"><pdf2xml><page number="1" width="1080" height="607"><fontspec id="0" size="24" family="Helvetica" color="#336699"/><text top="100" left="80" width="200" height="30" font="0">Editable PDF heading</text></page></pdf2xml>'''
@@ -59,11 +85,7 @@ class RC221PDFAndResults(unittest.TestCase):
   self.assertIn('setPendingPresentation({file',ui)
   self.assertIn('Modalità importazione PDF o PowerPoint',ui)
   self.assertIn('Elementi modificabili — conversione parziale',ui)
-  self.assertIn('showCorrectAnswers?:boolean',domain)
-  self.assertIn('resultTextStyles?:Record',domain)
-  self.assertIn('Evidenzia le risposte vere sotto la widget risultati',ui)
-  self.assertIn('resultHasAnswerKey(',ui)
-  self.assertIn('resultElementKey(',ui)
+  assert_private_grading_contract(ui,domain)
   policy=(ROOT/'apps/web/src/live-slide-policy.ts').read_text()
   self.assertIn("['results-button', 'participant-count']",policy)
  def test_no_legacy_automatic_pdf_import_call(self):

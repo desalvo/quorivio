@@ -1,3 +1,5 @@
+**RC288:** Riconciliato il test storico RC221 con il tasto R dei risultati; dettagli in [RC288](docs/RC_CYCLE288_GRADING_R_CI.it.md).
+
 **Novità RC287:** Evidenziazioni delle risposte più ampie, finestra «Formato widget» stabile fra schede, colori iniziale/finale delle barre e menu blu notte/verde petrolio con icone. Manuali IT/EN aggiornati.
 
 > **RC277 — Manuali completi:** sei guide IT/EN riscritte e ampliate con workflow, 21 widget, backup/LDAP/audit, tabelle e illustrazioni dichiarate. [Dettagli](docs/RC_CYCLE277_EXPANDED_MANUALS.it.md).
