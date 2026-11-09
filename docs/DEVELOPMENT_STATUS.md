@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC290 — Real screenshot format-window resize acceptance
+
+**RC290:** [Full CI 42670034364](https://github.com/desalvo/quorivio/actions/runs/42670034364) advanced through PDF inspection but stopped in real screenshot capture after ten frames. The capture compared naturally auto-sized Format widget tabs without resizing; corrected to explicitly resize via the real keyboard-accessible handle, verify both dimensions increase, then check dimensions stay stable after changing tabs. Added fail-closed regression tests and an extra authenticated screenshot; no runtime changes. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag. Full CI pending.
+
+---
+
 # Quorivio 0.1.0-dev — RC289 — PDF inspector CI dependency ordering
 
 **RC289:** [Full CI 42666096697](https://github.com/desalvo/quorivio/actions/runs/42666096697) failed in the RC287 manual-PDF contract because `fitz` (PyMuPDF) was installed later than the early pre-npm tests. Pinned PyMuPDF 1.26.7 and provisioned it before the RC287 and RC286 gates, retaining strict image and PDF checks. Added five ordering and mutation tests; no application runtime changes. Six manuals republished for RC289. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag. Full CI unverified.

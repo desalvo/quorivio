@@ -140,11 +140,28 @@ async def main():
                 await shot('editor-widget-format',editor)
                 contents=floating.get_by_role('tab',name='Contenuti')
                 if await contents.count():
-                    before=await floating.bounding_box()
+                    # RC290: this acceptance criterion applies AFTER a manual resize.
+                    # An auto-sized panel can correctly change height between tabs;
+                    # do not misreport that as a format-window regression. Drive the
+                    # real accessible resize handle (keyboard is deterministic on
+                    # Chromium even if the palette is docked near the screen edge).
+                    original=await floating.bounding_box()
+                    resize_handle=floating.get_by_role('button',name='Ridimensiona Formattazione rapida widget selezionato (trascina o usa le frecce)')
+                    await expect(resize_handle).to_be_visible(timeout=12000)
+                    await resize_handle.focus()
+                    await resize_handle.press('Shift+ArrowRight')
+                    await resize_handle.press('Shift+ArrowDown')
+                    resized=await floating.bounding_box()
+                    if (not original or not resized or
+                        resized['width']-original['width'] < 24 or
+                        resized['height']-original['height'] < 24):
+                        raise RuntimeError('Widget Formatting resize handle did not enlarge both dimensions')
+                    await shot('editor-widget-format-resized',editor)
                     await contents.click()
                     after=await floating.bounding_box()
-                    if before and after and (round(before['width'])!=round(after['width']) or round(before['height'])!=round(after['height'])):
-                        raise RuntimeError('Widget Formatting changed outer size when switching tabs')
+                    if (not after or abs(resized['width']-after['width']) > 2 or
+                        abs(resized['height']-after['height']) > 2):
+                        raise RuntimeError('Widget Formatting changed resized outer size when switching tabs')
                     await shot('editor-widget-format-tabs',editor)
                 await floating.get_by_role('button',name='Chiudi Formato widget').click()
             else:

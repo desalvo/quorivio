@@ -339,6 +339,11 @@ jobs:
           python3 -m unittest tools.tests.test_rc289_pdf_ci_order -q
           python3 -m pip install --disable-pip-version-check --break-system-packages 'pymupdf==1.26.7'
           python3 -c 'import fitz; assert hasattr(fitz, "open"); print("PyMuPDF PDF-inspection API available")'
+      # RC290: don't mistake a naturally auto-sized tab for a broken manually
+      # resized window. Validate the browser capture drives the real keyboard-
+      # accessible resize handle before checking unchanged outer dimensions.
+      - name: RC290 real screenshot formatting-resize acceptance preflight
+        run: python3 -m unittest tools.tests.test_rc290_manual_format_capture -q
       - name: RC287 answer borders, floating format tabs, gradient schema and navigation contracts before npm
         run: |
           node --experimental-strip-types --test apps/web/test/rc287-format-results-ui.test.ts apps/api/test/rc287-gradient-domain.test.ts
@@ -1822,7 +1827,8 @@ jobs:
           python3 tools/verify_rc_cycle286_inventory.py --historical
           python3 tools/verify_rc_cycle287_inventory.py --historical
           python3 tools/verify_rc_cycle288_inventory.py --historical
-          python3 tools/verify_rc_cycle289_inventory.py
+          python3 tools/verify_rc_cycle289_inventory.py --historical
+          python3 tools/verify_rc_cycle290_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC290 — Collaudo screenshot della finestra ridimensionata
+
+**RC290:** La [full CI 42670034364](https://github.com/desalvo/quorivio/actions/runs/42670034364) ha superato i controlli PDF ma si è fermata dopo dieci schermate reali: il test confrontava l’altezza automatica della finestra «Formato widget» prima di effettuare un resize. Ora il browser usa il comando reale e accessibile per ingrandire entrambe le dimensioni, verifica il cambiamento e controlla il mantenimento delle misure passando al tab Contenuti. Aggiunti test negativi, screenshot supplementare; runtime invariato. **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Full CI da verificare.
+
+---
+
 # Quorivio 0.1.0-dev — RC289 — Dipendenza PyMuPDF anticipata nella CI
 
 **RC289:** La [full CI 42666096697](https://github.com/desalvo/quorivio/actions/runs/42666096697) si è fermata nel controllo PDF RC287 perché `fitz` (PyMuPDF) veniva installato soltanto dopo i controlli anticipati. Installazione fissata a PyMuPDF 1.26.7 prima dei gate RC287 e RC286, senza indebolire i controlli su immagini e PDF. Aggiunti cinque test di ordine e regressione; runtime invariato. Sei manuali aggiornati RC289. **85,25%** (43 accettati/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; nessun commit/push/tag. Full CI da verificare.

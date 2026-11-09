@@ -1,3 +1,5 @@
+**RC290:** Corretto il collaudo Chromium: la finestra Formato viene realmente ridimensionata prima di verificare la conservazione delle dimensioni tra i tab. [Note RC290](docs/RC_CYCLE290_FORMAT_WINDOW_CAPTURE_CI.it.md).
+
 **RC289:** Corretta la sequenza delle dipendenze del controllo PDF in CI (PyMuPDF prima dei test dei manuali); [note RC289](docs/RC_CYCLE289_PDF_INSPECTOR_CI.it.md).
 
 **RC288:** Riconciliato il test storico RC221 con il tasto R dei risultati; dettagli in [RC288](docs/RC_CYCLE288_GRADING_R_CI.it.md).

@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC290 — Real post-resize format-tab acceptance
+
+**RC290:** Fixed false-positive live screenshot failure caused by comparing two auto-sized tabs without resizing. The browser now drives the real resize handle, proves both dimensions change, and checks persistence across the tab switch. Extra verified screenshot and negative regression checks; no runtime changes. [Details](RC_CYCLE290_FORMAT_WINDOW_CAPTURE_CI.en.md). **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag; full CI pending.
+
+---
+
 # Quorivio 0.1.0-dev — RC289 — Pre-install PDF inspection dependency
 
 **RC289:** Supply pinned PyMuPDF before the early RC287/RC286 PDF quality gates, preserving fail-closed image inspection and retaining later current-build screenshot verification. Five new regression tests check ordering and missing/relocated dependency. No runtime changes. Six manuals rebuilt and RC289 inventory promoted. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag. [Details](RC_CYCLE289_PDF_INSPECTOR_CI.en.md).
