@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Quorivio RC283 manual publication pipeline.
+"""Quorivio RC284 manual publication pipeline.
 
 Six role-specific bilingual Markdown sources are the editorial source of truth.
 This renders their tables, diagrams and labelled illustrative UI captures into
@@ -34,7 +34,7 @@ ROLES = {'user': {'it':'Partecipante','en':'Participant'},
 CSS = r'''@page {
     size: A4;
     margin: 17mm 16mm 18mm 16mm;
-    @bottom-left { content: 'Quorivio | RC283 documentation'; font-size: 8pt; color: #5b6680; }
+    @bottom-left { content: 'Quorivio | RC284 documentation'; font-size: 8pt; color: #5b6680; }
     @bottom-right { content: counter(page) ' / ' counter(pages); font-size: 8pt; color: #5b6680; }
 }
 @page:first { margin: 0; @bottom-left {content:normal} @bottom-right{content:normal} }
@@ -52,7 +52,7 @@ pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:8.4pt;line-height:1.4;
 code{font-family:'DejaVu Sans Mono',monospace;font-size:0.90em;color:#28345f}
 a{color:#5446d0;text-decoration:none}
 figure{margin:13pt 0 18pt;break-inside:avoid;background:#f7f8fd;border:1px solid #e2e5f0;padding:5pt;border-radius:6pt}
-figure img{display:block;max-width:100%;width:100%;height:auto;object-fit:contain}
+figure img{display:block;max-width:100%;width:auto;height:auto;max-height:158mm;object-fit:contain;margin:0 auto}
 figcaption{font-size:7.8pt;color:#576278;padding:6pt 5pt 2pt;line-height:1.4}
 hr{margin:14pt 0;border:none;border-top:1px solid #ddd}
 .cover{break-after:page;height:277mm;position:relative;padding:0;background:#fff}
@@ -95,7 +95,7 @@ def render_one(role: str, lang: str, *, require_real: bool = False) -> tuple[Pat
     for uri in img_names:
         if uri.startswith('http') or not (SOURCE/uri).resolve().is_file():
             raise ValueError(f'Invalid or missing local manual image: {uri}')
-    markup=mistune.create_markdown(plugins=['table','strikethrough','task_lists','url'])(md)
+    markup=mistune.create_markdown(escape=False, plugins=['table','strikethrough','task_lists','url'])(md)
     # The separate cover carries title and build metadata; avoid duplicate mastheads.
     markup=re.sub(r'^<h1>.*?</h1>\s*','',markup,count=1,flags=re.S)
     anchors=[]
@@ -120,7 +120,7 @@ def render_one(role: str, lang: str, *, require_real: bool = False) -> tuple[Pat
     info=('Documentazione tecnica | 9 novembre 2026' if lang=='it' else 'Technical documentation | 9 November 2026')
     subtitle=('Guida operativa illustrata' if lang=='it' else 'Illustrated operational guide')
     toc_title='Indice' if lang=='it' else 'Contents'
-    note=('Edizione RC283; certificazioni di sicurezza e infrastrutture reali restano separate.' if lang=='it' else 'RC283 edition; security and real infrastructure certifications remain separate.')
+    note=('Edizione RC284; certificazioni di sicurezza e infrastrutture reali restano separate.' if lang=='it' else 'RC284 edition; security and real infrastructure certifications remain separate.')
     contact=html.escape(meta['author'])
     platform=('Server Linux amd64/arm64 (Docker, Podman, Kubernetes). Client via browser su Windows, macOS, Linux, iOS e Android.' if lang=='it' else 'Linux amd64/arm64 server (Docker, Podman, Kubernetes). Web clients on Windows, macOS, Linux, iOS and Android.')
     minimum=('Minimo indicativo per valutazione: 2 vCPU, 4 GiB RAM, 20 GiB disco oltre ai dati persistenti; dimensionare la produzione con misure.' if lang=='it' else 'Indicative evaluation minimum: 2 vCPU, 4 GiB RAM, 20 GiB disk plus persistent data; benchmark production sizing.')
@@ -133,7 +133,7 @@ def render_one(role: str, lang: str, *, require_real: bool = False) -> tuple[Pat
     <section class="cover"><div class="cover-head"><div class="brand"><img class="cover-brand-logo" src="{brand_logo}" alt="Logo ufficiale Quorivio"/> Quorivio</div><div class="cover-kicker">{html.escape(subtitle)} · {html.escape(role_label)}</div><div class="cover-title">{html.escape(title)}</div><div class="cover-version">{html.escape(meta['version'])} • {html.escape(meta['build'])} • {info}</div></div>
     <img class="cover-picture" src="{cover_image}" alt="Quorivio event illustration"/>
     <div class="cover-details">{details}</div><div class="cover-disclaimer">{caption}<br>{note}</div></section>
-    <section class="toc"><h1>{toc_title}</h1><p>{len(anchors)} {"capitoli" if lang=='it' else 'chapters'} · {"Edizione" if lang=='it' else 'Edition'} RC283</p><ul>{toc}</ul></section>
+    <section class="toc"><h1>{toc_title}</h1><p>{len(anchors)} {"capitoli" if lang=='it' else 'chapters'} · {"Edizione" if lang=='it' else 'Edition'} RC284</p><ul>{toc}</ul></section>
     <main class="content">{markup}</main></body></html>'''
     OUTPUT.mkdir(parents=True,exist_ok=True)
     dest=OUTPUT/f'{role}-guide.{lang}.pdf'
@@ -162,10 +162,31 @@ def main():
             dest,chapters=render_one(role,lang,require_real=args.require_real)
             pdf=fitz.open(dest)
             pages=pdf.page_count
+            # Images must be embedded as actual PDF image objects. Older
+            # publications escaped <figure> as printable Markdown text while
+            # producing apparently valid PDFs and screenshot manifests.
+            body='\n'.join(page.get_text() for page in pdf)
+            if '<figure' in body or '<img src=' in body or 'manual-screenshots/' in body:
+                raise ValueError('Manual contains literal figure HTML instead of embedded images: '+str(dest))
+            from manual_screenshot_catalog import CATALOG, SCREENSHOTS, HISTORIC_SCREENSHOTS, evidence
+            gallery_root=SCREENSHOTS if args.require_real else (SCREENSHOTS if (SCREENSHOTS/'capture.json').is_file() else HISTORIC_SCREENSHOTS)
+            if (gallery_root/'capture.json').is_file():
+                captures=evidence(gallery_root,expected_commit=metadata()['commit'] if args.require_real else None,minimum=9)
+                expected=sum(role in CATALOG[name] for name in captures['shots'])
+                label='SCHERMATA REALE' if lang=='it' else 'REAL APP SCREENSHOT'
+                actual=body.count(label)
+                if actual!=expected:
+                    raise ValueError(f'Manual lost screenshot captions: {dest}, expected {expected}, got {actual}')
+                for page in pdf:
+                    if label in page.get_text():
+                        large_images=[info for info in page.get_image_info() if
+                          info['bbox'][2]-info['bbox'][0]>160 and info['bbox'][3]-info['bbox'][1]>110]
+                        if not large_images:
+                            raise ValueError('Screenshot caption has no embedded screenshot: '+str(dest))
             if pages<14 or not any('Quorivio' in p.get_text() for p in pdf):
                 raise ValueError('Broken or unexpectedly short PDF: '+str(dest))
-            if not any('RC283' in p.get_text() for p in pdf):
-                raise ValueError('Missing RC283 build identification: '+str(dest))
+            if not any('RC284' in p.get_text() for p in pdf):
+                raise ValueError('Missing RC284 build identification: '+str(dest))
             print(dest.name,'chapters',chapters,'pages',pages,'bytes',dest.stat().st_size)
             total+=pages
             pdf.close()

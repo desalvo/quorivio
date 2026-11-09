@@ -15,7 +15,8 @@ COPY --from=build /app/apps/web/package.json apps/web/package.json
 # Install only application runtime dependencies. The Node official image bundles
 # npm tooling that is not required to execute Quorivio; keeping it increases
 # the runtime attack surface and can introduce avoidable CVEs.
-RUN apk add --no-cache postgresql18-client tar \n    && npm install --omit=dev --no-audit --no-fund \
+RUN apk add --no-cache postgresql18-client tar \
+    && npm install --omit=dev --no-audit --no-fund \
     && npm cache clean --force \
     && rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack \
               /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack \

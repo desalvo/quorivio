@@ -1,0 +1,75 @@
+{
+  "build": "RC283 \u00b7 0bb89e6ac79e",
+  "captured_at": "2026-11-09T13:23:00.370167+00:00",
+  "commit": "0bb89e6ac79ed57493130f06fc5042182a166ed6",
+  "fixture": "synthetic-only",
+  "shots": {
+    "admin-audit": {
+      "height": 871,
+      "sha256": "7cbadd0d334db49878d6cd14761e32a5b26f15eb34305e65740e3b5ce5d114c2",
+      "width": 1148
+    },
+    "admin-backups": {
+      "height": 791,
+      "sha256": "5281b18a5875d04233bac58c71c88ee18c0227e6522e4402b244841168d72711",
+      "width": 1148
+    },
+    "admin-server-settings": {
+      "height": 940,
+      "sha256": "c63e10b9c87f42437425c2fb2e3e65466f44343963d2c9e61a015a194bd9233d",
+      "width": 1440
+    },
+    "admin-users": {
+      "height": 940,
+      "sha256": "18cdc08138fcf0b87ab8ad414c2e98c8e395d5459969251940ef7581fa724fb4",
+      "width": 1440
+    },
+    "editor-canvas": {
+      "height": 940,
+      "sha256": "e7a27a7a617e68953a18fdc0f19dbd201f05a2f9b8545e3ddd94afd0f5876182",
+      "width": 1440
+    },
+    "login-desktop": {
+      "height": 940,
+      "sha256": "822ce4648ec6799d4dbd3a69c83fc0a627f35f36eb07a5afdcae70cfd74bc200",
+      "width": 1440
+    },
+    "participant-entry-smartphone": {
+      "height": 844,
+      "sha256": "ad512c295a7d5c0e57f1503d746299222a3933c9e6cf5c3ced3316eab5a71716",
+      "width": 390
+    },
+    "participant-feedback-smartphone": {
+      "height": 844,
+      "sha256": "4a9d659c77404ec81b28a31cebc60f22335dda75a56675e96358cee9dfda2bf1",
+      "width": 390
+    },
+    "participant-question-smartphone": {
+      "height": 844,
+      "sha256": "bb5563ba155d5a70a400290d52c1eae81a0a1326517f1aa0d47f001ac5014ca5",
+      "width": 390
+    },
+    "presenter-live": {
+      "height": 940,
+      "sha256": "81f7c554603435cb65eb15d440fe7eea2828a35ebb70fd957c531584ff233be0",
+      "width": 1440
+    },
+    "rehearsal-presenter": {
+      "height": 940,
+      "sha256": "b888d6ac2ba146ae87f112632f67997d38557b456a85d93e965c2c9c9ae7904a",
+      "width": 1440
+    },
+    "rehearsal-smartphone": {
+      "height": 940,
+      "sha256": "31db53cadf69e0d2270cb372bfa284fa14d171475432f07f22e8e7fbdb38458a",
+      "width": 1440
+    },
+    "workspace-desktop": {
+      "height": 940,
+      "sha256": "52d95025680bccdef8f270532926ef500f1e48aa4259c61dd2909c4750b7e1dc",
+      "width": 1440
+    }
+  },
+  "source": "disposable-postgresql-chromium-live-app",
+  "version": "0.1.0-dev"
+}

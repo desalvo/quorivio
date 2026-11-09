@@ -1,8 +1,8 @@
 # Participant guide
 
-**Quorivio 0.1.0-dev · Documentation build RC283 · 9 November 2026**
+**Quorivio 0.1.0-dev · Documentation build RC284 · 9 November 2026**
 
-This guide explains how to join an interactive session, answer questions, understand feedback and use the available features on a phone or computer. It documents the RC276 application code as reviewed for documentation cycle RC278. The earlier illustrated screens are labelled reconstructions; the final gallery in CI-produced PDFs contains real captures of a disposable test instance, **never production captures**.
+This guide explains how to join an interactive session, answer questions, understand feedback and use the available features on a phone or computer. It documents the RC284 application code as reviewed for documentation cycle RC278. The earlier illustrated screens are labelled reconstructions; the final gallery in CI-produced PDFs contains real captures of a disposable test instance, **never production captures**.
 
 ## 1. What is Quorivio?
 
@@ -132,7 +132,7 @@ Before a live event, join a test invitation, enter a nickname, submit a single-c
 
 **Session:** event pages and controls. **Page:** one presenter-selected display. **Widget:** one visual or interactive component. **Preview:** simulation that does not replace live acceptance. **Confirmed submission:** answer accepted by the server. **Moderation:** approval of publishable content. **Retention:** configured period during which records are kept.
 
-**Validation scope:** this guide documents intended behavior in the RC276 codebase. It does not certify particular browsers, physical devices, LDAP/SMTP servers or Kubernetes clusters.
+**Validation scope:** this guide documents intended behavior in the RC284 codebase. It does not certify particular browsers, physical devices, LDAP/SMTP servers or Kubernetes clusters.
 
 ## Appendix A. Worked example of correct and incorrect answers
 

@@ -15,6 +15,9 @@ from urllib.parse import urlsplit
 ROOT = Path(__file__).resolve().parents[1]
 SCREENSHOTS = ROOT / 'docs/assets/manual-screenshots'
 CAPTURE_FILE = SCREENSHOTS / 'capture.json'
+# A verified historic gallery may illustrate local PDFs. Current-commit CI
+# builds MUST use SCREENSHOTS and --require-real instead of this fallback.
+HISTORIC_SCREENSHOTS = ROOT / 'docs/assets/manual-evidence-rc283'
 # Figures are included only for roles where they explain an actual workflow.
 CATALOG = {
  'login-desktop': ('user','presenter','admin'),
@@ -104,13 +107,25 @@ def evidence(path: Path = SCREENSHOTS, *, expected_commit: str | None = None, mi
 def gallery(role: str, lang: str, path: Path = SCREENSHOTS, *, require: bool = False, commit: str | None = None) -> str:
     if require and not commit:
         raise ValueError('A full source Git commit is mandatory when publishing authentic screenshots')
-    data = evidence(path, expected_commit=commit if require else None, minimum=9 if require else 0)
+    if require and path != SCREENSHOTS:
+        raise ValueError('Current-build screenshots must come from the active CI capture directory')
+    # Local checked-in manuals keep genuinely photographed examples with their
+    # original RC283 commit provenance. This can never satisfy CI --require-real.
+    historic = False
+    if not require and path == SCREENSHOTS and not (path / 'capture.json').is_file() and HISTORIC_SCREENSHOTS.is_dir():
+        path = HISTORIC_SCREENSHOTS
+        historic = True
+    if path == SCREENSHOTS and (path / 'capture.json').is_file() and not commit:
+        raise ValueError('Active screenshot evidence requires a matching source Git commit')
+    data = evidence(path, expected_commit=commit if path == SCREENSHOTS else None, minimum=9 if require else 0)
     images=[]
     for stem in CATALOG:
         if role not in CATALOG[stem] or stem not in data['shots']:continue
         caption=CAPTIONS[stem][0 if lang=='it' else 1]
         label=('SCHERMATA REALE' if lang=='it' else 'REAL APP SCREENSHOT')
-        images.append(f'<figure><img src="../assets/manual-screenshots/{stem}.png" alt="{caption}"/><figcaption>{label} · {caption} · Build {data.get("commit", "")[:12] or "local disposable"}.</figcaption></figure>')
+        source_dir = 'manual-evidence-rc283' if historic else 'manual-screenshots'
+        provenance = ('ARCHIVIO RC283' if lang=='it' else 'RC283 ARCHIVE') if historic else ('BUILD CORRENTE' if lang=='it' else 'CURRENT BUILD')
+        images.append(f'<figure><img src="../assets/{source_dir}/{stem}.png" alt="{caption}"/><figcaption>{label} · {provenance} · {caption} · Commit {data.get("commit", "")[:12] or "local disposable"}.</figcaption></figure>')
     if require and len(images)<3:
         raise ValueError(f'Too few screenshot examples for {role}')
     return '\n'.join(images)
