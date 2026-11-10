@@ -26,9 +26,9 @@ async def main():
   for viewport in (900, 400, 360):
    page=await browser.new_page(viewport={'width':viewport,'height':850})
    await page.set_content('<style>'+CSS+'</style>'+HTML)
-   measure=\'''() => Object.fromEntries(['answer-a','answer-b','text-a','text-b','row-a','row-text'].map(id=>{let r=document.getElementById(id).getBoundingClientRect();return [id,[r.x,r.y,r.width,r.height].map(v=>Math.round(v*100)/100)]}))\'''
+   measure='''() => Object.fromEntries(['answer-a','answer-b','text-a','text-b','row-a','row-text'].map(id=>{let r=document.getElementById(id).getBoundingClientRect();return [id,[r.x,r.y,r.width,r.height].map(v=>Math.round(v*100)/100)]}))'''
    baseline=await page.evaluate(measure)
-   await page.evaluate(\'''() => {
+   await page.evaluate('''() => {
      document.getElementById('answer-a').setAttribute('data-answer-verdict','correct');
      document.getElementById('answer-b').setAttribute('data-answer-verdict','incorrect');
      document.getElementById('row-a').setAttribute('data-answer-verdict','correct');
@@ -36,7 +36,7 @@ async def main():
        let icon=document.createElement('span');icon.className='answer-verdict-icon';icon.textContent='✓';document.getElementById(id).appendChild(icon);
      }
      let icon=document.createElement('small');icon.className='answer-verdict-icon';icon.textContent='✓';document.querySelector('#row-a .linked-result-final').appendChild(icon);
-   }\''')
+   }''')
    after=await page.evaluate(measure)
    mismatches={k:(baseline[k],after[k]) for k in baseline if any(abs(a-b)>.5 for a,b in zip(baseline[k],after[k]))}
    print(f'R geometry at {viewport}px: '+ ('PASS' if not mismatches else str(mismatches)))

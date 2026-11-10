@@ -11,3 +11,7 @@
 Le verifiche fisiche A4/B3 sull'accessibilità e sui partecipanti sono ancora aperte: punteggio certificato **85,25% (43 accepted / 17 partial)**, `rc_strict=false`, `publish_image=false` e `publish_latest=false`.
 
 **Titolo merge suggerito:** `fix: stabilize live results and archive Docker images [full-ci]`
+
+## Correzione full CI dopo la run 42887563358
+
+La prima esecuzione estesa `[full-ci]` ha trovato una stringa JavaScript a tripli apici con escape Python non valido nello script storico `tools/ci_rc295_results_layout_chromium.py`, non eseguito dalla qualità ordinaria. Rimossi i backslash errati. Ora la CI controlla **tutti** gli script Chromium opt-in prima di npm ed esegue anche il test Chromium reale del layout del tasto R nel gate PR, prima della full CI. È un controllo preventivo, non una dichiarazione di full CI verde. Necessaria una nuova run su main; nessuna immagine pubblicata su Docker Hub.

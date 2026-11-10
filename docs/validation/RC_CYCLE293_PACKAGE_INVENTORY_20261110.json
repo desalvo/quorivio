@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
   "cycle": 293,
-  "file_count_excluding_manifest": 2586,
+  "file_count_excluding_manifest": 2587,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -44,14 +44,14 @@
       "e377db62"
     ],
     ".github/workflows/ci.yml": [
-      "70768129",
-      "a25fac9d",
-      "db0a143b",
-      "67074c9d",
-      "ef526f25",
-      "c7aefc2d",
-      "cc63dde2",
-      "067b3370"
+      "f0a1aceb",
+      "e048d3f6",
+      "00bc7dfd",
+      "cb9df074",
+      "2f2f95f4",
+      "476baee7",
+      "e529d86a",
+      "ec21e027"
     ],
     ".github/workflows/converter-image.yml": [
       "6ff519db",
@@ -4924,24 +4924,24 @@
       "949f2c92"
     ],
     "docs/COMPLETION_HANDOFF.it.md": [
-      "54fe1687",
-      "f5ad85a1",
-      "08e90b4b",
-      "61f82137",
-      "b8503ab3",
-      "e99565d6",
-      "de98d9d3",
-      "d9809e5c"
+      "6f442925",
+      "aa8a536e",
+      "e6ee1ba2",
+      "ef29694b",
+      "89b1ba4d",
+      "796e7de6",
+      "929ec073",
+      "3972c36a"
     ],
     "docs/COMPLETION_HANDOFF.md": [
-      "c79d71fa",
-      "1a7cdbde",
-      "d8c8e359",
-      "b0607b77",
-      "f019b0d8",
-      "7737f8a9",
-      "eb4d69b3",
-      "431e6fdb"
+      "cadf45ea",
+      "d17f3591",
+      "10407444",
+      "129b7839",
+      "8bbcc4ac",
+      "3c2909f7",
+      "007d4acf",
+      "1fd3746f"
     ],
     "docs/CONVERSION_ATOMIC_PUBLISH.en.md": [
       "20d0f241",
@@ -5004,24 +5004,24 @@
       "455a0f27"
     ],
     "docs/DEVELOPMENT_STATUS.it.md": [
-      "242b28cc",
-      "b93ea028",
-      "74bd9f89",
-      "b6f5e670",
-      "288936cf",
-      "930233b6",
-      "f8927590",
-      "3e412eb8"
+      "43453463",
+      "896f706d",
+      "46a06f0f",
+      "72d3bed4",
+      "6f394db5",
+      "4833a14e",
+      "e2292394",
+      "709421bf"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "4bf1db5e",
-      "3d83041c",
-      "4865f8e3",
-      "8fabfdea",
-      "1c019fe5",
-      "8c8754c0",
-      "323c3927",
-      "c431c80e"
+      "8ecda280",
+      "e35c356c",
+      "2729d07f",
+      "78d8bfe8",
+      "f7dbfaea",
+      "53fb5bfa",
+      "e8526a48",
+      "fe66c9bc"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",
@@ -10774,24 +10774,24 @@
       "cf1e3e4d"
     ],
     "docs/RC_CYCLE300_LIVE_RESULTS_FULL_CI_OCI.en.md": [
-      "62e343d9",
-      "a32d2ed2",
-      "a69c4fd2",
-      "b052fb22",
-      "36dad780",
-      "f3ee69ef",
-      "a9d1c218",
-      "67bce108"
+      "5116c2fa",
+      "222b52a0",
+      "da45843c",
+      "a4f006d6",
+      "edb0f27d",
+      "c72f508d",
+      "9ebf522e",
+      "0a770a49"
     ],
     "docs/RC_CYCLE300_LIVE_RESULTS_FULL_CI_OCI.it.md": [
-      "3169425f",
-      "7fd0a05d",
-      "59ae5bf4",
-      "a0ded078",
-      "5ad5f1ec",
-      "9e36e407",
-      "91ddd174",
-      "5b6c005a"
+      "1b23130e",
+      "7620da99",
+      "84c3e97b",
+      "9d6571c7",
+      "2120f344",
+      "98f7a403",
+      "41b56fa2",
+      "0391890e"
     ],
     "docs/RC_CYCLE34_VERIFIED_GATE_RECONCILIATION.en.md": [
       "9cb4cd0e",
@@ -17363,6 +17363,16 @@
       "52af3010",
       "0c130e07"
     ],
+    "tools/ci_full_browser_script_syntax.py": [
+      "8c6708f4",
+      "08b47cbe",
+      "b458cdb2",
+      "38790816",
+      "fb00a79b",
+      "8da84302",
+      "e58e74a7",
+      "a6281727"
+    ],
     "tools/ci_graceful_shutdown.py": [
       "1b6d8d2f",
       "c571d4b8",
@@ -17994,14 +18004,14 @@
       "ec4d9857"
     ],
     "tools/ci_rc295_results_layout_chromium.py": [
-      "7d35ff3a",
-      "a984b016",
-      "d38bcc9e",
-      "d6f4ebe1",
-      "fe0b4d4c",
-      "ab16ac33",
-      "a2e3e28f",
-      "d671bd59"
+      "ddd4a2bd",
+      "117aa2da",
+      "ed0d1d83",
+      "394d9a64",
+      "af92b632",
+      "d4bec4ea",
+      "d4b4e077",
+      "fdc236be"
     ],
     "tools/ci_rc296_mobile_pie_chromium.py": [
       "4235b3f5",

@@ -1,5 +1,8 @@
 # Quorivio 0.1.0-dev — RC293 — Compact visual manuals and product brochures
 
+**RC300 full-CI hotfix (2026-11-10):** Expanded run 42887563358 exposed a Python syntax error in the older opt-in RC295 Chromium R-layout script. Fixed triple-quoted JavaScript, added an early inventory-wide full-browser Python syntax preflight and made native R-layout smoke mandatory on PRs. New full CI required; no Docker Hub publication. **85.25%** (43 accepted/17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+
 **RC300 checkpoint (2026-11-10):** Presenter live-result polling is now single-flight; the most recent authenticated counts survive transient errors while late callbacks are suppressed after a page/source change. RC300 adds Node regressions and portable, checksum-verified Docker amd64 archives only on an explicit `[full-ci]` main commit, which also triggers the extended RC/OCI suite. See `docs/RC_CYCLE300_LIVE_RESULTS_FULL_CI_OCI.en.md`. Base RC299 `6f48a9de9f2c`; certified **85.25%** (43 accepted / 17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
 
 
