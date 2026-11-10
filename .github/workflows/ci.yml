@@ -353,6 +353,8 @@ jobs:
       # RC295: exercise chart and R layout in the cheap pre-npm stage.
       - name: RC295 pie percentages, sizing, and unchanged R layout preflight
         run: node --experimental-strip-types --test apps/web/test/rc295-pie-and-truth-layout.test.ts apps/api/test/rc295-pie-size-domain.test.ts
+      - name: RC296 mobile pie percent and source-key regression before npm
+        run: node --experimental-strip-types --test apps/web/test/rc296-mobile-pie-legend.test.ts
       - name: RC293 visual manuals and brochure publication preflight
         run: python3 -m unittest tools.tests.test_rc293_visual_manuals_brochures -q
       - name: RC292 archived and live manual PDF pairing preflight
@@ -1252,6 +1254,9 @@ jobs:
           if [ -z "${QUORIVIO_CHROMIUM_PATH:-}" ]; then
             python3 tools/ci_browser_bootstrap.py --smoke --github-env "$GITHUB_ENV"
           fi
+      - name: RC296 real Chromium mobile pie percentage geometry
+        timeout-minutes: 2
+        run: python3 tools/ci_rc296_mobile_pie_chromium.py
       - name: Real Chromium JPG background and Logo upload/persistence acceptance
         timeout-minutes: 3
         env:
