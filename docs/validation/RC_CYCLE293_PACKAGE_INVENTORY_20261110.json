@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
   "cycle": 293,
-  "file_count_excluding_manifest": 2587,
+  "file_count_excluding_manifest": 2591,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -44,14 +44,14 @@
       "e377db62"
     ],
     ".github/workflows/ci.yml": [
-      "f0a1aceb",
-      "e048d3f6",
-      "00bc7dfd",
-      "cb9df074",
-      "2f2f95f4",
-      "476baee7",
-      "e529d86a",
-      "ec21e027"
+      "af9f7b27",
+      "f73e6218",
+      "47e5fcff",
+      "99d55ce3",
+      "e049a3de",
+      "bdaa2da4",
+      "75a2db00",
+      "490cdd21"
     ],
     ".github/workflows/converter-image.yml": [
       "6ff519db",
@@ -2414,14 +2414,14 @@
       "2586b822"
     ],
     "apps/web/src/style.css": [
-      "9445d3c1",
-      "bdf1ba19",
-      "3d95b7ce",
-      "0dd446de",
-      "2233c795",
-      "f58cd21f",
-      "cc386039",
-      "683f7ecc"
+      "c4619574",
+      "bcdd0eb0",
+      "8ce56f3f",
+      "a241c733",
+      "11c71e41",
+      "4cd81fea",
+      "43c4f9a4",
+      "2d79a041"
     ],
     "apps/web/src/thumbnail-menu-layout.ts": [
       "a4748563",
@@ -4924,24 +4924,24 @@
       "949f2c92"
     ],
     "docs/COMPLETION_HANDOFF.it.md": [
-      "6f442925",
-      "aa8a536e",
-      "e6ee1ba2",
-      "ef29694b",
-      "89b1ba4d",
-      "796e7de6",
-      "929ec073",
-      "3972c36a"
+      "e4f9da5a",
+      "0db23e9f",
+      "7fbfd9fe",
+      "4d83dbc9",
+      "644855c7",
+      "dc0ec528",
+      "9b2142dc",
+      "c2ec1d00"
     ],
     "docs/COMPLETION_HANDOFF.md": [
-      "cadf45ea",
-      "d17f3591",
-      "10407444",
-      "129b7839",
-      "8bbcc4ac",
-      "3c2909f7",
-      "007d4acf",
-      "1fd3746f"
+      "044c899e",
+      "5c1d66c1",
+      "bfebde8f",
+      "d2cb641e",
+      "9919c881",
+      "a557826c",
+      "25043e10",
+      "8df829c4"
     ],
     "docs/CONVERSION_ATOMIC_PUBLISH.en.md": [
       "20d0f241",
@@ -5004,24 +5004,24 @@
       "455a0f27"
     ],
     "docs/DEVELOPMENT_STATUS.it.md": [
-      "43453463",
-      "896f706d",
-      "46a06f0f",
-      "72d3bed4",
-      "6f394db5",
-      "4833a14e",
-      "e2292394",
-      "709421bf"
+      "f8478ec6",
+      "21a288f5",
+      "e2c25b61",
+      "9deb95ee",
+      "cd33de49",
+      "89f39b47",
+      "b231114e",
+      "3fbe24da"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "8ecda280",
-      "e35c356c",
-      "2729d07f",
-      "78d8bfe8",
-      "f7dbfaea",
-      "53fb5bfa",
-      "e8526a48",
-      "fe66c9bc"
+      "b35576f2",
+      "28d4a8a1",
+      "da3d43d6",
+      "11f39b5d",
+      "c88cd24c",
+      "5dc97bf9",
+      "fca21f57",
+      "076bd90c"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",
@@ -10792,6 +10792,26 @@
       "98f7a403",
       "41b56fa2",
       "0391890e"
+    ],
+    "docs/RC_CYCLE301_CROSS_ENGINE_PIE_LEGENDS.en.md": [
+      "e71caab7",
+      "3ffc4403",
+      "fad5db0c",
+      "a0b36276",
+      "c1f3b4a2",
+      "6b0aa0a5",
+      "46f87620",
+      "f1b4a6a9"
+    ],
+    "docs/RC_CYCLE301_CROSS_ENGINE_PIE_LEGENDS.it.md": [
+      "ee3db99b",
+      "ef77ff21",
+      "799ba3cd",
+      "d84dca3a",
+      "b4e8009b",
+      "9c8ebb9a",
+      "f93a3f80",
+      "1d184541"
     ],
     "docs/RC_CYCLE34_VERIFIED_GATE_RECONCILIATION.en.md": [
       "9cb4cd0e",
@@ -18053,6 +18073,16 @@
       "e50150e7",
       "0d6692e8"
     ],
+    "tools/ci_rc301_pie_cross_engine.py": [
+      "91ba1b32",
+      "3110b349",
+      "76d13974",
+      "1257a37b",
+      "4b2672ff",
+      "92400f5f",
+      "0bf83223",
+      "a3e591d4"
+    ],
     "tools/ci_rc71_lifecycle_postgres.py": [
       "15c9edcd",
       "2fb825f3",
@@ -22732,6 +22762,16 @@
       "0996a39f",
       "6b82b1cc",
       "bab91fef"
+    ],
+    "tools/tests/test_rc301_native_pie.py": [
+      "289a2ed9",
+      "3db47792",
+      "d76c7fb9",
+      "5f67dacb",
+      "950ff2fc",
+      "ca96c337",
+      "fd45b51c",
+      "965e89fb"
     ],
     "tools/tests/test_rc73_slide_master.py": [
       "2c080f2d",
