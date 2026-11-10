@@ -2355,9 +2355,9 @@ jobs:
           ARCH: ${{ matrix.arch }}
         run: |
           set -euo pipefail
-          [[ "$IMAGE_DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]] || { echo 'Invalid OCI app digest'; exit 1; }}
-          [[ "$CONVERTER_IMAGE_DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]] || { echo 'Invalid OCI converter digest'; exit 1; }}
-          [[ "$IMAGE_DIGEST" != "$CONVERTER_IMAGE_DIGEST" ]] || { echo 'Duplicate app/converter digests'; exit 1; }}
+          [[ "$IMAGE_DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]] || { echo 'Invalid OCI app digest'; exit 1; }
+          [[ "$CONVERTER_IMAGE_DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]] || { echo 'Invalid OCI converter digest'; exit 1; }
+          [[ "$IMAGE_DIGEST" != "$CONVERTER_IMAGE_DIGEST" ]] || { echo 'Duplicate app/converter digests'; exit 1; }
           mkdir -p digests
           printf '%s\n' "$IMAGE_DIGEST" > "digests/$ARCH.digest"
           printf '%s\n' "$CONVERTER_IMAGE_DIGEST" > "digests/converter-$ARCH.digest"
