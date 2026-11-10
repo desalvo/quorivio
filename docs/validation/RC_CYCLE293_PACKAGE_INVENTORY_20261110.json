@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
   "cycle": 293,
-  "file_count_excluding_manifest": 2567,
+  "file_count_excluding_manifest": 2570,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -44,14 +44,14 @@
       "e377db62"
     ],
     ".github/workflows/ci.yml": [
-      "914c6fd6",
-      "08758212",
-      "e326265d",
-      "aeb97162",
-      "d74c8a0b",
-      "5df52896",
-      "fc9b52c7",
-      "336dceab"
+      "f2d3714f",
+      "475eafbd",
+      "e0f07c4d",
+      "55f6bfa7",
+      "00c39b9f",
+      "602feae6",
+      "0af7f9f8",
+      "e6927f7c"
     ],
     ".github/workflows/converter-image.yml": [
       "6ff519db",
@@ -2084,14 +2084,14 @@
       "54a62e5d"
     ],
     "apps/web/src/main.tsx": [
-      "f6b9f6e1",
-      "e245590d",
-      "d25dc9cc",
-      "3ae3172b",
-      "7fce118e",
-      "97270ed4",
-      "66ef251e",
-      "da5f4e55"
+      "fc9860a6",
+      "ff2da82a",
+      "b9f8b5e7",
+      "c6f93222",
+      "6f99f384",
+      "e2a073a7",
+      "e35170ef",
+      "99e76ddd"
     ],
     "apps/web/src/main.tsx.orig": [
       "9230e5a3",
@@ -2454,14 +2454,14 @@
       "2586b822"
     ],
     "apps/web/src/style.css": [
-      "2e3682ed",
-      "c20cad99",
-      "a436167a",
-      "fbbccc74",
-      "80549146",
-      "cda99e27",
-      "626ebe1a",
-      "77be1f40"
+      "5906f23e",
+      "ebc99177",
+      "20de1613",
+      "41735bae",
+      "be165c6a",
+      "d4473ad3",
+      "4a1fb59a",
+      "60ca46fe"
     ],
     "apps/web/src/thumbnail-menu-layout.ts": [
       "a4748563",
@@ -25672,6 +25672,36 @@
       "c3ec050f",
       "4501ac60",
       "7be5beb3"
+    ],
+    "apps/web/test/rc296-mobile-pie-legend.test.ts": [
+      "75ce71e3",
+      "f51550b5",
+      "c382adbd",
+      "7775a4a2",
+      "ced22f47",
+      "e1578031",
+      "13d07ca0",
+      "8ffb17a8"
+    ],
+    "tools/ci_rc296_mobile_pie_chromium.py": [
+      "c6513c61",
+      "61016024",
+      "b98baea2",
+      "5c0064bb",
+      "23843196",
+      "7a7f4f42",
+      "24ae2371",
+      "10448f5a"
+    ],
+    "docs/RC_CYCLE296_MOBILE_PIE_LEGIBILITY.en.md": [
+      "78becb89",
+      "6787cee0",
+      "2d73f2b8",
+      "c65281df",
+      "4deb2306",
+      "d9549d15",
+      "0d2e4e32",
+      "8206dc18"
     ]
   }
 }

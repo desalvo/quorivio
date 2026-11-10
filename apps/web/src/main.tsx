@@ -1,5 +1,5 @@
 import {thumbnailWidgetModel} from './thumbnail-widget-content.js';
-import {resultPieLayout,resultPieSize,PIE_VIEWBOX} from './result-pie-layout.js';
+import {resultPieLayout,resultPieSize,resultPiePercent,PIE_VIEWBOX} from './result-pie-layout.js';
 import {answerFieldHeight,answerFieldHeightForKey} from './answer-field-resize.js';
 import {readWorkspaceLocation,writeWorkspaceLocation} from './workspace-recovery';
 import {LOCAL_SESSION_ARCHIVE_MIME,LOCAL_SESSION_ARCHIVE_MAX_BYTES,localSessionArchiveFilename,localSessionImportError,isLocalSessionArchiveMime} from './session-local-transfer.js';
@@ -337,7 +337,7 @@ function LinkedResultChart({widget,widgets,rows,emptyLabel}:{widget:any;widgets:
   <LinkedResultSourceQuestion result={viewWidget} source={source}/>
   {!widget.resultsOnly&&<>{widget.showTitle!==false&&<strong><WidgetStyledText text={widget.label||'Risultati'} widget={widget} field="label"/></strong>}{!resultSourceTitleVisible(widget)&&!resultSourceAnswersVisible(widget)&&<small>{source.label||source.kind} · {total} risposte{emptyLabel?' · '+emptyLabel:''}</small>}</>}
   {(resultSourceTitleVisible(widget)||resultSourceAnswersVisible(widget))&&<small>{total} risposte{emptyLabel?' · '+emptyLabel:''}</small>}
-  {chart==='pie'&&total>0&&<svg className="linked-results-pie linked-results-pie-chart" role="img" aria-label="Distribuzione percentuale delle risposte" viewBox={`0 0 ${PIE_VIEWBOX.width} ${PIE_VIEWBOX.height}`} data-pie-size={resultPieSize(widget.pieSize)} preserveAspectRatio="xMidYMid meet">
+  {chart==='pie'&&total>0&&<svg className="linked-results-pie linked-results-pie-chart" role="img" aria-label="Distribuzione percentuale delle risposte" viewBox={`0 0 ${PIE_VIEWBOX.width} ${PIE_VIEWBOX.height}`} data-pie-size={resultPieSize(widget.pieSize)} data-mobile-percent-labels={widget.pieShowPercentages===true?'true':'false'} preserveAspectRatio="xMidYMid meet">
    <title>Distribuzione percentuale delle risposte</title>
    {pieSegments.map(r=><path key={'slice-'+r.index} d={r.path} fill={pieColors[r.index-1]} stroke="#fff" strokeWidth="1.5"><title>{`Opzione ${r.index}: ${r.label||Math.round(r.share*100)+'%'}`}</title></path>)}
    {pieSegments.filter(r=>r.label).map(r=><g className="linked-results-pie-callout" key={'label-'+r.index}>
@@ -345,6 +345,13 @@ function LinkedResultChart({widget,widgets,rows,emptyLabel}:{widget:any;widgets:
     <text x={r.labelX} y={r.labelY} textAnchor={r.side==='left'?'end':'start'} dominantBaseline="middle">{r.label}</text>
    </g>)}
   </svg>}
+  {chart==='pie'&&total>0&&widget.pieShowPercentages===true&&<div className="linked-results-pie-mobile-legend" role="list" aria-label="Percentuali delle risposte">
+   {pieSegments.map(r=><div key={'pie-mobile-'+r.index} className="linked-results-pie-mobile-item" role="listitem">
+    <span className="linked-results-pie-mobile-swatch" aria-hidden="true" style={{backgroundColor:pieColors[r.index-1]}}/>
+    <span className="linked-results-pie-mobile-name" title={data[r.index-1]?.label||('Opzione '+r.index)}>{widget.pieShowOptionNumbers===true?(r.index+'. '):''}{data[r.index-1]?.label||('Opzione '+r.index)}</span>
+    <strong className="linked-results-pie-mobile-percent">{resultPiePercent(r.share)}</strong>
+   </div>)}
+  </div>}
   {emptyLabel==='live'&&total===0&&<small className="linked-results-no-data" role="status">Nessuna risposta ancora registrata per questa sorgente.</small>}
   <div className="linked-results-items">{displayRows.map((r,i)=>{const verdict=answerTruthVerdict(source,widget.targetQuestionId||'',r.id,viewWidget.showCorrectAnswers===true);return <div className={"linked-results-row"+truthVerdictClass(verdict)} data-answer-verdict={verdict||undefined} key={r.id} style={chart==='cloud'?{fontSize:`${Math.round(14+24*r.count/Math.max(1,total))}px`,color:cloudRankColor(i)}:undefined}><span className="linked-result-pair" data-result-custom={widget.resultTextStyles?.[resultElementKey('row',widget.targetQuestionId||'',r.id)]?"true":undefined} style={{...resultTextCss(widget.resultTextStyles,resultElementKey('row',widget.targetQuestionId||'',r.id)),...(chart==='pie'?{color:pieColors[data.findIndex(x=>x.id===r.id)]}: {})}}><span className="linked-result-label">{chart==='pie'&&widget.pieShowOptionNumbers===true?`${data.findIndex(x=>x.id===r.id)+1}. `:''}{splitResultLabel(r.label).prefix}</span><span className="linked-result-final">{splitResultLabel(r.label).last}<output>{chart==='cloud'?`[${r.count}]`:r.count}</output>{verdict&&<small className="answer-verdict-icon" aria-label={verdict==='correct'?'Risposta vera':'Risposta falsa'}>{truthVerdictSymbol(verdict)}</small>}</span></span>{chart==='bars'&&<div className="linked-results-track"><div style={{width:(total?100*r.count/total:0)+'%',...(widget.barHitGradient===true?{background:resultBarGradient(widget.barGradientStartColor,widget.barGradientEndColor,r.count/Math.max(1,Math.max(...data.map(x=>x.count))))}: {})}}/></div>}</div>})}</div>
  </section>;
