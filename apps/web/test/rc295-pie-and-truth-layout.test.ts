@@ -16,6 +16,10 @@ test('pie sizing is bounded and defaults safely for legacy sessions',()=>{
 test('pie percentages preserve tiny nonzero slices without rounding to zero',()=>{
  assert.equal(resultPiePercent(.0002),'0.02%');
  assert.equal(resultPiePercent(.0125),'1.3%');
+ assert.equal(resultPiePercent(0),'0%');
+ assert.equal(resultPiePercent(1e-9),'<0.0001%');
+ assert.equal(resultPiePercent(.000001),'0.0001%');
+ assert.equal(resultPiePercent(Number.NaN),'0%');
 });
 test('full-circle pie has two valid arc segments and one readable percentage',()=>{
  const [s]=resultPieLayout([100],100,true);

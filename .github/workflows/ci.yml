@@ -347,6 +347,9 @@ jobs:
       # RC292: the integration unittest discovery must compare published PDFs
       # to their archived screenshot provenance, not new active CI captures.
       # A separate --require-real build checks current PDF+capture as a pair.
+      # RC295: exercise chart and R layout in the cheap pre-npm stage.
+      - name: RC295 pie percentages, sizing, and unchanged R layout preflight
+        run: node --experimental-strip-types --test apps/web/test/rc295-pie-and-truth-layout.test.ts apps/api/test/rc295-pie-size-domain.test.ts
       - name: RC293 visual manuals and brochure publication preflight
         run: python3 -m unittest tools.tests.test_rc293_visual_manuals_brochures -q
       - name: RC292 archived and live manual PDF pairing preflight
@@ -970,6 +973,8 @@ jobs:
           # Smoke and export the exact browser used by every subsequent UI test.
           python3 tools/ci_browser_bootstrap.py --smoke --github-env "$GITHUB_ENV"
           export QUORIVIO_CHROMIUM_PATH="$(sed -n 's/^QUORIVIO_CHROMIUM_PATH=//p' "$GITHUB_ENV" | tail -1)"
+          # RC295: actual Chromium geometry at desktop and smartphone widths.
+          python3 tools/ci_rc295_results_layout_chromium.py
           # Exercise exactly the compiled distribution from the preceding build.
           # Vite's dev optimizer intermittently reloads its first ESM imports,
           # leaving a completely empty #root with no JavaScript exception.

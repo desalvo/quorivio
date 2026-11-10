@@ -9,7 +9,12 @@ export function resultPieSize(value:unknown):number {
  return typeof value==='number'&&Number.isFinite(value)?Math.min(100,Math.max(40,value)):PIE_SIZE_DEFAULT;
 }
 export function resultPiePercent(share:number):string {
- const percentage=Math.max(0,share)*100;
+ if(!Number.isFinite(share)||share<=0)return '0%';
+ const percentage=share*100;
+ // Never display a non-zero slice as 0%: even a tiny valid result needs a
+ // truthful, legible outside callout rather than disappearing on rounding.
+ if(share<0.000001)return '<0.0001%';
+ if(percentage<0.01)return `${Number(percentage.toFixed(4))}%`;
  return `${percentage.toFixed(percentage<1?2:percentage<10?1:0)}%`;
 }
 const polar=(cx:number,cy:number,radius:number,angle:number)=>({x:cx+Math.cos(angle)*radius,y:cy+Math.sin(angle)*radius});
