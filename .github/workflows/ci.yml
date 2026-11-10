@@ -347,6 +347,8 @@ jobs:
       # RC292: the integration unittest discovery must compare published PDFs
       # to their archived screenshot provenance, not new active CI captures.
       # A separate --require-real build checks current PDF+capture as a pair.
+      - name: RC293 visual manuals and brochure publication preflight
+        run: python3 -m unittest tools.tests.test_rc293_visual_manuals_brochures -q
       - name: RC292 archived and live manual PDF pairing preflight
         run: python3 -m unittest tools.tests.test_rc292_gallery_pairing -q
       - name: RC291 real side-by-side and smartphone preview screenshot preflight
@@ -1839,7 +1841,8 @@ jobs:
           python3 tools/verify_rc_cycle289_inventory.py --historical
           python3 tools/verify_rc_cycle290_inventory.py --historical
           python3 tools/verify_rc_cycle291_inventory.py --historical
-          python3 tools/verify_rc_cycle292_inventory.py
+          python3 tools/verify_rc_cycle292_inventory.py --historical
+          python3 tools/verify_rc_cycle293_inventory.py
       - name: Detect credential leaks
         uses: gitleaks/gitleaks-action@v2
         env:

@@ -1,8 +1,8 @@
 # Participant guide
 
-**Quorivio 0.1.0-dev · Documentation build RC292 · 9 November 2026**
+**Quorivio 0.1.0-dev · Documentation build RC293 · 10 November 2026**
 
-This guide explains how to join an interactive session, answer questions, understand feedback and use the available features on a phone or computer. It documents the RC292 application code as reviewed for documentation cycle RC278. The earlier illustrated screens are labelled reconstructions; the final gallery in CI-produced PDFs contains real captures of a disposable test instance, **never production captures**.
+This guide explains how to join an interactive session, answer questions, understand feedback and use the available features on a phone or computer. It documents the RC293 application code as reviewed for documentation cycle RC278. The earlier illustrated screens are labelled reconstructions; the final gallery in CI-produced PDFs contains real captures of a disposable test instance, **never production captures**.
 
 ## 1. What is Quorivio?
 
@@ -41,6 +41,25 @@ Registration is not approval. In deployments requiring authorization, an adminis
 The participant screen usually follows the page selected by the presenter. Mobile placement is adapted to the device and may differ from the desktop arrangement. A page can include a question, image, video, timer, submit control, rating, emoji reactions, QR code and other content. Read the complete question, the permitted number of selections, required fields and any time limit before submitting.
 
 If the presenter moves to another page while you are typing, confirm that your original question is still open. The app cannot promise that unfinished input on a closed page will be accepted.
+
+## Reading the smartphone screen: an illustrated walkthrough
+
+The public participant screen is not the presenter dashboard. During a live event, participants see only the currently shared slide and its permitted interactions; they cannot edit the session. These archived real captures show the principal controls.
+
+<figure><img src="../assets/manual-evidence-rc291/participant-entry-smartphone.png" alt="Verified real participant join screen"/><figcaption>Verified archived capture: joining from a smartphone browser.</figcaption></figure>
+
+| Visual control | Meaning | Action |
+|---|---|---|
+| Session code / QR | Event invitation | Open the organiser's link |
+| Title and description | Current question context | Read the complete prompt |
+| Circle or checkbox | Single or multiple choice | Select the permitted choices |
+| Submit answer | Final confirmation | Submit once before time runs out |
+| Feedback message | Receipt or answer result | Read the outcome without switching browser identity |
+| Timer and status | Open question, remaining time or waiting | Follow the presenter instructions |
+
+<figure><img src="../assets/manual-evidence-rc291/participant-question-smartphone.png" alt="Verified archived phone answering a question"/><figcaption>Archived real capture: an active question and participant controls on a smartphone.</figcaption></figure>
+
+<figure><img src="../assets/manual-illustrations/editorial-live-presentation-rc286.jpg" alt="Synthetic editorial photo of an event"/><figcaption>Synthetic editorial photograph of an event; the presenter controls content on a separate screen.</figcaption></figure>
 
 ## 4. Single choice, multiple choice and answer grading
 
@@ -132,7 +151,7 @@ Before a live event, join a test invitation, enter a nickname, submit a single-c
 
 **Session:** event pages and controls. **Page:** one presenter-selected display. **Widget:** one visual or interactive component. **Preview:** simulation that does not replace live acceptance. **Confirmed submission:** answer accepted by the server. **Moderation:** approval of publishable content. **Retention:** configured period during which records are kept.
 
-**Validation scope:** this guide documents intended behavior in the RC292 codebase. It does not certify particular browsers, physical devices, LDAP/SMTP servers or Kubernetes clusters.
+**Validation scope:** this guide documents intended behavior in the RC293 codebase. It does not certify particular browsers, physical devices, LDAP/SMTP servers or Kubernetes clusters.
 
 ## Appendix A. Worked example of correct and incorrect answers
 

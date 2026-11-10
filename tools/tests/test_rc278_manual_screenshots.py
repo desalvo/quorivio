@@ -4,6 +4,7 @@ import json
 import re
 import sys
 import tempfile
+from datetime import date
 import unittest
 from pathlib import Path
 
@@ -21,7 +22,8 @@ class ManualScreenshotContracts(unittest.TestCase):
   self.assertEqual(meta['license'],'EUPL-1.2')
   self.assertIn(meta['email'],(ROOT/'LICENSE').read_text())
   self.assertIn(meta['cycle'],meta['build'])
-  self.assertEqual(meta['published'],'2026-11-09')
+  self.assertEqual(meta['published'], date.fromisoformat(meta['published']).isoformat())
+  self.assertGreaterEqual(date.fromisoformat(meta['published']), date(2026, 11, 9))
   self.assertTrue((ROOT/'docs/assets/quorivio-logo.svg').is_file())
   self.assertIn('github.com/desalvo/quorivio',meta['repository'])
   workflow=(ROOT/'.github/workflows/ci.yml').read_text()

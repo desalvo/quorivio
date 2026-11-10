@@ -1,8 +1,8 @@
 # Manuale del presentatore
 
-**Quorivio 0.1.0-dev · Build documentale RC292 · 9 novembre 2026**
+**Quorivio 0.1.0-dev · Build documentale RC293 · 10 novembre 2026**
 
-Guida di lavoro completa per creare, progettare, provare, condurre ed esportare una sessione. Descrive il codice RC292 con le correzioni vero/falso e il pulsante **R**. Le immagini illustrative dei capitoli principali sono **ricostruzioni esplicitamente etichettate**; la galleria finale dei PDF CI utilizza screenshot autentici acquisiti su un ambiente di prova e verificati tramite manifest e SHA-256.
+Guida di lavoro completa per creare, progettare, provare, condurre ed esportare una sessione. Descrive il codice RC293 con le correzioni vero/falso e il pulsante **R**. Le immagini illustrative dei capitoli principali sono **ricostruzioni esplicitamente etichettate**; la galleria finale dei PDF CI utilizza screenshot autentici acquisiti su un ambiente di prova e verificati tramite manifest e SHA-256.
 
 ## 1. La sequenza operativa completa
 
@@ -61,6 +61,36 @@ L'editor supporta selezioni multiple, **Taglia/Copia/Incolla**, **Annulla/Ripeti
 ### 5.3 Testo e formattazione indipendente
 
 Il font di riferimento è **Arial**. È possibile applicare formattazione a tutto il widget o a un testo selezionato; l'editor conserva formattazioni specifiche per titolo, descrizione, opzioni di risposta e tasto di invio. Per le risposte lunghe prevedere ritorni a capo; non affidarsi a righe tagliate. Verificare allineamenti orizzontali/verticali e la continuità del carattere durante la digitazione.
+
+## Atlante visuale dell'editor: riconoscere le icone e le finestre
+
+L'immagine seguente deriva dalla **barra widget realmente acquisita con Chromium** nell'archivio di collaudo RC291. Le icone sono le stesse della schermata di prova; i riquadri e la legenda sono annotazioni didattiche. La posizione di alcuni comandi può dipendere dalla larghezza della finestra o dalla modalità Smartphone.
+
+<figure><img src="../assets/manual-illustrations/editor-toolbar-atlas-it-rc293.png" alt="Atlante visivo delle venti icone effettive della barra widget"/><figcaption>Atlante delle 20 icone: simbolo reale, nome, funzione e posizione nella barra di inserimento.</figcaption></figure>
+
+### Dalla barra al canvas: come usare un'icona
+
+1. Seleziona un elemento nella **barra superiore**; poi posizionalo sul canvas nella pagina desiderata. I widget possono essere selezionati e ridimensionati senza modificare il resto della diapositiva.
+2. Usa la **sidebar Pagine** per cambiare diapositiva: la miniatura mostra i widget effettivi, compresi testi e opzioni. Non confondere la miniatura con l'anteprima in esecuzione.
+3. Per modificare **dati e collegamenti**, apri le proprietà; per font, bordi, colori, gradienti, effetti e visibilità usa **Formato widget** dal menu contestuale. La finestra conserva le dimensioni impostate quando passi fra le schede.
+4. Per le domande con correzione, imposta le alternative vere/false nelle proprietà della domanda; il pulsante circolare **R** del widget Risultati serve a mostrarle durante la proiezione, non a inserire una barra sopra il footer dell'editor.
+5. Se il menu contestuale è lungo, scorri **al suo interno**; la pressione prolungata su touchscreen apre il menu contestuale dove supportata.
+
+| Gruppo di comandi | Icone riconoscibili | Quando usarle |
+|---|---|---|
+| Testi e impaginazione | Testo, Titolo, Footer, Nota adesiva | Per il testo a schermo, la numerazione e i riferimenti persistenti |
+| Forme e tempi | Forme, Linee, Timer | Per separatori, schemi e scadenze visibili |
+| Domande e interazioni | Domanda a sondaggio, Domanda sul tema, Quiz a tempo, Gradimento, Reazioni | Per acquisire risposte, giudizi o domande dal pubblico |
+| Media e identità | Immagine, Video, Logo, Documento PDF, Profilo presentatore | Per caricare o mostrare contenuti autorizzati |
+| Accesso e risultati | Codice QR, Risultati, Partecipanti connessi | Per ingresso alla sessione e visualizzazione live |
+
+<figure><img src="../assets/manual-evidence-rc291/editor-widget-format-tabs.png" alt="Schermata reale archiviata del formato widget dopo cambio tab"/><figcaption>Schermata autentica d'archivio: la finestra di formattazione dopo il ridimensionamento e il passaggio fra schede.</figcaption></figure>
+
+### Schemi, anteprime e controlli prima dell'evento
+
+La barra superiore può anche mostrare **Schemi**, **Presentatore**, **Partecipante**, **Smartphone** e **Affiancate**: sono modalità operative, non nuove tipologie di widget. In **Schemi** imposti i contenuti comuni; in **Presentatore** provi il display di conduzione; in **Partecipante** valuti cosa vede il pubblico; **Smartphone** controlla le proporzioni mobili; **Affiancate** confronta due viste contemporaneamente. Verifica i testi con font più grandi, la visibilità del footer e il riscalamento delle immagini prima del live.
+
+<figure><img src="../assets/manual-evidence-rc291/rehearsal-side-by-side-smartphone.png" alt="Schermata reale della anteprima affiancata smartphone"/><figcaption>Vista autentica archiviata: confronto presentatore/partecipante con dispositivo Smartphone.</figcaption></figure>
 
 ## 6. Schemi (master), sfondi e footer
 

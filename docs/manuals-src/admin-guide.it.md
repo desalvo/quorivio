@@ -1,8 +1,8 @@
 # Manuale dell'amministratore
 
-**Quorivio 0.1.0-dev · Build documentale RC292 · 9 novembre 2026**
+**Quorivio 0.1.0-dev · Build documentale RC293 · 10 novembre 2026**
 
-Manuale tecnico-operativo per installazione, configurazione, autenticazione, autorizzazioni, backup, monitoraggio, audit, manutenzione e ripristino. Le procedure sono desunte dal sorgente e dai chart della RC292; non costituiscono certificazione di un deployment reale. **Le illustrazioni esplicative presenti nei primi capitoli sono ricostruzioni**, etichettate come tali. La galleria finale, quando presente nel PDF generato dalla CI, contiene esclusivamente screenshot reali dell'istanza temporanea verificati tramite hash e commit; la revisione editoriale D5 resta separata.
+Manuale tecnico-operativo per installazione, configurazione, autenticazione, autorizzazioni, backup, monitoraggio, audit, manutenzione e ripristino. Le procedure sono desunte dal sorgente e dai chart della RC293; non costituiscono certificazione di un deployment reale. **Le illustrazioni esplicative presenti nei primi capitoli sono ricostruzioni**, etichettate come tali. La galleria finale, quando presente nel PDF generato dalla CI, contiene esclusivamente screenshot reali dell'istanza temporanea verificati tramite hash e commit; la revisione editoriale D5 resta separata.
 
 ## 1. Architettura e responsabilità
 
@@ -19,6 +19,24 @@ Quorivio comprende frontend React/Vite, API Node/Express, PostgreSQL 18 come arc
 | SMTP/LDAP/OIDC | Identità e notifiche | TLS, mapping autorizzazioni e credenziali. |
 
 **Modello di responsabilità:** il gestore dell'istanza decide configurazione, basi giuridiche, backup, accessi e risposta agli incidenti. Il proprietario di una sessione governa i propri contenuti; non ha automaticamente privilegi su altre organizzazioni.
+
+## Guida visuale per l'amministratore: dove trovare le impostazioni
+
+Prima di intervenire sul server, apri il pannello amministrativo con un account autorizzato. Le schermate seguenti sono **acquisizioni autentiche archiviate** di una installazione di prova; l'organizzazione può personalizzare i menu. Le fotografie ambientali aggiunte al manuale sono invece illustrazioni sintetiche.
+
+<figure><img src="../assets/manual-evidence-rc291/admin-server-settings.png" alt="Pannello reale delle impostazioni server"/><figcaption>Schermata verificata d'archivio: pannello delle impostazioni server.</figcaption></figure>
+
+| Menu o controllo | Operazione verificabile | Precauzione |
+|---|---|---|
+| Impostazioni server | URL pubblico, servizi esterni e configurazione | Salvare segreti fuori dai repository e verificare il TLS |
+| Utenti e autorizzazioni | Ruoli, approvazioni e accessi federati | Nessuna promozione automatica basata solo sull'email |
+| Backup e ripristino | Destinazioni, schedulazione, storico e test di restore | Provare il recupero su istanza isolata |
+| Audit | Ricerca eventi, retention e revisione amministrativa | Limitare accesso ai log e dati personali |
+| Servizi di infrastruttura | PostgreSQL, ClamAV, converter e ingress | Configurare health check e allarmi |
+
+<figure><img src="../assets/manual-evidence-rc291/admin-backups.png" alt="Pannello backup originale su ambiente sintetico"/><figcaption>Schermata reale archiviata del pannello Backup: verifica della destinazione, ultima esecuzione e stato.</figcaption></figure>
+
+<figure><img src="../assets/manual-illustrations/editorial-collaborative-workflow-rc286.jpg" alt="Fotografia editoriale sintetica di un gruppo di lavoro"/><figcaption>Inserto fotografico sintetico: revisione collegiale delle procedure prima del deploy, non schermata dell'app.</figcaption></figure>
 
 ## 2. Checklist prima della prima installazione
 
@@ -457,7 +475,7 @@ L'importazione `.quo` è un trasferimento **della sola sessione** e non va confu
 <figure><img src="../assets/manual-illustrations/workflow-local-quo-rc286.png" alt="DIAGRAMMA CONCETTUALE — copia `.quo` portabile, diversa da backup amministrativo."/><figcaption>DIAGRAMMA CONCETTUALE — copia `.quo` portabile, diversa da backup amministrativo.</figcaption></figure>
 
 
-## Appendice P. Collaudo grafico e regressioni RC292
+## Appendice P. Collaudo grafico e regressioni RC293
 
 Prima della pubblicazione, prova la **R** di un risultato collegato a una domanda con chiavi V/F, prima con Arial 16 px e poi con un altro font fino a 48–96 px. Controlla che il bordo verde/rosso sia visibile, non nasconda lettere, non tocchi altri bordi e che non compaia più alcuna barra sotto la widget. La prova deve includere schermo del presentatore e anteprima partecipante senza divulgare le chiavi di valutazione.
 

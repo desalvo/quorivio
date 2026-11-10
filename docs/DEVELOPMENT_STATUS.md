@@ -1,3 +1,9 @@
+# Quorivio 0.1.0-dev — RC293 — Compact visual manuals and product brochures
+
+**RC293:** Six illustrated IT/EN manuals repaginated to remove compulsory chapter gaps; original 20-icon editor toolbar atlas from real Chromium evidence; additional archived screenshots and explicitly synthetic photographs on each page; two product brochures in IT/EN (two A4 pages each) with official product metadata. No runtime code changed. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full CI RC293 pending; prior RC292 full CI green. No commit/push/tag.
+
+---
+
 # Quorivio 0.1.0-dev — RC292 — Screenshot/PDF provenance pairing in full CI
 
 **RC292:** [Full CI 42677602865](https://github.com/desalvo/quorivio/actions/runs/42677602865) captured all **25 authentic Chromium screenshots** and generated correct six new PDFs (9 participant, 17 presenter, six administrator image captions in each language), but the broad Kubernetes/integration unittest discovery mixed the active 25-image capture with the older checked-in RC291 PDFs (five/six captions). Restored strict pairing: the default published PDF gate validates the latest **archived RC291 screenshots** while the dedicated CI `--require-real` gate validates current screenshot evidence and its current output directory. Preserved original RC283 archive, added all 25 checksum-verified RC291 screenshots as a separate historic collection, and republished six RC292 manuals with the enlarged gallery. Added negative regression tests and an early CI preflight. No application runtime changes. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`; no commit/push/tag. Full downstream CI remains to be verified.

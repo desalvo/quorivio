@@ -1,3 +1,5 @@
+**Documentazione RC293:** sei manuali IT/EN compatti e illustrati, atlante delle icone originali dell’editor e due brochure pubblicitarie A4. Vedi [note di rilascio](docs/RC_CYCLE293_VISUAL_MANUALS_BROCHURES.it.md) e [brochure PDF](docs/brochures/). Runtime invariato.
+
 **RC292:** Corretto il confronto fra PDF versionati e acquisizioni nuove nella suite di integrazione, archiviate 25 immagini autentiche RC291 e rigenerati i manuali bilingui. [Note RC292](docs/RC_CYCLE292_PDF_GALLERY_PAIRING.it.md).
 
 **RC290:** Corretto il collaudo Chromium: la finestra Formato viene realmente ridimensionata prima di verificare la conservazione delle dimensioni tra i tab. [Note RC290](docs/RC_CYCLE290_FORMAT_WINDOW_CAPTURE_CI.it.md).

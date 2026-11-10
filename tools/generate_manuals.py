@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Quorivio RC292 manual publication pipeline.
+"""Quorivio RC293 manual publication pipeline.
 
 Six role-specific bilingual Markdown sources are the editorial source of truth.
 This renders their tables, diagrams and labelled illustrative UI captures into
@@ -18,6 +18,7 @@ import shutil
 import hashlib
 from manual_release_metadata import metadata, validate_release
 from manual_screenshot_catalog import gallery
+from manual_visual_finishing import finish as finish_manual_pdf
 
 import mistune
 from weasyprint import HTML
@@ -34,13 +35,16 @@ ROLES = {'user': {'it':'Partecipante','en':'Participant'},
 CSS = r'''@page {
     size: A4;
     margin: 17mm 16mm 18mm 16mm;
-    @bottom-left { content: 'Quorivio | RC292 documentation'; font-size: 8pt; color: #5b6680; }
+    @bottom-left { content: 'Quorivio | RC293 documentation'; font-size: 8pt; color: #5b6680; }
     @bottom-right { content: counter(page) ' / ' counter(pages); font-size: 8pt; color: #5b6680; }
 }
 @page:first { margin: 0; @bottom-left {content:normal} @bottom-right{content:normal} }
 html{font-size: 10pt;}body{font-family: 'DejaVu Sans',Arial,sans-serif;color:#1f293b;margin:0;line-height:1.53}
 h1,h2,h3{font-family:'DejaVu Sans',Arial,sans-serif;line-height:1.25;color:#1f2854}
-h2{font-size:17.5pt;margin:0 0 14pt;break-before:page;border-bottom:2px solid #5f56d9;padding-bottom:8pt}
+h2{font-size:16pt;margin:16pt 0 10pt;break-before:auto;break-after:avoid;border-bottom:2px solid #159e9a;padding-bottom:6pt}
+h2:first-child{margin-top:0}
+h2:has(+figure){break-after:avoid}
+h2+figure{margin-top:7pt}
 h3{font-size:11.5pt;color:#5746bc;margin:17pt 0 8pt;break-after:avoid}
 h2 + h3{margin-top:11pt}p{margin:0 0 9pt;text-align:left;orphans:2;widows:2}strong{color:#1e2850}
 li{margin-bottom:5pt}ul,ol{padding-left:19pt;margin:7pt 0 12pt}li>ul{margin:4pt 0}
@@ -51,10 +55,10 @@ tbody tr:nth-child(even){background:#f5f6fc}tbody tr:nth-child(odd){background:#
 pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:8.4pt;line-height:1.4;background:#f3f5fa;border-left:4px solid #5c50cd;border-radius:3px;padding:12pt;margin:12pt 0 17pt;break-inside:avoid}
 code{font-family:'DejaVu Sans Mono',monospace;font-size:0.90em;color:#28345f}
 a{color:#5446d0;text-decoration:none}
-figure{margin:13pt 0 18pt;break-inside:avoid;background:#f7f8fd;border:1px solid #e2e5f0;padding:5pt;border-radius:6pt}
-figure img{display:block;max-width:100%;width:auto;height:auto;max-height:158mm;object-fit:contain;margin:0 auto}
-figcaption{font-size:7.8pt;color:#576278;padding:6pt 5pt 2pt;line-height:1.4}
-hr{margin:14pt 0;border:none;border-top:1px solid #ddd}
+figure{margin:10pt 0 12pt;break-inside:avoid;background:#f7f8fd;border:1px solid #e2e5f0;padding:5pt;border-radius:6pt}
+figure img{display:block;max-width:100%;width:auto;height:auto;max-height:138mm;object-fit:contain;margin:0 auto}
+figcaption{font-size:7.5pt;color:#576278;padding:6pt 5pt 2pt;line-height:1.4}
+hr{margin:10pt 0;border:none;border-top:1px solid #ddd}
 .cover{break-after:page;height:277mm;position:relative;padding:0;background:#fff}
 .cover-head{padding:22mm 17mm 6mm;background:linear-gradient(130deg,#f5f5ff,#fff);border-bottom:4pt solid #604cdc}
 .brand{font-weight:900;font-size:24pt;color:#5446ce;letter-spacing:-1pt}
@@ -68,11 +72,14 @@ hr{margin:14pt 0;border:none;border-top:1px solid #ddd}
 .cover-disclaimer{margin:8mm 17mm;padding:9pt 12pt;background:#fdf6e9;color:#7c531a;border-left:4px solid #e3b866;font-size:9pt}
 .toc{break-after:page;padding-top:12mm}
 .toc h1{font-size:22pt;color:#1d2854}
-.toc ul{list-style:none;margin:20pt 0 0;padding:0}
-.toc li{padding:2pt 0;margin:0;border-bottom:1px dotted #d3d7e5;font-size:9pt;line-height:1.22}
+.toc ul{list-style:none;margin:16pt 0 12pt;padding:0;columns:2;column-gap:18pt}
+.toc li{break-inside:avoid;padding:3pt 0;margin:0;border-bottom:1px dotted #d3d7e5;font-size:9pt;line-height:1.22}
 .toc a{display:block;color:#2b305e}
 .toc a::after{content:leader('.') target-counter(attr(href),page);font-size:9pt;color:#79829a}
 .content{margin:0}
+figure:has(img[src*="editor-toolbar-atlas"]) img{max-height:170mm}
+.toc-hero{width:100%;max-height:48mm;object-fit:cover;object-position:center 38%;border-radius:8pt;margin-top:12mm}
+.toc-note{background:#eef9f8;border-left:4px solid #12a39c;padding:10pt 13pt;font-size:9pt;color:#173b4b}
 .content>p:first-of-type{font-size:10pt}
 .section-mark{font-size:8pt;color:#6b7280}
 '''
@@ -117,10 +124,10 @@ def render_one(role: str, lang: str, *, require_real: bool = False) -> tuple[Pat
     cover_image=(ASSETS/'quorivio-manual-cover.png').as_uri()
     role_label=ROLES[role][lang]
     caption=('DIAGRAMMI CONCETTUALI, FOTO SINTETICHE E SCHERMATE AUTENTICHE VERIFICATE' if lang=='it' else 'CONCEPTUAL DIAGRAMS, SYNTHETIC EDITORIAL PHOTOS AND VERIFIED REAL SCREENSHOTS')
-    info=('Documentazione tecnica | 9 novembre 2026' if lang=='it' else 'Technical documentation | 9 November 2026')
+    info=('Documentazione tecnica | 10 novembre 2026' if lang=='it' else 'Technical documentation | 10 November 2026')
     subtitle=('Guida operativa illustrata' if lang=='it' else 'Illustrated operational guide')
     toc_title='Indice' if lang=='it' else 'Contents'
-    note=('Edizione RC292; certificazioni di sicurezza e infrastrutture reali restano separate.' if lang=='it' else 'RC292 edition; security and real infrastructure certifications remain separate.')
+    note=('Edizione RC293; certificazioni di sicurezza e infrastrutture reali restano separate.' if lang=='it' else 'RC293 edition; security and real infrastructure certifications remain separate.')
     contact=html.escape(meta['author'])
     platform=('Server Linux amd64/arm64 (Docker, Podman, Kubernetes). Client via browser su Windows, macOS, Linux, iOS e Android.' if lang=='it' else 'Linux amd64/arm64 server (Docker, Podman, Kubernetes). Web clients on Windows, macOS, Linux, iOS and Android.')
     minimum=('Minimo indicativo per valutazione: 2 vCPU, 4 GiB RAM, 20 GiB disco oltre ai dati persistenti; dimensionare la produzione con misure.' if lang=='it' else 'Indicative evaluation minimum: 2 vCPU, 4 GiB RAM, 20 GiB disk plus persistent data; benchmark production sizing.')
@@ -133,11 +140,14 @@ def render_one(role: str, lang: str, *, require_real: bool = False) -> tuple[Pat
     <section class="cover"><div class="cover-head"><div class="brand"><img class="cover-brand-logo" src="{brand_logo}" alt="Logo ufficiale Quorivio"/> Quorivio</div><div class="cover-kicker">{html.escape(subtitle)} · {html.escape(role_label)}</div><div class="cover-title">{html.escape(title)}</div><div class="cover-version">{html.escape(meta['version'])} • {html.escape(meta['build'])} • {info}</div></div>
     <img class="cover-picture" src="{cover_image}" alt="Quorivio event illustration"/>
     <div class="cover-details">{details}</div><div class="cover-disclaimer">{caption}<br>{note}</div></section>
-    <section class="toc"><h1>{toc_title}</h1><p>{len(anchors)} {"capitoli" if lang=='it' else 'chapters'} · {"Edizione" if lang=='it' else 'Edition'} RC292</p><ul>{toc}</ul></section>
+    <section class="toc"><h1>{toc_title}</h1><p>{len(anchors)} {"capitoli" if lang=='it' else 'chapters'} · {"Edizione" if lang=='it' else 'Edition'} RC293</p><ul>{toc}</ul>
+    <div class="toc-note">{'Ogni sezione include procedure e controlli pratici. Le immagini archiviate sono acquisite dall’app reale; le fotografie ambientali sono illustrazioni sintetiche.' if lang=='it' else 'Every chapter contains practical actions and checks. Archived screens are captured from the actual app; environmental photos are synthetic illustrations.'}</div>
+    <img class="toc-hero" src="{(ASSETS/'manual-illustrations/editorial-live-presentation-rc286.jpg').as_uri()}" alt="Editorial illustration"/></section>
     <main class="content">{markup}</main></body></html>'''
     OUTPUT.mkdir(parents=True,exist_ok=True)
     dest=OUTPUT/f'{role}-guide.{lang}.pdf'
     HTML(string=document,base_url=str(SOURCE)).write_pdf(dest)
+    finish_manual_pdf(dest,role,lang)
     WEB.mkdir(parents=True,exist_ok=True)
     shutil.copy2(dest,WEB/dest.name)
     if hashlib.sha256(dest.read_bytes()).digest()!=hashlib.sha256((WEB/dest.name).read_bytes()).digest():
@@ -185,8 +195,8 @@ def main():
                             raise ValueError('Screenshot caption has no embedded screenshot: '+str(dest))
             if pages<14 or not any('Quorivio' in p.get_text() for p in pdf):
                 raise ValueError('Broken or unexpectedly short PDF: '+str(dest))
-            if not any('RC292' in p.get_text() for p in pdf):
-                raise ValueError('Missing RC292 build identification: '+str(dest))
+            if not any('RC293' in p.get_text() for p in pdf):
+                raise ValueError('Missing RC293 build identification: '+str(dest))
             print(dest.name,'chapters',chapters,'pages',pages,'bytes',dest.stat().st_size)
             total+=pages
             pdf.close()

@@ -1,8 +1,8 @@
 # Guida del partecipante
 
-**Quorivio 0.1.0-dev · Build documentale RC292 · 9 novembre 2026**
+**Quorivio 0.1.0-dev · Build documentale RC293 · 10 novembre 2026**
 
-Questa guida spiega come partecipare a una sessione interattiva, rispondere ai diversi tipi di domanda, interpretare gli esiti e usare correttamente le funzioni disponibili da smartphone o computer. È riferita al codice della RC292 e alla revisione editoriale RC278. Le prime figure sono ricostruzioni etichettate; la galleria finale nei PDF generati dalla CI usa screenshot autentici acquisiti sull'istanza di prova temporanea, **non su un server di produzione**.
+Questa guida spiega come partecipare a una sessione interattiva, rispondere ai diversi tipi di domanda, interpretare gli esiti e usare correttamente le funzioni disponibili da smartphone o computer. È riferita al codice della RC293 e alla revisione editoriale RC278. Le prime figure sono ricostruzioni etichettate; la galleria finale nei PDF generati dalla CI usa screenshot autentici acquisiti sull'istanza di prova temporanea, **non su un server di produzione**.
 
 ## 1. Conoscere Quorivio
 
@@ -41,6 +41,25 @@ La registrazione di un account non equivale all'approvazione: se l'organizzazion
 La pagina partecipante segue di norma la pagina scelta dal presentatore. Su smartphone la disposizione è adattata alle dimensioni del dispositivo e può essere diversa da quella desktop; l'obiettivo è preservare leggibilità e controlli senza richiedere uno zoom eccessivo. Nelle pagine possono comparire domanda, immagini, un video, timer, tasti di invio, gradimento, reazioni e un QR.
 
 **Prima di rispondere:** leggere il testo completo, verificare il numero di scelte consentite, eventuale scadenza temporale e obbligatorietà della risposta. Se il presentatore passa a un'altra pagina mentre si scrive, verificare che il campo sia ancora disponibile prima di inviare.
+
+## Leggere lo schermo dello smartphone: guida illustrata
+
+La schermata pubblica è diversa dalla dashboard dei presentatori. Durante un evento, il pubblico vede soltanto la pagina resa disponibile per la partecipazione; non può aprire l'editor o amministrare le domande. Guarda questi esempi autentici archiviati per riconoscere i controlli.
+
+<figure><img src="../assets/manual-evidence-rc291/participant-entry-smartphone.png" alt="Schermata autentica di ingresso da telefono"/><figcaption>Schermata autentica d'archivio: ingresso tramite browser del telefono.</figcaption></figure>
+
+| Elemento visuale | Cosa significa | Cosa fare |
+|---|---|---|
+| Codice sessione / QR | Invito associato all'evento | Aprire il collegamento ricevuto dall'organizzatore |
+| Titolo e descrizione | Contesto della domanda corrente | Leggere tutto prima di selezionare |
+| Cerchio o casella | Una risposta singola o multipla | Selezionare l'alternativa richiesta |
+| Invia risposta | Conferma dell'azione | Inviare una volta, entro il tempo disponibile |
+| Messaggio di feedback | Esito o ricevuta di consegna | Leggere senza cambiare identità browser |
+| Timer e stato | Domanda aperta, tempo residuo, attesa | Seguire le istruzioni del presentatore |
+
+<figure><img src="../assets/manual-evidence-rc291/participant-question-smartphone.png" alt="Schermata autentica della domanda sul telefono"/><figcaption>Schermata reale archiviata: una domanda attiva sul telefono, con i controlli del partecipante.</figcaption></figure>
+
+<figure><img src="../assets/manual-illustrations/editorial-live-presentation-rc286.jpg" alt="Inserto fotografico sintetico di una presentazione"/><figcaption>Fotografia illustrativa sintetica dell'evento: la gestione dei contenuti resta sullo schermo del relatore.</figcaption></figure>
 
 ## 4. Scelta singola, scelta multipla e valutazione vero/falso
 
@@ -132,7 +151,7 @@ Per l'accessibilità, usare l'ingrandimento del browser, orientare correttamente
 
 **Sessione:** insieme delle pagine e dei controlli dell'evento. **Pagina:** schermata presentata durante la sessione. **Widget:** componente visuale o interattivo della pagina. **Anteprima:** simulazione che non sostituisce il collaudo dal vivo. **Risposta confermata:** invio accettato dal server. **Moderazione:** decisione del presentatore su contenuti pubblicabili. **Retention:** durata di conservazione stabilita dall'installazione.
 
-**Stato di collaudo:** questa guida descrive il comportamento previsto dal codice della RC292. Non rappresenta una certificazione degli specifici browser, dispositivi, server LDAP/SMTP o cluster Kubernetes.
+**Stato di collaudo:** questa guida descrive il comportamento previsto dal codice della RC293. Non rappresenta una certificazione degli specifici browser, dispositivi, server LDAP/SMTP o cluster Kubernetes.
 
 ## Appendice A. Esempio completo di quiz corretto e sbagliato
 

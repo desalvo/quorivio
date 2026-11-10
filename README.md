@@ -1,3 +1,5 @@
+**RC293 documentation:** six space-efficient visual manuals (IT/EN), genuine archived editor icon atlas and two illustrated A4 product brochures. See [English release note](docs/RC_CYCLE293_VISUAL_MANUALS_BROCHURES.en.md) and [PDF brochures](docs/brochures/). The application runtime is unchanged.
+
 **RC292:** Fixed broad integration test PDF gallery mix-up, archived 25 authentic RC291 images and regenerated the bilingual manuals. [RC292 notes](docs/RC_CYCLE292_PDF_GALLERY_PAIRING.en.md).
 
 **RC291:** Scoped both distinct Smartphone controls in the real presenter/participant rehearsal and added side-by-side mobile screenshot evidence. [RC291 notes](docs/RC_CYCLE291_REHEARSAL_SMARTPHONE_CI.en.md).

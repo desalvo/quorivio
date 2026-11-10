@@ -1,8 +1,8 @@
 # Presenter guide
 
-**Quorivio 0.1.0-dev · Documentation build RC292 · 9 November 2026**
+**Quorivio 0.1.0-dev · Documentation build RC293 · 10 November 2026**
 
-An end-to-end guide to preparing, designing, rehearsing, conducting, exporting and archiving a Quorivio event. It reflects the RC292 codebase, including answer grading and the green **R** toggle. Earlier illustrative figures are **labelled browser-rendered reconstructions**. The final gallery in CI-built PDFs contains genuine screenshots of the running disposable application, verified against source commit and SHA-256.
+An end-to-end guide to preparing, designing, rehearsing, conducting, exporting and archiving a Quorivio event. It reflects the RC293 codebase, including answer grading and the green **R** toggle. Earlier illustrative figures are **labelled browser-rendered reconstructions**. The final gallery in CI-built PDFs contains genuine screenshots of the running disposable application, verified against source commit and SHA-256.
 
 ## 1. The complete event workflow
 
@@ -59,6 +59,36 @@ Multi-selection, **Cut/Copy/Paste**, **Undo/Redo** and deletion apply to the sel
 ### 5.3 Text formatting and line wrapping
 
 **Arial** is the reference font. Formatting can apply to the whole widget or to selected text. Question titles, descriptions, answer choices and submit buttons have independent typography. Long choices should wrap rather than disappear. Check left/center/right and vertical alignment in editor and preview.
+
+## Visual editor atlas: icons, windows and practical actions
+
+The atlas below is based on a **real Chromium capture of the RC291 widget toolbar**. The icons themselves are genuine; cards and captions are editorial annotations. Responsive layouts can rearrange commands.
+
+<figure><img src="../assets/manual-illustrations/editor-toolbar-atlas-en-rc293.png" alt="Visual atlas of twenty actual editor toolbar icons"/><figcaption>Twenty editor icons: original symbol, English label and usage.</figcaption></figure>
+
+### From toolbar to canvas: guided example
+
+1. Choose an element in the **top widget toolbar**, then position it on the desired page. Widgets may be selected and resized independently.
+2. Use the **Pages sidebar** to select or rearrange pages; thumbnails now depict actual widget content, not merely imported images.
+3. Open **Properties** for content and data binding; open **Widget Formatting** from the context menu for fonts, borders, colors, gradients, effects and visibility. A user-resized formatting window keeps its dimensions across tabs.
+4. For questions with an answer key, configure true/false alternatives in the question. The circular **R** on Results reveals grading during presentation; there is no separate strip overlaying the editor footer.
+5. For a long context menu, scroll **inside the menu**, including on supported touch devices.
+
+| Command family | Recognisable icons | Use case |
+|---|---|---|
+| Text and page layout | Text, Title, Footer, Sticky note | Captions, numbering and persistent page references |
+| Shapes and timing | Shapes, Lines, Timer | Dividers, diagrams and visible countdowns |
+| Questions and interactions | Poll question, Open question, Timed quiz, Rating, Reactions | Collect audience input and feedback |
+| Media and identity | Image, Video, Logo, PDF document, Presenter profile | Show approved assets and material |
+| Access and results | QR code, Results, Connected participants | Join events and monitor live engagement |
+
+<figure><img src="../assets/manual-evidence-rc291/editor-widget-format-tabs.png" alt="Verified archived widget formatting after changing tabs"/><figcaption>Verified archived capture: formatting window after user resize and tab switching.</figcaption></figure>
+
+### Master editor, previews and pre-event checks
+
+The top bar also offers **Schemes/Masters**, **Presenter**, **Participant**, **Smartphone** and **Side-by-side** modes. These are operational views, not extra widget kinds. Use **Masters** for shared page defaults, **Presenter** to rehearse projection, **Participant** to check audience controls, **Smartphone** for mobile layout and **Side-by-side** to compare screens. Validate large-font text, footers and image scaling before going live.
+
+<figure><img src="../assets/manual-evidence-rc291/rehearsal-side-by-side-smartphone.png" alt="Verified archived side by side smartphone rehearsal"/><figcaption>Real archived rehearsal: Presenter and Participant, with the participant device set to Smartphone.</figcaption></figure>
 
 ## 6. Slide masters, backgrounds and footers
 

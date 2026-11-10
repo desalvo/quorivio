@@ -1,8 +1,8 @@
 # Administrator guide
 
-**Quorivio 0.1.0-dev · Documentation build RC292 · 9 November 2026**
+**Quorivio 0.1.0-dev · Documentation build RC293 · 10 November 2026**
 
-Technical and operational manual for installation, configuration, identity management, backups, monitoring, audit logging, maintenance and disaster recovery. Procedures reflect the RC292 source and deployment charts; they do **not** certify a production environment. **Explanatory UI illustrations in earlier chapters are reconstructions**, labelled as such. When the CI-produced PDF includes the final gallery, it contains genuine screenshots of the disposable live application, verified against hashes and commit. Independent D5 editorial review remains required.
+Technical and operational manual for installation, configuration, identity management, backups, monitoring, audit logging, maintenance and disaster recovery. Procedures reflect the RC293 source and deployment charts; they do **not** certify a production environment. **Explanatory UI illustrations in earlier chapters are reconstructions**, labelled as such. When the CI-produced PDF includes the final gallery, it contains genuine screenshots of the disposable live application, verified against hashes and commit. Independent D5 editorial review remains required.
 
 ## 1. Architecture and responsibilities
 
@@ -19,6 +19,24 @@ Quorivio combines a React/Vite frontend, Node/Express API, PostgreSQL 18 as the 
 | SMTP/LDAP/OIDC | Identity and notifications | TLS, mapping, authorization and credential lifecycle. |
 
 **Responsibility model:** the instance operator determines infrastructure, legal basis, authorization, retention, backups and incident handling. A session owner manages that session; ownership does not imply cross-organization administrator rights.
+
+## Visual administrator guide: finding the settings
+
+Before changing the server, open the administration panel with an authorised account. The images below are **verified archived captures** from a disposable test instance; organisations may customise their menus. Editorial photos are synthetic illustrations.
+
+<figure><img src="../assets/manual-evidence-rc291/admin-server-settings.png" alt="Real server settings admin panel"/><figcaption>Verified archived screen: server settings and infrastructure controls.</figcaption></figure>
+
+| Menu or control | What to verify | Safety note |
+|---|---|---|
+| Server settings | Public URL, integrations and options | Keep secrets out of source control; test TLS |
+| Users and authorisations | Roles, approval and federated sign-in | Do not grant permissions solely from email |
+| Backup and restore | Destinations, schedules, history and restore rehearsal | Restore only on an isolated instance |
+| Audit | Search, retention and administrative review | Restrict personal data and log access |
+| Infrastructure services | PostgreSQL, ClamAV, converter and ingress | Enable health checks and alerting |
+
+<figure><img src="../assets/manual-evidence-rc291/admin-backups.png" alt="Real archived backup screen"/><figcaption>Verified archived screenshot: backup destination, execution history and status.</figcaption></figure>
+
+<figure><img src="../assets/manual-illustrations/editorial-collaborative-workflow-rc286.jpg" alt="Synthetic editorial photograph of a team"/><figcaption>Synthetic editorial photograph: reviewing the rollout runbook, not a live application capture.</figcaption></figure>
 
 ## 2. Pre-installation checklist
 
@@ -455,7 +473,7 @@ A `.quo` file copies **one session**, not the whole instance. In the dashboard, 
 <figure><img src="../assets/manual-illustrations/workflow-local-quo-rc286.png" alt="CONCEPTUAL DIAGRAM — portable `.quo` versus full-instance backup."/><figcaption>CONCEPTUAL DIAGRAM — portable `.quo` versus full-instance backup.</figcaption></figure>
 
 
-## Appendix P. RC292 graphical acceptance and regression checklist
+## Appendix P. RC293 graphical acceptance and regression checklist
 
 Before publication, exercise the **R** control of results linked to a graded question, first using Arial 16 px and then a different font up to 48–96 px. Verify that green/red outlines remain visible, do not obscure characters or touch adjacent frames, and that the old strip underneath the widget never reappears. Check presenter projection and participant preview without exposing answer keys to the audience.
 
