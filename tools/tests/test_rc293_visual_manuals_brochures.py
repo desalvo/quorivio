@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """RC293: keep publication truly graphical, compact, provenance-aware and bilingual."""
 from __future__ import annotations
-import hashlib,re,unittest
+import ast,hashlib,re,unittest
 from pathlib import Path
 import fitz
-from PIL import Image
 from tools.manual_screenshot_catalog import evidence,LATEST_ARCHIVED_SCREENSHOTS,LATEST_ARCHIVED_COMMIT
+from tools.manual_release_metadata import metadata
 ROOT=Path(__file__).resolve().parents[2]
 SOURCE=ROOT/'docs/manuals-src'
 ROLE={'user':'user','presenter':'presenter','admin':'admin'}
@@ -18,17 +18,26 @@ class RC293VisualManualsAndBrochures(unittest.TestCase):
   self.assertIn("SCREEN=ROOT/'docs/assets/manual-evidence-rc291/editor-canvas.png'",source)
   for language in ('it','en'):
    img=ROOT/f'docs/assets/manual-illustrations/editor-toolbar-atlas-{language}-rc293.png'
-   with Image.open(img) as pic:
-    self.assertGreater(pic.width,1400)
-    self.assertGreater(pic.height,1100)
-  self.assertEqual(len(__import__('tools.manual_icon_atlas',fromlist=['NAMES']).NAMES),20)
+   # PyMuPDF is already provisioned in the early PDF gate. Its pixmap
+   # decoder validates the entire PNG without requiring Pillow on runners.
+   pic=fitz.Pixmap(str(img))
+   self.assertGreater(pic.width,1400)
+   self.assertGreater(pic.height,1100)
+   self.assertIn(pic.n,(3,4))
+  # Parse the editor icon legend as a source constant instead of importing
+  # the image-generation tool, which intentionally depends on Pillow.
+  atlas_tree=ast.parse((ROOT/'tools/manual_icon_atlas.py').read_text())
+  names=next(node.value for node in atlas_tree.body
+             if isinstance(node,ast.Assign)
+             and any(isinstance(target,ast.Name) and target.id=='NAMES' for target in node.targets))
+  self.assertEqual(len(ast.literal_eval(names)),20)
 
  def test_six_manuals_contain_real_figures_and_no_commit_id(self):
   for role in ROLE:
    for language in ('it','en'):
     with self.subTest(role=role,language=language):
      source=(SOURCE/f'{role}-guide.{language}.md').read_text()
-     self.assertIn('RC293',source)
+     self.assertIn(metadata()['build'],source)
      self.assertIn('../assets/manual-evidence-rc291/',source)
      path=ROOT/f'docs/manuals/{role}-guide.{language}.pdf'
      copy=ROOT/f'apps/web/public/docs/manuals/{role}-guide.{language}.pdf'
@@ -37,7 +46,7 @@ class RC293VisualManualsAndBrochures(unittest.TestCase):
       self.assertGreaterEqual(pdf.page_count,16)
       self.assertLessEqual(pdf.page_count,40)
       texts='\n'.join(page.get_text() for page in pdf)
-      self.assertIn('RC293',texts)
+      self.assertIn(metadata()['build'],texts)
       self.assertIn('Alessandro De Salvo',texts)
       self.assertIn('braket71@gmail.com',texts)
       self.assertIn('EUPL-1.2',texts)
@@ -71,7 +80,7 @@ class RC293VisualManualsAndBrochures(unittest.TestCase):
     self.assertEqual(doc.page_count,2)
     for page in doc:self.assertGreaterEqual(len(page.get_image_info()),1)
     t='\n'.join(p.get_text() for p in doc)
-    for word in ('Quorivio','RC293','Alessandro De Salvo','braket71@gmail.com','EUPL-1.2','github.com/desalvo/quorivio','.quo'):
+    for word in ('Quorivio',metadata()['build'],'Alessandro De Salvo','braket71@gmail.com','EUPL-1.2','github.com/desalvo/quorivio','.quo'):
      self.assertIn(word,t)
     self.assertNotRegex(t,r'\b[0-9a-f]{40}\b')
   self.assertIn('official-quorivio-logo.png',(ROOT/'tools/generate_brochures.py').read_text())
@@ -83,7 +92,9 @@ class RC293VisualManualsAndBrochures(unittest.TestCase):
   self.assertIn('test_rc293_visual_manuals_brochures',ci)
   from tools.manual_release_metadata import metadata
   m=metadata()
-  self.assertEqual(m['build'],'RC293')
+  from tools.verify_rc_current_inventory import current_verifier_module
+  active=current_verifier_module().__name__.removeprefix('verify_rc_cycle').removesuffix('_inventory')
+  self.assertEqual(m['build'],f'RC{active}')
   self.assertEqual(m['published'],'2026-11-10')
 
 if __name__=='__main__':unittest.main()

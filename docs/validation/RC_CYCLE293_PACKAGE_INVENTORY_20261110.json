@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
   "cycle": 293,
-  "file_count_excluding_manifest": 2562,
+  "file_count_excluding_manifest": 2567,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -44,14 +44,14 @@
       "e377db62"
     ],
     ".github/workflows/ci.yml": [
-      "7a1785bc",
-      "dae37a5c",
-      "9a9e7faa",
-      "a3968338",
-      "458e9948",
-      "739a98a3",
-      "69b4a492",
-      "dcd49091"
+      "914c6fd6",
+      "08758212",
+      "e326265d",
+      "aeb97162",
+      "d74c8a0b",
+      "5df52896",
+      "fc9b52c7",
+      "336dceab"
     ],
     ".github/workflows/converter-image.yml": [
       "6ff519db",
@@ -224,14 +224,14 @@
       "2dd5f6ba"
     ],
     "apps/api/src/domain.ts": [
-      "18d9a571",
-      "c41b8bc1",
-      "6943d257",
-      "470ca86c",
-      "e6f5e524",
-      "49f11e07",
-      "759a8a09",
-      "6c64c90a"
+      "3f3cac68",
+      "36ab3179",
+      "64f609f9",
+      "6700ea50",
+      "d074babb",
+      "bc65b516",
+      "a48792d6",
+      "9d40ad2c"
     ],
     "apps/api/src/email-otp.ts": [
       "442c62ac",
@@ -1433,6 +1433,16 @@
       "d6030584",
       "903b3432"
     ],
+    "apps/api/test/rc295-pie-size-domain.test.ts": [
+      "dd2700ad",
+      "1cd621a0",
+      "d6ac978e",
+      "5d48d5a1",
+      "58d66bc5",
+      "e3c3e43b",
+      "ad099063",
+      "a8ebcc8c"
+    ],
     "apps/api/test/rc71-session-lifecycle.test.ts": [
       "2e8b873d",
       "b7460c44",
@@ -2074,14 +2084,14 @@
       "54a62e5d"
     ],
     "apps/web/src/main.tsx": [
-      "713272e9",
-      "1fa6f1ee",
-      "9ca05f7e",
-      "e0c8ae44",
-      "b444ce78",
-      "c7abed06",
-      "3858ddfa",
-      "17d585f0"
+      "f6b9f6e1",
+      "e245590d",
+      "d25dc9cc",
+      "3ae3172b",
+      "7fce118e",
+      "97270ed4",
+      "66ef251e",
+      "da5f4e55"
     ],
     "apps/web/src/main.tsx.orig": [
       "9230e5a3",
@@ -2353,6 +2363,16 @@
       "e087506e",
       "a4c2a225"
     ],
+    "apps/web/src/result-pie-layout.ts": [
+      "df6feb58",
+      "acc30782",
+      "62f4cef0",
+      "c1b43a1f",
+      "d188426a",
+      "4b2a238b",
+      "ee336bbe",
+      "d53ae4d8"
+    ],
     "apps/web/src/result-text-style.ts": [
       "05de4121",
       "948b8b4d",
@@ -2434,14 +2454,14 @@
       "2586b822"
     ],
     "apps/web/src/style.css": [
-      "2fb84705",
-      "e010f5a8",
-      "64875d30",
-      "a17bad0e",
-      "8d55ccec",
-      "56dd265c",
-      "3edd11e6",
-      "fc168eff"
+      "2e3682ed",
+      "c20cad99",
+      "a436167a",
+      "fbbccc74",
+      "80549146",
+      "cda99e27",
+      "626ebe1a",
+      "77be1f40"
     ],
     "apps/web/src/thumbnail-menu-layout.ts": [
       "a4748563",
@@ -3532,6 +3552,16 @@
       "1b538220",
       "aec8ef6b",
       "26276684"
+    ],
+    "apps/web/test/rc295-pie-and-truth-layout.test.ts": [
+      "f2c0207f",
+      "de6790c9",
+      "ba5a0149",
+      "e34d14dd",
+      "6ff7ac8e",
+      "b4744a14",
+      "557b4f47",
+      "8a7e440a"
     ],
     "apps/web/test/rc70-editor-timer-font.test.ts": [
       "116cfb27",
@@ -12683,66 +12713,6 @@
       "65a35c73",
       "9384744d"
     ],
-    "docs/manuals/admin-guide.en.pdf": [
-      "7ebafbbe",
-      "7776d0bd",
-      "a5ec3240",
-      "456249fa",
-      "9d9b1782",
-      "ee7e8411",
-      "e829b4e0",
-      "9e354a3c"
-    ],
-    "docs/manuals/admin-guide.it.pdf": [
-      "8e40bc4b",
-      "0011bd08",
-      "36c5a435",
-      "a3c0ff65",
-      "b356439b",
-      "75392bce",
-      "a7c85796",
-      "1f460455"
-    ],
-    "docs/manuals/presenter-guide.en.pdf": [
-      "352c40bd",
-      "75d6a5cb",
-      "7115f613",
-      "2e778ca9",
-      "17abe3ad",
-      "c678dd3d",
-      "779b0f73",
-      "09c3d982"
-    ],
-    "docs/manuals/presenter-guide.it.pdf": [
-      "b6a2d1af",
-      "05c46a26",
-      "dbd68102",
-      "8f99fa72",
-      "c1eb1ec9",
-      "ff72846f",
-      "9c398e47",
-      "c2ce971e"
-    ],
-    "docs/manuals/user-guide.en.pdf": [
-      "bc6a4d6f",
-      "b4e614cc",
-      "63183d9f",
-      "b813d72f",
-      "b26d8718",
-      "bc94cf40",
-      "22db5cad",
-      "6f8c23d0"
-    ],
-    "docs/manuals/user-guide.it.pdf": [
-      "91b91b39",
-      "caeab728",
-      "2b97b6f5",
-      "07ed6c67",
-      "dfe6b93e",
-      "1c99f784",
-      "8dde21f5",
-      "fa91f29e"
-    ],
     "docs/manuals-src/README.md": [
       "6a225c63",
       "3d4d1389",
@@ -12812,6 +12782,66 @@
       "abfc3868",
       "1af34f3d",
       "04c23107"
+    ],
+    "docs/manuals/admin-guide.en.pdf": [
+      "7ebafbbe",
+      "7776d0bd",
+      "a5ec3240",
+      "456249fa",
+      "9d9b1782",
+      "ee7e8411",
+      "e829b4e0",
+      "9e354a3c"
+    ],
+    "docs/manuals/admin-guide.it.pdf": [
+      "8e40bc4b",
+      "0011bd08",
+      "36c5a435",
+      "a3c0ff65",
+      "b356439b",
+      "75392bce",
+      "a7c85796",
+      "1f460455"
+    ],
+    "docs/manuals/presenter-guide.en.pdf": [
+      "352c40bd",
+      "75d6a5cb",
+      "7115f613",
+      "2e778ca9",
+      "17abe3ad",
+      "c678dd3d",
+      "779b0f73",
+      "09c3d982"
+    ],
+    "docs/manuals/presenter-guide.it.pdf": [
+      "b6a2d1af",
+      "05c46a26",
+      "dbd68102",
+      "8f99fa72",
+      "c1eb1ec9",
+      "ff72846f",
+      "9c398e47",
+      "c2ce971e"
+    ],
+    "docs/manuals/user-guide.en.pdf": [
+      "bc6a4d6f",
+      "b4e614cc",
+      "63183d9f",
+      "b813d72f",
+      "b26d8718",
+      "bc94cf40",
+      "22db5cad",
+      "6f8c23d0"
+    ],
+    "docs/manuals/user-guide.it.pdf": [
+      "91b91b39",
+      "caeab728",
+      "2b97b6f5",
+      "07ed6c67",
+      "dfe6b93e",
+      "1c99f784",
+      "8dde21f5",
+      "fa91f29e"
     ],
     "docs/validation/RC127_LOCAL_TEST_EVIDENCE_20261102.json": [
       "30969465",
@@ -17813,6 +17843,16 @@
       "ed89c8a4",
       "ec4d9857"
     ],
+    "tools/ci_rc295_results_layout_chromium.py": [
+      "7d35ff3a",
+      "a984b016",
+      "d38bcc9e",
+      "d6f4ebe1",
+      "fe0b4d4c",
+      "ab16ac33",
+      "a2e3e28f",
+      "d671bd59"
+    ],
     "tools/ci_rc71_lifecycle_postgres.py": [
       "15c9edcd",
       "2fb825f3",
@@ -21234,14 +21274,14 @@
       "ed1777a9"
     ],
     "tools/tests/test_rc286_authoring_manuals.py": [
-      "98e63e08",
-      "6c81e4cf",
-      "edc2f6ca",
-      "bdaada27",
-      "4789a8f2",
-      "c571734f",
-      "23355215",
-      "4bc97ddd"
+      "af80d7c5",
+      "62791cfb",
+      "061013b2",
+      "64346fb5",
+      "2be1e87e",
+      "fb4ce477",
+      "7d8b6b78",
+      "65970fa6"
     ],
     "tools/tests/test_rc287_result_formatting.py": [
       "1b6f6d1a",
@@ -21304,14 +21344,24 @@
       "32d33eb3"
     ],
     "tools/tests/test_rc293_visual_manuals_brochures.py": [
-      "7d49f2a1",
-      "ba3abad2",
-      "6d4c207a",
-      "4e4477b0",
-      "529946a9",
-      "a804649b",
-      "96516fc1",
-      "69de3051"
+      "ea0c9b80",
+      "929e0fd4",
+      "ce9b511b",
+      "ae0b44a7",
+      "17cd9192",
+      "ce7b98ce",
+      "c510dee8",
+      "ff80a3bc"
+    ],
+    "tools/tests/test_rc295_gitleaks_history.py": [
+      "63cde691",
+      "30f2c4aa",
+      "f7842eb8",
+      "060aacec",
+      "7cfc7393",
+      "4638b06b",
+      "dea311e1",
+      "71af8baa"
     ],
     "tools/tests/test_rc73_slide_master.py": [
       "2c080f2d",
