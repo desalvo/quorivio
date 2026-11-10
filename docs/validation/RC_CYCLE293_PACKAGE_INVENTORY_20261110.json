@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
   "cycle": 293,
-  "file_count_excluding_manifest": 2581,
+  "file_count_excluding_manifest": 2586,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -44,14 +44,14 @@
       "e377db62"
     ],
     ".github/workflows/ci.yml": [
-      "2cc6e067",
-      "3ec4fb5f",
-      "6959b9cd",
-      "31fa7e29",
-      "c585ff71",
-      "0ffc1bdb",
-      "cc4b4612",
-      "568c0c69"
+      "70768129",
+      "a25fac9d",
+      "db0a143b",
+      "67074c9d",
+      "ef526f25",
+      "c7aefc2d",
+      "cc63dde2",
+      "067b3370"
     ],
     ".github/workflows/converter-image.yml": [
       "6ff519db",
@@ -2023,6 +2023,16 @@
       "a02ff2ca",
       "abe8d133"
     ],
+    "apps/web/src/live-result-poller.ts": [
+      "768f1dd7",
+      "dd93554d",
+      "d4e28924",
+      "5c3bfcfb",
+      "866fe59c",
+      "48c795b1",
+      "f4f6d816",
+      "8a03354e"
+    ],
     "apps/web/src/live-slide-policy.ts": [
       "154c083b",
       "4addd55b",
@@ -2034,14 +2044,14 @@
       "54a62e5d"
     ],
     "apps/web/src/main.tsx": [
-      "a0e1c49a",
-      "74a60612",
-      "9cdc905f",
-      "f6b00581",
-      "f9a89d0f",
-      "a4bb9492",
-      "7a7b636d",
-      "0f7d5f36"
+      "dc35d01e",
+      "6aeb559b",
+      "691e11a7",
+      "ab703daf",
+      "f78a5b85",
+      "d964bf63",
+      "293dbd1f",
+      "3bcd21d0"
     ],
     "apps/web/src/main.tsx.orig": [
       "9230e5a3",
@@ -3533,6 +3543,16 @@
       "25439faa",
       "d458f430"
     ],
+    "apps/web/test/rc300-live-result-poller.test.ts": [
+      "ed9908fe",
+      "06331d1b",
+      "3c5dc993",
+      "3224fe16",
+      "5f98ced9",
+      "b5c81f46",
+      "f7abf78c",
+      "250060be"
+    ],
     "apps/web/test/rc70-editor-timer-font.test.ts": [
       "116cfb27",
       "f9be91d4",
@@ -4904,24 +4924,24 @@
       "949f2c92"
     ],
     "docs/COMPLETION_HANDOFF.it.md": [
-      "1372bbf2",
-      "864713f7",
-      "042bdc89",
-      "db826629",
-      "5b7c9378",
-      "1899f59d",
-      "b9d0213c",
-      "c1d5ec3b"
+      "54fe1687",
+      "f5ad85a1",
+      "08e90b4b",
+      "61f82137",
+      "b8503ab3",
+      "e99565d6",
+      "de98d9d3",
+      "d9809e5c"
     ],
     "docs/COMPLETION_HANDOFF.md": [
-      "caa5c9e1",
-      "f4dd55a9",
-      "c6aa698a",
-      "fe0efdbd",
-      "ebb0552f",
-      "7a62a0de",
-      "3576511b",
-      "c5e13dcc"
+      "c79d71fa",
+      "1a7cdbde",
+      "d8c8e359",
+      "b0607b77",
+      "f019b0d8",
+      "7737f8a9",
+      "eb4d69b3",
+      "431e6fdb"
     ],
     "docs/CONVERSION_ATOMIC_PUBLISH.en.md": [
       "20d0f241",
@@ -4984,24 +5004,24 @@
       "455a0f27"
     ],
     "docs/DEVELOPMENT_STATUS.it.md": [
-      "2fc5d6a1",
-      "42b9ceae",
-      "5cf89e7a",
-      "363449e0",
-      "941c4a55",
-      "5e876d97",
-      "48f323fc",
-      "0f9eea27"
+      "242b28cc",
+      "b93ea028",
+      "74bd9f89",
+      "b6f5e670",
+      "288936cf",
+      "930233b6",
+      "f8927590",
+      "3e412eb8"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "5252b9d7",
-      "ef9c902b",
-      "3480fbc0",
-      "024c92c5",
-      "ea83edef",
-      "805ef062",
-      "c03b77fd",
-      "f2c2ac61"
+      "4bf1db5e",
+      "3d83041c",
+      "4865f8e3",
+      "8fabfdea",
+      "1c019fe5",
+      "8c8754c0",
+      "323c3927",
+      "c431c80e"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",
@@ -10752,6 +10772,26 @@
       "34ac8a16",
       "7181337c",
       "cf1e3e4d"
+    ],
+    "docs/RC_CYCLE300_LIVE_RESULTS_FULL_CI_OCI.en.md": [
+      "62e343d9",
+      "a32d2ed2",
+      "a69c4fd2",
+      "b052fb22",
+      "36dad780",
+      "f3ee69ef",
+      "a9d1c218",
+      "67bce108"
+    ],
+    "docs/RC_CYCLE300_LIVE_RESULTS_FULL_CI_OCI.it.md": [
+      "3169425f",
+      "7fd0a05d",
+      "59ae5bf4",
+      "a0ded078",
+      "5ad5f1ec",
+      "9e36e407",
+      "91ddd174",
+      "5b6c005a"
     ],
     "docs/RC_CYCLE34_VERIFIED_GATE_RECONCILIATION.en.md": [
       "9cb4cd0e",
@@ -22672,6 +22712,16 @@
       "c74c75d6",
       "c9b7c244",
       "000dd15f"
+    ],
+    "tools/tests/test_rc300_image_archive_guard.py": [
+      "d51297aa",
+      "a75d84cf",
+      "c0510066",
+      "2d0409ab",
+      "943515b2",
+      "0996a39f",
+      "6b82b1cc",
+      "bab91fef"
     ],
     "tools/tests/test_rc73_slide_master.py": [
       "2c080f2d",
