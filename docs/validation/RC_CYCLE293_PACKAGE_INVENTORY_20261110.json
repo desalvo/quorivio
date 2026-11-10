@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
   "cycle": 293,
-  "file_count_excluding_manifest": 2573,
+  "file_count_excluding_manifest": 2577,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -44,14 +44,14 @@
       "e377db62"
     ],
     ".github/workflows/ci.yml": [
-      "5cbae3e4",
-      "9e6fda71",
-      "a794b6ce",
-      "f77bf030",
-      "f012e6d1",
-      "621f1141",
-      "d25ef206",
-      "f6469933"
+      "06c319ef",
+      "ff603a0c",
+      "08407d56",
+      "fc51287a",
+      "08410309",
+      "4ede35cd",
+      "ef72f89e",
+      "e1c58deb"
     ],
     ".github/workflows/converter-image.yml": [
       "6ff519db",
@@ -4214,24 +4214,24 @@
       "949f2c92"
     ],
     "docs/COMPLETION_HANDOFF.it.md": [
-      "8148f2c3",
-      "287ec386",
-      "f50fd95f",
-      "79bc029e",
-      "d6f36187",
-      "eae9f908",
-      "fbbb2fd4",
-      "d2e8c3c9"
+      "1372bbf2",
+      "864713f7",
+      "042bdc89",
+      "db826629",
+      "5b7c9378",
+      "1899f59d",
+      "b9d0213c",
+      "c1d5ec3b"
     ],
     "docs/COMPLETION_HANDOFF.md": [
-      "63efa508",
-      "16d2e39e",
-      "af591a8d",
-      "e44c3682",
-      "eb06e861",
-      "4cb835d5",
-      "3522bff0",
-      "41e9d20b"
+      "caa5c9e1",
+      "f4dd55a9",
+      "c6aa698a",
+      "fe0efdbd",
+      "ebb0552f",
+      "7a62a0de",
+      "3576511b",
+      "c5e13dcc"
     ],
     "docs/CONVERSION_ATOMIC_PUBLISH.en.md": [
       "20d0f241",
@@ -4294,24 +4294,24 @@
       "455a0f27"
     ],
     "docs/DEVELOPMENT_STATUS.it.md": [
-      "3f1bce6a",
-      "8c09f94e",
-      "ee8397b0",
-      "6ac903ac",
-      "71cd4a26",
-      "fe086d77",
-      "82ca7a58",
-      "a75bf153"
+      "34f760f4",
+      "85567f25",
+      "f81a09c3",
+      "bbf46a40",
+      "8aff5308",
+      "1ed51eff",
+      "6257a564",
+      "c6ab379d"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "13ff09dc",
-      "539d9ab8",
-      "c8d028cd",
-      "4980a1cf",
-      "f578d91b",
-      "c232a1c8",
-      "198476bb",
-      "3c3cbc51"
+      "f3d37727",
+      "ad3bc991",
+      "7d75e756",
+      "68f9e186",
+      "91e09400",
+      "492fb61c",
+      "b687a04d",
+      "deffc666"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",
@@ -25732,6 +25732,46 @@
       "560bc4c7",
       "4c57f28d",
       "eb971d93"
+    ],
+    "tools/ci_rc298_real_pie_pg_chromium.py": [
+      "8d7dfc7c",
+      "a86c2e67",
+      "fd994e43",
+      "e2614e78",
+      "bc478c83",
+      "652d5ea1",
+      "7574dc3e",
+      "bb27c6f2"
+    ],
+    "tools/tests/test_rc298_real_pie_postgres.py": [
+      "9ef8d438",
+      "67fbed88",
+      "b4641564",
+      "7a853e30",
+      "78e905bf",
+      "dfc239ae",
+      "b9a26bf6",
+      "afb00fc1"
+    ],
+    "docs/RC_CYCLE298_REAL_REACT_PG_PIE_ACCEPTANCE.en.md": [
+      "0827e21d",
+      "2e4c3338",
+      "b87cab78",
+      "5ed2093c",
+      "2b24c150",
+      "a58fde96",
+      "e1ae8e83",
+      "00f60238"
+    ],
+    "docs/RC_CYCLE298_REAL_REACT_PG_PIE_ACCEPTANCE.it.md": [
+      "9feb6bcb",
+      "2209be4e",
+      "de50457d",
+      "ab0d96e0",
+      "864d03ee",
+      "b8d900c1",
+      "53f5ee47",
+      "c353fa58"
     ]
   }
 }
