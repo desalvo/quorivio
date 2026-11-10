@@ -357,6 +357,8 @@ jobs:
         run: node --experimental-strip-types --test apps/web/test/rc296-mobile-pie-legend.test.ts
       - name: RC298 disposable PostgreSQL and compiled React pie contract preflight
         run: python3 -m unittest tools.tests.test_rc298_real_pie_postgres -q
+      - name: RC299 live votes and privacy real-browser preflight
+        run: python3 -m unittest tools.tests.test_rc299_real_votes_pg -q
       - name: RC297 accessible pie percent semantics and hidden-preference preflight
         run: node --experimental-strip-types --test apps/web/test/rc297-pie-screenreader.test.ts
       - name: RC293 visual manuals and brochure publication preflight
@@ -1279,6 +1281,12 @@ jobs:
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
         run: python3 tools/ci_rc298_real_pie_pg_chromium.py
+      - name: RC299 real participant votes to live presenter PostgreSQL pie
+        timeout-minutes: 4
+        env:
+          QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
+          QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
+        run: python3 tools/ci_rc299_real_votes_pg_chromium.py
       - name: Capture real app screenshots for the manuals
         timeout-minutes: 4
         env:
