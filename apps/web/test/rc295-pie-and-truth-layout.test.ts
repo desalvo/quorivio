@@ -32,7 +32,7 @@ test('each nonzero slice receives a distinct outside label and leader',()=>{
  assert.equal(parts.length,4);
  assert.deepEqual(parts.map(p=>p.index),[1,2,3,4]);
  assert.equal(parts.at(-1)?.label,'4. 0.02%');
- assert.ok(parts.every(p=>p.labelX<100||p.labelX>400));
+ assert.ok(parts.every(p=>p.labelX===120||p.labelX===380), 'leave width for long tiny-percentage callouts');
  assert.ok(parts.every(p=>p.leader.split(' ').length===3));
 });
 test('12 labels avoid collisions even for highly skewed pies',()=>{

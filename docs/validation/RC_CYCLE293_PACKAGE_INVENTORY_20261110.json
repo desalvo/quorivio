@@ -2364,14 +2364,14 @@
       "a4c2a225"
     ],
     "apps/web/src/result-pie-layout.ts": [
-      "0f18a706",
-      "91490a11",
-      "b392ddd7",
-      "6d7ba304",
-      "2f624b3a",
-      "54ff2050",
-      "fd818f09",
-      "fbc2e60f"
+      "df6feb58",
+      "acc30782",
+      "62f4cef0",
+      "c1b43a1f",
+      "d188426a",
+      "4b2a238b",
+      "ee336bbe",
+      "d53ae4d8"
     ],
     "apps/web/src/result-text-style.ts": [
       "05de4121",
@@ -3554,14 +3554,14 @@
       "26276684"
     ],
     "apps/web/test/rc295-pie-and-truth-layout.test.ts": [
-      "70eab6fb",
-      "a9073f87",
-      "836b7269",
-      "9987d09f",
-      "3981885e",
-      "567ec94c",
-      "1a79631b",
-      "ac6cde60"
+      "f2c0207f",
+      "de6790c9",
+      "ba5a0149",
+      "e34d14dd",
+      "6ff7ac8e",
+      "b4744a14",
+      "557b4f47",
+      "8a7e440a"
     ],
     "apps/web/test/rc70-editor-timer-font.test.ts": [
       "116cfb27",

@@ -40,7 +40,7 @@ export function resultPieLayout(values:readonly number[],size:unknown=PIE_SIZE_D
    :`M ${cx} ${cy} L ${start.x} ${start.y} A ${radius} ${radius} 0 ${share>.5?1:0} 1 ${end.x} ${end.y} Z`;
   const side:PieSlice['side']=Math.cos(midAngle)<0?'left':'right';
   const label=[showNumbers?`${index+1}.`:'',showPercentages?resultPiePercent(share):''].filter(Boolean).join(' ');
-  slices.push({index:index+1,count,share,from,path,midAngle,label,side,labelX:side==='left'?78:422,labelY:cy+Math.sin(midAngle)*(radius+19),leader:''});
+  slices.push({index:index+1,count,share,from,path,midAngle,label,side,labelX:side==='left'?120:380,labelY:cy+Math.sin(midAngle)*(radius+19),leader:''});
  });
  // Compute labels on each side independently, keeping a minimum vertical gap.
  // Small slices clustered around the same angle receive separate leader lines.
@@ -55,7 +55,7 @@ export function resultPieLayout(values:readonly number[],size:unknown=PIE_SIZE_D
    if(i>0)s.labelY=Math.max(s.labelY,entries[i-1].labelY+spacing);
    const edge=polar(cx,cy,radius,s.midAngle);
    const elbow=polar(cx,cy,radius+12,s.midAngle);
-   const lineEnd=side==='left'?86:414;
+   const lineEnd=side==='left'?128:372;
    s.leader=`${edge.x.toFixed(2)},${edge.y.toFixed(2)} ${elbow.x.toFixed(2)},${elbow.y.toFixed(2)} ${lineEnd},${s.labelY.toFixed(2)}`;
   });
  }
