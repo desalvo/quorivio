@@ -15,7 +15,7 @@ on:
         type: boolean
         default: false
       publish_image:
-        description: 'Explicitly publish a verified multi-architecture image to Docker Hub (never on push/PR/tag automatically)'
+        description: 'Explicitly publish BOTH verified Quorivio and Converter multiarch images to Docker Hub'
         type: boolean
         default: false
       publish_tag:
@@ -23,7 +23,7 @@ on:
         type: string
         default: ''
       publish_latest:
-        description: 'Also move Docker Hub latest tag (requires publish_image and main ref)'
+        description: 'Also update latest for BOTH Docker Hub images (publish_image and main only)'
         type: boolean
         default: false
       browser_test:
@@ -365,6 +365,8 @@ jobs:
           python3 -m unittest tools.tests.test_rc300_image_archive_guard -q
       - name: RC301 native pie legibility and source-contract preflight
         run: python3 -m unittest tools.tests.test_rc301_native_pie -q
+      - name: RC302 dual Docker publisher safety and contract regression
+        run: python3 -m unittest tools.tests.test_rc302_dual_docker_publish -q
       - name: Preflight all full Chromium scripts before dependencies
         run: python3 tools/ci_full_browser_script_syntax.py
       - name: RC297 accessible pie percent semantics and hidden-preference preflight
@@ -2349,15 +2351,100 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
+  publish-converter-platform:
+    name: Native converter OCI image (${{ matrix.arch }})
+    # An amd64 runner using QEMU can stall in npm install for arm64 after
+    # `qemu: uncaught target signal 4`. Never emulate the publication build.
+    if: >-
+      ${{ always() && github.repository == 'desalvo/quorivio' &&
+          ((github.event_name == 'workflow_dispatch' && inputs.publish_image == true &&
+            !inputs.rc_acceptance_suite &&
+            (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) &&
+            needs.validate.result == 'success' && needs.image-build.result == 'success') ||
+           (github.event_name == 'push' && github.ref == 'refs/heads/main' &&
+            contains(github.event.head_commit.message, '[publish-docker]') &&
+            needs.validate.result == 'success' && needs.image-build.result == 'success' &&
+            needs.rc-campaign-conclusion.result == 'success')) }}
+    needs: [validate, image-build, rc-campaign-conclusion]
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - {arch: amd64, platform: linux/amd64, runner: ubuntu-24.04}
+          - {arch: arm64, platform: linux/arm64, runner: ubuntu-24.04-arm}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 35
+    environment: production
+    permissions: {contents: read}
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - name: Verify authorized native publishing runner
+        env:
+          EXPECTED_ARCH: ${{ matrix.arch }}
+          QUORIVIO_COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          QUORIVIO_CAMPAIGN_CONCLUSION: ${{ needs.rc-campaign-conclusion.result }}
+          QUORIVIO_PUBLISH_IMAGE: ${{ inputs.publish_image }}
+          QUORIVIO_RC_ACCEPTANCE_SUITE: ${{ inputs.rc_acceptance_suite }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = 'desalvo/quorivio'
+          test "$(uname -m)" = "$([ "$EXPECTED_ARCH" = arm64 ] && echo aarch64 || echo x86_64)"
+          if [ "$GITHUB_EVENT_NAME" = push ]; then
+            test "$QUORIVIO_CAMPAIGN_CONCLUSION" = success
+            [[ "$QUORIVIO_COMMIT_MESSAGE" == *'[publish-docker]'* ]]
+          else
+            test "$GITHUB_EVENT_NAME" = workflow_dispatch
+            test "$QUORIVIO_PUBLISH_IMAGE" = true
+            test "$QUORIVIO_RC_ACCEPTANCE_SUITE" != true
+          fi
+      - uses: docker/setup-buildx-action@v3
+      - name: Docker Hub authentication
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Push a native converter architecture by immutable digest only
+        id: native-build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.converter
+          platforms: ${{ matrix.platform }}
+          outputs: type=image,name=desalvo/quorivio-converter,push-by-digest=true,name-canonical=true,push=true
+          sbom: true
+          provenance: mode=max
+          labels: |
+            org.opencontainers.image.source=https://github.com/desalvo/quorivio
+            org.opencontainers.image.licenses=EUPL-1.2
+            org.opencontainers.image.revision=${{ github.sha }}
+      - name: Record validated native image digest
+        env:
+          IMAGE_DIGEST: ${{ steps.native-build.outputs.digest }}
+          ARCH: ${{ matrix.arch }}
+        run: |
+          set -euo pipefail
+          [[ "$IMAGE_DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]] || { echo 'Invalid OCI image digest'; exit 1; }
+          mkdir -p converter-digests
+          printf '%s\n' "$IMAGE_DIGEST" > "converter-digests/$ARCH.digest"
+      - name: Transfer digest for atomic multiarch manifest publication
+        uses: actions/upload-artifact@v4
+        with:
+          name: quorivio-converter-native-${{ matrix.arch }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: converter-digests/${{ matrix.arch }}.digest
+          if-no-files-found: error
+          retention-days: 1
+
   publish:
-    name: Verified multiarch Docker Hub publication (manual)
+    name: Verified Quorivio + Converter multiarch publication (manual)
     if: >-
       ${{ always() && github.event_name == 'workflow_dispatch' && inputs.publish_image == true &&
           !inputs.rc_acceptance_suite &&
           (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) &&
           needs.validate.result == 'success' && needs.image-build.result == 'success' &&
-          needs.publish-platform.result == 'success' }}
-    needs: [validate, image-build, publish-platform]
+          needs.publish-platform.result == 'success' &&
+           needs.publish-converter-platform.result == 'success' }}
+    needs: [validate, image-build, publish-platform, publish-converter-platform]
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     environment: production
@@ -2386,21 +2473,29 @@ jobs:
           pattern: quorivio-native-*-${{ github.run_id }}-${{ github.run_attempt }}
           merge-multiple: true
           path: digests
-      - name: Assemble and verify both native images before tagging
+      - name: Download native converter architecture digests
+        uses: actions/download-artifact@v4
+        with:
+          pattern: quorivio-converter-native-*-${{ github.run_id }}-${{ github.run_attempt }}
+          merge-multiple: true
+          path: converter-digests
+      - name: Preflight and publish both native multiarch image repositories
         env:
           QUORIVIO_IMAGE_TAGS: ${{ steps.label.outputs.tags }}
           QUORIVIO_DIGEST_DIR: digests
-        run: bash tools/publish_multiarch_manifest.sh
+          QUORIVIO_CONVERTER_DIGEST_DIR: converter-digests
+        run: bash tools/publish_both_multiarch_manifest.sh
 
   publish-on-commit:
-    name: Verified multiarch Docker Hub publication (explicit commit)
+    name: Verified Quorivio + Converter multiarch publication (explicit commit)
     timeout-minutes: 10
     if: >-
       ${{ always() && github.event_name == 'push' && github.ref == 'refs/heads/main' &&
           contains(github.event.head_commit.message, '[publish-docker]') &&
           needs.validate.result == 'success' && needs.image-build.result == 'success' &&
-          needs.rc-campaign-conclusion.result == 'success' && needs.publish-platform.result == 'success' }}
-    needs: [validate, image-build, rc-campaign-conclusion, publish-platform]
+          needs.rc-campaign-conclusion.result == 'success' && needs.publish-platform.result == 'success' &&
+           needs.publish-converter-platform.result == 'success' }}
+    needs: [validate, image-build, rc-campaign-conclusion, publish-platform, publish-converter-platform]
     runs-on: ubuntu-24.04
     environment: production
     permissions: {contents: read}
@@ -2426,8 +2521,15 @@ jobs:
           pattern: quorivio-native-*-${{ github.run_id }}-${{ github.run_attempt }}
           merge-multiple: true
           path: digests
-      - name: Assemble and verify both native images before tagging
+      - name: Download native converter architecture digests
+        uses: actions/download-artifact@v4
+        with:
+          pattern: quorivio-converter-native-*-${{ github.run_id }}-${{ github.run_attempt }}
+          merge-multiple: true
+          path: converter-digests
+      - name: Preflight and publish both native multiarch image repositories
         env:
           QUORIVIO_IMAGE_TAGS: ${{ steps.label.outputs.tags }}
           QUORIVIO_DIGEST_DIR: digests
-        run: bash tools/publish_multiarch_manifest.sh
+          QUORIVIO_CONVERTER_DIGEST_DIR: converter-digests
+        run: bash tools/publish_both_multiarch_manifest.sh
