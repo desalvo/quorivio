@@ -90,12 +90,12 @@ class ManualPublishPolicy(unittest.TestCase):
         self.assertIn('!inputs.rc_acceptance_suite',condition)
         self.assertNotIn("github.event_name == 'push'",condition)
         self.assertIn("needs.publish-platform.result == 'success'",condition)
-        self.assertEqual(manual['needs'],['validate','image-build','publish-platform'])
+        self.assertEqual(manual['needs'],['validate','image-build','publish-platform','publish-converter-platform'])
         self.assertIn('publish_image:\n        description:',CI)
         self.assertIn('publish_latest:\n        description:',CI)
         self.assertIn('default: false',CI)
         self.assertTrue(any('bash tools/resolve_image_tags.sh'==x.get('run') for x in manual['steps']))
-        self.assertTrue(any('bash tools/publish_multiarch_manifest.sh'==x.get('run') for x in manual['steps']))
+        self.assertTrue(any('bash tools/publish_both_multiarch_manifest.sh'==x.get('run') for x in manual['steps']))
         self.assertIn('QUORIVIO_IMAGE_TAGS',str(manual['steps']))
 
     def test_native_build_and_both_publishers_have_read_only_github_permissions(self):

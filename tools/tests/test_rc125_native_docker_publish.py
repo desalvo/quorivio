@@ -28,10 +28,11 @@ class NativePublisherAcceptance(unittest.TestCase):
         for job in ('publish','publish-on-commit'):
             obj=jobs[job]
             self.assertIn('publish-platform',obj['needs'])
+            self.assertIn('publish-converter-platform',obj['needs'])
             self.assertIn("needs.publish-platform.result == 'success'",obj['if'])
             self.assertTrue(obj['timeout-minutes']<=10)
             self.assertEqual(obj['environment'],'production')
-            self.assertTrue(any('bash tools/publish_multiarch_manifest.sh'==x.get('run') for x in obj['steps']))
+            self.assertTrue(any('bash tools/publish_both_multiarch_manifest.sh'==x.get('run') for x in obj['steps']))
             self.assertFalse(any('docker/build-push-action' in x.get('uses','') for x in obj['steps']))
         self.assertIn('!inputs.rc_acceptance_suite',jobs['publish-platform']['if'])
         self.assertIn("needs.rc-campaign-conclusion.result == 'success'",jobs['publish-platform']['if'])
