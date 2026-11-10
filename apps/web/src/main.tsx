@@ -1,5 +1,6 @@
 import {thumbnailWidgetModel} from './thumbnail-widget-content.js';
 import {resultPieLayout,resultPieSize,resultPiePercent,PIE_VIEWBOX} from './result-pie-layout.js';
+import {createLiveResultPoller} from './live-result-poller.js';
 import {answerFieldHeight,answerFieldHeightForKey} from './answer-field-resize.js';
 import {readWorkspaceLocation,writeWorkspaceLocation} from './workspace-recovery';
 import {LOCAL_SESSION_ARCHIVE_MIME,LOCAL_SESSION_ARCHIVE_MAX_BYTES,localSessionArchiveFilename,localSessionImportError,isLocalSessionArchiveMime} from './session-local-transfer.js';
@@ -365,11 +366,10 @@ function PresenterLinkedResult({sessionId,activity,widget,widgets,activities}:{s
  const [rows,setRows]=useState<StatRow[]>([]);
  const [loadFailed,setLoadFailed]=useState(false);
  useEffect(()=>{
-  if(!source){setRows([]);setLoadFailed(false);return;}
-  let alive=true;
-  const load=async()=>{
-   try{
-    let next:StatRow[]=[];
+  setRows([]);setLoadFailed(false);
+  if(!source)return;
+  const poller=createLiveResultPoller(async()=>{
+   let next:StatRow[]=[];
     if(source.kind==='question'){
      const data=await request<any>(`/sessions/${encodeURIComponent(sessionId)}/widget-answers/detail?activity_id=${encodeURIComponent(sourceActivityId)}&widget_id=${encodeURIComponent(source.id)}&question_id=${encodeURIComponent(widget.targetQuestionId||'')}`);
      next=rowsFromWidgetAnswerDetail(source,data,widget.targetQuestionId||'');
@@ -389,13 +389,12 @@ function PresenterLinkedResult({sessionId,activity,widget,widgets,activities}:{s
      const data=await request<any>(`/sessions/${encodeURIComponent(sessionId)}/activities/${encodeURIComponent(sourceActivityId)}/topic-widgets/${encodeURIComponent(source.id)}/stats`);
      next=topicQuestionRows(data.total);
     }
-    if(alive){setRows(next);setLoadFailed(false)}
-   }catch{if(alive){setRows([]);setLoadFailed(true)}}
-  };
+   return next;
+  },next=>{setRows(next);setLoadFailed(false)},()=>setLoadFailed(true));
   // Live snapshots can arrive faster than an HTTP response. Do NOT depend on
   // the entire snapshot object: doing so cancels every in-flight request while
   // participants vote, leaving a permanently empty result chart.
-  void load();const timer=window.setInterval(()=>void load(),3000);return()=>{alive=false;window.clearInterval(timer)};
+  void poller.refresh();const timer=window.setInterval(()=>void poller.refresh(),3000);return()=>{poller.stop();window.clearInterval(timer)};
  },[sessionId,sourceActivityId,source?.id,source?.kind,widget.targetQuestionId]);
  return <div className="presenter-linked-results" data-source-activity-id={context?.activity.id||''}>
   <LinkedResultChart widget={widget} widgets={sourceWidgets} rows={rows} emptyLabel="live"/>
