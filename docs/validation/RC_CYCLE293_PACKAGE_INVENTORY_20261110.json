@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
   "cycle": 293,
-  "file_count_excluding_manifest": 2566,
+  "file_count_excluding_manifest": 2567,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -44,14 +44,14 @@
       "e377db62"
     ],
     ".github/workflows/ci.yml": [
-      "38995c34",
-      "4fb27e14",
-      "36be20e8",
-      "5c2b216a",
-      "4c9ce9cd",
-      "0a1aba69",
-      "f144f42a",
-      "dc846787"
+      "914c6fd6",
+      "08758212",
+      "e326265d",
+      "aeb97162",
+      "d74c8a0b",
+      "5df52896",
+      "fc9b52c7",
+      "336dceab"
     ],
     ".github/workflows/converter-image.yml": [
       "6ff519db",
@@ -21352,6 +21352,16 @@
       "ce7b98ce",
       "c510dee8",
       "ff80a3bc"
+    ],
+    "tools/tests/test_rc295_gitleaks_history.py": [
+      "63cde691",
+      "30f2c4aa",
+      "f7842eb8",
+      "060aacec",
+      "7cfc7393",
+      "4638b06b",
+      "dea311e1",
+      "71af8baa"
     ],
     "tools/tests/test_rc73_slide_master.py": [
       "2c080f2d",
