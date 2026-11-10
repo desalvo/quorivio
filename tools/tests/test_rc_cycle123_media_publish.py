@@ -24,7 +24,8 @@ class RealMediaAndPublishContracts(unittest.TestCase):
         self.assertIn("contains(github.event.head_commit.message, '[publish-docker]')", segment)
         self.assertIn("needs.rc-campaign-conclusion.result == 'success'",segment)
         self.assertIn("needs.publish-platform.result == 'success'",segment)
-        self.assertIn('bash tools/publish_multiarch_manifest.sh',segment)
+        self.assertIn('bash tools/publish_both_multiarch_manifest.sh',segment)
+        self.assertIn("needs.publish-converter-platform.result == 'success'",segment)
         self.assertIn('push=true',platform)
 
     def test_media_picker_is_ci_gated_with_auth_and_no_implicit_publish(self):
