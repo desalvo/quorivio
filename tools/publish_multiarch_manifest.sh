@@ -2,6 +2,8 @@
 # Atomic native AMD64 + ARM64 manifest publication; caller must authorize tags.
 set -euo pipefail
 [[ "${GITHUB_REPOSITORY:-}" == desalvo/quorivio ]] || { echo 'Wrong publishing repository' >&2; exit 2; }
+image_repo="${QUORIVIO_IMAGE_REPOSITORY:-desalvo/quorivio}"
+[[ "$image_repo" == desalvo/quorivio || "$image_repo" == desalvo/quorivio-converter ]] || { echo 'Unapproved image repository' >&2; exit 2; }
 [[ "${GITHUB_EVENT_NAME:-}" == workflow_dispatch || "${GITHUB_EVENT_NAME:-}" == push ]] || { echo 'Unsupported publication event' >&2; exit 2; }
 [[ -n "${QUORIVIO_IMAGE_TAGS:-}" ]] || { echo 'Missing approved image tags' >&2; exit 2; }
 source_dir="${QUORIVIO_DIGEST_DIR:-digests}"
@@ -17,7 +19,7 @@ done
 tags=()
 while IFS= read -r tag; do
     [[ -n "$tag" ]] || { echo 'Empty Docker image tag' >&2; exit 2; }
-    [[ "$tag" =~ ^desalvo/quorivio:[a-zA-Z0-9_][a-zA-Z0-9_.-]{0,127}$ ]] || { echo 'Invalid publisher tag' >&2; exit 2; }
+    [[ "$tag" =~ ^desalvo/quorivio(-converter)?:[a-zA-Z0-9_][a-zA-Z0-9_.-]{0,127}$ && "$tag" == "$image_repo:"* ]] || { echo 'Invalid publisher tag' >&2; exit 2; }
     tags+=("$tag")
 done <<< "$QUORIVIO_IMAGE_TAGS"
 ((${#tags[@]} >= 1 && ${#tags[@]} <= 2)) || { echo 'Invalid tag count' >&2; exit 2; }
@@ -27,7 +29,7 @@ done <<< "$QUORIVIO_IMAGE_TAGS"
 for pair in "amd64:$amd64" "arm64:$arm64"; do
     expected="${pair%%:*}"
     sha="${pair#*:}"
-    docker buildx imagetools inspect --raw "desalvo/quorivio@$sha" |
+    docker buildx imagetools inspect --raw "$image_repo@$sha" |
       python3 -c 'import json,sys
 arch=sys.argv[1]
 obj=json.load(sys.stdin)
@@ -39,7 +41,7 @@ if not any(p.get("os")=="linux" and p.get("architecture")==arch for p in platfor
 done
 args=()
 for tag in "${tags[@]}"; do args+=(--tag "$tag"); done
-docker buildx imagetools create "${args[@]}" "desalvo/quorivio@$amd64" "desalvo/quorivio@$arm64"
+docker buildx imagetools create "${args[@]}" "$image_repo@$amd64" "$image_repo@$arm64"
 for tag in "${tags[@]}"; do
     docker buildx imagetools inspect --raw "$tag" |
       python3 -c 'import json,sys
