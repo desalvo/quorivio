@@ -17,8 +17,10 @@ class ImageDefaults(unittest.TestCase):
   jobs=yaml.safe_load(workflow)['jobs']
   self.assertIn('publish-platform', jobs['publish']['needs'])
   self.assertIn('push-by-digest=true', str(jobs['publish-platform']['steps']))
+  self.assertIn('publish-converter-platform', jobs['publish']['needs'])
+  self.assertIn('push-by-digest=true', str(jobs['publish-converter-platform']['steps']))
   self.assertIn('QUORIVIO_IMAGE_TAGS: ${{ steps.label.outputs.tags }}', workflow)
-  self.assertIn('bash tools/publish_multiarch_manifest.sh',workflow)
+  self.assertIn('bash tools/publish_both_multiarch_manifest.sh',workflow)
   self.assertIn('inputs.publish_image == true', workflow)
   self.assertIn("github.event_name == 'workflow_dispatch'", workflow)
   self.assertIn('bash tools/resolve_image_tags.sh', workflow)

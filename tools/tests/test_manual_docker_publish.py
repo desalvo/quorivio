@@ -102,7 +102,7 @@ class ManualPublishPolicy(unittest.TestCase):
         import yaml
         jobs=yaml.safe_load(CI)['jobs']
         build=jobs['publish-platform']
-        for key in ('publish-platform','publish','publish-on-commit'):
+        for key in ('publish-platform','publish-converter-platform','publish','publish-on-commit'):
             self.assertEqual(jobs[key]['permissions'],{'contents':'read'})
             self.assertEqual(jobs[key]['environment'],'production')
         self.assertTrue(any(x.get('uses')=='docker/build-push-action@v6'
@@ -112,11 +112,12 @@ class ManualPublishPolicy(unittest.TestCase):
         for name in ('publish','publish-on-commit'):
             self.assertFalse(any(x.get('uses')=='docker/build-push-action@v6'
                                  for x in jobs[name]['steps']))
-            self.assertTrue(any('bash tools/publish_multiarch_manifest.sh'==x.get('run')
+            self.assertTrue(any('bash tools/publish_both_multiarch_manifest.sh'==x.get('run')
                                 for x in jobs[name]['steps']))
         commit=jobs['publish-on-commit']['if']
         self.assertIn("contains(github.event.head_commit.message, '[publish-docker]')",commit)
         self.assertIn("needs.rc-campaign-conclusion.result == 'success'",commit)
         self.assertIn("needs.publish-platform.result == 'success'",commit)
+        self.assertIn("needs.publish-converter-platform.result == 'success'",commit)
 
 if __name__=='__main__': unittest.main()

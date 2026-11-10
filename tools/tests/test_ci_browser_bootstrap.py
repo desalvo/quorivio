@@ -33,10 +33,12 @@ class BrowserBootstrapTests(unittest.TestCase):
         # the actual job identities and dependencies, not obsolete display names.
         import yaml
         jobs=yaml.safe_load(workflow)['jobs']
-        self.assertEqual(jobs['publish']['needs'], ['validate','image-build','publish-platform'])
+        self.assertEqual(jobs['publish']['needs'], ['validate','image-build','publish-platform','publish-converter-platform'])
         self.assertEqual(jobs['publish-on-commit']['needs'],
-                         ['validate','image-build','rc-campaign-conclusion','publish-platform'])
+                         ['validate','image-build','rc-campaign-conclusion','publish-platform','publish-converter-platform'])
         self.assertEqual(jobs['publish-platform']['needs'],
+                         ['validate','image-build','rc-campaign-conclusion'])
+        self.assertEqual(jobs['publish-converter-platform']['needs'],
                          ['validate','image-build','rc-campaign-conclusion'])
         self.assertIn("github.event_name == 'workflow_dispatch'", jobs['publish']['if'])
         self.assertIn("contains(github.event.head_commit.message, '[publish-docker]')",
