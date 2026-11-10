@@ -339,7 +339,7 @@ function LinkedResultChart({widget,widgets,rows,emptyLabel}:{widget:any;widgets:
   {(resultSourceTitleVisible(widget)||resultSourceAnswersVisible(widget))&&<small>{total} risposte{emptyLabel?' · '+emptyLabel:''}</small>}
   {chart==='pie'&&total>0&&<svg className="linked-results-pie linked-results-pie-chart" role="img" aria-label={widget.pieShowPercentages===true?"Distribuzione percentuale delle risposte. Legenda accessibile con conteggi e percentuali.":"Distribuzione delle risposte."} viewBox={`0 0 ${PIE_VIEWBOX.width} ${PIE_VIEWBOX.height}`} data-pie-size={resultPieSize(widget.pieSize)} data-mobile-percent-labels={widget.pieShowPercentages===true?'true':'false'} preserveAspectRatio="xMidYMid meet">
    <title>{widget.pieShowPercentages===true?"Distribuzione percentuale delle risposte":"Distribuzione delle risposte"}</title>
-   {pieSegments.map(r=><path key={'slice-'+r.index} d={r.path} fill={pieColors[r.index-1]} stroke="#fff" strokeWidth="1.5"><title>{`Opzione ${r.index}: ${r.label||Math.round(r.share*100)+'%'}`}</title></path>)}
+   {pieSegments.map(r=><path key={'slice-'+r.index} d={r.path} fill={pieColors[r.index-1]} stroke="#fff" strokeWidth="1.5"><title>{`Opzione ${r.index}${widget.pieShowPercentages===true?': '+resultPiePercent(r.share):''}`}</title></path>)}
    {pieSegments.filter(r=>r.label).map(r=><g className="linked-results-pie-callout" key={'label-'+r.index}>
     <polyline points={r.leader} fill="none" stroke={pieColors[r.index-1]} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
     <text x={r.labelX} y={r.labelY} textAnchor={r.side==='left'?'end':'start'} dominantBaseline="middle">{r.label}</text>
