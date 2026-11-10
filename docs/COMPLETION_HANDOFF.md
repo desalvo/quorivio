@@ -1,5 +1,8 @@
 # RC293 — Illustrated documentation and brochures handoff
 
+**RC301 handoff (2026-11-10):** Branch from verified RC300 publication commit `7c1046a16203`. Changed mobile results pie labels from ellipsis to multiline wrapping. Added actual production-TS SVG/legend browser acceptance on Chromium for PR and on native Firefox/WebKit for the extended suite. Original B3 and A4 external/physical gates remain partial. See `docs/RC_CYCLE301_CROSS_ENGINE_PIE_LEGENDS.en.md`; certified **85.25%** (43 accepted/17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+
 **RC300 hotfix (2026-11-10):** The first `[full-ci]` run 42887563358 failed at the old optional RC295 Chromium script due to invalid escaped Python triple quotes. A hotfix repairs it, adds a mandatory pre-npm parse of all opt-in browser scripts and makes actual native R geometry browser acceptance mandatory on PRs. Main full CI and Docker artifacts must be run again after the hotfix merge. No publication. Formal **85.25%** (43 accepted/17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
 
 

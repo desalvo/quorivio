@@ -1,5 +1,8 @@
 # Quorivio 0.1.0-dev — RC293 — Compact visual manuals and product brochures
 
+**RC301 development checkpoint (2026-11-10):** Fix long mobile results pie legend names to wrap instead of ellipsizing. Extend CI with production TypeScript geometry rendered against shipped CSS on native Chromium, Firefox and WebKit for desktop, phones and editor-phone, including tiny-slice percent legibility and percentage-disabled privacy. See `docs/RC_CYCLE301_CROSS_ENGINE_PIE_LEGENDS.en.md`. This is browser automation, **not** A4/B3 independent physical sign-off. Score **85.25%** (43 accepted/17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+
 **RC300 full-CI hotfix (2026-11-10):** Expanded run 42887563358 exposed a Python syntax error in the older opt-in RC295 Chromium R-layout script. Fixed triple-quoted JavaScript, added an early inventory-wide full-browser Python syntax preflight and made native R-layout smoke mandatory on PRs. New full CI required; no Docker Hub publication. **85.25%** (43 accepted/17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
 
 
