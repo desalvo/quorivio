@@ -32,24 +32,22 @@ def page_html(wrapper: str = "", with_percentages: bool = True) -> str:
         'aria-label="Percentuali delle risposte">' + items + "</div>"
         if with_percentages else ""
     )
-    return (
-        "<style>" + CSS + "</style>"
-        '<main style="width:min(100%,400px)">' + wrapper
-        '<div class="widget-canvas-item page-widget rehearsal-widget" '
-        'data-widget-kind="results-button">'
-        '<section class="linked-results result-view-pie" style="width:100%;height:560px;font:18px Arial">'
-        '<svg class="linked-results-pie linked-results-pie-chart" viewBox="0 0 500 320" '
-        'data-mobile-percent-labels="' + ("true" if with_percentages else "false") + '" '
-        'role="img" aria-label="' + (
-            "Distribuzione percentuale delle risposte. Legenda accessibile con conteggi e percentuali."
-            if with_percentages else "Distribuzione delle risposte."
-        ) + '">'
-        '<g class="linked-results-pie-callout"><text x="380" y="100">25%</text></g></svg>'
-        + legend
-        + '<div class="linked-results-items"><div class="linked-results-row" id="row-marker">'
-        '<span class="linked-result-pair">Risultato <output>10</output></span></div></div>'
-        "</section></div>" + closing + "</main>"
-    )
+    return "".join((
+        "<style>", CSS, "</style>",
+        '<main style="width:min(100%,400px)">', wrapper,
+        '<div class="widget-canvas-item page-widget rehearsal-widget" data-widget-kind="results-button">',
+        '<section class="linked-results result-view-pie" style="width:100%;height:560px;font:18px Arial">',
+        '<svg class="linked-results-pie linked-results-pie-chart" viewBox="0 0 500 320" data-mobile-percent-labels="',
+        "true" if with_percentages else "false",
+        '" role="img" aria-label="',
+        ("Distribuzione percentuale delle risposte. Legenda accessibile con conteggi e percentuali."
+         if with_percentages else "Distribuzione delle risposte."),
+        '"><g class="linked-results-pie-callout"><text x="380" y="100">25%</text></g></svg>',
+        legend,
+        '<div class="linked-results-items"><div class="linked-results-row" id="row-marker">',
+        '<span class="linked-result-pair">Risultato <output>10</output></span></div></div>',
+        "</section></div>", closing, "</main>",
+    ))
 
 
 async def run() -> None:
