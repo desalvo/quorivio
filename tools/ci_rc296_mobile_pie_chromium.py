@@ -51,7 +51,7 @@ async def run():
     const labels=[...legend.querySelectorAll('.linked-results-pie-mobile-percent')];
     const callout=document.querySelector('.linked-results-pie-callout');
     const b=svg.getBoundingClientRect();
-    return {visible:getComputedStyle(legend).display==='grid',
+    return {visible:getComputedStyle(legend).display==='grid' && getComputedStyle(legend).clipPath==='none' && legend.getBoundingClientRect().width>5,
      count:labels.length,
      minFont:Math.min(...labels.map(x=>parseFloat(getComputedStyle(x).fontSize))),
      overflow:legend.scrollWidth>legend.clientWidth+1,
