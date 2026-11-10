@@ -1,5 +1,8 @@
 # Quorivio 0.1.0-dev — RC293 — Manuali visuali compatti e brochure
 
+**RC300 hotfix full CI (10/11/2026):** La run estesa 42887563358 ha rilevato escape Python errati nello storico test Chromium RC295. Corretti i tripli apici, aggiunti controllo sintattico preventivo degli script browser e collaudo Chromium reale del layout R obbligatorio sulle PR. Nuova full CI necessaria; nessuna pubblicazione Docker Hub. **85,25%** (43 accepted/17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+
 **Checkpoint RC300 (10/11/2026):** Polling risultati live single-flight; i conteggi autenticati restano visibili durante errori temporanei, mentre le risposte tardive non modificano pagine o sorgenti chiuse. Aggiunti test Node e archivi Docker amd64 con checksum, solo con `[full-ci]` su main, che attiva anche la campagna estesa RC/OCI. Vedi `docs/RC_CYCLE300_LIVE_RESULTS_FULL_CI_OCI.it.md`. Base RC299 `6f48a9de9f2c`; certificazione **85,25%** (43 accepted / 17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
 
 

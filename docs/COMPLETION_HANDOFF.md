@@ -1,5 +1,8 @@
 # RC293 — Illustrated documentation and brochures handoff
 
+**RC300 hotfix (2026-11-10):** The first `[full-ci]` run 42887563358 failed at the old optional RC295 Chromium script due to invalid escaped Python triple quotes. A hotfix repairs it, adds a mandatory pre-npm parse of all opt-in browser scripts and makes actual native R geometry browser acceptance mandatory on PRs. Main full CI and Docker artifacts must be run again after the hotfix merge. No publication. Formal **85.25%** (43 accepted/17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+
 **RC300 handoff (2026-11-10):** RC299 main merge at `6f48a9de9f2c`. The new single-flight presenter polling suppresses overlapping HTTP fetches, keeps prior authenticated totals during outages, and discards late responses after unmount. Node tests and downloadable, seven-day, SHA-256-verified Docker linux/amd64 archives are triggered with the `[full-ci]` marker on the main merge; extended browser, capacity, Kubernetes and native OCI gates run, but no Docker Hub publishing. See `docs/RC_CYCLE300_LIVE_RESULTS_FULL_CI_OCI.en.md`. Physical A4/B3 gates still partial, **85.25%** (43 accepted / 17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
 
 

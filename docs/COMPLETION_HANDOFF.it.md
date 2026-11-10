@@ -1,5 +1,8 @@
 # RC293 — Passaggio manuali illustrati e brochure
 
+**Hotfix RC300 (10/11/2026):** La prima full CI `[full-ci]` 42887563358 è fallita a causa dei tripli apici Python errati nello script Chromium opzionale RC295. La correzione ripara lo script, verifica preventivamente tutti gli script browser e impone il test geometrico Chromium R nelle PR. La full CI su main e gli artifact Docker vanno ripetuti dopo il merge; nessuna pubblicazione. **85,25%** (43 accepted/17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+
 **Handoff RC300 (10/11/2026):** RC299 integrata in main `6f48a9de9f2c`. Il polling single-flight impedisce fetch HTTP sovrapposti, mantiene i conteggi validi durante disconnessioni e ignora risposte tardive dopo la chiusura. Test Node e immagini Docker linux/amd64 compresse con checksum SHA-256, scaricabili per sette giorni, disponibili con `[full-ci]` sul merge main; gate estesi browser, carico, Kubernetes e OCI nativi, nessuna pubblicazione Docker Hub. Vedi `docs/RC_CYCLE300_LIVE_RESULTS_FULL_CI_OCI.it.md`. Gate fisici A4/B3 ancora parziali, **85,25%** (43 accepted / 17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
 
 

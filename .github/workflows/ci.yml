@@ -363,6 +363,8 @@ jobs:
         run: |
           node --experimental-strip-types --test apps/web/test/rc300-live-result-poller.test.ts
           python3 -m unittest tools.tests.test_rc300_image_archive_guard -q
+      - name: Preflight all full Chromium scripts before dependencies
+        run: python3 tools/ci_full_browser_script_syntax.py
       - name: RC297 accessible pie percent semantics and hidden-preference preflight
         run: node --experimental-strip-types --test apps/web/test/rc297-pie-screenreader.test.ts
       - name: RC293 visual manuals and brochure publication preflight
@@ -1264,6 +1266,9 @@ jobs:
           if [ -z "${QUORIVIO_CHROMIUM_PATH:-}" ]; then
             python3 tools/ci_browser_bootstrap.py --smoke --github-env "$GITHUB_ENV"
           fi
+      - name: RC300 R layout full-CI Chromium smoke gate
+        timeout-minutes: 2
+        run: python3 tools/ci_rc295_results_layout_chromium.py
       - name: RC296 real Chromium mobile pie percentage geometry
         timeout-minutes: 2
         run: python3 tools/ci_rc296_mobile_pie_chromium.py

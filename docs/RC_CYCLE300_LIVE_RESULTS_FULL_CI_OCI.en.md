@@ -11,3 +11,7 @@
 Independent physical A4/B3 accessibility and participant sign-offs are still missing; the certified ledger remains **85.25% (43 accepted / 17 partial)**, with `rc_strict=false`, `publish_image=false` and `publish_latest=false`.
 
 **Suggested merge title:** `fix: stabilize live results and archive Docker images [full-ci]`
+
+## Full-CI hotfix after run 42887563358
+
+The first expanded `[full-ci]` run encountered a legacy invalid Python triple-quoted JavaScript expression in `tools/ci_rc295_results_layout_chromium.py`, even though the standard quality/container tests were green. Removed accidental backslashes before its triple quotes. CI now compiles **all** Chromium opt-in scripts in a cheap, mandatory pre-npm stage and executes the actual RC295 R-layout Chromium smoke after browser bootstrap even for regular PRs. This is a fail-closed safeguard, not a claim that the extended campaign passed. A corrected full CI must run on a new main commit; no Docker images were published.
