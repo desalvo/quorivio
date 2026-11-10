@@ -1,5 +1,7 @@
 # Quorivio 0.1.0-dev — RC293 — Compact visual manuals and product brochures
 
+**Development checkpoint RC298 (2026-11-10):** RC297 was merged with the suggested one-line commit title, and main mandatory CI [42830750852](https://github.com/desalvo/quorivio/actions/runs/42830750852) is green (production and container gates). RC298 adds a real compiled React + PostgreSQL + Chromium test for persisted linked pie results, desktop/phone accessibility, presenter/participant privacy and disabled-percentage behavior; see [RC298 evidence](RC_CYCLE298_REAL_REACT_PG_PIE_ACCEPTANCE.en.md). New PR validation pending. This is **not** a newly approved physical screen-reader/participant gate. Gate ledger **85.25%** (43 accepted, 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Documentation release inventory remains RC293 until a separately verified promotion.
+
 **RC293:** Six illustrated IT/EN manuals repaginated to remove compulsory chapter gaps; original 20-icon editor toolbar atlas from real Chromium evidence; additional archived screenshots and explicitly synthetic photographs on each page; two product brochures in IT/EN (two A4 pages each) with official product metadata. No runtime code changed. **85.25%** (43 accepted/17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full CI RC293 pending; prior RC292 full CI green. No commit/push/tag.
 
 ---
