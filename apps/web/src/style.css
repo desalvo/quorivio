@@ -3851,3 +3851,51 @@ body .editor-floating-panel.widget-selection-palette{
 .results-pie-size-control{display:inline-flex;align-items:center;flex-wrap:wrap;gap:8px}
 .results-pie-size-control input[type=range]{width:clamp(100px,12vw,190px);accent-color:#0b8677}
 .results-pie-size-control output{min-width:3ch;font-variant-numeric:tabular-nums;font-weight:700}
+
+/* RC296: on a 170px-wide phone chart, the SVG percent callouts shrink to
+ * around 6px. This semantic key keeps labels sized independently of the SVG. */
+.linked-results .linked-results-pie-mobile-legend{
+ display:none;grid-template-columns:repeat(auto-fit,minmax(min(100%,145px),1fr));gap:5px 8px;
+ width:100%;min-width:0;max-width:100%;box-sizing:border-box;
+ flex:0 0 auto;font:inherit;
+}
+.linked-results .linked-results-pie-mobile-item{
+ display:grid;grid-template-columns:12px minmax(0,1fr);align-items:center;
+ gap:2px 6px;min-width:0;max-width:100%;box-sizing:border-box;
+ padding:3px 5px;border:1px solid #d4dfeb;border-radius:5px;
+ background:#fff;color:#142c45;
+}
+.linked-results .linked-results-pie-mobile-swatch{
+ width:11px;height:11px;border-radius:2px;display:block;
+ border:1px solid #22304844;box-sizing:border-box;
+}
+.linked-results .linked-results-pie-mobile-name{
+ min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
+ font:600 clamp(12px,.74em,16px)/1.25 Arial,sans-serif;
+}
+.linked-results .linked-results-pie-mobile-percent{
+ grid-column:2;white-space:nowrap;overflow:visible;
+ font:750 clamp(14px,.88em,20px)/1.25 Arial,sans-serif;
+ font-variant-numeric:tabular-nums;
+}
+@media(max-width:640px){
+ .linked-results .linked-results-pie-mobile-legend{display:grid}
+ .linked-results .linked-results-pie-chart[data-mobile-percent-labels="true"] .linked-results-pie-callout{display:none}
+ .linked-results .linked-results-pie.linked-results-pie-chart{
+  width:min(100%,250px)!important;aspect-ratio:500 / 320!important;height:auto!important;
+ }
+}
+:is(.editor-ux-v2 .canvas-editor-group[data-canvas-device="phone"] .widget-canvas-item,
+ .rehearsal-phone-stage .rehearsal-widget,
+ .rehearsal-phone-widescreen-frame .rehearsal-widget,
+ .audience-widget-layout.stage-phone>.page-widget)[data-widget-kind="results-button"] .linked-results-pie-mobile-legend{display:grid}
+:is(.editor-ux-v2 .canvas-editor-group[data-canvas-device="phone"] .widget-canvas-item,
+ .rehearsal-phone-stage .rehearsal-widget,
+ .rehearsal-phone-widescreen-frame .rehearsal-widget,
+ .audience-widget-layout.stage-phone>.page-widget)[data-widget-kind="results-button"] .linked-results-pie-chart[data-mobile-percent-labels="true"] .linked-results-pie-callout{display:none}
+:is(.editor-ux-v2 .canvas-editor-group[data-canvas-device="phone"] .widget-canvas-item,
+ .rehearsal-phone-stage .rehearsal-widget,
+ .rehearsal-phone-widescreen-frame .rehearsal-widget,
+ .audience-widget-layout.stage-phone>.page-widget)[data-widget-kind="results-button"] .linked-results-pie.linked-results-pie-chart{
+ width:min(100%,250px)!important;aspect-ratio:500 / 320!important;height:auto!important;
+}
