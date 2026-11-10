@@ -40,7 +40,7 @@ class RealVotesPieAcceptance(unittest.TestCase):
 
     def test_svg_tooltips_announce_real_source_text_counts_and_optional_percentages(self):
         ui=MAIN.read_text(encoding='utf8')
-        self.assertIn('data[r.index-1]?.label||("Opzione "+r.index)',ui)
+        self.assertIn('data[r.index-1]?.label||('Opzione '+r.index)',ui)
         self.assertIn("r.count===1?'risposta':'risposte'",ui)
         self.assertIn("widget.pieShowPercentages===true?",ui)
         self.assertIn("resultPiePercent(r.share)",ui)
