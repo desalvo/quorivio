@@ -363,6 +363,8 @@ jobs:
         run: |
           node --experimental-strip-types --test apps/web/test/rc300-live-result-poller.test.ts
           python3 -m unittest tools.tests.test_rc300_image_archive_guard -q
+      - name: RC301 native pie legibility and source-contract preflight
+        run: python3 -m unittest tools.tests.test_rc301_native_pie -q
       - name: Preflight all full Chromium scripts before dependencies
         run: python3 tools/ci_full_browser_script_syntax.py
       - name: RC297 accessible pie percent semantics and hidden-preference preflight
@@ -1269,6 +1271,9 @@ jobs:
       - name: RC300 R layout full-CI Chromium smoke gate
         timeout-minutes: 2
         run: python3 tools/ci_rc295_results_layout_chromium.py
+      - name: RC301 Chromium readable pie legends
+        timeout-minutes: 3
+        run: python3 tools/ci_rc301_pie_cross_engine.py --engines chromium
       - name: RC296 real Chromium mobile pie percentage geometry
         timeout-minutes: 2
         run: python3 tools/ci_rc296_mobile_pie_chromium.py
@@ -1922,6 +1927,9 @@ jobs:
       - name: Native Firefox and WebKit page thumbnail reorder and readback acceptance
         timeout-minutes: 5
         run: python3 tools/ci_page_thumbnail_native.py --engines firefox webkit
+      - name: RC301 native Firefox and WebKit readable pie legends
+        timeout-minutes: 5
+        run: python3 tools/ci_rc301_pie_cross_engine.py --engines firefox webkit
       - name: Upload cross-browser failure evidence
         if: failure()
         uses: actions/upload-artifact@v4

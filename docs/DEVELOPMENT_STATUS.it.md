@@ -1,5 +1,8 @@
 # Quorivio 0.1.0-dev — RC293 — Manuali visuali compatti e brochure
 
+**Checkpoint sviluppo RC301 (10/11/2026):** Le etichette lunghe della legenda a torta smartphone vanno a capo senza troncamento. Nuovi test Chromium/Firefox/WebKit nativi sul vero calcolo TypeScript e CSS distribuito, a varie larghezze e per percentuali molto piccole o disabilitate. Dettagli `docs/RC_CYCLE301_CROSS_ENGINE_PIE_LEGENDS.it.md`. Prova browser **non** equivalente all'accettazione fisica indipendente A4/B3. Stato **85,25%** (43 accepted/17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+
 **RC300 hotfix full CI (10/11/2026):** La run estesa 42887563358 ha rilevato escape Python errati nello storico test Chromium RC295. Corretti i tripli apici, aggiunti controllo sintattico preventivo degli script browser e collaudo Chromium reale del layout R obbligatorio sulle PR. Nuova full CI necessaria; nessuna pubblicazione Docker Hub. **85,25%** (43 accepted/17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
 
 

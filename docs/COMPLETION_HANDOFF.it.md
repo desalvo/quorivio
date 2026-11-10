@@ -1,5 +1,8 @@
 # RC293 — Passaggio manuali illustrati e brochure
 
+**Handoff RC301 (10/11/2026):** Branch dal commit di pubblicazione RC300 `7c1046a16203`. Le legende a torta smartphone non troncano le risposte lunghe, ora su più righe. Test sui browser reali Chromium nelle PR e Firefox/WebKit nella CI estesa, usando la geometria TypeScript di produzione. A4/B3 fisici ancora parziali. Vedi `docs/RC_CYCLE301_CROSS_ENGINE_PIE_LEGENDS.it.md`; certificato **85,25%** (43 accepted/17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
+
+
 **Hotfix RC300 (10/11/2026):** La prima full CI `[full-ci]` 42887563358 è fallita a causa dei tripli apici Python errati nello script Chromium opzionale RC295. La correzione ripara lo script, verifica preventivamente tutti gli script browser e impone il test geometrico Chromium R nelle PR. La full CI su main e gli artifact Docker vanno ripetuti dopo il merge; nessuna pubblicazione. **85,25%** (43 accepted/17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
 
 
