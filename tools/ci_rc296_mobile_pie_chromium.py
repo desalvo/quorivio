@@ -51,15 +51,16 @@ async def run():
     const labels=[...legend.querySelectorAll('.linked-results-pie-mobile-percent')];
     const callout=document.querySelector('.linked-results-pie-callout');
     const b=svg.getBoundingClientRect();
-    return {visible:getComputedStyle(legend).display==='grid',
+    return {visible:getComputedStyle(legend).display==='grid' && getComputedStyle(legend).clipPath==='none' && legend.getBoundingClientRect().width>5,
      count:labels.length,
      minFont:Math.min(...labels.map(x=>parseFloat(getComputedStyle(x).fontSize))),
      overflow:legend.scrollWidth>legend.clientWidth+1,
      ratio:b.width/b.height,callout:getComputedStyle(callout).display!=='none'};
    }""")
    assert d['visible'] is visible,(name,d)
-   assert d['count']==12 and not d['overflow'],(name,d)
+   assert d['count']==12,(name,d)
    if visible:
+    assert not d['overflow'],(name,d)
     assert d['minFont']>=14,(name,d)
     assert not d['callout'],(name,d)
     assert abs(d['ratio']-500/320)<0.05,(name,d)
