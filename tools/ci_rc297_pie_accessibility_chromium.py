@@ -20,7 +20,7 @@ def page_html(wrapper: str = "", with_percentages: bool = True) -> str:
     closing = "</div>" * wrapper.count("<div")
     items = "".join(
         '<div class="linked-results-pie-mobile-item" role="listitem" '
-        f'aria-label="Risposta {i}: {i} risposte, {i}.5%">'
+        f'aria-label="Risposta {i}: {i} {("risposta" if i==1 else "risposte")}, {i}.5%">'
         '<span class="linked-results-pie-mobile-swatch" aria-hidden="true"></span>'
         f'<span class="linked-results-pie-mobile-name">Risposta {i}</span>'
         f'<strong class="linked-results-pie-mobile-percent">{i}.5%</strong>'
@@ -75,7 +75,7 @@ async def run() -> None:
             assert await entries.count() == 3, name
             names = [await entries.nth(i).get_attribute("aria-label") for i in range(3)]
             assert names == [
-                "Risposta 1: 1 risposte, 1.5%",
+                "Risposta 1: 1 risposta, 1.5%",
                 "Risposta 2: 2 risposte, 2.5%",
                 "Risposta 3: 3 risposte, 3.5%",
             ], (name, names)
