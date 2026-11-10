@@ -359,6 +359,10 @@ jobs:
         run: python3 -m unittest tools.tests.test_rc298_real_pie_postgres -q
       - name: RC299 live votes and privacy real-browser preflight
         run: python3 -m unittest tools.tests.test_rc299_real_votes_pg -q
+      - name: RC300 live polling and portable Docker archive preflight
+        run: |
+          node --experimental-strip-types --test apps/web/test/rc300-live-result-poller.test.ts
+          python3 -m unittest tools.tests.test_rc300_image_archive_guard -q
       - name: RC297 accessible pie percent semantics and hidden-preference preflight
         run: node --experimental-strip-types --test apps/web/test/rc297-pie-screenreader.test.ts
       - name: RC293 visual manuals and brochure publication preflight
@@ -1959,6 +1963,31 @@ jobs:
           severity: CRITICAL,HIGH
           exit-code: '1'
           ignore-unfixed: true
+      - name: Export scanned Docker images as portable archives [full-ci]
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[full-ci]')
+        shell: bash
+        run: |
+          set -euo pipefail
+          short="${GITHUB_SHA:0:12}"
+          mkdir -p /tmp/quorivio-ci-images
+          docker tag quorivio:gate "quorivio:sha-$short"
+          docker tag quorivio-converter:gate "quorivio-converter:sha-$short"
+          docker save "quorivio:sha-$short" | gzip -1 > "/tmp/quorivio-ci-images/quorivio-sha-$short.tar.gz"
+          docker save "quorivio-converter:sha-$short" | gzip -1 > "/tmp/quorivio-ci-images/quorivio-converter-sha-$short.tar.gz"
+          cd /tmp/quorivio-ci-images
+          sha256sum *.tar.gz > SHA256SUMS
+          sha256sum -c SHA256SUMS
+          gzip -t *.tar.gz
+      - name: Upload portable Docker images [full-ci]
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[full-ci]')
+        uses: actions/upload-artifact@v4
+        with:
+          name: quorivio-docker-images-${{ github.sha }}
+          path: /tmp/quorivio-ci-images/
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
+
   kubernetes-api-manifests:
     name: Kubernetes real API manifest schema (opt-in)
     if: github.event_name == 'workflow_dispatch' && inputs.kubernetes_manifest_test || (github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite) || (github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[full-ci]') || contains(github.event.head_commit.message, '[publish-docker]')))

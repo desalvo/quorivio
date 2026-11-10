@@ -61,7 +61,10 @@ test('live projection uses the same cross-page resolver with the source activity
  assert.match(live,/const sourceActivityId=context\?\.activity\.id\|\|activity\.id/);
  assert.match(live,/widget-answers\/detail\?activity_id=\$\{encodeURIComponent\(sourceActivityId\)\}/);
  assert.match(live,/results temporarily|Risultati temporaneamente non disponibili/);
- assert.match(live,/window\.setInterval\(\(\)=>void load\(\),3000\)/);
+ assert.match(live,/createLiveResultPoller\(async\(\)=>/);
+ assert.match(live,/window\.setInterval\(\(\)=>void poller\.refresh\(\),3000\)/);
+ assert.match(live,/poller\.stop\(\);window\.clearInterval\(timer\)/);
+ assert.doesNotMatch(live,/setRows\(\[\]\);setLoadFailed\(true\)/);
  assert.doesNotMatch(live,/liveRevision/,'live snapshot updates must not cancel every in-flight source stats HTTP request');
  // RC276: R state now lives inside the common LinkedResultChart renderer.
  // Never require a second live-only state: it would desynchronize rehearsals.
