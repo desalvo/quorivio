@@ -1,5 +1,8 @@
 # RC293 — Illustrated documentation and brochures handoff
 
+**RC302 handoff (2026-11-10):** New paired app/converter native Docker Hub publisher built on RC301 merged SHA `d18b14129afe8850b5df549213e5d56ba03a47b3`. Build both architectures natively for both images, upload distinct per-architecture digests, check converter manifests before moving app tags, and publish matching SHA/latest converter tags after app manifests. Manual and explicit-commit paths retain production environment and consent. Do not mistake app-only run 42897981990 for converter publication. See `docs/RC_CYCLE302_JOINT_DOCKER_HUB.en.md`. Strict RC external 17 gates remain pending, **85.25%**.
+
+
 **RC301 handoff (2026-11-10):** Branch from verified RC300 publication commit `7c1046a16203`. Changed mobile results pie labels from ellipsis to multiline wrapping. Added actual production-TS SVG/legend browser acceptance on Chromium for PR and on native Firefox/WebKit for the extended suite. Original B3 and A4 external/physical gates remain partial. See `docs/RC_CYCLE301_CROSS_ENGINE_PIE_LEGENDS.en.md`; certified **85.25%** (43 accepted/17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
 
 

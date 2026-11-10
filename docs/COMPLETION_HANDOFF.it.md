@@ -1,5 +1,8 @@
 # RC293 — Passaggio manuali illustrati e brochure
 
+**Handoff RC302 (10/11/2026):** Nuovo publisher congiunto nativo per app e converter dopo RC301 merged `d18b14129afe8850b5df549213e5d56ba03a47b3`. Build AMD64/ARM64 native per entrambe, digest distinti, preflight converter prima dei tag dell'applicazione, tag converter SHA/latest uguali ai tag app. Conservata l'autorizzazione esplicita e l'ambiente production. La vecchia run 42897981990 ha pubblicato soltanto l'app. Vedi `docs/RC_CYCLE302_JOINT_DOCKER_HUB.it.md`. RC stretta ancora in attesa dei 17 collaudi esterni, **85,25%**.
+
+
 **Handoff RC301 (10/11/2026):** Branch dal commit di pubblicazione RC300 `7c1046a16203`. Le legende a torta smartphone non troncano le risposte lunghe, ora su più righe. Test sui browser reali Chromium nelle PR e Firefox/WebKit nella CI estesa, usando la geometria TypeScript di produzione. A4/B3 fisici ancora parziali. Vedi `docs/RC_CYCLE301_CROSS_ENGINE_PIE_LEGENDS.it.md`; certificato **85,25%** (43 accepted/17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
 
 
