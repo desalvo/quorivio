@@ -18934,14 +18934,14 @@
       "49929c52"
     ],
     "tools/tests/test_ci_browser_bootstrap.py": [
-      "8a987fba",
-      "d49d3523",
-      "973c8354",
-      "99535f32",
-      "5c51afaa",
-      "acca7c74",
-      "b63c79ae",
-      "090a96ce"
+      "808d8913",
+      "6b30869a",
+      "05c6490c",
+      "e9dde4ab",
+      "fb801a9c",
+      "22fb2128",
+      "3bc2c25f",
+      "303a82d8"
     ],
     "tools/tests/test_ci_browser_editor_readonly_title.py": [
       "3287d0cb",
@@ -19434,14 +19434,14 @@
       "8ca3933d"
     ],
     "tools/tests/test_image_defaults.py": [
-      "92d9e6b8",
-      "65946508",
-      "d225e2d8",
-      "36efe52e",
-      "bf363c97",
-      "836de3da",
-      "bf9daaf7",
-      "348911fc"
+      "dbad65c7",
+      "c4000bc4",
+      "1ad64ed1",
+      "8dd4f231",
+      "80962cc2",
+      "6574ff6a",
+      "99a23ae4",
+      "286c52a4"
     ],
     "tools/tests/test_import_presentation.py": [
       "e7791737",
@@ -19584,14 +19584,14 @@
       "45b63a5f"
     ],
     "tools/tests/test_manual_docker_publish.py": [
-      "4ca01f8d",
-      "09f99cc0",
-      "f4619fe7",
-      "ff0a7e23",
-      "21277218",
-      "2a1c7564",
-      "bd6b0353",
-      "99ba8c2b"
+      "8a9c5aaf",
+      "3709daf6",
+      "b5de5993",
+      "61ef02ff",
+      "75d0b845",
+      "d05689e1",
+      "ef6ee516",
+      "0fc1b981"
     ],
     "tools/tests/test_mobile_touch_capture_contract.py": [
       "168e1cab",
