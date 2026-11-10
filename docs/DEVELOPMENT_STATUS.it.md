@@ -1,5 +1,7 @@
 # Quorivio 0.1.0-dev — RC293 — Manuali visuali compatti e brochure
 
+**Aggiornamento sviluppo RC298 (10/11/2026):** RC297 integrata con il titolo di commit suggerito; la CI obbligatoria di main [42830750852](https://github.com/desalvo/quorivio/actions/runs/42830750852) è verde (quality e container). RC298 introduce un test reale React compilato + PostgreSQL + Chromium su grafici a torta persistiti, accessibilità desktop/smartphone, riservatezza delle statistiche e percentuali disabilitate; vedi [protocollo RC298](RC_CYCLE298_REAL_REACT_PG_PIE_ACCEPTANCE.it.md). La nuova CI di PR è ancora da convalidare; non rappresenta approvazione degli screen reader fisici. Completamento **85,25%** (43 acquisiti, 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Il catalogo documentale RC293 resta invariato fino alla promozione verificata.
+
 **RC293:** Rigenerati i sei manuali IT/EN senza pagine vuote causate da capitoli forzati; atlante delle 20 icone originali da Chromium; schermate archiviate e foto sintetiche etichettate, grafica in ogni pagina; due brochure pubblicitarie IT/EN (2 pagine A4). Runtime invariato. **85,25%** (43 gate acquisiti/17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Nuova full CI da confermare. Nessun commit/push/tag.
 
 ---
