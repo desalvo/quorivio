@@ -52,16 +52,21 @@ class RC102Contracts(unittest.TestCase):
         condition=publish.split('    needs:',1)[0]
         self.assertIn("github.event_name == 'push'",condition)
         self.assertIn("github.ref == 'refs/heads/main'",condition)
-        self.assertIn('needs: [validate, image-build, rc-campaign-conclusion, publish-platform]',publish)
+        self.assertIn('needs: [validate, image-build, rc-campaign-conclusion, publish-platform, publish-converter-platform]',publish)
         for gate in ('validate','image-build','rc-campaign-conclusion'):
             self.assertIn("needs."+gate+".result == 'success'",condition)
         self.assertIn('environment: production',publish)
         self.assertIn('permissions: {contents: read}',publish)
         self.assertIn("needs.publish-platform.result == 'success'",condition)
-        self.assertIn('bash tools/publish_multiarch_manifest.sh',publish)
+        self.assertIn("needs.publish-converter-platform.result == 'success'",condition)
+        self.assertIn('bash tools/publish_both_multiarch_manifest.sh',publish)
         platform=CI.split('  publish-platform:',1)[1].split('  publish:',1)[0]
         self.assertIn('push=true',platform)
         self.assertIn('ubuntu-24.04-arm',platform)
+        converter=CI.split('  publish-converter-platform:',1)[1].split('  publish:',1)[0]
+        self.assertIn('file: Dockerfile.converter',converter)
+        self.assertIn('ubuntu-24.04-arm',converter)
+        self.assertIn("needs.rc-campaign-conclusion.result == 'success'",converter)
         self.assertIn("needs.rc-campaign-conclusion.result == 'success'",platform)
         self.assertIn('docker/setup-buildx-action@v3',publish)
         self.assertIn('secrets.DOCKERHUB_TOKEN',publish)
