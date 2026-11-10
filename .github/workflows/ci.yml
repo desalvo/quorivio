@@ -15,7 +15,7 @@ on:
         type: boolean
         default: false
       publish_image:
-        description: 'Explicitly publish a verified multi-architecture image to Docker Hub (never on push/PR/tag automatically)'
+        description: 'Explicitly publish verified multiarch app and converter images to Docker Hub'
         type: boolean
         default: false
       publish_tag:
@@ -23,7 +23,7 @@ on:
         type: string
         default: ''
       publish_latest:
-        description: 'Also move Docker Hub latest tag (requires publish_image and main ref)'
+        description: 'Also update both Docker Hub latest tags (requires publish_image and main ref)'
         type: boolean
         default: false
       browser_test:
@@ -365,6 +365,8 @@ jobs:
           python3 -m unittest tools.tests.test_rc300_image_archive_guard -q
       - name: RC301 native pie legibility and source-contract preflight
         run: python3 -m unittest tools.tests.test_rc301_native_pie -q
+      - name: RC302 paired image publication and digest verification preflight
+        run: python3 -m unittest tools.tests.test_rc302_joint_native_publisher -q
       - name: Preflight all full Chromium scripts before dependencies
         run: python3 tools/ci_full_browser_script_syntax.py
       - name: RC297 accessible pie percent semantics and hidden-preference preflight
@@ -2332,20 +2334,40 @@ jobs:
             org.opencontainers.image.source=https://github.com/desalvo/quorivio
             org.opencontainers.image.licenses=EUPL-1.2
             org.opencontainers.image.revision=${{ github.sha }}
-      - name: Record validated native image digest
+      - name: Build native converter architecture by immutable digest only
+        id: converter-native-build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.converter
+          platforms: ${{ matrix.platform }}
+          outputs: type=image,name=desalvo/quorivio-converter,push-by-digest=true,name-canonical=true,push=true
+          sbom: true
+          provenance: mode=max
+          labels: |
+            org.opencontainers.image.source=https://github.com/desalvo/quorivio
+            org.opencontainers.image.licenses=EUPL-1.2
+            org.opencontainers.image.revision=${{ github.sha }}
+      - name: Record validated native application and converter image digests
         env:
           IMAGE_DIGEST: ${{ steps.native-build.outputs.digest }}
+          CONVERTER_IMAGE_DIGEST: ${{ steps.converter-native-build.outputs.digest }}
           ARCH: ${{ matrix.arch }}
         run: |
           set -euo pipefail
-          [[ "$IMAGE_DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]] || { echo 'Invalid OCI image digest'; exit 1; }
+          [[ "$IMAGE_DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]] || { echo 'Invalid OCI app digest'; exit 1; }}
+          [[ "$CONVERTER_IMAGE_DIGEST" =~ ^sha256:[0-9a-f]{64}$ ]] || { echo 'Invalid OCI converter digest'; exit 1; }}
+          [[ "$IMAGE_DIGEST" != "$CONVERTER_IMAGE_DIGEST" ]] || { echo 'Duplicate app/converter digests'; exit 1; }}
           mkdir -p digests
           printf '%s\n' "$IMAGE_DIGEST" > "digests/$ARCH.digest"
-      - name: Transfer digest for atomic multiarch manifest publication
+          printf '%s\n' "$CONVERTER_IMAGE_DIGEST" > "digests/converter-$ARCH.digest"
+      - name: Transfer both native digests for paired multiarch publication
         uses: actions/upload-artifact@v4
         with:
           name: quorivio-native-${{ matrix.arch }}-${{ github.run_id }}-${{ github.run_attempt }}
-          path: digests/${{ matrix.arch }}.digest
+          path: |
+            digests/${{ matrix.arch }}.digest
+            digests/converter-${{ matrix.arch }}.digest
           if-no-files-found: error
           retention-days: 1
 
@@ -2386,11 +2408,29 @@ jobs:
           pattern: quorivio-native-*-${{ github.run_id }}-${{ github.run_attempt }}
           merge-multiple: true
           path: digests
+      - name: Preflight converter native digests before changing either image tag
+        env:
+          QUORIVIO_IMAGE_TAGS: ${{ steps.label.outputs.tags }}
+          QUORIVIO_DIGEST_DIR: digests
+          QUORIVIO_COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          QUORIVIO_CAMPAIGN_CONCLUSION: ${{ needs.rc-campaign-conclusion.result }}
+          QUORIVIO_PUBLISH_IMAGE: ${{ inputs.publish_image }}
+          QUORIVIO_RC_ACCEPTANCE_SUITE: ${{ inputs.rc_acceptance_suite }}
+        run: bash tools/publish_converter_multiarch_manifest.sh --verify-only
       - name: Assemble and verify both native images before tagging
         env:
           QUORIVIO_IMAGE_TAGS: ${{ steps.label.outputs.tags }}
           QUORIVIO_DIGEST_DIR: digests
         run: bash tools/publish_multiarch_manifest.sh
+      - name: Assemble and verify matching native converter multiarch tags
+        env:
+          QUORIVIO_IMAGE_TAGS: ${{ steps.label.outputs.tags }}
+          QUORIVIO_DIGEST_DIR: digests
+          QUORIVIO_COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          QUORIVIO_CAMPAIGN_CONCLUSION: ${{ needs.rc-campaign-conclusion.result }}
+          QUORIVIO_PUBLISH_IMAGE: ${{ inputs.publish_image }}
+          QUORIVIO_RC_ACCEPTANCE_SUITE: ${{ inputs.rc_acceptance_suite }}
+        run: bash tools/publish_converter_multiarch_manifest.sh
 
   publish-on-commit:
     name: Verified multiarch Docker Hub publication (explicit commit)
@@ -2426,8 +2466,26 @@ jobs:
           pattern: quorivio-native-*-${{ github.run_id }}-${{ github.run_attempt }}
           merge-multiple: true
           path: digests
+      - name: Preflight converter native digests before changing either image tag
+        env:
+          QUORIVIO_IMAGE_TAGS: ${{ steps.label.outputs.tags }}
+          QUORIVIO_DIGEST_DIR: digests
+          QUORIVIO_COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          QUORIVIO_CAMPAIGN_CONCLUSION: ${{ needs.rc-campaign-conclusion.result }}
+          QUORIVIO_PUBLISH_IMAGE: ${{ inputs.publish_image }}
+          QUORIVIO_RC_ACCEPTANCE_SUITE: ${{ inputs.rc_acceptance_suite }}
+        run: bash tools/publish_converter_multiarch_manifest.sh --verify-only
       - name: Assemble and verify both native images before tagging
         env:
           QUORIVIO_IMAGE_TAGS: ${{ steps.label.outputs.tags }}
           QUORIVIO_DIGEST_DIR: digests
         run: bash tools/publish_multiarch_manifest.sh
+      - name: Assemble and verify matching native converter multiarch tags
+        env:
+          QUORIVIO_IMAGE_TAGS: ${{ steps.label.outputs.tags }}
+          QUORIVIO_DIGEST_DIR: digests
+          QUORIVIO_COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          QUORIVIO_CAMPAIGN_CONCLUSION: ${{ needs.rc-campaign-conclusion.result }}
+          QUORIVIO_PUBLISH_IMAGE: ${{ inputs.publish_image }}
+          QUORIVIO_RC_ACCEPTANCE_SUITE: ${{ inputs.rc_acceptance_suite }}
+        run: bash tools/publish_converter_multiarch_manifest.sh
