@@ -1,5 +1,8 @@
 # RC293 — Illustrated documentation and brochures handoff
 
+**RC302 handoff (2026-11-10):** A single authorized Docker Hub workflow builds/publishes both `desalvo/quorivio` and `desalvo/quorivio-converter`. New `publish-converter-platform` matrix creates native AMD64/ARM64 digests alongside existing app matrix. Both final publishers now depend on both matrix results and run `tools/publish_both_multiarch_manifest.sh`, which validates all four architectures/digests before touching tags. Push `[publish-docker]` still requires the full RC campaign, manual dispatch requires consent; git version-tag publishing never touches `latest`. Strict RC remains blocked, score **85.25%** (43 accepted, 17 partial); no external sign-off simulated. See `docs/RC_CYCLE302_UNIFIED_DOCKER_PUBLISH.en.md`.
+
+
 **RC301 handoff (2026-11-10):** Branch from verified RC300 publication commit `7c1046a16203`. Changed mobile results pie labels from ellipsis to multiline wrapping. Added actual production-TS SVG/legend browser acceptance on Chromium for PR and on native Firefox/WebKit for the extended suite. Original B3 and A4 external/physical gates remain partial. See `docs/RC_CYCLE301_CROSS_ENGINE_PIE_LEGENDS.en.md`; certified **85.25%** (43 accepted/17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
 
 

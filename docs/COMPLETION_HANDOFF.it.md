@@ -1,5 +1,8 @@
 # RC293 — Passaggio manuali illustrati e brochure
 
+**Handoff RC302 (10/11/2026):** Pubblicazione Docker Hub con unico consenso di `desalvo/quorivio` e `desalvo/quorivio-converter`. Nuova matrice `publish-converter-platform` costruisce digest nativi AMD64/ARM64 accanto alla matrice principale. Entrambi i job finali attendono le matrici e usano `tools/publish_both_multiarch_manifest.sh`: tutti e quattro i digest devono essere validi prima di modificare qualsiasi tag. Il push `[publish-docker]` richiede la campagna RC completa, il workflow manuale un consenso; dalle versioni taggate non si modifica `latest`. RC stretta bloccata, certificato **85,25%** (43 accepted, 17 partial); nessun collaudo esterno inventato. Vedi `docs/RC_CYCLE302_UNIFIED_DOCKER_PUBLISH.it.md`.
+
+
 **Handoff RC301 (10/11/2026):** Branch dal commit di pubblicazione RC300 `7c1046a16203`. Le legende a torta smartphone non troncano le risposte lunghe, ora su più righe. Test sui browser reali Chromium nelle PR e Firefox/WebKit nella CI estesa, usando la geometria TypeScript di produzione. A4/B3 fisici ancora parziali. Vedi `docs/RC_CYCLE301_CROSS_ENGINE_PIE_LEGENDS.it.md`; certificato **85,25%** (43 accepted/17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
 
 

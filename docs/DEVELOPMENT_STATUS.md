@@ -1,5 +1,8 @@
 # Quorivio 0.1.0-dev — RC293 — Compact visual manuals and product brochures
 
+**RC302 unified Docker Hub publication (2026-11-10):** One explicitly authorized event now stages native AMD64+ARM64 digests for the main image and isolated PDF/PPTX converter, preflights all four, then moves matching immutable-SHA / `latest` labels for both repositories only after full RC acceptance on `[publish-docker]`. Manual publishing applies the same pair with explicit `publish_latest`; git release-tag publishing never updates `latest`. Converter-only maintenance workflow remains available. No release tag/physical sign-off; certified **85.25%** (43 accepted, 17 partial), `rc_strict=false`. Details `docs/RC_CYCLE302_UNIFIED_DOCKER_PUBLISH.en.md`.
+
+
 **RC301 development checkpoint (2026-11-10):** Fix long mobile results pie legend names to wrap instead of ellipsizing. Extend CI with production TypeScript geometry rendered against shipped CSS on native Chromium, Firefox and WebKit for desktop, phones and editor-phone, including tiny-slice percent legibility and percentage-disabled privacy. See `docs/RC_CYCLE301_CROSS_ENGINE_PIE_LEGENDS.en.md`. This is browser automation, **not** A4/B3 independent physical sign-off. Score **85.25%** (43 accepted/17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
 
 

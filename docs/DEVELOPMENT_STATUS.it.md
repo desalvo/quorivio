@@ -1,5 +1,8 @@
 # Quorivio 0.1.0-dev — RC293 — Manuali visuali compatti e brochure
 
+**RC302 pubblicazione Docker Hub unificata (10/11/2026):** Una sola autorizzazione prepara digest nativi AMD64+ARM64 di applicazione e converter PDF/PPTX; verifica tutte e quattro le immagini prima di aggiornare i tag SHA/`latest` corrispondenti, solo dopo la full CI per `[publish-docker]`. Il workflow manuale pubblica entrambe con consenso esplicito; il tag di release non modifica mai `latest`. Il workflow converter separato resta disponibile per manutenzione. Nessuna release o accettazione fisica inventata; **85,25%** (43 accepted, 17 partial), `rc_strict=false`. Vedi `docs/RC_CYCLE302_UNIFIED_DOCKER_PUBLISH.it.md`.
+
+
 **Checkpoint sviluppo RC301 (10/11/2026):** Le etichette lunghe della legenda a torta smartphone vanno a capo senza troncamento. Nuovi test Chromium/Firefox/WebKit nativi sul vero calcolo TypeScript e CSS distribuito, a varie larghezze e per percentuali molto piccole o disabilitate. Dettagli `docs/RC_CYCLE301_CROSS_ENGINE_PIE_LEGENDS.it.md`. Prova browser **non** equivalente all'accettazione fisica indipendente A4/B3. Stato **85,25%** (43 accepted/17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
 
 
