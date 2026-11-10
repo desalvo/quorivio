@@ -153,7 +153,8 @@ class RequiredBrowserMediaBootstrap(unittest.TestCase):
         manual = s.split('  publish:\n', 1)[1].split('\n  publish-on-commit:', 1)[0]
         self.assertIn("inputs.publish_image == true", manual)
         self.assertIn("needs.publish-platform.result == 'success'", manual)
-        self.assertIn('needs: [validate, image-build, publish-platform]', manual)
+        self.assertIn('needs: [validate, image-build, publish-platform, publish-converter-platform]', manual)
+        self.assertIn("needs.publish-converter-platform.result == 'success'", manual)
         self.assertIn('publish_image:\n        description:', s)
         self.assertIn('default: false', s)
 
