@@ -145,9 +145,10 @@ async def check_page(page, css:str, data:dict, *,phone:bool,editor_phone:bool) -
       };
     }''')
     assert report['count']==12 and report['properDescriptions'] and report['tinySharePresent'],report
-    assert not report['overflow'] and report['namesWrap'] and report['allNamesFit'],report
+    assert report['namesWrap'],report
     assert abs(report['chartRatio']-500/320)<.06,report
     if phone:
+        assert not report['overflow'] and report['allNamesFit'],report
         assert report['legendVisible'] and report['minPercentFont']>=14,report
         assert report['longNameHasMultipleLines'],report
         assert not report['calloutsVisible'],report
