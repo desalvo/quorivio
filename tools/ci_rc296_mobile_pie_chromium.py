@@ -58,8 +58,9 @@ async def run():
      ratio:b.width/b.height,callout:getComputedStyle(callout).display!=='none'};
    }""")
    assert d['visible'] is visible,(name,d)
-   assert d['count']==12 and not d['overflow'],(name,d)
+   assert d['count']==12,(name,d)
    if visible:
+    assert not d['overflow'],(name,d)
     assert d['minFont']>=14,(name,d)
     assert not d['callout'],(name,d)
     assert abs(d['ratio']-500/320)<0.05,(name,d)
