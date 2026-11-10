@@ -1,5 +1,8 @@
 # Quorivio 0.1.0-dev — RC293 — Manuali visuali compatti e brochure
 
+**Sviluppo RC302 (10/11/2026):** Pubblicazione congiunta su Docker Hub di `desalvo/quorivio` e `desalvo/quorivio-converter` con una sola autorizzazione, build native AMD64/ARM64, tag SHA/latest coerenti, preflight digest prima dei tag e verifica dei due manifest. L'applicazione era stata pubblicata con successo nella run 42897981990 e la full CI RC301 42901855073 era verde; la pubblicazione congiunta richiede ancora i nuovi gate. Vedi `docs/RC_CYCLE302_JOINT_DOCKER_HUB.it.md`. **85,25%** (43 accepted / 17 partial), RC stretta ancora bloccata dai collaudi esterni.
+
+
 **Checkpoint sviluppo RC301 (10/11/2026):** Le etichette lunghe della legenda a torta smartphone vanno a capo senza troncamento. Nuovi test Chromium/Firefox/WebKit nativi sul vero calcolo TypeScript e CSS distribuito, a varie larghezze e per percentuali molto piccole o disabilitate. Dettagli `docs/RC_CYCLE301_CROSS_ENGINE_PIE_LEGENDS.it.md`. Prova browser **non** equivalente all'accettazione fisica indipendente A4/B3. Stato **85,25%** (43 accepted/17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
 
 
