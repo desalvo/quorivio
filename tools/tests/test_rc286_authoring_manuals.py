@@ -76,7 +76,13 @@ class RC286AuthoringManuals(unittest.TestCase):
     self.assertIn('RC'+str(__import__('tools.manual_release_metadata',fromlist=['CYCLE']).CYCLE),body)
     self.assertNotRegex(body,r'\b(?:commit|Commit)\s+[0-9a-f]{8,40}\b')
     self.assertNotIn('.quorivio',body)
-    self.assertGreaterEqual(len(doc),30)
+    # RC293 compact pagination removed forced blank chapters. Validate actual
+    # document substance and illustration coverage, not an obsolete page floor.
+    self.assertGreaterEqual(len(doc),16)
+    self.assertLessEqual(len(doc),40)
+    self.assertGreater(len(body),10000)
+    self.assertTrue(all(page.get_image_info() for page in doc),
+                    'Each manual page must include a genuine graphic component')
     self.assertGreaterEqual(sum(len(p.get_image_info()) for p in doc),10)
     doc.close()
 

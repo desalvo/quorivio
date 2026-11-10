@@ -3785,3 +3785,69 @@ body .editor-floating-panel.widget-selection-palette .results-gradient-colors>la
 body .editor-floating-panel.widget-selection-palette{
  max-height:calc(100dvh - 16px)!important;
 }
+
+/* RC295: the presenter R switch MUST NOT reflow the result widget.  Reserve
+ * exactly the same border box, padding and verdict-icon lane in both states.
+ * Only colours/overlays change when data-answer-verdict appears.  This also
+ * works with independently customised font sizes and multi-line answers. */
+.linked-results .linked-source-answers .widget-answer-option,
+.linked-results .linked-results-items .linked-results-row,
+.linked-results .linked-source-answers .widget-answer-option[data-answer-verdict],
+.linked-results .linked-results-items .linked-results-row[data-answer-verdict]{
+ box-sizing:border-box!important;position:relative!important;
+ border:3px solid transparent!important;border-radius:10px!important;
+ padding:clamp(7px,.55em,18px) clamp(10px,.75em,22px)!important;
+ margin:2px 0!important;line-height:1.5!important;
+ min-height:max-content!important;height:auto!important;
+ overflow:visible!important;
+}
+.linked-results .linked-source-answers .widget-answer-option{
+ padding-right:clamp(34px,2.7em,55px)!important;
+}
+.linked-results .linked-source-answers .widget-answer-option[data-answer-verdict]{
+ padding-right:clamp(34px,2.7em,55px)!important;
+}
+.linked-results .linked-results-items .linked-results-row .linked-result-pair{
+ box-sizing:border-box!important;position:relative!important;
+ padding-right:clamp(30px,2.4em,50px)!important;
+ line-height:1.45!important;
+}
+.linked-results .linked-source-answers .widget-answer-option strong{
+ min-width:0!important;max-width:100%!important;
+ line-height:1.45!important;overflow-wrap:anywhere!important;white-space:pre-wrap!important;
+}
+.linked-results .linked-source-answers .widget-answer-option[data-answer-verdict="correct"],
+.linked-results .linked-results-items .linked-results-row[data-answer-verdict="correct"]{
+ border-color:#16834d!important;background:rgba(22,163,74,.09)!important;
+ box-shadow:0 1px 5px #16834d26!important;
+}
+.linked-results .linked-source-answers .widget-answer-option[data-answer-verdict="incorrect"],
+.linked-results .linked-results-items .linked-results-row[data-answer-verdict="incorrect"]{
+ border-color:#bf303f!important;background:rgba(220,38,38,.07)!important;
+ box-shadow:0 1px 5px #bf303f25!important;
+}
+.linked-results .linked-source-answers .widget-answer-option>.answer-verdict-icon,
+.linked-results .linked-results-items .linked-result-pair .answer-verdict-icon{
+ position:absolute!important;display:inline-flex!important;
+ right:clamp(8px,.6em,16px)!important;top:50%!important;
+ transform:translateY(-50%)!important;margin:0!important;
+ pointer-events:none!important;white-space:nowrap!important;
+}
+/* Pie labels are always outside the slices, with independently spaced leaders.
+ * SVG uses a fixed coordinate system: the author controls the radius, not
+ * the chart's surrounding box. A 0.1% slice still has a readable label. */
+.linked-results .linked-results-pie.linked-results-pie-chart{
+ display:block!important;flex:0 0 auto!important;align-self:center!important;
+ box-sizing:border-box!important;width:100%!important;height:auto!important;
+ min-width:0!important;max-width:600px!important;max-height:none!important;
+ aspect-ratio:500 / 320!important;border-radius:0!important;
+ overflow:visible!important;background:transparent!important;
+}
+.linked-results-pie-chart .linked-results-pie-callout text{
+ fill:#142c45;font:750 17px/1.2 Arial,sans-serif;
+ stroke:#fff;stroke-width:3px;stroke-linejoin:round;paint-order:stroke fill;
+}
+.linked-results-pie-chart .linked-results-pie-callout polyline{vector-effect:non-scaling-stroke}
+.results-pie-size-control{display:inline-flex;align-items:center;flex-wrap:wrap;gap:8px}
+.results-pie-size-control input[type=range]{width:clamp(100px,12vw,190px);accent-color:#0b8677}
+.results-pie-size-control output{min-width:3ch;font-variant-numeric:tabular-nums;font-weight:700}
