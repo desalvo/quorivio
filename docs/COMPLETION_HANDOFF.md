@@ -1,5 +1,7 @@
 # RC293 — Illustrated documentation and brochures handoff
 
+**Next development handoff (RC298, 2026-11-10):** Merged RC297 on main at 5707b7d938531d161e97e1e0beb3d767ae4411a9, mandatory post-merge CI 42830750852 SUCCESS. RC298 branch adds mandatory native compiled React + disposable PostgreSQL + Chromium linked-pie test (true persisted source/format, desktop + phone, presenter-only chart, disabled percentages); full PR CI pending. Read [RC298 plan](RC_CYCLE298_REAL_REACT_PG_PIE_ACCEPTANCE.en.md) and [Italian](RC_CYCLE298_REAL_REACT_PG_PIE_ACCEPTANCE.it.md). Formal evidence **85.25%** (43 accepted, 17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Keep RC293 documentation/inventory version unchanged, do not claim A4/B3 external sign-off or publish images without separate approval.
+
 The active documentation release is **RC293**. Six bilingual manuals are redesigned with compact chapter flow, genuine archived toolbar icon references, page-level photo/graphic inserts and extensive walkthroughs. Two searchable, two-page A4 brochures IT/EN have been added. The app runtime is unchanged. Certified baseline **85.25%**; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full CI for RC293 pending. No commit, push or tag performed.
 
 ---

@@ -1,5 +1,7 @@
 # RC293 — Passaggio manuali illustrati e brochure
 
+**Passaggio di consegne RC298 (10/11/2026):** RC297 integrata in main, commit 5707b7d938531d161e97e1e0beb3d767ae4411a9; CI post-merge 42830750852 verde. Il branch RC298 aggiunge test obbligatori del vero React compilato con PostgreSQL temporaneo e Chromium: dati realmente salvati, statistiche a torta desktop/smartphone, riservatezza dei partecipanti e percentuali nascoste; CI PR in attesa. [Protocollo RC298](RC_CYCLE298_REAL_REACT_PG_PIE_ACCEPTANCE.it.md). Evidenze formali ferme a **85,25%** (43 accettati, 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Catalogo documentale RC293 invariato: niente accettazione A4/B3 o pubblicazioni automatiche.
+
 La release documentale corrente è **RC293**. Sei manuali bilingui reimpaginati, atlante delle icone reali, inserti di fotografie sintetiche e schermate autentiche archiviate; aggiunte due brochure ricercabili in formato A4 IT/EN. Runtime dell’app invariato. Baseline **85,25%**; `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Full CI RC293 ancora da verificare. Nessun commit, push o tag.
 
 ---
