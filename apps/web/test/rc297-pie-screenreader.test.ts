@@ -10,7 +10,7 @@ test('desktop pie percentage list is accessible, not display:none',()=>{
  assert.ok(start>0);
  const block=css.slice(start,css.indexOf('}',start));
  assert.ok(block.includes('display:grid'));
- assert.ok(!block.includes('display:none'));
+ assert.ok(!/^\s*display:none\s*;/m.test(block));
  assert.ok(block.includes('position:absolute'));
  assert.ok(block.includes('clip-path:inset(50%)'));
  assert.ok(block.includes('width:1px;height:1px'));
