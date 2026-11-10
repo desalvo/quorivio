@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
   "cycle": 293,
-  "file_count_excluding_manifest": 2570,
+  "file_count_excluding_manifest": 2573,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -44,14 +44,14 @@
       "e377db62"
     ],
     ".github/workflows/ci.yml": [
-      "f2d3714f",
-      "475eafbd",
-      "e0f07c4d",
-      "55f6bfa7",
-      "00c39b9f",
-      "602feae6",
-      "0af7f9f8",
-      "e6927f7c"
+      "5cbae3e4",
+      "9e6fda71",
+      "a794b6ce",
+      "f77bf030",
+      "f012e6d1",
+      "621f1141",
+      "d25ef206",
+      "f6469933"
     ],
     ".github/workflows/converter-image.yml": [
       "6ff519db",
@@ -2084,14 +2084,14 @@
       "54a62e5d"
     ],
     "apps/web/src/main.tsx": [
-      "fc9860a6",
-      "ff2da82a",
-      "b9f8b5e7",
-      "c6f93222",
-      "6f99f384",
-      "e2a073a7",
-      "e35170ef",
-      "99e76ddd"
+      "3e704d52",
+      "988dbd4c",
+      "34c9c827",
+      "4e834488",
+      "aadf64ee",
+      "2cb1bf21",
+      "10924128",
+      "127f913b"
     ],
     "apps/web/src/main.tsx.orig": [
       "9230e5a3",
@@ -2454,14 +2454,14 @@
       "2586b822"
     ],
     "apps/web/src/style.css": [
-      "5906f23e",
-      "ebc99177",
-      "20de1613",
-      "41735bae",
-      "be165c6a",
-      "d4473ad3",
-      "4a1fb59a",
-      "60ca46fe"
+      "fdc8e2fa",
+      "d8702cf3",
+      "86119e91",
+      "2a80a2d9",
+      "6c02138d",
+      "a7eb7199",
+      "dec495f7",
+      "3f45a76a"
     ],
     "apps/web/src/thumbnail-menu-layout.ts": [
       "a4748563",
@@ -25684,14 +25684,14 @@
       "8ffb17a8"
     ],
     "tools/ci_rc296_mobile_pie_chromium.py": [
-      "c6513c61",
-      "61016024",
-      "b98baea2",
-      "5c0064bb",
-      "23843196",
-      "7a7f4f42",
-      "24ae2371",
-      "10448f5a"
+      "967dd5b7",
+      "0729ae4d",
+      "b7afa323",
+      "a9e3fe69",
+      "8ea0a776",
+      "9a138679",
+      "97777a13",
+      "44700342"
     ],
     "docs/RC_CYCLE296_MOBILE_PIE_LEGIBILITY.en.md": [
       "78becb89",
@@ -25702,6 +25702,36 @@
       "d9549d15",
       "0d2e4e32",
       "8206dc18"
+    ],
+    "apps/web/test/rc297-pie-screenreader.test.ts": [
+      "638390a1",
+      "044e8d37",
+      "68c56da9",
+      "cd4d7365",
+      "4920a771",
+      "8632a0af",
+      "bfe13aec",
+      "d0bf1730"
+    ],
+    "tools/ci_rc297_pie_accessibility_chromium.py": [
+      "8abbb4a1",
+      "35ac367f",
+      "31a27480",
+      "045b5371",
+      "de845db3",
+      "ea16665d",
+      "6968b968",
+      "50eb6fba"
+    ],
+    "docs/RC_CYCLE297_PIE_ACCESSIBILITY.en.md": [
+      "1555e95f",
+      "7d137dbe",
+      "a38e36ea",
+      "77faea7b",
+      "6efb4107",
+      "560bc4c7",
+      "4c57f28d",
+      "eb971d93"
     ]
   }
 }
