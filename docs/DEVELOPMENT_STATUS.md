@@ -1,5 +1,8 @@
 # Quorivio 0.1.0-dev — RC293 — Compact visual manuals and product brochures
 
+**RC302 development (2026-11-10):** Joint explicitly authorized native AMD64/ARM64 Docker Hub publication for `desalvo/quorivio` and `desalvo/quorivio-converter`, with identical SHA/latest labels, preflight digest validation before any mutable tag, separate post-publication manifest checks, and fail-closed regression coverage. Prior app-only publication run 42897981990 and RC301 full CI 42901855073 were green; joint publication requires this PR CI and a separate authorized successful main run. See `docs/RC_CYCLE302_JOINT_DOCKER_HUB.en.md`. Official **85.25%** (43 accepted / 17 partial); strict RC still awaiting external reviews.
+
+
 **RC301 development checkpoint (2026-11-10):** Fix long mobile results pie legend names to wrap instead of ellipsizing. Extend CI with production TypeScript geometry rendered against shipped CSS on native Chromium, Firefox and WebKit for desktop, phones and editor-phone, including tiny-slice percent legibility and percentage-disabled privacy. See `docs/RC_CYCLE301_CROSS_ENGINE_PIE_LEGENDS.en.md`. This is browser automation, **not** A4/B3 independent physical sign-off. Score **85.25%** (43 accepted/17 partial), `rc_strict=false`, `publish_image=false`, `publish_latest=false`.
 
 
