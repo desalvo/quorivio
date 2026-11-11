@@ -15,7 +15,7 @@ class RC137PresenterPrivacyAndBackground(unittest.TestCase):
   self.assertIn('<PresenterLinkedResult sessionId={sessionId}',canvas)
   self.assertNotIn('widget-answers/detail',canvas)
   self.assertIn("w.kind==='results-button'",canvas)
-  result_block=projection.split('{visible&&<div id="presenter-page-results"')[1]
+  result_block=projection.split("{visible&&<ResultsWidgetErrorBoundary key={'statistics-'+activity.id}")[1]
   self.assertNotIn('<PresenterLinkedResult key={w.id}',result_block)
   self.assertIn('aria-expanded={visible}',projection)
   self.assertIn('onClick={()=>setVisible(v=>!v)}',projection)
