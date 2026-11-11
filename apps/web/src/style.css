@@ -4001,3 +4001,21 @@ body .editor-floating-panel.widget-selection-palette{
  max-width:100%!important;min-width:0!important;
  box-sizing:border-box!important;overflow-wrap:anywhere!important;
 }
+
+/* RC308: shared native font size for source headings and QR destination URL.
+ * QR typography can widen the container without independently scaling its image;
+ * only widget-border resizing changes the QR image's available width. */
+.linked-results>.linked-source-question{font-size:inherit}
+.linked-results .linked-source-question-title:not([data-result-custom]){font-size:1.2em!important}
+.participant-access-qr{grid-template-rows:minmax(0,1fr) minmax(1.3em,auto)!important}
+.participant-access-qr[data-qr-show-title="true"]{grid-template-rows:auto minmax(0,1fr) minmax(1.3em,auto)!important}
+.participant-access-qr[data-qr-show-url="false"]{grid-template-rows:minmax(0,1fr)!important}
+.participant-access-qr[data-qr-show-title="true"][data-qr-show-url="false"]{grid-template-rows:auto minmax(0,1fr)!important}
+.participant-access-qr>.participant-qr-url{
+  font-size:var(--qr-url-font-size,15px)!important;
+  line-height:1.2!important;min-height:1.3em!important;
+  height:auto!important;max-height:2.4em!important;
+}
+.participant-access-qr>img{
+  max-width:max(0px,calc(100% - var(--qr-url-extra-width,0px)))!important;
+}
