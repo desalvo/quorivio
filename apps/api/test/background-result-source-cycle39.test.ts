@@ -15,8 +15,8 @@ test('source visualization can change without changing the linked result widget'
  source.resultsView='table';
  assert.equal(effectiveResultView(result,[source,result]),'table');
 });
-test('unlinked or invalid result displays fail to accessible bars fallback',()=>{
+test('unlinked results fail to bars, but explicit chart persists when source is valid',()=>{
  const result={id:'out',kind:'results-button',targetWidgetId:'missing',resultsView:'cloud'};
  assert.equal(effectiveResultView(result,[result]),'bars');
- assert.equal(effectiveResultView({...result,targetWidgetId:'a'},[{id:'a',kind:'reactions',resultsView:'unknown'},result]),'bars');
+ assert.equal(effectiveResultView({...result,targetWidgetId:'a'},[{id:'a',kind:'reactions',resultsView:'unknown'},result]),'cloud');
 });
