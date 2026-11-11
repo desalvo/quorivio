@@ -13,7 +13,7 @@ test('RC307 all graph types have a single source-ordered data sequence',()=>{
  assert.ok(ui.includes('rankedRows={data}'));
  for(const order of ['index-asc','index-desc','count-asc','count-desc']){
   const actual=sortedResultBars(original,order);
-  assert.deepEqual(visibleResultBars(actual,order,3).map(x=>x.id),actual.map(x=>x.id));
+  assert.deepEqual(visibleResultBars(original,order,3).map(x=>x.id),actual.map(x=>x.id));
  }
 });
 test('RC307 pie sorting preserves source option numbering independently of slice order',()=>{
