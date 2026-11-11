@@ -33,7 +33,8 @@ class LiveFreshnessCycle55(unittest.TestCase):
         self.assertIn('createLiveConnection({',self.ui)
         # The dedicated presenter stage owns its own authenticated connection.
         self.assertIn('function PresenterLiveScreen(',self.ui)
-        self.assertIn('useLive(sessionId,setData,setConnection)',self.ui)
+        self.assertIn('useLive(sessionId,s=>{if(isOwnerSessionSnapshot(s,sessionId))setData(normalizeOwnerSessionSnapshot(s))},setConnection)',self.ui)
+        self.assertNotIn('useLive(sessionId,setData,setConnection)',self.ui)
         self.assertIn('useLive(entry?.session?.id,',self.ui)
         self.assertIn('live-stale-warning',self.ui)
         self.assertIn('role="status" aria-live="polite"',self.ui)

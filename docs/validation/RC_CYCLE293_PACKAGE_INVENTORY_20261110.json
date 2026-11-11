@@ -19664,14 +19664,14 @@
       "3d87740a"
     ],
     "tools/tests/test_live_freshness_cycle55.py": [
-      "a38e0799",
-      "0b0de25a",
-      "45e52f99",
-      "a954f2bc",
-      "5d3021cd",
-      "b3e8f7b7",
-      "2711dffe",
-      "12add844"
+      "c061f092",
+      "5122c3e4",
+      "e130350e",
+      "5125fc95",
+      "01cc2a50",
+      "aeea79a9",
+      "173165fb",
+      "c5492032"
     ],
     "tools/tests/test_live_heartbeat_cycle56.py": [
       "f68c04bb",
@@ -19934,14 +19934,14 @@
       "c25f939d"
     ],
     "tools/tests/test_presenter_results_canvas.py": [
-      "856532ae",
-      "ebebb761",
-      "cd48f9e8",
-      "eab36f96",
-      "4bf79b9c",
-      "8063a274",
-      "d5762615",
-      "971b6db8"
+      "c01d3be7",
+      "7614d89a",
+      "604ada6e",
+      "ae60b883",
+      "32834a35",
+      "6fc2a52f",
+      "40b68fcf",
+      "8cc28020"
     ],
     "tools/tests/test_profile_40_cycle_integration.py": [
       "d28d3c23",
