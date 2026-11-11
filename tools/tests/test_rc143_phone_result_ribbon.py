@@ -12,7 +12,7 @@ class RC143PhoneResultsRibbon(unittest.TestCase):
                  'flex-wrap:wrap!important;align-content:flex-start!important','overflow-x:hidden!important;overflow-y:auto!important'):
    self.assertIn(marker,MAIN+CSS)
  def test_cloud_top_five_are_configurable_and_wrappable(self):
-  for marker in ('topResultRows(', 'splitResultLabel(', 'resultTopCount??5', 'Numero risultati principali',
+  for marker in ('visibleResultBars(', 'sortedResultBars(', 'splitResultLabel(', 'resultTopCount??5', 'Numero risultati principali',
                  'resultTopCount?:number','w.resultTopCount>=1&&w.resultTopCount<=20'):
    self.assertIn(marker,MAIN+DOMAIN)
   self.assertIn('white-space:normal!important',CSS)
