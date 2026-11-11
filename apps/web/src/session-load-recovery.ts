@@ -27,15 +27,19 @@ export function normalizeOwnerSessionSnapshot<T extends {results?:unknown;totals
  const normalizeDesign=(design:any)=>{
   if(design==null)return design;
   if(typeof design!=='object'||Array.isArray(design))return {};
-  const widgets=Array.isArray(design.widgets)?design.widgets.filter((widget:any)=>widget&&typeof widget==='object'&&!Array.isArray(widget)):[];
+  const existing=design.widgets;
+  const widgets=Array.isArray(existing)?existing.filter((widget:any)=>widget&&typeof widget==='object'&&!Array.isArray(widget)):[];
   const mapping=design.audiencePageId;
-  return {...design,widgets,...(typeof mapping==='string'&&mapping&&!validPageIds.has(mapping)?{audiencePageId:undefined}:{})};
+  const dangling=typeof mapping==='string'&&mapping!==''&&!validPageIds.has(mapping);
+  // Leave valid and older optional fields untouched; old snapshots must round-trip.
+  if((existing===undefined||(Array.isArray(existing)&&widgets.length===existing.length))&&!dangling)return design;
+  return {...design,...(existing!==undefined?{widgets}:{}),...(dangling?{audiencePageId:undefined}:{})};
  };
- const pages=rawPages.map((page:any)=>({
-  ...page,
-  page_design:normalizeDesign(page.page_design),
-  result_design:normalizeDesign(page.result_design),
-  options:Array.isArray(page.options)?page.options.filter((option:any)=>option&&typeof option==='object'):[],
- }));
+ const pages=rawPages.map((page:any)=>{
+  const pageDesign=normalizeDesign(page.page_design);
+  const resultDesign=normalizeDesign(page.result_design);
+  const options=Array.isArray(page.options)?page.options.filter((option:any)=>option&&typeof option==='object'):[];
+  return {...page,...(pageDesign!==page.page_design?{page_design:pageDesign}:{}),...(resultDesign!==page.result_design?{result_design:resultDesign}:{}),...(page.options!==undefined&&(options!==page.options||!Array.isArray(page.options))?{options}:{})};
+ });
  return {...value,...(Array.isArray(input.activities)?{activities:pages}:{}),results:Array.isArray(value.results)?value.results:[],totals:Array.isArray(value.totals)?value.totals:[]} as T&{results:any[];totals:any[]};
 }
