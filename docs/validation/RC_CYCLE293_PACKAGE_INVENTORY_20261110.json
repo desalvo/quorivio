@@ -3634,14 +3634,14 @@
       "551c6161"
     ],
     "apps/web/test/rc305-rating-reactions-bars.test.ts": [
-      "04981f28",
-      "e7d54c04",
-      "6a936551",
-      "2483a4d3",
-      "7cdce16b",
-      "4d9bca9c",
-      "0b72742e",
-      "41fa3f2a"
+      "199e6da5",
+      "f952869e",
+      "c0732267",
+      "d4f69312",
+      "5dea991e",
+      "199639bb",
+      "78adfcd7",
+      "80e2104f"
     ],
     "apps/web/test/rc306-long-bar-labels.test.ts": [
       "b76626dd",
@@ -3654,14 +3654,14 @@
       "7af8d8d1"
     ],
     "apps/web/test/rc307-results-layout-recovery.test.ts": [
-      "72b1a908",
-      "602a5b14",
-      "5b47ebaa",
-      "0cdf8192",
-      "d8cd30c0",
-      "cf310b38",
-      "6ef7cdfe",
-      "2ae5dbd0"
+      "7e7e9700",
+      "682d8aa3",
+      "4ccb630e",
+      "4daede52",
+      "c4e9689d",
+      "90902558",
+      "4214beb7",
+      "8fba9bd7"
     ],
     "apps/web/test/rc70-editor-timer-font.test.ts": [
       "116cfb27",
