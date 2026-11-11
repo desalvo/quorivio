@@ -1,0 +1,5 @@
+# Quorivio RC303 — Focus-safe presentation keyboard navigation
+**Date:** 2026-11-11. **Baseline:** RC302 commit \`39515557645166a097a1c67118e787ae3f2cb988\`.
+Presenter and rehearsal now share \`slide-keyboard-guard.ts\`. Arrow/PageUp/PageDown keys never advance slides while focus is inside form controls, menus, modal dialogs, tabs, rich-text editors, ARIA widgets or media controls. Repeated, composing, already-consumed and modified key events are ignored. Unmodified stage navigation is preserved. A positive and negative \`node:test\` suite is automatically included in CI.
+Automated full CI, Docker publication and external acceptance remain separate. **Certified completion stays 85.25%: 43 accepted / 17 partial**; independent NVDA/VoiceOver/TalkBack evidence for A4 is still missing.
+A \`[publish-docker]\` main commit requires the full CI campaign and only publishes paired native AMD64+ARM64 \`desalvo/quorivio\` and \`desalvo/quorivio-converter\` images after the automatic required gates pass.

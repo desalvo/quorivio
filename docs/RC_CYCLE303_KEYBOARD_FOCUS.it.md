@@ -1,0 +1,5 @@
+# Quorivio RC303 — Navigazione da tastiera senza conflitti
+**Data:** 11 novembre 2026. **Baseline:** RC302 commit \`39515557645166a097a1c67118e787ae3f2cb988\`.
+La tastiera del presentatore e quella dell'anteprima condividono ora \`slide-keyboard-guard.ts\`: le frecce/PageUp/PageDown non possono causare cambi pagina involontari quando il focus è su campi, pulsanti, menu, dialog, tab, contenuti modificabili, controlli ARIA o elementi multimediali. Gli eventi ripetuti, in composizione IME, già gestiti o modificati sono ignorati. La normale navigazione del palco resta invariata. Una suite \`node:test\` copre casi positivi e negativi ed è eseguita nella CI web.
+La CI completa, il publishing Docker e i collaudi esterni restano passaggi separati. **Avanzamento certificato: 85,25%, 43 accepted/17 partial**, senza promuovere A4 (NVDA/VoiceOver/TalkBack) in assenza di evidenze indipendenti.
+Il commit con marcatore \`[publish-docker]\` richiede prima tutta la campagna CI e pubblica insieme immagini AMD64+ARM64 di \`desalvo/quorivio\` e \`desalvo/quorivio-converter\` solo se tutti i gate automatici richiesti sono verdi.
