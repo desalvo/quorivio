@@ -224,14 +224,14 @@
       "2dd5f6ba"
     ],
     "apps/api/src/domain.ts": [
-      "caff50c1",
-      "0ccfe282",
-      "5a4ad9e6",
-      "7e0c18d2",
-      "1ec2ebfc",
-      "98310be1",
-      "12f9846c",
-      "295a292c"
+      "afb2f10e",
+      "7832381b",
+      "d1ff497a",
+      "c0654c3d",
+      "a297f81e",
+      "f3882453",
+      "62212d7d",
+      "04e8accf"
     ],
     "apps/api/src/email-otp.ts": [
       "442c62ac",
@@ -2094,14 +2094,14 @@
       "54a62e5d"
     ],
     "apps/web/src/main.tsx": [
-      "568773e0",
-      "11dc93a4",
-      "43e1d6f1",
-      "28591479",
-      "c3af9964",
-      "0cc0fe0e",
-      "c159d2c4",
-      "6f6f3499"
+      "cc710fd1",
+      "be09a858",
+      "a8145e14",
+      "503290b5",
+      "0f26de00",
+      "251c6d77",
+      "3497646b",
+      "5a1df28b"
     ],
     "apps/web/src/main.tsx.orig": [
       "9230e5a3",
@@ -2474,14 +2474,14 @@
       "2586b822"
     ],
     "apps/web/src/style.css": [
-      "b8bd5328",
-      "d55a0248",
-      "4b092ea8",
-      "081c031b",
-      "35bfa154",
-      "e23df4db",
-      "ca1c0eeb",
-      "f982828b"
+      "dcf0da8b",
+      "15c8dc86",
+      "30618f01",
+      "fb2533b5",
+      "4d284733",
+      "262e83d9",
+      "0875d86d",
+      "52a31f90"
     ],
     "apps/web/src/thumbnail-menu-layout.ts": [
       "a4748563",
@@ -3644,14 +3644,14 @@
       "41fa3f2a"
     ],
     "apps/web/test/rc306-long-bar-labels.test.ts": [
-      "761c862f",
-      "e17f0f26",
-      "c355bd82",
-      "3dddd699",
-      "f8e21a25",
-      "ae64972e",
-      "7fecd56f",
-      "1e67025e"
+      "b76626dd",
+      "704c079d",
+      "22c08d65",
+      "f5091f2b",
+      "473eeabb",
+      "48a1f9d6",
+      "e3a8effe",
+      "7af8d8d1"
     ],
     "apps/web/test/rc307-results-layout-recovery.test.ts": [
       "cc7632c0",
