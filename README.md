@@ -1,3 +1,5 @@
+**RC315 operator evidence:** Initialize a commit-bound technical test record with `python3 tools/rc_operator_acceptance.py --init-evidence /tmp/quorivio-rc-evidence/record.json --commit <40-character-commit-SHA>`, then validate with `--verify-evidence` using the same SHA. Artifacts must have safe relative paths and SHA256 checksums. Technical tests do not replace independent GDPR, AGID, security or accessibility approval.
+
 **RC313 Gauge:** Statistical widgets and result widgets now offer a Grafana-style semicircular Gauge from *Formato widget*: per-bound automatic/manual min and max, default rating range 0–9, optional min/max gradient, value label, default black needle-free arc, and min/max/weighted-mean aggregation. The gauge is a shared SVG across editor, rehearsal and live presenter, using source-scoped anonymous aggregate counts. See docs/DEVELOPMENT_STATUS.md.
 
 **RC293 documentation:** six space-efficient visual manuals (IT/EN), genuine archived editor icon atlas and two illustrated A4 product brochures. See [English release note](docs/RC_CYCLE293_VISUAL_MANUALS_BROCHURES.en.md) and [PDF brochures](docs/brochures/). The application runtime is unchanged.
