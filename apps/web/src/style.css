@@ -3975,3 +3975,29 @@ body .editor-floating-panel.widget-selection-palette{
 }
 /* Keep the same authored font and proportional bars in editor, rehearsal,
  * live presenter and narrow/mobile layouts; no absolute max-content width. */
+
+/* RC307 — One results layout in editor/schema, rehearsal and live projection.
+ * A results widget is never shrink-to-fit: labels wrap at the authored font,
+ * and the content scrolls vertically if it cannot fit within the same bounds. */
+:is(.editor-ux-v2 .widget-canvas-item,.rehearsal-widget,.projection-widget)[data-widget-kind="results-button"] .canvas-widget-results-native{display:contents!important;}
+:is(.editor-ux-v2 .widget-canvas-item,.rehearsal-widget,.projection-widget)[data-widget-kind="results-button"]>.widget-fit-frame[data-fit-mode="scroll"]{
+ padding:0!important;overflow:hidden!important;
+}
+:is(.editor-ux-v2 .widget-canvas-item,.rehearsal-widget,.projection-widget)[data-widget-kind="results-button"]>.widget-fit-frame[data-fit-mode="scroll"]>.widget-fit-content{
+ box-sizing:border-box!important;width:100%!important;height:100%!important;
+ min-height:0!important;max-width:100%!important;
+ overflow:hidden!important;transform:none!important;
+}
+:is(.editor-ux-v2 .widget-canvas-item,.rehearsal-widget,.projection-widget)[data-widget-kind="results-button"]>.widget-fit-frame[data-fit-mode="scroll"] .linked-results{
+ box-sizing:border-box!important;width:100%!important;max-width:100%!important;
+ min-width:0!important;min-height:0!important;height:100%!important;
+ overflow-x:hidden!important;overflow-y:auto!important;
+}
+/* Identical line breaks for the same authored canvas geometry at a given scale. */
+:is(.editor-ux-v2 .widget-canvas-item,.rehearsal-widget,.projection-widget)[data-widget-kind="results-button"] .linked-results-items{
+ min-width:0!important;max-width:100%!important;
+}
+:is(.editor-ux-v2 .widget-canvas-item,.rehearsal-widget,.projection-widget)[data-widget-kind="results-button"] .linked-result-pair{
+ max-width:100%!important;min-width:0!important;
+ box-sizing:border-box!important;overflow-wrap:anywhere!important;
+}

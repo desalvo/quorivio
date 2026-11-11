@@ -18,7 +18,7 @@ export function resultPiePercent(share:number):string {
  return `${percentage.toFixed(percentage<1?2:percentage<10?1:0)}%`;
 }
 const polar=(cx:number,cy:number,radius:number,angle:number)=>({x:cx+Math.cos(angle)*radius,y:cy+Math.sin(angle)*radius});
-export function resultPieLayout(values:readonly number[],size:unknown=PIE_SIZE_DEFAULT,showPercentages=true,showNumbers=false):PieSlice[]{
+export function resultPieLayout(values:readonly number[],size:unknown=PIE_SIZE_DEFAULT,showPercentages=true,showNumbers=false,optionNumbers?:readonly number[]):PieSlice[]{
  const clean=values.map(n=>Number.isFinite(n)&&n>0?n:0);
  const total=clean.reduce((a,b)=>a+b,0);
  if(total<=0)return [];
@@ -39,7 +39,7 @@ export function resultPieLayout(values:readonly number[],size:unknown=PIE_SIZE_D
    ?`M ${cx} ${cy-radius} A ${radius} ${radius} 0 1 1 ${cx} ${cy+radius} A ${radius} ${radius} 0 1 1 ${cx} ${cy-radius} Z`
    :`M ${cx} ${cy} L ${start.x} ${start.y} A ${radius} ${radius} 0 ${share>.5?1:0} 1 ${end.x} ${end.y} Z`;
   const side:PieSlice['side']=Math.cos(midAngle)<0?'left':'right';
-  const label=[showNumbers?`${index+1}.`:'',showPercentages?resultPiePercent(share):''].filter(Boolean).join(' ');
+  const label=[showNumbers?`${optionNumbers?.[index]??index+1}.`:'',showPercentages?resultPiePercent(share):''].filter(Boolean).join(' ');
   slices.push({index:index+1,count,share,from,path,midAngle,label,side,labelX:side==='left'?120:380,labelY:cy+Math.sin(midAngle)*(radius+19),leader:''});
  });
  // Compute labels on each side independently, keeping a minimum vertical gap.

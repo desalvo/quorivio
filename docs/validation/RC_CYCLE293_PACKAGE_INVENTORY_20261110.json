@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
   "cycle": 293,
-  "file_count_excluding_manifest": 2606,
+  "file_count_excluding_manifest": 2609,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -44,14 +44,14 @@
       "e377db62"
     ],
     ".github/workflows/ci.yml": [
-      "44a95a99",
-      "c304a148",
-      "5cdbf4dc",
-      "1944006b",
-      "ad5e234f",
-      "a77af7fc",
-      "80a379fd",
-      "8e6e5e93"
+      "bd4f2310",
+      "6441f86a",
+      "8ed676c3",
+      "ffe2b103",
+      "08d50c8b",
+      "228caaf0",
+      "94f02db2",
+      "c29e3f99"
     ],
     ".github/workflows/converter-image.yml": [
       "6ff519db",
@@ -2094,14 +2094,14 @@
       "54a62e5d"
     ],
     "apps/web/src/main.tsx": [
-      "55dc624d",
-      "b6f2ec35",
-      "522b61b3",
-      "0beb2ab9",
-      "2c68a407",
-      "1ac008d1",
-      "b82eeb3b",
-      "1940253b"
+      "568773e0",
+      "11dc93a4",
+      "43e1d6f1",
+      "28591479",
+      "c3af9964",
+      "0cc0fe0e",
+      "c159d2c4",
+      "6f6f3499"
     ],
     "apps/web/src/main.tsx.orig": [
       "9230e5a3",
@@ -2374,14 +2374,14 @@
       "a4c2a225"
     ],
     "apps/web/src/result-pie-layout.ts": [
-      "67d8bb8d",
-      "8ec93935",
-      "60329cca",
-      "649e3c4e",
-      "4d7fc674",
-      "dfcf6747",
-      "ed9caf78",
-      "b2718f0a"
+      "4c1ba966",
+      "8c4ebcbe",
+      "56bd583e",
+      "c90f4f38",
+      "6b74d775",
+      "ddd2c5ee",
+      "de8c6bff",
+      "51b3023f"
     ],
     "apps/web/src/result-text-style.ts": [
       "05de4121",
@@ -2474,14 +2474,14 @@
       "2586b822"
     ],
     "apps/web/src/style.css": [
-      "f56b8cb7",
-      "628fc849",
-      "abb3901a",
-      "79425842",
-      "86f5533b",
-      "dbfa9ec6",
-      "7aef908d",
-      "09482419"
+      "b8bd5328",
+      "d55a0248",
+      "4b092ea8",
+      "081c031b",
+      "35bfa154",
+      "e23df4db",
+      "ca1c0eeb",
+      "f982828b"
     ],
     "apps/web/src/thumbnail-menu-layout.ts": [
       "a4748563",
@@ -3634,14 +3634,14 @@
       "551c6161"
     ],
     "apps/web/test/rc305-rating-reactions-bars.test.ts": [
-      "88eb0a58",
-      "90921895",
-      "da70b634",
-      "807fa66c",
-      "5e39c8ad",
-      "6f434b8b",
-      "a683f861",
-      "a91aa54b"
+      "04981f28",
+      "e7d54c04",
+      "6a936551",
+      "2483a4d3",
+      "7cdce16b",
+      "4d9bca9c",
+      "0b72742e",
+      "41fa3f2a"
     ],
     "apps/web/test/rc306-long-bar-labels.test.ts": [
       "761c862f",
@@ -3652,6 +3652,16 @@
       "ae64972e",
       "7fecd56f",
       "1e67025e"
+    ],
+    "apps/web/test/rc307-results-layout-recovery.test.ts": [
+      "cc7632c0",
+      "fbf50a8b",
+      "5c6dc51e",
+      "91ca9f94",
+      "e4ae8f7f",
+      "830b54f6",
+      "35bf96d9",
+      "ad957853"
     ],
     "apps/web/test/rc70-editor-timer-font.test.ts": [
       "116cfb27",
@@ -5802,6 +5812,16 @@
       "9df264c6",
       "f5639dc4",
       "63a9d6b6"
+    ],
+    "docs/RC307_RESULTS_LAYOUT_RECOVERY.md": [
+      "2db81d45",
+      "cbf5ab70",
+      "5d2a7935",
+      "0cfda02f",
+      "0a6c2099",
+      "08c60945",
+      "e00a78d4",
+      "6548a333"
     ],
     "docs/RC49_HAPROXY_CROSS_NODE_RWX.en.md": [
       "7c1cc75e",
@@ -18144,14 +18164,14 @@
       "5e5372fd"
     ],
     "tools/ci_rc298_real_pie_pg_chromium.py": [
-      "8d7dfc7c",
-      "a86c2e67",
-      "fd994e43",
-      "e2614e78",
-      "bc478c83",
-      "652d5ea1",
-      "7574dc3e",
-      "bb27c6f2"
+      "649be606",
+      "0be25ec6",
+      "ed1c504b",
+      "fd281af1",
+      "e89af92b",
+      "43b9fd10",
+      "1e2d16ff",
+      "cc64c70f"
     ],
     "tools/ci_rc299_real_votes_pg_chromium.py": [
       "8704261a",
@@ -18182,6 +18202,16 @@
       "65dae0fe",
       "ad59ee6c",
       "7eaae5d4"
+    ],
+    "tools/ci_rc307_live_bar_dashboard_chromium.py": [
+      "bd20388a",
+      "808b939d",
+      "432dfaee",
+      "c90bc01b",
+      "c710054d",
+      "53507a3d",
+      "d8272f55",
+      "03becd4e"
     ],
     "tools/ci_rc71_lifecycle_postgres.py": [
       "15c9edcd",

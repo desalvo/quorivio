@@ -79,10 +79,12 @@ async def verify_enabled(widget, *, expected_phone: bool) -> None:
     await expect(legend).to_have_count(1)
     items = legend.get_by_role('listitem')
     await expect(items).to_have_count(3)
-    for index, option in enumerate(OPTIONS):
-        label = await items.nth(index).get_attribute('aria-label')
-        assert label and label.startswith(option['label'] + ': '), (index, label)
-        assert re.fullmatch(r'.+: [1-9][0-9]* rispost[ae], (?:[0-9]+(?:\.[0-9]+)?%|<0\.0001%)', label), label
+    # A configured sort changes slice order but never option identity.
+    labels = [await item.get_attribute('aria-label') for item in await items.all()]
+    for option in OPTIONS:
+        assert any(label and label.startswith(option['label'] + ': ') for label in labels), (option, labels)
+    for index, label in enumerate(labels):
+        assert label and re.fullmatch(r'.+: [1-9][0-9]* rispost[ae], (?:[0-9]+(?:\.[0-9]+)?%|<0\.0001%)', label), (index, label)
         visible_percent = (await items.nth(index).locator('.linked-results-pie-mobile-percent').inner_text()).strip()
         assert label.endswith(', ' + visible_percent), label
     state = await legend.evaluate('''node=>{

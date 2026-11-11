@@ -1305,6 +1305,12 @@ jobs:
           QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
           QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
         run: python3 tools/ci_rc299_real_votes_pg_chromium.py
+      - name: RC307 real bars editor-preview-presenter consistency and workspace recovery
+        timeout-minutes: 5
+        env:
+          QUORIVIO_CI_LOAD_TOKEN: ${{ env.QUORIVIO_CI_LOAD_TOKEN }}
+          QUORIVIO_CI_ADMIN_EMAIL: admin@example.com
+        run: python3 tools/ci_rc307_live_bar_dashboard_chromium.py
       - name: Capture real app screenshots for the manuals
         timeout-minutes: 4
         env:
