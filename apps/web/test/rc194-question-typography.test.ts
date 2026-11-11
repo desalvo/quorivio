@@ -64,7 +64,10 @@ test('format toolbar restores the highlighted DOM range following a style change
 test('editor uses the same default and answer style resolution as presenter, audience and rehearsal',()=>{
  assert.match(main,/initialWidgetTextStyle\(kind\)/);
  assert.match(main,/initialWidgetTextStyle\(k\)/);
- assert.match(main,/widgetTypographyStyle\(w\.kind===/);
+ assert.match(main,/stageWidgetTypography\(w,\{pageTitle/);
+ const stage=readFileSync(new URL('../src/stage-widget-typography.ts',import.meta.url),'utf8');
+ assert.match(stage,/widgetTypographyStyle\(resolved\)/);
+ assert.match(stage,/widgetDisplay\(widget,context\)\.style:widgetTextDefaults\(widget.kind,widget.style\)/);
  assert.match(main,/answerOptionStyle\(w.style\)/);
  assert.match(main,/const format=widgetTextDefaults\(source.kind,source.style\)\|\|\{\}/);
  assert.match(css,/RC194: long answers wrap/);
