@@ -19724,14 +19724,14 @@
       "45b63a5f"
     ],
     "tools/tests/test_manual_docker_publish.py": [
-      "eebb1738",
-      "3c54ca21",
-      "5a170bfc",
-      "b751bd56",
-      "862f6a01",
-      "4511ca80",
-      "acadc0a2",
-      "9d95f8a9"
+      "fe46f93b",
+      "224dcaab",
+      "cf3b0cc9",
+      "daf51558",
+      "1502d7b9",
+      "a26e74a4",
+      "5fc324b2",
+      "a4b5b1f4"
     ],
     "tools/tests/test_mobile_touch_capture_contract.py": [
       "168e1cab",
