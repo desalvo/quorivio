@@ -27,7 +27,10 @@ class FrontendCompilerHotfix(unittest.TestCase):
         start = self.source.index('const changePage=async(direction:-1|1)=>')
         end = self.source.index('const latest=useRef(changePage)', start)
         section = self.source[start:end]
-        self.assertIn('setData(await request<Snapshot>', section)
+        self.assertIn('const refreshed=await request<Snapshot>', section)
+        self.assertIn('if(isOwnerSessionSnapshot(refreshed,sessionId))setData(normalizeOwnerSessionSnapshot(refreshed))', section)
+        self.assertIn('if(isOwnerSessionSnapshot(recovered,sessionId))setData(normalizeOwnerSessionSnapshot(recovered))', section)
+        self.assertNotIn('setData(await request<Snapshot>', section)
         self.assertNotIn('setRestSnapshot', section)
         self.assertIn('}finally{pending.current=false;setBusy(false)}', section)
 
