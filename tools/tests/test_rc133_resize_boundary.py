@@ -9,7 +9,10 @@ WORKFLOW=(ROOT/'.github/workflows/ci.yml').read_text(encoding='utf8')
 class RC133ResizeBoundary(unittest.TestCase):
  def test_pointer_resizes_from_original_gesture_not_intermediate_widget(self):
   self.assertIn('const base=g.groupBase||widgets;',MAIN)
-  self.assertIn('onChange(resizeWidgetToCollisionLimit(base,g.id,nextPos));',MAIN)
+  self.assertIn('const resized=resizeWidgetToCollisionLimit(base,g.id,nextPos);',MAIN)
+  self.assertIn("const corner=['nw','ne','sw','se'].includes(g.edge)",MAIN)
+  self.assertIn('onChange(resized.map(w=>w.id===g.id?{...w,qrImagePixels:pixels}:w));',MAIN)
+  self.assertIn('}else onChange(resized);',MAIN)
   self.assertIn('onBeginGesture?.();',MAIN)
   self.assertIn('onEndGesture?.()',MAIN)
  def test_keyboard_resize_same_collision_limit_but_rotation_preserved(self):
