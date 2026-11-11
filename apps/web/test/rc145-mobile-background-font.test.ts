@@ -41,6 +41,9 @@ test('RC145 Arial default, whole-widget overrides and rich-text marks use the sa
  assert.equal(inlineMarkCss({fontFamily:'Arial'}).fontFamily,'Arial');
  const parts=styledSegments('Arial Georgia',[{field:'label',start:6,end:13,style:{fontFamily:'Georgia'}}],'label');
  assert.deepEqual(parts.map(x=>x.style.fontFamily),[undefined,'Georgia']);
- assert.match(source,/\.\.\.widgetTypographyStyle\(w\.kind==='title'\?widgetDisplay\(w,\{pageTitle,masterTitleStyle\}\)\.style:widgetTextDefaults\(w.kind,w.style\)\)/);
+ assert.ok(source.includes('...stageWidgetTypography(w,{pageTitle,masterTitleStyle},mobileMode)'));
+ const stage=readFileSync(new URL('../src/stage-widget-typography.ts',import.meta.url),'utf8');
+ assert.ok(stage.includes('widgetTypographyStyle(resolved)'));
+ assert.ok(stage.includes('widgetDisplay(widget,context).style:widgetTextDefaults(widget.kind,widget.style)'));
  assert.match(css,/\.editor-ux-v2 \.widget-canvas-item \.widget-fit-content>\.widget-rich-inline\{\s*font-family:inherit!important;/);
 });
