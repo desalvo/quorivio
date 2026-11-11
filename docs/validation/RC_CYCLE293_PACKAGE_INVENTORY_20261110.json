@@ -2094,14 +2094,14 @@
       "54a62e5d"
     ],
     "apps/web/src/main.tsx": [
-      "cc710fd1",
-      "be09a858",
-      "a8145e14",
-      "503290b5",
-      "0f26de00",
-      "251c6d77",
-      "3497646b",
-      "5a1df28b"
+      "07141032",
+      "e2532562",
+      "6cae670a",
+      "7c84d43e",
+      "a1579812",
+      "19b4402c",
+      "215706b0",
+      "0dce59bc"
     ],
     "apps/web/src/main.tsx.orig": [
       "9230e5a3",
@@ -2964,34 +2964,34 @@
       "958eb384"
     ],
     "apps/web/test/rc138-overlap-results-fit.test.ts": [
-      "32cdb638",
-      "ad30e726",
-      "fa1cb71e",
-      "758f60bb",
-      "c44879ca",
-      "a4bc78fe",
-      "76160bfe",
-      "e845177a"
+      "1cd36c31",
+      "d5b1bd0f",
+      "b54e8c3f",
+      "24dfab41",
+      "09436780",
+      "6d2fc6af",
+      "46d135d9",
+      "3a59dc0d"
     ],
     "apps/web/test/rc139-rating-editor-selection.test.ts": [
-      "85ef4f5a",
-      "7ed20b67",
-      "6851ba0f",
-      "9bf7706d",
-      "e9ce566e",
-      "40215e41",
-      "dc17fd2f",
-      "11eff296"
+      "f99c1cfd",
+      "478dedb9",
+      "a111aae8",
+      "ad036ca9",
+      "7bb068b5",
+      "ccfc3307",
+      "ca46fa99",
+      "996e4a28"
     ],
     "apps/web/test/rc141-presenter-parity-results.test.ts": [
-      "00c8d722",
-      "fe808f34",
-      "8102f02c",
-      "8320f1bb",
-      "202254e1",
-      "0b673517",
-      "0ea8ee5f",
-      "530eea2a"
+      "63c2e2de",
+      "be59ee05",
+      "84bfd18a",
+      "d32bcb9c",
+      "b5de0728",
+      "f2d5ba33",
+      "e51e313b",
+      "f7dcdd40"
     ],
     "apps/web/test/rc142-widget-size.test.ts": [
       "14dc3435",
@@ -3024,14 +3024,14 @@
       "82882708"
     ],
     "apps/web/test/rc145-mobile-background-font.test.ts": [
-      "cdb458f8",
-      "dac5e090",
-      "babbe8fc",
-      "2e3b4578",
-      "80177e5f",
-      "53bb67f5",
-      "d505d525",
-      "048d3d1d"
+      "ae0d5ae3",
+      "a375f91e",
+      "f0aee503",
+      "d115fd6c",
+      "e1a7cf55",
+      "06c76cde",
+      "fa495838",
+      "bb1d0488"
     ],
     "apps/web/test/rc155-conflict-ribbon.test.ts": [
       "ca3efdc3",
@@ -3654,14 +3654,14 @@
       "7af8d8d1"
     ],
     "apps/web/test/rc307-results-layout-recovery.test.ts": [
-      "cc7632c0",
-      "fbf50a8b",
-      "5c6dc51e",
-      "91ca9f94",
-      "e4ae8f7f",
-      "830b54f6",
-      "35bf96d9",
-      "ad957853"
+      "72b1a908",
+      "602a5b14",
+      "5b47ebaa",
+      "0cdf8192",
+      "d8cd30c0",
+      "cf310b38",
+      "6ef7cdfe",
+      "2ae5dbd0"
     ],
     "apps/web/test/rc70-editor-timer-font.test.ts": [
       "116cfb27",
