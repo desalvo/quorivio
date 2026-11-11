@@ -59,3 +59,13 @@ test('RC309 malformed live page or legacy statistics cannot unmount the authenti
  assert.ok(ui.includes("<ResultsWidgetErrorBoundary key={'statistics-'+activity.id} widgetId={'statistics-'+activity.id}>"),'the legacy statistics panel has its own boundary');
  assert.ok(ui.includes('La sessione e la dashboard restano operative.'));
 });
+
+test('RC309 authenticated dashboard defers live results into a local boundary',()=>{
+ assert.ok(ui.includes("function DashboardLiveResults({snapshot,activity,renderResults}"));
+ assert.ok(ui.includes("<ResultsWidgetErrorBoundary key={'dashboard-live-'+current.id} widgetId={'dashboard-live-'+current.id}>"));
+ assert.ok(ui.includes('<DashboardLiveResults snapshot={snap} activity={current} renderResults={showResults}/>'));
+ assert.ok(!ui.includes('{showResults(snap,current)}'),'never execute live-results render within root App reconciliation');
+ assert.ok(ui.includes('const results=Array.isArray(s?.results)?s.results:[]'));
+ assert.ok(ui.includes('const options=Array.isArray(a?.options)?a.options:[]'));
+ assert.ok(ui.includes('Number.isFinite(count)&&count>0?count:0'));
+});
