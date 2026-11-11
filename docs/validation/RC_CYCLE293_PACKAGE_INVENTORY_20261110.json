@@ -124,14 +124,14 @@
       "20b8d4d6"
     ],
     "apps/api/package.json": [
-      "0dff8f84",
-      "8967120c",
-      "eadbbbde",
-      "0a206960",
-      "47679723",
-      "4cc9adfe",
-      "79254b34",
-      "3d9e0e98"
+      "6c45ea8f",
+      "677e0a27",
+      "13bfb408",
+      "9d7465ce",
+      "cfeca2ed",
+      "266c952e",
+      "4b3fbe39",
+      "69361779"
     ],
     "apps/api/src/api-rate-policy.ts": [
       "c2d3f197",
@@ -1794,14 +1794,14 @@
       "da3c6e30"
     ],
     "apps/web/package.json": [
-      "a5be7fdd",
-      "7c38c6fe",
-      "903a681d",
-      "39716a81",
-      "7b310b69",
-      "e6bc7f7e",
-      "f3a06098",
-      "95d9c17c"
+      "6f3426ce",
+      "7e9cef51",
+      "6d841b7e",
+      "dc4b993b",
+      "bf5705f2",
+      "c9254375",
+      "cd9c5b67",
+      "1648a8f3"
     ],
     "apps/web/public/docs/assets/quorivio-icon.svg": [
       "7eeffa70",
@@ -17124,14 +17124,14 @@
       "b289f820"
     ],
     "package-lock.json": [
-      "eef1118c",
-      "2bd087a3",
-      "bb39497b",
-      "d24116c3",
-      "397f85d4",
-      "6bf971a8",
-      "21eaa332",
-      "f6d5223e"
+      "f9d446d4",
+      "2820652d",
+      "6f0eae28",
+      "c166e216",
+      "35683c49",
+      "7da08ba6",
+      "c6295e85",
+      "2c457254"
     ],
     "package.json": [
       "e3605aa0",
