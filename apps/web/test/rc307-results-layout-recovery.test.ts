@@ -50,3 +50,12 @@ test('RC307 Format widget sort applies to all graphs',()=>{
  assert.ok(ui.includes('aria-label="Ordinamento risposte risultati"'));
  for(const mode of ['index-asc','index-desc','count-asc','count-desc'])assert.ok(ui.includes('<option value="'+mode+'">'));
 });
+
+test('RC309 malformed live page or legacy statistics cannot unmount the authenticated workspace',()=>{
+ assert.ok(ui.includes("<ResultsWidgetErrorBoundary key={'page-'+current.id} widgetId={'page-'+current.id}>"));
+ const guarded=ui.split("<ResultsWidgetErrorBoundary key={'page-'+current.id} widgetId={'page-'+current.id}>")[1]?.split('</ResultsWidgetErrorBoundary>')[0]||'';
+ assert.ok(guarded.includes('resolveSlideMasterWidgets('),'page title and master widgets are inside the boundary');
+ assert.ok(guarded.includes('<PresenterPageResults '),'live projection is inside the boundary');
+ assert.ok(ui.includes("<ResultsWidgetErrorBoundary key={'statistics-'+activity.id} widgetId={'statistics-'+activity.id}>"),'the legacy statistics panel has its own boundary');
+ assert.ok(ui.includes('La sessione e la dashboard restano operative.'));
+});
