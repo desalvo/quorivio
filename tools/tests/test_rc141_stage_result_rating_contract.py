@@ -30,7 +30,8 @@ class RC141ResultAndRatingContract(unittest.TestCase):
         # RC169 and later render the shared reaction component in all three
         # projection surfaces; editor projection suppresses the duplicated
         # outer heading, while an explicitly shown authored title is retained.
-        self.assertIn("['reactions','results-button'].includes(w.kind)?{...w,showTitle:false}:w", UI)
+        self.assertIn("w.kind==='reactions'?{...w,showTitle:false}:w", UI)
+        self.assertIn("w.kind==='results-button'?{...w,showTitle:editing===w.id?false:w.showTitle}", UI)
         self.assertEqual(UI.count('<ReactionChoices'), 3)
         self.assertIn('data-show-title={widgetTitleVisible(w)}', UI)
         self.assertIn("w.showTitle!==false&&<strong><WidgetStyledText text={w.label||'Reazioni'}", UI)
