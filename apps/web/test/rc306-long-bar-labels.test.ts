@@ -45,7 +45,9 @@ test('RC308 QR URL typography is configurable and independent of QR image resizi
  assert.ok(ui.includes("qrUrlFontSize:next,qrUrlWidthExtra:"));
  assert.ok(ui.includes("'--qr-url-extra-width'"));
  assert.ok(css.includes('font-size:var(--qr-url-font-size,15px)!important'));
- assert.ok(css.includes('max-width:max(0px,calc(100% - var(--qr-url-extra-width,0px)))!important'));
- assert.ok(domain.includes('qrUrlFontSize?:number;qrUrlWidthExtra?:number'));
+ assert.ok(css.includes('max-width:min(var(--qr-image-size,100%),max(0px,calc(100% - var(--qr-url-extra-width,0px))))!important'));
+ assert.ok(css.includes('max-height:min(100%,var(--qr-image-size,100%))!important'));
+ assert.ok(ui.includes("'--qr-image-size':Number.isFinite(widget.qrImagePixels)"));
+ assert.ok(domain.includes('qrUrlFontSize?:number;qrUrlWidthExtra?:number;qrImagePixels?:number'));
  assert.ok(domain.includes('w.qrUrlFontSize>=10&&w.qrUrlFontSize<=96'));
 });
