@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
   "cycle": 293,
-  "file_count_excluding_manifest": 2601,
+  "file_count_excluding_manifest": 2603,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -224,14 +224,14 @@
       "2dd5f6ba"
     ],
     "apps/api/src/domain.ts": [
-      "3f3cac68",
-      "36ab3179",
-      "64f609f9",
-      "6700ea50",
-      "d074babb",
-      "bc65b516",
-      "a48792d6",
-      "9d40ad2c"
+      "caff50c1",
+      "0ccfe282",
+      "5a4ad9e6",
+      "7e0c18d2",
+      "1ec2ebfc",
+      "98310be1",
+      "12f9846c",
+      "295a292c"
     ],
     "apps/api/src/email-otp.ts": [
       "442c62ac",
@@ -574,14 +574,14 @@
       "6cf4c002"
     ],
     "apps/api/src/server.ts": [
-      "8f17ad87",
-      "35f34a74",
-      "33a78566",
-      "047def42",
-      "f126d02d",
-      "aa9d7ae4",
-      "c6b7a02e",
-      "2ed32b82"
+      "ce781411",
+      "a88b6efb",
+      "2fd94420",
+      "16c878a8",
+      "7316d230",
+      "0ef1aa05",
+      "075873cc",
+      "bd4e98f3"
     ],
     "apps/api/src/session-bus.ts": [
       "09ec6487",
@@ -2094,14 +2094,14 @@
       "54a62e5d"
     ],
     "apps/web/src/main.tsx": [
-      "ea8a5397",
-      "02625b51",
-      "5de9c1ec",
-      "5b03016f",
-      "499ba5ce",
-      "d0fd0d79",
-      "5d89bb95",
-      "b98539d4"
+      "27211ed7",
+      "f6d82ea5",
+      "c17e67aa",
+      "67b2ac68",
+      "e9bee139",
+      "f282c960",
+      "5532e645",
+      "2e89510b"
     ],
     "apps/web/src/main.tsx.orig": [
       "9230e5a3",
@@ -2264,14 +2264,14 @@
       "4fc9d6e8"
     ],
     "apps/web/src/rating-choices.tsx": [
-      "808bb6c6",
-      "8d7908ef",
-      "b0b47dec",
-      "a0e5854d",
-      "9f2936fc",
-      "eef97c56",
-      "c8da1194",
-      "2cf7961e"
+      "e59fea2d",
+      "ee041191",
+      "1b1166e4",
+      "70e5c55b",
+      "64f97fd9",
+      "7c422f3d",
+      "9841d709",
+      "abee178c"
     ],
     "apps/web/src/rating-range.ts": [
       "92051390",
@@ -2394,14 +2394,14 @@
       "5ba9dc70"
     ],
     "apps/web/src/result-top-rows.ts": [
-      "ba888c1d",
-      "26e41a0a",
-      "445319bf",
-      "c2b37a52",
-      "9be5e483",
-      "e49109cd",
-      "32fba800",
-      "2e2888d4"
+      "26bfe10d",
+      "acddd1d3",
+      "1d6086b8",
+      "54383535",
+      "793d537b",
+      "e1664023",
+      "75a57e32",
+      "249b6dd0"
     ],
     "apps/web/src/session-list-management.ts": [
       "1f2d6622",
@@ -2474,14 +2474,14 @@
       "2586b822"
     ],
     "apps/web/src/style.css": [
-      "64586b7d",
-      "f8a91233",
-      "bab65c67",
-      "2021218e",
-      "bde91133",
-      "3ac1db5f",
-      "023d3650",
-      "a9e7b23c"
+      "2b78edb3",
+      "497f122d",
+      "c5648fa0",
+      "5b33e80c",
+      "1274a74b",
+      "cca2ddd5",
+      "db70477b",
+      "2e0df4d3"
     ],
     "apps/web/src/thumbnail-menu-layout.ts": [
       "a4748563",
@@ -2634,14 +2634,14 @@
       "f116c35e"
     ],
     "apps/web/src/widget-results.ts": [
-      "415cded0",
-      "18e4cd7d",
-      "404c3e22",
-      "8bca7780",
-      "52d834d1",
-      "86fb3d2a",
-      "94dec4cd",
-      "087f2594"
+      "0d6852fc",
+      "c237329d",
+      "fe074194",
+      "3e6daf40",
+      "c338e3bc",
+      "083a4527",
+      "9aa4a0cf",
+      "6582cd91"
     ],
     "apps/web/src/widget-rich-editor.tsx": [
       "610fdf07",
@@ -3632,6 +3632,16 @@
       "11cd7a6a",
       "0e543e7b",
       "551c6161"
+    ],
+    "apps/web/test/rc305-rating-reactions-bars.test.ts": [
+      "88eb0a58",
+      "90921895",
+      "da70b634",
+      "807fa66c",
+      "5e39c8ad",
+      "6f434b8b",
+      "a683f861",
+      "a91aa54b"
     ],
     "apps/web/test/rc70-editor-timer-font.test.ts": [
       "116cfb27",
@@ -5762,6 +5772,16 @@
       "789dd83a",
       "50baab50",
       "bfdf4ba8"
+    ],
+    "docs/RC305_RATING_REACTIONS_BARS.md": [
+      "f707521a",
+      "c2f4a4a9",
+      "bc2a952d",
+      "4ba188b2",
+      "fdf09c47",
+      "4443ae65",
+      "113508c8",
+      "5d177108"
     ],
     "docs/RC49_HAPROXY_CROSS_NODE_RWX.en.md": [
       "7c1cc75e",

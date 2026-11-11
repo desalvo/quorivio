@@ -3908,3 +3908,21 @@ body .editor-floating-panel.widget-selection-palette{
  .audience-widget-layout.stage-phone>.page-widget)[data-widget-kind="results-button"] .linked-results-pie.linked-results-pie-chart{
  width:min(100%,250px)!important;aspect-ratio:var(--pie-chart-ratio,500 / 320)!important;height:auto!important;
 }
+
+/* RC305: bar rows must fill the result widget, even with fit-mode="scale".
+ * Older max-content sizing forced short tracks and a large unused right gutter. */
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget)[data-widget-kind="results-button"]>.widget-fit-frame[data-fit-mode="scale"] .linked-results.result-view-bars .linked-results-items .linked-results-row,
+.linked-results.result-view-bars .linked-results-items .linked-results-row{
+ width:100%!important;max-width:100%!important;min-width:0!important;
+ align-self:stretch!important;box-sizing:border-box!important;
+}
+.linked-results.result-view-bars .linked-results-items .linked-results-track{
+ grid-column:1/-1;width:100%!important;max-width:100%!important;
+ box-sizing:border-box!important;
+}
+/* The nearest inline-size container is the widget, not the global slide.
+ * Both reaction emojis and rating numbers follow horizontal widget resize. */
+.linked-results.result-view-bars{container-type:inline-size;}
+.linked-results.result-view-bars:is([data-result-source-kind="reactions"],[data-result-source-kind="rating"]) .linked-results-row .linked-result-pair{
+ font-size:clamp(14px,4.5cqw,54px)!important;line-height:1.15!important;
+}

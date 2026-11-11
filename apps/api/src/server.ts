@@ -2340,8 +2340,9 @@ app.get('/api/sessions/:id/ratings/stats',requireAuth,async(req,res)=>{try{
  const byPage=(await db.query('SELECT a.id AS activity_id,a.title,count(pr.score)::int AS responses,round(avg(pr.score)::numeric,2) AS mean FROM activities a LEFT JOIN page_ratings pr ON pr.activity_id=a.id WHERE a.session_id=$1 GROUP BY a.id,a.title,a.position ORDER BY a.position',[s.id])).rows;
  const byWidget=(await db.query('SELECT activity_id,widget_id,target_kind,target_id,count(*)::int AS responses,round(avg(score)::numeric,2) AS mean FROM page_ratings WHERE session_id=$1 GROUP BY activity_id,widget_id,target_kind,target_id ORDER BY target_kind,widget_id',[s.id])).rows;
  const distribution=(await db.query('SELECT score,count(*)::int AS count FROM page_ratings WHERE session_id=$1 GROUP BY score ORDER BY score',[s.id])).rows;
+ const byWidgetScore=(await db.query('SELECT activity_id,widget_id,score,count(*)::int AS count FROM page_ratings WHERE session_id=$1 GROUP BY activity_id,widget_id,score ORDER BY activity_id,widget_id,score',[s.id])).rows;
  const overall=(await db.query('SELECT count(*)::int AS responses,round(avg(score)::numeric,2) AS mean FROM page_ratings WHERE session_id=$1',[s.id])).rows[0];
- res.json({overall,by_page:byPage,by_widget:byWidget,distribution});
+ res.json({overall,by_page:byPage,by_widget:byWidget,distribution,by_widget_score:byWidgetScore});
  }catch(e){sendError(res,e)}});
 app.get('/api/sessions/:id/reactions/stats',requireAuth,async(req,res)=>{try{
  const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}
