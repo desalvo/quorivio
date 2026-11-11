@@ -7,7 +7,8 @@ CSS=(ROOT/'apps/web/src/style.css').read_text()
 class PresenterLinkedPreview(unittest.TestCase):
  def test_presenter_only_live_results_respect_authored_geometry(self):
   self.assertIn('<PresenterLinkedResult sessionId={sessionId}',SRC)
-  self.assertIn('{visible&&<div id="presenter-page-results"',SRC)
+  self.assertIn("{visible&&<ResultsWidgetErrorBoundary key={'statistics-'+activity.id}",SRC)
+  self.assertIn('<div id="presenter-page-results"',SRC)
   self.assertIn('className="primary presenter-results-button"',SRC)
   self.assertIn("w.kind==='results-button'?null",SRC)
  def test_results_source_is_page_scoped(self):
