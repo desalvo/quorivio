@@ -224,14 +224,14 @@
       "2dd5f6ba"
     ],
     "apps/api/src/domain.ts": [
-      "afb2f10e",
-      "7832381b",
-      "d1ff497a",
-      "c0654c3d",
-      "a297f81e",
-      "f3882453",
-      "62212d7d",
-      "04e8accf"
+      "c402d11d",
+      "1233afe3",
+      "67edcdb7",
+      "e91955a8",
+      "2f08f977",
+      "236b3497",
+      "ffaf3271",
+      "c78509a7"
     ],
     "apps/api/src/email-otp.ts": [
       "442c62ac",
@@ -1434,14 +1434,14 @@
       "903b3432"
     ],
     "apps/api/test/rc295-pie-size-domain.test.ts": [
-      "dd2700ad",
-      "1cd621a0",
-      "d6ac978e",
-      "5d48d5a1",
-      "58d66bc5",
-      "e3c3e43b",
-      "ad099063",
-      "a8ebcc8c"
+      "ee1b12b2",
+      "d1076f6c",
+      "89a521b4",
+      "fd1a93e3",
+      "06d7e8c3",
+      "8018a5b8",
+      "60dd2a1d",
+      "330117bc"
     ],
     "apps/api/test/rc71-session-lifecycle.test.ts": [
       "2e8b873d",
@@ -2094,14 +2094,14 @@
       "54a62e5d"
     ],
     "apps/web/src/main.tsx": [
-      "3fc7451e",
-      "8ac69b75",
-      "ce8fe7d9",
-      "486d1f58",
-      "b7ace6f9",
-      "a6f64676",
-      "c47fb687",
-      "ed3479b7"
+      "aa94a0a9",
+      "a7653956",
+      "af90d9b5",
+      "8123e527",
+      "49e51afb",
+      "cb7c7adc",
+      "88a0b539",
+      "7431d91b"
     ],
     "apps/web/src/main.tsx.orig": [
       "9230e5a3",
@@ -2374,14 +2374,14 @@
       "a4c2a225"
     ],
     "apps/web/src/result-pie-layout.ts": [
-      "4c1ba966",
-      "8c4ebcbe",
-      "56bd583e",
-      "c90f4f38",
-      "6b74d775",
-      "ddd2c5ee",
-      "de8c6bff",
-      "51b3023f"
+      "30ad577f",
+      "133fb5c9",
+      "a350bf08",
+      "aaeea707",
+      "5e4cfe07",
+      "f97693c2",
+      "41db8a83",
+      "e367d38f"
     ],
     "apps/web/src/result-text-style.ts": [
       "05de4121",
@@ -2474,14 +2474,14 @@
       "2586b822"
     ],
     "apps/web/src/style.css": [
-      "1aa68e18",
-      "244487f7",
-      "62e8ed59",
-      "abb68ef5",
-      "8b006c71",
-      "f2e4db8b",
-      "c3081ade",
-      "ac07de3a"
+      "6a2c3671",
+      "95646825",
+      "9dbeafeb",
+      "cf50918b",
+      "2cc7a066",
+      "02791f97",
+      "9872d959",
+      "e91e7948"
     ],
     "apps/web/src/thumbnail-menu-layout.ts": [
       "a4748563",
@@ -3574,14 +3574,14 @@
       "26276684"
     ],
     "apps/web/test/rc295-pie-and-truth-layout.test.ts": [
-      "f2c0207f",
-      "de6790c9",
-      "ba5a0149",
-      "e34d14dd",
-      "6ff7ac8e",
-      "b4744a14",
-      "557b4f47",
-      "8a7e440a"
+      "04980660",
+      "8adf040f",
+      "5202d373",
+      "75746077",
+      "f5b2f07a",
+      "09133782",
+      "d404e5f3",
+      "986b5cd5"
     ],
     "apps/web/test/rc296-mobile-pie-legend.test.ts": [
       "75ce71e3",
@@ -3624,14 +3624,14 @@
       "0a5fca1d"
     ],
     "apps/web/test/rc304-pie-compact-viewport.test.ts": [
-      "2ba48253",
-      "a4bf24dc",
-      "349b79ff",
-      "331d8d7a",
-      "a463e46f",
-      "11cd7a6a",
-      "0e543e7b",
-      "551c6161"
+      "80d19632",
+      "7a4ff0d7",
+      "5830ee71",
+      "363a8ce6",
+      "e2c18547",
+      "c23599d9",
+      "b1f4cae8",
+      "73a154e1"
     ],
     "apps/web/test/rc305-rating-reactions-bars.test.ts": [
       "199e6da5",
@@ -3654,14 +3654,14 @@
       "7af8d8d1"
     ],
     "apps/web/test/rc307-results-layout-recovery.test.ts": [
-      "0612bfa5",
-      "2668f09a",
-      "c2ddeb78",
-      "c8bf5f07",
-      "837af1bc",
-      "b7c8c282",
-      "57ddba9c",
-      "4cabc22b"
+      "044ef885",
+      "79c94bca",
+      "6059a647",
+      "d81cfda3",
+      "5a90d040",
+      "02e43a9b",
+      "0605b5d4",
+      "faaf4e7e"
     ],
     "apps/web/test/rc70-editor-timer-font.test.ts": [
       "116cfb27",
@@ -20944,14 +20944,14 @@
       "0611fb83"
     ],
     "tools/tests/test_rc208_session_recovery.py": [
-      "e81b3953",
-      "b8a52353",
-      "4e2d34ab",
-      "ed49b442",
-      "2a19f2d6",
-      "da023669",
-      "3ee81504",
-      "e5482755"
+      "d8d0c9d4",
+      "7e231d5c",
+      "1089c81b",
+      "4cd849d4",
+      "b76bfdd1",
+      "27eb9b1c",
+      "a7d22531",
+      "7a92704c"
     ],
     "tools/tests/test_rc209_open_session_actions.py": [
       "471351c2",

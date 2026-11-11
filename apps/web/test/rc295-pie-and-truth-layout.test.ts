@@ -9,8 +9,9 @@ const api=readFileSync(new URL('../../api/src/domain.ts',import.meta.url),'utf8'
 test('pie sizing is bounded and defaults safely for legacy sessions',()=>{
  assert.equal(resultPieSize(undefined),72);
  assert.equal(resultPieSize(NaN),72);
- assert.equal(resultPieSize(10),40);
- assert.equal(resultPieSize(120),100);
+ assert.equal(resultPieSize(10),25);
+ assert.equal(resultPieSize(120),120);
+ assert.equal(resultPieSize(170),150);
  assert.equal(resultPieSize(65),65);
 });
 test('pie percentages preserve tiny nonzero slices without rounding to zero',()=>{
@@ -60,7 +61,7 @@ test('result view uses SVG leaders and independently configurable circle radius'
  assert.match(ui,/aria-label="Dimensione torta risultati"/);
  assert.match(ui,/pieSize:Number\(e\.target\.value\)/);
 });
-test('API accepts only 40-100 integer percent for results widget',()=>{
+test('API accepts only 25-150 integer percent for results widget',()=>{
  assert.match(api,/pieSize\?:number/);
- assert.match(api,/w\.kind==='results-button'&&Number\.isInteger\(w\.pieSize\)&&w\.pieSize>=40&&w\.pieSize<=100/);
+ assert.match(api,/w\.kind==='results-button'&&Number\.isInteger\(w\.pieSize\)&&w\.pieSize>=25&&w\.pieSize<=150/);
 });

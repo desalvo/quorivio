@@ -6,7 +6,7 @@ export type PieSlice = {index:number;count:number;share:number;from:number;path:
 export const PIE_VIEWBOX = {width:500,height:320,cx:250,cy:160};
 export const PIE_SIZE_DEFAULT = 72;
 export function resultPieSize(value:unknown):number {
- return typeof value==='number'&&Number.isFinite(value)?Math.min(100,Math.max(40,value)):PIE_SIZE_DEFAULT;
+ return typeof value==='number'&&Number.isFinite(value)?Math.min(150,Math.max(25,value)):PIE_SIZE_DEFAULT;
 }
 export function resultPiePercent(share:number):string {
  if(!Number.isFinite(share)||share<=0)return '0%';
@@ -76,7 +76,7 @@ export function resultPieViewport(slices:readonly PieSlice[],size:unknown=PIE_SI
   top=Math.min(top,slice.labelY-13,elbowY-2);
   bottom=Math.max(bottom,slice.labelY+13,elbowY+2);
  }
- const y=Math.max(0,Math.floor(top-5));
- const end=Math.min(height,Math.ceil(bottom+5));
+ const y=resultPieSize(size)>100?Math.floor(top-5):Math.max(0,Math.floor(top-5));
+ const end=resultPieSize(size)>100?Math.ceil(bottom+5):Math.min(height,Math.ceil(bottom+5));
  return {y,width,height:Math.max(1,end-y)};
 }

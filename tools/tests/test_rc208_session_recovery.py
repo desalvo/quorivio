@@ -43,7 +43,8 @@ class RC208SessionRecovery(unittest.TestCase):
 
  def test_recover_from_render_fault_without_dropping_auth(self):
   self.assertIn('class WorkspaceErrorBoundary', WEB)
-  self.assertIn('componentDidCatch(){', WEB)
+  self.assertIn('componentDidCatch(error:Error){', WEB)
+  self.assertIn('Riprova la sessione corrente', WEB)
   self.assertIn("writeWorkspaceLocation({sessionId:'',section:'workspace',tab:'overview',pageId:''})", WEB)
   self.assertIn('window.location.assign(\'/\')', WEB)
 

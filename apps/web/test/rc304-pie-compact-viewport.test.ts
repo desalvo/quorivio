@@ -7,7 +7,7 @@ const css=readFileSync(new URL('../src/style.css',import.meta.url),'utf8');
 const ui=readFileSync(new URL('../src/main.tsx',import.meta.url),'utf8');
 
 test('RC304 reducing size releases vertical room for text even without labels',()=>{
- const heights=[100,72,40].map(size=>resultPieViewport(resultPieLayout([21,39,40],size,false,false),size).height);
+ const heights=[100,72,25].map(size=>resultPieViewport(resultPieLayout([21,39,40],size,false,false),size).height);
  assert.ok(heights[0]>heights[1]&&heights[1]>heights[2],JSON.stringify(heights));
  assert.ok(heights[0]<PIE_VIEWBOX.height&&heights[2]<PIE_VIEWBOX.height/2);
 });
@@ -28,10 +28,10 @@ test('RC304 callouts remain inside tight viewport across 1 to 12 categories',()=
  }
 });
 test('RC304 hiding labels yields an SVG closely hugging the circle',()=>{
- const slices=resultPieLayout([10,20,30],40,false,false);
+ const slices=resultPieLayout([10,20,30],25,false,false);
  assert.ok(slices.every(s=>s.label===''));
- const box=resultPieViewport(slices,40);
- assert.ok(box.height>=2*116*.4&&box.height<=2*116*.4+12);
+ const box=resultPieViewport(slices,25);
+ assert.ok(box.height>=2*116*.25&&box.height<=2*116*.25+12);
 });
 test('RC304 JSX and every responsive CSS rule use the dynamic aspect ratio',()=>{
  assert.ok(ui.includes('resultPieViewport(pieSegments,widget.pieSize)'));

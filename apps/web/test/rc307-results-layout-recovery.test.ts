@@ -86,3 +86,20 @@ test('RC311 unexpected workspace failure never silently clears the selected sess
  assert.ok(boundary.includes('Riprova la sessione corrente'));
  assert.ok(boundary.includes('La sessione selezionata è stata conservata.'));
 });
+
+test('RC312 bounded pie size 25–150 and empty pie visible',()=>{
+ assert.ok(ui.includes("{chart==='pie'&&<svg"));
+ assert.ok(ui.includes('className="linked-results-pie-empty"'));
+ assert.ok(ui.includes('min={25} max={150} step={5}'));
+ assert.ok(css.includes('max-height:42%!important'));
+});
+test('RC312 page shortcuts cannot intercept widget Backspace',()=>{
+ assert.ok(ui.includes("if(action==='delete'&&!focusInThumbnails)return;"));
+ assert.ok(ui.includes('e.preventDefault();e.stopPropagation();'));
+});
+test('RC312 corner QR drag resizes image, side drag retains pixel dimensions',()=>{
+ assert.ok(ui.includes("const corner=['nw','ne','sw','se'].includes(g.edge)"));
+ assert.ok(ui.includes('const ratio=corner?'));
+ assert.ok(ui.includes('qrImagePixels:pixels'));
+ assert.ok(css.includes('var(--qr-image-size,100%)'));
+});
