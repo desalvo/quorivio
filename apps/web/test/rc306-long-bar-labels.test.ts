@@ -32,3 +32,20 @@ test('RC306 dedicated Chromium test measures actual multiline label geometry',()
  assert.ok(browser.includes('scrollWidth'));
  assert.ok(browser.includes('viewport'));
 });
+
+test('RC308 source question titles honor the authored/default font size on every results chart',()=>{
+ assert.ok(ui.includes("fontSize:`${Math.max(10,Math.min(96,Number(format.fontSize)||22))}px`"));
+ assert.ok(ui.includes('function LinkedResultChart('));
+ assert.ok(ui.includes('<LinkedResultSourceQuestion result={viewWidget} source={source} rankedRows={data}/>'));
+ assert.ok(css.includes('.linked-results>.linked-source-question{font-size:inherit}'));
+});
+test('RC308 QR URL typography is configurable and independent of QR image resizing',()=>{
+ const domain=readFileSync(new URL('../../../api/src/domain.ts',import.meta.url),'utf8');
+ assert.ok(ui.includes('ariaLabel="Dimensione font URL QRCode"'));
+ assert.ok(ui.includes("qrUrlFontSize:next,qrUrlWidthExtra:"));
+ assert.ok(ui.includes("'--qr-url-extra-width'"));
+ assert.ok(css.includes('font-size:var(--qr-url-font-size,15px)!important'));
+ assert.ok(css.includes('max-width:max(0px,calc(100% - var(--qr-url-extra-width,0px)))!important'));
+ assert.ok(domain.includes('qrUrlFontSize?:number;qrUrlWidthExtra?:number'));
+ assert.ok(domain.includes('w.qrUrlFontSize>=10&&w.qrUrlFontSize<=96'));
+});
