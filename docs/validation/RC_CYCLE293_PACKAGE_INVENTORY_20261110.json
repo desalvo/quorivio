@@ -20824,14 +20824,14 @@
       "d0c5de75"
     ],
     "tools/tests/test_rc196_frontend_results_types.py": [
-      "8a75522c",
-      "4bd59042",
-      "3dd52378",
-      "140859eb",
-      "cec0e798",
-      "e52534fd",
-      "b11385df",
-      "b35b0f44"
+      "c742e880",
+      "31cd3d42",
+      "5e9f84fd",
+      "e75c5bae",
+      "af9931d0",
+      "7a74d73c",
+      "c322ad65",
+      "6e3411a4"
     ],
     "tools/tests/test_rc197_kubernetes_python_reconciliation.py": [
       "29a23bd8",
@@ -21554,14 +21554,14 @@
       "f1b6c33d"
     ],
     "tools/tests/test_rc275_source_renderer_contract.py": [
-      "54dd00f1",
-      "059308e9",
-      "dd367549",
-      "73f1b1ea",
-      "74207da2",
-      "b19276c9",
-      "8612f6dd",
-      "55b7cab5"
+      "3c2bfeaa",
+      "820b511d",
+      "8326e290",
+      "2d7a7013",
+      "211d4c48",
+      "fadff572",
+      "c8102c3c",
+      "ac7fa002"
     ],
     "tools/tests/test_rc277_manuals.py": [
       "926d318e",

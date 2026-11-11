@@ -25,7 +25,7 @@ def frontend_contract(ui: str) -> bool:
         and permission
         and "'showSourceQuestion'" in permission.group(1)
         and 'linkedResultQuestion(result,source)' in ui
-        and '<LinkedResultSourceQuestion result={viewWidget} source={source}/>' in ui
+        and '<LinkedResultSourceQuestion result={viewWidget} source={source} rankedRows={data}/>' in ui
         and 'const viewWidget={...widget,showCorrectAnswers:hasKey&&truthVisible}' in ui
         and 'showSourceQuestion:e.target.checked' in ui
     )

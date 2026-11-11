@@ -11,13 +11,13 @@ class LinkedSourceTruthContract(unittest.TestCase):
   chart=UI.split('function LinkedResultChart(',1)[1].split('function ',1)[0]
   self.assertIn('const [truthVisible,setTruthVisible]=useState(widget.showCorrectAnswers===true)',chart)
   self.assertIn('const viewWidget={...widget,showCorrectAnswers:hasKey&&truthVisible}',chart)
-  self.assertIn('<LinkedResultSourceQuestion result={viewWidget} source={source}/>',chart)
+  self.assertIn('<LinkedResultSourceQuestion result={viewWidget} source={source} rankedRows={data}/>',chart)
   self.assertIn('setTruthVisible(v=>!v)',chart)
   self.assertIn('aria-pressed={truthVisible}',chart)
   self.assertIn('resultHasAnswerKey(source,widget.targetQuestionId',chart)
-  self.assertNotIn('<LinkedResultSourceQuestion result={widget} source={source}/>',chart)
+  self.assertNotIn('<LinkedResultSourceQuestion result={widget} source={source} rankedRows={data}/>',chart)
  def test_rejects_loss_of_truth_bridge(self):
-  self.assertFalse(frontend_contract(UI.replace('<LinkedResultSourceQuestion result={viewWidget} source={source}/>','<LinkedResultSourceQuestion result={widget} source={source}/>',1)))
+  self.assertFalse(frontend_contract(UI.replace('<LinkedResultSourceQuestion result={viewWidget} source={source} rankedRows={data}/>','<LinkedResultSourceQuestion result={widget} source={source} rankedRows={data}/>',1)))
   self.assertFalse(frontend_contract(UI.replace('const viewWidget={...widget,showCorrectAnswers:hasKey&&truthVisible}','const viewWidget=widget',1)))
  def test_same_chart_live_and_rehearsal(self):
   self.assertIn('sourceWidgets} rows={rows} emptyLabel="live"',UI)
