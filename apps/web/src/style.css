@@ -4013,7 +4013,7 @@ body .editor-floating-panel.widget-selection-palette{
 .participant-access-qr[data-qr-show-title="true"][data-qr-show-url="false"]{grid-template-rows:auto minmax(0,1fr)!important}
 .participant-access-qr>.participant-qr-url{
   font-size:var(--qr-url-font-size,15px)!important;
-  line-height:1.2!important;min-height:1.3em!important;
+  line-height:1.2!important;min-height:max(22px,1.3em)!important;
   height:auto!important;max-height:2.4em!important;
 }
 .participant-access-qr>img{
