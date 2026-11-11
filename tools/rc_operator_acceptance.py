@@ -7,7 +7,9 @@ regenerated from the scored gate ledger; strict comparison catches stale plans.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -62,6 +64,149 @@ def make_plan(ledger_path: Path = GATES) -> dict:
             for g in pending
         ],
     }
+
+
+
+# Collected operator evidence is intentionally distinct from the independent
+# RC acceptance ledger.  These bundles never set approval flags or gate status.
+COMMIT_RE = re.compile(r'^[0-9a-f]{40}
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output', type=Path, default=PLAN)
+    parser.add_argument('--check', action='store_true', help='refuse a stale or edited plan')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('--init-evidence', type=Path, metavar='PATH', help='Create a non-attesting operator evidence bundle (refuses overwrite)')
+    group.add_argument('--verify-evidence', type=Path, metavar='PATH', help='Verify recorded artifact SHA256 and exact pending gates')
+    parser.add_argument('--commit', help='Exact 40-character Git commit for an evidence bundle')
+    args = parser.parse_args()
+    if args.init_evidence is not None:
+        if not args.commit:
+            parser.error('--init-evidence requires --commit')
+        data = make_evidence_bundle(args.commit)
+        args.init_evidence.parent.mkdir(parents=True, exist_ok=True)
+        with args.init_evidence.open('x', encoding='utf-8') as target:
+            target.write(json.dumps(data, indent=2, ensure_ascii=False) + '\\n')
+        print(f'Initialized {len(data["items"])} unreviewed operator test records at {args.init_evidence}')
+        return 0
+    if args.verify_evidence is not None:
+        verified = verify_evidence_bundle(args.verify_evidence, commit=args.commit)
+        print(json.dumps(verified, indent=2))
+        return 0
+    plan = make_plan()
+    serialized = json.dumps(plan, indent=2, ensure_ascii=False) + '\n'
+    if args.check:
+        if not args.output.is_file() or args.output.read_text(encoding='utf-8') != serialized:
+            print('External acceptance plan missing, stale or prematurely attested')
+            return 1
+        print(f'PASS: {len(plan["items"])} unresolved RC operator gates remain unaccepted')
+        return 0
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_text(serialized, encoding='utf-8')
+    print(f'Wrote {len(plan["items"])} pending independent operator reviews')
+    return 0
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())
+)
+SHA_RE = re.compile(r'^[0-9a-f]{64}
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output', type=Path, default=PLAN)
+    parser.add_argument('--check', action='store_true', help='refuse a stale or edited plan')
+    args = parser.parse_args()
+    plan = make_plan()
+    serialized = json.dumps(plan, indent=2, ensure_ascii=False) + '\n'
+    if args.check:
+        if not args.output.is_file() or args.output.read_text(encoding='utf-8') != serialized:
+            print('External acceptance plan missing, stale or prematurely attested')
+            return 1
+        print(f'PASS: {len(plan["items"])} unresolved RC operator gates remain unaccepted')
+        return 0
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_text(serialized, encoding='utf-8')
+    print(f'Wrote {len(plan["items"])} pending independent operator reviews')
+    return 0
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())
+)
+
+
+def make_evidence_bundle(commit: str, plan: dict | None = None) -> dict:
+    if not COMMIT_RE.fullmatch(commit):
+        raise ValueError('Evidence bundle requires an exact 40-character lowercase commit SHA')
+    source = plan if plan is not None else make_plan()
+    return {
+        'schema': 'quorivio-rc-operator-evidence-v1',
+        'commit': commit,
+        'ready_for_rc': False,
+        'independent_approval': False,
+        'notice': 'Technical operator evidence only; does not accept RC gates or replace independent review.',
+        'items': [
+            {
+                'id': item['id'],
+                'test_status': 'not_run',
+                'environment': '',
+                'operator': '',
+                'notes': '',
+                'artifacts': [],
+                'independent_approval': False,
+            }
+            for item in source['items']
+        ],
+    }
+
+
+def verify_evidence_bundle(bundle_path: Path, commit: str | None = None,
+                           plan: dict | None = None) -> dict:
+    """Verify commit binding, all gate IDs, safe file paths and artifact hashes.
+
+    This checks evidence integrity only. It never validates the adequacy of a
+    human review, changes RC gate states, or grants an independent sign-off.
+    """
+    bundle_path = bundle_path.resolve(strict=True)
+    data = json.loads(bundle_path.read_text(encoding='utf-8'))
+    source = plan if plan is not None else make_plan()
+    if data.get('schema') != 'quorivio-rc-operator-evidence-v1':
+        raise ValueError('Unsupported evidence bundle schema')
+    sha = data.get('commit')
+    if not isinstance(sha, str) or not COMMIT_RE.fullmatch(sha) or (commit is not None and sha != commit):
+        raise ValueError('Evidence bundle commit mismatch or invalid full SHA')
+    if data.get('ready_for_rc') is not False or data.get('independent_approval') is not False:
+        raise ValueError('Operator evidence cannot assert independent RC approval')
+    entries = data.get('items')
+    if not isinstance(entries, list) or [x.get('id') for x in entries if isinstance(x, dict)] != [x['id'] for x in source['items']] or len(entries) != len(source['items']):
+        raise ValueError('Evidence bundle gate IDs or ordering do not match the RC plan')
+    validated = 0
+    for item in entries:
+        if item.get('test_status') not in {'not_run', 'pass', 'fail', 'blocked'}:
+            raise ValueError('Unsupported technical test status')
+        if item.get('independent_approval') is not False:
+            raise ValueError('Operator test record cannot grant independent approval')
+        if not isinstance(item.get('environment'), str) or not isinstance(item.get('operator'), str) or not isinstance(item.get('notes'), str):
+            raise ValueError('Invalid operator metadata')
+        artifacts = item.get('artifacts')
+        if not isinstance(artifacts, list):
+            raise ValueError('Evidence artifacts must be a list')
+        for artifact in artifacts:
+            if not isinstance(artifact, dict):
+                raise ValueError('Invalid evidence artifact')
+            rel = artifact.get('path')
+            digest = artifact.get('sha256')
+            if not isinstance(rel, str) or not rel or not isinstance(digest, str) or not SHA_RE.fullmatch(digest):
+                raise ValueError('Invalid evidence path or SHA256')
+            relative = Path(rel)
+            if relative.is_absolute() or any(part in ('.', '..') for part in relative.parts) or '\\' in rel:
+                raise ValueError('Evidence paths must be relative without traversal')
+            root = bundle_path.parent
+            evidence_file = (root / relative).resolve(strict=True)
+            if not evidence_file.is_relative_to(root) or not evidence_file.is_file():
+                raise ValueError('Evidence artifact must be a regular file inside the bundle directory')
+            if hashlib.sha256(evidence_file.read_bytes()).hexdigest() != digest:
+                raise ValueError(f'Evidence SHA256 mismatch: {rel}')
+            validated += 1
+    return {'commit': sha, 'gates_checked': len(entries), 'artifacts_verified': validated,
+            'ready_for_rc': False, 'independent_approval': False}
 
 
 def main() -> int:
