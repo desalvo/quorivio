@@ -43,7 +43,8 @@ class SourceAndDelete(unittest.TestCase):
   self.assertIn('question:'+"'"+'+questionId',UI)
  def test_live_and_rehearsal_reuse_single_results_renderer(self):
   self.assertIn('function LinkedResultSourceQuestion(',UI)
-  self.assertIn('<LinkedResultSourceQuestion result={viewWidget} source={source}/>',UI)
+  self.assertIn('<LinkedResultSourceQuestion result={viewWidget} source={source} rankedRows={data}/>',UI)
+  self.assertIn('rankedRows.find(r=>r.id===opt.id)?.count||0',UI)
   self.assertIn('const viewWidget={...widget,showCorrectAnswers:hasKey&&truthVisible}',UI)
   self.assertIn('onClick={e=>{e.stopPropagation();setTruthVisible(v=>!v)}}',UI)
   self.assertIn('data-source-widget-id={source.id}',UI)
