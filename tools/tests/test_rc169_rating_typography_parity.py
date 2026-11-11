@@ -31,7 +31,8 @@ class RC169RatingTypographyParity(unittest.TestCase):
         self.assertIn('resolved?.fontSize??16',TYPO)
         self.assertIn('stageWidgetTypography(w,{pageTitle:viewActivity.title',UI)
         self.assertIn('stageWidgetTypography(w,{pageTitle:entry.activity.title',UI)
-        self.assertEqual(UI.count('stageWidgetTypography(w,{pageTitle:'),2)
+        self.assertIn('stageWidgetTypography(w,{pageTitle,masterTitleStyle},mobileMode)',UI)
+        self.assertEqual(UI.count('stageWidgetTypography(w,{pageTitle:'),3,'editor, rehearsal and public stage must use shared typeface resolution')
 
     def test_negative_unshared_rating_or_master_fallback_would_fail(self):
         broken=UI.replace('RatingStageContent widget={w} comment={ratingComments[w.id]',
