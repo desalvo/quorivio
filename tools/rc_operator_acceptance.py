@@ -112,7 +112,23 @@ SHA_RE = re.compile(r'^[0-9a-f]{64}
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, default=PLAN)
     parser.add_argument('--check', action='store_true', help='refuse a stale or edited plan')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('--init-evidence', type=Path, metavar='PATH', help='Create an operator evidence bundle without granting approval')
+    group.add_argument('--verify-evidence', type=Path, metavar='PATH', help='Check evidence files and their SHA256 values')
+    parser.add_argument('--commit', help='Exact 40-character Git SHA recorded by the operator')
     args = parser.parse_args()
+    if args.init_evidence is not None:
+        if not args.commit:
+            parser.error('--init-evidence requires --commit')
+        data = make_evidence_bundle(args.commit)
+        args.init_evidence.parent.mkdir(parents=True, exist_ok=True)
+        with args.init_evidence.open('x', encoding='utf-8') as out:
+            out.write(json.dumps(data, indent=2, ensure_ascii=False) + '\n')
+        print(f'Initialized {len(data["items"])} unreviewed operator records')
+        return 0
+    if args.verify_evidence is not None:
+        print(json.dumps(verify_evidence_bundle(args.verify_evidence, commit=args.commit), indent=2))
+        return 0
     plan = make_plan()
     serialized = json.dumps(plan, indent=2, ensure_ascii=False) + '\n'
     if args.check:
