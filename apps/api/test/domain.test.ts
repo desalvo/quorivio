@@ -1,4 +1,4 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {validTransition,validateOptions,checkAnswer,publicActivity,escapeCsvCell,validRetentionDays} from '../src/domain.ts';
+import test from 'node:test';import assert from 'node:assert/strict';import {validTransition,validateOptions,checkAnswer,publicActivity,escapeCsvCell,validRetentionDays,validPageDesign} from '../src/domain.ts';
 test('closed sessions cannot reopen',()=>{assert.equal(validTransition('closed','active'),false);assert.equal(validTransition('draft','active'),true)});
 test('options must be unique and valid',()=>{assert.equal(validateOptions([{id:'x',label:'A'},{id:'x',label:'B'}]),false);assert.equal(validateOptions([{id:'x',label:'A'},{id:'y',label:'B'}]),true)});
 test('quiz answers checked exclusively server-side',()=>{assert.equal(checkAnswer({type:'quiz',correct_option_id:'y',options:[]},'x'),false);assert.equal(checkAnswer({type:'quiz',correct_option_id:'y',options:[]},'y'),true)});
@@ -22,3 +22,11 @@ test('anonymous pseudonyms are bounded and reject markup',()=>{
 // Uploaded backgrounds must be UUID references, never arbitrary local paths.
 assert.equal(validPageDesign({backgroundAssetId:'not-a-uuid'}),false);
 assert.equal(validPageDesign({backgroundAssetId:'123e4567-e89b-42d3-a456-426614174000'}),true);
+
+test('RC313 gauge settings are validated and persisted only as safe finite values',()=>{
+ const gauge={id:'rating',kind:'rating',label:'Indice',resultsView:'gauge',gaugeMinMode:'manual',gaugeMin:0,gaugeMaxMode:'manual',gaugeMax:9,gaugeGradient:true,gaugeMinColor:'#cc0000',gaugeMaxColor:'#00cc00',gaugeColor:'#000000',gaugeShowValue:true,gaugeAggregation:'mean'};
+ assert.equal(validPageDesign({widgets:[gauge]}),true);
+ assert.equal(validPageDesign({widgets:[{...gauge,gaugeMax:Number.POSITIVE_INFINITY}]}),false);
+ assert.equal(validPageDesign({widgets:[{...gauge,gaugeColor:'red;url()'}]}),false);
+ assert.equal(validPageDesign({widgets:[{...gauge,gaugeAggregation:'sum'}]}),false);
+});

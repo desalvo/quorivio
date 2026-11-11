@@ -114,14 +114,14 @@
       "09ed5724"
     ],
     "README.md": [
-      "5fd298af",
-      "2ae94116",
-      "11d7d86b",
-      "7facc9ab",
-      "1a395d4e",
-      "93262a85",
-      "b089fd6d",
-      "20b8d4d6"
+      "79559a7d",
+      "55b3b2ee",
+      "a9c16b02",
+      "7027e4e8",
+      "5d1c2ae5",
+      "bf607699",
+      "47b3e29d",
+      "310340af"
     ],
     "apps/api/package.json": [
       "6c45ea8f",
@@ -224,14 +224,14 @@
       "2dd5f6ba"
     ],
     "apps/api/src/domain.ts": [
-      "c402d11d",
-      "1233afe3",
-      "67edcdb7",
-      "e91955a8",
-      "2f08f977",
-      "236b3497",
-      "ffaf3271",
-      "c78509a7"
+      "a3a04488",
+      "0c0714ed",
+      "754043aa",
+      "bef5cc68",
+      "510b16b7",
+      "989242ab",
+      "8201330a",
+      "0f59128d"
     ],
     "apps/api/src/email-otp.ts": [
       "442c62ac",
@@ -834,14 +834,14 @@
       "ea41d864"
     ],
     "apps/api/test/domain.test.ts": [
-      "065f395f",
-      "337850cd",
-      "d9768bf8",
-      "33e5269b",
-      "a318e433",
-      "fb00877a",
-      "b007500a",
-      "1f0840d4"
+      "194b43d7",
+      "11b8210d",
+      "7a902e9f",
+      "4e728107",
+      "df3777ad",
+      "c7bc13f0",
+      "681e7549",
+      "4f9d2c01"
     ],
     "apps/api/test/email-mfa-flow.test.ts": [
       "c74d44cc",
@@ -2094,14 +2094,14 @@
       "54a62e5d"
     ],
     "apps/web/src/main.tsx": [
-      "aa94a0a9",
-      "a7653956",
-      "af90d9b5",
-      "8123e527",
-      "49e51afb",
-      "cb7c7adc",
-      "88a0b539",
-      "7431d91b"
+      "a99833a7",
+      "f09a3cfa",
+      "16cea07f",
+      "a4316e33",
+      "141f9f29",
+      "5977d447",
+      "c26687c3",
+      "6b6ad783"
     ],
     "apps/web/src/main.tsx.orig": [
       "9230e5a3",
@@ -2474,14 +2474,14 @@
       "2586b822"
     ],
     "apps/web/src/style.css": [
-      "6a2c3671",
-      "95646825",
-      "9dbeafeb",
-      "cf50918b",
-      "2cc7a066",
-      "02791f97",
-      "9872d959",
-      "e91e7948"
+      "c7922f5b",
+      "7cd3ee72",
+      "b04e54c1",
+      "addbb960",
+      "5d2fb09c",
+      "1463c51a",
+      "c4c43521",
+      "1866ad99"
     ],
     "apps/web/src/thumbnail-menu-layout.ts": [
       "a4748563",
@@ -2634,14 +2634,14 @@
       "f116c35e"
     ],
     "apps/web/src/widget-results.ts": [
-      "0d6852fc",
-      "c237329d",
-      "fe074194",
-      "3e6daf40",
-      "c338e3bc",
-      "083a4527",
-      "9aa4a0cf",
-      "6582cd91"
+      "66584f29",
+      "5cbe7baf",
+      "5e88555c",
+      "e5ed056f",
+      "357137ac",
+      "71468c68",
+      "abb370d9",
+      "bc5e537a"
     ],
     "apps/web/src/widget-rich-editor.tsx": [
       "610fdf07",
@@ -3884,14 +3884,14 @@
       "881885b6"
     ],
     "apps/web/test/widget-results.test.ts": [
-      "41d43bd5",
-      "5c6a489f",
-      "defa87aa",
-      "6765eae0",
-      "0600c505",
-      "e7426b56",
-      "e519b4f2",
-      "ff6c73d3"
+      "eec7e119",
+      "1b01d35b",
+      "264b8a69",
+      "a58c771f",
+      "f628c69b",
+      "1bb68ea4",
+      "1bc16f15",
+      "a982d019"
     ],
     "apps/web/test/widget-rich-editor-ime.test.ts": [
       "88248341",
@@ -4404,14 +4404,14 @@
       "d240df37"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "2a7d2f8f",
-      "f4859994",
-      "66231ad9",
-      "3b158597",
-      "27b5bf3b",
-      "64fef252",
-      "a9020ae3",
-      "6c1b8a8e"
+      "c19d3821",
+      "d6bd3fcd",
+      "6cd861a7",
+      "171cfdf6",
+      "2d3ff664",
+      "3eedc210",
+      "2f300d69",
+      "4c03948c"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",
