@@ -40,7 +40,10 @@ class MobileBackgroundFontParity(unittest.TestCase):
         self.assertIn("fontFamily:safeWidgetFontFamily(style?.fontFamily)", typography)
         self.assertIn('font-family:inherit!important;font-weight:inherit!important;', self.css)
         self.assertIn(' :is(h1,h2,h3,h4){font-family:inherit;}', self.css)
-        self.assertIn("...widgetTypographyStyle(w.kind==='title'?widgetDisplay(w,{pageTitle,masterTitleStyle}).style:widgetTextDefaults(w.kind,w.style))", self.ui)
+        self.assertIn("...stageWidgetTypography(w,{pageTitle,masterTitleStyle},mobileMode)", self.ui)
+        stage=read("apps/web/src/stage-widget-typography.ts")
+        self.assertIn("widgetDisplay(widget,context).style:widgetTextDefaults(widget.kind,widget.style)",stage)
+        self.assertIn("widgetTypographyStyle(resolved)",stage)
 
     def test_release_gate_remains_unchanged(self):
         self.assertIn('85.25%', read('docs/RC_CYCLE145_MOBILE_BACKGROUND_FONT_PARITY.en.md'))
