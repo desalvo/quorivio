@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
   "cycle": 293,
-  "file_count_excluding_manifest": 2609,
+  "file_count_excluding_manifest": 2610,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -72,56 +72,6 @@
       "41d2d7f0",
       "4c783f9a",
       "bf0f8647"
-    ],
-    "Dockerfile": [
-      "148640fd",
-      "4362fbdc",
-      "a018e340",
-      "31eed7a9",
-      "2c2437a5",
-      "925830e9",
-      "5c6ce14c",
-      "640f725a"
-    ],
-    "Dockerfile.converter": [
-      "05f4d8c5",
-      "ffd69b5e",
-      "4a3e89ed",
-      "764ea5d0",
-      "0d7b429b",
-      "8b7525a8",
-      "3683eeef",
-      "cbde89fb"
-    ],
-    "LICENSE": [
-      "73c273b1",
-      "e427caef",
-      "0c800614",
-      "08343c08",
-      "2a9b26ee",
-      "47d03e60",
-      "79d67585",
-      "59abfd73"
-    ],
-    "README.it.md": [
-      "5db79f10",
-      "9f783dcc",
-      "ca636340",
-      "28ae283a",
-      "093a2654",
-      "e1824c4c",
-      "dbc522e1",
-      "09ed5724"
-    ],
-    "README.md": [
-      "ab164937",
-      "7b1ec41d",
-      "dff8b15f",
-      "b6104acb",
-      "9461fa58",
-      "296159be",
-      "e3acc5fc",
-      "42e6dd46"
     ],
     "apps/api/package.json": [
       "6c45ea8f",
@@ -2634,14 +2584,14 @@
       "f116c35e"
     ],
     "apps/web/src/widget-results.ts": [
-      "5d8d0626",
-      "3a5f088a",
-      "eef11bd4",
-      "ee4c9a79",
-      "b899ccf7",
-      "a70be870",
-      "f7091ab3",
-      "e284fc39"
+      "6e25c551",
+      "38dd770e",
+      "aa3ddd4b",
+      "90c67d6f",
+      "674740b6",
+      "4ebcc895",
+      "dd137c6d",
+      "b6d25caa"
     ],
     "apps/web/src/widget-rich-editor.tsx": [
       "610fdf07",
@@ -2782,6 +2732,16 @@
       "0743e20c",
       "49e4ef1c",
       "b9e1a47f"
+    ],
+    "apps/web/test/gauge-localized-scores.test.ts": [
+      "c86f83e3",
+      "a1328ba1",
+      "87e86f1d",
+      "fe683eda",
+      "26d40cf9",
+      "7520b776",
+      "1cc4c898",
+      "07f5c7e0"
     ],
     "apps/web/test/live-connection-cycle54.test.ts": [
       "16bb11b3",
@@ -3953,6 +3913,26 @@
       "274bc84d",
       "5335d24b"
     ],
+    "Dockerfile": [
+      "148640fd",
+      "4362fbdc",
+      "a018e340",
+      "31eed7a9",
+      "2c2437a5",
+      "925830e9",
+      "5c6ce14c",
+      "640f725a"
+    ],
+    "Dockerfile.converter": [
+      "05f4d8c5",
+      "ffd69b5e",
+      "4a3e89ed",
+      "764ea5d0",
+      "0d7b429b",
+      "8b7525a8",
+      "3683eeef",
+      "cbde89fb"
+    ],
     "docs/ADMIN_MFA_RESET.en.md": [
       "92d209d4",
       "7884f1f5",
@@ -3993,26 +3973,6 @@
       "11423384",
       "8c449715"
     ],
-    "docs/ARCHITECTURE.it.md": [
-      "1de74d65",
-      "8079aa88",
-      "b83660a3",
-      "4caac7cc",
-      "078c2152",
-      "f2dc0827",
-      "fcb8c0aa",
-      "d256344d"
-    ],
-    "docs/ARCHITECTURE.md": [
-      "0d3b7959",
-      "3ecccf0f",
-      "774120b8",
-      "31c33694",
-      "5de3372e",
-      "e6b4c942",
-      "e7947703",
-      "ecbd916b"
-    ],
     "docs/ARCHITECTURE_500.it.md": [
       "a9a649bd",
       "d7d8acaf",
@@ -4032,6 +3992,26 @@
       "53e54912",
       "a815626c",
       "33f5cb87"
+    ],
+    "docs/ARCHITECTURE.it.md": [
+      "1de74d65",
+      "8079aa88",
+      "b83660a3",
+      "4caac7cc",
+      "078c2152",
+      "f2dc0827",
+      "fcb8c0aa",
+      "d256344d"
+    ],
+    "docs/ARCHITECTURE.md": [
+      "0d3b7959",
+      "3ecccf0f",
+      "774120b8",
+      "31c33694",
+      "5de3372e",
+      "e6b4c942",
+      "e7947703",
+      "ecbd916b"
     ],
     "docs/ASSET_UPLOADS.en.md": [
       "9260a855",
@@ -4072,6 +4052,686 @@
       "fb8d4363",
       "df8b9ce0",
       "8be3bf45"
+    ],
+    "docs/assets/brochure-editorial/marketing-concept-en.png": [
+      "cb369c1e",
+      "ab71c543",
+      "acddcf75",
+      "1c212939",
+      "14fbd866",
+      "8ec6d04f",
+      "d1b6449f",
+      "9dd159e8"
+    ],
+    "docs/assets/brochure-editorial/marketing-concept-it.png": [
+      "859eb1e6",
+      "5686dd2c",
+      "a5e2ddac",
+      "52b9bfca",
+      "d7748564",
+      "6bc6ccb1",
+      "34683f41",
+      "95ddda3a"
+    ],
+    "docs/assets/brochure-editorial/marketing-photo-en.jpg": [
+      "7174bd9d",
+      "6ea70ceb",
+      "ecc0a64b",
+      "629157b2",
+      "8fedbddb",
+      "67563841",
+      "986e1c3c",
+      "e206c109"
+    ],
+    "docs/assets/brochure-editorial/marketing-photo-it.jpg": [
+      "b519f3c2",
+      "bc1a0c1f",
+      "2211a84b",
+      "53aa8ba1",
+      "ccf855b0",
+      "d082453a",
+      "98001719",
+      "b205340d"
+    ],
+    "docs/assets/brochure-editorial/official-quorivio-logo.png": [
+      "688b21d2",
+      "0f4080c2",
+      "fbf4612d",
+      "a7981b78",
+      "0bcee827",
+      "69d6ee8f",
+      "0f6f7acc",
+      "911792bb"
+    ],
+    "docs/assets/manual-evidence-rc283/admin-audit.png": [
+      "7cbadd0d",
+      "334db498",
+      "78d6cd14",
+      "761e32a5",
+      "b26f15eb",
+      "34305e65",
+      "740e3b5c",
+      "e5d114c2"
+    ],
+    "docs/assets/manual-evidence-rc283/admin-backups.png": [
+      "5281b18a",
+      "5875d042",
+      "33bac58c",
+      "71c88ee1",
+      "8c0227e6",
+      "522e4402",
+      "b2448411",
+      "68d72711"
+    ],
+    "docs/assets/manual-evidence-rc283/admin-server-settings.png": [
+      "c63e10b9",
+      "c87f4243",
+      "7425c2fb",
+      "2e3e6546",
+      "6f443439",
+      "63d2c9e6",
+      "1a015a19",
+      "4bd9233d"
+    ],
+    "docs/assets/manual-evidence-rc283/admin-users.png": [
+      "18cdc081",
+      "38fcf0b8",
+      "7ab8ad41",
+      "4c2e98c8",
+      "e395d545",
+      "99692519",
+      "40ef7581",
+      "fa724fb4"
+    ],
+    "docs/assets/manual-evidence-rc283/capture.json": [
+      "225557d9",
+      "6a913867",
+      "35f528dc",
+      "0076248a",
+      "6de529ca",
+      "242a67b0",
+      "ac977468",
+      "6a522102"
+    ],
+    "docs/assets/manual-evidence-rc283/editor-canvas.png": [
+      "e7a27a7a",
+      "617e6895",
+      "3a18fdc0",
+      "f19dbd20",
+      "1f05a2f9",
+      "b8545e3d",
+      "dd94afd0",
+      "f5876182"
+    ],
+    "docs/assets/manual-evidence-rc283/login-desktop.png": [
+      "822ce464",
+      "8ec6799d",
+      "4dbd3a69",
+      "c83fc0a6",
+      "27f35f36",
+      "eb07a5af",
+      "dcae70cf",
+      "d74bc200"
+    ],
+    "docs/assets/manual-evidence-rc283/participant-entry-smartphone.png": [
+      "ad512c29",
+      "5a7d5c0e",
+      "57f1503d",
+      "74629922",
+      "2a3933c9",
+      "e6cf5c3c",
+      "ed3316ea",
+      "b5a71716"
+    ],
+    "docs/assets/manual-evidence-rc283/participant-feedback-smartphone.png": [
+      "4a9d659c",
+      "77404ec8",
+      "1b28a31c",
+      "ebc60f22",
+      "335dda75",
+      "a56675e9",
+      "6358cee9",
+      "dfda2bf1"
+    ],
+    "docs/assets/manual-evidence-rc283/participant-question-smartphone.png": [
+      "bb5563ba",
+      "155d5a70",
+      "a400290d",
+      "52c1eae8",
+      "1a0a1326",
+      "517f1aa0",
+      "d47f001a",
+      "c5014ca5"
+    ],
+    "docs/assets/manual-evidence-rc283/presenter-live.png": [
+      "81f7c554",
+      "603435cb",
+      "65eb15d4",
+      "40fe7eea",
+      "2828a35e",
+      "bb70fd95",
+      "7c531584",
+      "ff233be0"
+    ],
+    "docs/assets/manual-evidence-rc283/rehearsal-presenter.png": [
+      "b888d6ac",
+      "2ba146ae",
+      "87f11263",
+      "2f67997d",
+      "38557b45",
+      "6a85d93e",
+      "965c2c9c",
+      "9ae7904a"
+    ],
+    "docs/assets/manual-evidence-rc283/rehearsal-smartphone.png": [
+      "31db53ca",
+      "df69e0d2",
+      "270cb372",
+      "bfa284fa",
+      "14d17147",
+      "5432f07f",
+      "22e8e7fb",
+      "db38458a"
+    ],
+    "docs/assets/manual-evidence-rc283/workspace-desktop.png": [
+      "52d95025",
+      "680bccde",
+      "f8f27053",
+      "2926ef50",
+      "0f1e48aa",
+      "4259c61d",
+      "d2909c47",
+      "50b7e1dc"
+    ],
+    "docs/assets/manual-evidence-rc291/admin-audit.png": [
+      "3a30e40b",
+      "85b5bdbe",
+      "a36ecd12",
+      "bbd98d6c",
+      "08b2378c",
+      "e70d2bb9",
+      "6126d601",
+      "bae071c3"
+    ],
+    "docs/assets/manual-evidence-rc291/admin-backups.png": [
+      "ac9fc0c6",
+      "2e87e6a9",
+      "3556015c",
+      "0bdcea45",
+      "6ecbff8f",
+      "87ab2a22",
+      "b513e7ae",
+      "4257a4b5"
+    ],
+    "docs/assets/manual-evidence-rc291/admin-server-settings.png": [
+      "13c79df1",
+      "185aadfd",
+      "9fd3bd67",
+      "71d94384",
+      "a43ee8c8",
+      "d71651b2",
+      "7b5bca48",
+      "fa35cfab"
+    ],
+    "docs/assets/manual-evidence-rc291/admin-users.png": [
+      "f39ccd15",
+      "06dd7155",
+      "b5197251",
+      "fb589c85",
+      "ba83ec4f",
+      "804ae092",
+      "90e07dec",
+      "3496cfc1"
+    ],
+    "docs/assets/manual-evidence-rc291/capture.json": [
+      "a8136924",
+      "27671567",
+      "8cd91ffe",
+      "d9d39e4f",
+      "7b1f2217",
+      "97c380d0",
+      "4038d547",
+      "ad141cf5"
+    ],
+    "docs/assets/manual-evidence-rc291/editor-canvas.png": [
+      "0055aff6",
+      "566964c8",
+      "2bb20e7e",
+      "dd7e89c8",
+      "15280cbb",
+      "2ac26e2a",
+      "0dbf39ed",
+      "c3fd7c57"
+    ],
+    "docs/assets/manual-evidence-rc291/editor-schema-inspector.png": [
+      "e9d8772c",
+      "322019ce",
+      "34f4b5ad",
+      "ea2afe34",
+      "bd10057e",
+      "78ec6745",
+      "9646d7b8",
+      "8a210147"
+    ],
+    "docs/assets/manual-evidence-rc291/editor-schema.png": [
+      "713b70e1",
+      "0fa1da7d",
+      "b2875342",
+      "91509c19",
+      "6cae6428",
+      "1c236f45",
+      "f3268c7e",
+      "7c9b6998"
+    ],
+    "docs/assets/manual-evidence-rc291/editor-thumbnails-widgets.png": [
+      "0055aff6",
+      "566964c8",
+      "2bb20e7e",
+      "dd7e89c8",
+      "15280cbb",
+      "2ac26e2a",
+      "0dbf39ed",
+      "c3fd7c57"
+    ],
+    "docs/assets/manual-evidence-rc291/editor-widget-context.png": [
+      "7dca830b",
+      "4adac635",
+      "240750b9",
+      "426c9624",
+      "b4be5013",
+      "d771a62e",
+      "2baa0a89",
+      "918d37a6"
+    ],
+    "docs/assets/manual-evidence-rc291/editor-widget-format-resized.png": [
+      "1d615f20",
+      "63e917dd",
+      "bd655421",
+      "6a8cd444",
+      "53e2f857",
+      "375c63be",
+      "29a1245c",
+      "4e7c3ca6"
+    ],
+    "docs/assets/manual-evidence-rc291/editor-widget-format-tabs.png": [
+      "5cf47746",
+      "477c7a3e",
+      "91f4bded",
+      "363cf30c",
+      "bee7f575",
+      "6c7e4a23",
+      "6cba37c8",
+      "3dd76b17"
+    ],
+    "docs/assets/manual-evidence-rc291/editor-widget-format.png": [
+      "6a76a368",
+      "06040e05",
+      "c05ede07",
+      "759f9396",
+      "98ae0048",
+      "61096eab",
+      "8d78481b",
+      "46f74559"
+    ],
+    "docs/assets/manual-evidence-rc291/login-desktop.png": [
+      "822ce464",
+      "8ec6799d",
+      "4dbd3a69",
+      "c83fc0a6",
+      "27f35f36",
+      "eb07a5af",
+      "dcae70cf",
+      "d74bc200"
+    ],
+    "docs/assets/manual-evidence-rc291/participant-entry-smartphone.png": [
+      "ad512c29",
+      "5a7d5c0e",
+      "57f1503d",
+      "74629922",
+      "2a3933c9",
+      "e6cf5c3c",
+      "ed3316ea",
+      "b5a71716"
+    ],
+    "docs/assets/manual-evidence-rc291/participant-feedback-smartphone.png": [
+      "19df11d6",
+      "f7fbd090",
+      "d6c67525",
+      "00e9bdf7",
+      "e0ef87c2",
+      "ca3b62ac",
+      "ff1153f8",
+      "52720325"
+    ],
+    "docs/assets/manual-evidence-rc291/participant-question-smartphone.png": [
+      "bb5563ba",
+      "155d5a70",
+      "a400290d",
+      "52c1eae8",
+      "1a0a1326",
+      "517f1aa0",
+      "d47f001a",
+      "c5014ca5"
+    ],
+    "docs/assets/manual-evidence-rc291/participant-widescreen.png": [
+      "6a4411bf",
+      "3a75a72f",
+      "1d162bbf",
+      "8cfd3f9a",
+      "41222d2c",
+      "e87ff6d1",
+      "01895628",
+      "287906a7"
+    ],
+    "docs/assets/manual-evidence-rc291/presenter-live-secondary.png": [
+      "d9a5fdee",
+      "d3dc2882",
+      "a514888e",
+      "fcd3505d",
+      "4dc89778",
+      "89a69bc5",
+      "2454b1a8",
+      "09e7c71d"
+    ],
+    "docs/assets/manual-evidence-rc291/presenter-live.png": [
+      "4677bb49",
+      "24555308",
+      "85938a82",
+      "8923b7a1",
+      "b81e88f3",
+      "d83c331f",
+      "c9425c45",
+      "c119b576"
+    ],
+    "docs/assets/manual-evidence-rc291/rehearsal-participant.png": [
+      "bf3055bd",
+      "56062243",
+      "1318fb1c",
+      "484daa13",
+      "422d9739",
+      "a8029836",
+      "0f8b5679",
+      "3d2a858a"
+    ],
+    "docs/assets/manual-evidence-rc291/rehearsal-presenter.png": [
+      "b28e91ea",
+      "c3763b40",
+      "7aef3d0f",
+      "559382bb",
+      "e6cae6cc",
+      "36012745",
+      "f7fa04c2",
+      "45e8f791"
+    ],
+    "docs/assets/manual-evidence-rc291/rehearsal-side-by-side-smartphone.png": [
+      "e9bee10e",
+      "6318540d",
+      "63b4f939",
+      "1b6573dc",
+      "7f1b0698",
+      "7c26188f",
+      "dad008f1",
+      "218af1df"
+    ],
+    "docs/assets/manual-evidence-rc291/rehearsal-side-by-side.png": [
+      "93e4af6e",
+      "ebc59f43",
+      "16bda631",
+      "c88377ca",
+      "74e7d57f",
+      "fbde680e",
+      "411a9910",
+      "33259e43"
+    ],
+    "docs/assets/manual-evidence-rc291/rehearsal-smartphone.png": [
+      "f2344063",
+      "0b6c7a6d",
+      "834478ad",
+      "3cea8287",
+      "fab17af4",
+      "88324294",
+      "956292d5",
+      "1522e6a3"
+    ],
+    "docs/assets/manual-evidence-rc291/workspace-desktop.png": [
+      "a7b701af",
+      "8a8335cb",
+      "dae740f5",
+      "9dd90ad0",
+      "78f52146",
+      "a9ba0017",
+      "8672c795",
+      "a8acb5a1"
+    ],
+    "docs/assets/manual-illustrations/backup-lifecycle.png": [
+      "3962edd6",
+      "07e26042",
+      "9f79b05e",
+      "46b301b9",
+      "1af8bb6d",
+      "67024d15",
+      "5cd258c2",
+      "2c9df312"
+    ],
+    "docs/assets/manual-illustrations/backup.png": [
+      "d0d42452",
+      "951012e0",
+      "163c17aa",
+      "cfef277f",
+      "1f156430",
+      "a3078e61",
+      "4df8e073",
+      "c2311883"
+    ],
+    "docs/assets/manual-illustrations/editor-toolbar-atlas-en-rc293.png": [
+      "00656427",
+      "619051ec",
+      "5169f496",
+      "fc731e90",
+      "ea3e72a1",
+      "8257099a",
+      "d65ed0dd",
+      "ba60078d"
+    ],
+    "docs/assets/manual-illustrations/editor-toolbar-atlas-it-rc293.png": [
+      "948dbe61",
+      "799d9d80",
+      "b24beb54",
+      "eef648ba",
+      "96483b34",
+      "fbaecc16",
+      "0ee70d04",
+      "14b17001"
+    ],
+    "docs/assets/manual-illustrations/editor.png": [
+      "9f17041b",
+      "7d6423c8",
+      "c949ba9e",
+      "7168eca9",
+      "6b06d710",
+      "20658e34",
+      "7dc7605e",
+      "fe07f2d2"
+    ],
+    "docs/assets/manual-illustrations/editorial-collaborative-workflow-rc286.jpg": [
+      "9d4cfe90",
+      "438f3583",
+      "447b5206",
+      "7c32a5a0",
+      "ca08eef6",
+      "d0357472",
+      "0264bbeb",
+      "a4d48222"
+    ],
+    "docs/assets/manual-illustrations/editorial-live-presentation-rc286.jpg": [
+      "c133c3ad",
+      "ccf6fc20",
+      "ee0f36bb",
+      "3c2c0880",
+      "8a25d10b",
+      "fd700ed3",
+      "f711974b",
+      "e20e96fc"
+    ],
+    "docs/assets/manual-illustrations/ldap-approval.png": [
+      "271d30c3",
+      "0731e089",
+      "d4864945",
+      "9a55e66a",
+      "9573f862",
+      "6a7fa7c8",
+      "57a685f9",
+      "f8570ff3"
+    ],
+    "docs/assets/manual-illustrations/ldap.png": [
+      "a0278689",
+      "5f5e071f",
+      "5bc24868",
+      "3c4e76ad",
+      "b73227f0",
+      "acaeb04c",
+      "e91bba96",
+      "43ee4e6d"
+    ],
+    "docs/assets/manual-illustrations/participant.png": [
+      "cb76be31",
+      "ef214048",
+      "02d6757b",
+      "084f1022",
+      "2f7eb4c8",
+      "2c07754d",
+      "32e0bbb4",
+      "1767e937"
+    ],
+    "docs/assets/manual-illustrations/results.png": [
+      "268bc6f6",
+      "89bcc61a",
+      "348da66b",
+      "4d564e0b",
+      "413f0a2b",
+      "11d30de8",
+      "192b8eba",
+      "6327256f"
+    ],
+    "docs/assets/manual-illustrations/sample-bar-chart.png": [
+      "f401982d",
+      "34fe7455",
+      "804346a8",
+      "71f0bf3b",
+      "2342cf24",
+      "e1a3c535",
+      "366df7d1",
+      "198ab90e"
+    ],
+    "docs/assets/manual-illustrations/sample-pie-chart.png": [
+      "4c065608",
+      "6d3ab0ec",
+      "f827580a",
+      "06451ca8",
+      "46289e55",
+      "08fa224e",
+      "b13e5013",
+      "d11c4514"
+    ],
+    "docs/assets/manual-illustrations/sessions.png": [
+      "2d0127fa",
+      "2f54169d",
+      "f210aaa4",
+      "64256409",
+      "41f9b94d",
+      "97a61118",
+      "2902bdeb",
+      "16a77a69"
+    ],
+    "docs/assets/manual-illustrations/workflow-live-presenter-user-rc286.png": [
+      "7a71dbfb",
+      "85eb403f",
+      "7fa494f4",
+      "6dd102ad",
+      "d858debb",
+      "e3d405f1",
+      "a26df6cb",
+      "0e4bd264"
+    ],
+    "docs/assets/manual-illustrations/workflow-local-quo-rc286.png": [
+      "a1e44613",
+      "0e741407",
+      "e3b8b7f8",
+      "faa29802",
+      "a237af27",
+      "aa5d5548",
+      "dd538b4f",
+      "3f1aa30e"
+    ],
+    "docs/assets/manual-illustrations/workflow-page-editor-rc286.png": [
+      "aa65a38a",
+      "768c5b28",
+      "91c414a8",
+      "8261ee3e",
+      "7ca6fbcd",
+      "f0bfa303",
+      "fed68d54",
+      "153d68a7"
+    ],
+    "docs/assets/manual-illustrations/workflow-preview-live-rc286.png": [
+      "d211efa5",
+      "095202af",
+      "1278a92a",
+      "4f91fac5",
+      "addeea0d",
+      "4206045e",
+      "3647679a",
+      "5828c25e"
+    ],
+    "docs/assets/manual-illustrations/workflow-scheme-editor-rc286.png": [
+      "3296dc62",
+      "4dd53a4b",
+      "aab9f908",
+      "e855bbc2",
+      "1b9d1bbb",
+      "3878eaa2",
+      "1123e8b7",
+      "a2fef70a"
+    ],
+    "docs/assets/manual-illustrations/workflow-widget-context-rc286.png": [
+      "24418c50",
+      "719482c2",
+      "086b1b46",
+      "c878026f",
+      "da0a2f36",
+      "807eb5aa",
+      "f437fab4",
+      "dff8199a"
+    ],
+    "docs/assets/quorivio-icon.svg": [
+      "7eeffa70",
+      "2544d87a",
+      "e968e0b1",
+      "636d8b73",
+      "492457ef",
+      "af2db36c",
+      "7254c6ab",
+      "15098761"
+    ],
+    "docs/assets/quorivio-logo.svg": [
+      "c3a1c17e",
+      "14ba9242",
+      "afc0101a",
+      "f8819006",
+      "676c3713",
+      "beec0194",
+      "4cbd06a5",
+      "0f13a053"
+    ],
+    "docs/assets/quorivio-manual-cover.png": [
+      "10dc07c4",
+      "5577768d",
+      "08566964",
+      "69e67c24",
+      "f139aa87",
+      "50ec290e",
+      "e8a5bfb7",
+      "5d65adc5"
     ],
     "docs/AUDIENCE_PAGE_SYNC.en.md": [
       "6a1297e7",
@@ -4132,6 +4792,26 @@
       "4c429206",
       "df09bf22",
       "02981214"
+    ],
+    "docs/brochures/quorivio-brochure-en.pdf": [
+      "104dbaa0",
+      "89936037",
+      "0f265966",
+      "81c35ae8",
+      "7bf2fb6c",
+      "eed5da0c",
+      "465c3730",
+      "51bc7be7"
+    ],
+    "docs/brochures/quorivio-brochure-it.pdf": [
+      "3809e943",
+      "381b303b",
+      "dd162f24",
+      "fab2638d",
+      "fdf28623",
+      "453c8fcf",
+      "65a35c73",
+      "9384744d"
     ],
     "docs/BUILD_INFO.en.md": [
       "15789afe",
@@ -5183,6 +5863,136 @@
       "05ec7842",
       "30daa037"
     ],
+    "docs/manuals-src/admin-guide.en.md": [
+      "47213d94",
+      "97c69972",
+      "731b7478",
+      "998c6767",
+      "9772a37e",
+      "707d8ac7",
+      "049b09d4",
+      "ae185aba"
+    ],
+    "docs/manuals-src/admin-guide.it.md": [
+      "1a79e930",
+      "48152fe3",
+      "a2e2735c",
+      "318cb366",
+      "0001dc11",
+      "72d7205a",
+      "5d52cf02",
+      "80540286"
+    ],
+    "docs/manuals-src/presenter-guide.en.md": [
+      "5c01b869",
+      "7f7ce0b5",
+      "bf38dcb6",
+      "aa7b55d0",
+      "3523124d",
+      "36b94afb",
+      "df0ffaef",
+      "7e3256a9"
+    ],
+    "docs/manuals-src/presenter-guide.it.md": [
+      "d1f73e50",
+      "0a069e2b",
+      "dab47aab",
+      "3ec49984",
+      "41c08b3e",
+      "20893428",
+      "5f4a9255",
+      "12021b26"
+    ],
+    "docs/manuals-src/README.md": [
+      "6a225c63",
+      "3d4d1389",
+      "93e14c8e",
+      "4908ee66",
+      "286bdbce",
+      "0dc3ef9f",
+      "a6d6c072",
+      "5072a7dc"
+    ],
+    "docs/manuals-src/user-guide.en.md": [
+      "334ac39e",
+      "a2a6532f",
+      "1e1859a4",
+      "bfa1ebc2",
+      "b7390d3f",
+      "8096acd2",
+      "29f37e2a",
+      "d7b97535"
+    ],
+    "docs/manuals-src/user-guide.it.md": [
+      "744ac6e0",
+      "4c693cdf",
+      "0a6094ac",
+      "d416de20",
+      "d5db60e6",
+      "abfc3868",
+      "1af34f3d",
+      "04c23107"
+    ],
+    "docs/manuals/admin-guide.en.pdf": [
+      "7ebafbbe",
+      "7776d0bd",
+      "a5ec3240",
+      "456249fa",
+      "9d9b1782",
+      "ee7e8411",
+      "e829b4e0",
+      "9e354a3c"
+    ],
+    "docs/manuals/admin-guide.it.pdf": [
+      "8e40bc4b",
+      "0011bd08",
+      "36c5a435",
+      "a3c0ff65",
+      "b356439b",
+      "75392bce",
+      "a7c85796",
+      "1f460455"
+    ],
+    "docs/manuals/presenter-guide.en.pdf": [
+      "352c40bd",
+      "75d6a5cb",
+      "7115f613",
+      "2e778ca9",
+      "17abe3ad",
+      "c678dd3d",
+      "779b0f73",
+      "09c3d982"
+    ],
+    "docs/manuals/presenter-guide.it.pdf": [
+      "b6a2d1af",
+      "05c46a26",
+      "dbd68102",
+      "8f99fa72",
+      "c1eb1ec9",
+      "ff72846f",
+      "9c398e47",
+      "c2ce971e"
+    ],
+    "docs/manuals/user-guide.en.pdf": [
+      "bc6a4d6f",
+      "b4e614cc",
+      "63183d9f",
+      "b813d72f",
+      "b26d8718",
+      "bc94cf40",
+      "22db5cad",
+      "6f8c23d0"
+    ],
+    "docs/manuals/user-guide.it.pdf": [
+      "91b91b39",
+      "caeab728",
+      "2b97b6f5",
+      "07ed6c67",
+      "dfe6b93e",
+      "1c99f784",
+      "8dde21f5",
+      "fa91f29e"
+    ],
     "docs/MEDIA_WIDGET_CYCLE.en.md": [
       "ea71fcda",
       "45cfab92",
@@ -5753,666 +6563,6 @@
       "261e2d16",
       "939d3b46"
     ],
-    "docs/RC136_EXTERNAL_ACCEPTANCE_EN.md": [
-      "690b4c02",
-      "a5fc3cb3",
-      "f8e75e5f",
-      "ecd82b33",
-      "579e5029",
-      "29450ab3",
-      "f152b9cb",
-      "5e549bd5"
-    ],
-    "docs/RC136_EXTERNAL_ACCEPTANCE_IT.md": [
-      "61118268",
-      "49e5d652",
-      "6a68c7e1",
-      "28fb0d2a",
-      "90b4f6d9",
-      "bf6e7c44",
-      "a2610eb7",
-      "954f6dcb"
-    ],
-    "docs/RC270_HELM_BACKUP_EXAMPLE.yaml": [
-      "70a98dbd",
-      "c1086bfb",
-      "782606ac",
-      "fb1d380c",
-      "714e1fc6",
-      "fb98c5d5",
-      "b731d811",
-      "77b558b9"
-    ],
-    "docs/RC304_COMPACT_PIE.md": [
-      "95b51fdb",
-      "bcacfee7",
-      "c2c75c1e",
-      "a78b9b0a",
-      "178b36cb",
-      "789dd83a",
-      "50baab50",
-      "bfdf4ba8"
-    ],
-    "docs/RC305_RATING_REACTIONS_BARS.md": [
-      "f707521a",
-      "c2f4a4a9",
-      "bc2a952d",
-      "4ba188b2",
-      "fdf09c47",
-      "4443ae65",
-      "113508c8",
-      "5d177108"
-    ],
-    "docs/RC306_BAR_WRAPPING.md": [
-      "f2d8b5f6",
-      "e131f0fc",
-      "90ca9d93",
-      "7de54e8c",
-      "f6d6bce6",
-      "9df264c6",
-      "f5639dc4",
-      "63a9d6b6"
-    ],
-    "docs/RC307_RESULTS_LAYOUT_RECOVERY.md": [
-      "2db81d45",
-      "cbf5ab70",
-      "5d2a7935",
-      "0cfda02f",
-      "0a6c2099",
-      "08c60945",
-      "e00a78d4",
-      "6548a333"
-    ],
-    "docs/RC49_HAPROXY_CROSS_NODE_RWX.en.md": [
-      "7c1cc75e",
-      "8f1dcae4",
-      "07cf72bf",
-      "3c276aa2",
-      "f04c81db",
-      "0c504689",
-      "b914da0e",
-      "1de9b62b"
-    ],
-    "docs/RC49_HAPROXY_CROSS_NODE_RWX.it.md": [
-      "714de40a",
-      "26bb112d",
-      "97954aa8",
-      "96bc1807",
-      "76291a68",
-      "a9aeef2e",
-      "a987382b",
-      "995b27bd"
-    ],
-    "docs/RC50_KIND_HTTPS_ACCEPTANCE.en.md": [
-      "00ea660f",
-      "c8a7ad3b",
-      "209a1df1",
-      "002072a4",
-      "376f0f1d",
-      "fed8fadd",
-      "45193204",
-      "23ed5d4d"
-    ],
-    "docs/RC50_KIND_HTTPS_ACCEPTANCE.it.md": [
-      "a01c253e",
-      "d6177a21",
-      "67ef7e66",
-      "8ae41bf2",
-      "4e1f22cc",
-      "d508de62",
-      "22b2a3ad",
-      "57839e9b"
-    ],
-    "docs/RC51_HTTPS_ACCEPTANCE.en.md": [
-      "a103c032",
-      "3c987461",
-      "28490cf2",
-      "9389c0f7",
-      "5cf7afc4",
-      "c3bfd533",
-      "a5dc62fc",
-      "1e448119"
-    ],
-    "docs/RC51_HTTPS_ACCEPTANCE.it.md": [
-      "5318f345",
-      "d51e73fd",
-      "e5808f1f",
-      "75232afd",
-      "504a6fde",
-      "dfaae809",
-      "c8391b35",
-      "c9ed95c3"
-    ],
-    "docs/RC52_SUSTAINED_500_SLO.en.md": [
-      "df8f0de6",
-      "7d420233",
-      "966b2911",
-      "3c5e7be3",
-      "be529451",
-      "5ab5cd71",
-      "da0bcf34",
-      "c22945ea"
-    ],
-    "docs/RC52_SUSTAINED_500_SLO.it.md": [
-      "0a5aae45",
-      "a18670d7",
-      "fdda5ecf",
-      "3605f65f",
-      "feb941e5",
-      "5896f5f8",
-      "93acbbfd",
-      "126e79ff"
-    ],
-    "docs/RC53_PRODUCTION_CSP_SECURITY.en.md": [
-      "ad09b8c9",
-      "7c8656e0",
-      "a2f6d502",
-      "e9ad0cae",
-      "ff5ecf14",
-      "61fc7c4c",
-      "b92678e6",
-      "1b2e6d60"
-    ],
-    "docs/RC53_PRODUCTION_CSP_SECURITY.it.md": [
-      "24a53f44",
-      "f25d2760",
-      "1d1c7ced",
-      "77649218",
-      "c66b9238",
-      "0def8717",
-      "75912a2a",
-      "6b1c3e32"
-    ],
-    "docs/RC54_LIVE_WEBSOCKET_RECOVERY.en.md": [
-      "f2cc29bd",
-      "41ce24a3",
-      "40ae55a2",
-      "33de5dca",
-      "79823349",
-      "7d0b04e4",
-      "41cd556d",
-      "22c125d2"
-    ],
-    "docs/RC54_LIVE_WEBSOCKET_RECOVERY.it.md": [
-      "efb7a5a4",
-      "6b947860",
-      "470fb35c",
-      "a3d548cc",
-      "e278ffda",
-      "63b6ab21",
-      "bc3d68cc",
-      "bacaf53d"
-    ],
-    "docs/RC55_LIVE_FRESHNESS_RECOVERY.en.md": [
-      "6bd04df0",
-      "f9c60f6e",
-      "1ae64b77",
-      "0864928f",
-      "5f3a9cfe",
-      "f1e89e89",
-      "c7a5ba17",
-      "8a94cba7"
-    ],
-    "docs/RC55_LIVE_FRESHNESS_RECOVERY.it.md": [
-      "0f950892",
-      "d3b8c481",
-      "b114cd81",
-      "3d979671",
-      "1d303a29",
-      "bc61a817",
-      "230e49b1",
-      "a6865b00"
-    ],
-    "docs/RC56_IDLE_SNAPSHOT_ACCEPTANCE.en.md": [
-      "bf341d43",
-      "e55c28f8",
-      "a30b1b73",
-      "44043ec3",
-      "68fd410c",
-      "dd05f7d4",
-      "caba42c3",
-      "fd70fcd1"
-    ],
-    "docs/RC56_IDLE_SNAPSHOT_ACCEPTANCE.it.md": [
-      "0071bdd2",
-      "b0c6addc",
-      "d1275e22",
-      "f3dfb47c",
-      "4f772407",
-      "aa0fd933",
-      "67544b3c",
-      "84219c7e"
-    ],
-    "docs/RC57_LIVE_FANOUT.en.md": [
-      "2fa766e0",
-      "67cadc32",
-      "6981f3e8",
-      "f91e4a94",
-      "c3ce9202",
-      "d94a79a5",
-      "b509faee",
-      "8f52decc"
-    ],
-    "docs/RC57_LIVE_FANOUT.it.md": [
-      "7c05aab7",
-      "08c49600",
-      "e018f3d3",
-      "ab96ed00",
-      "64f14c51",
-      "738aff02",
-      "47ff430e",
-      "68c6f889"
-    ],
-    "docs/RC58_VERIFIED_IDLE_SLO_AND_REFRESH.en.md": [
-      "5e97b51d",
-      "f5b6f31d",
-      "805f600b",
-      "1cb2b208",
-      "8ba8405e",
-      "5372887f",
-      "ca9077f8",
-      "6a392628"
-    ],
-    "docs/RC58_VERIFIED_IDLE_SLO_AND_REFRESH.it.md": [
-      "e525a6ec",
-      "a960a8b8",
-      "c2184d5b",
-      "8fc3ce07",
-      "020efb24",
-      "240e52f6",
-      "55a15298",
-      "6b95df5a"
-    ],
-    "docs/RC59_ACCELERATED_CLOSURE.en.md": [
-      "51de9dea",
-      "6423e34a",
-      "b5d8c9e4",
-      "1d77cf62",
-      "1ef6fe68",
-      "ff744b56",
-      "8bbf9959",
-      "0c688b70"
-    ],
-    "docs/RC59_ACCELERATED_CLOSURE.it.md": [
-      "92f7b261",
-      "a5e62099",
-      "05c60557",
-      "27764820",
-      "df137830",
-      "919d26e5",
-      "da633034",
-      "d1238256"
-    ],
-    "docs/RC60_FEDERATED_LINK_REVOCATION.en.md": [
-      "5d18e688",
-      "27891d46",
-      "0149ea6a",
-      "1eb1be39",
-      "33d38be9",
-      "edfe5496",
-      "0dbe104b",
-      "f1a5e817"
-    ],
-    "docs/RC60_FEDERATED_LINK_REVOCATION.it.md": [
-      "eb1fe2cc",
-      "887ed124",
-      "220a3e80",
-      "5b925220",
-      "1d998677",
-      "9f20159e",
-      "430df99f",
-      "2b8137e2"
-    ],
-    "docs/RC61_FEDERATED_IDENTITY_MANAGEMENT.en.md": [
-      "cd01a395",
-      "0c1d96e4",
-      "a0b133ed",
-      "e1391f93",
-      "533981ff",
-      "2ad197d6",
-      "ee975fa1",
-      "bf8d4100"
-    ],
-    "docs/RC61_FEDERATED_IDENTITY_MANAGEMENT.it.md": [
-      "c3fd3cdc",
-      "75b2495b",
-      "a3cdd83e",
-      "57d86601",
-      "565c2517",
-      "b72994cd",
-      "009019fa",
-      "712c9981"
-    ],
-    "docs/RC62_CI_THROTTLE_ISOLATION.en.md": [
-      "b17d897c",
-      "448ef4a5",
-      "b7ebc622",
-      "4513bf6a",
-      "bb50fe51",
-      "4005ff46",
-      "8349c584",
-      "40772fe9"
-    ],
-    "docs/RC62_CI_THROTTLE_ISOLATION.it.md": [
-      "10095d19",
-      "41051c62",
-      "a3a16fcc",
-      "2d1ee42a",
-      "ed605f19",
-      "6e20fc57",
-      "8e1ccbc8",
-      "9f10d9b8"
-    ],
-    "docs/RC63_HISTORICAL_INVENTORY_RECOVERY.en.md": [
-      "14b02979",
-      "a37de9c6",
-      "6273048d",
-      "d999f2df",
-      "bc2ca34a",
-      "0c55ce74",
-      "d01fa1d0",
-      "d620d614"
-    ],
-    "docs/RC63_HISTORICAL_INVENTORY_RECOVERY.it.md": [
-      "16a4c3e8",
-      "5cda52de",
-      "1b77ccaa",
-      "f0864daa",
-      "22e2ac9c",
-      "e17ae849",
-      "678f5c72",
-      "161a91e2"
-    ],
-    "docs/RC64_GITLEAKS_FIX.it.md": [
-      "e12ecbf1",
-      "55391e56",
-      "a8f7cfec",
-      "d9a76d0c",
-      "87c34b79",
-      "6e3f6ea2",
-      "8d71b9ed",
-      "ab164caf"
-    ],
-    "docs/RC65_HISTORICAL_DOCS_CI_HOTFIX.en.md": [
-      "0f01ce23",
-      "2129b580",
-      "16805644",
-      "c49c6893",
-      "1794e48e",
-      "7466707d",
-      "1569f09f",
-      "1fce5b7b"
-    ],
-    "docs/RC65_HISTORICAL_DOCS_CI_HOTFIX.it.md": [
-      "5966651f",
-      "2d803ed0",
-      "6fc119a2",
-      "1c28435b",
-      "08a50940",
-      "1cfc4274",
-      "c964497a",
-      "be392e94"
-    ],
-    "docs/RC66_VERIFIED_SSO_RECONCILIATION.en.md": [
-      "97f63398",
-      "3ec8a962",
-      "f982887d",
-      "381308bc",
-      "69b5971b",
-      "5a455c51",
-      "cfb16d8b",
-      "7c60399a"
-    ],
-    "docs/RC66_VERIFIED_SSO_RECONCILIATION.it.md": [
-      "ee520632",
-      "5ca20cfa",
-      "adf95239",
-      "e82202e3",
-      "8720ac29",
-      "aa4f05cf",
-      "d3117dcc",
-      "802f20bd"
-    ],
-    "docs/RC67_BROWSER_REHEARSAL_RECONCILIATION.en.md": [
-      "a03e9803",
-      "91c175b2",
-      "ee59a6f6",
-      "c3bf668b",
-      "d9b2cbc2",
-      "cd659095",
-      "854b66e6",
-      "c1d47024"
-    ],
-    "docs/RC67_BROWSER_REHEARSAL_RECONCILIATION.it.md": [
-      "7a07a983",
-      "4a80f365",
-      "a994e258",
-      "eb7cb077",
-      "c1ce67d5",
-      "4eb826e2",
-      "897e43f9",
-      "ebb30489"
-    ],
-    "docs/RC68_BACKGROUND_LIBRARY_VERIFIED_20261031.en.md": [
-      "13e5699a",
-      "965778ee",
-      "3021a46c",
-      "b2b65aaa",
-      "0d5ace42",
-      "e1450200",
-      "afa99337",
-      "47c41a91"
-    ],
-    "docs/RC68_BACKGROUND_LIBRARY_VERIFIED_20261031.it.md": [
-      "26143fc6",
-      "01387549",
-      "fd7641fc",
-      "6436bd95",
-      "5cf37a97",
-      "b8fe1a3e",
-      "d77404d4",
-      "c1486387"
-    ],
-    "docs/RC69_PAGE_ORDER_RECOVERY_20261031.en.md": [
-      "9275d21f",
-      "55ebbee4",
-      "050417c2",
-      "0aae34c8",
-      "33e4797e",
-      "7a1b9d9b",
-      "e884a3e5",
-      "95965d7e"
-    ],
-    "docs/RC69_PAGE_ORDER_RECOVERY_20261031.it.md": [
-      "4d3a014f",
-      "77577182",
-      "dcb5f992",
-      "4531bf3f",
-      "fc5ea800",
-      "f4d2150c",
-      "17c41f03",
-      "70e6fa12"
-    ],
-    "docs/RC70_EDITOR_TIMER_FIXES_20261031.en.md": [
-      "dce3474a",
-      "784007c2",
-      "19b8a732",
-      "66acf768",
-      "7a3aa3e4",
-      "30de71bd",
-      "99b7be26",
-      "cf3f4041"
-    ],
-    "docs/RC70_EDITOR_TIMER_FIXES_20261031.it.md": [
-      "aedaeda3",
-      "e30f1eef",
-      "dab5488e",
-      "87a6f421",
-      "fce0f7f6",
-      "c51f4ad0",
-      "3646a9f7",
-      "ac794dca"
-    ],
-    "docs/RC71_LIVE_EDITOR_LIFECYCLE_20261031.en.md": [
-      "1f96e49c",
-      "b2f8c8ba",
-      "5cb4a320",
-      "673e7bb7",
-      "7a328926",
-      "b8db4023",
-      "a977cb1c",
-      "b3db739e"
-    ],
-    "docs/RC71_LIVE_EDITOR_LIFECYCLE_20261031.it.md": [
-      "fa736faa",
-      "edea5596",
-      "33c9daa9",
-      "93aaf31d",
-      "7a170c95",
-      "4546986e",
-      "cb7bcf66",
-      "48250b84"
-    ],
-    "docs/RC72_LIVE_DASHBOARD_AND_WIDGETS_20261031.en.md": [
-      "3b37194e",
-      "6550ff26",
-      "5643d2f6",
-      "8fc85cbf",
-      "b707b9fb",
-      "70edc5f0",
-      "d7d31ea4",
-      "f1a391e3"
-    ],
-    "docs/RC72_LIVE_DASHBOARD_AND_WIDGETS_20261031.it.md": [
-      "01862cf8",
-      "c0063427",
-      "800798cb",
-      "7af7f7a0",
-      "c6ed350c",
-      "5a6c15fb",
-      "00db30d2",
-      "f00aefb9"
-    ],
-    "docs/RC77_DISPATCH_SAFETY.en.md": [
-      "240baa1b",
-      "f3aaabe4",
-      "bb08c1ba",
-      "c5169433",
-      "6b095500",
-      "54ea80d4",
-      "19d72eff",
-      "6a5efc06"
-    ],
-    "docs/RC77_DISPATCH_SAFETY.it.md": [
-      "a9434223",
-      "7ec89fd3",
-      "eeeed479",
-      "5990c77e",
-      "2d2dfe94",
-      "c0a12853",
-      "87323287",
-      "adb4ebef"
-    ],
-    "docs/RC83_WIDGET_CONTEXT_CAPTURE.en.md": [
-      "481e9533",
-      "796277b1",
-      "4110651f",
-      "590b3f0c",
-      "1cf235a3",
-      "42c06f3b",
-      "96336a97",
-      "6c220184"
-    ],
-    "docs/RC83_WIDGET_CONTEXT_CAPTURE.it.md": [
-      "02236ecc",
-      "14485238",
-      "792c3d74",
-      "a265d54d",
-      "06910584",
-      "810d071e",
-      "9b654574",
-      "fc7e777d"
-    ],
-    "docs/RC84_HISTORICAL_CONTEXT_CONTRACT_RECONCILIATION.en.md": [
-      "8830dd22",
-      "5d98cd6d",
-      "48deb10e",
-      "2913288c",
-      "4a32a4c0",
-      "4962d391",
-      "3e3b6353",
-      "a3701e42"
-    ],
-    "docs/RC84_HISTORICAL_CONTEXT_CONTRACT_RECONCILIATION.it.md": [
-      "fb52a1bf",
-      "39bc3a61",
-      "bae8d881",
-      "0a58af07",
-      "4d5062e4",
-      "75661235",
-      "b2d7a5e4",
-      "e9a35acd"
-    ],
-    "docs/RC85_NATIVE_CONTEXT_ROUTING_DIAGNOSIS.en.md": [
-      "2b64ac07",
-      "a07977ab",
-      "c9e56318",
-      "5e6f8257",
-      "8af23c88",
-      "567bc5da",
-      "358b30f4",
-      "ed56a44d"
-    ],
-    "docs/RC85_NATIVE_CONTEXT_ROUTING_DIAGNOSIS.it.md": [
-      "8401ac06",
-      "b56c739d",
-      "5465d4b8",
-      "d02fe12c",
-      "623b3029",
-      "660d6e2b",
-      "b1e8ef19",
-      "543e9e6d"
-    ],
-    "docs/RC86_CHROMIUM_WIDGET_PALETTE_DIAGNOSIS.en.md": [
-      "0360b61a",
-      "abac8ae7",
-      "e04ca0dd",
-      "cb3b9626",
-      "a38ea20a",
-      "b22b36a0",
-      "006c9b77",
-      "1ef52cce"
-    ],
-    "docs/RC86_CHROMIUM_WIDGET_PALETTE_DIAGNOSIS.it.md": [
-      "b789d982",
-      "631420b4",
-      "28187da7",
-      "41536e13",
-      "121e7509",
-      "14160fa7",
-      "bf451ca3",
-      "dde4711c"
-    ],
-    "docs/RC87_LIVE_IDLE_ACCEPTANCE_DIAGNOSIS.en.md": [
-      "2a5880a2",
-      "391e0aef",
-      "a66383af",
-      "33a763b8",
-      "5a1c9a09",
-      "8cb17441",
-      "12aa4ff7",
-      "1e21550a"
-    ],
-    "docs/RC87_LIVE_IDLE_ACCEPTANCE_DIAGNOSIS.it.md": [
-      "49ab5bfb",
-      "fc149faf",
-      "01ea9e55",
-      "2ac61af3",
-      "f5364a69",
-      "028659d0",
-      "f3be5a10",
-      "eae7d885"
-    ],
     "docs/RC_ACCELERATION_PLAN.en.md": [
       "00f99406",
       "4a192897",
@@ -6943,6 +7093,46 @@
       "96cb2839",
       "76db2dda"
     ],
+    "docs/RC_CYCLE_2026-10-24.en.md": [
+      "df2fb9b5",
+      "3ecf7b4a",
+      "eec8c17a",
+      "9022947c",
+      "4c4b1387",
+      "0ec1ba61",
+      "4e8687a9",
+      "90f1d450"
+    ],
+    "docs/RC_CYCLE_2026-10-24.it.md": [
+      "c57a4bd5",
+      "53163b03",
+      "bc26f4a7",
+      "a30080f6",
+      "1fac2ce2",
+      "31051c7f",
+      "0b8872f5",
+      "e13dbed2"
+    ],
+    "docs/RC_CYCLE10_VERIFIED_GATE_RECONCILIATION_20261029.en.md": [
+      "72bac996",
+      "1c3dd498",
+      "b03cb94a",
+      "6438e508",
+      "47aa9ccf",
+      "29e12fdc",
+      "10a4fdd2",
+      "5d20f8b7"
+    ],
+    "docs/RC_CYCLE10_VERIFIED_GATE_RECONCILIATION_20261029.it.md": [
+      "d682d0d1",
+      "9f0bb520",
+      "eae044a4",
+      "132c8147",
+      "e0a1fff4",
+      "0f37b44d",
+      "7db9aecf",
+      "092a973f"
+    ],
     "docs/RC_CYCLE104_PPTX_EDITABLE_RICH_TEXT.en.md": [
       "4666ff51",
       "1eb81af8",
@@ -7063,25 +7253,25 @@
       "a91fbfa3",
       "7410d0fd"
     ],
-    "docs/RC_CYCLE10_VERIFIED_GATE_RECONCILIATION_20261029.en.md": [
-      "72bac996",
-      "1c3dd498",
-      "b03cb94a",
-      "6438e508",
-      "47aa9ccf",
-      "29e12fdc",
-      "10a4fdd2",
-      "5d20f8b7"
+    "docs/RC_CYCLE11_FRAGMENT_LINK_MODAL_FOCUS_20261029.en.md": [
+      "aedee9a4",
+      "9f882cb5",
+      "d797099c",
+      "63654b3c",
+      "b9f9c30d",
+      "557a5b05",
+      "3c1e59ac",
+      "90e956b1"
     ],
-    "docs/RC_CYCLE10_VERIFIED_GATE_RECONCILIATION_20261029.it.md": [
-      "d682d0d1",
-      "9f0bb520",
-      "eae044a4",
-      "132c8147",
-      "e0a1fff4",
-      "0f37b44d",
-      "7db9aecf",
-      "092a973f"
+    "docs/RC_CYCLE11_FRAGMENT_LINK_MODAL_FOCUS_20261029.it.md": [
+      "0e64489b",
+      "6810e8f3",
+      "6019f747",
+      "8619fc8b",
+      "ad2ec020",
+      "d2571887",
+      "c7316e24",
+      "25e5e515"
     ],
     "docs/RC_CYCLE110_BACKGROUND_WORD_CLOUD_FREE_TEXT.en.md": [
       "37be1086",
@@ -7182,26 +7372,6 @@
       "7d536c13",
       "fbf96680",
       "ea85c569"
-    ],
-    "docs/RC_CYCLE11_FRAGMENT_LINK_MODAL_FOCUS_20261029.en.md": [
-      "aedee9a4",
-      "9f882cb5",
-      "d797099c",
-      "63654b3c",
-      "b9f9c30d",
-      "557a5b05",
-      "3c1e59ac",
-      "90e956b1"
-    ],
-    "docs/RC_CYCLE11_FRAGMENT_LINK_MODAL_FOCUS_20261029.it.md": [
-      "0e64489b",
-      "6810e8f3",
-      "6019f747",
-      "8619fc8b",
-      "ad2ec020",
-      "d2571887",
-      "c7316e24",
-      "25e5e515"
     ],
     "docs/RC_CYCLE120_EDITOR_CONFLICT_VISIBILITY.en.md": [
       "5a21ed68",
@@ -7563,6 +7733,26 @@
       "9903bafe",
       "a4931b5d"
     ],
+    "docs/RC_CYCLE14_NATIVE_BROWSERS_VERIFIED.en.md": [
+      "b35ae30c",
+      "da5a95f5",
+      "3c4811ac",
+      "5c9d2a48",
+      "4f711975",
+      "32de4f9a",
+      "a80ed56a",
+      "3ad7c794"
+    ],
+    "docs/RC_CYCLE14_NATIVE_BROWSERS_VERIFIED.it.md": [
+      "d11040ff",
+      "f78cd26a",
+      "38884b8d",
+      "f6096e5c",
+      "04348426",
+      "4088fc57",
+      "c298fdaf",
+      "1ebc3105"
+    ],
     "docs/RC_CYCLE140_FORMAT_SCOPE_PARITY.en.md": [
       "064c7342",
       "6f061d2a",
@@ -7752,26 +7942,6 @@
       "b7d153c1",
       "1d309c30",
       "6fe582de"
-    ],
-    "docs/RC_CYCLE14_NATIVE_BROWSERS_VERIFIED.en.md": [
-      "b35ae30c",
-      "da5a95f5",
-      "3c4811ac",
-      "5c9d2a48",
-      "4f711975",
-      "32de4f9a",
-      "a80ed56a",
-      "3ad7c794"
-    ],
-    "docs/RC_CYCLE14_NATIVE_BROWSERS_VERIFIED.it.md": [
-      "d11040ff",
-      "f78cd26a",
-      "38884b8d",
-      "f6096e5c",
-      "04348426",
-      "4088fc57",
-      "c298fdaf",
-      "1ebc3105"
     ],
     "docs/RC_CYCLE150_WIDGET_HISTORY_TYPES_BUILD_FIX.en.md": [
       "a1eb0ff2",
@@ -10823,26 +10993,6 @@
       "336f3007",
       "faf4def6"
     ],
-    "docs/RC_CYCLE91_SCHEME_PARITY_20261031.en.md": [
-      "4ca17fe0",
-      "df540620",
-      "ddaf5fee",
-      "11ac7bca",
-      "937948a5",
-      "2b11fd82",
-      "f5a6c90a",
-      "0ce4288c"
-    ],
-    "docs/RC_CYCLE91_SCHEME_PARITY_20261031.it.md": [
-      "531ebafd",
-      "af07407e",
-      "29f96adf",
-      "64204b1a",
-      "5f659de0",
-      "41092393",
-      "f5c48256",
-      "dbcdf535"
-    ],
     "docs/RC_CYCLE9_VERIFIED_GATE_HARDENING_20261028.en.md": [
       "920e2f93",
       "299812de",
@@ -10863,25 +11013,25 @@
       "b14de345",
       "1b598e63"
     ],
-    "docs/RC_CYCLE_2026-10-24.en.md": [
-      "df2fb9b5",
-      "3ecf7b4a",
-      "eec8c17a",
-      "9022947c",
-      "4c4b1387",
-      "0ec1ba61",
-      "4e8687a9",
-      "90f1d450"
+    "docs/RC_CYCLE91_SCHEME_PARITY_20261031.en.md": [
+      "4ca17fe0",
+      "df540620",
+      "ddaf5fee",
+      "11ac7bca",
+      "937948a5",
+      "2b11fd82",
+      "f5a6c90a",
+      "0ce4288c"
     ],
-    "docs/RC_CYCLE_2026-10-24.it.md": [
-      "c57a4bd5",
-      "53163b03",
-      "bc26f4a7",
-      "a30080f6",
-      "1fac2ce2",
-      "31051c7f",
-      "0b8872f5",
-      "e13dbed2"
+    "docs/RC_CYCLE91_SCHEME_PARITY_20261031.it.md": [
+      "531ebafd",
+      "af07407e",
+      "29f96adf",
+      "64204b1a",
+      "5f659de0",
+      "41092393",
+      "f5c48256",
+      "dbcdf535"
     ],
     "docs/RC_DASHBOARD_WIDGET_APPEARANCE_20261027.en.md": [
       "6bb03b97",
@@ -11353,6 +11503,16 @@
       "7c4c8668",
       "7a32c213"
     ],
+    "docs/RC_POST_COMMIT_DELTA.md": [
+      "881687a2",
+      "76e1f5b4",
+      "df1a96d0",
+      "65bf78d9",
+      "1a050ac1",
+      "9ae6c965",
+      "0b9221e5",
+      "85dbb381"
+    ],
     "docs/RC_POSTGRES_LEASE_PRECISION_HOTFIX.en.md": [
       "8fc4ed46",
       "b1882b85",
@@ -11372,16 +11532,6 @@
       "d81ff3de",
       "69de2139",
       "57317b28"
-    ],
-    "docs/RC_POST_COMMIT_DELTA.md": [
-      "881687a2",
-      "76e1f5b4",
-      "df1a96d0",
-      "65bf78d9",
-      "1a050ac1",
-      "9ae6c965",
-      "0b9221e5",
-      "85dbb381"
     ],
     "docs/RC_PROFILE_ADMIN_40_INTERVENTIONS.en.md": [
       "8da22dc6",
@@ -11753,6 +11903,666 @@
       "a8f6d476",
       "95a22b20"
     ],
+    "docs/RC136_EXTERNAL_ACCEPTANCE_EN.md": [
+      "690b4c02",
+      "a5fc3cb3",
+      "f8e75e5f",
+      "ecd82b33",
+      "579e5029",
+      "29450ab3",
+      "f152b9cb",
+      "5e549bd5"
+    ],
+    "docs/RC136_EXTERNAL_ACCEPTANCE_IT.md": [
+      "61118268",
+      "49e5d652",
+      "6a68c7e1",
+      "28fb0d2a",
+      "90b4f6d9",
+      "bf6e7c44",
+      "a2610eb7",
+      "954f6dcb"
+    ],
+    "docs/RC270_HELM_BACKUP_EXAMPLE.yaml": [
+      "70a98dbd",
+      "c1086bfb",
+      "782606ac",
+      "fb1d380c",
+      "714e1fc6",
+      "fb98c5d5",
+      "b731d811",
+      "77b558b9"
+    ],
+    "docs/RC304_COMPACT_PIE.md": [
+      "95b51fdb",
+      "bcacfee7",
+      "c2c75c1e",
+      "a78b9b0a",
+      "178b36cb",
+      "789dd83a",
+      "50baab50",
+      "bfdf4ba8"
+    ],
+    "docs/RC305_RATING_REACTIONS_BARS.md": [
+      "f707521a",
+      "c2f4a4a9",
+      "bc2a952d",
+      "4ba188b2",
+      "fdf09c47",
+      "4443ae65",
+      "113508c8",
+      "5d177108"
+    ],
+    "docs/RC306_BAR_WRAPPING.md": [
+      "f2d8b5f6",
+      "e131f0fc",
+      "90ca9d93",
+      "7de54e8c",
+      "f6d6bce6",
+      "9df264c6",
+      "f5639dc4",
+      "63a9d6b6"
+    ],
+    "docs/RC307_RESULTS_LAYOUT_RECOVERY.md": [
+      "2db81d45",
+      "cbf5ab70",
+      "5d2a7935",
+      "0cfda02f",
+      "0a6c2099",
+      "08c60945",
+      "e00a78d4",
+      "6548a333"
+    ],
+    "docs/RC49_HAPROXY_CROSS_NODE_RWX.en.md": [
+      "7c1cc75e",
+      "8f1dcae4",
+      "07cf72bf",
+      "3c276aa2",
+      "f04c81db",
+      "0c504689",
+      "b914da0e",
+      "1de9b62b"
+    ],
+    "docs/RC49_HAPROXY_CROSS_NODE_RWX.it.md": [
+      "714de40a",
+      "26bb112d",
+      "97954aa8",
+      "96bc1807",
+      "76291a68",
+      "a9aeef2e",
+      "a987382b",
+      "995b27bd"
+    ],
+    "docs/RC50_KIND_HTTPS_ACCEPTANCE.en.md": [
+      "00ea660f",
+      "c8a7ad3b",
+      "209a1df1",
+      "002072a4",
+      "376f0f1d",
+      "fed8fadd",
+      "45193204",
+      "23ed5d4d"
+    ],
+    "docs/RC50_KIND_HTTPS_ACCEPTANCE.it.md": [
+      "a01c253e",
+      "d6177a21",
+      "67ef7e66",
+      "8ae41bf2",
+      "4e1f22cc",
+      "d508de62",
+      "22b2a3ad",
+      "57839e9b"
+    ],
+    "docs/RC51_HTTPS_ACCEPTANCE.en.md": [
+      "a103c032",
+      "3c987461",
+      "28490cf2",
+      "9389c0f7",
+      "5cf7afc4",
+      "c3bfd533",
+      "a5dc62fc",
+      "1e448119"
+    ],
+    "docs/RC51_HTTPS_ACCEPTANCE.it.md": [
+      "5318f345",
+      "d51e73fd",
+      "e5808f1f",
+      "75232afd",
+      "504a6fde",
+      "dfaae809",
+      "c8391b35",
+      "c9ed95c3"
+    ],
+    "docs/RC52_SUSTAINED_500_SLO.en.md": [
+      "df8f0de6",
+      "7d420233",
+      "966b2911",
+      "3c5e7be3",
+      "be529451",
+      "5ab5cd71",
+      "da0bcf34",
+      "c22945ea"
+    ],
+    "docs/RC52_SUSTAINED_500_SLO.it.md": [
+      "0a5aae45",
+      "a18670d7",
+      "fdda5ecf",
+      "3605f65f",
+      "feb941e5",
+      "5896f5f8",
+      "93acbbfd",
+      "126e79ff"
+    ],
+    "docs/RC53_PRODUCTION_CSP_SECURITY.en.md": [
+      "ad09b8c9",
+      "7c8656e0",
+      "a2f6d502",
+      "e9ad0cae",
+      "ff5ecf14",
+      "61fc7c4c",
+      "b92678e6",
+      "1b2e6d60"
+    ],
+    "docs/RC53_PRODUCTION_CSP_SECURITY.it.md": [
+      "24a53f44",
+      "f25d2760",
+      "1d1c7ced",
+      "77649218",
+      "c66b9238",
+      "0def8717",
+      "75912a2a",
+      "6b1c3e32"
+    ],
+    "docs/RC54_LIVE_WEBSOCKET_RECOVERY.en.md": [
+      "f2cc29bd",
+      "41ce24a3",
+      "40ae55a2",
+      "33de5dca",
+      "79823349",
+      "7d0b04e4",
+      "41cd556d",
+      "22c125d2"
+    ],
+    "docs/RC54_LIVE_WEBSOCKET_RECOVERY.it.md": [
+      "efb7a5a4",
+      "6b947860",
+      "470fb35c",
+      "a3d548cc",
+      "e278ffda",
+      "63b6ab21",
+      "bc3d68cc",
+      "bacaf53d"
+    ],
+    "docs/RC55_LIVE_FRESHNESS_RECOVERY.en.md": [
+      "6bd04df0",
+      "f9c60f6e",
+      "1ae64b77",
+      "0864928f",
+      "5f3a9cfe",
+      "f1e89e89",
+      "c7a5ba17",
+      "8a94cba7"
+    ],
+    "docs/RC55_LIVE_FRESHNESS_RECOVERY.it.md": [
+      "0f950892",
+      "d3b8c481",
+      "b114cd81",
+      "3d979671",
+      "1d303a29",
+      "bc61a817",
+      "230e49b1",
+      "a6865b00"
+    ],
+    "docs/RC56_IDLE_SNAPSHOT_ACCEPTANCE.en.md": [
+      "bf341d43",
+      "e55c28f8",
+      "a30b1b73",
+      "44043ec3",
+      "68fd410c",
+      "dd05f7d4",
+      "caba42c3",
+      "fd70fcd1"
+    ],
+    "docs/RC56_IDLE_SNAPSHOT_ACCEPTANCE.it.md": [
+      "0071bdd2",
+      "b0c6addc",
+      "d1275e22",
+      "f3dfb47c",
+      "4f772407",
+      "aa0fd933",
+      "67544b3c",
+      "84219c7e"
+    ],
+    "docs/RC57_LIVE_FANOUT.en.md": [
+      "2fa766e0",
+      "67cadc32",
+      "6981f3e8",
+      "f91e4a94",
+      "c3ce9202",
+      "d94a79a5",
+      "b509faee",
+      "8f52decc"
+    ],
+    "docs/RC57_LIVE_FANOUT.it.md": [
+      "7c05aab7",
+      "08c49600",
+      "e018f3d3",
+      "ab96ed00",
+      "64f14c51",
+      "738aff02",
+      "47ff430e",
+      "68c6f889"
+    ],
+    "docs/RC58_VERIFIED_IDLE_SLO_AND_REFRESH.en.md": [
+      "5e97b51d",
+      "f5b6f31d",
+      "805f600b",
+      "1cb2b208",
+      "8ba8405e",
+      "5372887f",
+      "ca9077f8",
+      "6a392628"
+    ],
+    "docs/RC58_VERIFIED_IDLE_SLO_AND_REFRESH.it.md": [
+      "e525a6ec",
+      "a960a8b8",
+      "c2184d5b",
+      "8fc3ce07",
+      "020efb24",
+      "240e52f6",
+      "55a15298",
+      "6b95df5a"
+    ],
+    "docs/RC59_ACCELERATED_CLOSURE.en.md": [
+      "51de9dea",
+      "6423e34a",
+      "b5d8c9e4",
+      "1d77cf62",
+      "1ef6fe68",
+      "ff744b56",
+      "8bbf9959",
+      "0c688b70"
+    ],
+    "docs/RC59_ACCELERATED_CLOSURE.it.md": [
+      "92f7b261",
+      "a5e62099",
+      "05c60557",
+      "27764820",
+      "df137830",
+      "919d26e5",
+      "da633034",
+      "d1238256"
+    ],
+    "docs/RC60_FEDERATED_LINK_REVOCATION.en.md": [
+      "5d18e688",
+      "27891d46",
+      "0149ea6a",
+      "1eb1be39",
+      "33d38be9",
+      "edfe5496",
+      "0dbe104b",
+      "f1a5e817"
+    ],
+    "docs/RC60_FEDERATED_LINK_REVOCATION.it.md": [
+      "eb1fe2cc",
+      "887ed124",
+      "220a3e80",
+      "5b925220",
+      "1d998677",
+      "9f20159e",
+      "430df99f",
+      "2b8137e2"
+    ],
+    "docs/RC61_FEDERATED_IDENTITY_MANAGEMENT.en.md": [
+      "cd01a395",
+      "0c1d96e4",
+      "a0b133ed",
+      "e1391f93",
+      "533981ff",
+      "2ad197d6",
+      "ee975fa1",
+      "bf8d4100"
+    ],
+    "docs/RC61_FEDERATED_IDENTITY_MANAGEMENT.it.md": [
+      "c3fd3cdc",
+      "75b2495b",
+      "a3cdd83e",
+      "57d86601",
+      "565c2517",
+      "b72994cd",
+      "009019fa",
+      "712c9981"
+    ],
+    "docs/RC62_CI_THROTTLE_ISOLATION.en.md": [
+      "b17d897c",
+      "448ef4a5",
+      "b7ebc622",
+      "4513bf6a",
+      "bb50fe51",
+      "4005ff46",
+      "8349c584",
+      "40772fe9"
+    ],
+    "docs/RC62_CI_THROTTLE_ISOLATION.it.md": [
+      "10095d19",
+      "41051c62",
+      "a3a16fcc",
+      "2d1ee42a",
+      "ed605f19",
+      "6e20fc57",
+      "8e1ccbc8",
+      "9f10d9b8"
+    ],
+    "docs/RC63_HISTORICAL_INVENTORY_RECOVERY.en.md": [
+      "14b02979",
+      "a37de9c6",
+      "6273048d",
+      "d999f2df",
+      "bc2ca34a",
+      "0c55ce74",
+      "d01fa1d0",
+      "d620d614"
+    ],
+    "docs/RC63_HISTORICAL_INVENTORY_RECOVERY.it.md": [
+      "16a4c3e8",
+      "5cda52de",
+      "1b77ccaa",
+      "f0864daa",
+      "22e2ac9c",
+      "e17ae849",
+      "678f5c72",
+      "161a91e2"
+    ],
+    "docs/RC64_GITLEAKS_FIX.it.md": [
+      "e12ecbf1",
+      "55391e56",
+      "a8f7cfec",
+      "d9a76d0c",
+      "87c34b79",
+      "6e3f6ea2",
+      "8d71b9ed",
+      "ab164caf"
+    ],
+    "docs/RC65_HISTORICAL_DOCS_CI_HOTFIX.en.md": [
+      "0f01ce23",
+      "2129b580",
+      "16805644",
+      "c49c6893",
+      "1794e48e",
+      "7466707d",
+      "1569f09f",
+      "1fce5b7b"
+    ],
+    "docs/RC65_HISTORICAL_DOCS_CI_HOTFIX.it.md": [
+      "5966651f",
+      "2d803ed0",
+      "6fc119a2",
+      "1c28435b",
+      "08a50940",
+      "1cfc4274",
+      "c964497a",
+      "be392e94"
+    ],
+    "docs/RC66_VERIFIED_SSO_RECONCILIATION.en.md": [
+      "97f63398",
+      "3ec8a962",
+      "f982887d",
+      "381308bc",
+      "69b5971b",
+      "5a455c51",
+      "cfb16d8b",
+      "7c60399a"
+    ],
+    "docs/RC66_VERIFIED_SSO_RECONCILIATION.it.md": [
+      "ee520632",
+      "5ca20cfa",
+      "adf95239",
+      "e82202e3",
+      "8720ac29",
+      "aa4f05cf",
+      "d3117dcc",
+      "802f20bd"
+    ],
+    "docs/RC67_BROWSER_REHEARSAL_RECONCILIATION.en.md": [
+      "a03e9803",
+      "91c175b2",
+      "ee59a6f6",
+      "c3bf668b",
+      "d9b2cbc2",
+      "cd659095",
+      "854b66e6",
+      "c1d47024"
+    ],
+    "docs/RC67_BROWSER_REHEARSAL_RECONCILIATION.it.md": [
+      "7a07a983",
+      "4a80f365",
+      "a994e258",
+      "eb7cb077",
+      "c1ce67d5",
+      "4eb826e2",
+      "897e43f9",
+      "ebb30489"
+    ],
+    "docs/RC68_BACKGROUND_LIBRARY_VERIFIED_20261031.en.md": [
+      "13e5699a",
+      "965778ee",
+      "3021a46c",
+      "b2b65aaa",
+      "0d5ace42",
+      "e1450200",
+      "afa99337",
+      "47c41a91"
+    ],
+    "docs/RC68_BACKGROUND_LIBRARY_VERIFIED_20261031.it.md": [
+      "26143fc6",
+      "01387549",
+      "fd7641fc",
+      "6436bd95",
+      "5cf37a97",
+      "b8fe1a3e",
+      "d77404d4",
+      "c1486387"
+    ],
+    "docs/RC69_PAGE_ORDER_RECOVERY_20261031.en.md": [
+      "9275d21f",
+      "55ebbee4",
+      "050417c2",
+      "0aae34c8",
+      "33e4797e",
+      "7a1b9d9b",
+      "e884a3e5",
+      "95965d7e"
+    ],
+    "docs/RC69_PAGE_ORDER_RECOVERY_20261031.it.md": [
+      "4d3a014f",
+      "77577182",
+      "dcb5f992",
+      "4531bf3f",
+      "fc5ea800",
+      "f4d2150c",
+      "17c41f03",
+      "70e6fa12"
+    ],
+    "docs/RC70_EDITOR_TIMER_FIXES_20261031.en.md": [
+      "dce3474a",
+      "784007c2",
+      "19b8a732",
+      "66acf768",
+      "7a3aa3e4",
+      "30de71bd",
+      "99b7be26",
+      "cf3f4041"
+    ],
+    "docs/RC70_EDITOR_TIMER_FIXES_20261031.it.md": [
+      "aedaeda3",
+      "e30f1eef",
+      "dab5488e",
+      "87a6f421",
+      "fce0f7f6",
+      "c51f4ad0",
+      "3646a9f7",
+      "ac794dca"
+    ],
+    "docs/RC71_LIVE_EDITOR_LIFECYCLE_20261031.en.md": [
+      "1f96e49c",
+      "b2f8c8ba",
+      "5cb4a320",
+      "673e7bb7",
+      "7a328926",
+      "b8db4023",
+      "a977cb1c",
+      "b3db739e"
+    ],
+    "docs/RC71_LIVE_EDITOR_LIFECYCLE_20261031.it.md": [
+      "fa736faa",
+      "edea5596",
+      "33c9daa9",
+      "93aaf31d",
+      "7a170c95",
+      "4546986e",
+      "cb7bcf66",
+      "48250b84"
+    ],
+    "docs/RC72_LIVE_DASHBOARD_AND_WIDGETS_20261031.en.md": [
+      "3b37194e",
+      "6550ff26",
+      "5643d2f6",
+      "8fc85cbf",
+      "b707b9fb",
+      "70edc5f0",
+      "d7d31ea4",
+      "f1a391e3"
+    ],
+    "docs/RC72_LIVE_DASHBOARD_AND_WIDGETS_20261031.it.md": [
+      "01862cf8",
+      "c0063427",
+      "800798cb",
+      "7af7f7a0",
+      "c6ed350c",
+      "5a6c15fb",
+      "00db30d2",
+      "f00aefb9"
+    ],
+    "docs/RC77_DISPATCH_SAFETY.en.md": [
+      "240baa1b",
+      "f3aaabe4",
+      "bb08c1ba",
+      "c5169433",
+      "6b095500",
+      "54ea80d4",
+      "19d72eff",
+      "6a5efc06"
+    ],
+    "docs/RC77_DISPATCH_SAFETY.it.md": [
+      "a9434223",
+      "7ec89fd3",
+      "eeeed479",
+      "5990c77e",
+      "2d2dfe94",
+      "c0a12853",
+      "87323287",
+      "adb4ebef"
+    ],
+    "docs/RC83_WIDGET_CONTEXT_CAPTURE.en.md": [
+      "481e9533",
+      "796277b1",
+      "4110651f",
+      "590b3f0c",
+      "1cf235a3",
+      "42c06f3b",
+      "96336a97",
+      "6c220184"
+    ],
+    "docs/RC83_WIDGET_CONTEXT_CAPTURE.it.md": [
+      "02236ecc",
+      "14485238",
+      "792c3d74",
+      "a265d54d",
+      "06910584",
+      "810d071e",
+      "9b654574",
+      "fc7e777d"
+    ],
+    "docs/RC84_HISTORICAL_CONTEXT_CONTRACT_RECONCILIATION.en.md": [
+      "8830dd22",
+      "5d98cd6d",
+      "48deb10e",
+      "2913288c",
+      "4a32a4c0",
+      "4962d391",
+      "3e3b6353",
+      "a3701e42"
+    ],
+    "docs/RC84_HISTORICAL_CONTEXT_CONTRACT_RECONCILIATION.it.md": [
+      "fb52a1bf",
+      "39bc3a61",
+      "bae8d881",
+      "0a58af07",
+      "4d5062e4",
+      "75661235",
+      "b2d7a5e4",
+      "e9a35acd"
+    ],
+    "docs/RC85_NATIVE_CONTEXT_ROUTING_DIAGNOSIS.en.md": [
+      "2b64ac07",
+      "a07977ab",
+      "c9e56318",
+      "5e6f8257",
+      "8af23c88",
+      "567bc5da",
+      "358b30f4",
+      "ed56a44d"
+    ],
+    "docs/RC85_NATIVE_CONTEXT_ROUTING_DIAGNOSIS.it.md": [
+      "8401ac06",
+      "b56c739d",
+      "5465d4b8",
+      "d02fe12c",
+      "623b3029",
+      "660d6e2b",
+      "b1e8ef19",
+      "543e9e6d"
+    ],
+    "docs/RC86_CHROMIUM_WIDGET_PALETTE_DIAGNOSIS.en.md": [
+      "0360b61a",
+      "abac8ae7",
+      "e04ca0dd",
+      "cb3b9626",
+      "a38ea20a",
+      "b22b36a0",
+      "006c9b77",
+      "1ef52cce"
+    ],
+    "docs/RC86_CHROMIUM_WIDGET_PALETTE_DIAGNOSIS.it.md": [
+      "b789d982",
+      "631420b4",
+      "28187da7",
+      "41536e13",
+      "121e7509",
+      "14160fa7",
+      "bf451ca3",
+      "dde4711c"
+    ],
+    "docs/RC87_LIVE_IDLE_ACCEPTANCE_DIAGNOSIS.en.md": [
+      "2a5880a2",
+      "391e0aef",
+      "a66383af",
+      "33a763b8",
+      "5a1c9a09",
+      "8cb17441",
+      "12aa4ff7",
+      "1e21550a"
+    ],
+    "docs/RC87_LIVE_IDLE_ACCEPTANCE_DIAGNOSIS.it.md": [
+      "49ab5bfb",
+      "fc149faf",
+      "01ea9e55",
+      "2ac61af3",
+      "f5364a69",
+      "028659d0",
+      "f3be5a10",
+      "eae7d885"
+    ],
     "docs/RELEASE_CANDIDATE_READINESS.en.md": [
       "5fb90ef6",
       "ea5d2760",
@@ -11793,26 +12603,6 @@
       "6210cad4",
       "e66366be"
     ],
-    "docs/RESULTS_VISUALIZATION.en.md": [
-      "bd759e43",
-      "3bb8f8df",
-      "5ca398a1",
-      "c87cde71",
-      "0e4f5262",
-      "c1b3fa86",
-      "5ed74243",
-      "1938b2e1"
-    ],
-    "docs/RESULTS_VISUALIZATION.it.md": [
-      "d940b9f4",
-      "0e37e95d",
-      "b021af00",
-      "c037f02e",
-      "74973eeb",
-      "903f5b27",
-      "e08093fb",
-      "7d3ee04d"
-    ],
     "docs/RESULT_WORD_CLOUD.en.md": [
       "999988b2",
       "afb04b93",
@@ -11832,6 +12622,26 @@
       "8c7a3857",
       "d5b94dbd",
       "b2fd14af"
+    ],
+    "docs/RESULTS_VISUALIZATION.en.md": [
+      "bd759e43",
+      "3bb8f8df",
+      "5ca398a1",
+      "c87cde71",
+      "0e4f5262",
+      "c1b3fa86",
+      "5ed74243",
+      "1938b2e1"
+    ],
+    "docs/RESULTS_VISUALIZATION.it.md": [
+      "d940b9f4",
+      "0e37e95d",
+      "b021af00",
+      "c037f02e",
+      "74973eeb",
+      "903f5b27",
+      "e08093fb",
+      "7d3ee04d"
     ],
     "docs/ROOTLESS_PODMAN_RUNTIME_ACCEPTANCE.en.md": [
       "61a5075f",
@@ -12173,1106 +12983,6 @@
       "ad133927",
       "f049f84c"
     ],
-    "docs/VERSIONING.en.md": [
-      "d2ea72e3",
-      "d252a420",
-      "047e67b0",
-      "a5af5de2",
-      "77854532",
-      "02206a5c",
-      "800a98bc",
-      "e21f6402"
-    ],
-    "docs/VERSIONING.it.md": [
-      "01bc8872",
-      "f56fb4fb",
-      "59b270c3",
-      "c536eca9",
-      "22382455",
-      "c7ac45fe",
-      "c7e8b8d3",
-      "d512c82c"
-    ],
-    "docs/WIDGETS.en.md": [
-      "31f5e8b2",
-      "e6e18a17",
-      "5a0fb686",
-      "35777fe5",
-      "21277ffa",
-      "8b949553",
-      "de44fd71",
-      "2bbf1836"
-    ],
-    "docs/WIDGETS.it.md": [
-      "4ff920de",
-      "191667b1",
-      "7dd9943b",
-      "a62498ab",
-      "632c9448",
-      "b060d16f",
-      "bef6b8d1",
-      "05fec5e4"
-    ],
-    "docs/WIDGET_CANVAS.en.md": [
-      "79294b40",
-      "3d42335c",
-      "72dc9bab",
-      "539c5d63",
-      "1ca2e395",
-      "6fa9f59b",
-      "363fb3d6",
-      "5c5e9f23"
-    ],
-    "docs/WIDGET_CANVAS.it.md": [
-      "4437f912",
-      "accda91b",
-      "b0b0f7d0",
-      "4180f6aa",
-      "128eea36",
-      "4ad884b4",
-      "46794fc4",
-      "813bce34"
-    ],
-    "docs/WIDGET_RESULTS_PER_WIDGET.en.md": [
-      "86fab600",
-      "8ab96d74",
-      "f06b4b47",
-      "c52884e7",
-      "c1f72ae6",
-      "43a75ecf",
-      "101d8dbf",
-      "8ac064ef"
-    ],
-    "docs/WIDGET_RESULTS_PER_WIDGET.it.md": [
-      "7e993984",
-      "b37edcee",
-      "2b360011",
-      "d9784430",
-      "133619eb",
-      "2e799c3c",
-      "09231293",
-      "a85721e6"
-    ],
-    "docs/WIDGET_REVISIONS.en.md": [
-      "d373b0ec",
-      "c5e547bc",
-      "6bd1262f",
-      "90eb60b0",
-      "8e0e0dd1",
-      "6c27db26",
-      "58f017be",
-      "6c68cbe1"
-    ],
-    "docs/WIDGET_REVISIONS.it.md": [
-      "4be16af4",
-      "e2d8d89c",
-      "b8d11438",
-      "d65eefa7",
-      "a822be09",
-      "e443033c",
-      "6ebb9135",
-      "2f40237e"
-    ],
-    "docs/WIDGET_RUNTIME.en.md": [
-      "f19ec2ee",
-      "b24001da",
-      "d8b7dd0d",
-      "50413fcb",
-      "d143fa97",
-      "040ef44e",
-      "0f185bed",
-      "6a993230"
-    ],
-    "docs/WIDGET_RUNTIME.it.md": [
-      "43e0272b",
-      "66c6320e",
-      "96b2cc37",
-      "fd8560f8",
-      "7310dba2",
-      "faf91084",
-      "e2ae5f5b",
-      "5064d801"
-    ],
-    "docs/assets/brochure-editorial/marketing-concept-en.png": [
-      "cb369c1e",
-      "ab71c543",
-      "acddcf75",
-      "1c212939",
-      "14fbd866",
-      "8ec6d04f",
-      "d1b6449f",
-      "9dd159e8"
-    ],
-    "docs/assets/brochure-editorial/marketing-concept-it.png": [
-      "859eb1e6",
-      "5686dd2c",
-      "a5e2ddac",
-      "52b9bfca",
-      "d7748564",
-      "6bc6ccb1",
-      "34683f41",
-      "95ddda3a"
-    ],
-    "docs/assets/brochure-editorial/marketing-photo-en.jpg": [
-      "7174bd9d",
-      "6ea70ceb",
-      "ecc0a64b",
-      "629157b2",
-      "8fedbddb",
-      "67563841",
-      "986e1c3c",
-      "e206c109"
-    ],
-    "docs/assets/brochure-editorial/marketing-photo-it.jpg": [
-      "b519f3c2",
-      "bc1a0c1f",
-      "2211a84b",
-      "53aa8ba1",
-      "ccf855b0",
-      "d082453a",
-      "98001719",
-      "b205340d"
-    ],
-    "docs/assets/brochure-editorial/official-quorivio-logo.png": [
-      "688b21d2",
-      "0f4080c2",
-      "fbf4612d",
-      "a7981b78",
-      "0bcee827",
-      "69d6ee8f",
-      "0f6f7acc",
-      "911792bb"
-    ],
-    "docs/assets/manual-evidence-rc283/admin-audit.png": [
-      "7cbadd0d",
-      "334db498",
-      "78d6cd14",
-      "761e32a5",
-      "b26f15eb",
-      "34305e65",
-      "740e3b5c",
-      "e5d114c2"
-    ],
-    "docs/assets/manual-evidence-rc283/admin-backups.png": [
-      "5281b18a",
-      "5875d042",
-      "33bac58c",
-      "71c88ee1",
-      "8c0227e6",
-      "522e4402",
-      "b2448411",
-      "68d72711"
-    ],
-    "docs/assets/manual-evidence-rc283/admin-server-settings.png": [
-      "c63e10b9",
-      "c87f4243",
-      "7425c2fb",
-      "2e3e6546",
-      "6f443439",
-      "63d2c9e6",
-      "1a015a19",
-      "4bd9233d"
-    ],
-    "docs/assets/manual-evidence-rc283/admin-users.png": [
-      "18cdc081",
-      "38fcf0b8",
-      "7ab8ad41",
-      "4c2e98c8",
-      "e395d545",
-      "99692519",
-      "40ef7581",
-      "fa724fb4"
-    ],
-    "docs/assets/manual-evidence-rc283/capture.json": [
-      "225557d9",
-      "6a913867",
-      "35f528dc",
-      "0076248a",
-      "6de529ca",
-      "242a67b0",
-      "ac977468",
-      "6a522102"
-    ],
-    "docs/assets/manual-evidence-rc283/editor-canvas.png": [
-      "e7a27a7a",
-      "617e6895",
-      "3a18fdc0",
-      "f19dbd20",
-      "1f05a2f9",
-      "b8545e3d",
-      "dd94afd0",
-      "f5876182"
-    ],
-    "docs/assets/manual-evidence-rc283/login-desktop.png": [
-      "822ce464",
-      "8ec6799d",
-      "4dbd3a69",
-      "c83fc0a6",
-      "27f35f36",
-      "eb07a5af",
-      "dcae70cf",
-      "d74bc200"
-    ],
-    "docs/assets/manual-evidence-rc283/participant-entry-smartphone.png": [
-      "ad512c29",
-      "5a7d5c0e",
-      "57f1503d",
-      "74629922",
-      "2a3933c9",
-      "e6cf5c3c",
-      "ed3316ea",
-      "b5a71716"
-    ],
-    "docs/assets/manual-evidence-rc283/participant-feedback-smartphone.png": [
-      "4a9d659c",
-      "77404ec8",
-      "1b28a31c",
-      "ebc60f22",
-      "335dda75",
-      "a56675e9",
-      "6358cee9",
-      "dfda2bf1"
-    ],
-    "docs/assets/manual-evidence-rc283/participant-question-smartphone.png": [
-      "bb5563ba",
-      "155d5a70",
-      "a400290d",
-      "52c1eae8",
-      "1a0a1326",
-      "517f1aa0",
-      "d47f001a",
-      "c5014ca5"
-    ],
-    "docs/assets/manual-evidence-rc283/presenter-live.png": [
-      "81f7c554",
-      "603435cb",
-      "65eb15d4",
-      "40fe7eea",
-      "2828a35e",
-      "bb70fd95",
-      "7c531584",
-      "ff233be0"
-    ],
-    "docs/assets/manual-evidence-rc283/rehearsal-presenter.png": [
-      "b888d6ac",
-      "2ba146ae",
-      "87f11263",
-      "2f67997d",
-      "38557b45",
-      "6a85d93e",
-      "965c2c9c",
-      "9ae7904a"
-    ],
-    "docs/assets/manual-evidence-rc283/rehearsal-smartphone.png": [
-      "31db53ca",
-      "df69e0d2",
-      "270cb372",
-      "bfa284fa",
-      "14d17147",
-      "5432f07f",
-      "22e8e7fb",
-      "db38458a"
-    ],
-    "docs/assets/manual-evidence-rc283/workspace-desktop.png": [
-      "52d95025",
-      "680bccde",
-      "f8f27053",
-      "2926ef50",
-      "0f1e48aa",
-      "4259c61d",
-      "d2909c47",
-      "50b7e1dc"
-    ],
-    "docs/assets/manual-evidence-rc291/admin-audit.png": [
-      "3a30e40b",
-      "85b5bdbe",
-      "a36ecd12",
-      "bbd98d6c",
-      "08b2378c",
-      "e70d2bb9",
-      "6126d601",
-      "bae071c3"
-    ],
-    "docs/assets/manual-evidence-rc291/admin-backups.png": [
-      "ac9fc0c6",
-      "2e87e6a9",
-      "3556015c",
-      "0bdcea45",
-      "6ecbff8f",
-      "87ab2a22",
-      "b513e7ae",
-      "4257a4b5"
-    ],
-    "docs/assets/manual-evidence-rc291/admin-server-settings.png": [
-      "13c79df1",
-      "185aadfd",
-      "9fd3bd67",
-      "71d94384",
-      "a43ee8c8",
-      "d71651b2",
-      "7b5bca48",
-      "fa35cfab"
-    ],
-    "docs/assets/manual-evidence-rc291/admin-users.png": [
-      "f39ccd15",
-      "06dd7155",
-      "b5197251",
-      "fb589c85",
-      "ba83ec4f",
-      "804ae092",
-      "90e07dec",
-      "3496cfc1"
-    ],
-    "docs/assets/manual-evidence-rc291/capture.json": [
-      "a8136924",
-      "27671567",
-      "8cd91ffe",
-      "d9d39e4f",
-      "7b1f2217",
-      "97c380d0",
-      "4038d547",
-      "ad141cf5"
-    ],
-    "docs/assets/manual-evidence-rc291/editor-canvas.png": [
-      "0055aff6",
-      "566964c8",
-      "2bb20e7e",
-      "dd7e89c8",
-      "15280cbb",
-      "2ac26e2a",
-      "0dbf39ed",
-      "c3fd7c57"
-    ],
-    "docs/assets/manual-evidence-rc291/editor-schema-inspector.png": [
-      "e9d8772c",
-      "322019ce",
-      "34f4b5ad",
-      "ea2afe34",
-      "bd10057e",
-      "78ec6745",
-      "9646d7b8",
-      "8a210147"
-    ],
-    "docs/assets/manual-evidence-rc291/editor-schema.png": [
-      "713b70e1",
-      "0fa1da7d",
-      "b2875342",
-      "91509c19",
-      "6cae6428",
-      "1c236f45",
-      "f3268c7e",
-      "7c9b6998"
-    ],
-    "docs/assets/manual-evidence-rc291/editor-thumbnails-widgets.png": [
-      "0055aff6",
-      "566964c8",
-      "2bb20e7e",
-      "dd7e89c8",
-      "15280cbb",
-      "2ac26e2a",
-      "0dbf39ed",
-      "c3fd7c57"
-    ],
-    "docs/assets/manual-evidence-rc291/editor-widget-context.png": [
-      "7dca830b",
-      "4adac635",
-      "240750b9",
-      "426c9624",
-      "b4be5013",
-      "d771a62e",
-      "2baa0a89",
-      "918d37a6"
-    ],
-    "docs/assets/manual-evidence-rc291/editor-widget-format-resized.png": [
-      "1d615f20",
-      "63e917dd",
-      "bd655421",
-      "6a8cd444",
-      "53e2f857",
-      "375c63be",
-      "29a1245c",
-      "4e7c3ca6"
-    ],
-    "docs/assets/manual-evidence-rc291/editor-widget-format-tabs.png": [
-      "5cf47746",
-      "477c7a3e",
-      "91f4bded",
-      "363cf30c",
-      "bee7f575",
-      "6c7e4a23",
-      "6cba37c8",
-      "3dd76b17"
-    ],
-    "docs/assets/manual-evidence-rc291/editor-widget-format.png": [
-      "6a76a368",
-      "06040e05",
-      "c05ede07",
-      "759f9396",
-      "98ae0048",
-      "61096eab",
-      "8d78481b",
-      "46f74559"
-    ],
-    "docs/assets/manual-evidence-rc291/login-desktop.png": [
-      "822ce464",
-      "8ec6799d",
-      "4dbd3a69",
-      "c83fc0a6",
-      "27f35f36",
-      "eb07a5af",
-      "dcae70cf",
-      "d74bc200"
-    ],
-    "docs/assets/manual-evidence-rc291/participant-entry-smartphone.png": [
-      "ad512c29",
-      "5a7d5c0e",
-      "57f1503d",
-      "74629922",
-      "2a3933c9",
-      "e6cf5c3c",
-      "ed3316ea",
-      "b5a71716"
-    ],
-    "docs/assets/manual-evidence-rc291/participant-feedback-smartphone.png": [
-      "19df11d6",
-      "f7fbd090",
-      "d6c67525",
-      "00e9bdf7",
-      "e0ef87c2",
-      "ca3b62ac",
-      "ff1153f8",
-      "52720325"
-    ],
-    "docs/assets/manual-evidence-rc291/participant-question-smartphone.png": [
-      "bb5563ba",
-      "155d5a70",
-      "a400290d",
-      "52c1eae8",
-      "1a0a1326",
-      "517f1aa0",
-      "d47f001a",
-      "c5014ca5"
-    ],
-    "docs/assets/manual-evidence-rc291/participant-widescreen.png": [
-      "6a4411bf",
-      "3a75a72f",
-      "1d162bbf",
-      "8cfd3f9a",
-      "41222d2c",
-      "e87ff6d1",
-      "01895628",
-      "287906a7"
-    ],
-    "docs/assets/manual-evidence-rc291/presenter-live-secondary.png": [
-      "d9a5fdee",
-      "d3dc2882",
-      "a514888e",
-      "fcd3505d",
-      "4dc89778",
-      "89a69bc5",
-      "2454b1a8",
-      "09e7c71d"
-    ],
-    "docs/assets/manual-evidence-rc291/presenter-live.png": [
-      "4677bb49",
-      "24555308",
-      "85938a82",
-      "8923b7a1",
-      "b81e88f3",
-      "d83c331f",
-      "c9425c45",
-      "c119b576"
-    ],
-    "docs/assets/manual-evidence-rc291/rehearsal-participant.png": [
-      "bf3055bd",
-      "56062243",
-      "1318fb1c",
-      "484daa13",
-      "422d9739",
-      "a8029836",
-      "0f8b5679",
-      "3d2a858a"
-    ],
-    "docs/assets/manual-evidence-rc291/rehearsal-presenter.png": [
-      "b28e91ea",
-      "c3763b40",
-      "7aef3d0f",
-      "559382bb",
-      "e6cae6cc",
-      "36012745",
-      "f7fa04c2",
-      "45e8f791"
-    ],
-    "docs/assets/manual-evidence-rc291/rehearsal-side-by-side-smartphone.png": [
-      "e9bee10e",
-      "6318540d",
-      "63b4f939",
-      "1b6573dc",
-      "7f1b0698",
-      "7c26188f",
-      "dad008f1",
-      "218af1df"
-    ],
-    "docs/assets/manual-evidence-rc291/rehearsal-side-by-side.png": [
-      "93e4af6e",
-      "ebc59f43",
-      "16bda631",
-      "c88377ca",
-      "74e7d57f",
-      "fbde680e",
-      "411a9910",
-      "33259e43"
-    ],
-    "docs/assets/manual-evidence-rc291/rehearsal-smartphone.png": [
-      "f2344063",
-      "0b6c7a6d",
-      "834478ad",
-      "3cea8287",
-      "fab17af4",
-      "88324294",
-      "956292d5",
-      "1522e6a3"
-    ],
-    "docs/assets/manual-evidence-rc291/workspace-desktop.png": [
-      "a7b701af",
-      "8a8335cb",
-      "dae740f5",
-      "9dd90ad0",
-      "78f52146",
-      "a9ba0017",
-      "8672c795",
-      "a8acb5a1"
-    ],
-    "docs/assets/manual-illustrations/backup-lifecycle.png": [
-      "3962edd6",
-      "07e26042",
-      "9f79b05e",
-      "46b301b9",
-      "1af8bb6d",
-      "67024d15",
-      "5cd258c2",
-      "2c9df312"
-    ],
-    "docs/assets/manual-illustrations/backup.png": [
-      "d0d42452",
-      "951012e0",
-      "163c17aa",
-      "cfef277f",
-      "1f156430",
-      "a3078e61",
-      "4df8e073",
-      "c2311883"
-    ],
-    "docs/assets/manual-illustrations/editor-toolbar-atlas-en-rc293.png": [
-      "00656427",
-      "619051ec",
-      "5169f496",
-      "fc731e90",
-      "ea3e72a1",
-      "8257099a",
-      "d65ed0dd",
-      "ba60078d"
-    ],
-    "docs/assets/manual-illustrations/editor-toolbar-atlas-it-rc293.png": [
-      "948dbe61",
-      "799d9d80",
-      "b24beb54",
-      "eef648ba",
-      "96483b34",
-      "fbaecc16",
-      "0ee70d04",
-      "14b17001"
-    ],
-    "docs/assets/manual-illustrations/editor.png": [
-      "9f17041b",
-      "7d6423c8",
-      "c949ba9e",
-      "7168eca9",
-      "6b06d710",
-      "20658e34",
-      "7dc7605e",
-      "fe07f2d2"
-    ],
-    "docs/assets/manual-illustrations/editorial-collaborative-workflow-rc286.jpg": [
-      "9d4cfe90",
-      "438f3583",
-      "447b5206",
-      "7c32a5a0",
-      "ca08eef6",
-      "d0357472",
-      "0264bbeb",
-      "a4d48222"
-    ],
-    "docs/assets/manual-illustrations/editorial-live-presentation-rc286.jpg": [
-      "c133c3ad",
-      "ccf6fc20",
-      "ee0f36bb",
-      "3c2c0880",
-      "8a25d10b",
-      "fd700ed3",
-      "f711974b",
-      "e20e96fc"
-    ],
-    "docs/assets/manual-illustrations/ldap-approval.png": [
-      "271d30c3",
-      "0731e089",
-      "d4864945",
-      "9a55e66a",
-      "9573f862",
-      "6a7fa7c8",
-      "57a685f9",
-      "f8570ff3"
-    ],
-    "docs/assets/manual-illustrations/ldap.png": [
-      "a0278689",
-      "5f5e071f",
-      "5bc24868",
-      "3c4e76ad",
-      "b73227f0",
-      "acaeb04c",
-      "e91bba96",
-      "43ee4e6d"
-    ],
-    "docs/assets/manual-illustrations/participant.png": [
-      "cb76be31",
-      "ef214048",
-      "02d6757b",
-      "084f1022",
-      "2f7eb4c8",
-      "2c07754d",
-      "32e0bbb4",
-      "1767e937"
-    ],
-    "docs/assets/manual-illustrations/results.png": [
-      "268bc6f6",
-      "89bcc61a",
-      "348da66b",
-      "4d564e0b",
-      "413f0a2b",
-      "11d30de8",
-      "192b8eba",
-      "6327256f"
-    ],
-    "docs/assets/manual-illustrations/sample-bar-chart.png": [
-      "f401982d",
-      "34fe7455",
-      "804346a8",
-      "71f0bf3b",
-      "2342cf24",
-      "e1a3c535",
-      "366df7d1",
-      "198ab90e"
-    ],
-    "docs/assets/manual-illustrations/sample-pie-chart.png": [
-      "4c065608",
-      "6d3ab0ec",
-      "f827580a",
-      "06451ca8",
-      "46289e55",
-      "08fa224e",
-      "b13e5013",
-      "d11c4514"
-    ],
-    "docs/assets/manual-illustrations/sessions.png": [
-      "2d0127fa",
-      "2f54169d",
-      "f210aaa4",
-      "64256409",
-      "41f9b94d",
-      "97a61118",
-      "2902bdeb",
-      "16a77a69"
-    ],
-    "docs/assets/manual-illustrations/workflow-live-presenter-user-rc286.png": [
-      "7a71dbfb",
-      "85eb403f",
-      "7fa494f4",
-      "6dd102ad",
-      "d858debb",
-      "e3d405f1",
-      "a26df6cb",
-      "0e4bd264"
-    ],
-    "docs/assets/manual-illustrations/workflow-local-quo-rc286.png": [
-      "a1e44613",
-      "0e741407",
-      "e3b8b7f8",
-      "faa29802",
-      "a237af27",
-      "aa5d5548",
-      "dd538b4f",
-      "3f1aa30e"
-    ],
-    "docs/assets/manual-illustrations/workflow-page-editor-rc286.png": [
-      "aa65a38a",
-      "768c5b28",
-      "91c414a8",
-      "8261ee3e",
-      "7ca6fbcd",
-      "f0bfa303",
-      "fed68d54",
-      "153d68a7"
-    ],
-    "docs/assets/manual-illustrations/workflow-preview-live-rc286.png": [
-      "d211efa5",
-      "095202af",
-      "1278a92a",
-      "4f91fac5",
-      "addeea0d",
-      "4206045e",
-      "3647679a",
-      "5828c25e"
-    ],
-    "docs/assets/manual-illustrations/workflow-scheme-editor-rc286.png": [
-      "3296dc62",
-      "4dd53a4b",
-      "aab9f908",
-      "e855bbc2",
-      "1b9d1bbb",
-      "3878eaa2",
-      "1123e8b7",
-      "a2fef70a"
-    ],
-    "docs/assets/manual-illustrations/workflow-widget-context-rc286.png": [
-      "24418c50",
-      "719482c2",
-      "086b1b46",
-      "c878026f",
-      "da0a2f36",
-      "807eb5aa",
-      "f437fab4",
-      "dff8199a"
-    ],
-    "docs/assets/quorivio-icon.svg": [
-      "7eeffa70",
-      "2544d87a",
-      "e968e0b1",
-      "636d8b73",
-      "492457ef",
-      "af2db36c",
-      "7254c6ab",
-      "15098761"
-    ],
-    "docs/assets/quorivio-logo.svg": [
-      "c3a1c17e",
-      "14ba9242",
-      "afc0101a",
-      "f8819006",
-      "676c3713",
-      "beec0194",
-      "4cbd06a5",
-      "0f13a053"
-    ],
-    "docs/assets/quorivio-manual-cover.png": [
-      "10dc07c4",
-      "5577768d",
-      "08566964",
-      "69e67c24",
-      "f139aa87",
-      "50ec290e",
-      "e8a5bfb7",
-      "5d65adc5"
-    ],
-    "docs/brochures/quorivio-brochure-en.pdf": [
-      "104dbaa0",
-      "89936037",
-      "0f265966",
-      "81c35ae8",
-      "7bf2fb6c",
-      "eed5da0c",
-      "465c3730",
-      "51bc7be7"
-    ],
-    "docs/brochures/quorivio-brochure-it.pdf": [
-      "3809e943",
-      "381b303b",
-      "dd162f24",
-      "fab2638d",
-      "fdf28623",
-      "453c8fcf",
-      "65a35c73",
-      "9384744d"
-    ],
-    "docs/manuals-src/README.md": [
-      "6a225c63",
-      "3d4d1389",
-      "93e14c8e",
-      "4908ee66",
-      "286bdbce",
-      "0dc3ef9f",
-      "a6d6c072",
-      "5072a7dc"
-    ],
-    "docs/manuals-src/admin-guide.en.md": [
-      "47213d94",
-      "97c69972",
-      "731b7478",
-      "998c6767",
-      "9772a37e",
-      "707d8ac7",
-      "049b09d4",
-      "ae185aba"
-    ],
-    "docs/manuals-src/admin-guide.it.md": [
-      "1a79e930",
-      "48152fe3",
-      "a2e2735c",
-      "318cb366",
-      "0001dc11",
-      "72d7205a",
-      "5d52cf02",
-      "80540286"
-    ],
-    "docs/manuals-src/presenter-guide.en.md": [
-      "5c01b869",
-      "7f7ce0b5",
-      "bf38dcb6",
-      "aa7b55d0",
-      "3523124d",
-      "36b94afb",
-      "df0ffaef",
-      "7e3256a9"
-    ],
-    "docs/manuals-src/presenter-guide.it.md": [
-      "d1f73e50",
-      "0a069e2b",
-      "dab47aab",
-      "3ec49984",
-      "41c08b3e",
-      "20893428",
-      "5f4a9255",
-      "12021b26"
-    ],
-    "docs/manuals-src/user-guide.en.md": [
-      "334ac39e",
-      "a2a6532f",
-      "1e1859a4",
-      "bfa1ebc2",
-      "b7390d3f",
-      "8096acd2",
-      "29f37e2a",
-      "d7b97535"
-    ],
-    "docs/manuals-src/user-guide.it.md": [
-      "744ac6e0",
-      "4c693cdf",
-      "0a6094ac",
-      "d416de20",
-      "d5db60e6",
-      "abfc3868",
-      "1af34f3d",
-      "04c23107"
-    ],
-    "docs/manuals/admin-guide.en.pdf": [
-      "7ebafbbe",
-      "7776d0bd",
-      "a5ec3240",
-      "456249fa",
-      "9d9b1782",
-      "ee7e8411",
-      "e829b4e0",
-      "9e354a3c"
-    ],
-    "docs/manuals/admin-guide.it.pdf": [
-      "8e40bc4b",
-      "0011bd08",
-      "36c5a435",
-      "a3c0ff65",
-      "b356439b",
-      "75392bce",
-      "a7c85796",
-      "1f460455"
-    ],
-    "docs/manuals/presenter-guide.en.pdf": [
-      "352c40bd",
-      "75d6a5cb",
-      "7115f613",
-      "2e778ca9",
-      "17abe3ad",
-      "c678dd3d",
-      "779b0f73",
-      "09c3d982"
-    ],
-    "docs/manuals/presenter-guide.it.pdf": [
-      "b6a2d1af",
-      "05c46a26",
-      "dbd68102",
-      "8f99fa72",
-      "c1eb1ec9",
-      "ff72846f",
-      "9c398e47",
-      "c2ce971e"
-    ],
-    "docs/manuals/user-guide.en.pdf": [
-      "bc6a4d6f",
-      "b4e614cc",
-      "63183d9f",
-      "b813d72f",
-      "b26d8718",
-      "bc94cf40",
-      "22db5cad",
-      "6f8c23d0"
-    ],
-    "docs/manuals/user-guide.it.pdf": [
-      "91b91b39",
-      "caeab728",
-      "2b97b6f5",
-      "07ed6c67",
-      "dfe6b93e",
-      "1c99f784",
-      "8dde21f5",
-      "fa91f29e"
-    ],
-    "docs/validation/RC127_LOCAL_TEST_EVIDENCE_20261102.json": [
-      "30969465",
-      "66b21cf6",
-      "8cc24cd7",
-      "a644fe2c",
-      "4a16582f",
-      "eb01a43d",
-      "ff44d42d",
-      "34e011f3"
-    ],
-    "docs/validation/RC127_OPERATOR_ACCEPTANCE_PLAN_20261102.json": [
-      "fd59f4d1",
-      "451c0083",
-      "f2616bee",
-      "32bc35bd",
-      "7893529a",
-      "05e6d5c4",
-      "2831e5b4",
-      "65b2d325"
-    ],
-    "docs/validation/RC136_LOCAL_TEST_EVIDENCE_20261102.json": [
-      "41b78105",
-      "2d627a63",
-      "9c98f84f",
-      "9d3e57ba",
-      "99bbfae3",
-      "e6dbece8",
-      "816e553d",
-      "e0236a29"
-    ],
-    "docs/validation/RC136_OPERATOR_EVIDENCE_REQUIREMENTS_20261102.json": [
-      "09f84f29",
-      "acac8614",
-      "f3138ac9",
-      "77efecb2",
-      "805791fe",
-      "96262932",
-      "1ecbacd4",
-      "c0a2ffaa"
-    ],
-    "docs/validation/RC144_LOCAL_TEST_REPORT_20261103.json": [
-      "1f6a9dd0",
-      "2d354645",
-      "6ee48d8f",
-      "9175ecbb",
-      "03419adc",
-      "8f7ba645",
-      "598f1047",
-      "93915ae6"
-    ],
-    "docs/validation/RC145_LOCAL_TEST_REPORT_20261103.json": [
-      "14bc8fe0",
-      "9122f0bd",
-      "f020205b",
-      "76d2b856",
-      "f9f16d1c",
-      "31ca25a5",
-      "80edb5b4",
-      "4bcd701c"
-    ],
-    "docs/validation/RC239_FULL_CI_ACCEPTANCE_20261107.json": [
-      "f3d29171",
-      "a1bf9332",
-      "39b33fcc",
-      "7708e384",
-      "87f8a59d",
-      "5d302184",
-      "15af2bda",
-      "9308a73e"
-    ],
-    "docs/validation/RC245_FULL_CI_DOCKER_20261107.json": [
-      "bb3965b4",
-      "bd66fc92",
-      "efe25f50",
-      "ef901c7d",
-      "f874da52",
-      "4409dee0",
-      "576c8077",
-      "2c93e983"
-    ],
-    "docs/validation/RC73_SLIDE_MASTER_ACCEPTANCE_20261031.md": [
-      "2a5b00bb",
-      "00794cbb",
-      "cb7c5876",
-      "3252260d",
-      "491ffb77",
-      "a9bbd3a8",
-      "260bf731",
-      "5c4d8fc2"
-    ],
-    "docs/validation/RC74_FOOTER_BOTTOM_RIGHT_20261031.md": [
-      "d4cb7531",
-      "47501978",
-      "0b2367ef",
-      "5dd8ceef",
-      "c576311d",
-      "f1290417",
-      "42fdebc4",
-      "92c1f2d3"
-    ],
-    "docs/validation/RC75_TYPESCRIPT_BUILD_HOTFIX_20261031.md": [
-      "4d71eb77",
-      "54132d8c",
-      "bc9b767b",
-      "de2730da",
-      "fd4fe7e8",
-      "b03ade54",
-      "061901f3",
-      "a36b9989"
-    ],
-    "docs/validation/RC76_PYTHON_CI_EDITOR_CONTRACTS_20261031.md": [
-      "510155f6",
-      "c0195f50",
-      "79b5bd82",
-      "14431a92",
-      "71a28ee0",
-      "115c314e",
-      "84a30f8a",
-      "ea92af2b"
-    ],
-    "docs/validation/RC92_PRESENTER_STAGE_LOCAL_TESTS_20261101.md": [
-      "b45f0a73",
-      "e224cbd8",
-      "eda4b9e3",
-      "19d3c02f",
-      "adb56c88",
-      "6bf8af7d",
-      "1c1906f5",
-      "46d8fdd5"
-    ],
-    "docs/validation/RC93_PARTICIPANT_QR_LOCAL_TESTS_20261101.md": [
-      "baca6c01",
-      "746fccf1",
-      "b4addf5c",
-      "00f861f5",
-      "31286b7e",
-      "35925895",
-      "a2e3a48f",
-      "04b60041"
-    ],
-    "docs/validation/RC94_WIDGET_SHAPES_LOCAL_TESTS_20261101.md": [
-      "7d852c2a",
-      "858bc233",
-      "de010822",
-      "6fb990ec",
-      "ddcfcc6a",
-      "b8ec603d",
-      "5fe0cf54",
-      "02906fe1"
-    ],
     "docs/validation/RC_CI_40614893046_WYSIWYG_CONTRACT_HOTFIX.json": [
       "b4c412b7",
       "75092deb",
@@ -13312,6 +13022,26 @@
       "fe99cdf9",
       "8b8af7e3",
       "e696c836"
+    ],
+    "docs/validation/RC_CYCLE10_PACKAGE_INVENTORY_20261029.json": [
+      "3300f630",
+      "56c9dd72",
+      "8e49164c",
+      "d3e4c152",
+      "9fd3fce8",
+      "c3400a10",
+      "f17ff9ba",
+      "1a4d9571"
+    ],
+    "docs/validation/RC_CYCLE10_VERIFIED_GATE_RECONCILIATION_20261029.json": [
+      "ed8c5c33",
+      "5f55c606",
+      "b1d8b51b",
+      "ad620a9d",
+      "66179f40",
+      "8cda9a34",
+      "097283e4",
+      "b0b7fbda"
     ],
     "docs/validation/RC_CYCLE100_CI_RELEASE_METADATA_DIAGNOSIS_20261101.json": [
       "6f2dee40",
@@ -13453,25 +13183,25 @@
       "c158598c",
       "9e9f3a13"
     ],
-    "docs/validation/RC_CYCLE10_PACKAGE_INVENTORY_20261029.json": [
-      "3300f630",
-      "56c9dd72",
-      "8e49164c",
-      "d3e4c152",
-      "9fd3fce8",
-      "c3400a10",
-      "f17ff9ba",
-      "1a4d9571"
+    "docs/validation/RC_CYCLE11_PACKAGE_INVENTORY_20261029.json": [
+      "fdb6ffc6",
+      "40013c9c",
+      "04a5ff09",
+      "34bb0e2d",
+      "d5d26c77",
+      "0ca4eb84",
+      "2829750c",
+      "4fb49463"
     ],
-    "docs/validation/RC_CYCLE10_VERIFIED_GATE_RECONCILIATION_20261029.json": [
-      "ed8c5c33",
-      "5f55c606",
-      "b1d8b51b",
-      "ad620a9d",
-      "66179f40",
-      "8cda9a34",
-      "097283e4",
-      "b0b7fbda"
+    "docs/validation/RC_CYCLE11_SECURITY_AND_FOCUS_LOCAL_20261029.json": [
+      "55fb5b3c",
+      "f9b598a3",
+      "e823c2dc",
+      "96f414c8",
+      "16ac63a6",
+      "138cb4ed",
+      "dec09692",
+      "6e212dc6"
     ],
     "docs/validation/RC_CYCLE110_PACKAGE_INVENTORY_20261101.json": [
       "90cd504d",
@@ -13573,25 +13303,35 @@
       "eeb8f24b",
       "0b0c19a3"
     ],
-    "docs/validation/RC_CYCLE11_PACKAGE_INVENTORY_20261029.json": [
-      "fdb6ffc6",
-      "40013c9c",
-      "04a5ff09",
-      "34bb0e2d",
-      "d5d26c77",
-      "0ca4eb84",
-      "2829750c",
-      "4fb49463"
+    "docs/validation/RC_CYCLE12_EXTERNAL_ACCEPTANCE_TEMPLATE_20261029.json": [
+      "9c55d81b",
+      "f2fb659b",
+      "46a53c6a",
+      "82eddb0a",
+      "9996596b",
+      "69e8054a",
+      "1e2d5edc",
+      "c7f582bb"
     ],
-    "docs/validation/RC_CYCLE11_SECURITY_AND_FOCUS_LOCAL_20261029.json": [
-      "55fb5b3c",
-      "f9b598a3",
-      "e823c2dc",
-      "96f414c8",
-      "16ac63a6",
-      "138cb4ed",
-      "dec09692",
-      "6e212dc6"
+    "docs/validation/RC_CYCLE12_NATIVE_BROWSERS_LOCAL_20261029.json": [
+      "8d66fa0b",
+      "998160d3",
+      "840b79fb",
+      "0d748008",
+      "2a8b8cc3",
+      "c9e3c860",
+      "4dc2b9a6",
+      "3041f1aa"
+    ],
+    "docs/validation/RC_CYCLE12_PACKAGE_INVENTORY_20261029.json": [
+      "ea86b772",
+      "fdc5ce46",
+      "d6e5c06d",
+      "925faef0",
+      "1b91cae3",
+      "553aa543",
+      "f1403f1e",
+      "5fb8cde4"
     ],
     "docs/validation/RC_CYCLE120_PACKAGE_INVENTORY_20261101.json": [
       "1312ced0",
@@ -13703,35 +13443,15 @@
       "31258ad7",
       "bd59558f"
     ],
-    "docs/validation/RC_CYCLE12_EXTERNAL_ACCEPTANCE_TEMPLATE_20261029.json": [
-      "9c55d81b",
-      "f2fb659b",
-      "46a53c6a",
-      "82eddb0a",
-      "9996596b",
-      "69e8054a",
-      "1e2d5edc",
-      "c7f582bb"
-    ],
-    "docs/validation/RC_CYCLE12_NATIVE_BROWSERS_LOCAL_20261029.json": [
-      "8d66fa0b",
-      "998160d3",
-      "840b79fb",
-      "0d748008",
-      "2a8b8cc3",
-      "c9e3c860",
-      "4dc2b9a6",
-      "3041f1aa"
-    ],
-    "docs/validation/RC_CYCLE12_PACKAGE_INVENTORY_20261029.json": [
-      "ea86b772",
-      "fdc5ce46",
-      "d6e5c06d",
-      "925faef0",
-      "1b91cae3",
-      "553aa543",
-      "f1403f1e",
-      "5fb8cde4"
+    "docs/validation/RC_CYCLE13_PACKAGE_INVENTORY_20261029.json": [
+      "14c70a64",
+      "735f1df0",
+      "404e021f",
+      "4bdb6682",
+      "310b43fc",
+      "1d812fa7",
+      "1314d269",
+      "ed1c1a9c"
     ],
     "docs/validation/RC_CYCLE130_PACKAGE_INVENTORY_20261102.json": [
       "5130d634",
@@ -13833,15 +13553,25 @@
       "59ad1d00",
       "180e98bc"
     ],
-    "docs/validation/RC_CYCLE13_PACKAGE_INVENTORY_20261029.json": [
-      "14c70a64",
-      "735f1df0",
-      "404e021f",
-      "4bdb6682",
-      "310b43fc",
-      "1d812fa7",
-      "1314d269",
-      "ed1c1a9c"
+    "docs/validation/RC_CYCLE14_NATIVE_GITHUB_VERIFIED_20261029.json": [
+      "16bf03ee",
+      "7fc325d4",
+      "dc428c91",
+      "204036e0",
+      "aeec9a1b",
+      "52bb9c4f",
+      "b44be78d",
+      "ad4e5b8e"
+    ],
+    "docs/validation/RC_CYCLE14_PACKAGE_INVENTORY_20261029.json": [
+      "e1b5e0ab",
+      "394fbb74",
+      "e2a5b754",
+      "f0b6709b",
+      "214f46db",
+      "2530dcef",
+      "c7a0d9b5",
+      "05ac579e"
     ],
     "docs/validation/RC_CYCLE140_PACKAGE_INVENTORY_20261102.json": [
       "6487fb25",
@@ -13943,26 +13673,6 @@
       "190c9d57",
       "aa360ba8"
     ],
-    "docs/validation/RC_CYCLE14_NATIVE_GITHUB_VERIFIED_20261029.json": [
-      "16bf03ee",
-      "7fc325d4",
-      "dc428c91",
-      "204036e0",
-      "aeec9a1b",
-      "52bb9c4f",
-      "b44be78d",
-      "ad4e5b8e"
-    ],
-    "docs/validation/RC_CYCLE14_PACKAGE_INVENTORY_20261029.json": [
-      "e1b5e0ab",
-      "394fbb74",
-      "e2a5b754",
-      "f0b6709b",
-      "214f46db",
-      "2530dcef",
-      "c7a0d9b5",
-      "05ac579e"
-    ],
     "docs/validation/RC_CYCLE150_PACKAGE_INVENTORY_20261103.json": [
       "4010a041",
       "85a6a0b5",
@@ -14062,6 +13772,26 @@
       "2625f841",
       "bae6a2ec",
       "2b113d25"
+    ],
+    "docs/validation/RC_CYCLE16_GITHUB_VERIFIED_RECONCILIATION_20261029.json": [
+      "558841fb",
+      "a480a60a",
+      "5e48ea2c",
+      "30d926af",
+      "06842172",
+      "3d5fbcd3",
+      "30d10772",
+      "aaa336d4"
+    ],
+    "docs/validation/RC_CYCLE16_PACKAGE_INVENTORY_20261029.json": [
+      "910a9b53",
+      "a7d9edd7",
+      "2be17912",
+      "535803f4",
+      "b2e9eb55",
+      "3c43ae0a",
+      "fef7c2ac",
+      "59ad2986"
     ],
     "docs/validation/RC_CYCLE160_PACKAGE_INVENTORY_20261103.json": [
       "01c9ccf5",
@@ -14163,25 +13893,25 @@
       "e1b8a55b",
       "6a6c1525"
     ],
-    "docs/validation/RC_CYCLE16_GITHUB_VERIFIED_RECONCILIATION_20261029.json": [
-      "558841fb",
-      "a480a60a",
-      "5e48ea2c",
-      "30d926af",
-      "06842172",
-      "3d5fbcd3",
-      "30d10772",
-      "aaa336d4"
+    "docs/validation/RC_CYCLE17_ENCRYPTED_DR_LOCAL_20261029.json": [
+      "27ad93f1",
+      "2b08e77e",
+      "a8941ab1",
+      "7317af7d",
+      "216096cb",
+      "b7ebe115",
+      "a592f15b",
+      "ac2ae4be"
     ],
-    "docs/validation/RC_CYCLE16_PACKAGE_INVENTORY_20261029.json": [
-      "910a9b53",
-      "a7d9edd7",
-      "2be17912",
-      "535803f4",
-      "b2e9eb55",
-      "3c43ae0a",
-      "fef7c2ac",
-      "59ad2986"
+    "docs/validation/RC_CYCLE17_PACKAGE_INVENTORY_20261029.json": [
+      "fe1def2e",
+      "4069003e",
+      "9a1c9aff",
+      "be4c4f49",
+      "4c968cea",
+      "31e0a6df",
+      "7373c336",
+      "63c14e96"
     ],
     "docs/validation/RC_CYCLE170_PACKAGE_INVENTORY_20261103.json": [
       "69c7098b",
@@ -14323,25 +14053,25 @@
       "24e585b8",
       "4dfef736"
     ],
-    "docs/validation/RC_CYCLE17_ENCRYPTED_DR_LOCAL_20261029.json": [
-      "27ad93f1",
-      "2b08e77e",
-      "a8941ab1",
-      "7317af7d",
-      "216096cb",
-      "b7ebe115",
-      "a592f15b",
-      "ac2ae4be"
+    "docs/validation/RC_CYCLE18_ENCRYPTED_DR_LOCAL_20261029.json": [
+      "e7d7659d",
+      "82bcbabc",
+      "31a80cd3",
+      "67ef47b2",
+      "897f8203",
+      "16705708",
+      "8a0b57b9",
+      "22687aaf"
     ],
-    "docs/validation/RC_CYCLE17_PACKAGE_INVENTORY_20261029.json": [
-      "fe1def2e",
-      "4069003e",
-      "9a1c9aff",
-      "be4c4f49",
-      "4c968cea",
-      "31e0a6df",
-      "7373c336",
-      "63c14e96"
+    "docs/validation/RC_CYCLE18_PACKAGE_INVENTORY_20261029.json": [
+      "03cb798a",
+      "482d1b2c",
+      "a932b144",
+      "f13ea2a8",
+      "2ae26284",
+      "50cb55b5",
+      "4e8594f2",
+      "9f00c1e7"
     ],
     "docs/validation/RC_CYCLE180_LOCAL_ACCEPTANCE_20261104.json": [
       "61bb59aa",
@@ -14523,25 +14253,25 @@
       "993cd90c",
       "4d7487e1"
     ],
-    "docs/validation/RC_CYCLE18_ENCRYPTED_DR_LOCAL_20261029.json": [
-      "e7d7659d",
-      "82bcbabc",
-      "31a80cd3",
-      "67ef47b2",
-      "897f8203",
-      "16705708",
-      "8a0b57b9",
-      "22687aaf"
+    "docs/validation/RC_CYCLE19_DR_REHEARSAL_LOCAL_20261029.json": [
+      "b4121df1",
+      "6d102cc3",
+      "fae2642e",
+      "0382931d",
+      "e9933762",
+      "ab23ce05",
+      "ff7398bb",
+      "a71c1983"
     ],
-    "docs/validation/RC_CYCLE18_PACKAGE_INVENTORY_20261029.json": [
-      "03cb798a",
-      "482d1b2c",
-      "a932b144",
-      "f13ea2a8",
-      "2ae26284",
-      "50cb55b5",
-      "4e8594f2",
-      "9f00c1e7"
+    "docs/validation/RC_CYCLE19_PACKAGE_INVENTORY_20261029.json": [
+      "8ae067c5",
+      "432e6f54",
+      "002529ce",
+      "55a57395",
+      "f17da2b4",
+      "345801f9",
+      "744b36c5",
+      "b869dec8"
     ],
     "docs/validation/RC_CYCLE190_LOCAL_ACCEPTANCE_20261105.json": [
       "74870b3c",
@@ -14673,25 +14403,25 @@
       "df505200",
       "e1a58ef2"
     ],
-    "docs/validation/RC_CYCLE19_DR_REHEARSAL_LOCAL_20261029.json": [
-      "b4121df1",
-      "6d102cc3",
-      "fae2642e",
-      "0382931d",
-      "e9933762",
-      "ab23ce05",
-      "ff7398bb",
-      "a71c1983"
+    "docs/validation/RC_CYCLE20_PACKAGE_INVENTORY_20261029.json": [
+      "f2fc4177",
+      "ed78d1e1",
+      "e0a71a09",
+      "0ed819bd",
+      "a3f393d6",
+      "cf05426b",
+      "c5623a29",
+      "d4df749f"
     ],
-    "docs/validation/RC_CYCLE19_PACKAGE_INVENTORY_20261029.json": [
-      "8ae067c5",
-      "432e6f54",
-      "002529ce",
-      "55a57395",
-      "f17da2b4",
-      "345801f9",
-      "744b36c5",
-      "b869dec8"
+    "docs/validation/RC_CYCLE20_RETENTION_LOCAL_20261029.json": [
+      "6410b333",
+      "b579a6f5",
+      "3caf7897",
+      "a1ca769c",
+      "e8b92ef0",
+      "fd485dd0",
+      "56220d3f",
+      "f4ac0a33"
     ],
     "docs/validation/RC_CYCLE200_PACKAGE_INVENTORY_20261105.json": [
       "8177181f",
@@ -14803,25 +14533,25 @@
       "8cec85a4",
       "64063491"
     ],
-    "docs/validation/RC_CYCLE20_PACKAGE_INVENTORY_20261029.json": [
-      "f2fc4177",
-      "ed78d1e1",
-      "e0a71a09",
-      "0ed819bd",
-      "a3f393d6",
-      "cf05426b",
-      "c5623a29",
-      "d4df749f"
+    "docs/validation/RC_CYCLE21_MOUNTED_MIRROR_LOCAL_20261029.json": [
+      "564bfbf7",
+      "db3c589a",
+      "8c3b4f84",
+      "2084425d",
+      "2d205de3",
+      "ac8485b9",
+      "ca9a7de9",
+      "b0a48228"
     ],
-    "docs/validation/RC_CYCLE20_RETENTION_LOCAL_20261029.json": [
-      "6410b333",
-      "b579a6f5",
-      "3caf7897",
-      "a1ca769c",
-      "e8b92ef0",
-      "fd485dd0",
-      "56220d3f",
-      "f4ac0a33"
+    "docs/validation/RC_CYCLE21_PACKAGE_INVENTORY_20261029.json": [
+      "23976390",
+      "85a6cd36",
+      "2956d0e1",
+      "4034ff47",
+      "9f65de38",
+      "0b070314",
+      "572c5dd6",
+      "fe6f25a9"
     ],
     "docs/validation/RC_CYCLE210_PACKAGE_INVENTORY_20261106.json": [
       "30c93240",
@@ -14923,25 +14653,25 @@
       "76a0ebfd",
       "0e77dac7"
     ],
-    "docs/validation/RC_CYCLE21_MOUNTED_MIRROR_LOCAL_20261029.json": [
-      "564bfbf7",
-      "db3c589a",
-      "8c3b4f84",
-      "2084425d",
-      "2d205de3",
-      "ac8485b9",
-      "ca9a7de9",
-      "b0a48228"
+    "docs/validation/RC_CYCLE22_PACKAGE_INVENTORY_20261029.json": [
+      "74ff2232",
+      "0c39b110",
+      "1fb09b4c",
+      "868d417f",
+      "f6418653",
+      "5cdb95e2",
+      "2504a073",
+      "670c9b60"
     ],
-    "docs/validation/RC_CYCLE21_PACKAGE_INVENTORY_20261029.json": [
-      "23976390",
-      "85a6cd36",
-      "2956d0e1",
-      "4034ff47",
-      "9f65de38",
-      "0b070314",
-      "572c5dd6",
-      "fe6f25a9"
+    "docs/validation/RC_CYCLE22_REMOTE_ACCEPTANCE_AND_OCI_20261029.json": [
+      "b0dae034",
+      "1728bf16",
+      "5119e80a",
+      "ec0e38c0",
+      "ceee1484",
+      "20e8cc7e",
+      "ad9232bd",
+      "e82b160c"
     ],
     "docs/validation/RC_CYCLE220_PACKAGE_INVENTORY_20261106.json": [
       "1843ab3b",
@@ -15043,25 +14773,25 @@
       "6facb8d0",
       "7a28b006"
     ],
-    "docs/validation/RC_CYCLE22_PACKAGE_INVENTORY_20261029.json": [
-      "74ff2232",
-      "0c39b110",
-      "1fb09b4c",
-      "868d417f",
-      "f6418653",
-      "5cdb95e2",
-      "2504a073",
-      "670c9b60"
+    "docs/validation/RC_CYCLE23_K8S_HA_LOCAL_20261029.json": [
+      "b08837e3",
+      "6c53ee70",
+      "f21447bb",
+      "6d5c62fe",
+      "0a6f6783",
+      "c625477b",
+      "1a3087ca",
+      "31ad7a6d"
     ],
-    "docs/validation/RC_CYCLE22_REMOTE_ACCEPTANCE_AND_OCI_20261029.json": [
-      "b0dae034",
-      "1728bf16",
-      "5119e80a",
-      "ec0e38c0",
-      "ceee1484",
-      "20e8cc7e",
-      "ad9232bd",
-      "e82b160c"
+    "docs/validation/RC_CYCLE23_PACKAGE_INVENTORY_20261029.json": [
+      "9fe4e06f",
+      "5b35009f",
+      "436310dc",
+      "4b616af6",
+      "1cf613c2",
+      "b8d9aef4",
+      "33a72eef",
+      "2be29bd0"
     ],
     "docs/validation/RC_CYCLE230_PACKAGE_INVENTORY_20261106.json": [
       "19892bc5",
@@ -15163,25 +14893,25 @@
       "ec73702f",
       "698df329"
     ],
-    "docs/validation/RC_CYCLE23_K8S_HA_LOCAL_20261029.json": [
-      "b08837e3",
-      "6c53ee70",
-      "f21447bb",
-      "6d5c62fe",
-      "0a6f6783",
-      "c625477b",
-      "1a3087ca",
-      "31ad7a6d"
+    "docs/validation/RC_CYCLE24_KIND_RUNTIME_LOCAL_20261029.json": [
+      "72b7c29b",
+      "90ffd658",
+      "2d6aced6",
+      "683c87ee",
+      "ff940ed2",
+      "bbee03aa",
+      "1731ff1a",
+      "67ddb840"
     ],
-    "docs/validation/RC_CYCLE23_PACKAGE_INVENTORY_20261029.json": [
-      "9fe4e06f",
-      "5b35009f",
-      "436310dc",
-      "4b616af6",
-      "1cf613c2",
-      "b8d9aef4",
-      "33a72eef",
-      "2be29bd0"
+    "docs/validation/RC_CYCLE24_PACKAGE_INVENTORY_20261029.json": [
+      "318ae67a",
+      "a9d7d1b6",
+      "73df88a2",
+      "fa9cfe1c",
+      "bce4e579",
+      "5d341640",
+      "73e360e6",
+      "256dab83"
     ],
     "docs/validation/RC_CYCLE240_PACKAGE_INVENTORY_20261107.json": [
       "fb847a14",
@@ -15283,25 +15013,25 @@
       "62ad0141",
       "7b3ade53"
     ],
-    "docs/validation/RC_CYCLE24_KIND_RUNTIME_LOCAL_20261029.json": [
-      "72b7c29b",
-      "90ffd658",
-      "2d6aced6",
-      "683c87ee",
-      "ff940ed2",
-      "bbee03aa",
-      "1731ff1a",
-      "67ddb840"
+    "docs/validation/RC_CYCLE25_GRACEFUL_SHUTDOWN_CI_HOTFIX_20261030.json": [
+      "fd2bc0e2",
+      "10202bde",
+      "86cee6df",
+      "dc1b02a8",
+      "b22db518",
+      "798b030a",
+      "51b3e61b",
+      "69dcfc0e"
     ],
-    "docs/validation/RC_CYCLE24_PACKAGE_INVENTORY_20261029.json": [
-      "318ae67a",
-      "a9d7d1b6",
-      "73df88a2",
-      "fa9cfe1c",
-      "bce4e579",
-      "5d341640",
-      "73e360e6",
-      "256dab83"
+    "docs/validation/RC_CYCLE25_PACKAGE_INVENTORY_20261030.json": [
+      "2cea07fd",
+      "992eb03d",
+      "b0c9e0eb",
+      "e02259c6",
+      "e10e7df8",
+      "f479f2d0",
+      "6da60ae9",
+      "08a7c5e2"
     ],
     "docs/validation/RC_CYCLE250_PACKAGE_INVENTORY_20261107.json": [
       "3d26368b",
@@ -15403,25 +15133,25 @@
       "c5cf7e2e",
       "a025398a"
     ],
-    "docs/validation/RC_CYCLE25_GRACEFUL_SHUTDOWN_CI_HOTFIX_20261030.json": [
-      "fd2bc0e2",
-      "10202bde",
-      "86cee6df",
-      "dc1b02a8",
-      "b22db518",
-      "798b030a",
-      "51b3e61b",
-      "69dcfc0e"
+    "docs/validation/RC_CYCLE26_OCI_ARCH_CI_HOTFIX_20261030.json": [
+      "3a256c88",
+      "81caa8d4",
+      "36ca2635",
+      "97126bff",
+      "57608585",
+      "86b6dccf",
+      "0fb4b2b0",
+      "dfab5259"
     ],
-    "docs/validation/RC_CYCLE25_PACKAGE_INVENTORY_20261030.json": [
-      "2cea07fd",
-      "992eb03d",
-      "b0c9e0eb",
-      "e02259c6",
-      "e10e7df8",
-      "f479f2d0",
-      "6da60ae9",
-      "08a7c5e2"
+    "docs/validation/RC_CYCLE26_PACKAGE_INVENTORY_20261030.json": [
+      "c5c5de68",
+      "df8b8347",
+      "0b276d32",
+      "6df7313a",
+      "d8030fe4",
+      "529351b4",
+      "dd230f1e",
+      "5a6011bb"
     ],
     "docs/validation/RC_CYCLE260_PACKAGE_INVENTORY_20261108.json": [
       "b629f652",
@@ -15523,25 +15253,25 @@
       "ef9bc354",
       "3358f320"
     ],
-    "docs/validation/RC_CYCLE26_OCI_ARCH_CI_HOTFIX_20261030.json": [
-      "3a256c88",
-      "81caa8d4",
-      "36ca2635",
-      "97126bff",
-      "57608585",
-      "86b6dccf",
-      "0fb4b2b0",
-      "dfab5259"
+    "docs/validation/RC_CYCLE27_PACKAGE_INVENTORY_20261030.json": [
+      "98e57f03",
+      "c13524f0",
+      "f0f9131c",
+      "803e1f75",
+      "d2bdaa4b",
+      "f66ba327",
+      "d4592cc5",
+      "9cd302a9"
     ],
-    "docs/validation/RC_CYCLE26_PACKAGE_INVENTORY_20261030.json": [
-      "c5c5de68",
-      "df8b8347",
-      "0b276d32",
-      "6df7313a",
-      "d8030fe4",
-      "529351b4",
-      "dd230f1e",
-      "5a6011bb"
+    "docs/validation/RC_CYCLE27_ROOTLESS_PODMAN_LOCAL_20261030.json": [
+      "25d9b2d0",
+      "f00523d4",
+      "b0b0e44e",
+      "d4ab2434",
+      "cf00b2c8",
+      "5463e0d6",
+      "72f62db8",
+      "356c13ec"
     ],
     "docs/validation/RC_CYCLE271_PACKAGE_INVENTORY_20261109.json": [
       "efb60e61",
@@ -15633,25 +15363,25 @@
       "e5874a96",
       "e3193892"
     ],
-    "docs/validation/RC_CYCLE27_PACKAGE_INVENTORY_20261030.json": [
-      "98e57f03",
-      "c13524f0",
-      "f0f9131c",
-      "803e1f75",
-      "d2bdaa4b",
-      "f66ba327",
-      "d4592cc5",
-      "9cd302a9"
+    "docs/validation/RC_CYCLE28_PACKAGE_INVENTORY_20261030.json": [
+      "7fd40c4e",
+      "254ae168",
+      "81fb2f47",
+      "44c27d46",
+      "30e86d26",
+      "2139da64",
+      "31c90fb7",
+      "de1345b7"
     ],
-    "docs/validation/RC_CYCLE27_ROOTLESS_PODMAN_LOCAL_20261030.json": [
-      "25d9b2d0",
-      "f00523d4",
-      "b0b0e44e",
-      "d4ab2434",
-      "cf00b2c8",
-      "5463e0d6",
-      "72f62db8",
-      "356c13ec"
+    "docs/validation/RC_CYCLE28_PODMAN_TMPFS_HOTFIX_LOCAL_20261030.json": [
+      "5aa33d3c",
+      "447b685e",
+      "759ffdce",
+      "2ebff80a",
+      "2bc6909d",
+      "591131dc",
+      "a05698a1",
+      "35331c17"
     ],
     "docs/validation/RC_CYCLE280_PACKAGE_INVENTORY_20261109.json": [
       "5f6e593f",
@@ -15753,25 +15483,25 @@
       "9fa407d4",
       "dcfa4c8c"
     ],
-    "docs/validation/RC_CYCLE28_PACKAGE_INVENTORY_20261030.json": [
-      "7fd40c4e",
-      "254ae168",
-      "81fb2f47",
-      "44c27d46",
-      "30e86d26",
-      "2139da64",
-      "31c90fb7",
-      "de1345b7"
+    "docs/validation/RC_CYCLE29_MULTINODE_LOCAL_20261030.json": [
+      "973675c2",
+      "d723581f",
+      "240788eb",
+      "55689cad",
+      "9d729762",
+      "2634cb33",
+      "24b44d2e",
+      "9c64c933"
     ],
-    "docs/validation/RC_CYCLE28_PODMAN_TMPFS_HOTFIX_LOCAL_20261030.json": [
-      "5aa33d3c",
-      "447b685e",
-      "759ffdce",
-      "2ebff80a",
-      "2bc6909d",
-      "591131dc",
-      "a05698a1",
-      "35331c17"
+    "docs/validation/RC_CYCLE29_PACKAGE_INVENTORY_20261030.json": [
+      "a9824393",
+      "038ac3a0",
+      "a5a3af15",
+      "8d0a4ad3",
+      "18fa854b",
+      "c7655414",
+      "5c4e044e",
+      "07fe59d1"
     ],
     "docs/validation/RC_CYCLE290_PACKAGE_INVENTORY_20261109.json": [
       "6be41114",
@@ -15802,26 +15532,6 @@
       "442e5026",
       "0f42a457",
       "6e7a614d"
-    ],
-    "docs/validation/RC_CYCLE29_MULTINODE_LOCAL_20261030.json": [
-      "973675c2",
-      "d723581f",
-      "240788eb",
-      "55689cad",
-      "9d729762",
-      "2634cb33",
-      "24b44d2e",
-      "9c64c933"
-    ],
-    "docs/validation/RC_CYCLE29_PACKAGE_INVENTORY_20261030.json": [
-      "a9824393",
-      "038ac3a0",
-      "a5a3af15",
-      "8d0a4ad3",
-      "18fa854b",
-      "c7655414",
-      "5c4e044e",
-      "07fe59d1"
     ],
     "docs/validation/RC_CYCLE30_HA_OPERATOR_LOCAL_20261030.json": [
       "7a63003c",
@@ -16533,6 +16243,16 @@
       "614f324b",
       "3233245d"
     ],
+    "docs/validation/RC_CYCLE8_FILE_INVENTORY_20261028.json": [
+      "d4a3157e",
+      "5ad54e2e",
+      "f26171b6",
+      "28f5fc11",
+      "512ca8c2",
+      "5bd9d3ee",
+      "598d66c9",
+      "06be5ab4"
+    ],
     "docs/validation/RC_CYCLE80_PACKAGE_INVENTORY_20261031.json": [
       "b47eff5c",
       "ced890e5",
@@ -16633,15 +16353,25 @@
       "1642a344",
       "ff20e9c4"
     ],
-    "docs/validation/RC_CYCLE8_FILE_INVENTORY_20261028.json": [
-      "d4a3157e",
-      "5ad54e2e",
-      "f26171b6",
-      "28f5fc11",
-      "512ca8c2",
-      "5bd9d3ee",
-      "598d66c9",
-      "06be5ab4"
+    "docs/validation/RC_CYCLE9_PACKAGE_INVENTORY_20261028.json": [
+      "eab3e18f",
+      "db42cde8",
+      "a87b058e",
+      "ca2caef9",
+      "ec1a5d7a",
+      "cfc24af7",
+      "c375f50d",
+      "ef8c978b"
+    ],
+    "docs/validation/RC_CYCLE9_VERIFIED_GATE_HARDENING_20261028.json": [
+      "6b6a178c",
+      "ee920771",
+      "63ecc425",
+      "346bd67c",
+      "c02c9aef",
+      "91d3bf3d",
+      "4b359469",
+      "b75d5433"
     ],
     "docs/validation/RC_CYCLE90_PACKAGE_INVENTORY_20261031.json": [
       "bea513e1",
@@ -16772,26 +16502,6 @@
       "04c00b3d",
       "fe012ec2",
       "a486c828"
-    ],
-    "docs/validation/RC_CYCLE9_PACKAGE_INVENTORY_20261028.json": [
-      "eab3e18f",
-      "db42cde8",
-      "a87b058e",
-      "ca2caef9",
-      "ec1a5d7a",
-      "cfc24af7",
-      "c375f50d",
-      "ef8c978b"
-    ],
-    "docs/validation/RC_CYCLE9_VERIFIED_GATE_HARDENING_20261028.json": [
-      "6b6a178c",
-      "ee920771",
-      "63ecc425",
-      "346bd67c",
-      "c02c9aef",
-      "91d3bf3d",
-      "4b359469",
-      "b75d5433"
     ],
     "docs/validation/RC_EDITOR_VISUAL_PARITY_20261028.json": [
       "2a9751ce",
@@ -17033,6 +16743,276 @@
       "3e474ed7",
       "37f7e5cc"
     ],
+    "docs/validation/RC127_LOCAL_TEST_EVIDENCE_20261102.json": [
+      "30969465",
+      "66b21cf6",
+      "8cc24cd7",
+      "a644fe2c",
+      "4a16582f",
+      "eb01a43d",
+      "ff44d42d",
+      "34e011f3"
+    ],
+    "docs/validation/RC127_OPERATOR_ACCEPTANCE_PLAN_20261102.json": [
+      "fd59f4d1",
+      "451c0083",
+      "f2616bee",
+      "32bc35bd",
+      "7893529a",
+      "05e6d5c4",
+      "2831e5b4",
+      "65b2d325"
+    ],
+    "docs/validation/RC136_LOCAL_TEST_EVIDENCE_20261102.json": [
+      "41b78105",
+      "2d627a63",
+      "9c98f84f",
+      "9d3e57ba",
+      "99bbfae3",
+      "e6dbece8",
+      "816e553d",
+      "e0236a29"
+    ],
+    "docs/validation/RC136_OPERATOR_EVIDENCE_REQUIREMENTS_20261102.json": [
+      "09f84f29",
+      "acac8614",
+      "f3138ac9",
+      "77efecb2",
+      "805791fe",
+      "96262932",
+      "1ecbacd4",
+      "c0a2ffaa"
+    ],
+    "docs/validation/RC144_LOCAL_TEST_REPORT_20261103.json": [
+      "1f6a9dd0",
+      "2d354645",
+      "6ee48d8f",
+      "9175ecbb",
+      "03419adc",
+      "8f7ba645",
+      "598f1047",
+      "93915ae6"
+    ],
+    "docs/validation/RC145_LOCAL_TEST_REPORT_20261103.json": [
+      "14bc8fe0",
+      "9122f0bd",
+      "f020205b",
+      "76d2b856",
+      "f9f16d1c",
+      "31ca25a5",
+      "80edb5b4",
+      "4bcd701c"
+    ],
+    "docs/validation/RC239_FULL_CI_ACCEPTANCE_20261107.json": [
+      "f3d29171",
+      "a1bf9332",
+      "39b33fcc",
+      "7708e384",
+      "87f8a59d",
+      "5d302184",
+      "15af2bda",
+      "9308a73e"
+    ],
+    "docs/validation/RC245_FULL_CI_DOCKER_20261107.json": [
+      "bb3965b4",
+      "bd66fc92",
+      "efe25f50",
+      "ef901c7d",
+      "f874da52",
+      "4409dee0",
+      "576c8077",
+      "2c93e983"
+    ],
+    "docs/validation/RC73_SLIDE_MASTER_ACCEPTANCE_20261031.md": [
+      "2a5b00bb",
+      "00794cbb",
+      "cb7c5876",
+      "3252260d",
+      "491ffb77",
+      "a9bbd3a8",
+      "260bf731",
+      "5c4d8fc2"
+    ],
+    "docs/validation/RC74_FOOTER_BOTTOM_RIGHT_20261031.md": [
+      "d4cb7531",
+      "47501978",
+      "0b2367ef",
+      "5dd8ceef",
+      "c576311d",
+      "f1290417",
+      "42fdebc4",
+      "92c1f2d3"
+    ],
+    "docs/validation/RC75_TYPESCRIPT_BUILD_HOTFIX_20261031.md": [
+      "4d71eb77",
+      "54132d8c",
+      "bc9b767b",
+      "de2730da",
+      "fd4fe7e8",
+      "b03ade54",
+      "061901f3",
+      "a36b9989"
+    ],
+    "docs/validation/RC76_PYTHON_CI_EDITOR_CONTRACTS_20261031.md": [
+      "510155f6",
+      "c0195f50",
+      "79b5bd82",
+      "14431a92",
+      "71a28ee0",
+      "115c314e",
+      "84a30f8a",
+      "ea92af2b"
+    ],
+    "docs/validation/RC92_PRESENTER_STAGE_LOCAL_TESTS_20261101.md": [
+      "b45f0a73",
+      "e224cbd8",
+      "eda4b9e3",
+      "19d3c02f",
+      "adb56c88",
+      "6bf8af7d",
+      "1c1906f5",
+      "46d8fdd5"
+    ],
+    "docs/validation/RC93_PARTICIPANT_QR_LOCAL_TESTS_20261101.md": [
+      "baca6c01",
+      "746fccf1",
+      "b4addf5c",
+      "00f861f5",
+      "31286b7e",
+      "35925895",
+      "a2e3a48f",
+      "04b60041"
+    ],
+    "docs/validation/RC94_WIDGET_SHAPES_LOCAL_TESTS_20261101.md": [
+      "7d852c2a",
+      "858bc233",
+      "de010822",
+      "6fb990ec",
+      "ddcfcc6a",
+      "b8ec603d",
+      "5fe0cf54",
+      "02906fe1"
+    ],
+    "docs/VERSIONING.en.md": [
+      "d2ea72e3",
+      "d252a420",
+      "047e67b0",
+      "a5af5de2",
+      "77854532",
+      "02206a5c",
+      "800a98bc",
+      "e21f6402"
+    ],
+    "docs/VERSIONING.it.md": [
+      "01bc8872",
+      "f56fb4fb",
+      "59b270c3",
+      "c536eca9",
+      "22382455",
+      "c7ac45fe",
+      "c7e8b8d3",
+      "d512c82c"
+    ],
+    "docs/WIDGET_CANVAS.en.md": [
+      "79294b40",
+      "3d42335c",
+      "72dc9bab",
+      "539c5d63",
+      "1ca2e395",
+      "6fa9f59b",
+      "363fb3d6",
+      "5c5e9f23"
+    ],
+    "docs/WIDGET_CANVAS.it.md": [
+      "4437f912",
+      "accda91b",
+      "b0b0f7d0",
+      "4180f6aa",
+      "128eea36",
+      "4ad884b4",
+      "46794fc4",
+      "813bce34"
+    ],
+    "docs/WIDGET_RESULTS_PER_WIDGET.en.md": [
+      "86fab600",
+      "8ab96d74",
+      "f06b4b47",
+      "c52884e7",
+      "c1f72ae6",
+      "43a75ecf",
+      "101d8dbf",
+      "8ac064ef"
+    ],
+    "docs/WIDGET_RESULTS_PER_WIDGET.it.md": [
+      "7e993984",
+      "b37edcee",
+      "2b360011",
+      "d9784430",
+      "133619eb",
+      "2e799c3c",
+      "09231293",
+      "a85721e6"
+    ],
+    "docs/WIDGET_REVISIONS.en.md": [
+      "d373b0ec",
+      "c5e547bc",
+      "6bd1262f",
+      "90eb60b0",
+      "8e0e0dd1",
+      "6c27db26",
+      "58f017be",
+      "6c68cbe1"
+    ],
+    "docs/WIDGET_REVISIONS.it.md": [
+      "4be16af4",
+      "e2d8d89c",
+      "b8d11438",
+      "d65eefa7",
+      "a822be09",
+      "e443033c",
+      "6ebb9135",
+      "2f40237e"
+    ],
+    "docs/WIDGET_RUNTIME.en.md": [
+      "f19ec2ee",
+      "b24001da",
+      "d8b7dd0d",
+      "50413fcb",
+      "d143fa97",
+      "040ef44e",
+      "0f185bed",
+      "6a993230"
+    ],
+    "docs/WIDGET_RUNTIME.it.md": [
+      "43e0272b",
+      "66c6320e",
+      "96b2cc37",
+      "fd8560f8",
+      "7310dba2",
+      "faf91084",
+      "e2ae5f5b",
+      "5064d801"
+    ],
+    "docs/WIDGETS.en.md": [
+      "31f5e8b2",
+      "e6e18a17",
+      "5a0fb686",
+      "35777fe5",
+      "21277ffa",
+      "8b949553",
+      "de44fd71",
+      "2bbf1836"
+    ],
+    "docs/WIDGETS.it.md": [
+      "4ff920de",
+      "191667b1",
+      "7dd9943b",
+      "a62498ab",
+      "632c9448",
+      "b060d16f",
+      "bef6b8d1",
+      "05fec5e4"
+    ],
     "helm/quorivio/Chart.yaml": [
       "56e3964a",
       "3ce8339e",
@@ -17123,6 +17103,16 @@
       "69f51e46",
       "b289f820"
     ],
+    "LICENSE": [
+      "73c273b1",
+      "e427caef",
+      "0c800614",
+      "08343c08",
+      "2a9b26ee",
+      "47d03e60",
+      "79d67585",
+      "59abfd73"
+    ],
     "package-lock.json": [
       "b1cc43ab",
       "3008bdc6",
@@ -17142,6 +17132,26 @@
       "03772159",
       "b067eefb",
       "7f10d3cc"
+    ],
+    "README.it.md": [
+      "5db79f10",
+      "9f783dcc",
+      "ca636340",
+      "28ae283a",
+      "093a2654",
+      "e1824c4c",
+      "dbc522e1",
+      "09ed5724"
+    ],
+    "README.md": [
+      "ab164937",
+      "7b1ec41d",
+      "dff8b15f",
+      "b6104acb",
+      "9461fa58",
+      "296159be",
+      "e3acc5fc",
+      "42e6dd46"
     ],
     "tools/aggregate_load_500.py": [
       "62b45082",
@@ -17253,16 +17263,6 @@
       "6e4b2012",
       "52ca3ef4"
     ],
-    "tools/ci_browser_editor.py": [
-      "a00ad7ac",
-      "a2c4f5ab",
-      "4b9e88ec",
-      "a8f0f912",
-      "c2dd108d",
-      "c34fe52b",
-      "a8d19e12",
-      "9c42f389"
-    ],
     "tools/ci_browser_editor_conflict_visibility.py": [
       "32aafdc2",
       "fec11710",
@@ -17282,6 +17282,16 @@
       "b4ddad5a",
       "fca65610",
       "d64e7e48"
+    ],
+    "tools/ci_browser_editor.py": [
+      "a00ad7ac",
+      "a2c4f5ab",
+      "4b9e88ec",
+      "a8f0f912",
+      "c2dd108d",
+      "c34fe52b",
+      "a8d19e12",
+      "9c42f389"
     ],
     "tools/ci_browser_media_picker_postgres.py": [
       "26a4a8b3",
@@ -17732,6 +17742,36 @@
       "ec818f60",
       "7c4b84e8",
       "96fd34f1"
+    ],
+    "tools/ci_rc_gate_summary.py": [
+      "db8f3fec",
+      "4b6a03d5",
+      "aec540c8",
+      "b6f48453",
+      "5be4e72b",
+      "ceffacbe",
+      "e8526646",
+      "5b16fbb5"
+    ],
+    "tools/ci_rc_public_stage_chromium.py": [
+      "279f3516",
+      "cf297c15",
+      "160c2d02",
+      "aba27050",
+      "2e49e4e8",
+      "b0e9c762",
+      "245277b7",
+      "612b1a4b"
+    ],
+    "tools/ci_rc_rehearsal_dynamic_portals_chromium.py": [
+      "355e7106",
+      "5df71d92",
+      "587123fd",
+      "a1db8c84",
+      "d60503b6",
+      "43d7d85b",
+      "88bf576e",
+      "375201bd"
     ],
     "tools/ci_rc111_preview_results_chromium.py": [
       "9e4017d4",
@@ -18223,36 +18263,6 @@
       "92cc3b6c",
       "7c3de199"
     ],
-    "tools/ci_rc_gate_summary.py": [
-      "db8f3fec",
-      "4b6a03d5",
-      "aec540c8",
-      "b6f48453",
-      "5be4e72b",
-      "ceffacbe",
-      "e8526646",
-      "5b16fbb5"
-    ],
-    "tools/ci_rc_public_stage_chromium.py": [
-      "279f3516",
-      "cf297c15",
-      "160c2d02",
-      "aba27050",
-      "2e49e4e8",
-      "b0e9c762",
-      "245277b7",
-      "612b1a4b"
-    ],
-    "tools/ci_rc_rehearsal_dynamic_portals_chromium.py": [
-      "355e7106",
-      "5df71d92",
-      "587123fd",
-      "a1db8c84",
-      "d60503b6",
-      "43d7d85b",
-      "88bf576e",
-      "375201bd"
-    ],
     "tools/ci_recovery_url_chromium.py": [
       "05e28528",
       "0a7d9119",
@@ -18643,36 +18653,6 @@
       "f1c1fdcc",
       "81fa015e"
     ],
-    "tools/rc174_browser_geometry.py": [
-      "db1bcd84",
-      "d7bb131d",
-      "49f9aba5",
-      "ebadb238",
-      "2bcb5699",
-      "56e6c9a7",
-      "28e95902",
-      "3abdf937"
-    ],
-    "tools/rc175_browser_media_geometry.py": [
-      "853b4974",
-      "11f71303",
-      "05605a95",
-      "e00cf2a9",
-      "7c6dcf66",
-      "a6882a59",
-      "44aac02b",
-      "bb1509b3"
-    ],
-    "tools/rc176_browser_reading_order.py": [
-      "2f1c978d",
-      "6d5fbfe3",
-      "50562744",
-      "5b2d487a",
-      "8dd3c9e7",
-      "e0facd6c",
-      "dc7b9d62",
-      "eaf9d599"
-    ],
     "tools/rc_campaign_preflight.py": [
       "6741a074",
       "a2d3c566",
@@ -18742,6 +18722,36 @@
       "793a75cc",
       "81d16eba",
       "5b1a5235"
+    ],
+    "tools/rc174_browser_geometry.py": [
+      "db1bcd84",
+      "d7bb131d",
+      "49f9aba5",
+      "ebadb238",
+      "2bcb5699",
+      "56e6c9a7",
+      "28e95902",
+      "3abdf937"
+    ],
+    "tools/rc175_browser_media_geometry.py": [
+      "853b4974",
+      "11f71303",
+      "05605a95",
+      "e00cf2a9",
+      "7c6dcf66",
+      "a6882a59",
+      "44aac02b",
+      "bb1509b3"
+    ],
+    "tools/rc176_browser_reading_order.py": [
+      "2f1c978d",
+      "6d5fbfe3",
+      "50562744",
+      "5b2d487a",
+      "8dd3c9e7",
+      "e0facd6c",
+      "dc7b9d62",
+      "eaf9d599"
     ],
     "tools/recover_conversion_lock.py": [
       "a40810c0",
@@ -19992,6 +20002,1176 @@
       "1eeca615",
       "a5a75cc4",
       "ace618ec"
+    ],
+    "tools/tests/test_rc_calendar_paging.py": [
+      "72d2ace5",
+      "f5cb3f02",
+      "42022a0f",
+      "d4cc194c",
+      "88ea9df1",
+      "ad5e6d63",
+      "0760f6e7",
+      "ed0b1c63"
+    ],
+    "tools/tests/test_rc_checksum_manifest_gitleaks.py": [
+      "09748607",
+      "639a3ae0",
+      "8976dd24",
+      "be94682d",
+      "31bf0bd1",
+      "f7e07d94",
+      "617d9c2c",
+      "b8ea6631"
+    ],
+    "tools/tests/test_rc_chromium_rehearsal_portal_20261028.py": [
+      "b2778c04",
+      "37aed635",
+      "284ef25f",
+      "12e56ed7",
+      "79d81884",
+      "8b5bd863",
+      "e785f7a8",
+      "78374287"
+    ],
+    "tools/tests/test_rc_ci_40709447219_inventory_20261028.py": [
+      "38be1cdb",
+      "5be2e6a1",
+      "8d3b4351",
+      "3ce9efca",
+      "4d49a978",
+      "2db092ea",
+      "57ae0444",
+      "e36920f0"
+    ],
+    "tools/tests/test_rc_ci_40796695726_40797106013_20261029.py": [
+      "88450c67",
+      "dbf17181",
+      "78f02a84",
+      "47e65789",
+      "df5afd6b",
+      "c27adc12",
+      "cdd80580",
+      "9bd40d94"
+    ],
+    "tools/tests/test_rc_conversion_30_cycle.py": [
+      "258ed21b",
+      "4e331f7b",
+      "5501e825",
+      "639ff327",
+      "a6800ade",
+      "ed9ea08e",
+      "3e17bf42",
+      "18db5c81"
+    ],
+    "tools/tests/test_rc_conversion_eighth_30_cycle.py": [
+      "64377c44",
+      "0b6d7da3",
+      "564eb00b",
+      "01b17359",
+      "0a942913",
+      "85bb8218",
+      "05df1306",
+      "b3395bac"
+    ],
+    "tools/tests/test_rc_conversion_fifth_30_cycle.py": [
+      "bd766a6c",
+      "cb62e6aa",
+      "5221dc40",
+      "bcff20cb",
+      "7c04b51d",
+      "ef4e7411",
+      "a79615e3",
+      "b4ad59c7"
+    ],
+    "tools/tests/test_rc_conversion_fourth_30_cycle.py": [
+      "59b3df2d",
+      "1db73a69",
+      "94aca14e",
+      "f43a3179",
+      "db123e60",
+      "4dd14e52",
+      "d2c2f324",
+      "eb7e36fa"
+    ],
+    "tools/tests/test_rc_conversion_second_30_cycle.py": [
+      "98196ada",
+      "8e4acda1",
+      "143b207b",
+      "4fffcff1",
+      "2062b4c8",
+      "3f91f0aa",
+      "133cdef3",
+      "8bd55c86"
+    ],
+    "tools/tests/test_rc_conversion_seventh_30_cycle.py": [
+      "85068023",
+      "e5fe2b99",
+      "4fba7e29",
+      "5978bf12",
+      "6ba7432c",
+      "df8e1556",
+      "7681bfe0",
+      "cedcc179"
+    ],
+    "tools/tests/test_rc_conversion_sixth_30_cycle.py": [
+      "9f7c8e3a",
+      "21d72695",
+      "1ee2550f",
+      "cddf5aa8",
+      "43a76da9",
+      "65559288",
+      "29ea96b7",
+      "f17d8dc5"
+    ],
+    "tools/tests/test_rc_conversion_third_30_cycle.py": [
+      "410bd4bc",
+      "d555e2b3",
+      "1bca5c04",
+      "3eadb35f",
+      "58d12872",
+      "635f4c11",
+      "c742ef28",
+      "0fd53f8e"
+    ],
+    "tools/tests/test_rc_cross_browser_20261029.py": [
+      "3eca5b97",
+      "ff4f6cbe",
+      "f9b7a5de",
+      "08f1a31e",
+      "0bc347ad",
+      "6ff57268",
+      "d791bbf6",
+      "94f981e6"
+    ],
+    "tools/tests/test_rc_cycle10_package_integrity_20261029.py": [
+      "751029fa",
+      "437ce3da",
+      "7099f69b",
+      "e07c171c",
+      "75265080",
+      "18109a9b",
+      "e81401c5",
+      "2df34330"
+    ],
+    "tools/tests/test_rc_cycle10_proven_editor_geometry_deploy_security_20261029.py": [
+      "fe32610b",
+      "b39c7820",
+      "4a12220a",
+      "e355289d",
+      "fc08005b",
+      "df618de6",
+      "04297d03",
+      "5847da98"
+    ],
+    "tools/tests/test_rc_cycle100_release_status_guard.py": [
+      "599ba01c",
+      "ff17a911",
+      "f9c62008",
+      "669889c1",
+      "abcd7c93",
+      "23cd67cc",
+      "be5e9ac3",
+      "c354335e"
+    ],
+    "tools/tests/test_rc_cycle101_horizontal_editor_layout.py": [
+      "9e41fb6b",
+      "6388c085",
+      "b7ef22dc",
+      "4e223ffe",
+      "6a341ec7",
+      "a9326d8c",
+      "8645c9ab",
+      "fd60e5dc"
+    ],
+    "tools/tests/test_rc_cycle102_editor_and_commit_markers.py": [
+      "2eba0c7a",
+      "89b9e99c",
+      "c0dfa94b",
+      "d083359a",
+      "35f29c88",
+      "cd426c09",
+      "98f1ef0b",
+      "57e2cfee"
+    ],
+    "tools/tests/test_rc_cycle11_integrity_and_readiness_20261029.py": [
+      "540171c2",
+      "de3f1708",
+      "c54a7454",
+      "e067e417",
+      "51fe5dbe",
+      "572f0ca5",
+      "3416413c",
+      "9743fc26"
+    ],
+    "tools/tests/test_rc_cycle114_editor_preflight.py": [
+      "8c39ef48",
+      "60634770",
+      "0eb8298d",
+      "52f43213",
+      "9138e001",
+      "655f655e",
+      "40b2fb2f",
+      "1f0558d0"
+    ],
+    "tools/tests/test_rc_cycle115_typescript_strict.py": [
+      "9fd03d6e",
+      "07749f0f",
+      "e52763f5",
+      "95b7d18d",
+      "1d57c552",
+      "cd72190c",
+      "3d0de8a1",
+      "e7155138"
+    ],
+    "tools/tests/test_rc_cycle116_exact_group_selection.py": [
+      "7e40842e",
+      "c412b01e",
+      "9b30a368",
+      "1575adf0",
+      "a36330b6",
+      "7a1e189d",
+      "8aa7ac2f",
+      "d3e08f35"
+    ],
+    "tools/tests/test_rc_cycle117_autofit_atomic_undo.py": [
+      "de5207cd",
+      "032285a9",
+      "21bc6301",
+      "5587bfe0",
+      "8126f8e2",
+      "207b4269",
+      "9a33362d",
+      "3afc5482"
+    ],
+    "tools/tests/test_rc_cycle118_localized_release_headers.py": [
+      "fd1ba973",
+      "30d6691c",
+      "94ac05c1",
+      "99a143e1",
+      "1aa529a2",
+      "a6c7c866",
+      "38b79b72",
+      "299e5590"
+    ],
+    "tools/tests/test_rc_cycle119_autofit_duplication.py": [
+      "37eab02e",
+      "9a611ad7",
+      "e40ff15b",
+      "c28388b0",
+      "b4053eeb",
+      "ce6d32a3",
+      "cbc53bda",
+      "2f4f4778"
+    ],
+    "tools/tests/test_rc_cycle12_multibrowser_integrity_20261029.py": [
+      "b3c5c5ae",
+      "00c2cce6",
+      "d89b73bd",
+      "364c1f92",
+      "f004f70e",
+      "6a541526",
+      "580f7ff5",
+      "f8aa26ed"
+    ],
+    "tools/tests/test_rc_cycle120_conflict_visibility.py": [
+      "690d085a",
+      "91c58de9",
+      "117b767b",
+      "392af106",
+      "e7b01eb4",
+      "684ffdb1",
+      "38b5e356",
+      "71c6f709"
+    ],
+    "tools/tests/test_rc_cycle121_json_export.py": [
+      "9dc855ad",
+      "c5580f0e",
+      "538d34fa",
+      "654f901a",
+      "93dcfa4e",
+      "a0f78d08",
+      "0f0839db",
+      "7e0589cd"
+    ],
+    "tools/tests/test_rc_cycle122_historical_preflight.py": [
+      "addef141",
+      "fe39b29f",
+      "3efaae7a",
+      "eb9b9201",
+      "5c67c9dd",
+      "e6ee5a2c",
+      "2648c909",
+      "a94a4200"
+    ],
+    "tools/tests/test_rc_cycle123_media_publish.py": [
+      "b36bf969",
+      "0fedb5a5",
+      "914c7253",
+      "678e421c",
+      "3120dcb5",
+      "2761d656",
+      "27e902e5",
+      "d6813333"
+    ],
+    "tools/tests/test_rc_cycle14_verified_native_reconciliation_20261029.py": [
+      "ba85a613",
+      "82d6087a",
+      "7cc00dc4",
+      "f0caded6",
+      "cf77d015",
+      "6cf041d0",
+      "6d335dc1",
+      "a6a57140"
+    ],
+    "tools/tests/test_rc_cycle16_inventory_20261029.py": [
+      "9bfd8ac6",
+      "20474e5d",
+      "60592dd6",
+      "9bcd299c",
+      "d5745b7c",
+      "4ee96eb0",
+      "9130812d",
+      "13b16670"
+    ],
+    "tools/tests/test_rc_cycle16_verified_react_and_replica_20261029.py": [
+      "e6e13498",
+      "6f99ea6f",
+      "b8515891",
+      "2360eb3f",
+      "79ce255d",
+      "d03a4c3e",
+      "929604b3",
+      "77982228"
+    ],
+    "tools/tests/test_rc_cycle17_encrypted_dr_20261029.py": [
+      "6745aeb4",
+      "fbc1f581",
+      "403c121f",
+      "24cb5dcc",
+      "0aa2d2b5",
+      "9d5cf447",
+      "7e7e2353",
+      "13bc4c97"
+    ],
+    "tools/tests/test_rc_cycle17_inventory_20261029.py": [
+      "b59d7f56",
+      "b28600b5",
+      "330c727b",
+      "a73c20e3",
+      "d49d5d7d",
+      "68d94842",
+      "c75e727f",
+      "1723ef75"
+    ],
+    "tools/tests/test_rc_cycle18_inventory_20261029.py": [
+      "852ab41e",
+      "5b6052d0",
+      "50324dc1",
+      "a9ca2aef",
+      "41f638c8",
+      "344d50cf",
+      "5f5e35f6",
+      "021ce018"
+    ],
+    "tools/tests/test_rc_cycle18_secure_dr_20261029.py": [
+      "7b333e9d",
+      "a54a8ee0",
+      "1fd0a4fb",
+      "25fd13a1",
+      "faf63059",
+      "f81a18c8",
+      "86af652b",
+      "5f7fbd9e"
+    ],
+    "tools/tests/test_rc_cycle19_dr_rehearsal.py": [
+      "ee14f76f",
+      "f60fe74a",
+      "49dde5ae",
+      "e4a9503a",
+      "bd32d4b6",
+      "3b1071b1",
+      "20ffdba1",
+      "44272ce6"
+    ],
+    "tools/tests/test_rc_cycle198_answer_decorations.py": [
+      "7341d788",
+      "607551ac",
+      "c3a82196",
+      "bd6f1c03",
+      "ac5f6462",
+      "c7ef300d",
+      "f39183e8",
+      "1e723bcd"
+    ],
+    "tools/tests/test_rc_cycle20_authenticated_retention.py": [
+      "ee9c6731",
+      "fc84783e",
+      "66b02564",
+      "844c7c17",
+      "3b526a77",
+      "0e9f4af2",
+      "3197e559",
+      "9432ec2b"
+    ],
+    "tools/tests/test_rc_cycle21_mounted_mirror.py": [
+      "635cf861",
+      "6c78372c",
+      "ed52ad9f",
+      "2709722c",
+      "72f060bf",
+      "a91e3082",
+      "a2910741",
+      "91599b4c"
+    ],
+    "tools/tests/test_rc_cycle22_verified_dr_reconnect_oci.py": [
+      "4a79ff5d",
+      "aec6a24e",
+      "ce241f4e",
+      "46fb7c8a",
+      "03f990ee",
+      "cb150c80",
+      "7de57904",
+      "3fb11800"
+    ],
+    "tools/tests/test_rc_cycle23_k8s_ha.py": [
+      "403f4aa3",
+      "35e8e5cd",
+      "a6141edb",
+      "678aafee",
+      "36a33da7",
+      "5995a19b",
+      "be422a5e",
+      "5e88e23d"
+    ],
+    "tools/tests/test_rc_cycle24_kind_runtime.py": [
+      "9e3e8128",
+      "1d572bae",
+      "b45b6ca4",
+      "3d9fa9f7",
+      "d2587b1e",
+      "0cbbeaaf",
+      "6e6ee7a9",
+      "d04bf9a0"
+    ],
+    "tools/tests/test_rc_cycle26_oci_hotfix.py": [
+      "ce986b7e",
+      "be80cf5c",
+      "fb0f3e51",
+      "4fb0cc8c",
+      "14c2fa11",
+      "1861bfec",
+      "861aa9e1",
+      "807e01db"
+    ],
+    "tools/tests/test_rc_cycle27_rootless_podman.py": [
+      "d549e392",
+      "a2761842",
+      "3bd22a19",
+      "aca8348e",
+      "05b1145f",
+      "d1d99085",
+      "8e858cbe",
+      "9a5d5591"
+    ],
+    "tools/tests/test_rc_cycle28_podman_tmpfs.py": [
+      "3a0a95b2",
+      "6d069256",
+      "90eb69fb",
+      "738ff5ef",
+      "acfe44d9",
+      "eb8121ad",
+      "0ff0f0dc",
+      "42b311b7"
+    ],
+    "tools/tests/test_rc_cycle29_multinode_ingress.py": [
+      "228aa5d3",
+      "795100a8",
+      "81fbae4f",
+      "13119372",
+      "93cb1cf4",
+      "4c8360fa",
+      "fcec6c8a",
+      "2152c378"
+    ],
+    "tools/tests/test_rc_cycle30_inventory.py": [
+      "d3f8f576",
+      "9509fa34",
+      "28c8b51f",
+      "f09adac6",
+      "77cd7b66",
+      "625ffc65",
+      "ccbf042d",
+      "3e44df08"
+    ],
+    "tools/tests/test_rc_cycle30_operational_ha.py": [
+      "ee86e806",
+      "ddae73a5",
+      "b6119daf",
+      "b872aaca",
+      "738eabb8",
+      "a9e957f7",
+      "b5743dee",
+      "6098388f"
+    ],
+    "tools/tests/test_rc_cycle31_inventory.py": [
+      "0d6ba732",
+      "0d0d0432",
+      "be1b01ba",
+      "0f0f5216",
+      "680b8f54",
+      "5f3f90ab",
+      "853b9c9a",
+      "570f260b"
+    ],
+    "tools/tests/test_rc_cycle32_antivirus_k8s.py": [
+      "88886c81",
+      "0f9abc48",
+      "28ffc0b2",
+      "0085570a",
+      "40b65103",
+      "6afaec05",
+      "92ccce99",
+      "f5e50536"
+    ],
+    "tools/tests/test_rc_cycle33_clamav_ingress.py": [
+      "1b617c77",
+      "f302fe2a",
+      "9fdfe949",
+      "efb2b045",
+      "532618e9",
+      "b4b34797",
+      "50167ec0",
+      "1538df71"
+    ],
+    "tools/tests/test_rc_cycle34_evidence_scanner.py": [
+      "77c62ee0",
+      "b70d71fc",
+      "4aeefbcb",
+      "bcd904b1",
+      "e8fbb674",
+      "121ed2c7",
+      "43aec1c1",
+      "fb8ea718"
+    ],
+    "tools/tests/test_rc_cycle35_verified_bootstrap.py": [
+      "cfbea2ae",
+      "a28bfbc9",
+      "f36672d1",
+      "0a5d5be2",
+      "d71e44fa",
+      "d237f9b4",
+      "cf99b493",
+      "adaa4874"
+    ],
+    "tools/tests/test_rc_cycle36_haproxy_runtime.py": [
+      "8f6c98d1",
+      "678acb29",
+      "cff00869",
+      "f18accec",
+      "b8622cfd",
+      "c15fe363",
+      "3fc9d21f",
+      "a41be7cb"
+    ],
+    "tools/tests/test_rc_cycle37_editor_ux.py": [
+      "a411d36f",
+      "3e1cf09a",
+      "fca52fab",
+      "2529b8a4",
+      "062c4159",
+      "88f309e0",
+      "74f98c7d",
+      "559762bd"
+    ],
+    "tools/tests/test_rc_cycle4_submission_audit_20261028.py": [
+      "92f9fe02",
+      "07e73d8d",
+      "3850b548",
+      "ee4c30b3",
+      "33edc633",
+      "8820bae1",
+      "0ad0dfd2",
+      "63de06e0"
+    ],
+    "tools/tests/test_rc_cycle43_frontend_compile.py": [
+      "fffb5764",
+      "d0a3404b",
+      "a317f703",
+      "166b876a",
+      "4419734a",
+      "53a3b289",
+      "faa7c4db",
+      "d3e603b7"
+    ],
+    "tools/tests/test_rc_cycle44_browser_bootstrap.py": [
+      "60b968ff",
+      "f72e6c27",
+      "d2e0d8b8",
+      "18867a5f",
+      "043eccd0",
+      "7463fcbd",
+      "72508a91",
+      "dbff2a2d"
+    ],
+    "tools/tests/test_rc_cycle45_compiled_frontend.py": [
+      "e34aa535",
+      "352e5473",
+      "6567c90b",
+      "c4db9dac",
+      "465e8d36",
+      "e17c6bdc",
+      "6992b685",
+      "04ceb362"
+    ],
+    "tools/tests/test_rc_cycle46_quality_gate.py": [
+      "2c18e9d5",
+      "abf725bc",
+      "8da62f9b",
+      "c38170bb",
+      "05a2c7fa",
+      "48625fd6",
+      "06cb49e6",
+      "612be725"
+    ],
+    "tools/tests/test_rc_cycle47_portal_menu.py": [
+      "8f0083f4",
+      "9157e8e7",
+      "e3851bd8",
+      "d881ed71",
+      "e221cb09",
+      "ee60e416",
+      "03f1cd7a",
+      "50c83e51"
+    ],
+    "tools/tests/test_rc_cycle48_historical_inventory_guard.py": [
+      "5ffbd7b7",
+      "5541c8f1",
+      "d20cf8a3",
+      "a19ec100",
+      "d039c082",
+      "b27a4bd3",
+      "1bf91390",
+      "e7fd8ffa"
+    ],
+    "tools/tests/test_rc_cycle49_haproxy_rwx_probe.py": [
+      "6f5000bf",
+      "23ab82ad",
+      "d44e2852",
+      "42e6fbb8",
+      "19b77f88",
+      "0a540406",
+      "ba13c2b3",
+      "72e0c3b9"
+    ],
+    "tools/tests/test_rc_cycle5_timer_documentation_gate_20261028.py": [
+      "62a154bb",
+      "92bb2f53",
+      "b88f1d63",
+      "69fea47b",
+      "a69fd4b9",
+      "d0352dd1",
+      "5bc10daf",
+      "09094274"
+    ],
+    "tools/tests/test_rc_cycle50_https_tls.py": [
+      "a8cf69ae",
+      "e6ffe48c",
+      "49aca295",
+      "464dcb9a",
+      "95328024",
+      "698e06bb",
+      "ccc19969",
+      "69bb2628"
+    ],
+    "tools/tests/test_rc_cycle51_https_route_contract.py": [
+      "6c4fab3a",
+      "d6ee3c30",
+      "47c62753",
+      "e69362d8",
+      "c05d5169",
+      "6e516766",
+      "efe91916",
+      "e2d3bda9"
+    ],
+    "tools/tests/test_rc_cycle54_live_reconnect.py": [
+      "c413f9e9",
+      "bd4e0613",
+      "486f232e",
+      "aca979d3",
+      "5301797d",
+      "00f2a7a5",
+      "02d21553",
+      "b12d296a"
+    ],
+    "tools/tests/test_rc_cycle57_live_fanout.py": [
+      "d5e3edf3",
+      "61dfc854",
+      "ad27b127",
+      "76a12d1a",
+      "4c5a2581",
+      "69b03dac",
+      "4a04b26a",
+      "48bbc1d7"
+    ],
+    "tools/tests/test_rc_cycle58_reconciliation_and_backpressure.py": [
+      "b88758fd",
+      "146388aa",
+      "5578cc9b",
+      "89c710e0",
+      "3625584c",
+      "f934f052",
+      "cbce296e",
+      "f53d8314"
+    ],
+    "tools/tests/test_rc_cycle59_campaign.py": [
+      "e1b5e021",
+      "fc076133",
+      "97dcb483",
+      "e3c5eb05",
+      "6124d92a",
+      "8f5631de",
+      "75a3931b",
+      "a4ba77ae"
+    ],
+    "tools/tests/test_rc_cycle60_federated_link.py": [
+      "20c9cc50",
+      "c5476de4",
+      "ef7c081e",
+      "4cdf3791",
+      "f50a700a",
+      "ee733c4d",
+      "62c13029",
+      "164b6062"
+    ],
+    "tools/tests/test_rc_cycle61_identity_management.py": [
+      "b14751b1",
+      "05b9ed5c",
+      "953815a8",
+      "584538c1",
+      "46e58da4",
+      "72184830",
+      "1cedfa16",
+      "ea4c1ad8"
+    ],
+    "tools/tests/test_rc_cycle62_ci_rate_isolation.py": [
+      "a98334e0",
+      "f054783c",
+      "74325d7f",
+      "7fba0a6c",
+      "6ccec4fc",
+      "9fdd9272",
+      "a79d31c5",
+      "3e7a1707"
+    ],
+    "tools/tests/test_rc_cycle63_missing_inventory_recovery.py": [
+      "4f9b6dfc",
+      "f409965f",
+      "e52752f7",
+      "d6b68923",
+      "c104eb31",
+      "a1fb07ae",
+      "ad9f24cb",
+      "bb33d48c"
+    ],
+    "tools/tests/test_rc_cycle64_credential_fixture.py": [
+      "e08b6eec",
+      "4f52507a",
+      "9a6c1515",
+      "1404ca3f",
+      "39699f51",
+      "7a5387aa",
+      "bb8d466f",
+      "7c9b3202"
+    ],
+    "tools/tests/test_rc_cycle65_historical_documentation.py": [
+      "38d6a399",
+      "e545e4a0",
+      "9d4ffa20",
+      "76c46ff6",
+      "1a664792",
+      "1d8f57de",
+      "09b08f55",
+      "17852ef6"
+    ],
+    "tools/tests/test_rc_cycle66_verified_sso_reconciliation.py": [
+      "4766d72c",
+      "9449cc71",
+      "7cdd542c",
+      "8cd9314b",
+      "f8dfccf4",
+      "6995188a",
+      "d4e8cbab",
+      "b3da1afe"
+    ],
+    "tools/tests/test_rc_cycle67_browser_rehearsal_gate.py": [
+      "e48e217e",
+      "1eac8da7",
+      "3764bb50",
+      "df7ef419",
+      "cd1a9525",
+      "288140dc",
+      "c5e88147",
+      "0fe1ae76"
+    ],
+    "tools/tests/test_rc_cycle68_verified_private_backgrounds.py": [
+      "47db1cbf",
+      "c3f2cdc6",
+      "4107e7ec",
+      "20bc96cd",
+      "4ec48c89",
+      "b9130d7e",
+      "d7247808",
+      "fb040a0d"
+    ],
+    "tools/tests/test_rc_cycle69_thumbnail_reorder.py": [
+      "78c960a4",
+      "58eb5738",
+      "d8752698",
+      "238ceecf",
+      "3f33d7c2",
+      "cfae4c6d",
+      "1608a044",
+      "8260ef44"
+    ],
+    "tools/tests/test_rc_cycle71_live_session.py": [
+      "9467e3d9",
+      "6da8b3fa",
+      "67e97d8f",
+      "eddb90bf",
+      "31c66498",
+      "b959005f",
+      "b68755b8",
+      "5547ad84"
+    ],
+    "tools/tests/test_rc_cycle77_dispatch_isolation.py": [
+      "2f6ac7d5",
+      "b6fa78bf",
+      "8866b1cd",
+      "d0f9a2d0",
+      "ab031196",
+      "878b22f5",
+      "87a0c218",
+      "2f3f40d8"
+    ],
+    "tools/tests/test_rc_cycle78_preview_selector.py": [
+      "86869fba",
+      "2e4ec1f9",
+      "7bb72665",
+      "768c335d",
+      "e648dd96",
+      "e014623e",
+      "8b88254b",
+      "915ce84e"
+    ],
+    "tools/tests/test_rc_cycle79_inventory_closure.py": [
+      "1607a928",
+      "c08beece",
+      "0fea135e",
+      "d2dd19d7",
+      "0aba1295",
+      "fae0d76c",
+      "cd0eea1a",
+      "febf6ed5"
+    ],
+    "tools/tests/test_rc_cycle8_inventory.py": [
+      "f4f292c7",
+      "98c481eb",
+      "9fbb68bd",
+      "7411d8ed",
+      "5f5d979e",
+      "b28e2df7",
+      "c67b4abf",
+      "5cf13235"
+    ],
+    "tools/tests/test_rc_cycle80_widget_context_hit.py": [
+      "2e2b96dc",
+      "5857b9bb",
+      "4ae8811b",
+      "afb56f93",
+      "1128df5c",
+      "32cdaee6",
+      "80853df7",
+      "e90a8253"
+    ],
+    "tools/tests/test_rc_cycle81_stable_widget_pointer.py": [
+      "981a7eb0",
+      "169ffdbf",
+      "d5305332",
+      "24067089",
+      "e0a3c9f0",
+      "569a70d7",
+      "7bc172ce",
+      "ad7519ac"
+    ],
+    "tools/tests/test_rc_cycle83_real_widget_context.py": [
+      "6b047a6e",
+      "fb5b6ed9",
+      "7ba684dd",
+      "3debdfda",
+      "cde43fd1",
+      "6a815672",
+      "9b53f5fe",
+      "45656942"
+    ],
+    "tools/tests/test_rc_cycle84_historical_context_compat.py": [
+      "43bcb510",
+      "5e80214b",
+      "f7819881",
+      "03ca28de",
+      "d25beaa0",
+      "195d228c",
+      "51719df4",
+      "6de064e3"
+    ],
+    "tools/tests/test_rc_cycle85_secondary_pointer_context.py": [
+      "e2e710dd",
+      "2fff150f",
+      "746dcf02",
+      "af460879",
+      "7ec76490",
+      "b654f0dc",
+      "136fde00",
+      "536cd9d2"
+    ],
+    "tools/tests/test_rc_cycle86_palette_acceptance.py": [
+      "16aa2efc",
+      "9ea9b8d5",
+      "a7d8885b",
+      "423547ad",
+      "c5cdf84e",
+      "e83370ef",
+      "cef2d9bb",
+      "8596a80d"
+    ],
+    "tools/tests/test_rc_cycle88_capacity_join_url.py": [
+      "a8507325",
+      "6efa94c7",
+      "c1e3fd69",
+      "145b097a",
+      "3d1518de",
+      "486e820d",
+      "6ae952f5",
+      "ea0cc927"
+    ],
+    "tools/tests/test_rc_cycle89_editor_feedback.py": [
+      "46ec714b",
+      "8d4a894a",
+      "4b784c7d",
+      "2247361e",
+      "70d2cbe5",
+      "01601b4c",
+      "89655e65",
+      "fbc4dd3f"
+    ],
+    "tools/tests/test_rc_cycle9_verified_accessibility_stats_20261028.py": [
+      "186ea7e8",
+      "16ab2765",
+      "2f97d479",
+      "09ad1514",
+      "56b074cb",
+      "4dd216ef",
+      "36a51b66",
+      "2a37ee16"
+    ],
+    "tools/tests/test_rc_cycle96_ci_date_and_release_status.py": [
+      "facfe424",
+      "16da99f3",
+      "60afd427",
+      "fba8f446",
+      "f1c452c5",
+      "dffd16c3",
+      "cd73e85e",
+      "02946c6c"
+    ],
+    "tools/tests/test_rc_cycle97_pptx_dependency_staging.py": [
+      "371d83e8",
+      "d606547d",
+      "16869701",
+      "8d33f491",
+      "9dc36f52",
+      "dae8e0ff",
+      "ac07cbfe",
+      "5ede6990"
+    ],
+    "tools/tests/test_rc_cycle98_web_compile.py": [
+      "5f30fe08",
+      "9e197187",
+      "38f89462",
+      "886bcae4",
+      "b573878b",
+      "016d5c51",
+      "cd1a6675",
+      "b35a62cd"
+    ],
+    "tools/tests/test_rc_cycle99_ci_contract.py": [
+      "45f36635",
+      "76ea87a8",
+      "7e7d18ce",
+      "d8569605",
+      "dcf61399",
+      "d6cf4c27",
+      "24a9a83e",
+      "307f0b2b"
+    ],
+    "tools/tests/test_rc_dashboard_widget_appearance_20261027.py": [
+      "27bc407e",
+      "c69d2559",
+      "1688ed5b",
+      "31d6369c",
+      "a06b109f",
+      "de943fe8",
+      "1fe0c22e",
+      "d6517701"
+    ],
+    "tools/tests/test_rc_editor_media.py": [
+      "655c39c8",
+      "0410dda5",
+      "dba7010a",
+      "8feaa2a8",
+      "eacbb5d1",
+      "9d109b51",
+      "290ca4be",
+      "53bd4f5f"
+    ],
+    "tools/tests/test_rc_evidence_20261027.py": [
+      "ed2d42db",
+      "f6865ece",
+      "173e83f9",
+      "9bfcc6cd",
+      "066d9ac4",
+      "00f2a40e",
+      "0030033d",
+      "48d7beea"
+    ],
+    "tools/tests/test_rc_federated_auth_gate_20261028.py": [
+      "30e26b78",
+      "663cf738",
+      "edecc8de",
+      "c7e1e460",
+      "e2079aa3",
+      "36a1bb7b",
+      "6f555e39",
+      "c03c25e0"
+    ],
+    "tools/tests/test_rc_gate_audit.py": [
+      "5f6ceb03",
+      "97bba679",
+      "a47bf21c",
+      "e209febb",
+      "d439acf9",
+      "a683ca50",
+      "b1fa091a",
+      "c39af71b"
+    ],
+    "tools/tests/test_rc_presenter_linked_preview_20261028.py": [
+      "9d84933a",
+      "56de17d4",
+      "307c9dd5",
+      "f2291cb4",
+      "64c03397",
+      "0b1011b7",
+      "6ec9b8a6",
+      "81bc8215"
+    ],
+    "tools/tests/test_rc_public_stage_and_dynamic_portals_20261028.py": [
+      "22d13097",
+      "95d7e63a",
+      "e622ecf4",
+      "c40def1b",
+      "bbb2dfce",
+      "967d4d45",
+      "a6299b59",
+      "4deecc4a"
+    ],
+    "tools/tests/test_rc_question_revision_migration_20261028.py": [
+      "e3154de0",
+      "26aa4825",
+      "b917d5c9",
+      "aaa23405",
+      "1c4cf291",
+      "97605962",
+      "931115de",
+      "25861390"
+    ],
+    "tools/tests/test_rc_recovery_acceptance_20261028.py": [
+      "293ad002",
+      "ce60ec70",
+      "74fd1338",
+      "2f4161ba",
+      "5f0e0d5d",
+      "384e9a1d",
+      "822ec7bb",
+      "25bc4f4f"
+    ],
+    "tools/tests/test_rc_recovery_proven_40717525524.py": [
+      "a9cf6355",
+      "e2dde922",
+      "00aa4dc1",
+      "7ae09b09",
+      "c8a8dc21",
+      "783c42a2",
+      "64500020",
+      "4a278c66"
+    ],
+    "tools/tests/test_rc_rehearsal_background_and_profile_gate_20261028.py": [
+      "e2b2cced",
+      "1c97e635",
+      "d935e15d",
+      "cc858373",
+      "4b472ff0",
+      "388042c9",
+      "3c42582a",
+      "8cb42e01"
+    ],
+    "tools/tests/test_rc_rehearsal_unique_mount_20261028.py": [
+      "fc21aafe",
+      "af46fa18",
+      "72538609",
+      "94d35f10",
+      "8a7e44a5",
+      "df3a8cd0",
+      "c9077a81",
+      "03849933"
+    ],
+    "tools/tests/test_rc_release_preflight.py": [
+      "35030fcf",
+      "a07fb043",
+      "7c98651a",
+      "409aeed2",
+      "968ca69a",
+      "3d783b3f",
+      "3aeba321",
+      "6fc019b1"
+    ],
+    "tools/tests/test_rc_verified_subgates_20261028.py": [
+      "3eef0704",
+      "425aa56d",
+      "ffa01478",
+      "9697c1d5",
+      "d6e6c241",
+      "33315569",
+      "4f635784",
+      "e455c3f9"
+    ],
+    "tools/tests/test_rc_widget_shapes_and_closed_copy.py": [
+      "8b96b571",
+      "7a7a8ae4",
+      "3d192b34",
+      "5bc38b13",
+      "7625089d",
+      "028bf0cd",
+      "c5c824ff",
+      "e8f25468"
+    ],
+    "tools/tests/test_rc_wysiwyg_multi_questions_20261028.py": [
+      "4807b3c5",
+      "2112e8c2",
+      "fbf27417",
+      "1067dcf7",
+      "ccf4a97f",
+      "9f4678cb",
+      "88abc895",
+      "f405d80d"
     ],
     "tools/tests/test_rc103_native_thumbnail_reconciliation.py": [
       "0325141b",
@@ -21873,1176 +23053,6 @@
       "549aa296",
       "aab49441"
     ],
-    "tools/tests/test_rc_calendar_paging.py": [
-      "72d2ace5",
-      "f5cb3f02",
-      "42022a0f",
-      "d4cc194c",
-      "88ea9df1",
-      "ad5e6d63",
-      "0760f6e7",
-      "ed0b1c63"
-    ],
-    "tools/tests/test_rc_checksum_manifest_gitleaks.py": [
-      "09748607",
-      "639a3ae0",
-      "8976dd24",
-      "be94682d",
-      "31bf0bd1",
-      "f7e07d94",
-      "617d9c2c",
-      "b8ea6631"
-    ],
-    "tools/tests/test_rc_chromium_rehearsal_portal_20261028.py": [
-      "b2778c04",
-      "37aed635",
-      "284ef25f",
-      "12e56ed7",
-      "79d81884",
-      "8b5bd863",
-      "e785f7a8",
-      "78374287"
-    ],
-    "tools/tests/test_rc_ci_40709447219_inventory_20261028.py": [
-      "38be1cdb",
-      "5be2e6a1",
-      "8d3b4351",
-      "3ce9efca",
-      "4d49a978",
-      "2db092ea",
-      "57ae0444",
-      "e36920f0"
-    ],
-    "tools/tests/test_rc_ci_40796695726_40797106013_20261029.py": [
-      "88450c67",
-      "dbf17181",
-      "78f02a84",
-      "47e65789",
-      "df5afd6b",
-      "c27adc12",
-      "cdd80580",
-      "9bd40d94"
-    ],
-    "tools/tests/test_rc_conversion_30_cycle.py": [
-      "258ed21b",
-      "4e331f7b",
-      "5501e825",
-      "639ff327",
-      "a6800ade",
-      "ed9ea08e",
-      "3e17bf42",
-      "18db5c81"
-    ],
-    "tools/tests/test_rc_conversion_eighth_30_cycle.py": [
-      "64377c44",
-      "0b6d7da3",
-      "564eb00b",
-      "01b17359",
-      "0a942913",
-      "85bb8218",
-      "05df1306",
-      "b3395bac"
-    ],
-    "tools/tests/test_rc_conversion_fifth_30_cycle.py": [
-      "bd766a6c",
-      "cb62e6aa",
-      "5221dc40",
-      "bcff20cb",
-      "7c04b51d",
-      "ef4e7411",
-      "a79615e3",
-      "b4ad59c7"
-    ],
-    "tools/tests/test_rc_conversion_fourth_30_cycle.py": [
-      "59b3df2d",
-      "1db73a69",
-      "94aca14e",
-      "f43a3179",
-      "db123e60",
-      "4dd14e52",
-      "d2c2f324",
-      "eb7e36fa"
-    ],
-    "tools/tests/test_rc_conversion_second_30_cycle.py": [
-      "98196ada",
-      "8e4acda1",
-      "143b207b",
-      "4fffcff1",
-      "2062b4c8",
-      "3f91f0aa",
-      "133cdef3",
-      "8bd55c86"
-    ],
-    "tools/tests/test_rc_conversion_seventh_30_cycle.py": [
-      "85068023",
-      "e5fe2b99",
-      "4fba7e29",
-      "5978bf12",
-      "6ba7432c",
-      "df8e1556",
-      "7681bfe0",
-      "cedcc179"
-    ],
-    "tools/tests/test_rc_conversion_sixth_30_cycle.py": [
-      "9f7c8e3a",
-      "21d72695",
-      "1ee2550f",
-      "cddf5aa8",
-      "43a76da9",
-      "65559288",
-      "29ea96b7",
-      "f17d8dc5"
-    ],
-    "tools/tests/test_rc_conversion_third_30_cycle.py": [
-      "410bd4bc",
-      "d555e2b3",
-      "1bca5c04",
-      "3eadb35f",
-      "58d12872",
-      "635f4c11",
-      "c742ef28",
-      "0fd53f8e"
-    ],
-    "tools/tests/test_rc_cross_browser_20261029.py": [
-      "3eca5b97",
-      "ff4f6cbe",
-      "f9b7a5de",
-      "08f1a31e",
-      "0bc347ad",
-      "6ff57268",
-      "d791bbf6",
-      "94f981e6"
-    ],
-    "tools/tests/test_rc_cycle100_release_status_guard.py": [
-      "599ba01c",
-      "ff17a911",
-      "f9c62008",
-      "669889c1",
-      "abcd7c93",
-      "23cd67cc",
-      "be5e9ac3",
-      "c354335e"
-    ],
-    "tools/tests/test_rc_cycle101_horizontal_editor_layout.py": [
-      "9e41fb6b",
-      "6388c085",
-      "b7ef22dc",
-      "4e223ffe",
-      "6a341ec7",
-      "a9326d8c",
-      "8645c9ab",
-      "fd60e5dc"
-    ],
-    "tools/tests/test_rc_cycle102_editor_and_commit_markers.py": [
-      "2eba0c7a",
-      "89b9e99c",
-      "c0dfa94b",
-      "d083359a",
-      "35f29c88",
-      "cd426c09",
-      "98f1ef0b",
-      "57e2cfee"
-    ],
-    "tools/tests/test_rc_cycle10_package_integrity_20261029.py": [
-      "751029fa",
-      "437ce3da",
-      "7099f69b",
-      "e07c171c",
-      "75265080",
-      "18109a9b",
-      "e81401c5",
-      "2df34330"
-    ],
-    "tools/tests/test_rc_cycle10_proven_editor_geometry_deploy_security_20261029.py": [
-      "fe32610b",
-      "b39c7820",
-      "4a12220a",
-      "e355289d",
-      "fc08005b",
-      "df618de6",
-      "04297d03",
-      "5847da98"
-    ],
-    "tools/tests/test_rc_cycle114_editor_preflight.py": [
-      "8c39ef48",
-      "60634770",
-      "0eb8298d",
-      "52f43213",
-      "9138e001",
-      "655f655e",
-      "40b2fb2f",
-      "1f0558d0"
-    ],
-    "tools/tests/test_rc_cycle115_typescript_strict.py": [
-      "9fd03d6e",
-      "07749f0f",
-      "e52763f5",
-      "95b7d18d",
-      "1d57c552",
-      "cd72190c",
-      "3d0de8a1",
-      "e7155138"
-    ],
-    "tools/tests/test_rc_cycle116_exact_group_selection.py": [
-      "7e40842e",
-      "c412b01e",
-      "9b30a368",
-      "1575adf0",
-      "a36330b6",
-      "7a1e189d",
-      "8aa7ac2f",
-      "d3e08f35"
-    ],
-    "tools/tests/test_rc_cycle117_autofit_atomic_undo.py": [
-      "de5207cd",
-      "032285a9",
-      "21bc6301",
-      "5587bfe0",
-      "8126f8e2",
-      "207b4269",
-      "9a33362d",
-      "3afc5482"
-    ],
-    "tools/tests/test_rc_cycle118_localized_release_headers.py": [
-      "fd1ba973",
-      "30d6691c",
-      "94ac05c1",
-      "99a143e1",
-      "1aa529a2",
-      "a6c7c866",
-      "38b79b72",
-      "299e5590"
-    ],
-    "tools/tests/test_rc_cycle119_autofit_duplication.py": [
-      "37eab02e",
-      "9a611ad7",
-      "e40ff15b",
-      "c28388b0",
-      "b4053eeb",
-      "ce6d32a3",
-      "cbc53bda",
-      "2f4f4778"
-    ],
-    "tools/tests/test_rc_cycle11_integrity_and_readiness_20261029.py": [
-      "540171c2",
-      "de3f1708",
-      "c54a7454",
-      "e067e417",
-      "51fe5dbe",
-      "572f0ca5",
-      "3416413c",
-      "9743fc26"
-    ],
-    "tools/tests/test_rc_cycle120_conflict_visibility.py": [
-      "690d085a",
-      "91c58de9",
-      "117b767b",
-      "392af106",
-      "e7b01eb4",
-      "684ffdb1",
-      "38b5e356",
-      "71c6f709"
-    ],
-    "tools/tests/test_rc_cycle121_json_export.py": [
-      "9dc855ad",
-      "c5580f0e",
-      "538d34fa",
-      "654f901a",
-      "93dcfa4e",
-      "a0f78d08",
-      "0f0839db",
-      "7e0589cd"
-    ],
-    "tools/tests/test_rc_cycle122_historical_preflight.py": [
-      "addef141",
-      "fe39b29f",
-      "3efaae7a",
-      "eb9b9201",
-      "5c67c9dd",
-      "e6ee5a2c",
-      "2648c909",
-      "a94a4200"
-    ],
-    "tools/tests/test_rc_cycle123_media_publish.py": [
-      "b36bf969",
-      "0fedb5a5",
-      "914c7253",
-      "678e421c",
-      "3120dcb5",
-      "2761d656",
-      "27e902e5",
-      "d6813333"
-    ],
-    "tools/tests/test_rc_cycle12_multibrowser_integrity_20261029.py": [
-      "b3c5c5ae",
-      "00c2cce6",
-      "d89b73bd",
-      "364c1f92",
-      "f004f70e",
-      "6a541526",
-      "580f7ff5",
-      "f8aa26ed"
-    ],
-    "tools/tests/test_rc_cycle14_verified_native_reconciliation_20261029.py": [
-      "ba85a613",
-      "82d6087a",
-      "7cc00dc4",
-      "f0caded6",
-      "cf77d015",
-      "6cf041d0",
-      "6d335dc1",
-      "a6a57140"
-    ],
-    "tools/tests/test_rc_cycle16_inventory_20261029.py": [
-      "9bfd8ac6",
-      "20474e5d",
-      "60592dd6",
-      "9bcd299c",
-      "d5745b7c",
-      "4ee96eb0",
-      "9130812d",
-      "13b16670"
-    ],
-    "tools/tests/test_rc_cycle16_verified_react_and_replica_20261029.py": [
-      "e6e13498",
-      "6f99ea6f",
-      "b8515891",
-      "2360eb3f",
-      "79ce255d",
-      "d03a4c3e",
-      "929604b3",
-      "77982228"
-    ],
-    "tools/tests/test_rc_cycle17_encrypted_dr_20261029.py": [
-      "6745aeb4",
-      "fbc1f581",
-      "403c121f",
-      "24cb5dcc",
-      "0aa2d2b5",
-      "9d5cf447",
-      "7e7e2353",
-      "13bc4c97"
-    ],
-    "tools/tests/test_rc_cycle17_inventory_20261029.py": [
-      "b59d7f56",
-      "b28600b5",
-      "330c727b",
-      "a73c20e3",
-      "d49d5d7d",
-      "68d94842",
-      "c75e727f",
-      "1723ef75"
-    ],
-    "tools/tests/test_rc_cycle18_inventory_20261029.py": [
-      "852ab41e",
-      "5b6052d0",
-      "50324dc1",
-      "a9ca2aef",
-      "41f638c8",
-      "344d50cf",
-      "5f5e35f6",
-      "021ce018"
-    ],
-    "tools/tests/test_rc_cycle18_secure_dr_20261029.py": [
-      "7b333e9d",
-      "a54a8ee0",
-      "1fd0a4fb",
-      "25fd13a1",
-      "faf63059",
-      "f81a18c8",
-      "86af652b",
-      "5f7fbd9e"
-    ],
-    "tools/tests/test_rc_cycle198_answer_decorations.py": [
-      "7341d788",
-      "607551ac",
-      "c3a82196",
-      "bd6f1c03",
-      "ac5f6462",
-      "c7ef300d",
-      "f39183e8",
-      "1e723bcd"
-    ],
-    "tools/tests/test_rc_cycle19_dr_rehearsal.py": [
-      "ee14f76f",
-      "f60fe74a",
-      "49dde5ae",
-      "e4a9503a",
-      "bd32d4b6",
-      "3b1071b1",
-      "20ffdba1",
-      "44272ce6"
-    ],
-    "tools/tests/test_rc_cycle20_authenticated_retention.py": [
-      "ee9c6731",
-      "fc84783e",
-      "66b02564",
-      "844c7c17",
-      "3b526a77",
-      "0e9f4af2",
-      "3197e559",
-      "9432ec2b"
-    ],
-    "tools/tests/test_rc_cycle21_mounted_mirror.py": [
-      "635cf861",
-      "6c78372c",
-      "ed52ad9f",
-      "2709722c",
-      "72f060bf",
-      "a91e3082",
-      "a2910741",
-      "91599b4c"
-    ],
-    "tools/tests/test_rc_cycle22_verified_dr_reconnect_oci.py": [
-      "4a79ff5d",
-      "aec6a24e",
-      "ce241f4e",
-      "46fb7c8a",
-      "03f990ee",
-      "cb150c80",
-      "7de57904",
-      "3fb11800"
-    ],
-    "tools/tests/test_rc_cycle23_k8s_ha.py": [
-      "403f4aa3",
-      "35e8e5cd",
-      "a6141edb",
-      "678aafee",
-      "36a33da7",
-      "5995a19b",
-      "be422a5e",
-      "5e88e23d"
-    ],
-    "tools/tests/test_rc_cycle24_kind_runtime.py": [
-      "9e3e8128",
-      "1d572bae",
-      "b45b6ca4",
-      "3d9fa9f7",
-      "d2587b1e",
-      "0cbbeaaf",
-      "6e6ee7a9",
-      "d04bf9a0"
-    ],
-    "tools/tests/test_rc_cycle26_oci_hotfix.py": [
-      "ce986b7e",
-      "be80cf5c",
-      "fb0f3e51",
-      "4fb0cc8c",
-      "14c2fa11",
-      "1861bfec",
-      "861aa9e1",
-      "807e01db"
-    ],
-    "tools/tests/test_rc_cycle27_rootless_podman.py": [
-      "d549e392",
-      "a2761842",
-      "3bd22a19",
-      "aca8348e",
-      "05b1145f",
-      "d1d99085",
-      "8e858cbe",
-      "9a5d5591"
-    ],
-    "tools/tests/test_rc_cycle28_podman_tmpfs.py": [
-      "3a0a95b2",
-      "6d069256",
-      "90eb69fb",
-      "738ff5ef",
-      "acfe44d9",
-      "eb8121ad",
-      "0ff0f0dc",
-      "42b311b7"
-    ],
-    "tools/tests/test_rc_cycle29_multinode_ingress.py": [
-      "228aa5d3",
-      "795100a8",
-      "81fbae4f",
-      "13119372",
-      "93cb1cf4",
-      "4c8360fa",
-      "fcec6c8a",
-      "2152c378"
-    ],
-    "tools/tests/test_rc_cycle30_inventory.py": [
-      "d3f8f576",
-      "9509fa34",
-      "28c8b51f",
-      "f09adac6",
-      "77cd7b66",
-      "625ffc65",
-      "ccbf042d",
-      "3e44df08"
-    ],
-    "tools/tests/test_rc_cycle30_operational_ha.py": [
-      "ee86e806",
-      "ddae73a5",
-      "b6119daf",
-      "b872aaca",
-      "738eabb8",
-      "a9e957f7",
-      "b5743dee",
-      "6098388f"
-    ],
-    "tools/tests/test_rc_cycle31_inventory.py": [
-      "0d6ba732",
-      "0d0d0432",
-      "be1b01ba",
-      "0f0f5216",
-      "680b8f54",
-      "5f3f90ab",
-      "853b9c9a",
-      "570f260b"
-    ],
-    "tools/tests/test_rc_cycle32_antivirus_k8s.py": [
-      "88886c81",
-      "0f9abc48",
-      "28ffc0b2",
-      "0085570a",
-      "40b65103",
-      "6afaec05",
-      "92ccce99",
-      "f5e50536"
-    ],
-    "tools/tests/test_rc_cycle33_clamav_ingress.py": [
-      "1b617c77",
-      "f302fe2a",
-      "9fdfe949",
-      "efb2b045",
-      "532618e9",
-      "b4b34797",
-      "50167ec0",
-      "1538df71"
-    ],
-    "tools/tests/test_rc_cycle34_evidence_scanner.py": [
-      "77c62ee0",
-      "b70d71fc",
-      "4aeefbcb",
-      "bcd904b1",
-      "e8fbb674",
-      "121ed2c7",
-      "43aec1c1",
-      "fb8ea718"
-    ],
-    "tools/tests/test_rc_cycle35_verified_bootstrap.py": [
-      "cfbea2ae",
-      "a28bfbc9",
-      "f36672d1",
-      "0a5d5be2",
-      "d71e44fa",
-      "d237f9b4",
-      "cf99b493",
-      "adaa4874"
-    ],
-    "tools/tests/test_rc_cycle36_haproxy_runtime.py": [
-      "8f6c98d1",
-      "678acb29",
-      "cff00869",
-      "f18accec",
-      "b8622cfd",
-      "c15fe363",
-      "3fc9d21f",
-      "a41be7cb"
-    ],
-    "tools/tests/test_rc_cycle37_editor_ux.py": [
-      "a411d36f",
-      "3e1cf09a",
-      "fca52fab",
-      "2529b8a4",
-      "062c4159",
-      "88f309e0",
-      "74f98c7d",
-      "559762bd"
-    ],
-    "tools/tests/test_rc_cycle43_frontend_compile.py": [
-      "fffb5764",
-      "d0a3404b",
-      "a317f703",
-      "166b876a",
-      "4419734a",
-      "53a3b289",
-      "faa7c4db",
-      "d3e603b7"
-    ],
-    "tools/tests/test_rc_cycle44_browser_bootstrap.py": [
-      "60b968ff",
-      "f72e6c27",
-      "d2e0d8b8",
-      "18867a5f",
-      "043eccd0",
-      "7463fcbd",
-      "72508a91",
-      "dbff2a2d"
-    ],
-    "tools/tests/test_rc_cycle45_compiled_frontend.py": [
-      "e34aa535",
-      "352e5473",
-      "6567c90b",
-      "c4db9dac",
-      "465e8d36",
-      "e17c6bdc",
-      "6992b685",
-      "04ceb362"
-    ],
-    "tools/tests/test_rc_cycle46_quality_gate.py": [
-      "2c18e9d5",
-      "abf725bc",
-      "8da62f9b",
-      "c38170bb",
-      "05a2c7fa",
-      "48625fd6",
-      "06cb49e6",
-      "612be725"
-    ],
-    "tools/tests/test_rc_cycle47_portal_menu.py": [
-      "8f0083f4",
-      "9157e8e7",
-      "e3851bd8",
-      "d881ed71",
-      "e221cb09",
-      "ee60e416",
-      "03f1cd7a",
-      "50c83e51"
-    ],
-    "tools/tests/test_rc_cycle48_historical_inventory_guard.py": [
-      "5ffbd7b7",
-      "5541c8f1",
-      "d20cf8a3",
-      "a19ec100",
-      "d039c082",
-      "b27a4bd3",
-      "1bf91390",
-      "e7fd8ffa"
-    ],
-    "tools/tests/test_rc_cycle49_haproxy_rwx_probe.py": [
-      "6f5000bf",
-      "23ab82ad",
-      "d44e2852",
-      "42e6fbb8",
-      "19b77f88",
-      "0a540406",
-      "ba13c2b3",
-      "72e0c3b9"
-    ],
-    "tools/tests/test_rc_cycle4_submission_audit_20261028.py": [
-      "92f9fe02",
-      "07e73d8d",
-      "3850b548",
-      "ee4c30b3",
-      "33edc633",
-      "8820bae1",
-      "0ad0dfd2",
-      "63de06e0"
-    ],
-    "tools/tests/test_rc_cycle50_https_tls.py": [
-      "a8cf69ae",
-      "e6ffe48c",
-      "49aca295",
-      "464dcb9a",
-      "95328024",
-      "698e06bb",
-      "ccc19969",
-      "69bb2628"
-    ],
-    "tools/tests/test_rc_cycle51_https_route_contract.py": [
-      "6c4fab3a",
-      "d6ee3c30",
-      "47c62753",
-      "e69362d8",
-      "c05d5169",
-      "6e516766",
-      "efe91916",
-      "e2d3bda9"
-    ],
-    "tools/tests/test_rc_cycle54_live_reconnect.py": [
-      "c413f9e9",
-      "bd4e0613",
-      "486f232e",
-      "aca979d3",
-      "5301797d",
-      "00f2a7a5",
-      "02d21553",
-      "b12d296a"
-    ],
-    "tools/tests/test_rc_cycle57_live_fanout.py": [
-      "d5e3edf3",
-      "61dfc854",
-      "ad27b127",
-      "76a12d1a",
-      "4c5a2581",
-      "69b03dac",
-      "4a04b26a",
-      "48bbc1d7"
-    ],
-    "tools/tests/test_rc_cycle58_reconciliation_and_backpressure.py": [
-      "b88758fd",
-      "146388aa",
-      "5578cc9b",
-      "89c710e0",
-      "3625584c",
-      "f934f052",
-      "cbce296e",
-      "f53d8314"
-    ],
-    "tools/tests/test_rc_cycle59_campaign.py": [
-      "e1b5e021",
-      "fc076133",
-      "97dcb483",
-      "e3c5eb05",
-      "6124d92a",
-      "8f5631de",
-      "75a3931b",
-      "a4ba77ae"
-    ],
-    "tools/tests/test_rc_cycle5_timer_documentation_gate_20261028.py": [
-      "62a154bb",
-      "92bb2f53",
-      "b88f1d63",
-      "69fea47b",
-      "a69fd4b9",
-      "d0352dd1",
-      "5bc10daf",
-      "09094274"
-    ],
-    "tools/tests/test_rc_cycle60_federated_link.py": [
-      "20c9cc50",
-      "c5476de4",
-      "ef7c081e",
-      "4cdf3791",
-      "f50a700a",
-      "ee733c4d",
-      "62c13029",
-      "164b6062"
-    ],
-    "tools/tests/test_rc_cycle61_identity_management.py": [
-      "b14751b1",
-      "05b9ed5c",
-      "953815a8",
-      "584538c1",
-      "46e58da4",
-      "72184830",
-      "1cedfa16",
-      "ea4c1ad8"
-    ],
-    "tools/tests/test_rc_cycle62_ci_rate_isolation.py": [
-      "a98334e0",
-      "f054783c",
-      "74325d7f",
-      "7fba0a6c",
-      "6ccec4fc",
-      "9fdd9272",
-      "a79d31c5",
-      "3e7a1707"
-    ],
-    "tools/tests/test_rc_cycle63_missing_inventory_recovery.py": [
-      "4f9b6dfc",
-      "f409965f",
-      "e52752f7",
-      "d6b68923",
-      "c104eb31",
-      "a1fb07ae",
-      "ad9f24cb",
-      "bb33d48c"
-    ],
-    "tools/tests/test_rc_cycle64_credential_fixture.py": [
-      "e08b6eec",
-      "4f52507a",
-      "9a6c1515",
-      "1404ca3f",
-      "39699f51",
-      "7a5387aa",
-      "bb8d466f",
-      "7c9b3202"
-    ],
-    "tools/tests/test_rc_cycle65_historical_documentation.py": [
-      "38d6a399",
-      "e545e4a0",
-      "9d4ffa20",
-      "76c46ff6",
-      "1a664792",
-      "1d8f57de",
-      "09b08f55",
-      "17852ef6"
-    ],
-    "tools/tests/test_rc_cycle66_verified_sso_reconciliation.py": [
-      "4766d72c",
-      "9449cc71",
-      "7cdd542c",
-      "8cd9314b",
-      "f8dfccf4",
-      "6995188a",
-      "d4e8cbab",
-      "b3da1afe"
-    ],
-    "tools/tests/test_rc_cycle67_browser_rehearsal_gate.py": [
-      "e48e217e",
-      "1eac8da7",
-      "3764bb50",
-      "df7ef419",
-      "cd1a9525",
-      "288140dc",
-      "c5e88147",
-      "0fe1ae76"
-    ],
-    "tools/tests/test_rc_cycle68_verified_private_backgrounds.py": [
-      "47db1cbf",
-      "c3f2cdc6",
-      "4107e7ec",
-      "20bc96cd",
-      "4ec48c89",
-      "b9130d7e",
-      "d7247808",
-      "fb040a0d"
-    ],
-    "tools/tests/test_rc_cycle69_thumbnail_reorder.py": [
-      "78c960a4",
-      "58eb5738",
-      "d8752698",
-      "238ceecf",
-      "3f33d7c2",
-      "cfae4c6d",
-      "1608a044",
-      "8260ef44"
-    ],
-    "tools/tests/test_rc_cycle71_live_session.py": [
-      "9467e3d9",
-      "6da8b3fa",
-      "67e97d8f",
-      "eddb90bf",
-      "31c66498",
-      "b959005f",
-      "b68755b8",
-      "5547ad84"
-    ],
-    "tools/tests/test_rc_cycle77_dispatch_isolation.py": [
-      "2f6ac7d5",
-      "b6fa78bf",
-      "8866b1cd",
-      "d0f9a2d0",
-      "ab031196",
-      "878b22f5",
-      "87a0c218",
-      "2f3f40d8"
-    ],
-    "tools/tests/test_rc_cycle78_preview_selector.py": [
-      "86869fba",
-      "2e4ec1f9",
-      "7bb72665",
-      "768c335d",
-      "e648dd96",
-      "e014623e",
-      "8b88254b",
-      "915ce84e"
-    ],
-    "tools/tests/test_rc_cycle79_inventory_closure.py": [
-      "1607a928",
-      "c08beece",
-      "0fea135e",
-      "d2dd19d7",
-      "0aba1295",
-      "fae0d76c",
-      "cd0eea1a",
-      "febf6ed5"
-    ],
-    "tools/tests/test_rc_cycle80_widget_context_hit.py": [
-      "2e2b96dc",
-      "5857b9bb",
-      "4ae8811b",
-      "afb56f93",
-      "1128df5c",
-      "32cdaee6",
-      "80853df7",
-      "e90a8253"
-    ],
-    "tools/tests/test_rc_cycle81_stable_widget_pointer.py": [
-      "981a7eb0",
-      "169ffdbf",
-      "d5305332",
-      "24067089",
-      "e0a3c9f0",
-      "569a70d7",
-      "7bc172ce",
-      "ad7519ac"
-    ],
-    "tools/tests/test_rc_cycle83_real_widget_context.py": [
-      "6b047a6e",
-      "fb5b6ed9",
-      "7ba684dd",
-      "3debdfda",
-      "cde43fd1",
-      "6a815672",
-      "9b53f5fe",
-      "45656942"
-    ],
-    "tools/tests/test_rc_cycle84_historical_context_compat.py": [
-      "43bcb510",
-      "5e80214b",
-      "f7819881",
-      "03ca28de",
-      "d25beaa0",
-      "195d228c",
-      "51719df4",
-      "6de064e3"
-    ],
-    "tools/tests/test_rc_cycle85_secondary_pointer_context.py": [
-      "e2e710dd",
-      "2fff150f",
-      "746dcf02",
-      "af460879",
-      "7ec76490",
-      "b654f0dc",
-      "136fde00",
-      "536cd9d2"
-    ],
-    "tools/tests/test_rc_cycle86_palette_acceptance.py": [
-      "16aa2efc",
-      "9ea9b8d5",
-      "a7d8885b",
-      "423547ad",
-      "c5cdf84e",
-      "e83370ef",
-      "cef2d9bb",
-      "8596a80d"
-    ],
-    "tools/tests/test_rc_cycle88_capacity_join_url.py": [
-      "a8507325",
-      "6efa94c7",
-      "c1e3fd69",
-      "145b097a",
-      "3d1518de",
-      "486e820d",
-      "6ae952f5",
-      "ea0cc927"
-    ],
-    "tools/tests/test_rc_cycle89_editor_feedback.py": [
-      "46ec714b",
-      "8d4a894a",
-      "4b784c7d",
-      "2247361e",
-      "70d2cbe5",
-      "01601b4c",
-      "89655e65",
-      "fbc4dd3f"
-    ],
-    "tools/tests/test_rc_cycle8_inventory.py": [
-      "f4f292c7",
-      "98c481eb",
-      "9fbb68bd",
-      "7411d8ed",
-      "5f5d979e",
-      "b28e2df7",
-      "c67b4abf",
-      "5cf13235"
-    ],
-    "tools/tests/test_rc_cycle96_ci_date_and_release_status.py": [
-      "facfe424",
-      "16da99f3",
-      "60afd427",
-      "fba8f446",
-      "f1c452c5",
-      "dffd16c3",
-      "cd73e85e",
-      "02946c6c"
-    ],
-    "tools/tests/test_rc_cycle97_pptx_dependency_staging.py": [
-      "371d83e8",
-      "d606547d",
-      "16869701",
-      "8d33f491",
-      "9dc36f52",
-      "dae8e0ff",
-      "ac07cbfe",
-      "5ede6990"
-    ],
-    "tools/tests/test_rc_cycle98_web_compile.py": [
-      "5f30fe08",
-      "9e197187",
-      "38f89462",
-      "886bcae4",
-      "b573878b",
-      "016d5c51",
-      "cd1a6675",
-      "b35a62cd"
-    ],
-    "tools/tests/test_rc_cycle99_ci_contract.py": [
-      "45f36635",
-      "76ea87a8",
-      "7e7d18ce",
-      "d8569605",
-      "dcf61399",
-      "d6cf4c27",
-      "24a9a83e",
-      "307f0b2b"
-    ],
-    "tools/tests/test_rc_cycle9_verified_accessibility_stats_20261028.py": [
-      "186ea7e8",
-      "16ab2765",
-      "2f97d479",
-      "09ad1514",
-      "56b074cb",
-      "4dd216ef",
-      "36a51b66",
-      "2a37ee16"
-    ],
-    "tools/tests/test_rc_dashboard_widget_appearance_20261027.py": [
-      "27bc407e",
-      "c69d2559",
-      "1688ed5b",
-      "31d6369c",
-      "a06b109f",
-      "de943fe8",
-      "1fe0c22e",
-      "d6517701"
-    ],
-    "tools/tests/test_rc_editor_media.py": [
-      "655c39c8",
-      "0410dda5",
-      "dba7010a",
-      "8feaa2a8",
-      "eacbb5d1",
-      "9d109b51",
-      "290ca4be",
-      "53bd4f5f"
-    ],
-    "tools/tests/test_rc_evidence_20261027.py": [
-      "ed2d42db",
-      "f6865ece",
-      "173e83f9",
-      "9bfcc6cd",
-      "066d9ac4",
-      "00f2a40e",
-      "0030033d",
-      "48d7beea"
-    ],
-    "tools/tests/test_rc_federated_auth_gate_20261028.py": [
-      "30e26b78",
-      "663cf738",
-      "edecc8de",
-      "c7e1e460",
-      "e2079aa3",
-      "36a1bb7b",
-      "6f555e39",
-      "c03c25e0"
-    ],
-    "tools/tests/test_rc_gate_audit.py": [
-      "5f6ceb03",
-      "97bba679",
-      "a47bf21c",
-      "e209febb",
-      "d439acf9",
-      "a683ca50",
-      "b1fa091a",
-      "c39af71b"
-    ],
-    "tools/tests/test_rc_presenter_linked_preview_20261028.py": [
-      "9d84933a",
-      "56de17d4",
-      "307c9dd5",
-      "f2291cb4",
-      "64c03397",
-      "0b1011b7",
-      "6ec9b8a6",
-      "81bc8215"
-    ],
-    "tools/tests/test_rc_public_stage_and_dynamic_portals_20261028.py": [
-      "22d13097",
-      "95d7e63a",
-      "e622ecf4",
-      "c40def1b",
-      "bbb2dfce",
-      "967d4d45",
-      "a6299b59",
-      "4deecc4a"
-    ],
-    "tools/tests/test_rc_question_revision_migration_20261028.py": [
-      "e3154de0",
-      "26aa4825",
-      "b917d5c9",
-      "aaa23405",
-      "1c4cf291",
-      "97605962",
-      "931115de",
-      "25861390"
-    ],
-    "tools/tests/test_rc_recovery_acceptance_20261028.py": [
-      "293ad002",
-      "ce60ec70",
-      "74fd1338",
-      "2f4161ba",
-      "5f0e0d5d",
-      "384e9a1d",
-      "822ec7bb",
-      "25bc4f4f"
-    ],
-    "tools/tests/test_rc_recovery_proven_40717525524.py": [
-      "a9cf6355",
-      "e2dde922",
-      "00aa4dc1",
-      "7ae09b09",
-      "c8a8dc21",
-      "783c42a2",
-      "64500020",
-      "4a278c66"
-    ],
-    "tools/tests/test_rc_rehearsal_background_and_profile_gate_20261028.py": [
-      "e2b2cced",
-      "1c97e635",
-      "d935e15d",
-      "cc858373",
-      "4b472ff0",
-      "388042c9",
-      "3c42582a",
-      "8cb42e01"
-    ],
-    "tools/tests/test_rc_rehearsal_unique_mount_20261028.py": [
-      "fc21aafe",
-      "af46fa18",
-      "72538609",
-      "94d35f10",
-      "8a7e44a5",
-      "df3a8cd0",
-      "c9077a81",
-      "03849933"
-    ],
-    "tools/tests/test_rc_release_preflight.py": [
-      "35030fcf",
-      "a07fb043",
-      "7c98651a",
-      "409aeed2",
-      "968ca69a",
-      "3d783b3f",
-      "3aeba321",
-      "6fc019b1"
-    ],
-    "tools/tests/test_rc_verified_subgates_20261028.py": [
-      "3eef0704",
-      "425aa56d",
-      "ffa01478",
-      "9697c1d5",
-      "d6e6c241",
-      "33315569",
-      "4f635784",
-      "e455c3f9"
-    ],
-    "tools/tests/test_rc_widget_shapes_and_closed_copy.py": [
-      "8b96b571",
-      "7a7a8ae4",
-      "3d192b34",
-      "5bc38b13",
-      "7625089d",
-      "028bf0cd",
-      "c5c824ff",
-      "e8f25468"
-    ],
-    "tools/tests/test_rc_wysiwyg_multi_questions_20261028.py": [
-      "4807b3c5",
-      "2112e8c2",
-      "fbf27417",
-      "1067dcf7",
-      "ccf4a97f",
-      "9f4678cb",
-      "88abc895",
-      "f405d80d"
-    ],
     "tools/tests/test_recover_conversion_lock.py": [
       "e0d68e75",
       "a99420b5",
@@ -23253,6 +23263,16 @@
       "bf72f595",
       "1755da5d"
     ],
+    "tools/verify_rc_cycle10_inventory.py": [
+      "ac1d90ca",
+      "ddf39b9d",
+      "13c83f6f",
+      "88adffd8",
+      "d1fa12db",
+      "d2eb5c32",
+      "812ca3bb",
+      "66b10587"
+    ],
     "tools/verify_rc_cycle100_inventory.py": [
       "f818eb4c",
       "ba4030ba",
@@ -23353,15 +23373,15 @@
       "ff6d1e82",
       "8c7063d0"
     ],
-    "tools/verify_rc_cycle10_inventory.py": [
-      "ac1d90ca",
-      "ddf39b9d",
-      "13c83f6f",
-      "88adffd8",
-      "d1fa12db",
-      "d2eb5c32",
-      "812ca3bb",
-      "66b10587"
+    "tools/verify_rc_cycle11_inventory.py": [
+      "c2bfd284",
+      "86c4dfca",
+      "b7674178",
+      "1fee0b15",
+      "a70c8722",
+      "8a765b33",
+      "202c9e83",
+      "d605ef49"
     ],
     "tools/verify_rc_cycle110_inventory.py": [
       "0f9c0967",
@@ -23463,15 +23483,15 @@
       "4e48e24a",
       "9a36426e"
     ],
-    "tools/verify_rc_cycle11_inventory.py": [
-      "c2bfd284",
-      "86c4dfca",
-      "b7674178",
-      "1fee0b15",
-      "a70c8722",
-      "8a765b33",
-      "202c9e83",
-      "d605ef49"
+    "tools/verify_rc_cycle12_inventory.py": [
+      "ff21fee4",
+      "ffa90f20",
+      "36650c10",
+      "7740c237",
+      "b7a8d8aa",
+      "7705d15c",
+      "1d064c1d",
+      "8104ab01"
     ],
     "tools/verify_rc_cycle120_inventory.py": [
       "7155af1f",
@@ -23573,15 +23593,15 @@
       "de0d7abc",
       "6bebe96d"
     ],
-    "tools/verify_rc_cycle12_inventory.py": [
-      "ff21fee4",
-      "ffa90f20",
-      "36650c10",
-      "7740c237",
-      "b7a8d8aa",
-      "7705d15c",
-      "1d064c1d",
-      "8104ab01"
+    "tools/verify_rc_cycle13_inventory.py": [
+      "0534e253",
+      "1fed4233",
+      "f398d37c",
+      "4c5e6e4d",
+      "f33209b0",
+      "4bb37772",
+      "5a3e9916",
+      "f05d8cf9"
     ],
     "tools/verify_rc_cycle130_inventory.py": [
       "390cf182",
@@ -23683,15 +23703,15 @@
       "8c71242d",
       "f730bf22"
     ],
-    "tools/verify_rc_cycle13_inventory.py": [
-      "0534e253",
-      "1fed4233",
-      "f398d37c",
-      "4c5e6e4d",
-      "f33209b0",
-      "4bb37772",
-      "5a3e9916",
-      "f05d8cf9"
+    "tools/verify_rc_cycle14_inventory.py": [
+      "e328597e",
+      "7d58f490",
+      "9fd21519",
+      "776e0d28",
+      "ed9d4ed3",
+      "0b351d31",
+      "e16017e4",
+      "2933e826"
     ],
     "tools/verify_rc_cycle140_inventory.py": [
       "d7d0e988",
@@ -23793,16 +23813,6 @@
       "159fad6f",
       "e55b83af"
     ],
-    "tools/verify_rc_cycle14_inventory.py": [
-      "e328597e",
-      "7d58f490",
-      "9fd21519",
-      "776e0d28",
-      "ed9d4ed3",
-      "0b351d31",
-      "e16017e4",
-      "2933e826"
-    ],
     "tools/verify_rc_cycle150_inventory.py": [
       "2f1e7de8",
       "9a8b84ce",
@@ -23902,6 +23912,16 @@
       "44e9527c",
       "26c79d1b",
       "2fea1a0d"
+    ],
+    "tools/verify_rc_cycle16_inventory.py": [
+      "f50da529",
+      "240ea08d",
+      "7aed1414",
+      "32ca4444",
+      "7c620176",
+      "c1792b0e",
+      "72684a45",
+      "7c9b7107"
     ],
     "tools/verify_rc_cycle160_inventory.py": [
       "658ad646",
@@ -24003,15 +24023,15 @@
       "56130e7a",
       "a6a8bace"
     ],
-    "tools/verify_rc_cycle16_inventory.py": [
-      "f50da529",
-      "240ea08d",
-      "7aed1414",
-      "32ca4444",
-      "7c620176",
-      "c1792b0e",
-      "72684a45",
-      "7c9b7107"
+    "tools/verify_rc_cycle17_inventory.py": [
+      "643a0e04",
+      "4275c271",
+      "7da05d85",
+      "6f88a03e",
+      "1da6fded",
+      "90c3e537",
+      "69ee79b8",
+      "cb09e646"
     ],
     "tools/verify_rc_cycle170_inventory.py": [
       "67a1308d",
@@ -24113,15 +24133,15 @@
       "5286082f",
       "563c4648"
     ],
-    "tools/verify_rc_cycle17_inventory.py": [
-      "643a0e04",
-      "4275c271",
-      "7da05d85",
-      "6f88a03e",
-      "1da6fded",
-      "90c3e537",
-      "69ee79b8",
-      "cb09e646"
+    "tools/verify_rc_cycle18_inventory.py": [
+      "201ff6fa",
+      "e85df847",
+      "f20f2e3e",
+      "703ed22f",
+      "1bae3733",
+      "0ab03f7a",
+      "da298f0b",
+      "f96c732a"
     ],
     "tools/verify_rc_cycle180_inventory.py": [
       "744c483f",
@@ -24223,15 +24243,15 @@
       "00bf1002",
       "ddd13681"
     ],
-    "tools/verify_rc_cycle18_inventory.py": [
-      "201ff6fa",
-      "e85df847",
-      "f20f2e3e",
-      "703ed22f",
-      "1bae3733",
-      "0ab03f7a",
-      "da298f0b",
-      "f96c732a"
+    "tools/verify_rc_cycle19_inventory.py": [
+      "3fdf9831",
+      "ede4ae5c",
+      "983547d8",
+      "bec6ff98",
+      "ccc3d3e0",
+      "9c713070",
+      "436fd159",
+      "482d8a9f"
     ],
     "tools/verify_rc_cycle190_inventory.py": [
       "fc9d3c8a",
@@ -24333,15 +24353,15 @@
       "4f72c587",
       "95343b12"
     ],
-    "tools/verify_rc_cycle19_inventory.py": [
-      "3fdf9831",
-      "ede4ae5c",
-      "983547d8",
-      "bec6ff98",
-      "ccc3d3e0",
-      "9c713070",
-      "436fd159",
-      "482d8a9f"
+    "tools/verify_rc_cycle20_inventory.py": [
+      "8a7175bc",
+      "021c7989",
+      "feb7afb3",
+      "18b4d5d3",
+      "ff59d95e",
+      "e15c17a1",
+      "6902ce77",
+      "e7def274"
     ],
     "tools/verify_rc_cycle200_inventory.py": [
       "c54f6f7c",
@@ -24443,15 +24463,15 @@
       "3ea152fe",
       "651f0d55"
     ],
-    "tools/verify_rc_cycle20_inventory.py": [
-      "8a7175bc",
-      "021c7989",
-      "feb7afb3",
-      "18b4d5d3",
-      "ff59d95e",
-      "e15c17a1",
-      "6902ce77",
-      "e7def274"
+    "tools/verify_rc_cycle21_inventory.py": [
+      "48728690",
+      "84ffe6f7",
+      "329f1450",
+      "7742b8e3",
+      "245a6546",
+      "e14160ce",
+      "15f7f740",
+      "229041de"
     ],
     "tools/verify_rc_cycle210_inventory.py": [
       "47cc2cd6",
@@ -24553,15 +24573,15 @@
       "9e4cb978",
       "0a3f75bb"
     ],
-    "tools/verify_rc_cycle21_inventory.py": [
-      "48728690",
-      "84ffe6f7",
-      "329f1450",
-      "7742b8e3",
-      "245a6546",
-      "e14160ce",
-      "15f7f740",
-      "229041de"
+    "tools/verify_rc_cycle22_inventory.py": [
+      "c5df738f",
+      "584d725e",
+      "3fc2c4ed",
+      "92b61548",
+      "70ca9429",
+      "52cb1443",
+      "3b519a19",
+      "75efae7b"
     ],
     "tools/verify_rc_cycle220_inventory.py": [
       "da3dfb8d",
@@ -24663,15 +24683,15 @@
       "211f3b6b",
       "a7a9f384"
     ],
-    "tools/verify_rc_cycle22_inventory.py": [
-      "c5df738f",
-      "584d725e",
-      "3fc2c4ed",
-      "92b61548",
-      "70ca9429",
-      "52cb1443",
-      "3b519a19",
-      "75efae7b"
+    "tools/verify_rc_cycle23_inventory.py": [
+      "e3828401",
+      "4f8ff297",
+      "2709c35d",
+      "0769ab3e",
+      "31cac417",
+      "12395eed",
+      "c97c2c4b",
+      "1ee72fb2"
     ],
     "tools/verify_rc_cycle230_inventory.py": [
       "7e87ea36",
@@ -24773,15 +24793,15 @@
       "6808a2cc",
       "699f3739"
     ],
-    "tools/verify_rc_cycle23_inventory.py": [
-      "e3828401",
-      "4f8ff297",
-      "2709c35d",
-      "0769ab3e",
-      "31cac417",
-      "12395eed",
-      "c97c2c4b",
-      "1ee72fb2"
+    "tools/verify_rc_cycle24_inventory.py": [
+      "e2c9d136",
+      "33130550",
+      "81a08749",
+      "84840444",
+      "1fb1bd7a",
+      "14a430ff",
+      "792d21aa",
+      "19fef38e"
     ],
     "tools/verify_rc_cycle240_inventory.py": [
       "82d44263",
@@ -24883,15 +24903,15 @@
       "6b191549",
       "db8ed1bc"
     ],
-    "tools/verify_rc_cycle24_inventory.py": [
-      "e2c9d136",
-      "33130550",
-      "81a08749",
-      "84840444",
-      "1fb1bd7a",
-      "14a430ff",
-      "792d21aa",
-      "19fef38e"
+    "tools/verify_rc_cycle25_inventory.py": [
+      "ed8c9a4d",
+      "9da7f943",
+      "9b6f5a20",
+      "e5ee267b",
+      "fc10eb02",
+      "0fbf3fe2",
+      "ab41c2fe",
+      "189a20a0"
     ],
     "tools/verify_rc_cycle250_inventory.py": [
       "d2dd2f7b",
@@ -24993,15 +25013,15 @@
       "8e9364e0",
       "3e7946f2"
     ],
-    "tools/verify_rc_cycle25_inventory.py": [
-      "ed8c9a4d",
-      "9da7f943",
-      "9b6f5a20",
-      "e5ee267b",
-      "fc10eb02",
-      "0fbf3fe2",
-      "ab41c2fe",
-      "189a20a0"
+    "tools/verify_rc_cycle26_inventory.py": [
+      "c1fa3d6f",
+      "26713ea7",
+      "2017849a",
+      "5c9719c7",
+      "2d6d03ac",
+      "a483c18b",
+      "b304c655",
+      "c5ce4483"
     ],
     "tools/verify_rc_cycle260_inventory.py": [
       "bee21c11",
@@ -25103,15 +25123,15 @@
       "7a2d4e20",
       "065bc846"
     ],
-    "tools/verify_rc_cycle26_inventory.py": [
-      "c1fa3d6f",
-      "26713ea7",
-      "2017849a",
-      "5c9719c7",
-      "2d6d03ac",
-      "a483c18b",
-      "b304c655",
-      "c5ce4483"
+    "tools/verify_rc_cycle27_inventory.py": [
+      "76a8aa61",
+      "7746d630",
+      "3cabc8dd",
+      "3432d75d",
+      "1bcc5e8c",
+      "9504f803",
+      "8796a9db",
+      "63fd624e"
     ],
     "tools/verify_rc_cycle271_inventory.py": [
       "6d93bec5",
@@ -25203,15 +25223,15 @@
       "ce18d10c",
       "d5194d70"
     ],
-    "tools/verify_rc_cycle27_inventory.py": [
-      "76a8aa61",
-      "7746d630",
-      "3cabc8dd",
-      "3432d75d",
-      "1bcc5e8c",
-      "9504f803",
-      "8796a9db",
-      "63fd624e"
+    "tools/verify_rc_cycle28_inventory.py": [
+      "8e5c0b43",
+      "55e46277",
+      "9032d083",
+      "6b56fac2",
+      "5a2cc0b9",
+      "e0ace5d2",
+      "0f6b1633",
+      "bf256fe2"
     ],
     "tools/verify_rc_cycle280_inventory.py": [
       "7e78539e",
@@ -25313,15 +25333,15 @@
       "0875d089",
       "81723c19"
     ],
-    "tools/verify_rc_cycle28_inventory.py": [
-      "8e5c0b43",
-      "55e46277",
-      "9032d083",
-      "6b56fac2",
-      "5a2cc0b9",
-      "e0ace5d2",
-      "0f6b1633",
-      "bf256fe2"
+    "tools/verify_rc_cycle29_inventory.py": [
+      "7b0e6edf",
+      "0e42edd7",
+      "65903339",
+      "28fc3994",
+      "0f32fcab",
+      "5121c06b",
+      "b7ae0608",
+      "25fa82e4"
     ],
     "tools/verify_rc_cycle290_inventory.py": [
       "8df4090e",
@@ -25362,16 +25382,6 @@
       "3fa4ca41",
       "2ee655d4",
       "2d7d9618"
-    ],
-    "tools/verify_rc_cycle29_inventory.py": [
-      "7b0e6edf",
-      "0e42edd7",
-      "65903339",
-      "28fc3994",
-      "0f32fcab",
-      "5121c06b",
-      "b7ae0608",
-      "25fa82e4"
     ],
     "tools/verify_rc_cycle30_inventory.py": [
       "a97a4fb4",
@@ -25863,6 +25873,16 @@
       "f4161ccb",
       "f8c457a2"
     ],
+    "tools/verify_rc_cycle8_inventory.py": [
+      "ca6179f9",
+      "d88eb90e",
+      "6efc4551",
+      "5a372ffa",
+      "e8beb8e6",
+      "9a7eecc3",
+      "51eb8b4e",
+      "244b9eb1"
+    ],
     "tools/verify_rc_cycle80_inventory.py": [
       "f2f77b03",
       "1308ae43",
@@ -25962,16 +25982,6 @@
       "ac312dd1",
       "7ca1676c",
       "9848a231"
-    ],
-    "tools/verify_rc_cycle8_inventory.py": [
-      "ca6179f9",
-      "d88eb90e",
-      "6efc4551",
-      "5a372ffa",
-      "e8beb8e6",
-      "9a7eecc3",
-      "51eb8b4e",
-      "244b9eb1"
     ],
     "tools/verify_rc_cycle90_inventory.py": [
       "32841a26",

@@ -56,8 +56,10 @@ export type GaugeModel={value:number|null;min:number;max:number;percent:number;t
 /** Work on anonymous presenter-only histogram counts; rating scores use weighted votes. */
 export function gaugeModel(rows:readonly StatRow[],config:GaugeConfig={},sourceKind='question'):GaugeModel{
  const bins=rows.filter(r=>Number.isSafeInteger(r.count)&&r.count>0);
- const scored=bins.map(r=>({n:Number(r.label),count:r.count}));
- const numeric=scored.length>0&&scored.every((r,i)=>Number.isFinite(r.n)&&rows.some(x=>x.count>0&&Number(x.label)===r.n&&String(x.label).trim()!==''));
+ // Treat localized decimal scores as numeric, but never coerce blank, hex or exponent labels.
+ // A non-numeric category continues to represent its response count instead.
+ const scored=bins.map(r=>{const label=r.label.trim();return {n:/^[+-]?(?:\d+(?:[.,]\d+)?|[.,]\d+)$/.test(label)?Number(label.replace(',','.')):NaN,count:r.count};});
+ const numeric=scored.length>0&&scored.every(r=>Number.isFinite(r.n));
  const samples=numeric?scored:bins.map(r=>({n:r.count,count:1}));
  const aggregation=config.gaugeAggregation==='min'||config.gaugeAggregation==='max'?config.gaugeAggregation:'mean';
  const raw=samples.length?(aggregation==='min'?Math.min(...samples.map(r=>r.n)):aggregation==='max'?Math.max(...samples.map(r=>r.n)):samples.reduce((sum,r)=>sum+r.n*r.count,0)/samples.reduce((sum,r)=>sum+r.count,0)):null;
