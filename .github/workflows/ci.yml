@@ -81,8 +81,11 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  # Keep each push and its full RC/Docker pipeline independent. Previously a
+  # later commit to main cancelled in-flight acceptance and publication jobs,
+  # leaving no verified images and hiding genuine CI failures.
+  group: ci-${{ github.ref }}-${{ github.run_id }}
+  cancel-in-progress: false
 jobs:
   validate:
     name: Production quality gate
