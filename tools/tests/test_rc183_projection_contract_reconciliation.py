@@ -61,7 +61,8 @@ class RC183ProjectionContracts(unittest.TestCase):
     def test_rating_and_reaction_heading_policy(self):
         self.assertTrue(rating_policy(UI, POLICY))
         self.assertEqual(UI.count('<ReactionChoices'), 3)
-        self.assertIn("['reactions','results-button'].includes(w.kind)?{...w,showTitle:false}:w", UI)
+        self.assertIn("w.kind==='reactions'?{...w,showTitle:false}:w", UI)
+        self.assertIn("w.kind==='results-button'?{...w,showTitle:editing===w.id?false:w.showTitle}", UI)
 
     def test_rating_double_heading_mutation_is_detected(self):
         altered = UI.replace('widgetTitleVisible(widget)&&<strong>', 'true&&<strong>', 1)
