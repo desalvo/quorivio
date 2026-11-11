@@ -764,14 +764,14 @@
       "99842584"
     ],
     "apps/api/test/background-result-source-cycle39.test.ts": [
-      "42716140",
-      "68ec0efe",
-      "bae64a22",
-      "45ff276b",
-      "715b9012",
-      "a008d871",
-      "71e9e1ba",
-      "70b10907"
+      "ab0f967c",
+      "8d643c44",
+      "25ea8bd3",
+      "c9310df1",
+      "1cfe475d",
+      "b5ee1fd6",
+      "3d131814",
+      "7d5c9432"
     ],
     "apps/api/test/background-upload-failure.test.ts": [
       "88d5d2a9",
@@ -834,14 +834,14 @@
       "ea41d864"
     ],
     "apps/api/test/domain.test.ts": [
-      "194b43d7",
-      "11b8210d",
-      "7a902e9f",
-      "4e728107",
-      "df3777ad",
-      "c7bc13f0",
-      "681e7549",
-      "4f9d2c01"
+      "838010a7",
+      "3e3727ff",
+      "0381007c",
+      "808b9980",
+      "ef333b28",
+      "7bfa4474",
+      "19abf075",
+      "6cf74c4b"
     ],
     "apps/api/test/email-mfa-flow.test.ts": [
       "c74d44cc",
@@ -2094,14 +2094,14 @@
       "54a62e5d"
     ],
     "apps/web/src/main.tsx": [
-      "a99833a7",
-      "f09a3cfa",
-      "16cea07f",
-      "a4316e33",
-      "141f9f29",
-      "5977d447",
-      "c26687c3",
-      "6b6ad783"
+      "372fc74e",
+      "75a9ade9",
+      "995f547d",
+      "4387f780",
+      "6638b54b",
+      "0abbcd72",
+      "cd103b8d",
+      "e7cdf543"
     ],
     "apps/web/src/main.tsx.orig": [
       "9230e5a3",
@@ -2634,14 +2634,14 @@
       "f116c35e"
     ],
     "apps/web/src/widget-results.ts": [
-      "66584f29",
-      "5cbe7baf",
-      "5e88555c",
-      "e5ed056f",
-      "357137ac",
-      "71468c68",
-      "abb370d9",
-      "bc5e537a"
+      "5d8d0626",
+      "3a5f088a",
+      "eef11bd4",
+      "ee4c9a79",
+      "b899ccf7",
+      "a70be870",
+      "f7091ab3",
+      "e284fc39"
     ],
     "apps/web/src/widget-rich-editor.tsx": [
       "610fdf07",

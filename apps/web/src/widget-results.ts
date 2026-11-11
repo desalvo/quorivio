@@ -42,7 +42,9 @@ export function linkedStatisticContext<T extends {id:string;page_design?:{widget
 export type ResultView='bars'|'pie'|'table'|'cloud'|'gauge';
 /** Explicit result view overrides source; legacy results inherit the source view. */
 export function effectiveResultView(resultWidget:StatisticalWidget,widgets:StatisticalWidget[]):ResultView{
- const view=resultWidget.resultsView??linkedStatisticSource(resultWidget,widgets)?.resultsView;
+ const source=linkedStatisticSource(resultWidget,widgets);
+ if(!source)return 'bars';
+ const view=resultWidget.resultsView??source.resultsView;
  return view==='pie'||view==='table'||view==='cloud'||view==='gauge'?view:'bars';
 }
 export type GaugeConfig={
