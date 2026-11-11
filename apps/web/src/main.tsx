@@ -333,7 +333,7 @@ function LinkedResultChart({widget,widgets,rows,emptyLabel}:{widget:any;widgets:
  if(!source)return <div className="linked-results linked-results-unconfigured" role="status">{widget.showTitle!==false&&!widget.resultsOnly&&<strong>{widget.label||'Risultati'}</strong>}<small>Collega un widget statistico dalle proprietà, anche da un’altra pagina.</small></div>;
  const sourceRows=rows||sampleStatisticRows(source,1,{},widget.targetQuestionId||'');
  const data=sortedResultBars(sourceRows,widget.resultSortOrder);
- const displayRows=visibleResultBars(data,widget.resultSortOrder,widget.resultTopCount);
+ const displayRows=visibleResultBars(sourceRows,widget.resultSortOrder,widget.resultTopCount);
  const maxBarCount=Math.max(0,...displayRows.map(r=>Number.isFinite(r.count)?r.count:0));
  const total=data.reduce((n,r)=>n+r.count,0);
  const pieColors=data.map(r=>{
