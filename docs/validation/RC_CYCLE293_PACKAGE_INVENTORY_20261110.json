@@ -20294,14 +20294,14 @@
       "1b92a8aa"
     ],
     "tools/tests/test_rc145_mobile_background_font.py": [
-      "8f8a931e",
-      "2793e776",
-      "89a3f1ef",
-      "cfc3cec0",
-      "6958acd3",
-      "697b778e",
-      "5df9bf26",
-      "08aff40a"
+      "5424b654",
+      "7b186b6e",
+      "ed211d67",
+      "5be32af6",
+      "02ae2772",
+      "635a356f",
+      "703ecfa0",
+      "a161b5b5"
     ],
     "tools/tests/test_rc146_release_header_fix.py": [
       "e977e27a",
@@ -21284,14 +21284,14 @@
       "24d0c485"
     ],
     "tools/tests/test_rc242_arial_master_zoom.py": [
-      "529e18c3",
-      "22944930",
-      "44398246",
-      "c7109fc8",
-      "cf45c572",
-      "acaf7416",
-      "f4e93552",
-      "b44e6bda"
+      "e2482bed",
+      "83e57f01",
+      "90e5bcb9",
+      "b165b87b",
+      "3de8d7b5",
+      "f33133e0",
+      "9d809f72",
+      "ee36437c"
     ],
     "tools/tests/test_rc243_global_zoom_effect_cleanup.py": [
       "c4d3c356",
