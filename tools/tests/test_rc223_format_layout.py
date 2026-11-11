@@ -24,7 +24,7 @@ def validate(ui=UI,css=CSS):
         'aria-label="Pagina collegata ai risultati"',
         'aria-label="Stile bordo widget"',
         'aria-label="Visibilità e contenuti widget"',
-        "allowScale={!['qr','participant-count'].includes(w.kind)",
+        "allowScale={!['qr','participant-count','results-button'].includes(w.kind)",
         'className="participant-qr-url" href={url} title={url}',
     ]
     required_css=[
@@ -60,7 +60,7 @@ class RC223FormatLayout(unittest.TestCase):
             validate(css=CSS.replace('white-space:nowrap!important;word-break:normal!important;','white-space:normal!important;word-break:break-word!important;',1))
     def test_negative_qr_whole_widget_scaling(self):
         with self.assertRaisesRegex(AssertionError,'interaction contract'):
-            validate(ui=UI.replace("allowScale={!['qr','participant-count'].includes(w.kind)","allowScale={"))
+            validate(ui=UI.replace("allowScale={!['qr','participant-count','results-button'].includes(w.kind)","allowScale={"))
     def test_ci_must_run_before_npm_and_browser(self):
         self.assertIn('tools.tests.test_rc223_format_layout',CI)
         self.assertIn('tools/ci_rc223_widget_layout_chromium.py',CI)
