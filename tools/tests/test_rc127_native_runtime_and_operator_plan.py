@@ -32,7 +32,7 @@ class NativeRuntimeAcceptance(unittest.TestCase):
     def test_native_os_identity_is_checked_before_build(self):
         steps = self.jobs['runtime-architecture']['steps']
         guard = next(i for i, step in enumerate(steps) if 'Verify actual native runner architecture' in step.get('name',''))
-        builder = next(i for i, step in enumerate(steps) if step.get('uses') == 'docker/build-push-action@v6')
+        builder = next(i for i, step in enumerate(steps) if step.get('uses') in ('docker/build-push-action@v6', 'docker/build-push-action@v7'))
         self.assertLess(guard, builder)
         self.assertIn('uname -m', steps[guard]['run'])
         self.assertIn('aarch64', steps[guard]['run'])
