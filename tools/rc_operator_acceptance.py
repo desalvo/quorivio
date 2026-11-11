@@ -66,86 +66,9 @@ def make_plan(ledger_path: Path = GATES) -> dict:
     }
 
 
-
-# Collected operator evidence is intentionally distinct from the independent
-# RC acceptance ledger.  These bundles never set approval flags or gate status.
-COMMIT_RE = re.compile(r'^[0-9a-f]{40}
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--output', type=Path, default=PLAN)
-    parser.add_argument('--check', action='store_true', help='refuse a stale or edited plan')
-    group = parser.add_mutually_exclusive_group()
-    group.add_argument('--init-evidence', type=Path, metavar='PATH', help='Create a non-attesting operator evidence bundle (refuses overwrite)')
-    group.add_argument('--verify-evidence', type=Path, metavar='PATH', help='Verify recorded artifact SHA256 and exact pending gates')
-    parser.add_argument('--commit', help='Exact 40-character Git commit for an evidence bundle')
-    args = parser.parse_args()
-    if args.init_evidence is not None:
-        if not args.commit:
-            parser.error('--init-evidence requires --commit')
-        data = make_evidence_bundle(args.commit)
-        args.init_evidence.parent.mkdir(parents=True, exist_ok=True)
-        with args.init_evidence.open('x', encoding='utf-8') as target:
-            target.write(json.dumps(data, indent=2, ensure_ascii=False) + '\\n')
-        print(f'Initialized {len(data["items"])} unreviewed operator test records at {args.init_evidence}')
-        return 0
-    if args.verify_evidence is not None:
-        verified = verify_evidence_bundle(args.verify_evidence, commit=args.commit)
-        print(json.dumps(verified, indent=2))
-        return 0
-    plan = make_plan()
-    serialized = json.dumps(plan, indent=2, ensure_ascii=False) + '\n'
-    if args.check:
-        if not args.output.is_file() or args.output.read_text(encoding='utf-8') != serialized:
-            print('External acceptance plan missing, stale or prematurely attested')
-            return 1
-        print(f'PASS: {len(plan["items"])} unresolved RC operator gates remain unaccepted')
-        return 0
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(serialized, encoding='utf-8')
-    print(f'Wrote {len(plan["items"])} pending independent operator reviews')
-    return 0
-
-
-if __name__ == '__main__':
-    raise SystemExit(main())
-)
-SHA_RE = re.compile(r'^[0-9a-f]{64}
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--output', type=Path, default=PLAN)
-    parser.add_argument('--check', action='store_true', help='refuse a stale or edited plan')
-    group = parser.add_mutually_exclusive_group()
-    group.add_argument('--init-evidence', type=Path, metavar='PATH', help='Create an operator evidence bundle without granting approval')
-    group.add_argument('--verify-evidence', type=Path, metavar='PATH', help='Check evidence files and their SHA256 values')
-    parser.add_argument('--commit', help='Exact 40-character Git SHA recorded by the operator')
-    args = parser.parse_args()
-    if args.init_evidence is not None:
-        if not args.commit:
-            parser.error('--init-evidence requires --commit')
-        data = make_evidence_bundle(args.commit)
-        args.init_evidence.parent.mkdir(parents=True, exist_ok=True)
-        with args.init_evidence.open('x', encoding='utf-8') as out:
-            out.write(json.dumps(data, indent=2, ensure_ascii=False) + '\n')
-        print(f'Initialized {len(data["items"])} unreviewed operator records')
-        return 0
-    if args.verify_evidence is not None:
-        print(json.dumps(verify_evidence_bundle(args.verify_evidence, commit=args.commit), indent=2))
-        return 0
-    plan = make_plan()
-    serialized = json.dumps(plan, indent=2, ensure_ascii=False) + '\n'
-    if args.check:
-        if not args.output.is_file() or args.output.read_text(encoding='utf-8') != serialized:
-            print('External acceptance plan missing, stale or prematurely attested')
-            return 1
-        print(f'PASS: {len(plan["items"])} unresolved RC operator gates remain unaccepted')
-        return 0
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(serialized, encoding='utf-8')
-    print(f'Wrote {len(plan["items"])} pending independent operator reviews')
-    return 0
-
-
-if __name__ == '__main__':
-    raise SystemExit(main())
-)
+# Operator evidence remains separate from external RC approval.
+COMMIT_RE = re.compile(r'^[0-9a-f]{40}$')
+SHA_RE = re.compile(r'^[0-9a-f]{64}$')
 
 
 def make_evidence_bundle(commit: str, plan: dict | None = None) -> dict:
@@ -229,7 +152,24 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, default=PLAN)
     parser.add_argument('--check', action='store_true', help='refuse a stale or edited plan')
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('--init-evidence', type=Path, metavar='PATH', help='Create a non-attesting operator evidence bundle')
+    group.add_argument('--verify-evidence', type=Path, metavar='PATH', help='Verify evidence artifact SHA256 digests')
+    parser.add_argument('--commit', help='Exact full Git SHA for this evidence bundle')
     args = parser.parse_args()
+    if args.init_evidence is not None:
+        if not args.commit:
+            parser.error('--init-evidence requires --commit')
+        data = make_evidence_bundle(args.commit)
+        args.init_evidence.parent.mkdir(parents=True, exist_ok=True)
+        with args.init_evidence.open('x', encoding='utf-8') as target:
+            target.write(json.dumps(data, indent=2, ensure_ascii=False) + '\n')
+        print(f'Initialized {len(data["items"])} unreviewed operator test records')
+        return 0
+    if args.verify_evidence is not None:
+        result = verify_evidence_bundle(args.verify_evidence, commit=args.commit)
+        print(json.dumps(result, indent=2))
+        return 0
     plan = make_plan()
     serialized = json.dumps(plan, indent=2, ensure_ascii=False) + '\n'
     if args.check:
