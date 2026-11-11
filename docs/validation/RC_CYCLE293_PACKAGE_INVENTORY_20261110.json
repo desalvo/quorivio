@@ -2094,14 +2094,14 @@
       "54a62e5d"
     ],
     "apps/web/src/main.tsx": [
-      "70232fd2",
-      "0ce39606",
-      "70aab2ec",
-      "0a11060b",
-      "8a4526ff",
-      "0367a56e",
-      "f155bcde",
-      "b5b80bf8"
+      "bc8ed321",
+      "6c478c59",
+      "c7953e85",
+      "b6335a3d",
+      "782a2fbc",
+      "59e835b1",
+      "4a40b30b",
+      "d0c87681"
     ],
     "apps/web/src/main.tsx.orig": [
       "9230e5a3",
@@ -3654,14 +3654,14 @@
       "7af8d8d1"
     ],
     "apps/web/test/rc307-results-layout-recovery.test.ts": [
-      "0e66e0d4",
-      "fa4aad1a",
-      "6ea4197f",
-      "a42297c1",
-      "05733ca6",
-      "82455e39",
-      "6b8faa4d",
-      "191f524f"
+      "cfa3deea",
+      "255c8f7c",
+      "7dc24117",
+      "4dbca06b",
+      "0f20fc49",
+      "772c2c62",
+      "132d3877",
+      "4bb7190a"
     ],
     "apps/web/test/rc70-editor-timer-font.test.ts": [
       "116cfb27",
