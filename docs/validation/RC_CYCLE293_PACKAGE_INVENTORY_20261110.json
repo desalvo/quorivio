@@ -114,14 +114,14 @@
       "09ed5724"
     ],
     "README.md": [
-      "5fd298af",
-      "2ae94116",
-      "11d7d86b",
-      "7facc9ab",
-      "1a395d4e",
-      "93262a85",
-      "b089fd6d",
-      "20b8d4d6"
+      "ab164937",
+      "7b1ec41d",
+      "dff8b15f",
+      "b6104acb",
+      "9461fa58",
+      "296159be",
+      "e3acc5fc",
+      "42e6dd46"
     ],
     "apps/api/package.json": [
       "6c45ea8f",
@@ -224,14 +224,14 @@
       "2dd5f6ba"
     ],
     "apps/api/src/domain.ts": [
-      "c402d11d",
-      "1233afe3",
-      "67edcdb7",
-      "e91955a8",
-      "2f08f977",
-      "236b3497",
-      "ffaf3271",
-      "c78509a7"
+      "a3a04488",
+      "0c0714ed",
+      "754043aa",
+      "bef5cc68",
+      "510b16b7",
+      "989242ab",
+      "8201330a",
+      "0f59128d"
     ],
     "apps/api/src/email-otp.ts": [
       "442c62ac",
@@ -764,14 +764,14 @@
       "99842584"
     ],
     "apps/api/test/background-result-source-cycle39.test.ts": [
-      "42716140",
-      "68ec0efe",
-      "bae64a22",
-      "45ff276b",
-      "715b9012",
-      "a008d871",
-      "71e9e1ba",
-      "70b10907"
+      "7309891e",
+      "16492672",
+      "30a778d6",
+      "f59cc6e7",
+      "7b257549",
+      "ac0b5431",
+      "ca99e06c",
+      "9e1450d1"
     ],
     "apps/api/test/background-upload-failure.test.ts": [
       "88d5d2a9",
@@ -834,14 +834,14 @@
       "ea41d864"
     ],
     "apps/api/test/domain.test.ts": [
-      "065f395f",
-      "337850cd",
-      "d9768bf8",
-      "33e5269b",
-      "a318e433",
-      "fb00877a",
-      "b007500a",
-      "1f0840d4"
+      "838010a7",
+      "3e3727ff",
+      "0381007c",
+      "808b9980",
+      "ef333b28",
+      "7bfa4474",
+      "19abf075",
+      "6cf74c4b"
     ],
     "apps/api/test/email-mfa-flow.test.ts": [
       "c74d44cc",
@@ -2094,14 +2094,14 @@
       "54a62e5d"
     ],
     "apps/web/src/main.tsx": [
-      "aa94a0a9",
-      "a7653956",
-      "af90d9b5",
-      "8123e527",
-      "49e51afb",
-      "cb7c7adc",
-      "88a0b539",
-      "7431d91b"
+      "372fc74e",
+      "75a9ade9",
+      "995f547d",
+      "4387f780",
+      "6638b54b",
+      "0abbcd72",
+      "cd103b8d",
+      "e7cdf543"
     ],
     "apps/web/src/main.tsx.orig": [
       "9230e5a3",
@@ -2474,14 +2474,14 @@
       "2586b822"
     ],
     "apps/web/src/style.css": [
-      "6a2c3671",
-      "95646825",
-      "9dbeafeb",
-      "cf50918b",
-      "2cc7a066",
-      "02791f97",
-      "9872d959",
-      "e91e7948"
+      "c7922f5b",
+      "7cd3ee72",
+      "b04e54c1",
+      "addbb960",
+      "5d2fb09c",
+      "1463c51a",
+      "c4c43521",
+      "1866ad99"
     ],
     "apps/web/src/thumbnail-menu-layout.ts": [
       "a4748563",
@@ -2634,14 +2634,14 @@
       "f116c35e"
     ],
     "apps/web/src/widget-results.ts": [
-      "0d6852fc",
-      "c237329d",
-      "fe074194",
-      "3e6daf40",
-      "c338e3bc",
-      "083a4527",
-      "9aa4a0cf",
-      "6582cd91"
+      "5d8d0626",
+      "3a5f088a",
+      "eef11bd4",
+      "ee4c9a79",
+      "b899ccf7",
+      "a70be870",
+      "f7091ab3",
+      "e284fc39"
     ],
     "apps/web/src/widget-rich-editor.tsx": [
       "610fdf07",
@@ -3744,14 +3744,14 @@
       "f393af67"
     ],
     "apps/web/test/result-cloud.test.ts": [
-      "bd071f27",
-      "2f3f3909",
-      "1073ee66",
-      "51779b69",
-      "e2031879",
-      "01894bf3",
-      "09b3285f",
-      "64f7762c"
+      "2fe97460",
+      "03bae4cc",
+      "2855f262",
+      "59acf896",
+      "4204e377",
+      "1acc4b72",
+      "b26f752c",
+      "0f81fcf5"
     ],
     "apps/web/test/session-load-recovery.test.ts": [
       "89ba5433",
@@ -3884,14 +3884,14 @@
       "881885b6"
     ],
     "apps/web/test/widget-results.test.ts": [
-      "41d43bd5",
-      "5c6a489f",
-      "defa87aa",
-      "6765eae0",
-      "0600c505",
-      "e7426b56",
-      "e519b4f2",
-      "ff6c73d3"
+      "eec7e119",
+      "1b01d35b",
+      "264b8a69",
+      "a58c771f",
+      "f628c69b",
+      "1bb68ea4",
+      "1bc16f15",
+      "a982d019"
     ],
     "apps/web/test/widget-rich-editor-ime.test.ts": [
       "88248341",
@@ -4404,14 +4404,14 @@
       "d240df37"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "2a7d2f8f",
-      "f4859994",
-      "66231ad9",
-      "3b158597",
-      "27b5bf3b",
-      "64fef252",
-      "a9020ae3",
-      "6c1b8a8e"
+      "cbd3fa84",
+      "e3ec7d82",
+      "e99488bc",
+      "f6932e98",
+      "4452eb49",
+      "e75e3233",
+      "fbd772aa",
+      "dbf13c89"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",

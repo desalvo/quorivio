@@ -1,6 +1,6 @@
 /** Page-scoped presenter statistics; result controls never reference participants directly. */
 export const STATISTICAL_WIDGET_KINDS=['question','timed-quiz','rating','reactions','topic-question'] as const;
-export type StatisticalWidget={id:string;kind:string;label?:string;description?:string;answerMode?:string;options?:{id:string;label:string}[];targetWidgetId?:string;targetActivityId?:string;targetQuestionId?:string;questions?:{id:string;label:string;description?:string;answerMode?:string;options?:{id:string;label:string}[]}[];resultsView?:string;resultSortOrder?:'index-asc'|'index-desc'|'count-asc'|'count-desc';resultsOnly?:boolean;showTitle?:boolean;showSourceQuestion?:boolean;showSourceTitle?:boolean;showSourceAnswers?:boolean};
+export type StatisticalWidget={id:string;kind:string;label?:string;description?:string;answerMode?:string;options?:{id:string;label:string}[];targetWidgetId?:string;targetActivityId?:string;targetQuestionId?:string;questions?:{id:string;label:string;description?:string;answerMode?:string;options?:{id:string;label:string}[]}[];resultsView?:string;gaugeMinMode?:'auto'|'manual';gaugeMaxMode?:'auto'|'manual';gaugeMin?:number;gaugeMax?:number;gaugeGradient?:boolean;gaugeMinColor?:string;gaugeMaxColor?:string;gaugeColor?:string;gaugeShowValue?:boolean;gaugeAggregation?:'min'|'max'|'mean';resultSortOrder?:'index-asc'|'index-desc'|'count-asc'|'count-desc';resultsOnly?:boolean;showTitle?:boolean;showSourceQuestion?:boolean;showSourceTitle?:boolean;showSourceAnswers?:boolean};
 export type StatRow={id:string;label:string;count:number};
 export type SourceQuestionPart={id?:string;label:string;description?:string;answerMode?:string;options?:{id:string;label:string}[]};
 /** The author may reveal a read-only copy of the SOURCE question above the
@@ -39,11 +39,39 @@ export function linkedStatisticContext<T extends {id:string;page_design?:{widget
  const source=linkedStatisticSource(widget,widgets);
  return source?{activity,widgets,source}:undefined;
 }
-export type ResultView='bars'|'pie'|'table'|'cloud';
-/** The source question/quiz/poll controls the appearance; result widgets cannot override it. */
+export type ResultView='bars'|'pie'|'table'|'cloud'|'gauge';
+/** Explicit result view overrides source; legacy results inherit the source view. */
 export function effectiveResultView(resultWidget:StatisticalWidget,widgets:StatisticalWidget[]):ResultView{
- const view=linkedStatisticSource(resultWidget,widgets)?.resultsView;
- return view==='pie'||view==='table'||view==='cloud'?view:'bars';
+ const source=linkedStatisticSource(resultWidget,widgets);
+ if(!source)return 'bars';
+ const view=resultWidget.resultsView??source.resultsView;
+ return view==='pie'||view==='table'||view==='cloud'||view==='gauge'?view:'bars';
+}
+export type GaugeConfig={
+ gaugeMinMode?:'auto'|'manual';gaugeMaxMode?:'auto'|'manual';gaugeMin?:number;gaugeMax?:number;
+ gaugeAggregation?:'min'|'max'|'mean';gaugeGradient?:boolean;gaugeMinColor?:string;
+ gaugeMaxColor?:string;gaugeColor?:string;gaugeShowValue?:boolean;
+};
+export type GaugeModel={value:number|null;min:number;max:number;percent:number;total:number;aggregation:'min'|'max'|'mean'};
+/** Work on anonymous presenter-only histogram counts; rating scores use weighted votes. */
+export function gaugeModel(rows:readonly StatRow[],config:GaugeConfig={},sourceKind='question'):GaugeModel{
+ const bins=rows.filter(r=>Number.isSafeInteger(r.count)&&r.count>0);
+ const scored=bins.map(r=>({n:Number(r.label),count:r.count}));
+ const numeric=scored.length>0&&scored.every((r,i)=>Number.isFinite(r.n)&&rows.some(x=>x.count>0&&Number(x.label)===r.n&&String(x.label).trim()!==''));
+ const samples=numeric?scored:bins.map(r=>({n:r.count,count:1}));
+ const aggregation=config.gaugeAggregation==='min'||config.gaugeAggregation==='max'?config.gaugeAggregation:'mean';
+ const raw=samples.length?(aggregation==='min'?Math.min(...samples.map(r=>r.n)):aggregation==='max'?Math.max(...samples.map(r=>r.n)):samples.reduce((sum,r)=>sum+r.n*r.count,0)/samples.reduce((sum,r)=>sum+r.count,0)):null;
+ const autoMin=sourceKind==='rating'?0:samples.length?Math.min(0,...samples.map(r=>r.n)):0;
+ const autoMax=sourceKind==='rating'?9:samples.length?Math.max(1,...samples.map(r=>r.n)):100;
+ const finite=(n:unknown):n is number=>typeof n==='number'&&Number.isFinite(n)&&n>=-1000000&&n<=1000000;
+ const min=config.gaugeMinMode==='manual'&&finite(config.gaugeMin)?config.gaugeMin:autoMin;
+ const candidateMax=config.gaugeMaxMode==='manual'&&finite(config.gaugeMax)?config.gaugeMax:autoMax;
+ const max=candidateMax>min?candidateMax:min+1;
+ const percent=raw===null?0:Math.min(100,Math.max(0,(raw-min)/(max-min)*100));
+ return {value:raw,min,max,percent,total:bins.reduce((sum,r)=>sum+r.count,0),aggregation};
+}
+export function gaugeColor(input:unknown,fallback='#000000'):string{
+ return typeof input==='string'&&/^#[0-9a-fA-F]{6}$/.test(input)?input:fallback;
 }
 export const REHEARSAL_EMOJIS=['👍','❤️','😂','😮','👏','🎉','🤔','😕'] as const;
 /** The same safe, count-only projection is used by live PostgreSQL and by rehearsal.

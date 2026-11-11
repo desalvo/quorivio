@@ -22,3 +22,11 @@ test('anonymous pseudonyms are bounded and reject markup',()=>{
 // Uploaded backgrounds must be UUID references, never arbitrary local paths.
 assert.equal(validPageDesign({backgroundAssetId:'not-a-uuid'}),false);
 assert.equal(validPageDesign({backgroundAssetId:'123e4567-e89b-42d3-a456-426614174000'}),true);
+
+test('RC313 gauge settings are validated and persisted only as safe finite values',()=>{
+ const gauge={id:'rating',kind:'rating',label:'Indice',resultsView:'gauge',gaugeMinMode:'manual',gaugeMin:0,gaugeMaxMode:'manual',gaugeMax:9,gaugeGradient:true,gaugeMinColor:'#cc0000',gaugeMaxColor:'#00cc00',gaugeColor:'#000000',gaugeShowValue:true,gaugeAggregation:'mean'};
+ assert.equal(validPageDesign({widgets:[gauge]}),true);
+ assert.equal(validPageDesign({widgets:[{...gauge,gaugeMax:Number.POSITIVE_INFINITY}]}),false);
+ assert.equal(validPageDesign({widgets:[{...gauge,gaugeColor:'red;url()'}]}),false);
+ assert.equal(validPageDesign({widgets:[{...gauge,gaugeAggregation:'sum'}]}),false);
+});
