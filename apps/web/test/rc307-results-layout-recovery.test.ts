@@ -69,3 +69,11 @@ test('RC309 authenticated dashboard defers live results into a local boundary',(
  assert.ok(ui.includes('const options=Array.isArray(a?.options)?a.options:[]'));
  assert.ok(ui.includes('Number.isFinite(count)&&count>0?count:0'));
 });
+
+// The participant-facing page can differ from the presenter page. Its optional
+// discussion widgets must never take down the authenticated dashboard.
+test('RC310 independently routed audience extensions stay inside an error boundary',()=>{
+ assert.ok(ui.includes("<ResultsWidgetErrorBoundary key={'audience-extension-'+current.id} widgetId={'audience-extension-'+current.id}>"));
+ assert.ok(ui.includes('Array.isArray((current as any).page_design?.widgets)'));
+ assert.ok(ui.includes('<PresenterAudienceExtensions key={current.id} sessionId={selected} activityId={current.id}/>'));
+});
