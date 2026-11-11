@@ -85,8 +85,13 @@ else:sys.exit(1)
         import yaml
         jobs=yaml.safe_load(CI.read_text(encoding='utf8'))['jobs']
         build=jobs['publish-platform']
-        builds=[s for s in build['steps'] if s.get('uses')=='docker/build-push-action@v6']
+        supported_actions={'docker/build-push-action@v6',
+                           'docker/build-push-action@v7'}
+        builds=[s for s in build['steps']
+                if s.get('uses') in supported_actions]
         self.assertEqual(len(builds),2)
+        self.assertEqual(len({s['uses'] for s in builds}),1,
+                         'Both native images must use the same supported Buildx action version')
         self.assertEqual({s['id'] for s in builds},
                          {'native-build','converter-native-build'})
         converter=next(s for s in builds if s['id']=='converter-native-build')

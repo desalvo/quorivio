@@ -135,7 +135,10 @@ class KubernetesHA(unittest.TestCase):
     def test_kind_job_is_opt_in_and_does_not_publish(self):
         workflow=(ROOT/'.github/workflows/ci.yml').read_text()
         self.assertIn("inputs.kubernetes_manifest_test",workflow)
-        self.assertIn('helm/kind-action@v1.12.0',workflow)
+        self.assertTrue(
+            'helm/kind-action@v1.12.0' in workflow or
+            'helm/kind-action@v1.15.1' in workflow,
+            'KIND runner must use an explicitly supported pinned helm/kind-action version')
         self.assertIn('python3 tools/ci_k8s_apiserver_smoke.py',workflow)
         script=(ROOT/'tools/ci_k8s_apiserver_smoke.py').read_text()
         self.assertIn("'--dry-run=server'",script)

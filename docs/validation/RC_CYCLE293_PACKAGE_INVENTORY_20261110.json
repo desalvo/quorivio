@@ -44,24 +44,24 @@
       "e377db62"
     ],
     ".github/workflows/ci.yml": [
-      "edfc0470",
-      "77c8eabf",
-      "faff51e9",
-      "22e6406d",
-      "55915885",
-      "baa98a8d",
-      "c965e2e3",
-      "d29f590c"
+      "022f68f8",
+      "c306218c",
+      "ef2450ac",
+      "58fc059a",
+      "946e77cf",
+      "b3cb9347",
+      "d5410200",
+      "02475ed3"
     ],
     ".github/workflows/converter-image.yml": [
-      "6ff519db",
-      "6b24b486",
-      "b30004aa",
-      "26a1070c",
-      "b8bf236b",
-      "2950134d",
-      "e63ca790",
-      "0e4e4023"
+      "da7d2e50",
+      "8e73b985",
+      "c6c2fa5b",
+      "9081c9c7",
+      "6f0bc21c",
+      "51a818f5",
+      "156d0990",
+      "5e477b12"
     ],
     ".gitignore": [
       "ca752cf7",
@@ -19614,14 +19614,14 @@
       "f0b0fe82"
     ],
     "tools/tests/test_k8s_ha_hardening.py": [
-      "03af078d",
-      "6efe3344",
-      "4943eb7a",
-      "a42e2b95",
-      "9a65ff7f",
-      "494d39b7",
-      "287b4ffa",
-      "cb97d362"
+      "ff237744",
+      "077aa14c",
+      "0d1412fc",
+      "b2c5afa9",
+      "ca239bcb",
+      "a826ef84",
+      "3fe5a559",
+      "fb4c8118"
     ],
     "tools/tests/test_k8s_runtime_cycle24.py": [
       "2d478d9c",
@@ -19724,14 +19724,14 @@
       "45b63a5f"
     ],
     "tools/tests/test_manual_docker_publish.py": [
-      "eebb1738",
-      "3c54ca21",
-      "5a170bfc",
-      "b751bd56",
-      "862f6a01",
-      "4511ca80",
-      "acadc0a2",
-      "9d95f8a9"
+      "fe46f93b",
+      "224dcaab",
+      "cf3b0cc9",
+      "daf51558",
+      "1502d7b9",
+      "a26e74a4",
+      "5fc324b2",
+      "a4b5b1f4"
     ],
     "tools/tests/test_mobile_touch_capture_contract.py": [
       "168e1cab",
@@ -20124,14 +20124,14 @@
       "7ae757ef"
     ],
     "tools/tests/test_rc127_native_runtime_and_operator_plan.py": [
-      "98e8f35f",
-      "6f2cf401",
-      "3436caad",
-      "375a4ddf",
-      "7d1d8d4e",
-      "6ce95219",
-      "e6f4a395",
-      "8553b589"
+      "6fcf9677",
+      "f74bce6c",
+      "a8869143",
+      "a0af4a90",
+      "78f91a92",
+      "44c14207",
+      "99a0c2a9",
+      "90c69c90"
     ],
     "tools/tests/test_rc128_rehearsal_parity_contract.py": [
       "e940faa3",
@@ -21774,14 +21774,14 @@
       "965e89fb"
     ],
     "tools/tests/test_rc302_joint_native_publisher.py": [
-      "cd4ce78f",
-      "270c3a6d",
-      "ae0ef7df",
-      "6c8430c5",
-      "a2c993ed",
-      "0e3bf836",
-      "c40d7551",
-      "1530f32a"
+      "ef0a3def",
+      "9e67b34f",
+      "e2b829ee",
+      "7ca61149",
+      "cc795490",
+      "783a6f53",
+      "029902e6",
+      "b2d9b950"
     ],
     "tools/tests/test_rc73_slide_master.py": [
       "2c080f2d",
@@ -22034,14 +22034,14 @@
       "fd60e5dc"
     ],
     "tools/tests/test_rc_cycle102_editor_and_commit_markers.py": [
-      "21cea93a",
-      "ab619b45",
-      "a8647b10",
-      "43a0d5e9",
-      "f6d2e075",
-      "6bfa44c5",
-      "2f96f5ca",
-      "c197f75d"
+      "2eba0c7a",
+      "89b9e99c",
+      "c0dfa94b",
+      "d083359a",
+      "35f29c88",
+      "cd426c09",
+      "98f1ef0b",
+      "57e2cfee"
     ],
     "tools/tests/test_rc_cycle10_package_integrity_20261029.py": [
       "751029fa",

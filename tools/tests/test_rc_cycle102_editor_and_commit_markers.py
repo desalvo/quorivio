@@ -63,7 +63,8 @@ class RC102Contracts(unittest.TestCase):
         self.assertIn('push=true',platform)
         self.assertIn('ubuntu-24.04-arm',platform)
         self.assertIn("needs.rc-campaign-conclusion.result == 'success'",platform)
-        self.assertIn('docker/setup-buildx-action@v3',publish)
+        self.assertIn('docker/setup-buildx-action@v4',publish)
+        self.assertNotIn('docker/setup-buildx-action@v3',publish)
         self.assertIn('secrets.DOCKERHUB_TOKEN',publish)
         # Preserve independent manual publishing; RC workflow_dispatch cannot publish.
         manual=CI.split('  publish:',1)[1].split('  publish-on-commit:',1)[0]

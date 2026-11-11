@@ -105,12 +105,12 @@ class ManualPublishPolicy(unittest.TestCase):
         for key in ('publish-platform','publish','publish-on-commit'):
             self.assertEqual(jobs[key]['permissions'],{'contents':'read'})
             self.assertEqual(jobs[key]['environment'],'production')
-        self.assertTrue(any(x.get('uses')=='docker/build-push-action@v6'
+        self.assertTrue(any(x.get('uses') in ('docker/build-push-action@v6', 'docker/build-push-action@v7')
                             for x in build['steps']))
         self.assertEqual({x['arch']:x['platform'] for x in build['strategy']['matrix']['include']},
                          {'amd64':'linux/amd64','arm64':'linux/arm64'})
         for name in ('publish','publish-on-commit'):
-            self.assertFalse(any(x.get('uses')=='docker/build-push-action@v6'
+            self.assertFalse(any(x.get('uses') in ('docker/build-push-action@v6', 'docker/build-push-action@v7')
                                  for x in jobs[name]['steps']))
             self.assertTrue(any('bash tools/publish_multiarch_manifest.sh'==x.get('run')
                                 for x in jobs[name]['steps']))
