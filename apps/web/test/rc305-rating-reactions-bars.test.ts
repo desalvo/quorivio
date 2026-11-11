@@ -30,7 +30,7 @@ test('RC305 maximum displayed bar is always 100% with safe zero handling',()=>{
  assert.equal(resultBarWidth(100,22),100);
 });
 test('RC305 React rows use maximum of visible bars and source widget kind',()=>{
- assert.ok(ui.includes('visibleResultBars(data,widget.resultSortOrder,widget.resultTopCount)'));
+ assert.ok(ui.includes('visibleResultBars(sourceRows,widget.resultSortOrder,widget.resultTopCount)'));
  assert.ok(ui.includes('resultBarWidth(r.count,maxBarCount)'));
  assert.ok(ui.includes('data-result-source-kind={source.kind}'));
  assert.ok(ui.includes('aria-label="Ordinamento risposte risultati"'));
