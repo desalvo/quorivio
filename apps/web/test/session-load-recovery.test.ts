@@ -27,3 +27,25 @@ test('older snapshot without statistics arrays is normalized to avoid a blank da
  assert.equal(isOwnerSessionSnapshot(older,sid),true);
  assert.deepEqual(normalizeOwnerSessionSnapshot(older),{...older,results:[],totals:[]});
 });
+
+test('divergent presenter/audience pages remain independent and preserve the presenter dashboard',()=>{
+ const original={session:{...snapshot.session,current_activity_id:'audience',presenter_activity_id:'presenter'},activities:[
+  {id:'presenter',type:'slide',page_design:{audiencePageId:'audience',widgets:[]}},
+  {id:'audience',type:'slide',page_design:{widgets:'broken-legacy-widget-array'},result_design:{widgets:null},options:null},
+ ],results:[],totals:[]};
+ assert.equal(isOwnerSessionSnapshot(original,sid),true);
+ const safe=normalizeOwnerSessionSnapshot(original);
+ assert.equal(safe.session.presenter_activity_id,'presenter');
+ assert.equal(safe.session.current_activity_id,'audience');
+ assert.equal(safe.activities[0].page_design.audiencePageId,'audience');
+ assert.deepEqual(safe.activities[1].page_design.widgets,[]);
+ assert.deepEqual(safe.activities[1].result_design.widgets,[]);
+ assert.deepEqual(safe.activities[1].options,[]);
+ assert.equal(original.activities[1].page_design.widgets,'broken-legacy-widget-array');
+});
+test('deleted audience target falls back in memory without changing saved presenter page',()=>{
+ const original={session:snapshot.session,activities:[{id:'presenter',page_design:{audiencePageId:'deleted-audience',widgets:[]}}]};
+ const safe=normalizeOwnerSessionSnapshot(original);
+ assert.equal(safe.activities[0].page_design.audiencePageId,undefined);
+ assert.equal(original.activities[0].page_design.audiencePageId,'deleted-audience');
+});

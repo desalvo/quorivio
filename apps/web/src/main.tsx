@@ -1638,7 +1638,8 @@ function PresenterLiveScreen({sessionId,renderResults}:{sessionId:string;renderR
  const [screenError,setScreenError]=useState('');
  const [data,setData]=useState<Snapshot|null>(null);
  const [connection,setConnection]=useState<'connecting'|'connected'|'disconnected'|'blocked'>('connecting');
- useLive(sessionId,setData,setConnection);
+ // Invalid or audience-only live payloads must never replace the last valid presenter projection.
+ useLive(sessionId,s=>{if(isOwnerSessionSnapshot(s,sessionId))setData(normalizeOwnerSessionSnapshot(s))},setConnection);
  const [busy,setBusy]=useState(false);
  const [full,setFull]=useState(false);
  const [mobileControls,setMobileControls]=useState(()=>window.matchMedia('(hover: none), (pointer: coarse)').matches);
@@ -1658,11 +1659,12 @@ function PresenterLiveScreen({sessionId,renderResults}:{sessionId:string;renderR
    try{
     const s=await request<Snapshot>(`/sessions/${encodeURIComponent(sessionId)}`);
     if(!mounted)return;
-    setVerified(true);setData(s);
+    if(!isOwnerSessionSnapshot(s,sessionId))throw Error('invalid_presenter_snapshot');
+    setVerified(true);setData(normalizeOwnerSessionSnapshot(s));
     if(['active','ready'].includes(s.session.status)&&!s.session.current_activity_id&&s.activities.length){
      await request(`/sessions/${encodeURIComponent(sessionId)}/presentation/ensure-first-page`,'POST');
      const fresh=await request<Snapshot>(`/sessions/${encodeURIComponent(sessionId)}`);
-     if(mounted)setData(fresh);
+     if(mounted&&isOwnerSessionSnapshot(fresh,sessionId))setData(normalizeOwnerSessionSnapshot(fresh));
     }
    }catch(e){if(mounted)setScreenError(e instanceof Error?e.message:String(e))}
   })();
@@ -1682,9 +1684,11 @@ function PresenterLiveScreen({sessionId,renderResults}:{sessionId:string;renderR
   pending.current=true;setBusy(true);setScreenError('');
   try{
    await request(`/sessions/${encodeURIComponent(sessionId)}/activities/${encodeURIComponent(target.id)}/open`,'POST',{expected_current_activity_id:data.session.current_activity_id,expected_presenter_activity_id:data.session.presenter_activity_id||data.session.current_activity_id});
-   setData(await request<Snapshot>(`/sessions/${encodeURIComponent(sessionId)}`));
+   const refreshed=await request<Snapshot>(`/sessions/${encodeURIComponent(sessionId)}`);
+   if(isOwnerSessionSnapshot(refreshed,sessionId))setData(normalizeOwnerSessionSnapshot(refreshed));
+   else setScreenError('La pagina partecipanti ha restituito uno snapshot non valido. La pagina presentatore resta disponibile.');
   }catch(e){setScreenError(e instanceof Error?e.message:String(e));
-   try{setData(await request<Snapshot>(`/sessions/${encodeURIComponent(sessionId)}`))}catch{}
+   try{const recovered=await request<Snapshot>(`/sessions/${encodeURIComponent(sessionId)}`);if(isOwnerSessionSnapshot(recovered,sessionId))setData(normalizeOwnerSessionSnapshot(recovered))}catch{}
   }finally{pending.current=false;setBusy(false)}
  };
  const latest=useRef(changePage);latest.current=changePage;

@@ -90,7 +90,9 @@ jobs:
   validate:
     name: Production quality gate
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    # The full Node/PostgreSQL/browser/preflight sequence exceeded 25 minutes and
+    # GitHub labelled the run cancelled despite no overlapping push.
+    timeout-minutes: 60
     # Run-scoped, disposable PostgreSQL credential. This is not a production secret.
     env:
       QUORIVIO_CI_DB_PASSWORD: ${{ format('ci-{0}-{1}-{2}', github.run_id, github.run_attempt, github.sha) }}

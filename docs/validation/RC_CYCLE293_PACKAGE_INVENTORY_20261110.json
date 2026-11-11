@@ -44,14 +44,14 @@
       "e377db62"
     ],
     ".github/workflows/ci.yml": [
-      "69209d39",
-      "e4148ea7",
-      "64216b62",
-      "fd17ebd2",
-      "42768cfa",
-      "3534aafa",
-      "c7a0e7dd",
-      "1fd54294"
+      "edfc0470",
+      "77c8eabf",
+      "faff51e9",
+      "22e6406d",
+      "55915885",
+      "baa98a8d",
+      "c965e2e3",
+      "d29f590c"
     ],
     ".github/workflows/converter-image.yml": [
       "6ff519db",
@@ -2094,14 +2094,14 @@
       "54a62e5d"
     ],
     "apps/web/src/main.tsx": [
-      "bc8ed321",
-      "6c478c59",
-      "c7953e85",
-      "b6335a3d",
-      "782a2fbc",
-      "59e835b1",
-      "4a40b30b",
-      "d0c87681"
+      "b93083da",
+      "1ee2164a",
+      "c075a023",
+      "29aa9635",
+      "443e454d",
+      "e01ccd44",
+      "918278a7",
+      "862d6555"
     ],
     "apps/web/src/main.tsx.orig": [
       "9230e5a3",
@@ -2414,14 +2414,14 @@
       "a3ef28c6"
     ],
     "apps/web/src/session-load-recovery.ts": [
-      "14704b71",
-      "4e48728d",
-      "c69dd352",
-      "5e6991ef",
-      "ec890f5e",
-      "48151fb8",
-      "5cf3a1ed",
-      "9e3f7657"
+      "3f81f5d0",
+      "59eac0bd",
+      "22af626c",
+      "d6e85919",
+      "ab7fa876",
+      "d0bf04fa",
+      "a905bdd5",
+      "485192d8"
     ],
     "apps/web/src/session-local-transfer.ts": [
       "6cb212ba",
@@ -3754,14 +3754,14 @@
       "64f7762c"
     ],
     "apps/web/test/session-load-recovery.test.ts": [
-      "b6d23c09",
-      "3704b61f",
-      "76b86e2e",
-      "b07b4bd9",
-      "8a9c93e7",
-      "9ef7b0f0",
-      "8ffce7ed",
-      "b6bfacd8"
+      "89ba5433",
+      "1590893a",
+      "9ef8d257",
+      "6999ce58",
+      "152e7fb0",
+      "ede9e89f",
+      "ecbe7fc7",
+      "20c67e45"
     ],
     "apps/web/test/session-qr-state.test.ts": [
       "5cf52a35",
