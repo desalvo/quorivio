@@ -61,3 +61,22 @@ export function resultPieLayout(values:readonly number[],size:unknown=PIE_SIZE_D
  }
  return slices;
 }
+
+/** Compact vertical SVG bounds for the circle, callouts and leader elbows.
+ * The horizontal 500-unit geometry remains stable when the pie is resized.
+ */
+export type PieViewport={y:number;width:number;height:number};
+export function resultPieViewport(slices:readonly PieSlice[],size:unknown=PIE_SIZE_DEFAULT):PieViewport{
+ const radius=116*resultPieSize(size)/100;
+ const {width,height,cy}=PIE_VIEWBOX;
+ let top=cy-radius,bottom=cy+radius;
+ for(const slice of slices){
+  if(!slice.label)continue;
+  const elbowY=cy+Math.sin(slice.midAngle)*(radius+12);
+  top=Math.min(top,slice.labelY-13,elbowY-2);
+  bottom=Math.max(bottom,slice.labelY+13,elbowY+2);
+ }
+ const y=Math.max(0,Math.floor(top-5));
+ const end=Math.min(height,Math.ceil(bottom+5));
+ return {y,width,height:Math.max(1,end-y)};
+}

@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
   "cycle": 293,
-  "file_count_excluding_manifest": 2599,
+  "file_count_excluding_manifest": 2601,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -2094,14 +2094,14 @@
       "54a62e5d"
     ],
     "apps/web/src/main.tsx": [
-      "dc35d01e",
-      "6aeb559b",
-      "691e11a7",
-      "ab703daf",
-      "f78a5b85",
-      "d964bf63",
-      "293dbd1f",
-      "3bcd21d0"
+      "ea8a5397",
+      "02625b51",
+      "5de9c1ec",
+      "5b03016f",
+      "499ba5ce",
+      "d0fd0d79",
+      "5d89bb95",
+      "b98539d4"
     ],
     "apps/web/src/main.tsx.orig": [
       "9230e5a3",
@@ -2374,14 +2374,14 @@
       "a4c2a225"
     ],
     "apps/web/src/result-pie-layout.ts": [
-      "df6feb58",
-      "acc30782",
-      "62f4cef0",
-      "c1b43a1f",
-      "d188426a",
-      "4b2a238b",
-      "ee336bbe",
-      "d53ae4d8"
+      "67d8bb8d",
+      "8ec93935",
+      "60329cca",
+      "649e3c4e",
+      "4d7fc674",
+      "dfcf6747",
+      "ed9caf78",
+      "b2718f0a"
     ],
     "apps/web/src/result-text-style.ts": [
       "05de4121",
@@ -2474,14 +2474,14 @@
       "2586b822"
     ],
     "apps/web/src/style.css": [
-      "c4619574",
-      "bcdd0eb0",
-      "8ce56f3f",
-      "a241c733",
-      "11c71e41",
-      "4cd81fea",
-      "43c4f9a4",
-      "2d79a041"
+      "64586b7d",
+      "f8a91233",
+      "bab65c67",
+      "2021218e",
+      "bde91133",
+      "3ac1db5f",
+      "023d3650",
+      "a9e7b23c"
     ],
     "apps/web/src/thumbnail-menu-layout.ts": [
       "a4748563",
@@ -3622,6 +3622,16 @@
       "0d003c21",
       "3178987d",
       "0a5fca1d"
+    ],
+    "apps/web/test/rc304-pie-compact-viewport.test.ts": [
+      "2ba48253",
+      "a4bf24dc",
+      "349b79ff",
+      "331d8d7a",
+      "a463e46f",
+      "11cd7a6a",
+      "0e543e7b",
+      "551c6161"
     ],
     "apps/web/test/rc70-editor-timer-font.test.ts": [
       "116cfb27",
@@ -5742,6 +5752,16 @@
       "fb98c5d5",
       "b731d811",
       "77b558b9"
+    ],
+    "docs/RC304_COMPACT_PIE.md": [
+      "95b51fdb",
+      "bcacfee7",
+      "c2c75c1e",
+      "a78b9b0a",
+      "178b36cb",
+      "789dd83a",
+      "50baab50",
+      "bfdf4ba8"
     ],
     "docs/RC49_HAPROXY_CROSS_NODE_RWX.en.md": [
       "7c1cc75e",

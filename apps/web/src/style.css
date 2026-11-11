@@ -3833,14 +3833,13 @@ body .editor-floating-panel.widget-selection-palette{
  transform:translateY(-50%)!important;margin:0!important;
  pointer-events:none!important;white-space:nowrap!important;
 }
-/* Pie labels are always outside the slices, with independently spaced leaders.
- * SVG uses a fixed coordinate system: the author controls the radius, not
- * the chart's surrounding box. A 0.1% slice still has a readable label. */
+/* RC304: keep the SVG's intrinsic height synchronized with the actual
+ * pie, leaders and labels. Shrinking a pie must free room for answer text. */
 .linked-results .linked-results-pie.linked-results-pie-chart{
  display:block!important;flex:0 0 auto!important;align-self:center!important;
  box-sizing:border-box!important;width:100%!important;height:auto!important;
  min-width:0!important;max-width:600px!important;max-height:none!important;
- aspect-ratio:500 / 320!important;border-radius:0!important;
+ aspect-ratio:var(--pie-chart-ratio,500 / 320)!important;border-radius:0!important;
  overflow:visible!important;background:transparent!important;
 }
 .linked-results-pie-chart .linked-results-pie-callout text{
@@ -3889,7 +3888,7 @@ body .editor-floating-panel.widget-selection-palette{
  }
  .linked-results .linked-results-pie-chart[data-mobile-percent-labels="true"] .linked-results-pie-callout{display:none}
  .linked-results .linked-results-pie.linked-results-pie-chart{
-  width:min(100%,250px)!important;aspect-ratio:500 / 320!important;height:auto!important;
+  width:min(100%,250px)!important;aspect-ratio:var(--pie-chart-ratio,500 / 320)!important;height:auto!important;
  }
 }
 :is(.editor-ux-v2 .canvas-editor-group[data-canvas-device="phone"] .widget-canvas-item,
@@ -3907,5 +3906,5 @@ body .editor-floating-panel.widget-selection-palette{
  .rehearsal-phone-stage .rehearsal-widget,
  .rehearsal-phone-widescreen-frame .rehearsal-widget,
  .audience-widget-layout.stage-phone>.page-widget)[data-widget-kind="results-button"] .linked-results-pie.linked-results-pie-chart{
- width:min(100%,250px)!important;aspect-ratio:500 / 320!important;height:auto!important;
+ width:min(100%,250px)!important;aspect-ratio:var(--pie-chart-ratio,500 / 320)!important;height:auto!important;
 }

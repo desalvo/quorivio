@@ -1,5 +1,5 @@
 import {thumbnailWidgetModel} from './thumbnail-widget-content.js';
-import {resultPieLayout,resultPieSize,resultPiePercent,PIE_VIEWBOX} from './result-pie-layout.js';
+import {resultPieLayout,resultPieSize,resultPiePercent,resultPieViewport} from './result-pie-layout.js';
 import {createLiveResultPoller} from './live-result-poller.js';
 import {answerFieldHeight,answerFieldHeightForKey} from './answer-field-resize.js';
 import {readWorkspaceLocation,writeWorkspaceLocation} from './workspace-recovery';
@@ -333,12 +333,13 @@ function LinkedResultChart({widget,widgets,rows,emptyLabel}:{widget:any;widgets:
   return /^#[0-9a-f]{6}$/i.test(chosen||'')?chosen:['#277fd1','#e87947','#51a580','#a477ca','#d35482','#b5a337'][i%6];
  });
  const pieSegments=resultPieLayout(data.map(r=>r.count),widget.pieSize,widget.pieShowPercentages===true,widget.pieShowOptionNumbers===true);
+ const pieViewport=resultPieViewport(pieSegments,widget.pieSize);
  return <section className={'linked-results result-view-'+chart} data-answer-key-enabled={String(hasKey)} aria-label={'Risultati '+(source.label||source.kind)}>
   {hasKey&&<button type="button" className={'result-answer-key-toggle'+(truthVisible?' is-active':'')} aria-label={truthVisible?'Nascondi risposte vere e false':'Evidenzia risposte vere e false'} aria-pressed={truthVisible} title={truthVisible?'Nascondi evidenziazione delle risposte':'Mostra risposte vere e false'} onPointerDown={e=>e.stopPropagation()} onClick={e=>{e.stopPropagation();setTruthVisible(v=>!v)}}>R</button>}
   <LinkedResultSourceQuestion result={viewWidget} source={source}/>
   {!widget.resultsOnly&&<>{widget.showTitle!==false&&<strong><WidgetStyledText text={widget.label||'Risultati'} widget={widget} field="label"/></strong>}{!resultSourceTitleVisible(widget)&&!resultSourceAnswersVisible(widget)&&<small>{source.label||source.kind} · {total} risposte{emptyLabel?' · '+emptyLabel:''}</small>}</>}
   {(resultSourceTitleVisible(widget)||resultSourceAnswersVisible(widget))&&<small>{total} risposte{emptyLabel?' · '+emptyLabel:''}</small>}
-  {chart==='pie'&&total>0&&<svg className="linked-results-pie linked-results-pie-chart" role="img" aria-label={widget.pieShowPercentages===true?"Distribuzione percentuale delle risposte. Legenda accessibile con conteggi e percentuali.":"Distribuzione delle risposte."} viewBox={`0 0 ${PIE_VIEWBOX.width} ${PIE_VIEWBOX.height}`} data-pie-size={resultPieSize(widget.pieSize)} data-mobile-percent-labels={widget.pieShowPercentages===true?'true':'false'} preserveAspectRatio="xMidYMid meet">
+  {chart==='pie'&&total>0&&<svg className="linked-results-pie linked-results-pie-chart" role="img" aria-label={widget.pieShowPercentages===true?"Distribuzione percentuale delle risposte. Legenda accessibile con conteggi e percentuali.":"Distribuzione delle risposte."} viewBox={`0 ${pieViewport.y} ${pieViewport.width} ${pieViewport.height}`} style={{'--pie-chart-ratio':`${pieViewport.width} / ${pieViewport.height}`} as React.CSSProperties} data-pie-viewport-height={pieViewport.height} data-pie-size={resultPieSize(widget.pieSize)} data-mobile-percent-labels={widget.pieShowPercentages===true?'true':'false'} preserveAspectRatio="xMidYMid meet">
    <title>{widget.pieShowPercentages===true?"Distribuzione percentuale delle risposte":"Distribuzione delle risposte"}</title>
    {pieSegments.map(r=><path key={'slice-'+r.index} d={r.path} fill={pieColors[r.index-1]} stroke="#fff" strokeWidth="1.5"><title>{`${data[r.index-1]?.label||('Opzione '+r.index)}: ${r.count} ${r.count===1?'risposta':'risposte'}${widget.pieShowPercentages===true?', '+resultPiePercent(r.share):''}`}</title></path>)}
    {pieSegments.filter(r=>r.label).map(r=><g className="linked-results-pie-callout" key={'label-'+r.index}>
