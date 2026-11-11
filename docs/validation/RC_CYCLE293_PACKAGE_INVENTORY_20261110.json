@@ -2094,14 +2094,14 @@
       "54a62e5d"
     ],
     "apps/web/src/main.tsx": [
-      "748a296c",
-      "24d3d1a0",
-      "062f2f18",
-      "35a10660",
-      "3dfa1e1e",
-      "54bd0621",
-      "a87f0964",
-      "04ae654d"
+      "3fc7451e",
+      "8ac69b75",
+      "ce8fe7d9",
+      "486d1f58",
+      "b7ace6f9",
+      "a6f64676",
+      "c47fb687",
+      "ed3479b7"
     ],
     "apps/web/src/main.tsx.orig": [
       "9230e5a3",
@@ -3654,14 +3654,14 @@
       "7af8d8d1"
     ],
     "apps/web/test/rc307-results-layout-recovery.test.ts": [
-      "2c3f3720",
-      "cc2fed73",
-      "d8e49f49",
-      "f36fd282",
-      "0b06fe10",
-      "2373e2c5",
-      "6c657a08",
-      "81c08119"
+      "0612bfa5",
+      "2668f09a",
+      "c2ddeb78",
+      "c8bf5f07",
+      "837af1bc",
+      "b7c8c282",
+      "57ddba9c",
+      "4cabc22b"
     ],
     "apps/web/test/rc70-editor-timer-font.test.ts": [
       "116cfb27",
@@ -22864,14 +22864,14 @@
       "a890b5ac"
     ],
     "tools/tests/test_rc_cycle99_ci_contract.py": [
-      "764c842f",
-      "082fe1fc",
-      "112ecdab",
-      "edb5e6d6",
-      "2f3cf743",
-      "85da4d1e",
-      "cfe65d18",
-      "e832b1ee"
+      "45f36635",
+      "76ea87a8",
+      "7e7d18ce",
+      "d8569605",
+      "dcf61399",
+      "d6cf4c27",
+      "24a9a83e",
+      "307f0b2b"
     ],
     "tools/tests/test_rc_cycle9_verified_accessibility_stats_20261028.py": [
       "186ea7e8",

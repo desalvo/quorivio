@@ -22,7 +22,7 @@ class Cycle99CiContract(unittest.TestCase):
     def test_dashboard_uses_guarded_navigation_and_stage_subscribes_live(self):
         self.assertIn('onClick={()=>navigateDashboard(key)}', UI)
         self.assertIn('if(confirmSchemaNavigation())setDashboardPage(page)', UI)
-        self.assertIn('useLive(sessionId,setData,setConnection)', UI)
+        self.assertIn('useLive(sessionId,s=>{if(isOwnerSessionSnapshot(s,sessionId))setData(normalizeOwnerSessionSnapshot(s))},setConnection)', UI)
         self.assertIn('useLive(entry?.session?.id,', UI)
 
     def test_title_footer_and_selected_text_share_rich_editor(self):

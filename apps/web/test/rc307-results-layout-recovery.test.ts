@@ -77,3 +77,12 @@ test('RC310 independently routed audience extensions stay inside an error bounda
  assert.ok(ui.includes('Array.isArray((current as any).page_design?.widgets)'));
  assert.ok(ui.includes('<PresenterAudienceExtensions key={current.id} sessionId={selected} activityId={current.id}/>'));
 });
+
+test('RC311 unexpected workspace failure never silently clears the selected session',()=>{
+ const boundary=ui.split('class WorkspaceErrorBoundary')[1]?.split('function GlobalPageZoomShell')[0]||'';
+ const catchBody=boundary.split('componentDidCatch(error:Error)')[1]?.split('render(){')[0]||'';
+ assert.ok(catchBody.includes('this.setState'),'auto recovery attempts one retry');
+ assert.ok(!catchBody.includes('writeWorkspaceLocation('),'automatic recovery must keep session identity');
+ assert.ok(boundary.includes('Riprova la sessione corrente'));
+ assert.ok(boundary.includes('La sessione selezionata è stata conservata.'));
+});
