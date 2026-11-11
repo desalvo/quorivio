@@ -20,7 +20,10 @@ class RC242ArialMasterZoom(unittest.TestCase):
         self.assertIn('font-family:inherit;',self.css)
         self.assertIn('RC242: the application theme',self.css)
         self.assertIn('initialWidgetTextStyle(kind)',self.main)
-        self.assertIn('widgetTypographyStyle(w.kind===',self.main)
+        self.assertIn('stageWidgetTypography(w,',self.main)
+        stage=(ROOT/'apps/web/src/stage-widget-typography.ts').read_text()
+        self.assertIn('widgetTypographyStyle(resolved)',stage)
+        self.assertIn("widgetDisplay(widget,context).style:widgetTextDefaults(widget.kind,widget.style)",stage)
 
     def test_scheme_save_is_always_accessible_without_second_ribbon_row(self):
         self.assertIn('slide-scheme-ribbon-save',self.main)
