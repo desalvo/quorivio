@@ -17,7 +17,8 @@ const liveTruthWiring=(source:string)=>{
    chart.includes('{hasKey&&<button') &&
    chart.includes('aria-pressed={truthVisible}') &&
    chart.includes('setTruthVisible(v=>!v)') &&
-   chart.includes('<LinkedResultSourceQuestion result={viewWidget} source={source}/>') &&
+   chart.includes('<LinkedResultSourceQuestion result={viewWidget} source={source} rankedRows={data}/>') &&
+   chart.includes('rankedRows={data}') &&
    chart.includes('answerTruthVerdict(source,widget.targetQuestionId') &&
    !live.includes('showCorrectLive');
 };
