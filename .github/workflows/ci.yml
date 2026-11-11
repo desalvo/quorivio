@@ -924,7 +924,7 @@ jobs:
         run: python3 -m unittest tools.tests.test_rc_cycle66_verified_sso_reconciliation -q
       - name: Check nonsecret CI token fixture
         run: python3 -m unittest tools.tests.test_rc_cycle64_credential_fixture -q
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with: {node-version: '22'} # npm caching requires a committed package-lock.json
       - name: RC280 fail-closed npm lockfile and LDAP dependency preflight
         run: python3 -m unittest tools.tests.test_rc280_npm_lock -q
@@ -1920,7 +1920,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: {persist-credentials: false}
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with: {node-version: '22'}
       - name: RC280 fail-closed npm lockfile and LDAP dependency preflight
         run: python3 -m unittest tools.tests.test_rc280_npm_lock -q
@@ -1961,16 +1961,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: {persist-credentials: false}
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
       - name: Build without publishing
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           push: false
           load: true
           tags: quorivio:gate
       - name: Build dedicated document converter image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: Dockerfile.converter
@@ -2026,7 +2026,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: {persist-credentials: false}
-      - uses: helm/kind-action@v1.12.0
+      - uses: helm/kind-action@v1.15.1
         with:
           cluster_name: quorivio-schema
           version: v0.26.0
@@ -2042,7 +2042,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: {persist-credentials: false}
-      - uses: helm/kind-action@v1.12.0
+      - uses: helm/kind-action@v1.15.1
         with:
           cluster_name: quorivio-runtime
           version: v0.26.0
@@ -2072,7 +2072,7 @@ jobs:
           test "$(id -u)" -ne 0
           sudo install -d -m 0777 /tmp/quorivio-kind-multinode-shared
           test "$(stat -c %a /tmp/quorivio-kind-multinode-shared)" = 777
-      - uses: helm/kind-action@v1.12.0
+      - uses: helm/kind-action@v1.15.1
         with:
           cluster_name: quorivio-multinode
           version: v0.26.0
@@ -2112,7 +2112,7 @@ jobs:
         run: |
           test "$(id -u)" -ne 0
           sudo install -d -m 0777 /tmp/quorivio-kind-multinode-shared
-      - uses: helm/kind-action@v1.12.0
+      - uses: helm/kind-action@v1.15.1
         with:
           cluster_name: quorivio-multinode
           version: v0.26.0
@@ -2147,7 +2147,7 @@ jobs:
         run: |
           test "$(id -u)" -ne 0
           sudo install -d -m 0777 /tmp/quorivio-kind-multinode-shared
-      - uses: helm/kind-action@v1.12.0
+      - uses: helm/kind-action@v1.15.1
         with:
           cluster_name: quorivio-multinode
           version: v0.26.0
@@ -2198,9 +2198,9 @@ jobs:
           set -euo pipefail
           expected="$( [ "$TARGET_ARCH" = arm64 ] && echo aarch64 || echo x86_64 )"
           test "$(uname -m)" = "$expected" || { echo 'Wrong CPU for native OCI runtime test'; exit 1; }
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
       - name: Compile native OCI without publication
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           platforms: ${{ matrix.platform }}
@@ -2240,7 +2240,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: {persist-credentials: false}
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with: {node-version: '22'}
       - name: Start disposable ClamAV with private loopback-only port
         run: |
@@ -2328,7 +2328,7 @@ jobs:
             test "$QUORIVIO_PUBLISH_IMAGE" = true
             test "$QUORIVIO_RC_ACCEPTANCE_SUITE" != true
           fi
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
       - name: Docker Hub authentication
         uses: docker/login-action@v3
         with:
@@ -2336,7 +2336,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Push a single native architecture by immutable digest only
         id: native-build
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           platforms: ${{ matrix.platform }}
@@ -2349,7 +2349,7 @@ jobs:
             org.opencontainers.image.revision=${{ github.sha }}
       - name: Build native converter architecture by immutable digest only
         id: converter-native-build
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: Dockerfile.converter
@@ -2410,7 +2410,7 @@ jobs:
           QUORIVIO_PUBLISH_IMAGE: ${{ inputs.publish_image }}
           QUORIVIO_RC_ACCEPTANCE_SUITE: ${{ inputs.rc_acceptance_suite }}
         run: bash tools/resolve_image_tags.sh
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
       - name: Docker Hub authentication
         uses: docker/login-action@v3
         with:
@@ -2468,7 +2468,7 @@ jobs:
           QUORIVIO_COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
           QUORIVIO_CAMPAIGN_CONCLUSION: ${{ needs.rc-campaign-conclusion.result }}
         run: bash tools/resolve_commit_image_tags.sh
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
       - name: Docker Hub authentication
         uses: docker/login-action@v3
         with:
