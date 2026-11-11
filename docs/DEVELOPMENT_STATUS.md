@@ -1,5 +1,7 @@
 # Quorivio 0.1.0-dev — RC293 — Compact visual manuals and product brochures
 
+**RC315 — Operator evidence hardening (2026-11-12):** Recovered previously unmerged PR #26 evidence-bundle verification code on top of latest main. Includes `--init-evidence`/`--verify-evidence`, exact commit binding, safe relative evidence artifact paths, SHA256 integrity, and rejection of unauthorized independent sign-off. Regression tests retained. External RC gate score unchanged (85.25%, 43 accepted / 17 partial).
+
 # Quorivio 0.1.0-dev — RC313 — Grafana-style semicircular Gauge (2026-11-11)
 
 New persisted Gauge chart for all statistical widgets: auto/manual limits (ratings 0–9), weighted mean/min/max, configurable color (black default), optional min/max gradient, optional numeric value, shared accessible SVG rendering for live/editor/rehearsal and legacy widget results. Validation and regression tests added. **Pending PR CI; do not promote external RC gates. Official score 85.25%, 43 accepted and 17 partial.**

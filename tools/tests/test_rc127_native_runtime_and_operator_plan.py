@@ -1,6 +1,8 @@
 """RC127: native OCI runtime per-architecture CI and truthful external RC plan."""
 from pathlib import Path
 import json
+import hashlib
+import tempfile
 import subprocess
 import unittest
 import yaml
@@ -8,7 +10,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tools'))
-from rc_operator_acceptance import make_plan, PLAN
+from rc_operator_acceptance import make_plan, make_evidence_bundle, verify_evidence_bundle, PLAN
 from rc_gate_audit import audit
 
 
@@ -80,6 +82,47 @@ class NativeRuntimeAcceptance(unittest.TestCase):
         self.assertEqual(json.loads(PLAN.read_text()), plan)
         self.assertEqual(audit()['score'], 85.25)
 
+
+    def test_operator_evidence_bundle_is_commit_bound_and_non_attesting(self):
+        sha = 'a' * 40
+        evidence = make_evidence_bundle(sha)
+        self.assertFalse(evidence['ready_for_rc'])
+        self.assertFalse(evidence['independent_approval'])
+        self.assertEqual(len(evidence['items']), 17)
+        with self.assertRaisesRegex(ValueError, '40-character'):
+            make_evidence_bundle('main')
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / 'evidence.json'
+            artifact = Path(folder) / 'screenshots' / 'editor.txt'
+            artifact.parent.mkdir()
+            artifact.write_bytes(b'operator test image fixture')
+            evidence['items'][0]['test_status'] = 'pass'
+            evidence['items'][0]['artifacts'] = [
+                {'path': 'screenshots/editor.txt',
+                 'sha256': hashlib.sha256(artifact.read_bytes()).hexdigest()}
+            ]
+            path.write_text(json.dumps(evidence), encoding='utf-8')
+            report = verify_evidence_bundle(path, commit=sha)
+            self.assertEqual(report['artifacts_verified'], 1)
+            self.assertFalse(report['ready_for_rc'])
+            artifact.write_bytes(b'tampered')
+            with self.assertRaisesRegex(ValueError, 'SHA256 mismatch'):
+                verify_evidence_bundle(path, commit=sha)
+            artifact.write_bytes(b'operator test image fixture')
+            evidence['items'][0]['artifacts'][0]['path'] = '../editor.txt'
+            path.write_text(json.dumps(evidence), encoding='utf-8')
+            with self.assertRaisesRegex(ValueError, 'relative without traversal'):
+                verify_evidence_bundle(path, commit=sha)
+            evidence['items'][0]['artifacts'] = []
+            evidence['items'][0]['independent_approval'] = True
+            path.write_text(json.dumps(evidence), encoding='utf-8')
+            with self.assertRaisesRegex(ValueError, 'cannot grant independent approval'):
+                verify_evidence_bundle(path, commit=sha)
+            evidence['items'][0]['independent_approval'] = False
+            evidence['items'][0]['test_status'] = 'accepted'
+            path.write_text(json.dumps(evidence), encoding='utf-8')
+            with self.assertRaisesRegex(ValueError, 'Unsupported technical test status'):
+                verify_evidence_bundle(path, commit=sha)
 
 if __name__ == '__main__':
     unittest.main()
