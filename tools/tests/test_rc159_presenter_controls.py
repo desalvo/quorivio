@@ -26,13 +26,14 @@ def rating_ok(ui, rating, css):
  return all(t in ui for t in (
   'function RatingStageContent(',
   'size={widget.style?.ratingButtonSize}',
-  'comment={demoRatingComments[w.id]',
+  "comment={viewer==='participant'?demoRatingComments[w.id]",
   'comment={ratingComments[w.id]',
   'RatingCommentField value={comment}',
   '>Invia risposta</button>',
  )) and 'Invia risposta al widget' not in ui and all(t in rating for t in (
   'export function RatingCommentField(', 'maxLength={1000}',
   'readOnly={readOnly||!onChange}', 'aria-label="Commento facoltativo"',
+  "value={readOnly?'':value}", "const current=!readOnly&&selected!==undefined",
  )) and '.rating-comment-input{display:block;' in css and 'background:#ffffff!important;color:#142b44!important' in css
 
 def policy_ok(api,policy):
@@ -58,6 +59,8 @@ class RC159PresenterControls(unittest.TestCase):
  def test_negative_comment_visibility(self):
   self.assertFalse(rating_ok(UI.replace('RatingCommentField value={comment}','div data-broken-comment',1),RATING,CSS))
   self.assertFalse(rating_ok(UI,RATING.replace('readOnly={readOnly||!onChange}','readOnly={false}',1),CSS))
+  self.assertFalse(rating_ok(UI,RATING.replace("value={readOnly?'':value}",'value={value}',1),CSS))
+  self.assertFalse(rating_ok(UI,RATING.replace('const current=!readOnly&&selected!==undefined','const current=selected!==undefined',1),CSS))
   self.assertFalse(rating_ok(UI,RATING,CSS.replace('background:#ffffff!important;color:#142b44!important','background:black;color:white',1)))
  def test_negative_rate_guard(self):
   self.assertFalse(policy_ok(API.replace('Number(r.rows[0].hits)>limit','false',1),POLICY))
