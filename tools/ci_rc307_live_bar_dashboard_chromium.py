@@ -77,6 +77,15 @@ async def run():
             await screen.reload(wait_until='domcontentloaded')
             await expect(screen.locator('.projection-widget[data-widget-kind="results-button"] .linked-results.result-view-bars')).to_have_count(1,timeout=20000)
             await expect(screen.locator('.session-restore-error')).to_have_count(0)
+            # Exercise the *authenticated dashboard*, which the historic RC307
+            # test missed: it rendered the separate /screen projection only.
+            await editor.get_by_role('region',name='Editor grafico delle pagine').get_by_role('button',name='Esci',exact=True).click()
+            await expect(editor.locator('.live-panel')).to_be_visible(timeout=20000)
+            await expect(editor.locator('.session-restore-error')).to_have_count(0)
+            await editor.reload(wait_until='domcontentloaded')
+            await expect(editor.locator('.session-restore-error')).to_have_count(0)
+            await expect(editor.locator('.live-panel')).to_be_visible(timeout=20000)
+            print('RC309 PASS: authenticated dashboard and reopened session remain usable')
             assert not errors, 'React errors: '+'; '.join(errors[:3])
             current = await call(context,'GET',f'/api/sessions/{sid}')
             assert current['session']['status']=='active'
