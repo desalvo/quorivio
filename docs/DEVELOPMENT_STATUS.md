@@ -1,4 +1,10 @@
-# RC313 — Grafana-style semicircular Gauge (2026-11-11)\n\nNew persisted Gauge chart for all statistical widgets: auto/manual limits (ratings 0–9), weighted mean/min/max, configurable color (black default), optional min/max gradient, optional numeric value, shared accessible SVG rendering for live/editor/rehearsal and legacy widget results. Validation and regression tests added. **Pending PR CI; do not promote external RC gates. Official score 85.25%, 43 accepted and 17 partial.**\n\n---\n\n# Quorivio 0.1.0-dev — RC293 — Compact visual manuals and product brochures
+# Quorivio 0.1.0-dev — RC313 — Grafana-style semicircular Gauge (2026-11-11)
+
+New persisted Gauge chart for all statistical widgets: auto/manual limits (ratings 0–9), weighted mean/min/max, configurable color (black default), optional min/max gradient, optional numeric value, shared accessible SVG rendering for live/editor/rehearsal and legacy widget results. Validation and regression tests added. **Pending PR CI; do not promote external RC gates. Official score 85.25%, 43 accepted and 17 partial.**
+
+---
+
+# Quorivio 0.1.0-dev — RC293 — Compact visual manuals and product brochures
 
 **RC302 development (2026-11-10):** Joint explicitly authorized native AMD64/ARM64 Docker Hub publication for `desalvo/quorivio` and `desalvo/quorivio-converter`, with identical SHA/latest labels, preflight digest validation before any mutable tag, separate post-publication manifest checks, and fail-closed regression coverage. Prior app-only publication run 42897981990 and RC301 full CI 42901855073 were green; joint publication requires this PR CI and a separate authorized successful main run. See `docs/RC_CYCLE302_JOINT_DOCKER_HUB.en.md`. Official **85.25%** (43 accepted / 17 partial); strict RC still awaiting external reviews.
 
