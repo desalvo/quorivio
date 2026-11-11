@@ -63,7 +63,9 @@ class BackgroundUploadAndFormatting(unittest.TestCase):
  def test_cloud_colors_displayed_across_views(self):
   self.assertGreaterEqual(M.count('cloudRankColor('),3)
   self.assertIn('rankCloudItems(Object.entries(rev.options)',M)
-  self.assertIn("chart==='cloud'?rankCloudItems(data",M)
+  self.assertIn("const data=sortedResultBars(sourceRows,widget.resultSortOrder)",M)
+  self.assertIn("const displayRows=visibleResultBars(data,widget.resultSortOrder,widget.resultTopCount)",M)
+  self.assertIn("chart==='cloud'",M)
   self.assertIn('rankCloudItems(words,w=>w.count,w=>w.word)',M)
   self.assertIn('.result-cloud-word',CSS)
 if __name__=='__main__':unittest.main()
