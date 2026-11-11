@@ -8,7 +8,7 @@ const css=readFileSync(new URL('../src/style.css',import.meta.url),'utf8');
 const original=[{id:'first',count:8},{id:'second',count:10},{id:'third',count:11}];
 test('RC307 all graph types have a single source-ordered data sequence',()=>{
  assert.ok(ui.includes('const data=sortedResultBars(sourceRows,widget.resultSortOrder)'));
- assert.ok(ui.includes('const displayRows=visibleResultBars(data,widget.resultSortOrder,widget.resultTopCount)'));
+ assert.ok(ui.includes('const displayRows=visibleResultBars(sourceRows,widget.resultSortOrder,widget.resultTopCount)'));
  assert.ok(ui.includes('const pieSegments=resultPieLayout(data.map(r=>r.count)'));
  assert.ok(ui.includes('rankedRows={data}'));
  for(const order of ['index-asc','index-desc','count-asc','count-desc']){
