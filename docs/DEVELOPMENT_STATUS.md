@@ -1,3 +1,9 @@
+# RC303 — Operator evidence integrity and release gate separation (2026-11-11)
+
+**Implementation (pending CI):** Added commit-bound, SHA256-verified operator evidence bundles to `tools/rc_operator_acceptance.py` with `--init-evidence`, `--verify-evidence` and strict tests for tampering, path traversal, commit identity, and prohibition of fabricated independent approval. Test fixture is in `tools/tests/test_rc127_native_runtime_and_operator_plan.py`. Use: `python3 tools/rc_operator_acceptance.py --init-evidence /tmp/quorivio-rc-evidence/record.json --commit <exact-40-char-main-SHA>`; record technical test status, add evidence file paths relative to the record and SHA256 hashes, then run `python3 tools/rc_operator_acceptance.py --verify-evidence /tmp/quorivio-rc-evidence/record.json --commit <same-SHA>`. Generated evidence remains outside Git, must not contain real credentials, and does not convert operator passes into independent sign-off. **RC matrix unchanged: 85.25% / 43 accepted / 17 partial; strict RC remains false.** Full CI 43082384804 successful on publication commit 173f0f42ac04, with any Docker registry publication subject to separate job/digest checks.
+
+---
+
 # Quorivio 0.1.0-dev — RC293 — Compact visual manuals and product brochures
 
 **RC302 development (2026-11-10):** Joint explicitly authorized native AMD64/ARM64 Docker Hub publication for `desalvo/quorivio` and `desalvo/quorivio-converter`, with identical SHA/latest labels, preflight digest validation before any mutable tag, separate post-publication manifest checks, and fail-closed regression coverage. Prior app-only publication run 42897981990 and RC301 full CI 42901855073 were green; joint publication requires this PR CI and a separate authorized successful main run. See `docs/RC_CYCLE302_JOINT_DOCKER_HUB.en.md`. Official **85.25%** (43 accepted / 17 partial); strict RC still awaiting external reviews.

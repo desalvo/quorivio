@@ -1,3 +1,5 @@
+**RC operator evidence capture (RC303):** Technical collaudatori can initialize a commit-bound evidence record using `python3 tools/rc_operator_acceptance.py --init-evidence /tmp/quorivio-rc-evidence/record.json --commit <40-hex-Git-SHA>`. Use `--verify-evidence /tmp/quorivio-rc-evidence/record.json --commit <same-SHA>` to verify file integrity. Evidence artifacts use relative paths and SHA256 checksums; no credentials or personal data should be included. Passing technical tests does **not** grant independent accessibility, security, AGID or GDPR acceptance; the strict RC gate remains closed until reviewed proof is available. See `docs/DEVELOPMENT_STATUS.md`.
+
 **RC293 documentation:** six space-efficient visual manuals (IT/EN), genuine archived editor icon atlas and two illustrated A4 product brochures. See [English release note](docs/RC_CYCLE293_VISUAL_MANUALS_BROCHURES.en.md) and [PDF brochures](docs/brochures/). The application runtime is unchanged.
 
 **RC292:** Fixed broad integration test PDF gallery mix-up, archived 25 authentic RC291 images and regenerated the bilingual manuals. [RC292 notes](docs/RC_CYCLE292_PDF_GALLERY_PAIRING.en.md).

@@ -114,14 +114,14 @@
       "09ed5724"
     ],
     "README.md": [
-      "5fd298af",
-      "2ae94116",
-      "11d7d86b",
-      "7facc9ab",
-      "1a395d4e",
-      "93262a85",
-      "b089fd6d",
-      "20b8d4d6"
+      "044a7726",
+      "8b6d7f2b",
+      "bb080bb6",
+      "8474e4e4",
+      "b9171560",
+      "4559fea8",
+      "cd52f7c4",
+      "9ae0196c"
     ],
     "apps/api/package.json": [
       "6c45ea8f",
@@ -4404,14 +4404,14 @@
       "d240df37"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "2a7d2f8f",
-      "f4859994",
-      "66231ad9",
-      "3b158597",
-      "27b5bf3b",
-      "64fef252",
-      "a9020ae3",
-      "6c1b8a8e"
+      "8338f87a",
+      "906e8b64",
+      "3cbdfa45",
+      "644a5cd1",
+      "779c5336",
+      "3317a62c",
+      "86a8fe72",
+      "eed19a1c"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",
@@ -18724,14 +18724,14 @@
       "af283a59"
     ],
     "tools/rc_operator_acceptance.py": [
-      "2695446a",
-      "fd5dabc7",
-      "605ce7a6",
-      "c6b16a07",
-      "66ed6e13",
-      "cc0feeb9",
-      "089526c6",
-      "e86f4016"
+      "56267bc7",
+      "b77dd6a5",
+      "aa366291",
+      "ed389581",
+      "6bcdb628",
+      "37968f4e",
+      "8078ae4d",
+      "27b833e9"
     ],
     "tools/rc_release_preflight.py": [
       "e92c193e",
@@ -20124,14 +20124,14 @@
       "7ae757ef"
     ],
     "tools/tests/test_rc127_native_runtime_and_operator_plan.py": [
-      "6fcf9677",
-      "f74bce6c",
-      "a8869143",
-      "a0af4a90",
-      "78f91a92",
-      "44c14207",
-      "99a0c2a9",
-      "90c69c90"
+      "479bd6f6",
+      "c52753a7",
+      "bd5e76fe",
+      "cbfe8191",
+      "0179eab6",
+      "9b6d5164",
+      "c7e6bc13",
+      "34afcfbd"
     ],
     "tools/tests/test_rc128_rehearsal_parity_contract.py": [
       "e940faa3",
