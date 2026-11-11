@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
   "cycle": 293,
-  "file_count_excluding_manifest": 2603,
+  "file_count_excluding_manifest": 2606,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -44,14 +44,14 @@
       "e377db62"
     ],
     ".github/workflows/ci.yml": [
-      "c1cf0ba7",
-      "2a989460",
-      "092e28e6",
-      "aee8c42a",
-      "065df48a",
-      "81a3e350",
-      "c646e294",
-      "74fba3df"
+      "44a95a99",
+      "c304a148",
+      "5cdbf4dc",
+      "1944006b",
+      "ad5e234f",
+      "a77af7fc",
+      "80a379fd",
+      "8e6e5e93"
     ],
     ".github/workflows/converter-image.yml": [
       "6ff519db",
@@ -2094,14 +2094,14 @@
       "54a62e5d"
     ],
     "apps/web/src/main.tsx": [
-      "27211ed7",
-      "f6d82ea5",
-      "c17e67aa",
-      "67b2ac68",
-      "e9bee139",
-      "f282c960",
-      "5532e645",
-      "2e89510b"
+      "55dc624d",
+      "b6f2ec35",
+      "522b61b3",
+      "0beb2ab9",
+      "2c68a407",
+      "1ac008d1",
+      "b82eeb3b",
+      "1940253b"
     ],
     "apps/web/src/main.tsx.orig": [
       "9230e5a3",
@@ -2474,14 +2474,14 @@
       "2586b822"
     ],
     "apps/web/src/style.css": [
-      "2b78edb3",
-      "497f122d",
-      "c5648fa0",
-      "5b33e80c",
-      "1274a74b",
-      "cca2ddd5",
-      "db70477b",
-      "2e0df4d3"
+      "f56b8cb7",
+      "628fc849",
+      "abb3901a",
+      "79425842",
+      "86f5533b",
+      "dbfa9ec6",
+      "7aef908d",
+      "09482419"
     ],
     "apps/web/src/thumbnail-menu-layout.ts": [
       "a4748563",
@@ -3642,6 +3642,16 @@
       "6f434b8b",
       "a683f861",
       "a91aa54b"
+    ],
+    "apps/web/test/rc306-long-bar-labels.test.ts": [
+      "761c862f",
+      "e17f0f26",
+      "c355bd82",
+      "3dddd699",
+      "f8e21a25",
+      "ae64972e",
+      "7fecd56f",
+      "1e67025e"
     ],
     "apps/web/test/rc70-editor-timer-font.test.ts": [
       "116cfb27",
@@ -5782,6 +5792,16 @@
       "4443ae65",
       "113508c8",
       "5d177108"
+    ],
+    "docs/RC306_BAR_WRAPPING.md": [
+      "f2d8b5f6",
+      "e131f0fc",
+      "90ca9d93",
+      "7de54e8c",
+      "f6d6bce6",
+      "9df264c6",
+      "f5639dc4",
+      "63a9d6b6"
     ],
     "docs/RC49_HAPROXY_CROSS_NODE_RWX.en.md": [
       "7c1cc75e",
@@ -18152,6 +18172,16 @@
       "708f3d1a",
       "c1ade2a4",
       "7bab3f3a"
+    ],
+    "tools/ci_rc306_bar_wrap_chromium.py": [
+      "4969c336",
+      "04a1ad7a",
+      "3993623d",
+      "6723e0c1",
+      "852d5b3c",
+      "65dae0fe",
+      "ad59ee6c",
+      "7eaae5d4"
     ],
     "tools/ci_rc71_lifecycle_postgres.py": [
       "15c9edcd",

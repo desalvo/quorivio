@@ -996,6 +996,8 @@ jobs:
           export QUORIVIO_CHROMIUM_PATH="$(sed -n 's/^QUORIVIO_CHROMIUM_PATH=//p' "$GITHUB_ENV" | tail -1)"
           # RC295: actual Chromium geometry at desktop and smartphone widths.
           python3 tools/ci_rc295_results_layout_chromium.py
+          # RC306: actual browser proves long result options wrap at readable size.
+          python3 tools/ci_rc306_bar_wrap_chromium.py
           # Exercise exactly the compiled distribution from the preceding build.
           # Vite's dev optimizer intermittently reloads its first ESM imports,
           # leaving a completely empty #root with no JavaScript exception.

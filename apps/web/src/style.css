@@ -3926,3 +3926,52 @@ body .editor-floating-panel.widget-selection-palette{
 .linked-results.result-view-bars:is([data-result-source-kind="reactions"],[data-result-source-kind="rating"]) .linked-results-row .linked-result-pair{
  font-size:clamp(14px,4.5cqw,54px)!important;line-height:1.15!important;
 }
+
+/* RC306 — Long statistics options are paragraphs, never unbreakable scaled
+ * strips.  Bars deliberately enter readable scroll mode in WidgetContentFit.
+ * Keep the row and track at widget width; use available vertical space for
+ * natural line wrapping, and scroll when a slide has many verbose answers. */
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-widget-kind="results-button"]
+  .widget-fit-frame[data-fit-mode="scroll"] .linked-results.result-view-bars{
+ display:flex!important;flex-direction:column!important;
+ box-sizing:border-box!important;width:100%!important;max-width:100%!important;
+ height:100%!important;max-height:100%!important;min-height:0!important;
+ overflow-x:hidden!important;overflow-y:auto!important;
+}
+.linked-results.result-view-bars .linked-results-items{
+ display:flex!important;flex-direction:column!important;align-items:stretch!important;
+ flex:0 0 auto!important;min-width:0!important;width:100%!important;
+ height:auto!important;min-height:0!important;
+ overflow-x:hidden!important;overflow-y:visible!important;
+}
+.linked-results.result-view-bars .linked-results-items .linked-results-row,
+:is(.widget-canvas-item,.projection-widget,.rehearsal-widget)[data-widget-kind="results-button"]
+  .widget-fit-frame[data-fit-mode="scroll"] .linked-results.result-view-bars .linked-results-row{
+ display:flex!important;flex-direction:column!important;align-items:stretch!important;
+ width:100%!important;min-width:0!important;max-width:100%!important;
+ box-sizing:border-box!important;height:auto!important;
+ flex:0 0 auto!important;white-space:normal!important;
+}
+.linked-results.result-view-bars .linked-results-items .linked-results-row .linked-result-pair{
+ display:block!important;flex:0 0 auto!important;width:100%!important;
+ max-width:100%!important;min-width:0!important;
+ box-sizing:border-box!important;white-space:normal!important;
+ overflow-wrap:anywhere!important;word-break:normal!important;
+}
+.linked-results.result-view-bars .linked-results-items .linked-results-row .linked-result-label{
+ display:inline!important;white-space:normal!important;
+ max-width:100%!important;min-width:0!important;
+ overflow-wrap:anywhere!important;word-break:normal!important;
+}
+.linked-results.result-view-bars .linked-results-items .linked-results-row .linked-result-final{
+ display:inline-flex!important;max-width:100%!important;min-width:0!important;
+ white-space:normal!important;overflow-wrap:anywhere!important;
+ vertical-align:baseline!important;
+}
+.linked-results.result-view-bars .linked-results-items .linked-results-row .linked-results-track{
+ flex:0 0 auto!important;align-self:stretch!important;
+ width:100%!important;max-width:100%!important;min-width:0!important;
+ box-sizing:border-box!important;
+}
+/* Keep the same authored font and proportional bars in editor, rehearsal,
+ * live presenter and narrow/mobile layouts; no absolute max-content width. */

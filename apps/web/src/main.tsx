@@ -145,9 +145,17 @@ function EditorFloatingWindow({children,className,ariaLabel,role='region',placem
 function WidgetContentFit({children,editor=false,allowScale=true,minScale=.12,textStyle}:{children:React.ReactNode;editor?:boolean;allowScale?:boolean;minScale?:number;textStyle?:React.CSSProperties}){
  const frame=useRef<HTMLDivElement>(null),body=useRef<HTMLDivElement>(null);
  const [factor,setFactor]=useState(1);
+ const [readableBars,setReadableBars]=useState(false);
+ const canScale=allowScale&&!readableBars;
  useEffect(()=>{
   let raf=0;const measure=()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{
    const a=frame.current,b=body.current;if(!a||!b)return;
+   // Results bars are an editorial text layout, not a bitmap: wrap long
+   // answer labels at the authored font size and scroll vertically instead
+   // of shrinking all text to fit an unconstrained max-content row.
+   const hasBars=Boolean(b.querySelector('.linked-results.result-view-bars'));
+   setReadableBars(current=>current===hasBars?current:hasBars);
+   if(hasBars){setFactor(1);return;}
    const availableW=Math.max(1,a.clientWidth),availableH=Math.max(1,a.clientHeight);
    // Scroll bounds are measured before the visual transform and include wrapped text.
    const width=Math.max(b.scrollWidth,b.clientWidth),height=Math.max(b.scrollHeight,b.clientHeight);
@@ -160,9 +168,9 @@ function WidgetContentFit({children,editor=false,allowScale=true,minScale=.12,te
   const changes=new MutationObserver(measure);if(body.current)changes.observe(body.current,{childList:true,characterData:true,subtree:true});
   return()=>{cancelAnimationFrame(raf);resize.disconnect();changes.disconnect()};
  },[children,allowScale,minScale]);
- return <><div className="widget-fit-frame" ref={frame} data-scaled={allowScale&&factor<.985} data-fit-mode={allowScale?'scale':'scroll'}>
-  <div className="widget-fit-content" ref={body} style={{...textStyle,transform:allowScale&&factor<.985?`scale(${factor})`:undefined}}>{children}</div>
- </div>{editor&&allowScale&&factor<.985&&<span className="widget-rescale-indicator" role="status" title={`Contenuto ridotto al ${Math.round(factor*100)}% per entrare nel widget`} aria-label={`Contenuto ridotto al ${Math.round(factor*100)}%`}>↘ {Math.round(factor*100)}%</span>}</>;
+ return <><div className="widget-fit-frame" ref={frame} data-scaled={canScale&&factor<.985} data-fit-mode={canScale?'scale':'scroll'}>
+  <div className="widget-fit-content" ref={body} style={{...textStyle,transform:canScale&&factor<.985?`scale(${factor})`:undefined}}>{children}</div>
+ </div>{editor&&canScale&&factor<.985&&<span className="widget-rescale-indicator" role="status" title={`Contenuto ridotto al ${Math.round(factor*100)}% per entrare nel widget`} aria-label={`Contenuto ridotto al ${Math.round(factor*100)}%`}>↘ {Math.round(factor*100)}%</span>}</>;
 }
 
 type DiskVolumeStatus={status:'ok'|'warning'|'unavailable';usedBytes:number|null;totalBytes:number|null;availableBytes:number|null;usedPercent:number|null;observedAt:string|null;reason?:string};
