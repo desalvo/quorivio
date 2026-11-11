@@ -23,8 +23,8 @@ class MobileRatingContracts(unittest.TestCase):
   self.assertIn('mobile&&!viewActivity?.page_design?.importedImageFit?{backgroundImage:viewActivity?.page_design?.mobile?.backgroundAssetId?',ui)
  def test_phone_controls_do_not_downscale_fonts(self):
   ui=source('apps/web/src/main.tsx');css=source('apps/web/src/style.css')
-  self.assertIn("allowScale={!['qr','participant-count','results-button'].includes(kind)&&!mobile&&",ui)
-  self.assertIn("allowScale={!['qr','participant-count','results-button'].includes(w.kind)&&!mobileMode&&",ui)
+  self.assertIn("allowScale={!['qr','participant-count','results-button'].includes(kind)&&!mobile}",ui)
+  self.assertIn("allowScale={!['qr','participant-count','results-button'].includes(w.kind)&&!mobileMode&&editing!==w.id}",ui)
   self.assertIn('min-height:min-content!important;',css)
   self.assertIn('width:390px!important;height:100%!important;',css)
  def test_collaboration_and_restore_keep_mobile_draft(self):
