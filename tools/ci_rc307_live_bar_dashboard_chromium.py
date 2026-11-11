@@ -6,7 +6,7 @@ import os
 from playwright.async_api import async_playwright, expect
 from ci_browser_editor_postgres import BASE, call, open_editor
 from ci_browser_participant import validate_disposable_origin
-from ci_rc298_real_pie_pg_chromium import persisted_case, CHART
+from ci_rc298_real_pie_pg_chromium import persisted_case, CHART, QUESTION
 
 TITLE = 'RC307 real bars and presenter recovery'
 
@@ -30,9 +30,11 @@ async def run():
             snapshot = await call(context,'GET',f'/api/sessions/{sid}')
             page = next(p for p in snapshot['activities'] if p['id']==aid)
             widgets = list(page['page_design']['widgets'])
+            source = next(w for w in widgets if w['id']==QUESTION)
+            source['resultsView'] = 'bars'
             result = next(w for w in widgets if w['id']==CHART)
             result.update({
-                'label':'Titolo widget risultati RC307','resultsView':'bars',
+                'label':'Titolo widget risultati RC307',
                 'resultsOnly':False,'showTitle':True,
                 'showSourceTitle':False,'showSourceAnswers':False,
                 'resultSortOrder':'index-desc','resultTopCount':3,
