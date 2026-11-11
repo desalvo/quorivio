@@ -40,7 +40,7 @@ test('RC308 source question titles honor the authored/default font size on every
  assert.ok(css.includes('.linked-results>.linked-source-question{font-size:inherit}'));
 });
 test('RC308 QR URL typography is configurable and independent of QR image resizing',()=>{
- const domain=readFileSync(new URL('../../../api/src/domain.ts',import.meta.url),'utf8');
+ const domain=readFileSync(new URL('../../api/src/domain.ts',import.meta.url),'utf8');
  assert.ok(ui.includes('ariaLabel="Dimensione font URL QRCode"'));
  assert.ok(ui.includes("qrUrlFontSize:next,qrUrlWidthExtra:"));
  assert.ok(ui.includes("'--qr-url-extra-width'"));
