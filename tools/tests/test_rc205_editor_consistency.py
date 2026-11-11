@@ -21,7 +21,7 @@ CI = (ROOT / '.github/workflows/ci.yml').read_text(encoding='utf8')
 def guard_editor_consistency(web: str, css: str, api: str, domain: str, pptx: str) -> None:
     """The earliest CI step must reject silent regressions before npm install."""
     necessary_web = (
-        'WidgetContentFit editor textStyle={widgetTypographyStyle(',
+        'WidgetContentFit editor textStyle={stageWidgetTypography(',
         'sourceActivities={snap.activities}',
         'peerWidgets={w.kind===\'results-button\'&&w.targetActivityId',
         'sampleStatisticRows(linkedStatisticSource(widget,peerWidgets)!,42)',
@@ -78,6 +78,10 @@ class RC205EditorConsistency(unittest.TestCase):
     def test_guard_rejects_old_raster_only_import(self):
         with self.assertRaisesRegex(AssertionError, 'Imported page'):
             guard_editor_consistency(WEB, CSS, API.replace("backgroundAssetId:assetId", "media:[{kind:'image'}]", 1), DOMAIN, PPTX)
+
+    def test_guard_rejects_old_inconsistent_editor_typography(self):
+        with self.assertRaisesRegex(AssertionError, 'RC205 editor regression'):
+            guard_editor_consistency(WEB.replace('WidgetContentFit editor textStyle={stageWidgetTypography(', 'WidgetContentFit editor textStyle={widgetTypographyStyle(', 1), CSS, API, DOMAIN, PPTX)
 
     def test_guard_rejects_duplicate_font_picker(self):
         with self.assertRaisesRegex(AssertionError, 'Duplicate'):

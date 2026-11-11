@@ -20904,14 +20904,14 @@
       "9636bbee"
     ],
     "tools/tests/test_rc205_editor_consistency.py": [
-      "4ca8525e",
-      "1ce2164d",
-      "87155134",
-      "0fc22ad9",
-      "04c28ad6",
-      "09d3e94d",
-      "04ad0cba",
-      "b1baa587"
+      "905ce805",
+      "e5d94b91",
+      "913a6e44",
+      "f855df9c",
+      "3a1d5565",
+      "abb0f86a",
+      "98b46274",
+      "e5947e05"
     ],
     "tools/tests/test_rc205_native_slide_roundtrip.py": [
       "ab9e49c5",
