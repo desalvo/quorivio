@@ -64,7 +64,13 @@ async def run():
                       content.scrollHeight*factor<=node.clientHeight+4&&
                       getComputedStyle(node).overflowY!=='auto';
                 }''')
-            await expect.poll(lambda: assert_fitted(canvas),timeout=9000).to_be_true()
+            async def wait_for_fit(widget):
+                for _ in range(45):
+                    if await assert_fitted(widget):
+                        return
+                    await asyncio.sleep(.2)
+                assert await assert_fitted(widget), 'Scaled content must fit without a nested scrollbar'
+            await wait_for_fit(canvas)
             assert await canvas.locator('.canvas-widget-results-native').count()==1
             print('RC326 PASS: editor title visible, entire results widget uses proportional content fit')
             await editor.locator('button.editor-preview-open.preview-presenter[aria-haspopup="dialog"]').click()
@@ -73,6 +79,7 @@ async def run():
             preview = dialog.locator('.rehearsal-pane .rehearsal-widget[data-widget-kind="results-button"]')
             await expect(preview).to_have_count(1)
             await expect(preview.locator('.widget-fit-frame[data-fit-mode="scale"]')).to_have_count(1)
+            await wait_for_fit(preview)
             await expect(preview.get_by_text('Titolo widget risultati RC307')).to_be_visible()
             await dialog.get_by_role('button',name='Chiudi anteprima').click()
             print('RC326 PASS: rehearsal preview uses the same proportional fit policy')
@@ -86,6 +93,7 @@ async def run():
             await expect(live.locator('.linked-results.result-view-bars')).to_have_count(1)
             await expect(live.get_by_text('Titolo widget risultati RC307')).to_be_visible()
             await expect(live.locator('.widget-fit-frame[data-fit-mode="scale"]')).to_have_count(1)
+            await wait_for_fit(live)
             await expect(screen.locator('.session-restore-error')).to_have_count(0)
             await screen.reload(wait_until='domcontentloaded')
             await expect(screen.locator('.projection-widget[data-widget-kind="results-button"] .linked-results.result-view-bars')).to_have_count(1,timeout=20000)
