@@ -51,18 +51,31 @@ async def run():
             await expect(canvas).to_have_count(1,timeout=20000)
             await expect(canvas.locator('.linked-results.result-view-bars')).to_have_count(1)
             await expect(canvas.get_by_text('Titolo widget risultati RC307')).to_be_visible()
-            await expect(canvas.locator('.widget-fit-frame[data-fit-mode="scroll"]')).to_have_count(1)
+            await expect(canvas.locator('.widget-fit-frame[data-fit-mode="scale"]')).to_have_count(1)
+            # The rendered viewport must contain the *effective scaled content*,
+            # including long labels, percentages and answer-key badges.
+            async def assert_fitted(widget):
+                frame=widget.locator('.widget-fit-frame[data-fit-mode="scale"]')
+                return await frame.evaluate('''node => {
+                    const content=node.querySelector(':scope > .widget-fit-content');
+                    const factor=Number(content?.style.getPropertyValue('--widget-fit-scale')||1);
+                    return Number.isFinite(factor)&&factor>0&&
+                      content.scrollWidth*factor<=node.clientWidth+4&&
+                      content.scrollHeight*factor<=node.clientHeight+4&&
+                      getComputedStyle(node).overflowY!=='auto';
+                }''')
+            await expect.poll(lambda: assert_fitted(canvas),timeout=9000).to_be_true()
             assert await canvas.locator('.canvas-widget-results-native').count()==1
-            print('RC307 PASS: editor title visible, no auto-fit shrink')
+            print('RC326 PASS: editor title visible, entire results widget uses proportional content fit')
             await editor.locator('button.editor-preview-open.preview-presenter[aria-haspopup="dialog"]').click()
             dialog = editor.get_by_role('dialog',name='Anteprima interattiva della sessione')
             await expect(dialog).to_be_visible()
             preview = dialog.locator('.rehearsal-pane .rehearsal-widget[data-widget-kind="results-button"]')
             await expect(preview).to_have_count(1)
-            await expect(preview.locator('.widget-fit-frame[data-fit-mode="scroll"]')).to_have_count(1)
+            await expect(preview.locator('.widget-fit-frame[data-fit-mode="scale"]')).to_have_count(1)
             await expect(preview.get_by_text('Titolo widget risultati RC307')).to_be_visible()
             await dialog.get_by_role('button',name='Chiudi anteprima').click()
-            print('RC307 PASS: preview title and no-fit renderer')
+            print('RC326 PASS: rehearsal preview uses the same proportional fit policy')
             await call(context,'POST',f'/api/sessions/{sid}/status',{'status':'active'})
             await call(context,'POST',f'/api/sessions/{sid}/activities/{aid}/open',{})
             screen = await context.new_page()
@@ -72,7 +85,7 @@ async def run():
             await expect(live).to_have_count(1,timeout=20000)
             await expect(live.locator('.linked-results.result-view-bars')).to_have_count(1)
             await expect(live.get_by_text('Titolo widget risultati RC307')).to_be_visible()
-            await expect(live.locator('.widget-fit-frame[data-fit-mode="scroll"]')).to_have_count(1)
+            await expect(live.locator('.widget-fit-frame[data-fit-mode="scale"]')).to_have_count(1)
             await expect(screen.locator('.session-restore-error')).to_have_count(0)
             await screen.reload(wait_until='domcontentloaded')
             await expect(screen.locator('.projection-widget[data-widget-kind="results-button"] .linked-results.result-view-bars')).to_have_count(1,timeout=20000)
