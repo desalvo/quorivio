@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
   "cycle": 293,
-  "file_count_excluding_manifest": 2642,
+  "file_count_excluding_manifest": 2643,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -6194,24 +6194,24 @@
       "5072a7dc"
     ],
     "docs/manuals-src/user-guide.en.md": [
-      "334ac39e",
-      "a2a6532f",
-      "1e1859a4",
-      "bfa1ebc2",
-      "b7390d3f",
-      "8096acd2",
-      "29f37e2a",
-      "d7b97535"
+      "161ce216",
+      "adb50bf4",
+      "d3909796",
+      "c9f8760b",
+      "183147f6",
+      "b42518a0",
+      "61062055",
+      "22f7f0e1"
     ],
     "docs/manuals-src/user-guide.it.md": [
-      "744ac6e0",
-      "4c693cdf",
-      "0a6094ac",
-      "d416de20",
-      "d5db60e6",
-      "abfc3868",
-      "1af34f3d",
-      "04c23107"
+      "ad2b9910",
+      "84437ba2",
+      "6bc34721",
+      "0efbfc38",
+      "1014f053",
+      "60d91459",
+      "c5a50ebf",
+      "c39730f6"
     ],
     "docs/manuals/admin-guide.en.pdf": [
       "7ebafbbe",
@@ -18554,14 +18554,14 @@
       "482c59a1"
     ],
     "tools/ci_rc329_server_settings_tabs_chromium.py": [
-      "9ee15842",
-      "f4d88f16",
-      "56107a81",
-      "7f0c8006",
-      "813a25ac",
-      "994cacaf",
-      "db9ec938",
-      "3b4e0fcc"
+      "39f0d285",
+      "c76dcb73",
+      "7bef7164",
+      "44688981",
+      "5c026f24",
+      "0a0abca7",
+      "55a401c5",
+      "c9840386"
     ],
     "tools/ci_rc71_lifecycle_postgres.py": [
       "15c9edcd",
@@ -18714,14 +18714,14 @@
       "38f15337"
     ],
     "tools/generate_brochures.py": [
-      "f2428f9f",
-      "b496cdb7",
-      "7726ff38",
-      "baa8f46a",
-      "9dc89a80",
-      "0340813e",
-      "afbd6fe7",
-      "cf4849e7"
+      "d9c19203",
+      "2d9a8720",
+      "d277f723",
+      "257dbb0b",
+      "dc042e85",
+      "384af086",
+      "d8bc1023",
+      "72160190"
     ],
     "tools/generate_manuals.py": [
       "3fa672fe",
@@ -18934,14 +18934,14 @@
       "321f2135"
     ],
     "tools/pptx_portable.py": [
-      "5d7c40c0",
-      "2a585960",
-      "30c9df23",
-      "e61f066e",
-      "fdce35d9",
-      "8660864f",
-      "c07ccecd",
-      "a80b67c2"
+      "267a59dd",
+      "ebbba050",
+      "007cd358",
+      "940d9107",
+      "6024fb06",
+      "5c1133c0",
+      "da8fe342",
+      "413616c3"
     ],
     "tools/publish_converter_multiarch_manifest.sh": [
       "2f560deb",
@@ -23282,6 +23282,16 @@
       "59ff3afb",
       "0570692c",
       "352e9bf6"
+    ],
+    "tools/tests/test_rc332_export_background.py": [
+      "58321cdc",
+      "ea936938",
+      "46d24d01",
+      "0b43add4",
+      "2bad3b8b",
+      "407ec527",
+      "49de4eae",
+      "bb8b1d39"
     ],
     "tools/tests/test_rc73_slide_master.py": [
       "2c080f2d",
