@@ -62,3 +62,24 @@ test('RC327: extreme and predicted content never exceeds either widget dimension
  assert.doesNotMatch(ui,/maxScale:2\.25/,'default content fit must not impose an arbitrary enlargement cap');
  assert.match(ui,/setFactor\(previous=>next<previous\?next:/,'growth in natural content must immediately reduce scale');
 });
+
+test('RC328: Formato widget shares persisted autoFit with the inspector',()=>{
+ const panel=ui.split('aria-label="Visibilità e contenuti widget"')[1]?.split("w.kind==='profile'")[0]||'';
+ assert.match(panel,/aria-label="Adatta automaticamente il contenuto - Formato widget"/);
+ assert.match(panel,/checked=\{w\.autoFit!==false\}/);
+ assert.match(panel,/onChange=\{e=>patch\(w\.id,\{autoFit:e\.target\.checked\}\)\}/);
+ assert.match(ui,/aria-label="Ridimensionamento automatico contenuto risultati"/);
+ assert.match(ui,/data-fit-predicted-rows=\{displayRows\.length\}/);
+});
+test('RC328: scaled results wrap labels and consume available vertical geometry',()=>{
+ const fix=css.split('/* RC328: auto-fit uses the complete widget geometry')[1]||'';
+ assert.match(fix,/min-height:100%!important;height:auto!important/);
+ assert.match(fix,/justify-content:space-between!important/);
+ assert.match(fix,/justify-content:space-evenly!important/);
+ assert.match(fix,/\.linked-results-row \.linked-result-pair\{[\s\S]*?white-space:normal!important/);
+ assert.match(fix,/\.linked-results-row \.linked-result-label\{[\s\S]*?white-space:pre-wrap!important/);
+ assert.match(fix,/\.linked-results-row \.linked-result-final\{[\s\S]*?white-space:nowrap!important/);
+ assert.match(fix,/linked-results\.result-view-pie \.linked-results-pie-chart/);
+ assert.match(ui,/configuredRows>actualRows\.length\?predictedResultsHeight/);
+ assert.ok(!fix.includes('width:max-content!important'));
+});

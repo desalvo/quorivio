@@ -164,7 +164,7 @@ function WidgetContentFit({children,editor=false,allowScale=true,minScale=.005,t
     const configuredRows=chartHasRows?Number(results?.dataset.fitPredictedRows??actualRows.length):0;
     const tallestRow=Math.max(22,...actualRows.map(row=>row.offsetHeight));
     const otherHeight=results?Math.max(0,results.scrollHeight-(rows?.scrollHeight||0)):0;
-    const predicted=results&&chartHasRows?predictedResultsHeight({
+    const predicted=results&&chartHasRows&&configuredRows>actualRows.length?predictedResultsHeight({
      rows:Math.max(actualRows.length,configuredRows||0),
      maxRowHeight:tallestRow,
      otherHeight:b.scrollHeight-results.scrollHeight+otherHeight,
@@ -451,7 +451,7 @@ function LinkedResultChart({widget,widgets,rows,emptyLabel}:{widget:any;widgets:
  });
  const pieSegments=resultPieLayout(data.map(r=>r.count),widget.pieSize,widget.pieShowPercentages===true,widget.pieShowOptionNumbers===true,data.map(r=>sourceRows.findIndex(item=>item.id===r.id)+1));
  const pieViewport=resultPieViewport(pieSegments,widget.pieSize);
- return <section className={'linked-results result-view-'+chart} data-answer-key-enabled={String(hasKey)} data-fit-predicted-rows={sourceRows.length} data-fit-predicted-chart={chart} data-result-source-kind={source.kind} data-gauge-transparent={chart==='gauge'&&((widget.gaugeTransparent??source.gaugeTransparent)===true)?'true':undefined} data-bubbles-fit={chart==='bubbles'&&((widget.bubbleNoScroll??source.bubbleNoScroll)!==false)?'true':'false'} aria-label={'Risultati '+(source.label||source.kind)}>
+ return <section className={'linked-results result-view-'+chart} data-answer-key-enabled={String(hasKey)} data-fit-predicted-rows={displayRows.length} data-fit-predicted-chart={chart} data-result-source-kind={source.kind} data-gauge-transparent={chart==='gauge'&&((widget.gaugeTransparent??source.gaugeTransparent)===true)?'true':undefined} data-bubbles-fit={chart==='bubbles'&&((widget.bubbleNoScroll??source.bubbleNoScroll)!==false)?'true':'false'} aria-label={'Risultati '+(source.label||source.kind)}>
   {hasKey&&<button type="button" className={'result-answer-key-toggle'+(truthVisible?' is-active':'')} aria-label={truthVisible?'Nascondi risposte vere e false':'Evidenzia risposte vere e false'} aria-pressed={truthVisible} title={truthVisible?'Nascondi evidenziazione delle risposte':'Mostra risposte vere e false'} onPointerDown={e=>e.stopPropagation()} onClick={e=>{e.stopPropagation();setTruthVisible(v=>!v)}}>R</button>}
   <LinkedResultSourceQuestion result={viewWidget} source={source} rankedRows={data}/>
   {!widget.resultsOnly&&<>{widget.showTitle!==false&&<strong><WidgetStyledText text={widget.label||'Risultati'} widget={widget} field="label"/></strong>}{!resultSourceTitleVisible(widget)&&!resultSourceAnswersVisible(widget)&&<small>{source.label||source.kind} · {total} risposte{emptyLabel?' · '+emptyLabel:''}</small>}</>}
@@ -1668,6 +1668,7 @@ function WidgetCanvas({widgets,numberingWidgets,onChange,pageTitle="",sessionTit
   </>}
   {formatTab==='content'&&<section className="palette-ribbon-group" aria-label="Visibilità e contenuti widget"><div className="palette-ribbon-controls widget-format-advanced">
    <label><input type="checkbox" checked={w.kind==='qr'?w.showTitle===true:w.showTitle!==false} onChange={e=>patch(w.id,{showTitle:e.target.checked})}/> {['question','timed-quiz','topic-question'].includes(w.kind)?'Mostra testo della domanda':'Mostra titolo widget'}</label>
+   {!['qr','participant-count','shape','line'].includes(w.kind)&&<label className="widget-auto-fit-setting"><input type="checkbox" role="switch" aria-label="Adatta automaticamente il contenuto - Formato widget" checked={w.autoFit!==false} onChange={e=>patch(w.id,{autoFit:e.target.checked})}/> Adatta automaticamente il contenuto alla dimensione del widget</label>}
    {w.kind==='profile'&&<>
     <label><input type="checkbox" aria-label="Mostra foto presentatore" checked={w.showProfilePhoto!==false} onChange={e=>patch(w.id,{showProfilePhoto:e.target.checked})}/> Foto del presentatore (se disponibile)</label>
     <label><input type="checkbox" aria-label="Mostra nome presentatore" checked={w.showProfileName!==false} onChange={e=>patch(w.id,{showProfileName:e.target.checked})}/> Nome del presentatore</label>
