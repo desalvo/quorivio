@@ -38,6 +38,7 @@ import {validPageOrder} from './page-sequence.js';
 import {HOUSEKEEPING_PERIOD_MS,removeExpiredConversionJobs,removeOrphanSessionAssetFiles} from './temporary-housekeeping.js';
 import {authenticateDirectory,searchDirectory} from './ldap-auth.js';
 import {loadAuthBackends,backendPublic,saveAuthBackend,testAuthBackend,enabledLdapBackend,enabledOidcBackends,enabledSocialBackends,backendAllowsMfa} from './auth-backends.js';
+import {publicSsoBranding} from './sso-branding.js';
 import {auditOperation,validAuditRetention} from './operation-audit.js';
 import {sendRegistrationReviewEmail} from './smtp.js';
 import {allowedBackupBackends,validateBackupTarget,sealBackupConfig,openBackupConfig,publicBackupConfig,type BackupTarget} from './backup-storage.js';
@@ -363,7 +364,7 @@ async function authorizedFederatedLink(req:express.Request){
 app.get('/api/auth/oidc/providers',async(_req,res)=>{try{
  const [oidc,social]=await Promise.all([enabledOidcBackends(db,secret),enabledSocialBackends(db,secret)]);
  res.setHeader('Cache-Control','no-store');
- res.json({providers:[...oidc.map(x=>({id:x.id,label:x.label||x.id})),...social.map(x=>({id:x.id,label:x.id==='github'?'GitHub':'Facebook'}))]});
+ res.json({providers:[...oidc.map(x=>({id:x.id,label:x.label||x.id,...publicSsoBranding(x.id,x)})),...social.map(x=>({id:x.id,label:x.id==='github'?'GitHub':'Facebook',...publicSsoBranding(x.id)}))]});
  }catch(e){console.error('auth provider discovery failed',e instanceof Error?e.name:'error');res.status(503).json({error:'auth_config_unavailable'})}});
 app.get('/api/auth/oidc/:provider/start',async(req,res)=>{try{
  const p=(await enabledOidcBackends(db,secret).catch(()=>[])).find(x=>x.id===req.params.provider);if(!p){res.status(404).json({error:'provider_unavailable'});return}

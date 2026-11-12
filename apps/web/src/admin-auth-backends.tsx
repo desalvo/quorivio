@@ -2,6 +2,10 @@
  * Disable/enable each provider independently; the local backend stays active.
  */
 import React,{useEffect,useState} from 'react';
+const predefinedSso=['google','github','facebook','microsoft','okta','keycloak','authentik'];
+const isPreparedSso=(id:string)=>predefinedSso.includes(id);
+const logoPath=(id:string)=>isPreparedSso(id)?'/sso-icons/'+id+'.svg':'';
+
 type ApiRequest=<T=any>(url:string,method?:string,body?:unknown,options?:{signal?:AbortSignal;cache?:RequestCache})=>Promise<T>;
 type Kind='local'|'ldap'|'oidc'|'social';
 type Backend={id:string;kind:Kind;enabled:boolean;mfaEnabled:boolean;configured:boolean;lastTestedAt:string|null;config:Record<string,any>;hasSecret:boolean};
@@ -27,18 +31,20 @@ const fields:Record<Kind,Array<{key:string;label:string;secret?:boolean;type?:st
   {key:'issuer',label:'OIDC Issuer (HTTPS)'},
   {key:'clientId',label:'Client ID'},
   {key:'clientSecret',label:'Client secret',secret:true},
-  {key:'redirectUri',label:'Redirect URI HTTPS'}
+  {key:'redirectUri',label:'Redirect URI HTTPS'},
+  {key:'buttonColor',label:'Colore pulsante di accesso',type:'color'}
  ],
  social:[
   {key:'label',label:'Nome visualizzato alla login'},
   {key:'clientId',label:'Client ID'},
   {key:'clientSecret',label:'Client secret',secret:true},
-  {key:'redirectUri',label:'Redirect URI HTTPS'}
+  {key:'redirectUri',label:'Redirect URI HTTPS'},
+  {key:'buttonColor',label:'Colore pulsante di accesso',type:'color'}
  ]
 };
 const initialConfig=(id:string,kind:Kind)=>({
  ...(kind==='ldap'?{label:'LDAP / Active Directory',url:'ldaps://',startTls:false,filter:'(uid={login})',idAttribute:'entryUUID',emailAttribute:'mail',groupAttribute:'memberOf',autoProvision:false}:{ }),
- ...(kind==='oidc'?{label:id.toUpperCase(),issuer:'https://',redirectUri:location.origin+'/api/auth/oidc/'+id+'/callback'}:{}),
+ ...(kind==='oidc'?{label:({google:'Google',microsoft:'Microsoft Entra ID',okta:'Okta',keycloak:'Keycloak',authentik:'Authentik'} as Record<string,string>)[id]||id.toUpperCase(),issuer:id==='google'?'https://accounts.google.com':'',redirectUri:location.origin+'/api/auth/oidc/'+id+'/callback'}:{}),
  ...(kind==='social'?{label:id==='github'?'GitHub':'Facebook',redirectUri:location.origin+'/api/auth/social/'+id+'/callback'}:{})
 });
 export function AuthBackendSettingsPanel({request}:{request:ApiRequest}){
@@ -50,6 +56,18 @@ export function AuthBackendSettingsPanel({request}:{request:ApiRequest}){
  const item=drafts[selected]||existing;
  const change=(patch:Partial<Backend>)=>{if(!item)return;setDrafts(old=>({...old,[selected]:{...item,...patch}}))};
  const changeConfig=(key:string,value:string|boolean)=>{if(!item)return;change({config:{...item.config,[key]:value}})};
+ const selectCustomLogo=(file?:File)=>{
+  if(!file)return;
+  if(!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>32768||file.size<16){setMessage('Logo: usa PNG/JPEG/WebP di massimo 32 KiB (SVG non consentito).');return}
+  const target=selected;
+  const reader=new FileReader();
+  reader.onload=()=>{const value=reader.result;if(typeof value!=='string'||!/^data:image\/(png|jpeg|webp);base64,/.test(value)){setMessage('Formato del logo non valido.');return}
+   setDrafts(old=>{const current=old[target]||items.find(x=>x.id===target);return current?{...old,[target]:{...current,config:{...current.config,logoData:value}}}:old});
+   setMessage('Logo pronto: salva per pubblicarlo sul pulsante SSO.');};
+  reader.onerror=()=>setMessage('Impossibile leggere il logo.');
+  reader.readAsDataURL(file);
+ };
+
  const save=async()=>{if(!item)return;setBusy(true);setMessage('');
   try{
    await request('/admin/auth/backends/'+encodeURIComponent(item.id),'PUT',{kind:item.kind,enabled:item.kind==='local'?true:item.enabled,mfaEnabled:item.mfaEnabled,config:item.config});
@@ -95,11 +113,19 @@ export function AuthBackendSettingsPanel({request}:{request:ApiRequest}){
    {item.kind==='ldap'&&<><label><input type="checkbox" checked={item.config.startTls===true} onChange={e=>changeConfig('startTls',e.target.checked)}/> Usa StartTLS con LDAP (obbligatorio se URI ldap://)</label><label><input type="checkbox" checked={item.config.autoProvision===true} onChange={e=>changeConfig('autoProvision',e.target.checked)}/> Richiedi provisioning automatico previa approvazione amministratore</label></>}
    {fields[item.kind].map(f=><label key={f.key}>{f.label}<input
       type={f.secret?'password':f.type||'text'} autoComplete={f.secret?'new-password':'off'}
-      maxLength={f.secret?2048:1024} value={f.secret?(drafts[selected]?.config[f.key]??''):item.config[f.key]??''}
+      maxLength={f.secret?2048:1024} value={f.secret?(drafts[selected]?.config[f.key]??''):f.type==='color'?(item.config[f.key]||({google:'#FFFFFF',microsoft:'#3468A3',okta:'#006DAD',keycloak:'#293C69',authentik:'#195C67',github:'#24292F',facebook:'#1877F2'} as Record<string,string>)[item.id]||'#295C6C'):item.config[f.key]??''}
       placeholder={f.secret?(item.hasSecret?'Segreto già salvato — lascia vuoto per conservarlo':'Inserisci credenziale'):''}
       onChange={e=>changeConfig(f.key,e.target.value)}/>
      </label>)}
    {item.kind==='ldap'&&<p className="muted tiny">TLS con verifica dei certificati sempre attiva. Per CA private, monta il certificato nel server e specifica il percorso. L'account di servizio viene testato con una bind sicura e una ricerca limitata.</p>}
+   {(item.kind==='oidc'||item.kind==='social')&&<div className="admin-sso-branding" aria-label="Aspetto pulsante SSO"><span>Anteprima pulsante login</span>
+    <span className="admin-sso-preview" style={{background:item.config.buttonColor||({google:'#FFFFFF',microsoft:'#3468A3',okta:'#006DAD',keycloak:'#293C69',authentik:'#195C67',github:'#24292F',facebook:'#1877F2'} as Record<string,string>)[item.id]||'#295C6C',color:item.id==='google'&&!item.config.buttonColor?'#202124':'#FFFFFF'}}>
+     {(isPreparedSso(item.id)||item.config.logoData)&&<img src={logoPath(item.id)||item.config.logoData} alt="" aria-hidden="true"/>}{item.config.label||item.id}
+    </span></div>}
+   {item.kind==='oidc'&&!isPreparedSso(item.id)&&<div className="admin-sso-custom-logo">
+    <label>Logo personalizzato SSO (PNG, JPEG o WebP, massimo 32 KiB)<input type="file" aria-label="Carica logo custom per provider OIDC" accept="image/png,image/jpeg,image/webp" onChange={e=>selectCustomLogo(e.target.files?.[0])}/></label>
+    {item.config.logoData&&<button type="button" className="outline small" onClick={()=>changeConfig('logoData','')}>Rimuovi logo personalizzato</button>}
+   </div>}
    {item.kind==='oidc'&&<p className="muted tiny">Callback richiesto: /api/auth/oidc/{item.id}/callback. Il test verifica discovery e chiavi JWKS; la prova completa delle credenziali richiede un login.</p>}
    {item.kind==='social'&&<p className="muted tiny">Callback richiesto: /api/auth/social/{item.id}/callback. Il test statico non può provare il client secret senza un accesso OAuth reale.</p>}
    <div className="downloads"><button type="button" className="primary small" disabled={busy} onClick={()=>void save()}>Salva configurazione</button><button type="button" className="outline small" disabled={busy} onClick={()=>void test()}>{drafts[selected]||!existing?'Testa bozza senza salvare':'Testa backend salvato'}</button><button type="button" className="outline small" disabled={busy} onClick={()=>{if(Object.keys(drafts).length>0&&!window.confirm('Ricaricare? Le modifiche non salvate a tutti i backend andranno perse.'))return;void refresh().catch(e=>setMessage(String(e)))}}>Ricarica</button></div>

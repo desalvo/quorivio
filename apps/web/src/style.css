@@ -4274,3 +4274,23 @@ main.hero.login-manual-cover .panel.login{
  }
  .dashboard .server-settings-tabs > button.server-settings-tab{flex:0 0 auto!important}
 }
+
+/* RC330: locally hosted provider identity, no third-party logo requests. */
+.oidc-options{display:flex;flex-direction:column;gap:9px;min-width:0}
+.oidc-options>.sso-provider-button{
+ display:inline-flex!important;align-items:center!important;justify-content:center!important;
+ width:100%;min-height:45px;padding:10px 15px;gap:12px;text-align:center;
+ border:1px solid #869ab9;border-radius:10px;
+ background:var(--sso-background,#295C6C)!important;color:var(--sso-foreground,#fff)!important;
+ font-weight:700;text-decoration:none;box-shadow:0 3px 8px #070c2038;
+ overflow-wrap:anywhere;transition:filter .15s,transform .15s;
+}
+.oidc-options>.sso-provider-button:hover{filter:brightness(1.09)}
+.oidc-options>.sso-provider-button:focus-visible{outline:3px solid #ffce53;outline-offset:2px}
+.oidc-options>.sso-provider-button img,.admin-sso-preview img{
+ width:25px;height:25px;max-height:25px;object-fit:contain;
+ flex:0 0 auto;padding:3px;border-radius:5px;background:#fff;
+}
+.admin-sso-branding,.admin-sso-custom-logo{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:9px 0}
+.admin-sso-preview{display:inline-flex;gap:9px;align-items:center;padding:8px 14px;border:1px solid #9ca3af;border-radius:9px;font-weight:700}
+.admin-sso-custom-logo input[type=file]{max-width:100%}
