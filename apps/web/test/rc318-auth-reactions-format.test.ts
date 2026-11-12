@@ -55,7 +55,7 @@ test('RC318: only relevant chart controls appear in Formato widget and Top N is 
  assert.ok(main.includes("['bars','pie','table','cloud','gauge'].includes(widget.resultsView)"));
  assert.match(main,/onChange={e=>patch\(w\.id,\{resultSortOrder:e\.target\.value\}\)}/);
  assert.doesNotMatch(main,/\{sort\}/);
- assert.match(main,/chart==='bubbles'&&<div className="linked-results-bubbles"/);
+ assert.match(main,/chart==='bubbles'&&<ResponsiveReactionBubbles/);
  assert.match(main,/chart!=='gauge'&&chart!=='bubbles'/);
  assert.match(css,/\.linked-results-bubble-orb/);
 });
