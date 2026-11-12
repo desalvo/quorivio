@@ -1063,7 +1063,11 @@ app.put('/api/admin/auth/backends/:id',requireAuth,requireAdmin,async(req,res)=>
  if(/^(invalid_|local_backend|ldap_|sso_|insecure_)/.test(reason)){res.status(400).json({error:reason});return}
  sendError(res,e)}});
 app.post('/api/admin/auth/backends/:id/test',requireAuth,requireAdmin,async(req,res)=>{try{
- const result=await testAuthBackend(db,secret,req.params.id);
+ // Empty body: test the saved provider and timestamp it. A supplied draft is
+ // validated and probed without persisting secrets, enabling the backend or
+ // changing last_tested_at. Authorization is identical for both paths.
+ const draft=req.body&&typeof req.body==='object'&&!Array.isArray(req.body)&&Object.keys(req.body).length?req.body:undefined;
+ const result=await testAuthBackend(db,secret,req.params.id,draft);
  res.setHeader('Cache-Control','private, no-store');res.json(result);
  }catch(e){console.error('authentication backend test unavailable',e instanceof Error?e.name:'error');res.status(422).json({error:'backend_test_failed'})}});
 app.get('/api/admin/settings',requireAuth,requireAdmin,async(_req,res)=>{try{const r=await db.query('SELECT key,value FROM platform_settings');res.json(Object.fromEntries(r.rows.map(x=>[x.key,x.value])))}catch(e){sendError(res,e)}});
