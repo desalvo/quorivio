@@ -1,5 +1,8 @@
 # Quorivio 0.1.0-dev — RC293 — Compact visual manuals and product brochures
 
+**RC318 functional TypeScript correction (2026-11-12):** Full production typecheck in PR CI 43142548062 flagged an undefined `sort` JSX variable inside the new contextual widget format ribbon. Replaced placeholder with a real, persisted result ordering selector (original/reverse, count ascending/descending) for bar, pie, table, word-cloud and emoji-bubble result charts. Bound to selected result widget `resultSortOrder`; new regression rejects the orphaned JSX placeholder. Updated source/test manifest. **Await full CI; no merge or Docker publication claim.**
+
+
 **RC318 RC269 follow-up (2026-11-12):** The no-reload assertion introduced in the RC269 historical test accidentally searched the entire application, matching unrelated intentional navigation calls. CI 43142267768 failed on this overbroad test. Narrowed only the negative assertion to the `redirectExpiredPresenterAuth` function, preserving separate positive assertions for in-app login signal and HTTP request suppression. Does not alter runtime navigation. **Pending CI; external readiness remains 85.25%.**
 
 
