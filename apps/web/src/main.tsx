@@ -711,8 +711,8 @@ function PresenterAudienceExtensions({sessionId,activityId}:{sessionId:string;ac
 }
 type PresenterProfileVisibility={showEmail?:boolean;showProfilePhoto?:boolean;showProfileName?:boolean;showProfileDescription?:boolean};
 type PresenterProfileProps=PresenterProfileVisibility&{presenterId?:string;label?:string;description?:string};
-function PresenterProfileCard({profile,label,description,showEmail,showProfilePhoto,showProfileName,showProfileDescription}:PresenterProfileProps&{profile:any|null}){
- const photo=profile?.photo_url||profile?.profile_photo_url;
+function PresenterProfileCard({profile,photoUrl,label,description,showEmail,showProfilePhoto,showProfileName,showProfileDescription}:PresenterProfileProps&{profile:any|null;photoUrl?:string}){
+ const photo=photoUrl;
  return <div className="page-widget presenter-profile-card" data-widget-kind="profile">
   {!profile?<strong>{label||'Profilo presentatore'}</strong>:<div className="presenter-profile-identity">
    {showProfilePhoto!==false&&photo&&<img src={photo} alt={`Foto di ${profile.name||'presentatore'}`} className="presenter-profile-avatar" loading="lazy"/>}
@@ -727,15 +727,16 @@ function PresenterProfileCard({profile,label,description,showEmail,showProfilePh
 function PresenterProfileWidget({code,...settings}:PresenterProfileProps&{code:string}){
  const [profiles,setProfiles]=useState<any[]>([]);
  useEffect(()=>{let active=true;fetch(`/api/join/${encodeURIComponent(code)}/presenter-profiles`).then(r=>r.ok?r.json():[]).then((data:any)=>{if(active)setProfiles(Array.isArray(data)?data:[])}).catch(()=>{if(active)setProfiles([])});return()=>{active=false}},[code]);
- const chosen=settings.presenterId?profiles.find(p=>p.id===settings.presenterId):profiles[0];
- return <PresenterProfileCard {...settings} profile={chosen||null}/>;
+ const p=settings.presenterId?profiles.find(p=>p.id===settings.presenterId):profiles[0];
+ // Only the public, session-scoped photo URL may reach anonymous projections.
+ return <PresenterProfileCard {...settings} profile={p||null} photoUrl={p?p.photo_url:undefined}/>;
 }
 /** Editor and private rehearsal must use the authenticated session endpoint, even for draft pages. */
 function EditorPresenterProfileWidget({sessionId,...settings}:PresenterProfileProps&{sessionId:string}){
  const [profiles,setProfiles]=useState<any[]>([]);
  useEffect(()=>{let active=true;if(!sessionId){setProfiles([]);return}request<any[]>(`/sessions/${encodeURIComponent(sessionId)}/presenter-profiles`).then(data=>{if(active)setProfiles(Array.isArray(data)?data:[])}).catch(()=>{if(active)setProfiles([])});return()=>{active=false}},[sessionId]);
  const chosen=settings.presenterId?profiles.find(p=>p.id===settings.presenterId):profiles.find(p=>p.is_owner)||profiles[0];
- return <PresenterProfileCard {...settings} profile={chosen||null}/>;
+ return <PresenterProfileCard {...settings} profile={chosen||null} photoUrl={chosen?.profile_photo_url}/>
 }
 function QuestionWidget({code,activityId,widget}:{code:string;activityId:string;widget:any}){
  return <div className="widget-question-group" aria-label={widget.label||'Gruppo di domande'}>
