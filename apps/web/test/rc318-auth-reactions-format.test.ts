@@ -11,10 +11,10 @@ test('RC318: expired presenter auth returns to login without full-document reloa
  assert.match(redirect,/reauthenticationRedirecting=true/);
  assert.match(redirect,/window.history.replaceState/);
  assert.match(redirect,/quorivio:authentication-expired/);
- assert.doesNotMatch(redirect,/location\\.(?:replace|reload|assign)\\(/);
- assert.match(main,/if\\(reauthenticationRedirecting&&!authRoute\\)/);
- assert.match(main,/setMe\\(null\\);setSnap\\(null\\);setSelected\\(''\\)/);
- assert.match(main,/writeWorkspaceLocation\\(\\{sessionId:'',section:'workspace'/);
+ assert.doesNotMatch(redirect,/location\.(?:replace|reload|assign)\(/);
+ assert.match(main,/if\(reauthenticationRedirecting&&!authRoute\)/);
+ assert.match(main,/setMe\(null\);setSnap\(null\);setSelected\(''\)/);
+ assert.match(main,/writeWorkspaceLocation\(\{sessionId:'',section:'workspace'/);
 });
 test('RC318: linked reaction statistics default to bubbles but honor explicit chart preference',()=>{
  const source={id:'emoji',kind:'reactions'};
@@ -39,13 +39,13 @@ test('RC318: reaction bubbles are proportionate, privacy-safe and respect top N 
  assert.equal(reactionBubbles([{id:'x',label:'❤',count:-1}]).length,0);
 });
 test('RC318: only relevant chart controls appear in Formato widget and Top N is editable there',()=>{
- assert.match(main,/const formatChart=w.kind==='results-button'\\?effectiveResultView\\(w,formatSourceWidgets\\)/);
- assert.match(main,/formatLinkedSource\\?\\.kind==='reactions'/);
+ assert.match(main,/const formatChart=w.kind==='results-button'\?effectiveResultView\(w,formatSourceWidgets\)/);
+ assert.match(main,/formatLinkedSource\?\.kind==='reactions'/);
  assert.match(main,/formatChart==='pie'&&<>/);
  assert.match(main,/formatChart==='bars'&&<>/);
  assert.match(main,/formatChart==='gauge'&&<div className="gauge-format-controls"/);
  assert.match(main,/Numero risultati principali - Formato widget/);
  assert.match(main,/chart==='bubbles'&&<div className="linked-results-bubbles"/);
  assert.match(main,/chart!=='gauge'&&chart!=='bubbles'/);
- assert.match(css,/\\.linked-results-bubble-orb/);
+ assert.match(css,/\.linked-results-bubble-orb/);
 });
