@@ -44,6 +44,6 @@ class RC17Integrity(unittest.TestCase):
         self.assertIn('python3 tools/verify_rc_cycle16_inventory.py --historical',wf)
         self.assertIn('python3 tools/verify_rc_cycle17_inventory.py',wf)
         self.assertLess(wf.index('python3 tools/verify_rc_cycle17_inventory.py'),wf.index('Detect credential leaks'))
-        self.assertIn('gitleaks/gitleaks-action@v2',wf)
+        self.assertRegex(wf, r'gitleaks/gitleaks-action@v(?:2|3)\b')
 
 if __name__=='__main__':unittest.main()

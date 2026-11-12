@@ -71,7 +71,7 @@ class RCCi40709447219Hotfix(unittest.TestCase):
         self.assertIn('python3 tools/verify_rc_public_stage_inventory.py',ci)
         self.assertIn('python3 tools/verify_rc_checksum_manifest.py',ci)
         self.assertLess(ci.index('Verify grouped SHA-256 evidence inventory'),ci.index('Detect credential leaks'))
-        self.assertIn('gitleaks/gitleaks-action@v2',ci)
+        self.assertRegex(ci, r'gitleaks/gitleaks-action@v(?:2|3)\b')
 
 
 if __name__=='__main__': unittest.main()

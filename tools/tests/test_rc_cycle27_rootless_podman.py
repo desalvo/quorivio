@@ -32,7 +32,7 @@ class Cycle27(unittest.TestCase):
         self.assertIn(newer, workflow)
         self.assertLess(workflow.index(older), workflow.index(newer))
         self.assertLess(workflow.index(newer), workflow.index('Detect credential leaks'))
-        self.assertIn('gitleaks/gitleaks-action@v2', workflow)
+        self.assertRegex(workflow, r'gitleaks/gitleaks-action@v(?:2|3)\b')
         self.assertIn("if: github.event_name == 'workflow_dispatch' && inputs.rootless_podman_test", workflow)
         self.assertIn("if: github.event_name == 'workflow_dispatch' && inputs.runtime_arch_test", workflow)
         self.assertIn('push: false', workflow)
