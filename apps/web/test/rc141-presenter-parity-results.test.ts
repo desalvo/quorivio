@@ -26,7 +26,7 @@ test('RC141: presenter result counts never separate from their answer, including
  assert.match(css,/\.linked-result-pair>output\{[\s\S]*?white-space:nowrap!important/);
  assert.match(css,/\[data-fit-mode="scale"\] \.linked-results-row/);
  assert.match(css,/overflow:visible!important/);
- assert.match(main,/minScale=\{w.kind==='results-button'\?\.04:\.12\}/);
+ assert.match(main,/minScale=\{w.kind==='results-button'\?\.005:\.08\}/);
 });
 test('RC141: editor, presenter and audience share reaction controls',()=>{
  assert.equal(REHEARSAL_EMOJIS.length,8);
