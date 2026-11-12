@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
   "cycle": 293,
-  "file_count_excluding_manifest": 2639,
+  "file_count_excluding_manifest": 2642,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -1394,14 +1394,14 @@
       "388e4327"
     ],
     "apps/api/test/rc269-ldap-housekeeping.test.ts": [
-      "fc86beba",
-      "5d0126a8",
-      "62682128",
-      "c39b5ecf",
-      "75dca465",
-      "91252396",
-      "058970f3",
-      "5f3fe263"
+      "a9ece6f6",
+      "65c5eb55",
+      "4ae72650",
+      "a5c4077f",
+      "53dedb64",
+      "876e6277",
+      "fa44841d",
+      "e4162f82"
     ],
     "apps/api/test/rc270-backup-audit.test.ts": [
       "c50b475a",
@@ -1434,14 +1434,24 @@
       "330117bc"
     ],
     "apps/api/test/rc322-auth-backends.test.ts": [
-      "4c9cec59",
-      "059e9c49",
-      "226d17ed",
-      "d0540914",
-      "959f2463",
-      "ecbc37c0",
-      "c878def5",
-      "fa1b50f0"
+      "5b69e7c0",
+      "db509ee8",
+      "3d68bbfd",
+      "a98c9dbe",
+      "dd3efa27",
+      "c910f093",
+      "f06e0861",
+      "14810f79"
+    ],
+    "apps/api/test/rc332-notifications-debug.test.ts": [
+      "812a8e18",
+      "4a9fe860",
+      "d82e7cf6",
+      "6af5566d",
+      "f7002eb0",
+      "8f94617d",
+      "2aa301cc",
+      "ff1ddb05"
     ],
     "apps/api/test/rc71-session-lifecycle.test.ts": [
       "2e8b873d",
@@ -2004,14 +2014,34 @@
       "1c69552f"
     ],
     "apps/web/src/admin-auth-backends.tsx": [
-      "6b5b7425",
-      "0d77e75f",
-      "f72fe067",
-      "86e93620",
-      "95368013",
-      "d7e4eb78",
-      "2efc71dc",
-      "a93c1edc"
+      "626f0800",
+      "ffe350dd",
+      "8af841b7",
+      "62a40466",
+      "ce659abc",
+      "17eaabea",
+      "b0edb29f",
+      "3537daa0"
+    ],
+    "apps/web/src/admin-debug.tsx": [
+      "6f85cfd9",
+      "ca3c7989",
+      "1dab2a3d",
+      "56b1bf76",
+      "e64246ad",
+      "e6b14b58",
+      "f48167a7",
+      "0231b49e"
+    ],
+    "apps/web/src/admin-notifications.tsx": [
+      "469f0840",
+      "d0fb9b5a",
+      "cae17fa7",
+      "b66ba2ba",
+      "8f02a388",
+      "e2b8a99b",
+      "43c08998",
+      "bf7b6ffb"
     ],
     "apps/web/src/answer-field-resize.ts": [
       "65a512c2",
@@ -2174,14 +2204,14 @@
       "54a62e5d"
     ],
     "apps/web/src/main.tsx": [
-      "4b43089a",
-      "8dec673b",
-      "e5f863ff",
-      "cbc23730",
-      "8d9ab012",
-      "f05e9072",
-      "ea6a7a14",
-      "131317eb"
+      "b80e4790",
+      "03d1d6e3",
+      "3a58ecc3",
+      "b9c14f0e",
+      "71a96992",
+      "bc17f780",
+      "aa062bb2",
+      "c12b786a"
     ],
     "apps/web/src/main.tsx.orig": [
       "9230e5a3",
