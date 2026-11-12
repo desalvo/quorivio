@@ -7,12 +7,14 @@ const css=readFileSync(new URL('../src/style.css',import.meta.url),'utf8');
 const workflow=readFileSync(new URL('../../../.github/workflows/ci.yml',import.meta.url),'utf8');
 const browser=readFileSync(new URL('../../../tools/ci_rc306_bar_wrap_chromium.py',import.meta.url),'utf8');
 
-test('RC306 detects bar chart children and avoids auto-fit shrinking the entire widget',()=>{
- assert.ok(ui.includes("b.querySelector('.linked-results.result-view-bars')"));
- assert.ok(ui.includes('if(hasBars){setFactor(1);return;}'));
- assert.ok(ui.includes("const canScale=allowScale&&!readableBars;"));
- assert.ok(ui.includes("data-fit-mode={canScale?'scale':'scroll'}"));
- assert.ok(ui.includes("transform:canScale&&factor<.985?"));
+test('RC326 supersedes RC306 scroll-only bars with one bounded proportional fit',()=>{
+ assert.ok(ui.includes("const chartHasRows=Boolean(results&&['bars','pie','table','cloud'].includes("));
+ assert.ok(ui.includes('const next=proportionalWidgetScale({'));
+ assert.ok(ui.includes('contentWidth:Math.max(b.scrollWidth,b.clientWidth)'));
+ assert.ok(ui.includes('contentHeight:Math.max(b.scrollHeight,b.clientHeight)'));
+ assert.ok(ui.includes("data-fit-mode={allowScale?'scale':'scroll'}"));
+ assert.ok(ui.includes("data-fit-predicted-rows={sourceRows.length}"));
+ assert.ok(css.includes('RC326: the entire authored widget scales together'));
 });
 test('RC306 result label widths are bounded and long words wrap naturally',()=>{
  assert.ok(css.includes('RC306 — Long statistics options'));
