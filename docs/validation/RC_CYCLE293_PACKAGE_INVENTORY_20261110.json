@@ -3034,24 +3034,24 @@
       "cf3c2f13"
     ],
     "apps/web/test/rc139-rating-editor-selection.test.ts": [
-      "f99c1cfd",
-      "478dedb9",
-      "a111aae8",
-      "ad036ca9",
-      "7bb068b5",
-      "ccfc3307",
-      "ca46fa99",
-      "996e4a28"
+      "6c9b8a49",
+      "a527de90",
+      "b632cfdb",
+      "71576b7f",
+      "86190c13",
+      "07ef240b",
+      "8d6cdd4b",
+      "be6abfc4"
     ],
     "apps/web/test/rc141-presenter-parity-results.test.ts": [
-      "63c2e2de",
-      "be59ee05",
-      "84bfd18a",
-      "d32bcb9c",
-      "b5de0728",
-      "f2d5ba33",
-      "e51e313b",
-      "f7dcdd40"
+      "d7dc63cb",
+      "84d4a681",
+      "abd5112c",
+      "d06d82cc",
+      "5ac06d62",
+      "c54b7081",
+      "d31cc0f5",
+      "a8caf1c8"
     ],
     "apps/web/test/rc142-widget-size.test.ts": [
       "14dc3435",
@@ -3704,14 +3704,14 @@
       "faf66d98"
     ],
     "apps/web/test/rc306-long-bar-labels.test.ts": [
-      "3ac09a31",
-      "6ea9ef5a",
-      "ebe866ae",
-      "b628f678",
-      "d4578e79",
-      "02d8ef70",
-      "9a8cf16c",
-      "25ad9824"
+      "3760214a",
+      "888636a4",
+      "18b2ce59",
+      "4c9e9d3c",
+      "f35e38f6",
+      "763f8fcd",
+      "cd1aac96",
+      "3dfc6ad7"
     ],
     "apps/web/test/rc307-results-layout-recovery.test.ts": [
       "6ff03c04",
@@ -3784,14 +3784,14 @@
       "51f8069c"
     ],
     "apps/web/test/rc326-session-fit-cover.test.ts": [
-      "d9c22e1f",
-      "c186a48f",
-      "7724d710",
-      "59e4ece7",
-      "750ba1f7",
-      "49c1ca66",
-      "d89c1f87",
-      "6881cee7"
+      "04612fc7",
+      "9b0cb505",
+      "7e371f26",
+      "b9f8b1a3",
+      "ef1cb09d",
+      "6566d805",
+      "07e34e6e",
+      "cd3ea6a3"
     ],
     "apps/web/test/rc70-editor-timer-font.test.ts": [
       "116cfb27",
@@ -4014,14 +4014,14 @@
       "881885b6"
     ],
     "apps/web/test/widget-results.test.ts": [
-      "d0f148b4",
-      "58e18306",
-      "3a1b6e4d",
-      "f9183fe1",
-      "252ddcc2",
-      "18a3ddad",
-      "a8b44e92",
-      "e2e15c64"
+      "6b0bd1a5",
+      "447e8cf2",
+      "218fca7a",
+      "d52d67ae",
+      "2d0509bd",
+      "fc40c066",
+      "211cce9f",
+      "9f543ec3"
     ],
     "apps/web/test/widget-rich-editor-ime.test.ts": [
       "88248341",
