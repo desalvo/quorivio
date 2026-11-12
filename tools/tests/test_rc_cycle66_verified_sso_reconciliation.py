@@ -50,9 +50,9 @@ class VerifiedFederatedIdentityGate(unittest.TestCase):
         workflow=(ROOT/'.github/workflows/ci.yml').read_text()
         for line in ('run: node tools/ci_federated_link_postgres.mjs',
                      'run: node tools/ci_federated_identity_management_pg.mjs',
-                     'gitleaks/gitleaks-action@v2',
                      'rc_acceptance_suite:'):
             self.assertIn(line,workflow)
+        self.assertRegex(workflow, r'gitleaks/gitleaks-action@v(?:2|3)\b')
         self.assertIn('python3 tools/verify_rc_cycle65_inventory.py --historical',workflow)
         self.assertIn('python3 tools/verify_rc_cycle66_inventory.py',workflow)
 
