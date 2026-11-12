@@ -23,7 +23,7 @@ test('RC321 bubble fit is the default, persists, and can return to scroll mode',
  assert.match(main,/fit=\{\(widget\.bubbleNoScroll\?\?source\.bubbleNoScroll\)!==false\}/);
  assert.match(css,/\.linked-results\.result-view-bubbles\[data-bubbles-fit="true"\]/);
  assert.match(main,/new ResizeObserver\(measure\)/);
- assert.match(main,/reactionBubbles\(rows,widget\.resultTopCount\?\?rows\.length/);
+ assert.match(main,/reactionBubbles\(rows,widget\.resultTopCount\?\?5,widget\.resultSortOrder\)/);
  assert.equal(validPageDesign({widgets:[{id:'reaction',kind:'reactions',bubbleNoScroll:false}]}),true);
  assert.equal(validPageDesign({widgets:[{id:'reaction',kind:'reactions',bubbleNoScroll:1}]}),false);
 });
@@ -42,3 +42,18 @@ test('RC321 responsive grid keeps every reaction inside resize-constrained cells
  assert.ok(small.diameter<large.diameter);
  assert.ok(small.metaFont<large.metaFont);
 });
+
+test('RC321 bubble result count stays controlled by widget properties and Formato widget',()=>{
+ const rows=['👍','❤️','😂','😮','👏','🎉','🤔','😕'].map((label,i)=>({id:String(i),label,count:i+1}));
+ assert.equal(reactionBubbles(rows,2,'count-desc').length,2);
+ assert.deepEqual(reactionBubbles(rows,2,'count-desc').map(r=>r.label),['😕','🤔']);
+ assert.equal(reactionBubbles(rows,7,'count-desc').length,7);
+ assert.equal(reactionBubbles(rows,5,'count-desc').length,5);
+ assert.match(main,/value=\{w\.resultTopCount\?\?5\} onCommit=\{n=>patch\(w\.id,\{resultTopCount:n\}\)\}/);
+ assert.match(main,/aria-label="Numero risultati principali" min=\{1\} max=\{20\} step=\{1\} value=\{w\.resultTopCount\?\?5\}/);
+ assert.match(main,/fit=\{\(widget\.bubbleNoScroll\?\?source\.bubbleNoScroll\)!==false\}/);
+ const selected=reactionBubbles(rows,2,'count-desc');
+ assert.equal(fitReactionBubbleLayout(selected,120,80).diameters.length,2);
+ assert.equal(validPageDesign({widgets:[{id:'reaction',kind:'reactions'}, {id:'result',kind:'results-button',targetWidgetId:'reaction',resultsView:'bubbles',resultTopCount:2}]}),true);
+});
+
