@@ -14,8 +14,8 @@ test('RC321 Gauge defaults to white with dark accessible captions and optional t
  assert.match(css,/\.linked-results-gauge-major text\{fill:#1c304b/);
  assert.match(main,/gaugeTransparent===true/);
  assert.match(main,/onChange=\{e=>patch\(w\.id,\{gaugeTransparent:e\.target\.checked\}\)\}/);
- assert.equal(validPageDesign({widgets:[{id:'r',kind:'rating',gaugeTransparent:true}]}),true);
- assert.equal(validPageDesign({widgets:[{id:'r',kind:'rating',gaugeTransparent:'yes'}]}),false);
+ assert.equal(validPageDesign({widgets:[{id:'r',kind:'reactions',resultsView:'gauge',gaugeTransparent:true}]}),true);
+ assert.equal(validPageDesign({widgets:[{id:'r',kind:'reactions',resultsView:'gauge',gaugeTransparent:'yes'}]}),false);
 });
 test('RC321 bubble fit is the default, persists, and can return to scroll mode',()=>{
  assert.match(main,/checked=\{w\.bubbleNoScroll!==false\}/);
