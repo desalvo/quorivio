@@ -14,7 +14,13 @@ class SessionSidebarAndMaster(unittest.TestCase):
    self.assertIn(label,UI)
   for method in ('closeSidebarSession','duplicateSelected','renameSidebarSession','deleteSession'):
    self.assertIn(method,UI)
-  self.assertIn("window.confirm('Terminare definitivamente",UI)
+  # RC326: closing an editor viewer must never change server session state.
+  self.assertIn('function closeSidebarSession(){if(!sidebarBusy)leaveCurrentSession()}',UI)
+  closing=UI.split('function closeSidebarSession(){',1)[1].split('async function renameSidebarSession()',1)[0]
+  self.assertNotIn('/status',closing)
+  self.assertNotIn('request(',closing)
+  # Explicit presentation termination remains a separate command.
+  self.assertIn("onClick={()=>changeStatus('closed')}",UI)
   self.assertIn('Eliminare definitivamente la sessione e tutte le risposte?',UI)
   self.assertIn("selectedSessionRole==='owner'",UI)
   self.assertIn('result.session.access_role',(ROOT/'apps/api/src/server.ts').read_text())
