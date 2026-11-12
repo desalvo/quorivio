@@ -112,7 +112,8 @@ export async function loadAuthBackends(db:Pool,secret:string,env:NodeJS.ProcessE
  }
  return [...byId.values()];
 }
-export async function saveAuthBackend(db:Pool,secret:string,id:string,input:unknown):Promise<PublicBackend>{
+/** Build the exact effective configuration (including previously sealed credentials) without writing it. */
+export async function prepareAuthBackend(db:Pool,secret:string,id:string,input:unknown):Promise<Backend>{
  if(!input||typeof input!=='object'||Array.isArray(input))throw Error('invalid_backend_request');
  const body=input as Record<string,any>;
  const kind=expectedKind(id);
@@ -135,6 +136,12 @@ export async function saveAuthBackend(db:Pool,secret:string,id:string,input:unkn
   if(kind!=='ldap'&&config.clientId&&config.clientSecret&&config.redirectUri&&(kind==='social'||config.issuer))validateAuthBackend(id,kind,config);
  }
  const revised:Backend={id,kind,enabled:kind==='local'?true:body.enabled,mfaEnabled:kind==='local'||kind==='ldap'?body.mfaEnabled:false,config,lastTestedAt:null};
+ return revised;
+}
+/** Only Save persists a draft. Testing uses prepareAuthBackend without storing credentials or changing the active provider. */
+export async function saveAuthBackend(db:Pool,secret:string,id:string,input:unknown):Promise<PublicBackend>{
+ const revised=await prepareAuthBackend(db,secret,id,input);
+ const {kind,config}=revised;
  await db.query("INSERT INTO auth_backends(id,kind,enabled,mfa_enabled,config_encrypted,last_tested_at) VALUES($1,$2,$3,$4,$5,NULL) ON CONFLICT(id) DO UPDATE SET enabled=$3,mfa_enabled=$4,config_encrypted=$5,last_tested_at=NULL,updated_at=now()",
   [id,kind,revised.enabled,revised.mfaEnabled,kind==='local'?'':sealAuthConfig(config,secret)]);
  return backendPublic(revised);
@@ -161,9 +168,10 @@ export async function backendAllowsMfa(db:Pool,secret:string,userId:string):Prom
  return Boolean(backends.find(x=>x.id===(isLdap?'ldap':'local'))?.mfaEnabled);
 }
 /** Tests do not create sessions or link users, and cannot expose credentials. */
-export async function testAuthBackend(db:Pool,secret:string,id:string):Promise<{ok:true;scope:string}>{
- const b=(await loadAuthBackends(db,secret)).find(x=>x.id===id);
- if(!b)throw Error('unknown_backend');
+export async function testAuthBackend(db:Pool,secret:string,id:string,draft?:unknown):Promise<{ok:true;scope:string;preview:boolean}>{
+ const saved=(await loadAuthBackends(db,secret)).find(x=>x.id===id);
+ if(!saved&&draft===undefined)throw Error('unknown_backend');
+ const b=draft===undefined?saved!:await prepareAuthBackend(db,secret,id,draft);
  validateAuthBackend(b.id,b.kind,b.config);
  let scope='configuration';
  if(b.kind==='ldap'){
@@ -188,6 +196,7 @@ export async function testAuthBackend(db:Pool,secret:string,id:string):Promise<{
  }else if(b.kind==='social'){
   scope='configuration_only_interactive_oauth_required'; // cannot prove client secret without user authorization
  }else scope='local_internal';
- await db.query('UPDATE auth_backends SET last_tested_at=now() WHERE id=$1',[id]);
- return {ok:true,scope};
+ // A draft test must never update last_tested_at or activate/store the proposed credentials.
+ if(draft===undefined)await db.query('UPDATE auth_backends SET last_tested_at=now() WHERE id=$1',[id]);
+ return {ok:true,scope,preview:draft!==undefined};
 }

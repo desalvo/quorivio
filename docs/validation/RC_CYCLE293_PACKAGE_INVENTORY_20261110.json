@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
   "cycle": 293,
-  "file_count_excluding_manifest": 2617,
+  "file_count_excluding_manifest": 2618,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -174,14 +174,14 @@
       "ad9a890c"
     ],
     "apps/api/src/auth-backends.ts": [
-      "de9f9341",
-      "5d89e30c",
-      "966834d1",
-      "93460233",
-      "883525bf",
-      "52587ea7",
-      "48ee8b79",
-      "46ddc23a"
+      "3fc41b07",
+      "e19e93cb",
+      "cfa7b684",
+      "822342af",
+      "fd23b6e7",
+      "5e2b8656",
+      "544f43a3",
+      "040aad23"
     ],
     "apps/api/src/background-upload-failure.ts": [
       "da211908",
@@ -584,14 +584,14 @@
       "6cf4c002"
     ],
     "apps/api/src/server.ts": [
-      "8be2690f",
-      "30082ecf",
-      "86db39f5",
-      "35c9cc91",
-      "86f7fcc5",
-      "5c1f5a41",
-      "d55cc011",
-      "712431b6"
+      "1142f9bc",
+      "cad6b074",
+      "c4933869",
+      "b481bac1",
+      "5e8515b2",
+      "2a71f016",
+      "1036dea6",
+      "61788da9"
     ],
     "apps/api/src/session-bus.ts": [
       "09ec6487",
@@ -1954,14 +1954,14 @@
       "85c9ac92"
     ],
     "apps/web/src/admin-auth-backends.tsx": [
-      "8e2068bf",
-      "437a5e11",
-      "e8ee1254",
-      "fa55b686",
-      "05c71dbc",
-      "c95ceee1",
-      "b9d1b825",
-      "15643533"
+      "f52d0490",
+      "8e7205fa",
+      "4553e996",
+      "6df1b686",
+      "3930edc5",
+      "450f30da",
+      "45ff3318",
+      "caa05a8b"
     ],
     "apps/web/src/answer-field-resize.ts": [
       "65a512c2",
@@ -3733,6 +3733,16 @@
       "3560c444",
       "8a7668a0"
     ],
+    "apps/web/test/rc324-auth-backend-drafts.test.ts": [
+      "b6b5762f",
+      "75f7fcca",
+      "14e7fc3f",
+      "dc160935",
+      "205acbc0",
+      "c606bf5a",
+      "b88ec6a4",
+      "780e8ac8"
+    ],
     "apps/web/test/rc70-editor-timer-font.test.ts": [
       "116cfb27",
       "f9be91d4",
@@ -4204,14 +4214,14 @@
       "02981214"
     ],
     "docs/AUTH_BACKENDS_CONFIGURATION_IT_EN.md": [
-      "847ce63e",
-      "bc4ea13a",
-      "7cf8c900",
-      "efb42d30",
-      "d150e68a",
-      "97106a7a",
-      "0ee624ad",
-      "498132b3"
+      "ef3fcee8",
+      "1a193533",
+      "00de8c7f",
+      "6d4c3cf9",
+      "04f7ed0c",
+      "6953fc57",
+      "8e915fb1",
+      "129eda61"
     ],
     "docs/BUILD_INFO.en.md": [
       "15789afe",
@@ -4484,14 +4494,14 @@
       "d240df37"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "3f34aeda",
-      "23c6a353",
-      "5192da29",
-      "59485759",
-      "55393b8d",
-      "161c75bf",
-      "c6d1f7cd",
-      "d8fd27d0"
+      "7fa791f7",
+      "ea1bef09",
+      "dd493226",
+      "8ee99f8c",
+      "29886c67",
+      "2553409e",
+      "16b473dd",
+      "811f180c"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",
