@@ -59,6 +59,6 @@ test('RC327: extreme and predicted content never exceeds either widget dimension
  const capped=proportionalWidgetScale({frameWidth:300,frameHeight:200,contentWidth:10,contentHeight:10,maxScale:3});
  assert.equal(capped,3,'a specialized renderer may explicitly cap upscaling');
  assert.equal(proportionalWidgetScale({frameWidth:300,frameHeight:200,contentWidth:Infinity,contentHeight:10}),1);
- assert.doesNotMatch(ui,/maxScale:2\\.25/,'default content fit must not impose an arbitrary enlargement cap');
- assert.match(ui,/setFactor\\(previous=>next<previous\\?next:/,'growth in natural content must immediately reduce scale');
+ assert.doesNotMatch(ui,/maxScale:2\.25/,'default content fit must not impose an arbitrary enlargement cap');
+ assert.match(ui,/setFactor\(previous=>next<previous\?next:/,'growth in natural content must immediately reduce scale');
 });
