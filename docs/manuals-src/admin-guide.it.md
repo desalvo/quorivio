@@ -238,6 +238,56 @@ SMTP serve per richieste di approvazione, recupero credenziali e notifiche opera
 
 OAuth/OIDC può usare provider configurati come Google, GitHub, Facebook o provider generici, con callback HTTPS e segreti specifici. Verificare `state`, redirect URI e collegamento esplicito dell'identità: la coincidenza della mail non è un proof-of-ownership. MFA TOTP e codici di recupero vanno gestiti secondo la policy dell'istanza. I reset MFA amministrativi richiedono autorizzazione forte e revoca delle sessioni pertinenti.
 
+
+### 12.1 SSO: dove configurare e ottenere i parametri
+
+Aprire **Dashboard → Impostazioni server → Autenticazione → Backend di autenticazione e autorizzazione** come amministratore di piattaforma. Scegliere il provider predisposto nel menu Backend oppure inserire un ID nel campo Nuovo provider OIDC e premere Aggiungi SSO. Tutti i backend esterni sono disabilitati per default. Il backend interno resta sempre disponibile.
+
+| Parametro in Quorivio | Cosa inserire / dove ottenerlo |
+|---|---|
+| Nome visualizzato alla login | Etichetta specifica per il provider, mostrata accanto al logo sul pulsante di login. |
+| OIDC Issuer (HTTPS) | Il valore esatto issuer della discovery OIDC del tenant/realm/app scelti. Deve esistere il documento /.well-known/openid-configuration e il JWKS HTTPS. Conservare la barra finale se prevista dall'IdP. |
+| Client ID | Identificatore della nuova applicazione Web/confidential registrata presso il provider. |
+| Client secret | Segreto della stessa applicazione; Quorivio lo memorizza cifrato. Campo lasciato vuoto = conserva segreto esistente. Non pubblicare mai la credenziale. |
+| Redirect URI HTTPS | Per OIDC: https://DOMINIO-QUORIVIO/api/auth/oidc/ID/callback ; per GitHub/Facebook: https://DOMINIO-QUORIVIO/api/auth/social/ID/callback . L'ID è quello del backend; registrare il valore ESATTO nel portale del provider. |
+| Colore pulsante | Colore personalizzabile, distinto per provider; Quorivio sceglie il colore del testo per il contrasto. |
+| Logo | Preset: logo incluso nell'applicazione, nessun caricamento. Provider OIDC personalizzato: caricare PNG, JPEG o WebP fino a 32 KiB; non sono ammessi SVG o URL remoti. |
+| Abilita backend | Attivare soltanto dopo Salva configurazione, Testa backend salvato e prova reale di accesso e collegamento identità. Il test OIDC verifica discovery/JWKS, non la validità del Client secret. |
+
+### 12.2 Tabella di tutti i provider OIDC predisposti
+
+Ogni riga si configura **in Quorivio, Impostazioni server → Autenticazione → Backend** e nel rispettivo portale esterno. I preset non contengono credenziali o tenant già configurati.
+
+| Provider (ID) | Issuer OIDC da verificare | Sito del provider: dove creare il client Web e registrare il callback |
+|---|---|---|
+| **Google (google)** | https://accounts.google.com | [Google Cloud Console](https://console.cloud.google.com/auth/clients) → Google Auth Platform → Clients → Create Client → Web application → Authorized redirect URIs. [Documentazione](https://developers.google.com/identity/openid-connect/openid-connect). |
+| **Microsoft Entra ID (microsoft)** | https://login.microsoftonline.com/TENANT-GUID/v2.0 | [Entra admin center](https://entra.microsoft.com/) → App registrations → New registration → Authentication → Add a platform → Web → Redirect URI. Poi Certificates & secrets → Client secrets. [Documentazione](https://learn.microsoft.com/en-us/entra/identity-platform/v2-protocols-oidc). Usare un tenant specifico, non un issuer multi-tenant non verificato. |
+| **Okta (okta)** | https://ORGANIZZAZIONE.okta.com/oauth2/default (o issuer effettivo del proprio authorization server) | [Okta Admin Console](https://developer.okta.com/docs/guides/sign-into-web-app-redirect/) → Applications → Create App Integration → OIDC → Web Application → Sign-in redirect URIs; recuperare Client credentials. |
+| **Keycloak (keycloak)** | https://IDP/realms/REALM | [Keycloak Admin Console](https://www.keycloak.org/securing-apps/oidc-layers) → Realm → Clients → Create client → OpenID Connect → Client authentication → Valid redirect URIs → Credentials. |
+| **Authentik (authentik)** | https://IDP/application/o/APP-SLUG/ (attenzione alla barra finale) | [Authentik Admin](https://docs.goauthentik.io/add-secure-apps/providers/oauth2/create-oauth2-provider) → Applications → New Application → OAuth2/OIDC Provider → Redirect URIs; recuperare Client ID, secret e issuer esatto. |
+| **OIDC custom (ID scelto, es. infn)** | URL issuer HTTPS dichiarato dall'IdP | Console del proprio IdP: creare client confidential Web con Authorization Code + PKCE, scope openid email profile, email verificata e JWKS RS256; impostare il callback Quorivio. Per IdP solo SAML usare un broker OIDC; SAML diretto non è supportato. |
+
+**Issuer Authentik:** il campo issuer deve corrispondere esattamente sia alla discovery sia al claim iss dei token, compresa la barra finale quando presente; non normalizzarlo arbitrariamente.
+
+### 12.3 GitHub e Facebook: provider OAuth, non OIDC
+
+| Provider | Parametri nel portale esterno | Callback da impostare |
+|---|---|---|
+| **GitHub (github)** | [GitHub → Settings → Developer settings → OAuth Apps → New OAuth App](https://github.com/settings/developers); Application name, Homepage, Authorization callback URL, Client ID e Client secret. | https://DOMINIO-QUORIVIO/api/auth/social/github/callback |
+| **Facebook (facebook)** | [Meta for Developers](https://developers.facebook.com/apps/) → My Apps → crea App → Facebook Login → Settings → Valid OAuth Redirect URIs; App ID e App secret; verificare modalità Live e revisione dell'app. | https://DOMINIO-QUORIVIO/api/auth/social/facebook/callback |
+
+La scheda OAuth social non richiede Issuer. Anche questi pulsanti hanno logo integrato e colore distinto. MFA per tutti gli SSO è delegata all'Identity Provider; Quorivio non aggiunge un secondo codice.
+
+### 12.4 Collaudo e sicurezza
+
+1. Creare un client Web/confidential nel provider e copiare in Quorivio ID, secret, issuer (solo OIDC), redirect esatto, label e colore.
+2. Eseguire **Testa bozza senza salvare**: non abilita e non memorizza credenziali. Salvare, quindi eseguire **Testa backend salvato**. Discovery/JWKS non convalidano i segreti OAuth.
+3. Abilitare il backend e verificare con un browser privato che ogni SSO compaia con logo, nome e colore corretti.
+4. Eseguire un accesso vero e il collegamento esplicito a un account approvato. Non associare account sulla sola email: identità federata = provider e subject stabile.
+5. Per OIDC custom usare **Carica logo custom per provider OIDC**: immagini raster ridotte, controllate dal backend e pubblicate come asset locale all'app, mai tramite URL terzi.
+6. Conservare un amministratore locale di emergenza; ruotare i segreti, verificare HTTPS, audit, revoche e informativa GDPR sui trasferimenti dati verso IdP esterni.
+
+
 ## 13. Audit delle operazioni e retention
 
 Il registro audit conserva evento, attore, timestamp, azione, risorsa e stato senza memorizzare password, cookie, token, IP o contenuto integrale delle risposte. Gli amministratori possono ricercare per utente, risorsa/UUID e azione, consultare le pagine e impostare retention **7–3650 giorni**.

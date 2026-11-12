@@ -168,7 +168,7 @@ export async function enabledOidcBackends(db:Pool,secret:string):Promise<OidcPro
  return (await loadAuthBackends(db,secret)).filter(x=>x.kind==='oidc'&&x.enabled).map(b=>{validateAuthBackend(b.id,b.kind,b.config);return {...b.config,id:b.id} as OidcProvider});
 }
 export async function enabledSocialBackends(db:Pool,secret:string):Promise<SocialProvider[]>{
- return (await loadAuthBackends(db,secret)).filter(x=>x.kind==='social'&&x.enabled).map(b=>{validateAuthBackend(b.id,b.kind,b.config);return {id:b.id,clientId:b.config.clientId,clientSecret:b.config.clientSecret,redirectUri:b.config.redirectUri} as SocialProvider});
+ return (await loadAuthBackends(db,secret)).filter(x=>x.kind==='social'&&x.enabled).map(b=>{validateAuthBackend(b.id,b.kind,b.config);return {id:b.id,clientId:b.config.clientId,clientSecret:b.config.clientSecret,redirectUri:b.config.redirectUri,buttonColor:b.config.buttonColor} as SocialProvider});
 }
 export async function backendAllowsMfa(db:Pool,secret:string,userId:string):Promise<boolean>{
  const isLdap=(await db.query('SELECT EXISTS(SELECT 1 FROM ldap_identities WHERE user_id=$1) AS ldap',[userId])).rows[0]?.ldap===true;

@@ -51,3 +51,14 @@ test('RC330 custom SSO icons allow only small raster data and distinct preset ba
  assert.match(admin,/Carica logo custom per provider OIDC/);
  assert.match(ui,/className="sso-provider-button"/);
 });
+test('RC330 exact Authentik issuer and token claim preserve trailing slash',async()=>{
+ const {validateDiscovery,validateClaims}=await import('../../api/src/oidc.ts');
+ const provider={id:'authentik',issuer:'https://id.example/application/o/quorivio/',clientId:'client',clientSecret:'secret',redirectUri:'https://quorivio.example/api/auth/oidc/authentik/callback'};
+ const disc={issuer:provider.issuer,authorization_endpoint:'https://id.example/authorize',token_endpoint:'https://id.example/token',jwks_uri:'https://id.example/jwks'};
+ assert.equal(validateDiscovery(provider,disc).issuer,provider.issuer);
+ assert.throws(()=>validateDiscovery({...provider,issuer:provider.issuer.slice(0,-1)},disc),/invalid_oidc_discovery/);
+ const now=Math.floor(Date.now()/1000);
+ const claims={iss:provider.issuer,aud:'client',sub:'alice',email:'alice@example.org',email_verified:true,nonce:'1234567890123456',exp:now+3600,iat:now};
+ assert.equal(validateClaims(claims,provider,claims.nonce).subject,'alice');
+ assert.throws(()=>validateClaims({...claims,iss:provider.issuer.slice(0,-1)},provider,claims.nonce),/invalid_oidc_claims/);
+});

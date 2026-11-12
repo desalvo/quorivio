@@ -238,6 +238,56 @@ SMTP supports approval notices, recovery and operational alerts. Configure host,
 
 OAuth/OIDC supports configured providers such as Google, GitHub, Facebook or generic identity providers, subject to HTTPS callbacks and provider-specific credentials. Validate `state`, redirect URIs and explicit account linking: matching email addresses is not evidence of identity ownership. TOTP MFA and recovery codes must follow the deployment's security policy. Administrative MFA reset must include strong authorization and relevant session revocation.
 
+
+### 12.1 SSO: where credentials are configured
+
+A platform administrator opens **Dashboard → Server settings → Authentication → Authentication and authorization backends**. Select a prepared backend or enter an ID in New OIDC provider and choose Add SSO. External backends start disabled; local login stays enabled.
+
+| Quorivio field | What to enter / where it comes from |
+|---|---|
+| Login label | Provider-specific button text shown next to its logo. |
+| OIDC Issuer (HTTPS) | Exact issuer in the IdP discovery document for the chosen tenant/realm/application; /.well-known/openid-configuration and JWKS must be reachable over HTTPS. Preserve a trailing slash when needed. |
+| Client ID | Registered confidential/Web application identifier from the provider console. |
+| Client secret | Secret of that application; stored encrypted in Quorivio. Leave an existing secret field blank to preserve it. |
+| Redirect URI HTTPS | OIDC: https://QUORIVIO-DOMAIN/api/auth/oidc/ID/callback ; GitHub/Facebook: https://QUORIVIO-DOMAIN/api/auth/social/ID/callback . Register the EXACT URL externally. |
+| Login button colour | Configurable per-provider colour, with foreground chosen for legible contrast. |
+| Logo | Prepared providers ship with local icons. Custom OIDC providers accept PNG/JPEG/WebP uploads up to 32 KiB; SVG and remote arbitrary URLs are prohibited. |
+| Enable backend | Only after Save, Test saved backend and real interactive sign-in/linking. OIDC Test verifies discovery/JWKS, not credentials. |
+
+### 12.2 All prepared OpenID Connect provider settings
+
+The Quorivio location for each provider is **Server settings → Authentication → Backend**. The listed presets have local icons, but require actual tenant, client and secret configuration.
+
+| Provider (ID) | OIDC issuer example to verify | External provider console: Web client registration and callback configuration |
+|---|---|---|
+| **Google (google)** | https://accounts.google.com | [Google Cloud Console](https://console.cloud.google.com/auth/clients) → Google Auth Platform → Clients → Create Client → Web application → Authorized redirect URIs. [Documentation](https://developers.google.com/identity/openid-connect/openid-connect). |
+| **Microsoft Entra ID (microsoft)** | https://login.microsoftonline.com/TENANT-GUID/v2.0 | [Entra admin center](https://entra.microsoft.com/) → App registrations → New registration → Authentication → Add platform → Web → Redirect URI; Certificates & secrets → Client secrets. [Documentation](https://learn.microsoft.com/en-us/entra/identity-platform/v2-protocols-oidc). Prefer a fixed tenant. |
+| **Okta (okta)** | https://ORG.okta.com/oauth2/default, or the configured authorization server's real issuer | [Okta Admin](https://developer.okta.com/docs/guides/sign-into-web-app-redirect/) → Applications → Create App Integration → OIDC → Web Application → Sign-in redirect URIs; obtain client credentials. |
+| **Keycloak (keycloak)** | https://IDP/realms/REALM | [Keycloak Admin](https://www.keycloak.org/securing-apps/oidc-layers) → Realm → Clients → Create client → OIDC → Client authentication → Valid redirect URIs → Credentials. |
+| **Authentik (authentik)** | https://IDP/application/o/APP-SLUG/ (trailing slash may be required) | [Authentik Admin](https://docs.goauthentik.io/add-secure-apps/providers/oauth2/create-oauth2-provider) → Applications → New Application → OAuth2/OIDC Provider → Redirect URIs; copy Client ID, secret and exact issuer. |
+| **Custom OIDC (chosen ID, e.g. infn)** | Real IdP HTTPS issuer | Register a confidential Web OIDC client with Authorization Code + PKCE, scopes openid email profile, verified email, RS256 JWKS, and exact callback. SAML-only IdPs need an OIDC broker. Direct SAML is not supported. |
+
+**Authentik issuer detail:** Quorivio requires the issuer in discovery and the token iss claim to exactly match the configured issuer, including a trailing slash when the IdP declares it.
+
+### 12.3 Social OAuth providers: GitHub and Facebook are not OIDC
+
+| Provider | External console and parameters | Callback URL |
+|---|---|---|
+| **GitHub (github)** | [Settings → Developer settings → OAuth Apps → New OAuth App](https://github.com/settings/developers); application name, homepage, authorization callback, Client ID and Client secret. | https://QUORIVIO-DOMAIN/api/auth/social/github/callback |
+| **Facebook (facebook)** | [Meta for Developers](https://developers.facebook.com/apps/) → My Apps → create app → Facebook Login → Settings → Valid OAuth Redirect URIs; App ID, App secret, app review/live mode. | https://QUORIVIO-DOMAIN/api/auth/social/facebook/callback |
+
+Social OAuth does not have an Issuer field. Each enabled backend gets an independent icon and colour. SSO MFA is handled by its IdP.
+
+### 12.4 Secure operator validation
+
+1. Register a confidential Web application and exact Quorivio callback at the external IdP. Copy ID, secret, exact OIDC issuer, label and colour into Quorivio.
+2. Choose **Test unsaved draft** (does not enable or save); then Save and **Test saved backend**. Discovery/JWKS alone cannot prove OAuth client credentials.
+3. Enable each provider; verify logo, label and distinctive colour in a private browser.
+4. Test real sign-in and explicit approved-account linking. Never link by email alone: federated identity is the pair provider + stable subject.
+5. For custom OIDC upload a small raster logo. The server validates the data and the login does not request third-party logo URLs.
+6. Keep a local recovery administrator, rotate credentials, enforce HTTPS/audit and review GDPR notices for personal data sent to external IdPs.
+
+
 ## 13. Operation audit and retention
 
 The operation audit includes actor, timestamp, action, resource and outcome without storing passwords, cookies, tokens, IP addresses or full participant answer contents. Authorized administrators may search by user, resource/UUID and action, paginate records, and configure retention from **7 to 3650 days**.

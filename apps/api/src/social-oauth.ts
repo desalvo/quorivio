@@ -1,7 +1,7 @@
 import {boundedFederatedJson} from './federated-response.js';
 /** OAuth2 providers that do not expose standard OpenID Connect id_tokens. */
 import {createHmac,randomBytes} from 'node:crypto';
-export type SocialProvider={id:'github'|'facebook';clientId:string;clientSecret:string;redirectUri:string};
+export type SocialProvider={id:'github'|'facebook';clientId:string;clientSecret:string;redirectUri:string;buttonColor?:string};
 export function socialProviders(env:NodeJS.ProcessEnv=process.env):SocialProvider[]{return (['github','facebook'] as const).flatMap(id=>{const prefix='OAUTH_'+id.toUpperCase()+'_';const clientId=env[prefix+'CLIENT_ID'],clientSecret=env[prefix+'CLIENT_SECRET'],redirectUri=env[prefix+'REDIRECT_URI'];if(!clientId||!clientSecret||!redirectUri)return [];try{const u=new URL(redirectUri);if(u.protocol!=='https:'||u.username||u.password||u.hash||u.search||u.pathname!==`/api/auth/social/${id}/callback`)return []}catch{return []}return [{id,clientId,clientSecret,redirectUri}]})}
 export const socialState=()=>randomBytes(32).toString('base64url');
 export function socialAuthorizationUrl(p:SocialProvider,state:string){const u=new URL(p.id==='github'?'https://github.com/login/oauth/authorize':'https://www.facebook.com/v22.0/dialog/oauth');u.searchParams.set('client_id',p.clientId);u.searchParams.set('redirect_uri',p.redirectUri);u.searchParams.set('state',state);u.searchParams.set('response_type','code');u.searchParams.set('scope',p.id==='github'?'read:user user:email':'public_profile,email');return u.toString()}

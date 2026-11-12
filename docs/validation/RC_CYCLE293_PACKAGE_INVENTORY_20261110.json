@@ -174,14 +174,14 @@
       "ad9a890c"
     ],
     "apps/api/src/auth-backends.ts": [
-      "aee7d40d",
-      "c2781291",
-      "e76f078f",
-      "e556c42c",
-      "35ff4ac4",
-      "878be849",
-      "2a31fe5c",
-      "9f4ad7a7"
+      "9b1af948",
+      "3f2b2de5",
+      "366723bb",
+      "f520b840",
+      "da565b83",
+      "1c6c235e",
+      "e80a58de",
+      "774b5967"
     ],
     "apps/api/src/background-upload-failure.ts": [
       "da211908",
@@ -414,14 +414,14 @@
       "018632ad"
     ],
     "apps/api/src/oidc.ts": [
-      "3ca302ff",
-      "431d1674",
-      "183d4394",
-      "d559faed",
-      "6fa418dc",
-      "80fbf9d4",
-      "0ba25c37",
-      "44897d52"
+      "62417c13",
+      "5b7da8cd",
+      "8267d3a8",
+      "a869d315",
+      "0a649716",
+      "54c6819b",
+      "ecda8782",
+      "06d56982"
     ],
     "apps/api/src/operation-audit.ts": [
       "47b17194",
@@ -634,14 +634,14 @@
       "833ffb6c"
     ],
     "apps/api/src/social-oauth.ts": [
-      "5bb4a78d",
-      "56afbe11",
-      "31901f84",
-      "2f238fc5",
-      "431a06f4",
-      "6ca87ec9",
-      "308a1ceb",
-      "ae7df79e"
+      "efefa761",
+      "1a087a67",
+      "332a8036",
+      "c8542437",
+      "57386bd6",
+      "2931e3b2",
+      "bb1b9cbb",
+      "d1db04c7"
     ],
     "apps/api/src/statistics-export.ts": [
       "515715cf",
@@ -4264,14 +4264,14 @@
       "02981214"
     ],
     "docs/AUTH_BACKENDS_CONFIGURATION_IT_EN.md": [
-      "ef3fcee8",
-      "1a193533",
-      "00de8c7f",
-      "6d4c3cf9",
-      "04f7ed0c",
-      "6953fc57",
-      "8e915fb1",
-      "129eda61"
+      "bd4aef57",
+      "2705d1fe",
+      "364a9c1e",
+      "cb941923",
+      "2382e63f",
+      "eb97bc99",
+      "0a634d22",
+      "720c2035"
     ],
     "docs/BUILD_INFO.en.md": [
       "15789afe",
@@ -4544,14 +4544,14 @@
       "d240df37"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "2b1c9224",
-      "2a945e31",
-      "1486eaaf",
-      "a25dc693",
-      "95130d13",
-      "77dce00f",
-      "b600ec92",
-      "24f4b006"
+      "760ebc6c",
+      "b32c135d",
+      "95c33c44",
+      "093fa3cf",
+      "7cf961ff",
+      "50111685",
+      "dfa16283",
+      "c7b07770"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",
@@ -13164,24 +13164,24 @@
       "5072a7dc"
     ],
     "docs/manuals-src/admin-guide.en.md": [
-      "47213d94",
-      "97c69972",
-      "731b7478",
-      "998c6767",
-      "9772a37e",
-      "707d8ac7",
-      "049b09d4",
-      "ae185aba"
+      "f3686db3",
+      "d1f8b0db",
+      "346594f5",
+      "7c9bc9f1",
+      "0e55b5c8",
+      "25e875f5",
+      "94b42c3a",
+      "5e6eb5af"
     ],
     "docs/manuals-src/admin-guide.it.md": [
-      "1a79e930",
-      "48152fe3",
-      "a2e2735c",
-      "318cb366",
-      "0001dc11",
-      "72d7205a",
-      "5d52cf02",
-      "80540286"
+      "b5c4567a",
+      "b34fc0a1",
+      "70df3c29",
+      "62f18ac6",
+      "b7fa8d04",
+      "cb4c0c79",
+      "d6ae6b33",
+      "aabfd7e6"
     ],
     "docs/manuals-src/presenter-guide.en.md": [
       "5c01b869",
@@ -26354,14 +26354,14 @@
       "c28a3484"
     ],
     "apps/web/test/rc330-sso-profile.test.ts": [
-      "3685c23b",
-      "3f46f09c",
-      "6d6f2717",
-      "0c9a71d6",
-      "0dd0e130",
-      "99baa224",
-      "2a27d5a3",
-      "85d331c0"
+      "b1b72efa",
+      "a385bc07",
+      "bb66e2ff",
+      "9361d14b",
+      "c3c1f891",
+      "c41ff5da",
+      "b13f0f6c",
+      "5cbeb3e2"
     ]
   }
 }
