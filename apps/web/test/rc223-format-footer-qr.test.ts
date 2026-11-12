@@ -25,7 +25,7 @@ test('QR link is one line and scrolls instead of scaling whole QR widget',()=>{
  assert.match(ui,/className="participant-qr-url" href=\{url\} title=\{url\}/);
  assert.match(css,/min-height:22px!important;height:auto!important;max-height:24px!important/);
  assert.match(css,/white-space:nowrap!important;word-break:normal!important/);
- assert.ok(ui.includes("allowScale={!['qr','participant-count','results-button'].includes(w.kind)"));
+ assert.ok(ui.includes("allowScale={w.autoFit!==false&&!['qr','participant-count'].includes(w.kind)"));
  assert.ok(css.includes('font-size:var(--qr-url-font-size,15px)!important'));
  assert.ok(ui.includes('qrUrlFontSize:next,qrUrlWidthExtra:'));
 });
