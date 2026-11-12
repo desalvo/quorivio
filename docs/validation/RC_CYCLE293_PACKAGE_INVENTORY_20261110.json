@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
   "cycle": 293,
-  "file_count_excluding_manifest": 2611,
+  "file_count_excluding_manifest": 2612,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -174,14 +174,14 @@
       "2dd5f6ba"
     ],
     "apps/api/src/domain.ts": [
-      "7d86480d",
-      "403bc39e",
-      "45ca4821",
-      "1c9f1398",
-      "d132203f",
-      "cd1dc197",
-      "0b0a162f",
-      "60d18e27"
+      "2191063f",
+      "90fd1175",
+      "fb910204",
+      "9e03224f",
+      "602f9241",
+      "b4242aa6",
+      "8cbe27c0",
+      "e6bfad8c"
     ],
     "apps/api/src/email-otp.ts": [
       "442c62ac",
@@ -2044,14 +2044,14 @@
       "54a62e5d"
     ],
     "apps/web/src/main.tsx": [
-      "1a4ebcaf",
-      "3d79caf7",
-      "f3c8c068",
-      "3c8325d0",
-      "29606ca7",
-      "b7a84fe7",
-      "4f481c66",
-      "ec5e1cef"
+      "a0c8f1d8",
+      "8e422fd3",
+      "2356f4cc",
+      "3ea29eb0",
+      "2073b4d8",
+      "e66e2f73",
+      "0984fc19",
+      "0dcca62c"
     ],
     "apps/web/src/main.tsx.orig": [
       "9230e5a3",
@@ -2424,14 +2424,14 @@
       "2586b822"
     ],
     "apps/web/src/style.css": [
-      "c4268485",
-      "c89f4bf9",
-      "ce19de21",
-      "d078600c",
-      "f224e65f",
-      "d3b87d8e",
-      "1745bb30",
-      "7f826010"
+      "6a4493e5",
+      "42f2e6dc",
+      "8c121e07",
+      "db5942b3",
+      "8eddcf9b",
+      "79235d8a",
+      "4e5cff54",
+      "fea22301"
     ],
     "apps/web/src/thumbnail-menu-layout.ts": [
       "a4748563",
@@ -2584,14 +2584,14 @@
       "f116c35e"
     ],
     "apps/web/src/widget-results.ts": [
-      "6e25c551",
-      "38dd770e",
-      "aa3ddd4b",
-      "90c67d6f",
-      "674740b6",
-      "4ebcc895",
-      "dd137c6d",
-      "b6d25caa"
+      "398de8fa",
+      "8a5ef31d",
+      "7c1a483e",
+      "2a74aa41",
+      "70ce2046",
+      "37a34f06",
+      "ffe99f9d",
+      "0d7c7493"
     ],
     "apps/web/src/widget-rich-editor.tsx": [
       "610fdf07",
@@ -5084,14 +5084,14 @@
       "d240df37"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "1e1bec79",
-      "3d86fc87",
-      "9e153053",
-      "aae931ad",
-      "0d761561",
-      "e693815b",
-      "2f325a3e",
-      "8aadf621"
+      "5c2d52a5",
+      "6bf022ca",
+      "7122b91d",
+      "7fc49873",
+      "b69e4a55",
+      "c61ede9a",
+      "2e854984",
+      "87a53bc2"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",
@@ -26112,6 +26112,16 @@
       "411e1342",
       "ba698a16",
       "76e43547"
+    ],
+    "apps/web/test/rc318-auth-reactions-format.test.ts": [
+      "815cc9c5",
+      "7f01920d",
+      "8056e9cd",
+      "25738bb5",
+      "ae94c7ea",
+      "0bef9453",
+      "7ae8ab47",
+      "3ce954c7"
     ]
   }
 }
