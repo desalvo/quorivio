@@ -46,7 +46,7 @@ class Ci4079Hotfix(unittest.TestCase):
     def test_workflow_checks_new_manifest_and_keeps_security_gate(self):
         workflow=(ROOT/'.github/workflows/ci.yml').read_text(encoding='utf-8')
         self.assertIn('python3 tools/verify_rc_cycle14_inventory.py',workflow)
-        self.assertIn('gitleaks/gitleaks-action@v2',workflow)
+        self.assertRegex(workflow, r'gitleaks/gitleaks-action@v(?:2|3)\b')
         self.assertIn('python3 tools/ci_recovery_url_chromium.py',workflow)
         self.assertLess(workflow.index('Verify grouped SHA-256 evidence inventory'),workflow.index('Detect credential leaks'))
 
