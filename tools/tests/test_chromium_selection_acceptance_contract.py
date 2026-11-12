@@ -26,7 +26,7 @@ class ChromiumSelectionAcceptanceContract(unittest.TestCase):
         source=(ROOT/'tools/ci_browser_editor.py').read_text()
         workflow=(ROOT/'.github/workflows/ci.yml').read_text()
         self.assertIn('editor-autosave-failure.png',source)
-        self.assertIn('actions/upload-artifact@v4',workflow)
+        self.assertRegex(workflow, r'actions/upload-artifact@v(?:4|7)\b')
         self.assertIn('if: failure() && github.event_name',workflow)
         self.assertIn('if-no-files-found: ignore',workflow)
 
