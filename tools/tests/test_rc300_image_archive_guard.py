@@ -12,8 +12,9 @@ class PortableImages(unittest.TestCase):
   subset=CI[b:CI.index('  kubernetes-api-manifests:',c)]
   guard="github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[full-ci]')"
   self.assertEqual(subset.count(guard),2)
-  for marker in ('docker save "quorivio:sha-$short"','docker save "quorivio-converter:sha-$short"','sha256sum *.tar.gz > SHA256SUMS','gzip -t','actions/upload-artifact@v4','retention-days: 7'):
+  for marker in ('docker save "quorivio:sha-$short"','docker save "quorivio-converter:sha-$short"','sha256sum *.tar.gz > SHA256SUMS','gzip -t','retention-days: 7'):
    with self.subTest(marker=marker): self.assertIn(marker,subset)
+  self.assertRegex(subset, r'uses: actions/upload-artifact@v(?:4|7)\b')
   for denied in ('push: true','docker push','docker/login-action'):
    self.assertNotIn(denied,subset)
  def test_extended_full_ci_still_includes_native_oci(self):
