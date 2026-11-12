@@ -4164,3 +4164,10 @@ main.hero.login-manual-cover .panel.login{
   >.widget-fit-frame[data-fit-mode="scale"] .linked-results.result-view-bubbles{
  max-height:none!important;overflow:visible!important;
 }
+
+/* RC326 explicit mode overrides legacy phone transform:none declarations:
+   one shared transform even for mobile editor, rehearsal and audience view. */
+:is(.widget-canvas-item,.rehearsal-widget,.projection-widget,.audience-widget-layout>.page-widget)
+  >.widget-fit-frame[data-fit-mode="scale"]>.widget-fit-content{
+ transform:scale(var(--widget-fit-scale,1))!important;
+}
