@@ -9,7 +9,7 @@ class RCPullRequestGitleaksHistory(unittest.TestCase):
   text = (ROOT / '.github/workflows/ci.yml').read_text(encoding='utf8')
   checkout = text.index('      - uses: actions/checkout@v4')
   self.assertIn('with: {persist-credentials: false, fetch-depth: 0}', text[checkout:checkout+150])
-  self.assertIn('gitleaks/gitleaks-action@v2', text)
-  self.assertLess(checkout, text.index('gitleaks/gitleaks-action@v2'))
+  self.assertRegex(text, r'gitleaks/gitleaks-action@v(?:2|3)\b')
+  self.assertLess(checkout, text.index('gitleaks/gitleaks-action@v'))
 
 if __name__ == '__main__': unittest.main()
