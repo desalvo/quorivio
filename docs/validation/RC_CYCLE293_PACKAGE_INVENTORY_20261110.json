@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
   "cycle": 293,
-  "file_count_excluding_manifest": 2610,
+  "file_count_excluding_manifest": 2611,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -174,14 +174,14 @@
       "2dd5f6ba"
     ],
     "apps/api/src/domain.ts": [
-      "a3a04488",
-      "0c0714ed",
-      "754043aa",
-      "bef5cc68",
-      "510b16b7",
-      "989242ab",
-      "8201330a",
-      "0f59128d"
+      "7d86480d",
+      "403bc39e",
+      "45ca4821",
+      "1c9f1398",
+      "d132203f",
+      "cd1dc197",
+      "0b0a162f",
+      "60d18e27"
     ],
     "apps/api/src/email-otp.ts": [
       "442c62ac",
@@ -2044,14 +2044,14 @@
       "54a62e5d"
     ],
     "apps/web/src/main.tsx": [
-      "2fbdd8e3",
-      "a54cf3f5",
-      "37a84cb4",
-      "c2941b6d",
-      "4c87446b",
-      "17774f6f",
-      "ec1d73a0",
-      "67bda8ff"
+      "c563affb",
+      "38f18a78",
+      "02f5ae32",
+      "45684a7f",
+      "6497b5dd",
+      "774a1a50",
+      "03903f44",
+      "12bfec22"
     ],
     "apps/web/src/main.tsx.orig": [
       "9230e5a3",
@@ -2424,14 +2424,14 @@
       "2586b822"
     ],
     "apps/web/src/style.css": [
-      "f8d87cd0",
-      "4ef796f8",
-      "7fc4aebe",
-      "2d5e0d62",
-      "61c08bd1",
-      "2f9a3155",
-      "ed90e85f",
-      "c4290e7f"
+      "c4268485",
+      "c89f4bf9",
+      "ce19de21",
+      "d078600c",
+      "f224e65f",
+      "d3b87d8e",
+      "1745bb30",
+      "7f826010"
     ],
     "apps/web/src/thumbnail-menu-layout.ts": [
       "a4748563",
@@ -5084,14 +5084,14 @@
       "d240df37"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "b8d0855e",
-      "831d0e23",
-      "97005ac6",
-      "063339cd",
-      "33334168",
-      "857215be",
-      "7b7633f6",
-      "91cbdb78"
+      "1e1bec79",
+      "3d86fc87",
+      "9e153053",
+      "aae931ad",
+      "0d761561",
+      "e693815b",
+      "2f325a3e",
+      "8aadf621"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",
@@ -26102,6 +26102,16 @@
       "c3ec050f",
       "4501ac60",
       "7be5beb3"
+    ],
+    "apps/web/test/rc317-presenter-profile-parity.test.ts": [
+      "c44af270",
+      "88f37f0e",
+      "16b7a5e8",
+      "0fdf050d",
+      "437dbf29",
+      "b5fd40cf",
+      "b98f8713",
+      "b2dd9637"
     ]
   }
 }
