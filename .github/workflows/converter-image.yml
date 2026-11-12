@@ -22,7 +22,7 @@ jobs:
     timeout-minutes: 90
     environment: production
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: {persist-credentials: false}
       - name: Validate target image tags without shell interpolation
         id: tags

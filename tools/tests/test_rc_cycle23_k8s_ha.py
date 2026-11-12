@@ -42,7 +42,7 @@ class Cycle23RC(unittest.TestCase):
         self.assertIn(after,text)
         self.assertLess(text.index(before),text.index(after))
         self.assertLess(text.index(after),text.index('Detect credential leaks'))
-        self.assertIn('gitleaks/gitleaks-action@v2',text)
+        self.assertRegex(text, r'gitleaks/gitleaks-action@v(?:2|3)\b')
 
     def test_operator_docs_and_report_are_explicit_about_limits(self):
         report=json.loads((ROOT/'docs/validation/RC_CYCLE23_K8S_HA_LOCAL_20261029.json').read_text())

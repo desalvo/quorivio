@@ -137,7 +137,8 @@ class KubernetesHA(unittest.TestCase):
         self.assertIn("inputs.kubernetes_manifest_test",workflow)
         self.assertTrue(
             'helm/kind-action@v1.12.0' in workflow or
-            'helm/kind-action@v1.15.1' in workflow,
+            'helm/kind-action@v1.15.1' in workflow or
+            'helm/kind-action@v1.15.2' in workflow,
             'KIND runner must use an explicitly supported pinned helm/kind-action version')
         self.assertIn('python3 tools/ci_k8s_apiserver_smoke.py',workflow)
         script=(ROOT/'tools/ci_k8s_apiserver_smoke.py').read_text()

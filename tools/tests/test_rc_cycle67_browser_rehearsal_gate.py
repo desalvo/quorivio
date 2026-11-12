@@ -49,8 +49,9 @@ class VerifiedBrowserRehearsalGate(unittest.TestCase):
   self.assertEqual((self.receipt['accounting']['before'],self.receipt['accounting']['after'],self.receipt['accounting']['delta_percentage_points']),(82.75,83.75,1.0))
  def test_real_ci_contains_tests_and_security_checks(self):
   w=(ROOT/'.github/workflows/ci.yml').read_text()
-  for t in ('ci_rehearsal_submission_chromium.py','ci_cross_browser_rc.py','ci_rehearsal_timer_chromium.py','gitleaks/gitleaks-action@v2','publish_image == true'):
+  for t in ('ci_rehearsal_submission_chromium.py','ci_cross_browser_rc.py','ci_rehearsal_timer_chromium.py','publish_image == true'):
    self.assertIn(t,w)
+  self.assertRegex(w, r'gitleaks/gitleaks-action@v(?:2|3)\b')
   self.assertIn('python3 tools/verify_rc_cycle66_inventory.py --historical',w)
   self.assertIn('python3 tools/verify_rc_cycle67_inventory.py --historical',w)
 if __name__=='__main__':unittest.main()

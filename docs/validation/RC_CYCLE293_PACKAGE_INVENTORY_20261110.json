@@ -44,24 +44,24 @@
       "e377db62"
     ],
     ".github/workflows/ci.yml": [
-      "022f68f8",
-      "c306218c",
-      "ef2450ac",
-      "58fc059a",
-      "946e77cf",
-      "b3cb9347",
-      "d5410200",
-      "02475ed3"
+      "8552d72f",
+      "4d0ec66d",
+      "77d7757b",
+      "ae9666ef",
+      "f3e88b86",
+      "9ea20c37",
+      "005e2559",
+      "c9ba221a"
     ],
     ".github/workflows/converter-image.yml": [
-      "da7d2e50",
-      "8e73b985",
-      "c6c2fa5b",
-      "9081c9c7",
-      "6f0bc21c",
-      "51a818f5",
-      "156d0990",
-      "5e477b12"
+      "9d99101a",
+      "268230b1",
+      "47c9f842",
+      "0c4b26e2",
+      "71c76ef4",
+      "b7f2245f",
+      "a243a813",
+      "73fe3f8c"
     ],
     ".gitignore": [
       "ca752cf7",
@@ -19074,14 +19074,14 @@
       "1104df27"
     ],
     "tools/tests/test_chromium_selection_acceptance_contract.py": [
-      "583ba393",
-      "c58e2ce8",
-      "2a61c416",
-      "d53152f7",
-      "6dfd754a",
-      "40660239",
-      "254d0e51",
-      "49929c52"
+      "66c2b4a5",
+      "66db828d",
+      "41b275f7",
+      "de2b6891",
+      "a6ef21e8",
+      "af522b03",
+      "41efc40b",
+      "af83603d"
     ],
     "tools/tests/test_ci_browser_bootstrap.py": [
       "8a987fba",
@@ -19624,14 +19624,14 @@
       "f0b0fe82"
     ],
     "tools/tests/test_k8s_ha_hardening.py": [
-      "ff237744",
-      "077aa14c",
-      "0d1412fc",
-      "b2c5afa9",
-      "ca239bcb",
-      "a826ef84",
-      "3fe5a559",
-      "fb4c8118"
+      "d8caf82c",
+      "b49d6e29",
+      "d4f8ace8",
+      "d9e9a094",
+      "a16d5024",
+      "7ec65510",
+      "d6ebc019",
+      "283730aa"
     ],
     "tools/tests/test_k8s_runtime_cycle24.py": [
       "2d478d9c",
@@ -20034,24 +20034,24 @@
       "78374287"
     ],
     "tools/tests/test_rc_ci_40709447219_inventory_20261028.py": [
-      "38be1cdb",
-      "5be2e6a1",
-      "8d3b4351",
-      "3ce9efca",
-      "4d49a978",
-      "2db092ea",
-      "57ae0444",
-      "e36920f0"
+      "04d8cd09",
+      "e645487e",
+      "5e12bcf3",
+      "631d1b04",
+      "2dffc4f0",
+      "1aba06da",
+      "d4b7e767",
+      "db52257e"
     ],
     "tools/tests/test_rc_ci_40796695726_40797106013_20261029.py": [
-      "88450c67",
-      "dbf17181",
-      "78f02a84",
-      "47e65789",
-      "df5afd6b",
-      "c27adc12",
-      "cdd80580",
-      "9bd40d94"
+      "bd0ca168",
+      "a4bd5ec6",
+      "a32eb7c1",
+      "cc277f2b",
+      "a1699d3f",
+      "6a9c6130",
+      "87183ab8",
+      "fb0ca14e"
     ],
     "tools/tests/test_rc_conversion_30_cycle.py": [
       "258ed21b",
@@ -20324,14 +20324,14 @@
       "a6a57140"
     ],
     "tools/tests/test_rc_cycle16_inventory_20261029.py": [
-      "9bfd8ac6",
-      "20474e5d",
-      "60592dd6",
-      "9bcd299c",
-      "d5745b7c",
-      "4ee96eb0",
-      "9130812d",
-      "13b16670"
+      "66a0e04b",
+      "1adbc072",
+      "9a90ef53",
+      "b9b21bab",
+      "76fccfa1",
+      "5d559ac9",
+      "e958d73a",
+      "1c1760d3"
     ],
     "tools/tests/test_rc_cycle16_verified_react_and_replica_20261029.py": [
       "e6e13498",
@@ -20354,14 +20354,14 @@
       "13bc4c97"
     ],
     "tools/tests/test_rc_cycle17_inventory_20261029.py": [
-      "b59d7f56",
-      "b28600b5",
-      "330c727b",
-      "a73c20e3",
-      "d49d5d7d",
-      "68d94842",
-      "c75e727f",
-      "1723ef75"
+      "c330c034",
+      "faf94f5f",
+      "5fb31596",
+      "c2e9a418",
+      "0cdfeec0",
+      "b9a06c15",
+      "f9a6d917",
+      "7db1aa91"
     ],
     "tools/tests/test_rc_cycle18_inventory_20261029.py": [
       "852ab41e",
@@ -20434,14 +20434,14 @@
       "3fb11800"
     ],
     "tools/tests/test_rc_cycle23_k8s_ha.py": [
-      "403f4aa3",
-      "35e8e5cd",
-      "a6141edb",
-      "678aafee",
-      "36a33da7",
-      "5995a19b",
-      "be422a5e",
-      "5e88e23d"
+      "52962ae4",
+      "45cea43f",
+      "06c5aaa7",
+      "b20c4ba2",
+      "83fe798b",
+      "987bed23",
+      "5b63a135",
+      "154c0f4e"
     ],
     "tools/tests/test_rc_cycle24_kind_runtime.py": [
       "9e3e8128",
@@ -20464,24 +20464,24 @@
       "807e01db"
     ],
     "tools/tests/test_rc_cycle27_rootless_podman.py": [
-      "d549e392",
-      "a2761842",
-      "3bd22a19",
-      "aca8348e",
-      "05b1145f",
-      "d1d99085",
-      "8e858cbe",
-      "9a5d5591"
+      "e60bebcb",
+      "f54487b9",
+      "0f78222b",
+      "4ad6dd02",
+      "d6c71556",
+      "b64a6707",
+      "7fe4101f",
+      "4082dc58"
     ],
     "tools/tests/test_rc_cycle28_podman_tmpfs.py": [
-      "3a0a95b2",
-      "6d069256",
-      "90eb69fb",
-      "738ff5ef",
-      "acfe44d9",
-      "eb8121ad",
-      "0ff0f0dc",
-      "42b311b7"
+      "1ce091fb",
+      "cec264f7",
+      "5db62b3f",
+      "a63f0c9a",
+      "bea5468f",
+      "4667e49e",
+      "79f91948",
+      "b7ccddde"
     ],
     "tools/tests/test_rc_cycle29_multinode_ingress.py": [
       "228aa5d3",
@@ -20774,14 +20774,14 @@
       "bb33d48c"
     ],
     "tools/tests/test_rc_cycle64_credential_fixture.py": [
-      "e08b6eec",
-      "4f52507a",
-      "9a6c1515",
-      "1404ca3f",
-      "39699f51",
-      "7a5387aa",
-      "bb8d466f",
-      "7c9b3202"
+      "3fa9e037",
+      "0b286bf7",
+      "9044b4da",
+      "fada0de9",
+      "d9faa402",
+      "ddc0085d",
+      "ffe400ee",
+      "3c6d3fee"
     ],
     "tools/tests/test_rc_cycle65_historical_documentation.py": [
       "38d6a399",
@@ -20794,34 +20794,34 @@
       "17852ef6"
     ],
     "tools/tests/test_rc_cycle66_verified_sso_reconciliation.py": [
-      "4766d72c",
-      "9449cc71",
-      "7cdd542c",
-      "8cd9314b",
-      "f8dfccf4",
-      "6995188a",
-      "d4e8cbab",
-      "b3da1afe"
+      "dfdb7d47",
+      "99b6ee30",
+      "b62124c3",
+      "7d50996e",
+      "80bd1ef7",
+      "c432632a",
+      "753a705c",
+      "55d5fa1a"
     ],
     "tools/tests/test_rc_cycle67_browser_rehearsal_gate.py": [
-      "e48e217e",
-      "1eac8da7",
-      "3764bb50",
-      "df7ef419",
-      "cd1a9525",
-      "288140dc",
-      "c5e88147",
-      "0fe1ae76"
+      "f51ae214",
+      "b0227d6f",
+      "23f43735",
+      "4bd083da",
+      "c969f040",
+      "8b7dbc1f",
+      "eb4e7815",
+      "f2d59bf1"
     ],
     "tools/tests/test_rc_cycle68_verified_private_backgrounds.py": [
-      "47db1cbf",
-      "c3f2cdc6",
-      "4107e7ec",
-      "20bc96cd",
-      "4ec48c89",
-      "b9130d7e",
-      "d7247808",
-      "fb040a0d"
+      "5282f21d",
+      "592c7029",
+      "afba8dff",
+      "745a2165",
+      "aca68f37",
+      "e68a825e",
+      "297a6f0c",
+      "5683e187"
     ],
     "tools/tests/test_rc_cycle69_thumbnail_reorder.py": [
       "78c960a4",
@@ -22904,14 +22904,14 @@
       "ff80a3bc"
     ],
     "tools/tests/test_rc295_gitleaks_history.py": [
-      "63cde691",
-      "30f2c4aa",
-      "f7842eb8",
-      "060aacec",
-      "7cfc7393",
-      "4638b06b",
-      "dea311e1",
-      "71af8baa"
+      "dbd28538",
+      "148b0e5f",
+      "38012fbb",
+      "fe0bf0f7",
+      "03f2ef92",
+      "655cde16",
+      "3bf70c44",
+      "0366b395"
     ],
     "tools/tests/test_rc298_real_pie_postgres.py": [
       "9ef8d438",
@@ -22934,14 +22934,14 @@
       "000dd15f"
     ],
     "tools/tests/test_rc300_image_archive_guard.py": [
-      "d51297aa",
-      "a75d84cf",
-      "c0510066",
-      "2d0409ab",
-      "943515b2",
-      "0996a39f",
-      "6b82b1cc",
-      "bab91fef"
+      "c79e9b8e",
+      "5e645817",
+      "b70dd723",
+      "792cfab7",
+      "845aaee8",
+      "efddbed2",
+      "15ed2e27",
+      "7e395809"
     ],
     "tools/tests/test_rc301_native_pie.py": [
       "289a2ed9",
@@ -22954,14 +22954,14 @@
       "965e89fb"
     ],
     "tools/tests/test_rc302_joint_native_publisher.py": [
-      "ef0a3def",
-      "9e67b34f",
-      "e2b829ee",
-      "7ca61149",
-      "cc795490",
-      "783a6f53",
-      "029902e6",
-      "b2d9b950"
+      "90a6d5f5",
+      "56154a88",
+      "cdcc6556",
+      "26017196",
+      "a1ab2747",
+      "59ff3afb",
+      "0570692c",
+      "352e9bf6"
     ],
     "tools/tests/test_rc73_slide_master.py": [
       "2c080f2d",

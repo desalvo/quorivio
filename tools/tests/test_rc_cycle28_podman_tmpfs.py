@@ -26,7 +26,7 @@ class Cycle28(unittest.TestCase):
         self.assertIn(latest, workflow)
         self.assertLess(workflow.index(historic), workflow.index(latest))
         self.assertLess(workflow.index(latest), workflow.index(leak))
-        self.assertIn('gitleaks/gitleaks-action@v2', workflow)
+        self.assertRegex(workflow, r'gitleaks/gitleaks-action@v(?:2|3)\b')
 
     def test_run_records_six_green_and_one_failed_without_promotion(self):
         matrix = json.loads((ROOT / 'docs/RC_GATE_MATRIX.json').read_text())
