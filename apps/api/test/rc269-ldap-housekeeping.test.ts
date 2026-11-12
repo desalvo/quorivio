@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {mkdtemp,mkdir,writeFile,stat,lstat,rm,symlink} from 'node:fs/promises';
 import os from 'node:os';import path from 'node:path';
 import {escapeLdapFilter,ldapSettingsFromEnv,ldapUserFilter,directoryAccountRole} from '../src/ldap-auth.ts';
-import {removeExpiredConversionJobs,removeOrphanSessionAssetFiles,HOUSEKEEPING_PERIOD_MS} from '../src/temporary-housekeeping.ts';
+import {removeExpiredConversionJobs,removeOrphanSessionAssetFiles,temporaryRetentionMs} from '../src/temporary-housekeeping.ts';
 
 test('LDAPS verifies certificates, rejects plaintext LDAP, and does not trust email identity implicitly',()=>{
  assert.throws(()=>ldapSettingsFromEnv({LDAP_URL:'ldap://ldap.test',LDAP_BIND_DN:'cn=svc',LDAP_BIND_PASSWORD:'pw',LDAP_BASE_DN:'dc=test'}),/ldap_requires_starttls/);
@@ -19,7 +19,7 @@ test('LDAPS verifies certificates, rejects plaintext LDAP, and does not trust em
  assert.equal(directoryAccountRole(settings,[]),'user');
 });
 
-test('12h conversion cleanup keeps recent, unknown, active and symlinked workspaces',async()=>{
+test('30-day conversion cleanup keeps recent, unknown, active and symlinked workspaces',async()=>{
  const root=await mkdtemp(path.join(os.tmpdir(),'quorivio-housekeeping-'));
  const expired='a'.repeat(32),recent='b'.repeat(32),active='c'.repeat(32),locked='e'.repeat(32);
  try{
@@ -29,7 +29,7 @@ test('12h conversion cleanup keeps recent, unknown, active and symlinked workspa
   await symlink(path.join(root,expired),path.join(root,'d'.repeat(32)));
   const later=Date.now()+HOUSEKEEPING_PERIOD_MS+60000;
   const removed=await removeExpiredConversionJobs(root,later,new Set([path.join(root,active)]));
-  assert.equal(removed,2); // expired and recent become stale at a simulated 12h future clock
+  assert.equal(removed,2); // expired and recent become stale at a simulated 30 day future clock
   await assert.rejects(stat(path.join(root,expired)),{code:'ENOENT'});
   await stat(path.join(root,active));await stat(path.join(root,locked));await stat(path.join(root,'human-named-folder'));
   await lstat(path.join(root,'d'.repeat(32)));

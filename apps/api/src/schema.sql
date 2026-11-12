@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS platform_settings(key text PRIMARY KEY,value text NOT
 -- Disabled-by-default, encrypted authentication-provider configuration (all replicas share PostgreSQL).
 CREATE TABLE IF NOT EXISTS auth_backends(id text PRIMARY KEY,kind text NOT NULL CHECK(kind IN ('local','ldap','oidc','social')),enabled boolean NOT NULL DEFAULT false,mfa_enabled boolean NOT NULL DEFAULT false,config_encrypted text NOT NULL DEFAULT '',last_tested_at timestamptz,updated_at timestamptz NOT NULL DEFAULT now());
 INSERT INTO platform_settings(key,value) VALUES('closed_session_retention_days','60') ON CONFLICT DO NOTHING;
+INSERT INTO platform_settings(key,value) VALUES('temporary_retention_days','30') ON CONFLICT DO NOTHING;
 -- Durable GDPR session-media erasure outbox. Must be created before startup purge.
 CREATE TABLE IF NOT EXISTS session_asset_cleanup_jobs(
  session_id uuid PRIMARY KEY,

@@ -35,7 +35,7 @@ import {widgetAnswerShapeChanged,aggregateWidgetAnswerRevisions,aggregateShortTe
 import {answerKeyIds,gradeChoiceAnswer} from './widget-answer-key.js';
 import {normalizeWord,validateQuestion,moderationStatus,safeFrequency,parseModerationQueueQuery,parseModerationBulk} from './audience-tools.js';
 import {validPageOrder} from './page-sequence.js';
-import {HOUSEKEEPING_PERIOD_MS,removeExpiredConversionJobs,removeOrphanSessionAssetFiles} from './temporary-housekeeping.js';
+import {HOUSEKEEPING_PERIOD_MS,removeExpiredConversionJobs,removeOrphanSessionAssetFiles,DEFAULT_TEMP_RETENTION_DAYS} from './temporary-housekeeping.js';
 import {authenticateDirectory,searchDirectory} from './ldap-auth.js';
 import {loadAuthBackends,backendPublic,saveAuthBackend,testAuthBackend,enabledLdapBackend,enabledLdapBackends,ldapIdentityKey,enabledOidcBackends,enabledSocialBackends,backendAllowsMfa} from './auth-backends.js';
 import {publicSsoBranding} from './sso-branding.js';
@@ -2629,11 +2629,13 @@ async function runHousekeeping(){
  if(housekeepingInProgress)return;
  housekeepingInProgress=true;
  try{
-  const conversion=await removeExpiredConversionJobs(process.env.QUORIVIO_CONVERSION_DIR||'/conversions');
+  const row=await db.query("SELECT value FROM platform_settings WHERE key='temporary_retention_days'");
+  const retentionDays=Number(row.rows[0]?.value||DEFAULT_TEMP_RETENTION_DAYS);
+  const conversion=await removeExpiredConversionJobs(process.env.QUORIVIO_CONVERSION_DIR||'/conversions',Date.now(),new Set(),retentionDays);
   const orphan=await removeOrphanSessionAssetFiles(assetRoot,async(sid,aid)=>{
    const r=await db.query('SELECT 1 FROM session_assets WHERE id=$1 AND session_id=$2 LIMIT 1',[aid,sid]);return !!r.rowCount;
-  });
-  console.log('12h housekeeping completed',JSON.stringify({conversionWorkspacesRemoved:conversion,unregisteredOldMediaRemoved:orphan}));
+  },Date.now(),retentionDays);
+  console.log('scheduled housekeeping completed',JSON.stringify({retentionDays,conversionWorkspacesRemoved:conversion,unregisteredOldMediaRemoved:orphan}));
  }finally{housekeepingInProgress=false}
 }
 async function initialize(){await withBootstrapLock(db,async bootstrap=>{const schema=readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)),'../src/schema.sql'),'utf8');await bootstrap.query(schema);publicBase=(await bootstrap.query("SELECT value FROM platform_settings WHERE key='public_base_url'")).rows[0]?.value||base;// Helm and Kubernetes wizard may bootstrap a first backup target via a Kubernetes Secret.

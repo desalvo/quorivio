@@ -1,6 +1,6 @@
 /** Validate all requested platform settings before starting a database transaction.
  * Reject partial updates rather than persisting the first valid field and then failing. */
-export type SettingsPatch={public_base_url?:string;closed_session_retention_days?:number;max_upload_mb?:number};
+export type SettingsPatch={public_base_url?:string;closed_session_retention_days?:number;temporary_retention_days?:number;max_upload_mb?:number};
 export type SettingsPatchResult={ok:true;changes:[string,string][]}|{ok:false;error:string};
 export function validateSettingsPatch(input:unknown):SettingsPatchResult{
  if(!input||typeof input!=='object'||Array.isArray(input))return {ok:false,error:'invalid_update'};
@@ -17,6 +17,10 @@ export function validateSettingsPatch(input:unknown):SettingsPatchResult{
  if(value.closed_session_retention_days!==undefined){
   if(typeof value.closed_session_retention_days!=='number'||!Number.isInteger(value.closed_session_retention_days)||value.closed_session_retention_days<1||value.closed_session_retention_days>3650)return {ok:false,error:'invalid_retention'};
   changes.push(['closed_session_retention_days',String(value.closed_session_retention_days)]);
+ }
+ if(value.temporary_retention_days!==undefined){
+  if(typeof value.temporary_retention_days!=='number'||!Number.isInteger(value.temporary_retention_days)||value.temporary_retention_days<1||value.temporary_retention_days>3650)return {ok:false,error:'invalid_temporary_retention'};
+  changes.push(['temporary_retention_days',String(value.temporary_retention_days)]);
  }
  if(value.max_upload_mb!==undefined){
   if(typeof value.max_upload_mb!=='number'||!Number.isInteger(value.max_upload_mb)||value.max_upload_mb<1||value.max_upload_mb>1024)return {ok:false,error:'invalid_upload_limit'};
