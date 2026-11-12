@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
   "cycle": 293,
-  "file_count_excluding_manifest": 2612,
+  "file_count_excluding_manifest": 2613,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -174,14 +174,14 @@
       "2dd5f6ba"
     ],
     "apps/api/src/domain.ts": [
-      "422d180c",
-      "322745b6",
-      "238d094d",
-      "a4c82b69",
-      "af4b1a3e",
-      "d6481b04",
-      "9db43453",
-      "88e2f7ef"
+      "d8580c5b",
+      "ba23e7b5",
+      "cfb544e6",
+      "9634f056",
+      "861740df",
+      "466c24c6",
+      "636f32f0",
+      "d0dd2946"
     ],
     "apps/api/src/email-otp.ts": [
       "442c62ac",
@@ -2044,14 +2044,14 @@
       "54a62e5d"
     ],
     "apps/web/src/main.tsx": [
-      "574d0151",
-      "56bb0d0b",
-      "41965532",
-      "f1c26ca3",
-      "aa24605c",
-      "20646541",
-      "3c1dfb4f",
-      "30424c77"
+      "a5fedbc2",
+      "b7412e54",
+      "7e35c168",
+      "6cd95007",
+      "1ea5d5e2",
+      "c1d4145b",
+      "7229eb79",
+      "72bf996b"
     ],
     "apps/web/src/main.tsx.orig": [
       "9230e5a3",
@@ -2424,14 +2424,14 @@
       "2586b822"
     ],
     "apps/web/src/style.css": [
-      "6a4493e5",
-      "42f2e6dc",
-      "8c121e07",
-      "db5942b3",
-      "8eddcf9b",
-      "79235d8a",
-      "4e5cff54",
-      "fea22301"
+      "fb6c9e40",
+      "29afedaa",
+      "4d6bb379",
+      "682c51a1",
+      "ee8c632d",
+      "541153b8",
+      "a05f16c2",
+      "28658f05"
     ],
     "apps/web/src/thumbnail-menu-layout.ts": [
       "a4748563",
@@ -2584,14 +2584,14 @@
       "f116c35e"
     ],
     "apps/web/src/widget-results.ts": [
-      "40cf8eaf",
-      "a6205ce0",
-      "4f2da68e",
-      "c67f00d8",
-      "ea322365",
-      "6585035c",
-      "184caa06",
-      "678ccff2"
+      "b2d10320",
+      "a1735075",
+      "03abe4f5",
+      "f8fa5178",
+      "7197c704",
+      "874161c6",
+      "a5677e11",
+      "95aa285c"
     ],
     "apps/web/src/widget-rich-editor.tsx": [
       "610fdf07",
@@ -5084,14 +5084,14 @@
       "d240df37"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "7f89b2e5",
-      "dc29eabd",
-      "9f97bcd3",
-      "b209a222",
-      "f472c0e4",
-      "b70f86f8",
-      "fc766348",
-      "0a4c5711"
+      "7e678ce1",
+      "d656015b",
+      "eeb8d8e1",
+      "c019d498",
+      "7b5f7ac5",
+      "6b829a87",
+      "95de4e2f",
+      "0be9144d"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",
@@ -26114,14 +26114,24 @@
       "76e43547"
     ],
     "apps/web/test/rc318-auth-reactions-format.test.ts": [
-      "e5534a36",
-      "dd8d3270",
-      "f0239b98",
-      "6660df4b",
-      "3095e43d",
-      "9032c6b5",
-      "c7e53215",
-      "77652ea9"
+      "e7a6fba8",
+      "07628327",
+      "970394cd",
+      "9332c808",
+      "a891e106",
+      "e3b53018",
+      "c5b3a9c8",
+      "1ddad7c5"
+    ],
+    "apps/web/test/rc321-gauge-bubbles-responsive.test.ts": [
+      "a5f939ac",
+      "de0777f6",
+      "b7934bdb",
+      "d4fefd04",
+      "c5cf92df",
+      "9570eb9d",
+      "3560c444",
+      "8a7668a0"
     ]
   }
 }

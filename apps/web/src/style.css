@@ -4026,27 +4026,26 @@ body .editor-floating-panel.widget-selection-palette{
 .linked-results.result-view-pie .linked-results-items{flex:1 1 auto!important;min-height:24%!important;overflow-y:auto!important;scrollbar-width:thin}
 .linked-results-pie-empty{vector-effect:non-scaling-stroke}
 
-/* RC316: luminous, graduated needle dial. No 52%-height cap: the widget
-   auto-fits to the chart, not to the old vertical answer list. */
+/* RC321: white Gauge by default; optional fully transparent chart surface. */
 .linked-results.result-view-gauge{
- background:radial-gradient(ellipse at 50% 78%,#1c295b 0%,#101b3a 52%,#090f24 100%)!important;
- color:#f7f8ff!important;gap:.2em!important;overflow:hidden!important;
+ background:#fff!important;color:#182b45!important;gap:.2em!important;overflow:hidden!important;
 }
+.linked-results.result-view-gauge[data-gauge-transparent="true"]{background:transparent!important}
 .linked-results.result-view-gauge .linked-results-gauge{
  width:100%!important;max-width:580px!important;max-height:none!important;
  height:auto!important;min-height:0!important;flex:0 1 auto!important;
  margin:auto auto 0!important;overflow:visible!important;
- filter:drop-shadow(0 1px 7px #4b49ad55);
+ filter:drop-shadow(0 1px 6px #2e518533);
 }
-.linked-results-gauge-halo{fill:none;stroke-width:27;opacity:.55;stroke-linecap:round}
-.linked-results-gauge-track{fill:none;stroke:#3b4765;stroke-width:22;stroke-linecap:round;opacity:.75}
+.linked-results-gauge-halo{fill:none;stroke-width:27;opacity:.22;stroke-linecap:round}
+.linked-results-gauge-track{fill:none;stroke:#c6d3e4;stroke-width:22;stroke-linecap:round;opacity:1}
 .linked-results-gauge-fill{fill:none;stroke-width:20;stroke-linecap:round}
-.linked-results-gauge-major line{stroke:#f5f7ff;stroke-width:2.6}
-.linked-results-gauge-minor line{stroke:#ced7ed;stroke-width:1;opacity:.65}
-.linked-results-gauge-major text{fill:#f7f9ff;font:600 12px system-ui,sans-serif}
-.linked-results-gauge-needle{filter:drop-shadow(0 2px 4px #a39cff8e)}
-.linked-results-gauge-value{fill:#fff;font:800 43px system-ui,sans-serif;letter-spacing:-1.5px}
-.linked-results-gauge-caption{fill:#d9defb;font:500 14px system-ui,sans-serif}
+.linked-results-gauge-major line{stroke:#263c59;stroke-width:2.6}
+.linked-results-gauge-minor line{stroke:#526783;stroke-width:1;opacity:.75}
+.linked-results-gauge-major text{fill:#1c304b;font:650 12px system-ui,sans-serif}
+.linked-results-gauge-needle{filter:drop-shadow(0 2px 3px #24466c66)}
+.linked-results-gauge-value{fill:#142945;font:800 43px system-ui,sans-serif;letter-spacing:-1.5px}
+.linked-results-gauge-caption{fill:#314966;font:600 14px system-ui,sans-serif}
 @media(prefers-reduced-motion:reduce){.linked-results-gauge *{transition:none!important;animation:none!important}}
 
 /* RC317 — identical presenter identity layout in editor, rehearsal and live. */
@@ -4059,12 +4058,30 @@ body .editor-floating-panel.widget-selection-palette{
 .presenter-profile-custom-text{margin:.4em 0 0;white-space:pre-wrap}
 
 
-/* RC318 — responsive emoji bubbles: count/percentage always visible, not hover-only. */
-.linked-results.result-view-bubbles{min-width:0;gap:.45em;overflow:auto}
+/* RC321: measured bubble grid; scrolling is an explicit opt-out. */
+.linked-results.result-view-bubbles{min-width:0;gap:.35em;overflow:auto}
 .linked-results-bubbles{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:center;gap:clamp(9px,2%,22px);padding:12px 8px;min-width:0;max-width:100%;overflow:auto}
 .linked-results-bubble-item{display:flex;flex:0 0 auto;flex-direction:column;gap:4px;align-items:center;justify-content:flex-end;text-align:center;min-width:56px}
 .linked-results-bubble-orb{display:flex;justify-content:center;align-items:center;flex:0 0 auto;width:var(--reaction-bubble-size,76px);height:var(--reaction-bubble-size,76px);max-width:100%;border-radius:50%;font-size:clamp(24px,2.8em,50px);line-height:1;background:radial-gradient(circle at 30% 25%,hsl(var(--reaction-bubble-hue,210) 90% 90%),hsl(var(--reaction-bubble-hue,210) 80% 67%) 65%,hsl(var(--reaction-bubble-hue,210) 75% 43%));border:2px solid #fff9;box-shadow:inset 0 3px 10px #fff8,0 6px 12px #081b2930;overflow:hidden}
 .linked-results-bubble-count{font-weight:750;font-size:1.1em;font-variant-numeric:tabular-nums}
 .linked-results-bubble-percent{font-variant-numeric:tabular-nums;opacity:.8}
-@media(max-width:640px){.linked-results-bubbles{gap:12px;padding:8px 4px}.linked-results-bubble-orb{font-size:2em}}
+.linked-results.result-view-bubbles[data-bubbles-fit="true"]{display:flex;flex-direction:column;min-height:0!important;overflow:hidden!important}
+.linked-results.result-view-bubbles[data-bubbles-fit="true"]>.linked-results-bubbles[data-bubble-mode="fit"]{
+ box-sizing:border-box;width:100%;height:auto;flex:1 1 0;min-height:0;min-width:0;max-width:100%;overflow:hidden!important;
+ display:grid;grid-template-columns:repeat(var(--bubble-columns,1),minmax(0,1fr));
+ grid-template-rows:repeat(var(--bubble-rows,1),minmax(0,1fr));
+ align-items:center;justify-items:center;gap:var(--bubble-gap,3px);padding:var(--bubble-padding,2px);
+}
+.linked-results-bubbles[data-bubble-mode="fit"] .linked-results-bubble-item{
+ width:100%;height:100%;min-width:0;min-height:0;overflow:hidden;justify-content:center;gap:0;
+}
+.linked-results-bubbles[data-bubble-mode="fit"] .linked-results-bubble-orb{
+ width:var(--reaction-bubble-size);height:var(--reaction-bubble-size);min-width:0;
+ max-height:100%;border-width:1px;font-size:var(--bubble-emoji-font,18px)!important;
+}
+.linked-results-bubbles[data-bubble-mode="fit"] .linked-results-bubble-count,
+.linked-results-bubbles[data-bubble-mode="fit"] .linked-results-bubble-percent{
+ font-size:var(--bubble-meta-font,10px)!important;line-height:1.1;white-space:nowrap;
+}
+@media(max-width:640px){.linked-results-bubbles[data-bubble-mode="scroll"]{gap:12px;padding:8px 4px}.linked-results-bubbles[data-bubble-mode="scroll"] .linked-results-bubble-orb{font-size:2em}}
 @media(prefers-reduced-motion:reduce){.linked-results-bubble-item,.linked-results-bubble-orb{animation:none!important;transition:none!important}}

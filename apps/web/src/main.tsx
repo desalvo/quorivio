@@ -27,7 +27,7 @@ import {RichWidgetText,restoreDomTextRange} from './widget-rich-editor.js';
 import {explicitWidgetFontFamily,widgetTextDefaults,initialWidgetTextStyle} from './widget-typography-defaults.js';
 import {RatingChoices,RatingCommentField} from './rating-choices.js';
 import {ReactionChoices} from './reaction-choices.js';
-import {eligibleStatisticSources,linkedStatisticSource,linkedResultQuestion,resultSourceTitleVisible,resultSourceAnswersVisible,linkedStatisticContext,effectiveResultView,sampleStatisticRows,rehearsalFreeTextRows,rowsFromWidgetAnswerDetail,topicQuestionRows,REHEARSAL_EMOJIS,type StatRow,gaugeModel,gaugeColor,reactionBubbles} from './widget-results.js';
+import {eligibleStatisticSources,linkedStatisticSource,linkedResultQuestion,resultSourceTitleVisible,resultSourceAnswersVisible,linkedStatisticContext,effectiveResultView,sampleStatisticRows,rehearsalFreeTextRows,rowsFromWidgetAnswerDetail,topicQuestionRows,REHEARSAL_EMOJIS,type StatRow,gaugeModel,gaugeColor,reactionBubbles,fitReactionBubbleLayout} from './widget-results.js';
 import {resultTextCss,resultHasAnswerKey,resultElementKey} from './result-text-style.js';
 import {answerTruthVerdict,feedbackOptionVerdict,truthVerdictClass,truthVerdictSymbol} from './answer-truth-presentation.js';
 import {ResultFormatControls} from './result-format-controls.js';
@@ -354,7 +354,7 @@ function ResultGauge({widget,rows,sourceKind='question'}:{widget:any;rows:StatRo
   <title>{`Gauge ${model.aggregation}: ${label}, intervallo ${model.min}–${model.max}`}</title>
   <defs>
    <linearGradient id={`gauge-arc-${uid}`} x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stopColor={minColor}/><stop offset="48%" stopColor="#ffe944"/><stop offset="100%" stopColor={maxColor}/></linearGradient>
-   <linearGradient id={`gauge-needle-${uid}`} x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stopColor="#9ea9dc"/><stop offset="48%" stopColor="#fff"/><stop offset="100%" stopColor="#e4ecff"/></linearGradient>
+   <linearGradient id={`gauge-needle-${uid}`} x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stopColor="#1d3555"/><stop offset="48%" stopColor="#4e709a"/><stop offset="100%" stopColor="#172c48"/></linearGradient>
    <filter id={`gauge-glow-${uid}`} x="-30%" y="-50%" width="160%" height="200%"><feGaussianBlur stdDeviation="5"/></filter>
   </defs>
   <path className="linked-results-gauge-halo" d={arc} stroke={arcColor} filter={`url(#gauge-glow-${uid})`}/>
@@ -372,6 +372,40 @@ function ResultGauge({widget,rows,sourceKind='question'}:{widget:any;rows:StatRo
   {showValue&&<text className="linked-results-gauge-value" x="180" y="245" textAnchor="middle">{label}</text>}
   <text className="linked-results-gauge-caption" x="180" y="273" textAnchor="middle">{widget.label||'Risultati'}</text>
  </svg>;
+}
+
+
+/** Shared responsive emoji layout for editor, preview and presenter: measured
+ * using the chart's own frame, with a scrollable opt-out for legacy layouts. */
+function ResponsiveReactionBubbles({widget,rows,total,fit}:{widget:any;rows:StatRow[];total:number;fit:boolean}){
+ const items=total>0?reactionBubbles(rows,widget.resultTopCount??5,widget.resultSortOrder):[];
+ const container=useRef<HTMLDivElement>(null);
+ const [viewport,setViewport]=useState({width:360,height:220});
+ useEffect(()=>{
+  if(!fit||!container.current)return;
+  const el=container.current;let raf=0;
+  const measure=()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{
+   const width=el.clientWidth,height=el.clientHeight;
+   setViewport(old=>Math.abs(old.width-width)<1&&Math.abs(old.height-height)<1?old:{width,height});
+  })};
+  const observer=new ResizeObserver(measure);
+  observer.observe(el);measure();
+  return()=>{cancelAnimationFrame(raf);observer.disconnect()};
+ },[fit]);
+ const layout=fitReactionBubbleLayout(items,viewport.width,viewport.height);
+ const presentation=fit?({
+  '--bubble-columns':String(layout.columns),'--bubble-rows':String(layout.rows),
+  '--bubble-gap':layout.gap+'px','--bubble-padding':layout.padding+'px',
+  '--bubble-meta-font':layout.metaFont+'px','--bubble-emoji-font':layout.emojiFont+'px'
+ } as React.CSSProperties):undefined;
+ return <div ref={container} className="linked-results-bubbles" data-bubble-mode={fit?'fit':'scroll'} style={presentation} role="list" aria-label="Reazioni più frequenti">
+  {items.map((r,i)=><div className="linked-results-bubble-item" key={r.id} role="listitem" aria-label={`${r.label}: ${r.count} reazioni, ${r.percent.toFixed(1)}%`}>
+   <span className="linked-results-bubble-orb" style={{'--reaction-bubble-size':`${fit?layout.diameters[i]:r.size}px`,'--reaction-bubble-hue':String((i*53+210)%360)} as React.CSSProperties}><span aria-hidden="true">{r.label}</span></span>
+   <strong className="linked-results-bubble-count">{r.count}</strong>
+   <small className="linked-results-bubble-percent">{r.percent.toLocaleString('it-IT',{maximumFractionDigits:1})}%</small>
+  </div>)}
+  {total===0&&<span className="linked-results-no-data" role="status">Nessuna reazione ancora registrata.</span>}
+ </div>;
 }
 
 /** The exact same chart is used in editor, both rehearsals and presenter projection. */
@@ -397,20 +431,13 @@ function LinkedResultChart({widget,widgets,rows,emptyLabel}:{widget:any;widgets:
  });
  const pieSegments=resultPieLayout(data.map(r=>r.count),widget.pieSize,widget.pieShowPercentages===true,widget.pieShowOptionNumbers===true,data.map(r=>sourceRows.findIndex(item=>item.id===r.id)+1));
  const pieViewport=resultPieViewport(pieSegments,widget.pieSize);
- return <section className={'linked-results result-view-'+chart} data-answer-key-enabled={String(hasKey)} data-result-source-kind={source.kind} aria-label={'Risultati '+(source.label||source.kind)}>
+ return <section className={'linked-results result-view-'+chart} data-answer-key-enabled={String(hasKey)} data-result-source-kind={source.kind} data-gauge-transparent={chart==='gauge'&&((widget.gaugeTransparent??source.gaugeTransparent)===true)?'true':undefined} data-bubbles-fit={chart==='bubbles'&&((widget.bubbleNoScroll??source.bubbleNoScroll)!==false)?'true':'false'} aria-label={'Risultati '+(source.label||source.kind)}>
   {hasKey&&<button type="button" className={'result-answer-key-toggle'+(truthVisible?' is-active':'')} aria-label={truthVisible?'Nascondi risposte vere e false':'Evidenzia risposte vere e false'} aria-pressed={truthVisible} title={truthVisible?'Nascondi evidenziazione delle risposte':'Mostra risposte vere e false'} onPointerDown={e=>e.stopPropagation()} onClick={e=>{e.stopPropagation();setTruthVisible(v=>!v)}}>R</button>}
   <LinkedResultSourceQuestion result={viewWidget} source={source} rankedRows={data}/>
   {!widget.resultsOnly&&<>{widget.showTitle!==false&&<strong><WidgetStyledText text={widget.label||'Risultati'} widget={widget} field="label"/></strong>}{!resultSourceTitleVisible(widget)&&!resultSourceAnswersVisible(widget)&&<small>{source.label||source.kind} · {total} risposte{emptyLabel?' · '+emptyLabel:''}</small>}</>}
   {(resultSourceTitleVisible(widget)||resultSourceAnswersVisible(widget))&&<small>{total} risposte{emptyLabel?' · '+emptyLabel:''}</small>}
   {chart==='gauge'&&<ResultGauge widget={{...source,...widget}} rows={sourceRows} sourceKind={source.kind}/>}
-  {chart==='bubbles'&&<div className="linked-results-bubbles" role="list" aria-label="Reazioni più frequenti">
-   {(total>0?reactionBubbles(sourceRows,widget.resultTopCount,widget.resultSortOrder):[]).map((r,i)=><div className="linked-results-bubble-item" key={r.id} role="listitem" aria-label={`${r.label}: ${r.count} reazioni, ${r.percent.toFixed(1)}%`}>
-    <span className="linked-results-bubble-orb" style={{'--reaction-bubble-size':`${r.size}px`,'--reaction-bubble-hue':String((i*53+210)%360)} as React.CSSProperties}><span aria-hidden="true">{r.label}</span></span>
-    <strong className="linked-results-bubble-count">{r.count}</strong>
-    <small className="linked-results-bubble-percent">{r.percent.toLocaleString('it-IT',{maximumFractionDigits:1})}%</small>
-   </div>)}
-   {total===0&&<span className="linked-results-no-data" role="status">Nessuna reazione ancora registrata.</span>}
-  </div>}
+  {chart==='bubbles'&&<ResponsiveReactionBubbles widget={widget} rows={sourceRows} total={total} fit={(widget.bubbleNoScroll??source.bubbleNoScroll)!==false}/>}
   {chart==='pie'&&<svg className="linked-results-pie linked-results-pie-chart" role="img" aria-label={widget.pieShowPercentages===true?"Distribuzione percentuale delle risposte. Legenda accessibile con conteggi e percentuali.":"Distribuzione delle risposte."} viewBox={`0 ${pieViewport.y} ${pieViewport.width} ${pieViewport.height}`} style={{'--pie-chart-ratio':`${pieViewport.width} / ${pieViewport.height}`} as React.CSSProperties} data-pie-viewport-height={pieViewport.height} data-pie-size={resultPieSize(widget.pieSize)} data-mobile-percent-labels={widget.pieShowPercentages===true?'true':'false'} preserveAspectRatio="xMidYMid meet">
    <title>{widget.pieShowPercentages===true?"Distribuzione percentuale delle risposte":"Distribuzione delle risposte"}</title>
    {total===0&&<circle className="linked-results-pie-empty" cx={250} cy={160} r={116*resultPieSize(widget.pieSize)/100} fill="#e9eff5" stroke="#9aaec2" strokeWidth="2" aria-label="Torta vuota: nessuna risposta"/>}
@@ -1668,7 +1695,8 @@ function WidgetCanvas({widgets,numberingWidgets,onChange,pageTitle="",sessionTit
    </>}
    {w.kind==='qr'&&<><label><input type="checkbox" checked={w.showQrUrl!==false} onChange={e=>patch(w.id,{showQrUrl:e.target.checked})}/> Mostra URL accesso (riga singola)</label>{w.showQrUrl!==false&&<label>Dimensione font URL (px)<EditableNumberField ariaLabel="Dimensione font URL QRCode" min={10} max={96} value={w.qrUrlFontSize??15} onCommit={next=>{const old=Math.max(10,Math.min(96,Number(w.qrUrlFontSize)||15));const width=Number(w.position?.width)||25;const x=Number(w.position?.x)||0;const delta=Math.max(0,next-old)*0.9;const growth=Math.max(0,Math.min(delta,100-x-width));patch(w.id,{qrUrlFontSize:next,qrUrlWidthExtra:(Number(w.qrUrlWidthExtra)||0)+growth*12.8,position:{...w.position,width:width+growth}})}}/></label>}</>}
    {['question','timed-quiz','rating','reactions','topic-question','results-button'].includes(w.kind)&&<><label>Tipo di grafico risultati<select aria-label="Tipo grafico risultati - Formato widget" value={formatChart} onChange={e=>patch(w.id,{resultsView:e.target.value})}><option value="bars">Barre</option><option value="pie">Torta</option><option value="table">Tabella</option><option value="cloud">Nuvola</option><option value="gauge">Gauge semicircolare</option>{(w.kind==='reactions'||formatLinkedSource?.kind==='reactions')&&<option value="bubbles">Bolle emoji (reazioni)</option>}</select></label>
-   {formatChart==='gauge'&&<div className="gauge-format-controls" role="group" aria-label="Opzioni Gauge"><label>Limite minimo<select aria-label="Modalità minimo Gauge" value={w.gaugeMinMode||'auto'} onChange={e=>patch(w.id,{gaugeMinMode:e.target.value})}><option value="auto">Automatico da dati / sorgente</option><option value="manual">Manuale</option></select></label>{w.gaugeMinMode==='manual'&&<label>Minimo<input type="number" aria-label="Minimo Gauge" step="any" min={-1000000} max={1000000} value={w.gaugeMin??0} onChange={e=>{const n=Number(e.target.value);if(Number.isFinite(n)&&Math.abs(n)<=1000000)patch(w.id,{gaugeMin:n})}}/></label>}<label>Limite massimo<select aria-label="Modalità massimo Gauge" value={w.gaugeMaxMode||'auto'} onChange={e=>patch(w.id,{gaugeMaxMode:e.target.value})}><option value="auto">Automatico da dati / sorgente</option><option value="manual">Manuale</option></select></label>{w.gaugeMaxMode==='manual'&&<label>Massimo<input type="number" aria-label="Massimo Gauge" step="any" min={-1000000} max={1000000} value={w.gaugeMax??9} onChange={e=>{const n=Number(e.target.value);if(Number.isFinite(n)&&Math.abs(n)<=1000000)patch(w.id,{gaugeMax:n})}}/></label>}<label>Aggregazione<select aria-label="Aggregazione Gauge" value={w.gaugeAggregation||'mean'} onChange={e=>patch(w.id,{gaugeAggregation:e.target.value})}><option value="min">Minimo</option><option value="max">Massimo</option><option value="mean">Media ponderata</option></select></label><label><input type="checkbox" checked={w.gaugeShowValue!==false} onChange={e=>patch(w.id,{gaugeShowValue:e.target.checked})}/> Mostra indicatore del valore</label><label>Colore Gauge<input type="color" aria-label="Colore Gauge" value={w.gaugeColor||'#000000'} onChange={e=>patch(w.id,{gaugeColor:e.target.value})}/></label><label><input type="checkbox" checked={w.gaugeGradient!==false} onChange={e=>patch(w.id,{gaugeGradient:e.target.checked})}/> Gradiente minimo/massimo</label>{w.gaugeGradient!==false&&<><label>Colore minimo<input type="color" aria-label="Colore minimo Gauge" value={w.gaugeMinColor||'#d44949'} onChange={e=>patch(w.id,{gaugeMinColor:e.target.value})}/></label><label>Colore massimo<input type="color" aria-label="Colore massimo Gauge" value={w.gaugeMaxColor||'#22ad80'} onChange={e=>patch(w.id,{gaugeMaxColor:e.target.value})}/></label></>}</div>}</>}
+   {formatChart==='gauge'&&<div className="gauge-format-controls" role="group" aria-label="Opzioni Gauge"><label>Limite minimo<select aria-label="Modalità minimo Gauge" value={w.gaugeMinMode||'auto'} onChange={e=>patch(w.id,{gaugeMinMode:e.target.value})}><option value="auto">Automatico da dati / sorgente</option><option value="manual">Manuale</option></select></label>{w.gaugeMinMode==='manual'&&<label>Minimo<input type="number" aria-label="Minimo Gauge" step="any" min={-1000000} max={1000000} value={w.gaugeMin??0} onChange={e=>{const n=Number(e.target.value);if(Number.isFinite(n)&&Math.abs(n)<=1000000)patch(w.id,{gaugeMin:n})}}/></label>}<label>Limite massimo<select aria-label="Modalità massimo Gauge" value={w.gaugeMaxMode||'auto'} onChange={e=>patch(w.id,{gaugeMaxMode:e.target.value})}><option value="auto">Automatico da dati / sorgente</option><option value="manual">Manuale</option></select></label>{w.gaugeMaxMode==='manual'&&<label>Massimo<input type="number" aria-label="Massimo Gauge" step="any" min={-1000000} max={1000000} value={w.gaugeMax??9} onChange={e=>{const n=Number(e.target.value);if(Number.isFinite(n)&&Math.abs(n)<=1000000)patch(w.id,{gaugeMax:n})}}/></label>}<label>Aggregazione<select aria-label="Aggregazione Gauge" value={w.gaugeAggregation||'mean'} onChange={e=>patch(w.id,{gaugeAggregation:e.target.value})}><option value="min">Minimo</option><option value="max">Massimo</option><option value="mean">Media ponderata</option></select></label><label><input type="checkbox" checked={w.gaugeShowValue!==false} onChange={e=>patch(w.id,{gaugeShowValue:e.target.checked})}/> Mostra indicatore del valore</label><label><input type="checkbox" checked={w.gaugeTransparent===true} onChange={e=>patch(w.id,{gaugeTransparent:e.target.checked})}/> Sfondo trasparente Gauge (predefinito bianco)</label><label>Colore Gauge<input type="color" aria-label="Colore Gauge" value={w.gaugeColor||'#000000'} onChange={e=>patch(w.id,{gaugeColor:e.target.value})}/></label><label><input type="checkbox" checked={w.gaugeGradient!==false} onChange={e=>patch(w.id,{gaugeGradient:e.target.checked})}/> Gradiente minimo/massimo</label>{w.gaugeGradient!==false&&<><label>Colore minimo<input type="color" aria-label="Colore minimo Gauge" value={w.gaugeMinColor||'#d44949'} onChange={e=>patch(w.id,{gaugeMinColor:e.target.value})}/></label><label>Colore massimo<input type="color" aria-label="Colore massimo Gauge" value={w.gaugeMaxColor||'#22ad80'} onChange={e=>patch(w.id,{gaugeMaxColor:e.target.value})}/></label></>}</div>}</>}
+   {formatChart==='bubbles'&&<label><input type="checkbox" checked={w.bubbleNoScroll!==false} onChange={e=>patch(w.id,{bubbleNoScroll:e.target.checked})}/> Adatta le bolle al riquadro senza scorrimento (predefinito)</label>}
    {w.kind==='results-button'&&<>
     {formatChart==='pie'&&<><label><input type="checkbox" checked={w.pieShowOptionNumbers===true} onChange={e=>patch(w.id,{pieShowOptionNumbers:e.target.checked})}/> Torta: numera le opzioni nella torta e nella legenda</label><label><input type="checkbox" checked={w.pieShowPercentages===true} onChange={e=>patch(w.id,{pieShowPercentages:e.target.checked})}/> Torta: visualizza percentuale per fetta</label><label className="results-pie-size-control">Dimensione torta <input type="range" aria-label="Dimensione torta risultati" min={25} max={150} step={5} value={resultPieSize(w.pieSize)} onChange={e=>patch(w.id,{pieSize:Number(e.target.value)})}/><output>{resultPieSize(w.pieSize)}%</output></label></>}
     {['bars','pie','table','cloud','bubbles'].includes(formatChart)&&<label>Ordinamento risultati<select aria-label="Ordinamento risultati - Formato widget" value={w.resultSortOrder||'index-asc'} onChange={e=>patch(w.id,{resultSortOrder:e.target.value})}><option value="index-asc">Ordine originale</option><option value="index-desc">Ordine originale inverso</option><option value="count-desc">Più risposte prima</option><option value="count-asc">Meno risposte prima</option></select></label>}

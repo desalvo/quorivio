@@ -1,6 +1,6 @@
 /** Page-scoped presenter statistics; result controls never reference participants directly. */
 export const STATISTICAL_WIDGET_KINDS=['question','timed-quiz','rating','reactions','topic-question'] as const;
-export type StatisticalWidget={id:string;kind:string;label?:string;description?:string;answerMode?:string;options?:{id:string;label:string}[];targetWidgetId?:string;targetActivityId?:string;targetQuestionId?:string;questions?:{id:string;label:string;description?:string;answerMode?:string;options?:{id:string;label:string}[]}[];resultsView?:string;gaugeMinMode?:'auto'|'manual';gaugeMaxMode?:'auto'|'manual';gaugeMin?:number;gaugeMax?:number;gaugeGradient?:boolean;gaugeMinColor?:string;gaugeMaxColor?:string;gaugeColor?:string;gaugeShowValue?:boolean;gaugeAggregation?:'min'|'max'|'mean';resultSortOrder?:'index-asc'|'index-desc'|'count-asc'|'count-desc';resultsOnly?:boolean;showTitle?:boolean;showSourceQuestion?:boolean;showSourceTitle?:boolean;showSourceAnswers?:boolean};
+export type StatisticalWidget={id:string;kind:string;label?:string;description?:string;answerMode?:string;options?:{id:string;label:string}[];targetWidgetId?:string;targetActivityId?:string;targetQuestionId?:string;questions?:{id:string;label:string;description?:string;answerMode?:string;options?:{id:string;label:string}[]}[];resultsView?:string;gaugeMinMode?:'auto'|'manual';gaugeMaxMode?:'auto'|'manual';gaugeMin?:number;gaugeMax?:number;gaugeGradient?:boolean;gaugeMinColor?:string;gaugeMaxColor?:string;gaugeColor?:string;gaugeShowValue?:boolean;gaugeAggregation?:'min'|'max'|'mean';gaugeTransparent?:boolean;bubbleNoScroll?:boolean;resultSortOrder?:'index-asc'|'index-desc'|'count-asc'|'count-desc';resultsOnly?:boolean;showTitle?:boolean;showSourceQuestion?:boolean;showSourceTitle?:boolean;showSourceAnswers?:boolean};
 export type StatRow={id:string;label:string;count:number};
 export type SourceQuestionPart={id?:string;label:string;description?:string;answerMode?:string;options?:{id:string;label:string}[]};
 /** The author may reveal a read-only copy of the SOURCE question above the
@@ -61,6 +61,29 @@ export function reactionBubbles(rows:readonly StatRow[],limit=5,sort:'count-desc
   size:Math.round(56+60*Math.sqrt(Math.max(0,row.count)/max))
  }));
 }
+
+/** Arrange anonymous emoji results inside a resizeable chart frame, with no scroll.
+ * All measurements refer to the chart's actual content box, not window size. */
+export function fitReactionBubbleLayout(items:readonly {size:number}[],width:number,height:number){
+ const count=Math.max(1,items.length);
+ const W=Math.max(1,Number.isFinite(width)?width:1),H=Math.max(1,Number.isFinite(height)?height:1);
+ const gap=Math.max(1,Math.min(8,Math.floor(Math.min(W,H)/85)));
+ const padding=Math.max(1,Math.min(5,Math.floor(Math.min(W,H)/60)));
+ let best={columns:1,rows:count,diameter:0,cellWidth:W,cellHeight:H};
+ for(let columns=1;columns<=count;columns++){
+  const rows=Math.ceil(count/columns);
+  const cellWidth=Math.max(1,(W-2*padding-gap*(columns-1))/columns);
+  const cellHeight=Math.max(1,(H-2*padding-gap*(rows-1))/rows);
+  const metaHeight=Math.min(34,Math.max(6,cellHeight*.32));
+  const diameter=Math.max(1,Math.min(136,cellWidth-2,cellHeight-metaHeight-2));
+  if(diameter>best.diameter)best={columns,rows,diameter,cellWidth,cellHeight};
+ }
+ const maxSourceSize=Math.max(1,...items.map(item=>Number.isFinite(item.size)?Math.max(0,item.size):0));
+ const diameters=items.map(item=>Math.max(1,Math.floor(best.diameter*(.58+.42*Math.max(0,Math.min(1,item.size/maxSourceSize))))));
+ const metaFont=Math.max(2,Math.min(15,(best.cellHeight-best.diameter)/2.7,best.cellHeight*.145));
+ return {...best,diameters,gap,padding,metaFont,emojiFont:Math.max(2,Math.min(50,best.diameter*.44))};
+}
+
 export type GaugeConfig={
  gaugeMinMode?:'auto'|'manual';gaugeMaxMode?:'auto'|'manual';gaugeMin?:number;gaugeMax?:number;
  gaugeAggregation?:'min'|'max'|'mean';gaugeGradient?:boolean;gaugeMinColor?:string;
