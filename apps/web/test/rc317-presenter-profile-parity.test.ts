@@ -20,7 +20,8 @@ test('RC317 editor uses authenticated presenter endpoint before publication',()=
  assert.match(main,/usePrivateProfile=\{w.kind==='profile'\}/);
  assert.match(main,/request<any\[\]>\(`\/sessions\/\$\{encodeURIComponent\(sessionId\)\}\/presenter-profiles`\)/);
  assert.match(main,/profiles.find\(p=>p.is_owner\)/);
- assert.match(main,/profile\?\.photo_url\|\|profile\?\.profile_photo_url/);
+ assert.match(main,/photoUrl=\{p\?p\.photo_url:undefined\}/);
+ assert.match(main,/photoUrl=\{chosen\?\.profile_photo_url\}/);
 });
 test('RC317 format widget controls photo, name, email and description with public email opt-in',()=>{
  for(const label of ['Mostra foto presentatore','Mostra nome presentatore','Mostra email presentatore','Mostra descrizione presentatore'])assert.ok(main.includes(label),label);
