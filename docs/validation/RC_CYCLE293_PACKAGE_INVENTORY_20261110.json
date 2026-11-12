@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
   "cycle": 293,
-  "file_count_excluding_manifest": 2625,
+  "file_count_excluding_manifest": 2626,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -44,14 +44,14 @@
       "e377db62"
     ],
     ".github/workflows/ci.yml": [
-      "8552d72f",
-      "4d0ec66d",
-      "77d7757b",
-      "ae9666ef",
-      "f3e88b86",
-      "9ea20c37",
-      "005e2559",
-      "c9ba221a"
+      "6558e6ae",
+      "e3adf62a",
+      "4ae316b9",
+      "a0b6e826",
+      "424e0b9a",
+      "d8bcc67f",
+      "e9543ac5",
+      "5afa4333"
     ],
     ".github/workflows/converter-image.yml": [
       "9d99101a",
@@ -2504,14 +2504,14 @@
       "2586b822"
     ],
     "apps/web/src/style.css": [
-      "537d9c55",
-      "e92e50b5",
-      "eba295ac",
-      "82dd9747",
-      "7a55ab5e",
-      "91d3d264",
-      "054a1545",
-      "c59af14a"
+      "e334a658",
+      "9cc2b098",
+      "bcc0ccb2",
+      "94d0d72d",
+      "bd23486c",
+      "ce32781a",
+      "8993c565",
+      "1b35ddcb"
     ],
     "apps/web/src/thumbnail-menu-layout.ts": [
       "a4748563",
@@ -3764,14 +3764,14 @@
       "780e8ac8"
     ],
     "apps/web/test/rc325-server-settings-tabs.test.ts": [
-      "47da35e5",
-      "839007a2",
-      "b02bbed0",
-      "9a913441",
-      "1efc7937",
-      "c10f413b",
-      "8b273c91",
-      "cde5bc1b"
+      "cba29057",
+      "ff767f1b",
+      "5c01085c",
+      "d0316ec0",
+      "dd00da70",
+      "b11cd56d",
+      "bc7d7ca6",
+      "00aa3a7e"
     ],
     "apps/web/test/rc325-ui-locale.test.ts": [
       "18caa7c2",
@@ -4544,14 +4544,14 @@
       "d240df37"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "b92e3b24",
-      "e8a30bb4",
-      "206dd377",
-      "ba116ba4",
-      "7145cb07",
-      "b6962925",
-      "f8b6c4fd",
-      "6784feaf"
+      "2b1c9224",
+      "2a945e31",
+      "1486eaaf",
+      "a25dc693",
+      "95130d13",
+      "77dce00f",
+      "b600ec92",
+      "24f4b006"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",
@@ -5964,14 +5964,14 @@
       "6548a333"
     ],
     "docs/RC326_SESSION_FIT_LOGIN_IT_EN.md": [
-      "93e0896f",
-      "d16d3ca0",
-      "eebf48c9",
-      "626fb6cc",
-      "fe394468",
-      "e8d1fd0a",
-      "c84517e3",
-      "ec586fab"
+      "27a84f82",
+      "88515b74",
+      "c3e361c4",
+      "39b886c6",
+      "1174515f",
+      "d12d2b31",
+      "61d6b96b",
+      "7044f1c1"
     ],
     "docs/RC49_HAPROXY_CROSS_NODE_RWX.en.md": [
       "7c1cc75e",
@@ -26252,6 +26252,16 @@
       "c3ec050f",
       "4501ac60",
       "7be5beb3"
+    ],
+    "tools/ci_rc329_server_settings_tabs_chromium.py": [
+      "ef5e3d1e",
+      "10bf9816",
+      "b98db028",
+      "8a39368c",
+      "7b779f87",
+      "2c8c8a05",
+      "997771ec",
+      "4c0fb7b3"
     ]
   }
 }

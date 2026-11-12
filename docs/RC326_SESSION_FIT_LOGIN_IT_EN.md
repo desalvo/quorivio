@@ -31,3 +31,11 @@
 **EN:** «Widget formatting → Content» exposes the very same persisted automatic-fit option as the results inspector (and other eligible content widgets). Long answers wrap within the available width instead of forcing a full-line max-content width; the last word and its count remain together. Pie charts stay readable and bounded while answer rows distribute across unused widget height. Predictive measurement considers only selected visible rows and avoids double-counting those already rendered. The authored widget rectangle is unchanged, and explicit scroll mode remains available.
 
 **Acceptance:** compare exact long-option fixture in editor, rehearsal/preview, live presenter and mobile; verify no tiny corner layout, clipping or unwanted nested scroll. The official RC readiness remains **85.25%** until independent sign-off.
+
+## RC329 — Visibilità dei tab delle impostazioni server / Server settings tab visibility
+
+**IT:** Nella pagina **Impostazioni server** (amministratore di piattaforma), i sette tab **Generale, Autenticazione, Posta elettronica, Spazio disco, Convertitore, Backup, Audit** ricevono ora colori di sfondo/testo espliciti e un bordo visibile. La barra usa una tinta blu scuro, ogni tab inattivo un blu contrastato e quello selezionato un verde petrolio con testo bianco. Hover, focus tastiera e selezione rimangono distinguibili; altezza minima 44px e scorrimento orizzontale su smartphone. La correzione è limitata a questi tab e non modifica configurazioni, permessi o salvataggi.
+
+**EN:** All seven platform server-settings tabs now have explicit visible backgrounds, borders and WCAG-AA text contrast in unselected, hovered and selected states. The dark tab rail harmonizes with the dashboard, the selected tab is teal, the keyboard focus ring remains visible and mobile users can scroll horizontally to access every tab. No authentication, permission or settings persistence logic changed.
+
+**Verifica / Validation:** Node tests check the tab/panel contracts and contrast values; an opt-in Chromium fixture uses the actual production CSS at narrow and desktop widths to inspect rendered button visibility, text contrast and horizontal scrolling. RC acceptance score unchanged pending sign-off.
