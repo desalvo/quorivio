@@ -4048,3 +4048,12 @@ body .editor-floating-panel.widget-selection-palette{
 .linked-results-gauge-value{fill:#fff;font:800 43px system-ui,sans-serif;letter-spacing:-1.5px}
 .linked-results-gauge-caption{fill:#d9defb;font:500 14px system-ui,sans-serif}
 @media(prefers-reduced-motion:reduce){.linked-results-gauge *{transition:none!important;animation:none!important}}
+
+/* RC317 — identical presenter identity layout in editor, rehearsal and live. */
+.projection-sample-profile,.presenter-profile-card{min-width:0;max-width:100%;overflow-wrap:anywhere}
+.presenter-profile-identity{display:flex;align-items:center;gap:.7em;flex-wrap:wrap;min-width:0}
+.presenter-profile-card .presenter-profile-avatar{display:block;width:clamp(38px,5em,100px);height:clamp(38px,5em,100px);aspect-ratio:1;object-fit:cover;border-radius:50%;flex:0 0 auto}
+.presenter-profile-details{display:flex;flex-direction:column;gap:.18em;min-width:0;overflow-wrap:anywhere}
+.presenter-profile-name{font-weight:700;font-size:1.05em}
+.presenter-profile-email{font-size:.9em;overflow-wrap:anywhere;word-break:break-word}
+.presenter-profile-custom-text{margin:.4em 0 0;white-space:pre-wrap}
