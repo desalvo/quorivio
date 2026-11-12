@@ -1003,6 +1003,8 @@ jobs:
           python3 tools/ci_rc295_results_layout_chromium.py
           # RC306: actual browser proves long result options wrap at readable size.
           python3 tools/ci_rc306_bar_wrap_chromium.py
+          # RC329: actual browser confirms seven server-settings tabs are legible.
+          python3 tools/ci_rc329_server_settings_tabs_chromium.py
           # Exercise exactly the compiled distribution from the preceding build.
           # Vite's dev optimizer intermittently reloads its first ESM imports,
           # leaving a completely empty #root with no JavaScript exception.

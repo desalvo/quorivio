@@ -4232,3 +4232,45 @@ main.hero.login-manual-cover .panel.login{
  width:min(100%,600px)!important;max-height:340px!important;
  height:auto!important;flex:0 1 auto!important;overflow:visible!important;
 }
+
+/* RC329: platform server tabs live inside a dark dashboard. RC325's light
+   container and inherited pale text made seven inactive tabs nearly invisible.
+   Give the tab rail and every state explicit contrasting colours. Scope the
+   rules to the server settings only, preserving all other dashboard buttons. */
+.dashboard .server-settings-tabs{
+ display:flex!important;flex-wrap:wrap!important;align-items:stretch!important;
+ gap:8px!important;padding:10px!important;margin:0 0 16px!important;
+ background:#12283e!important;border:1px solid #6083a0!important;
+ border-radius:12px!important;box-sizing:border-box!important;
+ min-width:0!important;max-width:100%!important;
+}
+.dashboard .server-settings-tabs > button.server-settings-tab{
+ display:inline-flex!important;visibility:visible!important;opacity:1!important;
+ align-items:center!important;justify-content:center!important;
+ flex:0 0 auto!important;min-height:44px!important;min-width:0!important;
+ padding:10px 15px!important;box-sizing:border-box!important;
+ border:1px solid #7899b4!important;border-radius:9px!important;
+ background:#26465f!important;color:#f8fbff!important;
+ font:700 14px/1.3 'DM Sans',system-ui,sans-serif!important;
+ letter-spacing:0!important;text-align:center!important;
+ white-space:nowrap!important;text-shadow:none!important;
+ box-shadow:0 1px 3px #07172755!important;cursor:pointer!important;
+}
+.dashboard .server-settings-tabs > button.server-settings-tab:not([aria-selected="true"]):hover{
+ background:#345d7d!important;color:#ffffff!important;border-color:#add6f0!important;
+}
+.dashboard .server-settings-tabs > button.server-settings-tab.active,
+.dashboard .server-settings-tabs > button.server-settings-tab[aria-selected="true"]{
+ background:#096858!important;color:#ffffff!important;
+ border-color:#73ddc3!important;box-shadow:inset 0 0 0 1px #73ddc366,0 2px 6px #06182c66!important;
+}
+.dashboard .server-settings-tabs > button.server-settings-tab:focus-visible{
+ outline:3px solid #ffcf57!important;outline-offset:2px!important;
+}
+@media(max-width:640px){
+ .dashboard .server-settings-tabs{
+  flex-wrap:nowrap!important;overflow-x:auto!important;overflow-y:visible!important;
+  scrollbar-width:thin!important;scrollbar-color:#88adc6 #12283e!important;
+ }
+ .dashboard .server-settings-tabs > button.server-settings-tab{flex:0 0 auto!important}
+}

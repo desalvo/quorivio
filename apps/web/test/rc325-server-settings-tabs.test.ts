@@ -38,3 +38,37 @@ test('language switch updates UI copy, menu labels, document language and access
  assert.match(locale,/aria-label','title','placeholder/);
  assert.match(locale,/contenteditable/);
 });
+
+test('RC329 server tabs always have visible controls and WCAG-AA text contrast',()=>{
+ const fix=css.split('/* RC329: platform server tabs live inside a dark dashboard.')[1]||'';
+ assert.ok(fix,'missing RC329 scoped tab contrast override');
+ assert.match(fix,/\.dashboard \.server-settings-tabs > button\.server-settings-tab\{/);
+ assert.match(fix,/visibility:visible!important;opacity:1!important/);
+ assert.match(fix,/min-height:44px!important/);
+ assert.match(fix,/white-space:nowrap!important/);
+ assert.match(fix,/\.server-settings-tab\[aria-selected="true"\]/);
+ assert.match(fix,/\.server-settings-tab:focus-visible/);
+ const brightness=(hex:string)=>{
+  const rgb=hex.match(/[a-f\d]{2}/gi);
+  assert.ok(rgb&&rgb.length===3,'valid RGB colour '+hex);
+  const values=rgb.map(x=>parseInt(x,16)/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4);
+  return .2126*values[0]+.7152*values[1]+.0722*values[2];
+ };
+ const contrast=(a:string,b:string)=>{
+  const hi=Math.max(brightness(a),brightness(b)),lo=Math.min(brightness(a),brightness(b));
+  return (hi+.05)/(lo+.05);
+ };
+ for(const [name,textColor,background] of [
+  ['inactive','#f8fbff','#26465f'],
+  ['hover','#ffffff','#345d7d'],
+  ['selected','#ffffff','#096858'],
+ ]){
+  assert.ok(fix.includes('background:'+background+'!important'),name+' background must be explicit');
+  assert.ok(fix.includes('color:'+textColor+'!important'),name+' text must be explicit');
+  assert.ok(contrast(textColor,background)>=4.5,name+' must pass WCAG AA');
+ }
+ assert.match(fix,/@media\(max-width:640px\)\{[\s\S]*?overflow-x:auto!important/);
+ assert.match(fix,/scrollbar-width:thin!important/);
+ assert.match(main,/role="tablist"/);
+ assert.match(main,/tabIndex=\{serverSettingsTab===item\.id\?0:-1\}/);
+});
