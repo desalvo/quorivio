@@ -4085,3 +4085,29 @@ body .editor-floating-panel.widget-selection-palette{
 }
 @media(max-width:640px){.linked-results-bubbles[data-bubble-mode="scroll"]{gap:12px;padding:8px 4px}.linked-results-bubbles[data-bubble-mode="scroll"] .linked-results-bubble-orb{font-size:2em}}
 @media(prefers-reduced-motion:reduce){.linked-results-bubble-item,.linked-results-bubble-orb{animation:none!important;transition:none!important}}
+
+
+/* RC325 — tabbed server configuration. Keep inactive forms mounted so drafts
+   survive tab changes; hidden panels remain absent from keyboard navigation. */
+.server-settings-tabs{
+ display:flex;flex-wrap:wrap;align-items:stretch;gap:6px;
+ margin:0 0 16px;padding:9px;border:1px solid #ccd9e4;
+ border-radius:12px;background:var(--panel-bg,#f4f7fb);
+}
+.server-settings-tab{
+ border:1px solid transparent;border-radius:9px;
+ padding:10px 15px;min-height:40px;white-space:nowrap;
+ color:inherit;background:transparent;font-weight:600;
+}
+.server-settings-tab:hover{background:#dbeafe66}
+.server-settings-tab.active,
+.server-settings-tab[aria-selected="true"]{
+ background:#fff;border-color:#a9c1de;
+ box-shadow:0 1px 4px #122d4d18;color:#153b73;
+}
+.server-settings-tab:focus-visible{outline:3px solid #2c6cb5;outline-offset:2px}
+[role="tabpanel"][hidden]{display:none!important}
+@media(max-width:640px){
+ .server-settings-tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin}
+ .server-settings-tab{flex:0 0 auto}
+}
