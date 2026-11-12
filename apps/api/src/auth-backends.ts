@@ -177,7 +177,7 @@ export async function testAuthBackend(db:Pool,secret:string,id:string):Promise<{
   const tlsOptions={rejectUnauthorized:true,minVersion:'TLSv1.2' as const,...(settings.caFile?{ca:[readFileSync(settings.caFile)]}:{})};
   const client=new Client({url:settings.url,timeout:8000,connectTimeout:5000,tlsOptions});
   try{if(settings.startTls)await client.startTLS(tlsOptions);await client.bind(settings.bindDn,settings.bindPassword);
-   await client.search(settings.baseDn,{scope:'base',filter:'(objectClass=*)',sizeLimit:1,timeLimit:5});scope='secure_ldap_bind_and_base_search';
+   await client.search(settings.baseDn,{scope:'base',filter:'(objectClass=*)',attributes:['1.1'],sizeLimit:1,timeLimit:5});scope='secure_ldap_bind_and_base_search';
   }finally{await client.unbind().catch(()=>{})}
  }else if(b.kind==='oidc'){
   const provider={...b.config,id:b.id} as OidcProvider;
