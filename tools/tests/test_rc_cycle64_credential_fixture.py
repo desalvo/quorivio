@@ -25,7 +25,7 @@ class CredentialFixtureRegression(unittest.TestCase):
 
     def test_gitleaks_stays_enabled_and_suppressions_are_not_added(self):
         workflow = (ROOT / '.github/workflows/ci.yml').read_text(encoding='utf-8')
-        self.assertIn('gitleaks/gitleaks-action@v2', workflow)
+        self.assertRegex(workflow, r'gitleaks/gitleaks-action@v(?:2|3)\b')
         self.assertIn('Detect credential leaks', workflow)
         self.assertFalse((ROOT / '.gitleaks.toml').exists())
         self.assertNotIn('GITLEAKS_ENABLE_COMMENTS: false', workflow)
