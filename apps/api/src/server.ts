@@ -20,8 +20,8 @@ import {SESSION_CHANNEL,startSessionBus} from './session-bus.js';
 import {boundedFederatedJson} from './federated-response.js';
 import {FEDERATED_LINK_ELIGIBLE_SQL,FEDERATED_LINK_INSERT_SQL,validFederatedLinkIssuedAt} from './federated-link.js';
 import {FEDERATED_IDENTITY_LIST_SQL,FEDERATED_IDENTITY_UNLINK_SQL,validFederatedProviderId,validFederatedUnlinkPassword} from './federated-identities.js';
-import {socialProviders,socialState,socialAuthorizationUrl,exchangeSocialCode,socialSubject} from './social-oauth.js';
-import {providersFromEnv,nonce,pkceChallenge,authorizationUrl,validateDiscovery,verifyIdToken,fetchOidcJson} from './oidc.js';
+import {socialState,socialAuthorizationUrl,exchangeSocialCode,socialSubject} from './social-oauth.js';
+import {nonce,pkceChallenge,authorizationUrl,validateDiscovery,verifyIdToken,fetchOidcJson} from './oidc.js';
 import {generateRecoveryCodes,recoveryCodeDigest,validRecoveryCode} from './recovery-codes.js';
 import {LOAD_DEMO_KEY,LOAD_DEMO_TITLE,loadDemoPages} from './load-test-demo.js';
 import {downloadGravatar} from './gravatar.js';
@@ -36,13 +36,14 @@ import {answerKeyIds,gradeChoiceAnswer} from './widget-answer-key.js';
 import {normalizeWord,validateQuestion,moderationStatus,safeFrequency,parseModerationQueueQuery,parseModerationBulk} from './audience-tools.js';
 import {validPageOrder} from './page-sequence.js';
 import {HOUSEKEEPING_PERIOD_MS,removeExpiredConversionJobs,removeOrphanSessionAssetFiles} from './temporary-housekeeping.js';
-import {ldapSettingsFromEnv,authenticateDirectory,searchDirectory} from './ldap-auth.js';
+import {authenticateDirectory,searchDirectory} from './ldap-auth.js';
+import {loadAuthBackends,backendPublic,saveAuthBackend,testAuthBackend,enabledLdapBackend,enabledOidcBackends,enabledSocialBackends,backendAllowsMfa} from './auth-backends.js';
 import {auditOperation,validAuditRetention} from './operation-audit.js';
 import {sendRegistrationReviewEmail} from './smtp.js';
 import {allowedBackupBackends,validateBackupTarget,sealBackupConfig,openBackupConfig,publicBackupConfig,type BackupTarget} from './backup-storage.js';
 import {buildFullBackup,uploadBackup} from './full-backup.js';
 import express from 'express';import helmet from 'helmet';import pg from 'pg';import bcrypt from 'bcryptjs';import QRCode from 'qrcode';import {WebSocketServer,WebSocket} from 'ws';import {liveSessionActive,livePresenterAuthorized,liveParticipantAuthorized} from './live-socket-policy.js';import {createLiveSnapshotQueue} from './live-snapshot-queue.js';import {createLivePeriodicRefresh} from './live-periodic-refresh.js';import {deliverLiveSnapshot} from './live-broadcast.js';import {shouldDropSlowSocket} from './live-delivery-policy.js';import {createServer} from 'node:http';import {randomUUID,randomBytes,createHash,createHmac,timingSafeEqual} from 'node:crypto';import {readFileSync,existsSync} from 'node:fs';import {mkdir,writeFile,readFile,unlink,rm,copyFile} from 'node:fs/promises';import {validAsset} from './asset-policy.js';import {normalizedFileName,findAvailableFileName} from './file-display-names.js';import {receiveAssetStream} from './stream-upload.js';import {scanUploadedFile} from './malware-scan.js';import {classifyBackgroundUploadFailure,backgroundUploadLog,type BackgroundUploadPhase} from './background-upload-failure.js';import {readdir,stat} from 'node:fs/promises';import path from 'node:path';import {fileURLToPath} from 'node:url';import {validTransition,validateOptions,checkAnswer,publicActivity,publicTheme,escapeCsvCell,validRetentionDays,validPageDesign,validPseudonym,validAnswerMode,validateSubmittedAnswer,validReaction,type Activity,type SessionStatus} from './domain.js';
-const ldapSettings=ldapSettingsFromEnv();const db=new pg.Pool({connectionString:process.env.DATABASE_URL});const secret=process.env.AUTH_SECRET||'';if(secret.length<32)throw new Error('AUTH_SECRET must have >= 32 characters');
+const db=new pg.Pool({connectionString:process.env.DATABASE_URL});const secret=process.env.AUTH_SECRET||'';if(secret.length<32)throw new Error('AUTH_SECRET must have >= 32 characters');
 const base=process.env.PUBLIC_BASE_URL||'http://localhost:8080';let publicBase=base;const app=express();app.disable('x-powered-by');
 // Vite HMR is used only in development; production serves precompiled local assets.
 // Keep CSP active even behind HTTP-to-HTTPS reverse proxies (PUBLIC_BASE_URL is
@@ -358,11 +359,14 @@ async function authorizedFederatedLink(req:express.Request){
  return eligible.rowCount?{userId,issuedAt}:null;
 }
 // OIDC authorization code + PKCE. Accounts are never silently linked by email.
-const oidcProviders=providersFromEnv();
-// Federated authorization state is persisted in PostgreSQL for cross-replica callbacks.
-app.get('/api/auth/oidc/providers',(_,res)=>res.json({providers:[...oidcProviders.map(x=>({id:x.id,label:x.label||x.id})),...socialProviders().map(x=>({id:x.id}))]}));
+// Provider state is resolved from PostgreSQL on every request, also on HA replicas.
+app.get('/api/auth/oidc/providers',async(_req,res)=>{try{
+ const [oidc,social]=await Promise.all([enabledOidcBackends(db,secret),enabledSocialBackends(db,secret)]);
+ res.setHeader('Cache-Control','no-store');
+ res.json({providers:[...oidc.map(x=>({id:x.id,label:x.label||x.id})),...social.map(x=>({id:x.id,label:x.id==='github'?'GitHub':'Facebook'}))]});
+ }catch(e){console.error('auth provider discovery failed',e instanceof Error?e.name:'error');res.status(503).json({error:'auth_config_unavailable'})}});
 app.get('/api/auth/oidc/:provider/start',async(req,res)=>{try{
- const p=oidcProviders.find(x=>x.id===req.params.provider);if(!p){res.status(404).json({error:'provider_unavailable'});return}
+ const p=(await enabledOidcBackends(db,secret).catch(()=>[])).find(x=>x.id===req.params.provider);if(!p){res.status(404).json({error:'provider_unavailable'});return}
  const d=validateDiscovery(p,await fetchOidcJson(p.issuer.replace(/\/$/,'')+'/.well-known/openid-configuration'));
  const state=nonce(),verifier=nonce()+nonce(),nonceValue=nonce();
 
@@ -376,7 +380,7 @@ app.get('/api/auth/oidc/:provider/start',async(req,res)=>{try{
 app.get('/api/auth/oidc/:provider/callback',async(req,res)=>{const state=typeof req.query.state==='string'?req.query.state:'',code=req.query.code;
  const flow=await db.query("DELETE FROM auth_flows WHERE state_hash=$1 AND kind='oidc' AND expires_at>now() RETURNING provider,nonce,verifier,link_user,link_auth_issued_at_ms",[hash(state)]).catch(()=>null);if(!flow){res.status(503).json({error:'auth_state_unavailable'});return}const pending=flow.rows[0]?{provider:flow.rows[0].provider,nonce:flow.rows[0].nonce,verifier:flow.rows[0].verifier,linkUser:flow.rows[0].link_user,linkIssuedAt:flow.rows[0].link_auth_issued_at_ms,expires:Date.now()+1}:null;res.clearCookie('q_oidc_state',{path:'/api/auth/oidc'});
  if(!pending||pending.expires<Date.now()||pending.provider!==req.params.provider||cookies(req.headers.cookie).q_oidc_state!==state||typeof code!=='string'||code.length>4096){res.status(400).json({error:'oidc_state_invalid'});return}
- const p=oidcProviders.find(x=>x.id===pending.provider);if(!p){res.status(400).json({error:'oidc_provider_missing'});return}
+ const p=(await enabledOidcBackends(db,secret).catch(()=>[])).find(x=>x.id===pending.provider);if(!p){res.status(400).json({error:'oidc_provider_missing'});return}
  try{const d=validateDiscovery(p,await fetchOidcJson(p.issuer.replace(/\/$/,'')+'/.well-known/openid-configuration'));
  const tokenReply=await fetch(d.token_endpoint,{method:'POST',signal:AbortSignal.timeout(8000),redirect:'error',headers:{'content-type':'application/x-www-form-urlencoded'},body:new URLSearchParams({grant_type:'authorization_code',code,redirect_uri:p.redirectUri,client_id:p.clientId,client_secret:p.clientSecret,code_verifier:pending.verifier})});
  if(!tokenReply.ok){res.status(401).json({error:'oidc_exchange_failed'});return}
@@ -393,7 +397,7 @@ app.get('/api/auth/oidc/:provider/callback',async(req,res)=>{const state=typeof 
  if(!existing.rowCount){res.status(403).json({error:'identity_not_linked',message:'Sign in with your password and link your identity in account settings first.'});return}
  const u=existing.rows[0];if(!u.approved||u.must_change_password){res.status(403).json({error:'account_not_approved'});return}
  // Strict policy: users with TOTP cannot bypass MFA through OIDC.
- if(u.totp_enabled||u.email_mfa_enabled){res.status(403).json({error:'oidc_mfa_requires_local_login'});return}
+ // MFA is handled by the identity provider for federated authentication. Local and LDAP MFA remain enforced on password login.
  userId=u.id;const expires=Date.now()+8*3600*1000;const body=`${userId}.${expires}`;
  res.cookie('q_auth',`${body}.${sign(body)}`,{httpOnly:true,sameSite:'strict',secure:true,maxAge:8*3600*1000,path:'/'});await refreshGravatarForUser(userId);res.redirect('/?oidc_login=1');
  }catch(e){console.error('oidc callback',e instanceof Error?e.message:'error');res.status(502).json({error:'oidc_verification_failed'})}});
@@ -402,7 +406,7 @@ app.get('/api/auth/oidc/:provider/callback',async(req,res)=>{const state=typeof 
 // These providers do not issue standard OIDC id_tokens; obtain the immutable provider user ID via their HTTPS API.
 // Social OAuth uses the same single-consume PostgreSQL state store.
 app.get('/api/auth/social/:provider/start',async(req,res)=>{try{
- const p=socialProviders().find(x=>x.id===req.params.provider);if(!p){res.status(404).json({error:'provider_unavailable'});return}
+ const p=(await enabledSocialBackends(db,secret).catch(()=>[])).find(x=>x.id===req.params.provider);if(!p){res.status(404).json({error:'provider_unavailable'});return}
  const link=req.query.link==='true'?await authorizedFederatedLink(req):null;
  if(req.query.link==='true'&&!link){res.status(401).json({error:'authentication_required'});return}
 
@@ -415,7 +419,7 @@ app.get('/api/auth/social/:provider/callback',async(req,res)=>{
  const flow=await db.query("DELETE FROM auth_flows WHERE state_hash=$1 AND kind='social' AND expires_at>now() RETURNING provider,link_user,link_auth_issued_at_ms",[hash(state)]).catch(()=>null);if(!flow){res.status(503).json({error:'auth_state_unavailable'});return}const pending=flow.rows[0]?{provider:flow.rows[0].provider,linkUser:flow.rows[0].link_user,linkIssuedAt:flow.rows[0].link_auth_issued_at_ms,expires:Date.now()+1}:null;res.clearCookie('q_social_state',{path:'/api/auth/social'});
  const code=req.query.code;
  if(!pending||pending.expires<Date.now()||pending.provider!==req.params.provider||cookies(req.headers.cookie).q_social_state!==state||typeof code!=='string'||code.length>4096){res.status(400).json({error:'social_state_invalid'});return}
- const p=socialProviders().find(x=>x.id===pending.provider);if(!p){res.status(404).json({error:'provider_unavailable'});return}
+ const p=(await enabledSocialBackends(db,secret).catch(()=>[])).find(x=>x.id===pending.provider);if(!p){res.status(404).json({error:'provider_unavailable'});return}
  try{const subject=await socialSubject(p,await exchangeSocialCode(p,code));
  if(pending.linkUser){const issuedAt=validFederatedLinkIssuedAt(pending.linkIssuedAt);
  if(issuedAt===null){res.status(403).json({error:'link_not_allowed'});return}
@@ -425,7 +429,7 @@ app.get('/api/auth/social/:provider/callback',async(req,res)=>{
  const existing=await db.query('SELECT u.id,u.approved,u.must_change_password,u.totp_enabled,u.email_mfa_enabled FROM oidc_identities i JOIN users u ON u.id=i.user_id WHERE i.provider=$1 AND i.subject=$2',[p.id,subject]);
  if(!existing.rowCount){res.status(403).json({error:'identity_not_linked'});return}
  const u=existing.rows[0];if(!u.approved||u.must_change_password){res.status(403).json({error:'account_not_approved'});return}
- if(u.totp_enabled||u.email_mfa_enabled){res.status(403).json({error:'social_mfa_requires_local_login'});return}
+ // Social SSO delegates MFA to its provider; no second Quorivio challenge.
  const expires=Date.now()+8*3600*1000;const body=`${u.id}.${expires}`;
  res.cookie('q_auth',`${body}.${sign(body)}`,{httpOnly:true,sameSite:'strict',secure:true,maxAge:8*3600*1000,path:'/'});await refreshGravatarForUser(u.id);res.redirect('/?oidc_login=1');
  }catch(e){console.error('social oauth callback',e instanceof Error?e.message:'error');res.status(502).json({error:'social_authentication_failed'})}
@@ -433,8 +437,9 @@ app.get('/api/auth/social/:provider/callback',async(req,res)=>{
 /** LDAP/LDAPS is opt-in and *separate* from local authentication. An LDAP
  * search is not authentication: the user's own DN must successfully bind.
  * Email matches never create implicit links to existing local/SSO accounts. */
-app.get('/api/auth/ldap/status',(_req,res)=>res.json({enabled:!!ldapSettings,label:ldapSettings?.label||'LDAP / Active Directory'}));
+app.get('/api/auth/ldap/status',async(_req,res)=>{try{const ldapSettings=await enabledLdapBackend(db,secret).catch(()=>null);res.setHeader('Cache-Control','no-store');res.json({enabled:!!ldapSettings,label:ldapSettings?.label||'LDAP / Active Directory'})}catch(e){console.error('LDAP status unavailable',e instanceof Error?e.name:'error');res.status(503).json({error:'auth_config_unavailable'})}});
 app.post('/api/auth/ldap/register',async(req,res)=>{
+ const ldapSettings=await enabledLdapBackend(db,secret).catch(()=>null);
  if(!ldapSettings){res.status(404).json({error:'ldap_not_configured'});return}
  const login=req.body?.email,password=req.body?.password;
  if(typeof login!=='string'||typeof password!=='string'||!login.trim()||login.length>254){res.status(400).json({error:'invalid_request'});return}
@@ -455,6 +460,7 @@ app.post('/api/auth/ldap/register',async(req,res)=>{
  }catch(e){if((e as any)?.code==='23505'){res.status(409).json({error:'account_exists'});return}console.error('ldap registration unavailable',e instanceof Error?e.name:'unknown');res.status(503).json({error:'ldap_registration_unavailable'})}
 });
 app.post('/api/auth/ldap/login',async(req,res)=>{
+ const ldapSettings=await enabledLdapBackend(db,secret).catch(()=>null);
  if(!ldapSettings){res.status(404).json({error:'ldap_not_configured'});return}
  const login=req.body?.email,password=req.body?.password;
  if(typeof login!=='string'||typeof password!=='string'||login.length>254||!login.trim()||password.length>1024){res.status(400).json({error:'invalid_request'});return}
@@ -495,6 +501,7 @@ app.post('/api/auth/ldap/login',async(req,res)=>{
 /* Explicit account linking requires an already authenticated presenter AND a
  * fresh successful directory bind. Never link identities based on email alone. */
 app.post('/api/auth/ldap/link',requireAuth,async(req,res)=>{
+ const ldapSettings=await enabledLdapBackend(db,secret).catch(()=>null);
  if(!ldapSettings){res.status(404).json({error:'ldap_not_configured'});return}
  const login=req.body?.email,password=req.body?.password;
  if(typeof login!=='string'||typeof password!=='string'||!login.trim()||login.length>254){res.status(400).json({error:'invalid_request'});return}
@@ -560,11 +567,23 @@ app.post('/api/auth/email-mfa/verify',async(req,res)=>{try{
  await refreshGravatarForUser(user.user_id);
  res.json({email:user.email,role:user.role,must_change_password:user.must_change_password});
  }catch(e){sendError(res,e)}});
+/** Verify MFA account changes against the internal password OR a separately linked,
+ * still enabled LDAP identity. An email match alone never authorizes a user. */
+async function verifyAccountPassword(uid:string,password:string,storedHash:string):Promise<boolean>{
+ if(typeof password!=='string'||password.length<1||password.length>1024)return false;
+ if(await bcrypt.compare(password,storedHash))return true;
+ const ldap=await enabledLdapBackend(db,secret);if(!ldap)return false;
+ const linked=await db.query("SELECT li.subject,u.email FROM ldap_identities li JOIN users u ON u.id=li.user_id WHERE li.user_id=$1 AND li.provider='default'",[uid]);
+ if(!linked.rowCount)return false;
+ const verified=await authenticateDirectory(ldap,linked.rows[0].email,password);
+ return Boolean(verified&&verified.subject===linked.rows[0].subject&&verified.email===linked.rows[0].email);
+}
 app.post('/api/auth/email-mfa/settings',requireAuth,async(req,res)=>{try{
  const uid=auth(req)!,enabled=req.body?.enabled,password=req.body?.password;
+  if(enabled===true&&!await backendAllowsMfa(db,secret,uid)){res.status(403).json({error:'mfa_disabled_for_backend'});return}
  if(typeof enabled!=='boolean'||typeof password!=='string'){res.status(400).json({error:'invalid_request'});return}
  const r=await db.query('SELECT email,password_hash,email_mfa_enabled FROM users WHERE id=$1',[uid]);
- if(!r.rowCount||!await bcrypt.compare(password,r.rows[0].password_hash)){res.status(403).json({error:'invalid_credentials'});return}
+ if(!r.rowCount||!await verifyAccountPassword(uid,password,r.rows[0].password_hash)){res.status(403).json({error:'invalid_credentials'});return}
  if(r.rows[0].email_mfa_enabled===enabled){res.status(409).json({error:'email_mfa_already_in_requested_state'});return}
  if(enabled){
   const smtp=await activeSmtpConfig();
@@ -680,8 +699,9 @@ app.post('/api/auth/change-password',requireAuth,async(req,res)=>{const current=
 
 // TOTP is optional and bound to a fully authenticated user. Enrolment remains
 // inactive until a valid authenticator code is provided.
+app.get('/api/auth/mfa/policy',requireAuth,async(req,res)=>{try{res.setHeader('Cache-Control','private, no-store');res.json({enrollment_enabled:await backendAllowsMfa(db,secret,auth(req)!)})}catch(e){sendError(res,e)}});
 app.post('/api/auth/mfa/setup',requireAuth,async(req,res)=>{try{
- const uid=auth(req)!;const r=await db.query('SELECT totp_enabled FROM users WHERE id=$1',[uid]);if(!r.rowCount||r.rows[0].totp_enabled){res.status(409).json({error:'mfa_already_enabled'});return}
+ const uid=auth(req)!;if(!await backendAllowsMfa(db,secret,uid)){res.status(403).json({error:'mfa_disabled_for_backend'});return}const r=await db.query('SELECT totp_enabled FROM users WHERE id=$1',[uid]);if(!r.rowCount||r.rows[0].totp_enabled){res.status(409).json({error:'mfa_already_enabled'});return}
  const secretValue=generateTotpSecret();await db.query('UPDATE users SET totp_pending_secret=$2 WHERE id=$1',[uid,sealTotp(secretValue,secret)]);
  const email=(await db.query('SELECT email FROM users WHERE id=$1',[uid])).rows[0].email;
  res.setHeader('Cache-Control','no-store, private');
@@ -702,10 +722,10 @@ app.post('/api/auth/mfa/confirm',requireAuth,async(req,res)=>{try{
  }catch(e){sendError(res,e)}});
 app.post('/api/auth/mfa/disable',requireAuth,async(req,res)=>{try{
  const uid=auth(req)!;const code=String(req.body?.code||'');const password=String(req.body?.password||'');const r=await db.query('SELECT password_hash,totp_secret,totp_enabled FROM users WHERE id=$1',[uid]);
- if(!r.rowCount||!r.rows[0].totp_enabled||!await bcrypt.compare(password,r.rows[0].password_hash)||!validTotpCode(code)||!verifyTotp(openTotp(r.rows[0].totp_secret,secret),code)){res.status(403).json({error:'invalid_credentials'});return}
+ if(!r.rowCount||!r.rows[0].totp_enabled||!await verifyAccountPassword(uid,password,r.rows[0].password_hash)||!validTotpCode(code)||!verifyTotp(openTotp(r.rows[0].totp_secret,secret),code)){res.status(403).json({error:'invalid_credentials'});return}
  await db.query('UPDATE users SET totp_secret=NULL,totp_pending_secret=NULL,totp_enabled=false,auth_revoked_at=now() WHERE id=$1',[uid]);await db.query('DELETE FROM mfa_recovery_codes WHERE user_id=$1',[uid]);res.json({enabled:false});
  }catch(e){sendError(res,e)}});
-app.post('/api/auth/mfa/recovery-codes/rotate',requireAuth,async(req,res)=>{try{const uid=auth(req)!;const {password,code}=req.body||{};const r=await db.query('SELECT password_hash,totp_secret,totp_enabled FROM users WHERE id=$1',[uid]);if(!r.rowCount||!r.rows[0].totp_enabled||typeof password!=='string'||!await bcrypt.compare(password,r.rows[0].password_hash)||!validTotpCode(code)||!verifyTotp(openTotp(r.rows[0].totp_secret,secret),code)){res.status(403).json({error:'invalid_credentials'});return}const codes=generateRecoveryCodes(),client=await db.connect();try{await client.query('BEGIN');await client.query('DELETE FROM mfa_recovery_codes WHERE user_id=$1',[uid]);for(const c of codes)await client.query('INSERT INTO mfa_recovery_codes(user_id,code_hash) VALUES($1,$2)',[uid,recoveryCodeDigest(c,secret)]);await client.query('COMMIT')}catch(e){await client.query('ROLLBACK');throw e}finally{client.release()}res.json({recovery_codes:codes});}catch(e){sendError(res,e)}});
+app.post('/api/auth/mfa/recovery-codes/rotate',requireAuth,async(req,res)=>{try{const uid=auth(req)!;const {password,code}=req.body||{};const r=await db.query('SELECT password_hash,totp_secret,totp_enabled FROM users WHERE id=$1',[uid]);if(!r.rowCount||!r.rows[0].totp_enabled||typeof password!=='string'||!await verifyAccountPassword(uid,password,r.rows[0].password_hash)||!validTotpCode(code)||!verifyTotp(openTotp(r.rows[0].totp_secret,secret),code)){res.status(403).json({error:'invalid_credentials'});return}const codes=generateRecoveryCodes(),client=await db.connect();try{await client.query('BEGIN');await client.query('DELETE FROM mfa_recovery_codes WHERE user_id=$1',[uid]);for(const c of codes)await client.query('INSERT INTO mfa_recovery_codes(user_id,code_hash) VALUES($1,$2)',[uid,recoveryCodeDigest(c,secret)]);await client.query('COMMIT')}catch(e){await client.query('ROLLBACK');throw e}finally{client.release()}res.json({recovery_codes:codes});}catch(e){sendError(res,e)}});
 app.get('/api/admin/smtp',requireAuth,requireAdmin,async(_req,res)=>{try{res.json(publicSmtpConfig(await activeSmtpConfig()))}catch(e){sendError(res,e)}});
 app.put('/api/admin/smtp',requireAuth,requireAdmin,async(req,res)=>{try{
  const previous=await activeSmtpConfig();const body={...req.body,password:req.body?.password||previous?.password};
@@ -784,12 +804,14 @@ app.patch('/api/admin/users/:id/identity',requireAuth,requireAdmin,async(req,res
  if(!result.rowCount){res.status(404).end();return}res.json(result.rows[0]);
  }catch(e){if((e as any)?.code==='23505'){res.status(409).json({error:'email_already_taken'});return}sendError(res,e)}});
 app.get('/api/admin/ldap/search',requireAuth,requireAdmin,async(req,res)=>{
+ const ldapSettings=await enabledLdapBackend(db,secret).catch(()=>null);
  if(!ldapSettings){res.status(404).json({error:'ldap_not_configured'});return}
  const q=String(req.query.q||'').trim();if(q.length<2||q.length>120){res.status(400).json({error:'invalid_search'});return}
  try{res.setHeader('Cache-Control','private, no-store');res.json({items:await searchDirectory(ldapSettings,q)})}
  catch(e){console.error('ldap search failed',e instanceof Error?e.name:'unknown');res.status(503).json({error:'directory_unavailable'})}
 });
 app.post('/api/admin/ldap/users',requireAuth,requireAdmin,async(req,res)=>{
+ const ldapSettings=await enabledLdapBackend(db,secret).catch(()=>null);
  if(!ldapSettings){res.status(404).json({error:'ldap_not_configured'});return}
  const q=String(req.body?.query||'').trim(),subject=req.body?.subject,role=req.body?.role;
  if(q.length<2||q.length>120||typeof subject!=='string'||!['user','presenter','moderator','org_admin','platform_admin'].includes(role)){res.status(400).json({error:'invalid_user'});return}
@@ -1029,6 +1051,21 @@ async function runScheduledFullBackup(){
  RETURNING config_encrypted`);
  if(result.rowCount&&result.rows[0].config_encrypted){const target=validateBackupTarget(openBackupConfig(result.rows[0].config_encrypted,secret));await executeBackupRun(target,null)}
 }
+/** Administrative authentication provider registry. Secrets are encrypted and never returned. */
+app.get('/api/admin/auth/backends',requireAuth,requireAdmin,async(_req,res)=>{try{
+ res.setHeader('Cache-Control','private, no-store');
+ res.json({backends:(await loadAuthBackends(db,secret)).map(backendPublic)});
+ }catch(e){sendError(res,e)}});
+app.put('/api/admin/auth/backends/:id',requireAuth,requireAdmin,async(req,res)=>{try{
+ const backend=await saveAuthBackend(db,secret,req.params.id,req.body);
+ res.setHeader('Cache-Control','private, no-store');res.json(backend);
+ }catch(e){const reason=e instanceof Error?e.message:'invalid_backend_request';
+ if(/^(invalid_|local_backend|ldap_|sso_|insecure_)/.test(reason)){res.status(400).json({error:reason});return}
+ sendError(res,e)}});
+app.post('/api/admin/auth/backends/:id/test',requireAuth,requireAdmin,async(req,res)=>{try{
+ const result=await testAuthBackend(db,secret,req.params.id);
+ res.setHeader('Cache-Control','private, no-store');res.json(result);
+ }catch(e){console.error('authentication backend test unavailable',e instanceof Error?e.name:'error');res.status(422).json({error:'backend_test_failed'})}});
 app.get('/api/admin/settings',requireAuth,requireAdmin,async(_req,res)=>{try{const r=await db.query('SELECT key,value FROM platform_settings');res.json(Object.fromEntries(r.rows.map(x=>[x.key,x.value])))}catch(e){sendError(res,e)}});
 app.patch('/api/admin/settings',requireAuth,requireAdmin,async(req,res)=>{
  const patch=validateSettingsPatch(req.body);
