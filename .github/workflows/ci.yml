@@ -112,7 +112,7 @@ jobs:
           --health-retries 15
     steps:
       # Gitleaks needs the entire pull-request commit range, including the base parent.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: {persist-credentials: false, fetch-depth: 0}
       - name: RC295 Gitleaks complete PR ancestry preflight
         run: python3 -m unittest tools.tests.test_rc295_gitleaks_history -q
@@ -1918,7 +1918,7 @@ jobs:
     timeout-minutes: 20
     permissions: {contents: read}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: {persist-credentials: false}
       - uses: actions/setup-node@v7
         with: {node-version: '22'}
@@ -1959,7 +1959,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions: {contents: read}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: {persist-credentials: false}
       - uses: docker/setup-buildx-action@v4
       - name: Build without publishing
@@ -2024,7 +2024,7 @@ jobs:
     timeout-minutes: 12
     permissions: {contents: read}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: {persist-credentials: false}
       - uses: helm/kind-action@v1.15.1
         with:
@@ -2040,7 +2040,7 @@ jobs:
     timeout-minutes: 22
     permissions: {contents: read}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: {persist-credentials: false}
       - uses: helm/kind-action@v1.15.1
         with:
@@ -2065,7 +2065,7 @@ jobs:
     timeout-minutes: 30
     permissions: {contents: read}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: {persist-credentials: false}
       - name: Prepare disposable runner bind mount for KIND workers
         run: |
@@ -2106,7 +2106,7 @@ jobs:
       matrix:
         controller: [nginx, haproxytech]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: {persist-credentials: false}
       - name: Prepare isolated two-worker-only host bind
         run: |
@@ -2141,7 +2141,7 @@ jobs:
     timeout-minutes: 35
     permissions: {contents: read}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: {persist-credentials: false}
       - name: Prepare ephemeral KIND-only runner shared volume
         run: |
@@ -2189,7 +2189,7 @@ jobs:
     timeout-minutes: 30
     permissions: {contents: read}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: {persist-credentials: false}
       - name: Verify actual native runner architecture before container build
         env:
@@ -2220,7 +2220,7 @@ jobs:
     timeout-minutes: 25
     permissions: {contents: read}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: {persist-credentials: false}
       - name: Install rootless container engine
         run: |
@@ -2238,7 +2238,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 18
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: {persist-credentials: false}
       - uses: actions/setup-node@v7
         with: {node-version: '22'}
@@ -2275,7 +2275,7 @@ jobs:
     runs-on: ubuntu-24.04
     permissions: {contents: read}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: {persist-credentials: false}
       - name: Fail closed on skipped, cancelled or failed RC campaign jobs
         env:
@@ -2307,7 +2307,7 @@ jobs:
     environment: production
     permissions: {contents: read}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: {persist-credentials: false}
       - name: Verify authorized native publishing runner
         env:
@@ -2398,7 +2398,7 @@ jobs:
     environment: production
     permissions: {contents: read}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: {persist-credentials: false}
       - name: Verify publisher repository
         run: test "$GITHUB_REPOSITORY" = 'desalvo/quorivio'
@@ -2458,7 +2458,7 @@ jobs:
     environment: production
     permissions: {contents: read}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: {persist-credentials: false}
       - name: Verify publisher repository
         run: test "$GITHUB_REPOSITORY" = 'desalvo/quorivio'
