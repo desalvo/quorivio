@@ -3854,14 +3854,14 @@
       "780e8ac8"
     ],
     "apps/web/test/rc325-server-settings-tabs.test.ts": [
-      "d3c37a56",
-      "562e02ab",
-      "e3535699",
-      "5be37cdb",
-      "a935e178",
-      "d5c7759d",
-      "225942af",
-      "73bb7c96"
+      "2c11a3a8",
+      "416257d9",
+      "107eb6cc",
+      "69efd4e8",
+      "ee9dbe5a",
+      "c324315a",
+      "fe0025d9",
+      "0c764a60"
     ],
     "apps/web/test/rc325-ui-locale.test.ts": [
       "18caa7c2",
@@ -5354,24 +5354,24 @@
       "455a0f27"
     ],
     "docs/DEVELOPMENT_STATUS.it.md": [
-      "6c1389c9",
-      "32a282c1",
-      "f006fe6f",
-      "35f526d7",
-      "e4f77bb3",
-      "2d4315b9",
-      "9bf56133",
-      "d240df37"
+      "5f65c9d2",
+      "f3468370",
+      "d1862e17",
+      "134d6be2",
+      "c5426d69",
+      "259f4e6f",
+      "edc7d4f7",
+      "0c154a14"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "ca5e8f99",
-      "d7f9d289",
-      "f6625e88",
-      "81f941d9",
-      "eb9d061f",
-      "e6a4ab86",
-      "0860430e",
-      "97592efb"
+      "2b18d1e9",
+      "ec62bc06",
+      "71b57a1d",
+      "a74339c1",
+      "ebfc7d1b",
+      "906ed88e",
+      "085544cc",
+      "9eabb78b"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",
@@ -6144,44 +6144,44 @@
       "30daa037"
     ],
     "docs/manuals-src/admin-guide.en.md": [
-      "f5bdd1b7",
-      "ea26cc12",
-      "14495d66",
-      "f81597b9",
-      "efd9ff46",
-      "66cf711e",
-      "8751d2b2",
-      "f3fea371"
+      "63c9f7b2",
+      "0fc01d4e",
+      "b94822cb",
+      "678239fc",
+      "c21467ce",
+      "56ed6d5c",
+      "44d09344",
+      "f55d1f2d"
     ],
     "docs/manuals-src/admin-guide.it.md": [
-      "8f24b6b8",
-      "b21823eb",
-      "593c6485",
-      "cadefe07",
-      "6f530761",
-      "c439b525",
-      "2ae627d2",
-      "9ab3f80a"
+      "68f862bf",
+      "87ad387a",
+      "a2be6c56",
+      "ae98088d",
+      "6df707ed",
+      "d3c17b7f",
+      "47e3bf8d",
+      "5d1eb2f9"
     ],
     "docs/manuals-src/presenter-guide.en.md": [
-      "5c01b869",
-      "7f7ce0b5",
-      "bf38dcb6",
-      "aa7b55d0",
-      "3523124d",
-      "36b94afb",
-      "df0ffaef",
-      "7e3256a9"
+      "b3254c0c",
+      "491cfbce",
+      "c1338d85",
+      "cf04d230",
+      "0a58ecc3",
+      "865bf3f1",
+      "1f1150b1",
+      "bca1c8e7"
     ],
     "docs/manuals-src/presenter-guide.it.md": [
-      "d1f73e50",
-      "0a069e2b",
-      "dab47aab",
-      "3ec49984",
-      "41c08b3e",
-      "20893428",
-      "5f4a9255",
-      "12021b26"
+      "c2057864",
+      "c349d4a5",
+      "c4587593",
+      "ea2c316f",
+      "5f52303c",
+      "2931af3f",
+      "a32b821e",
+      "468ba9b6"
     ],
     "docs/manuals-src/README.md": [
       "6a225c63",
