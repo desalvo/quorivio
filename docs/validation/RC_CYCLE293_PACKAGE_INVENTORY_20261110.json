@@ -2674,14 +2674,14 @@
       "219e0c2a"
     ],
     "apps/web/src/widget-placement.ts": [
-      "0bb00383",
-      "bb6a9aa7",
-      "ac15a6af",
-      "18d1cd42",
-      "29a014c2",
-      "b97e9699",
-      "7109dc32",
-      "f116c35e"
+      "feaac551",
+      "3147809b",
+      "1a578063",
+      "81c9076a",
+      "e3156849",
+      "ad6e78e3",
+      "c636d84b",
+      "ddb75970"
     ],
     "apps/web/src/widget-results.ts": [
       "b2d10320",
@@ -2954,14 +2954,14 @@
       "2b873ebe"
     ],
     "apps/web/test/rc119-content-only-autofit.test.ts": [
-      "0f783c63",
-      "d045f39d",
-      "8c70aab6",
-      "2ec42240",
-      "06c441fa",
-      "bfbc6092",
-      "fe7a213f",
-      "8a47350e"
+      "9f608221",
+      "79ad87a8",
+      "0f535e99",
+      "a5762fa0",
+      "758c833f",
+      "c7972837",
+      "6ef701bc",
+      "c8cad6b6"
     ],
     "apps/web/test/rc123-media-pickers.test.ts": [
       "bb5e3b7e",
@@ -3014,24 +3014,24 @@
       "cb64c2e2"
     ],
     "apps/web/test/rc133-resize-limit.test.ts": [
-      "672bf98d",
-      "eef8a090",
-      "3d03d54f",
-      "9bcb4cfd",
-      "3d3d8fc0",
-      "1c8f2eae",
-      "ba871ed4",
-      "958eb384"
+      "92842f6f",
+      "12ab7c3c",
+      "f56384f1",
+      "831024b8",
+      "bac208ce",
+      "b07dd692",
+      "4895c442",
+      "ceac1454"
     ],
     "apps/web/test/rc138-overlap-results-fit.test.ts": [
-      "1cd36c31",
-      "d5b1bd0f",
-      "b54e8c3f",
-      "24dfab41",
-      "09436780",
-      "6d2fc6af",
-      "46d135d9",
-      "3a59dc0d"
+      "bd368670",
+      "21adf7b1",
+      "61d91293",
+      "15f80de0",
+      "e85ecb13",
+      "8da20a79",
+      "974dc435",
+      "cf3c2f13"
     ],
     "apps/web/test/rc139-rating-editor-selection.test.ts": [
       "f99c1cfd",
@@ -20224,14 +20224,14 @@
       "c046a0ec"
     ],
     "tools/tests/test_rc109_editor_autofit_answer_footer.py": [
-      "f7335b99",
-      "9f3cb536",
-      "8c2ad814",
-      "7a2e37e8",
-      "1a425df2",
-      "395d400f",
-      "df3539dc",
-      "bc1cdd4f"
+      "d8c45a33",
+      "33727d65",
+      "2f69d47a",
+      "d83f7827",
+      "86a8440d",
+      "b8b5fc78",
+      "29052435",
+      "a14ecc07"
     ],
     "tools/tests/test_rc110_background_cloud_answer.py": [
       "e08d2d4c",
@@ -20344,14 +20344,14 @@
       "12b0e709"
     ],
     "tools/tests/test_rc133_resize_boundary.py": [
-      "3b7a65ff",
-      "937730ee",
-      "9a958177",
-      "8b8a0c09",
-      "7c858cc6",
-      "a6ceb26b",
-      "871a8a36",
-      "6c3a26c6"
+      "e4fdfaa1",
+      "9c9219db",
+      "a5b75b4e",
+      "b2f0f5b6",
+      "b2e1f436",
+      "87aae0b4",
+      "2b4becfa",
+      "b1b6144f"
     ],
     "tools/tests/test_rc134_presenter_answer_parity.py": [
       "5bb20002",
