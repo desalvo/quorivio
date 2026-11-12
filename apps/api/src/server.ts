@@ -366,7 +366,7 @@ app.get('/api/auth/oidc/providers',async(_req,res)=>{try{
  res.json({providers:[...oidc.map(x=>({id:x.id,label:x.label||x.id})),...social.map(x=>({id:x.id,label:x.id==='github'?'GitHub':'Facebook'}))]});
  }catch(e){console.error('auth provider discovery failed',e instanceof Error?e.name:'error');res.status(503).json({error:'auth_config_unavailable'})}});
 app.get('/api/auth/oidc/:provider/start',async(req,res)=>{try{
- const p=(await enabledOidcBackends(db,secret)).find(x=>x.id===req.params.provider);if(!p){res.status(404).json({error:'provider_unavailable'});return}
+ const p=(await enabledOidcBackends(db,secret).catch(()=>[])).find(x=>x.id===req.params.provider);if(!p){res.status(404).json({error:'provider_unavailable'});return}
  const d=validateDiscovery(p,await fetchOidcJson(p.issuer.replace(/\/$/,'')+'/.well-known/openid-configuration'));
  const state=nonce(),verifier=nonce()+nonce(),nonceValue=nonce();
 
@@ -380,7 +380,7 @@ app.get('/api/auth/oidc/:provider/start',async(req,res)=>{try{
 app.get('/api/auth/oidc/:provider/callback',async(req,res)=>{const state=typeof req.query.state==='string'?req.query.state:'',code=req.query.code;
  const flow=await db.query("DELETE FROM auth_flows WHERE state_hash=$1 AND kind='oidc' AND expires_at>now() RETURNING provider,nonce,verifier,link_user,link_auth_issued_at_ms",[hash(state)]).catch(()=>null);if(!flow){res.status(503).json({error:'auth_state_unavailable'});return}const pending=flow.rows[0]?{provider:flow.rows[0].provider,nonce:flow.rows[0].nonce,verifier:flow.rows[0].verifier,linkUser:flow.rows[0].link_user,linkIssuedAt:flow.rows[0].link_auth_issued_at_ms,expires:Date.now()+1}:null;res.clearCookie('q_oidc_state',{path:'/api/auth/oidc'});
  if(!pending||pending.expires<Date.now()||pending.provider!==req.params.provider||cookies(req.headers.cookie).q_oidc_state!==state||typeof code!=='string'||code.length>4096){res.status(400).json({error:'oidc_state_invalid'});return}
- const p=(await enabledOidcBackends(db,secret)).find(x=>x.id===pending.provider);if(!p){res.status(400).json({error:'oidc_provider_missing'});return}
+ const p=(await enabledOidcBackends(db,secret).catch(()=>[])).find(x=>x.id===pending.provider);if(!p){res.status(400).json({error:'oidc_provider_missing'});return}
  try{const d=validateDiscovery(p,await fetchOidcJson(p.issuer.replace(/\/$/,'')+'/.well-known/openid-configuration'));
  const tokenReply=await fetch(d.token_endpoint,{method:'POST',signal:AbortSignal.timeout(8000),redirect:'error',headers:{'content-type':'application/x-www-form-urlencoded'},body:new URLSearchParams({grant_type:'authorization_code',code,redirect_uri:p.redirectUri,client_id:p.clientId,client_secret:p.clientSecret,code_verifier:pending.verifier})});
  if(!tokenReply.ok){res.status(401).json({error:'oidc_exchange_failed'});return}
@@ -406,7 +406,7 @@ app.get('/api/auth/oidc/:provider/callback',async(req,res)=>{const state=typeof 
 // These providers do not issue standard OIDC id_tokens; obtain the immutable provider user ID via their HTTPS API.
 // Social OAuth uses the same single-consume PostgreSQL state store.
 app.get('/api/auth/social/:provider/start',async(req,res)=>{try{
- const p=(await enabledSocialBackends(db,secret)).find(x=>x.id===req.params.provider);if(!p){res.status(404).json({error:'provider_unavailable'});return}
+ const p=(await enabledSocialBackends(db,secret).catch(()=>[])).find(x=>x.id===req.params.provider);if(!p){res.status(404).json({error:'provider_unavailable'});return}
  const link=req.query.link==='true'?await authorizedFederatedLink(req):null;
  if(req.query.link==='true'&&!link){res.status(401).json({error:'authentication_required'});return}
 
@@ -419,7 +419,7 @@ app.get('/api/auth/social/:provider/callback',async(req,res)=>{
  const flow=await db.query("DELETE FROM auth_flows WHERE state_hash=$1 AND kind='social' AND expires_at>now() RETURNING provider,link_user,link_auth_issued_at_ms",[hash(state)]).catch(()=>null);if(!flow){res.status(503).json({error:'auth_state_unavailable'});return}const pending=flow.rows[0]?{provider:flow.rows[0].provider,linkUser:flow.rows[0].link_user,linkIssuedAt:flow.rows[0].link_auth_issued_at_ms,expires:Date.now()+1}:null;res.clearCookie('q_social_state',{path:'/api/auth/social'});
  const code=req.query.code;
  if(!pending||pending.expires<Date.now()||pending.provider!==req.params.provider||cookies(req.headers.cookie).q_social_state!==state||typeof code!=='string'||code.length>4096){res.status(400).json({error:'social_state_invalid'});return}
- const p=(await enabledSocialBackends(db,secret)).find(x=>x.id===pending.provider);if(!p){res.status(404).json({error:'provider_unavailable'});return}
+ const p=(await enabledSocialBackends(db,secret).catch(()=>[])).find(x=>x.id===pending.provider);if(!p){res.status(404).json({error:'provider_unavailable'});return}
  try{const subject=await socialSubject(p,await exchangeSocialCode(p,code));
  if(pending.linkUser){const issuedAt=validFederatedLinkIssuedAt(pending.linkIssuedAt);
  if(issuedAt===null){res.status(403).json({error:'link_not_allowed'});return}
@@ -437,9 +437,9 @@ app.get('/api/auth/social/:provider/callback',async(req,res)=>{
 /** LDAP/LDAPS is opt-in and *separate* from local authentication. An LDAP
  * search is not authentication: the user's own DN must successfully bind.
  * Email matches never create implicit links to existing local/SSO accounts. */
-app.get('/api/auth/ldap/status',async(_req,res)=>{try{const ldapSettings=await enabledLdapBackend(db,secret);res.setHeader('Cache-Control','no-store');res.json({enabled:!!ldapSettings,label:ldapSettings?.label||'LDAP / Active Directory'})}catch(e){console.error('LDAP status unavailable',e instanceof Error?e.name:'error');res.status(503).json({error:'auth_config_unavailable'})}});
+app.get('/api/auth/ldap/status',async(_req,res)=>{try{const ldapSettings=await enabledLdapBackend(db,secret).catch(()=>null);res.setHeader('Cache-Control','no-store');res.json({enabled:!!ldapSettings,label:ldapSettings?.label||'LDAP / Active Directory'})}catch(e){console.error('LDAP status unavailable',e instanceof Error?e.name:'error');res.status(503).json({error:'auth_config_unavailable'})}});
 app.post('/api/auth/ldap/register',async(req,res)=>{
- const ldapSettings=await enabledLdapBackend(db,secret);
+ const ldapSettings=await enabledLdapBackend(db,secret).catch(()=>null);
  if(!ldapSettings){res.status(404).json({error:'ldap_not_configured'});return}
  const login=req.body?.email,password=req.body?.password;
  if(typeof login!=='string'||typeof password!=='string'||!login.trim()||login.length>254){res.status(400).json({error:'invalid_request'});return}
@@ -460,7 +460,7 @@ app.post('/api/auth/ldap/register',async(req,res)=>{
  }catch(e){if((e as any)?.code==='23505'){res.status(409).json({error:'account_exists'});return}console.error('ldap registration unavailable',e instanceof Error?e.name:'unknown');res.status(503).json({error:'ldap_registration_unavailable'})}
 });
 app.post('/api/auth/ldap/login',async(req,res)=>{
- const ldapSettings=await enabledLdapBackend(db,secret);
+ const ldapSettings=await enabledLdapBackend(db,secret).catch(()=>null);
  if(!ldapSettings){res.status(404).json({error:'ldap_not_configured'});return}
  const login=req.body?.email,password=req.body?.password;
  if(typeof login!=='string'||typeof password!=='string'||login.length>254||!login.trim()||password.length>1024){res.status(400).json({error:'invalid_request'});return}
@@ -501,7 +501,7 @@ app.post('/api/auth/ldap/login',async(req,res)=>{
 /* Explicit account linking requires an already authenticated presenter AND a
  * fresh successful directory bind. Never link identities based on email alone. */
 app.post('/api/auth/ldap/link',requireAuth,async(req,res)=>{
- const ldapSettings=await enabledLdapBackend(db,secret);
+ const ldapSettings=await enabledLdapBackend(db,secret).catch(()=>null);
  if(!ldapSettings){res.status(404).json({error:'ldap_not_configured'});return}
  const login=req.body?.email,password=req.body?.password;
  if(typeof login!=='string'||typeof password!=='string'||!login.trim()||login.length>254){res.status(400).json({error:'invalid_request'});return}
@@ -793,14 +793,14 @@ app.patch('/api/admin/users/:id/identity',requireAuth,requireAdmin,async(req,res
  if(!result.rowCount){res.status(404).end();return}res.json(result.rows[0]);
  }catch(e){if((e as any)?.code==='23505'){res.status(409).json({error:'email_already_taken'});return}sendError(res,e)}});
 app.get('/api/admin/ldap/search',requireAuth,requireAdmin,async(req,res)=>{
- const ldapSettings=await enabledLdapBackend(db,secret);
+ const ldapSettings=await enabledLdapBackend(db,secret).catch(()=>null);
  if(!ldapSettings){res.status(404).json({error:'ldap_not_configured'});return}
  const q=String(req.query.q||'').trim();if(q.length<2||q.length>120){res.status(400).json({error:'invalid_search'});return}
  try{res.setHeader('Cache-Control','private, no-store');res.json({items:await searchDirectory(ldapSettings,q)})}
  catch(e){console.error('ldap search failed',e instanceof Error?e.name:'unknown');res.status(503).json({error:'directory_unavailable'})}
 });
 app.post('/api/admin/ldap/users',requireAuth,requireAdmin,async(req,res)=>{
- const ldapSettings=await enabledLdapBackend(db,secret);
+ const ldapSettings=await enabledLdapBackend(db,secret).catch(()=>null);
  if(!ldapSettings){res.status(404).json({error:'ldap_not_configured'});return}
  const q=String(req.body?.query||'').trim(),subject=req.body?.subject,role=req.body?.role;
  if(q.length<2||q.length>120||typeof subject!=='string'||!['user','presenter','moderator','org_admin','platform_admin'].includes(role)){res.status(400).json({error:'invalid_user'});return}

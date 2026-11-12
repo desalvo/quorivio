@@ -143,7 +143,11 @@ export async function enabledLdapBackend(db:Pool,secret:string):Promise<LdapSett
  const b=(await loadAuthBackends(db,secret)).find(x=>x.id==='ldap');
  if(!b?.enabled)return null;
  validateAuthBackend(b.id,b.kind,b.config);
- return b.config as LdapSettings;
+ const c=b.config;
+ return ldapSettingsFromEnv({LDAP_URL:c.url,LDAP_STARTTLS:c.startTls?'true':'false',LDAP_BIND_DN:c.bindDn,LDAP_BIND_PASSWORD:c.bindPassword,LDAP_BASE_DN:c.baseDn,
+  LDAP_USER_FILTER:c.filter,LDAP_ID_ATTRIBUTE:c.idAttribute,LDAP_EMAIL_ATTRIBUTE:c.emailAttribute,LDAP_GROUP_ATTRIBUTE:c.groupAttribute,
+  LDAP_ADMIN_GROUP_DN:c.adminGroupDn,LDAP_PRESENTER_GROUP_DN:c.presenterGroupDn,LDAP_ORGANIZATION_ID:c.organizationId,
+  LDAP_AUTO_PROVISION:c.autoProvision?'true':'false',LDAP_TLS_CA_FILE:c.caFile,LDAP_LABEL:c.label})!;
 }
 export async function enabledOidcBackends(db:Pool,secret:string):Promise<OidcProvider[]>{
  return (await loadAuthBackends(db,secret)).filter(x=>x.kind==='oidc'&&x.enabled).map(b=>{validateAuthBackend(b.id,b.kind,b.config);return {...b.config,id:b.id} as OidcProvider});
@@ -154,7 +158,7 @@ export async function enabledSocialBackends(db:Pool,secret:string):Promise<Socia
 export async function backendAllowsMfa(db:Pool,secret:string,userId:string):Promise<boolean>{
  const isLdap=(await db.query('SELECT EXISTS(SELECT 1 FROM ldap_identities WHERE user_id=$1) AS ldap',[userId])).rows[0]?.ldap===true;
  const backends=await loadAuthBackends(db,secret);
- return Boolean(backends.find(x=>x.id===isLdap?'ldap':'local')?.mfaEnabled);
+ return Boolean(backends.find(x=>x.id===(isLdap?'ldap':'local'))?.mfaEnabled);
 }
 /** Tests do not create sessions or link users, and cannot expose credentials. */
 export async function testAuthBackend(db:Pool,secret:string,id:string):Promise<{ok:true;scope:string}>{
@@ -164,7 +168,11 @@ export async function testAuthBackend(db:Pool,secret:string,id:string):Promise<{
  let scope='configuration';
  if(b.kind==='ldap'){
   const {Client}=await import('ldapts');
-  const settings=b.config as LdapSettings;
+  const c=b.config;
+  const settings=ldapSettingsFromEnv({LDAP_URL:c.url,LDAP_STARTTLS:c.startTls?'true':'false',LDAP_BIND_DN:c.bindDn,LDAP_BIND_PASSWORD:c.bindPassword,LDAP_BASE_DN:c.baseDn,
+   LDAP_USER_FILTER:c.filter,LDAP_ID_ATTRIBUTE:c.idAttribute,LDAP_EMAIL_ATTRIBUTE:c.emailAttribute,LDAP_GROUP_ATTRIBUTE:c.groupAttribute,
+   LDAP_ADMIN_GROUP_DN:c.adminGroupDn,LDAP_PRESENTER_GROUP_DN:c.presenterGroupDn,LDAP_ORGANIZATION_ID:c.organizationId,
+   LDAP_AUTO_PROVISION:c.autoProvision?'true':'false',LDAP_TLS_CA_FILE:c.caFile,LDAP_LABEL:c.label})!;
   const {readFileSync}=await import('node:fs');
   const tlsOptions={rejectUnauthorized:true,minVersion:'TLSv1.2' as const,...(settings.caFile?{ca:[readFileSync(settings.caFile)]}:{})};
   const client=new Client({url:settings.url,timeout:8000,connectTimeout:5000,tlsOptions});
