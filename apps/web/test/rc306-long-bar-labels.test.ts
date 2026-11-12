@@ -13,7 +13,7 @@ test('RC326 supersedes RC306 scroll-only bars with one bounded proportional fit'
  assert.ok(ui.includes('contentWidth:Math.max(b.scrollWidth,b.clientWidth)'));
  assert.ok(ui.includes('contentHeight:Math.max(b.scrollHeight,b.clientHeight)'));
  assert.ok(ui.includes("data-fit-mode={allowScale?'scale':'scroll'}"));
- assert.ok(ui.includes("data-fit-predicted-rows={sourceRows.length}"));
+ assert.ok(ui.includes("data-fit-predicted-rows={displayRows.length}"));
  assert.ok(css.includes('RC326: the entire authored widget scales together'));
 });
 test('RC306 result label widths are bounded and long words wrap naturally',()=>{

@@ -4181,13 +4181,13 @@ main.hero.login-manual-cover .panel.login{
   >.widget-fit-frame[data-fit-mode="scale"]>.widget-fit-content{
  width:100%!important;max-width:100%!important;min-width:0!important;
  min-height:100%!important;height:auto!important;
- box-sizing:border-box!important;
+ box-sizing:border-box!important;display:flex!important;flex-direction:column!important;
 }
 :is(.widget-canvas-item,.projection-widget,.rehearsal-widget,.audience-widget-layout>.page-widget)[data-widget-kind="results-button"]
   >.widget-fit-frame[data-fit-mode="scale"] .linked-results{
  display:flex!important;flex-direction:column!important;
  width:100%!important;min-width:0!important;max-width:100%!important;
- min-height:100%!important;height:auto!important;
+ min-height:0!important;height:auto!important;flex:1 0 auto!important;
  justify-content:space-between!important;
  gap:.45em!important;box-sizing:border-box!important;
  overflow:visible!important;

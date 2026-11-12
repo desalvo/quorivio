@@ -2504,14 +2504,14 @@
       "2586b822"
     ],
     "apps/web/src/style.css": [
-      "07271cc6",
-      "88490a9d",
-      "61b34e43",
-      "8d78d3de",
-      "30f3f5cf",
-      "64dc6b52",
-      "bdff2cd2",
-      "24ffd0fb"
+      "537d9c55",
+      "e92e50b5",
+      "eba295ac",
+      "82dd9747",
+      "7a55ab5e",
+      "91d3d264",
+      "054a1545",
+      "c59af14a"
     ],
     "apps/web/src/thumbnail-menu-layout.ts": [
       "a4748563",
@@ -3704,14 +3704,14 @@
       "faf66d98"
     ],
     "apps/web/test/rc306-long-bar-labels.test.ts": [
-      "3760214a",
-      "888636a4",
-      "18b2ce59",
-      "4c9e9d3c",
-      "f35e38f6",
-      "763f8fcd",
-      "cd1aac96",
-      "3dfc6ad7"
+      "e16f56de",
+      "4b5785b5",
+      "907b37be",
+      "9d787c7a",
+      "16f507ef",
+      "8dca7c5f",
+      "fc9aa76d",
+      "2c083264"
     ],
     "apps/web/test/rc307-results-layout-recovery.test.ts": [
       "6ff03c04",
@@ -3784,14 +3784,14 @@
       "51f8069c"
     ],
     "apps/web/test/rc326-session-fit-cover.test.ts": [
-      "2274dcf2",
-      "d5890d44",
-      "1b4fff8d",
-      "5fdcab94",
-      "3dd411da",
-      "17608e5a",
-      "cad8596b",
-      "45f78e72"
+      "f9a1a99b",
+      "2e8c65d0",
+      "3b69f8e3",
+      "4e914aa1",
+      "e1d9a2ad",
+      "9714fec6",
+      "9296c775",
+      "3188e9b3"
     ],
     "apps/web/test/rc70-editor-timer-font.test.ts": [
       "116cfb27",

@@ -26,7 +26,7 @@ test('automatic content fit is default and does not mutate widget geometry',()=>
  assert.match(ui,/data-fit-mode=\{allowScale\?'scale':'scroll'\}/);
  assert.match(ui,/results\?\.dataset\.fitPredictedRows/);
  assert.match(ui,/chartHasRows/);
- assert.match(ui,/data-fit-predicted-rows=\{sourceRows\.length\}/);
+ assert.match(ui,/data-fit-predicted-rows=\{displayRows\.length\}/);
  assert.match(ui,/checked=\{w\.autoFit!==false\}/);
  assert.match(ui,/autoFit is a content-fit preference, NEVER a widget geometry edit/);
  assert.doesNotMatch(ui,/Adatta automaticamente l'altezza al contenuto/);
