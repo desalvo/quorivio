@@ -79,7 +79,7 @@ class PrivateBackgroundEvidenceCycle68(unittest.TestCase):
         self.assertIn('run: python3 -m unittest tools.tests.test_rc_cycle68_verified_private_backgrounds -q', w)
         self.assertIn('python3 tools/verify_rc_cycle67_inventory.py --historical', w)
         self.assertIn('python3 tools/verify_rc_cycle68_inventory.py', w)
-        self.assertIn('gitleaks/gitleaks-action@v2', w)
+        self.assertRegex(w, r'gitleaks/gitleaks-action@v(?:2|3)\b')
         self.assertIn("inputs.publish_image == true", w)
 
 

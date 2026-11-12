@@ -100,7 +100,7 @@ else:sys.exit(1)
         self.assertIn('name=desalvo/quorivio-converter',converter['with']['outputs'])
         self.assertIs(converter['with']['sbom'],True)
         self.assertEqual(converter['with']['provenance'],'mode=max')
-        transfer=next(s for s in build['steps'] if s.get('uses')=='actions/upload-artifact@v4')
+        transfer=next(s for s in build['steps'] if s.get('uses') in {'actions/upload-artifact@v4','actions/upload-artifact@v7'})
         self.assertIn('converter-${{ matrix.arch }}.digest',transfer['with']['path'])
         self.assertEqual(build['environment'],'production')
         for name in ('publish','publish-on-commit'):

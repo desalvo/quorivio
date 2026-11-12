@@ -112,7 +112,7 @@ jobs:
           --health-retries 15
     steps:
       # Gitleaks needs the entire pull-request commit range, including the base parent.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: {persist-credentials: false, fetch-depth: 0}
       - name: RC295 Gitleaks complete PR ancestry preflight
         run: python3 -m unittest tools.tests.test_rc295_gitleaks_history -q
@@ -1151,7 +1151,7 @@ jobs:
           python3 tools/ci_page_thumbnail_native.py --engines chromium
       - name: Upload Chromium failure diagnostics
         if: failure() && github.event_name == 'workflow_dispatch' && inputs.browser_test || (failure() && github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite) || (failure() && (github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[full-ci]') || contains(github.event.head_commit.message, '[publish-docker]'))))
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: chromium-editor-failure
           path: /tmp/quorivio-browser-artifacts/
@@ -1331,7 +1331,7 @@ jobs:
           QUORIVIO_MANUAL_OUTPUT_DIR=/tmp/quorivio-manual-build python3 -m unittest tools.tests.test_rc284_manual_pdf_gallery -q
       - name: Publish build-matched real screenshots and six manuals
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: quorivio-live-manuals-${{ github.sha }}
           path: |
@@ -1433,7 +1433,7 @@ jobs:
         run: python3 tools/ci_browser_profile.py
       - name: Upload Chromium real editor failure diagnostics
         if: failure() && github.event_name == 'workflow_dispatch' && inputs.browser_test || (failure() && github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite) || (failure() && (github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[full-ci]') || contains(github.event.head_commit.message, '[publish-docker]'))))
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: chromium-real-editor-failure
           path: /tmp/quorivio-browser-artifacts/
@@ -1441,7 +1441,7 @@ jobs:
           retention-days: 3
       - name: Upload Chromium participant failure diagnostics
         if: failure() && github.event_name == 'workflow_dispatch' && inputs.browser_test || (failure() && github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite) || (failure() && (github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[full-ci]') || contains(github.event.head_commit.message, '[publish-docker]'))))
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: chromium-participant-failure
           path: /tmp/quorivio-browser-artifacts/
@@ -1520,7 +1520,7 @@ jobs:
           python3 tools/ci_backup_restore.py
       - name: Upload sanitized disposable DR rehearsal metrics
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dr-rehearsal-ci-only
           path: /tmp/quorivio-dr-rehearsal.json
@@ -1907,7 +1907,7 @@ jobs:
           python3 tools/verify_rc_cycle292_inventory.py --historical
           python3 tools/verify_rc_cycle293_inventory.py
       - name: Detect credential leaks
-        uses: gitleaks/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   cross-browser:
@@ -1918,7 +1918,7 @@ jobs:
     timeout-minutes: 20
     permissions: {contents: read}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: {persist-credentials: false}
       - uses: actions/setup-node@v7
         with: {node-version: '22'}
@@ -1947,7 +1947,7 @@ jobs:
         run: python3 tools/ci_rc301_pie_cross_engine.py --engines firefox webkit
       - name: Upload cross-browser failure evidence
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: firefox-webkit-rc-acceptance-failure
           path: /tmp/quorivio-cross-browser-artifacts/
@@ -1959,7 +1959,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions: {contents: read}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: {persist-credentials: false}
       - uses: docker/setup-buildx-action@v4
       - name: Build without publishing
@@ -2008,7 +2008,7 @@ jobs:
           gzip -t *.tar.gz
       - name: Upload portable Docker images [full-ci]
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[full-ci]')
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: quorivio-docker-images-${{ github.sha }}
           path: /tmp/quorivio-ci-images/
@@ -2024,9 +2024,9 @@ jobs:
     timeout-minutes: 12
     permissions: {contents: read}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: {persist-credentials: false}
-      - uses: helm/kind-action@v1.15.1
+      - uses: helm/kind-action@v1.15.2
         with:
           cluster_name: quorivio-schema
           version: v0.26.0
@@ -2040,9 +2040,9 @@ jobs:
     timeout-minutes: 22
     permissions: {contents: read}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: {persist-credentials: false}
-      - uses: helm/kind-action@v1.15.1
+      - uses: helm/kind-action@v1.15.2
         with:
           cluster_name: quorivio-runtime
           version: v0.26.0
@@ -2065,14 +2065,14 @@ jobs:
     timeout-minutes: 30
     permissions: {contents: read}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: {persist-credentials: false}
       - name: Prepare disposable runner bind mount for KIND workers
         run: |
           test "$(id -u)" -ne 0
           sudo install -d -m 0777 /tmp/quorivio-kind-multinode-shared
           test "$(stat -c %a /tmp/quorivio-kind-multinode-shared)" = 777
-      - uses: helm/kind-action@v1.15.1
+      - uses: helm/kind-action@v1.15.2
         with:
           cluster_name: quorivio-multinode
           version: v0.26.0
@@ -2106,13 +2106,13 @@ jobs:
       matrix:
         controller: [nginx, haproxytech]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: {persist-credentials: false}
       - name: Prepare isolated two-worker-only host bind
         run: |
           test "$(id -u)" -ne 0
           sudo install -d -m 0777 /tmp/quorivio-kind-multinode-shared
-      - uses: helm/kind-action@v1.15.1
+      - uses: helm/kind-action@v1.15.2
         with:
           cluster_name: quorivio-multinode
           version: v0.26.0
@@ -2141,13 +2141,13 @@ jobs:
     timeout-minutes: 35
     permissions: {contents: read}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: {persist-credentials: false}
       - name: Prepare ephemeral KIND-only runner shared volume
         run: |
           test "$(id -u)" -ne 0
           sudo install -d -m 0777 /tmp/quorivio-kind-multinode-shared
-      - uses: helm/kind-action@v1.15.1
+      - uses: helm/kind-action@v1.15.2
         with:
           cluster_name: quorivio-multinode
           version: v0.26.0
@@ -2189,7 +2189,7 @@ jobs:
     timeout-minutes: 30
     permissions: {contents: read}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: {persist-credentials: false}
       - name: Verify actual native runner architecture before container build
         env:
@@ -2220,7 +2220,7 @@ jobs:
     timeout-minutes: 25
     permissions: {contents: read}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: {persist-credentials: false}
       - name: Install rootless container engine
         run: |
@@ -2238,7 +2238,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 18
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: {persist-credentials: false}
       - uses: actions/setup-node@v7
         with: {node-version: '22'}
@@ -2275,7 +2275,7 @@ jobs:
     runs-on: ubuntu-24.04
     permissions: {contents: read}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: {persist-credentials: false}
       - name: Fail closed on skipped, cancelled or failed RC campaign jobs
         env:
@@ -2307,7 +2307,7 @@ jobs:
     environment: production
     permissions: {contents: read}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: {persist-credentials: false}
       - name: Verify authorized native publishing runner
         env:
@@ -2375,7 +2375,7 @@ jobs:
           printf '%s\n' "$IMAGE_DIGEST" > "digests/$ARCH.digest"
           printf '%s\n' "$CONVERTER_IMAGE_DIGEST" > "digests/converter-$ARCH.digest"
       - name: Transfer both native digests for paired multiarch publication
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: quorivio-native-${{ matrix.arch }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
@@ -2398,7 +2398,7 @@ jobs:
     environment: production
     permissions: {contents: read}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: {persist-credentials: false}
       - name: Verify publisher repository
         run: test "$GITHUB_REPOSITORY" = 'desalvo/quorivio'
@@ -2416,7 +2416,7 @@ jobs:
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           pattern: quorivio-native-*-${{ github.run_id }}-${{ github.run_attempt }}
           merge-multiple: true
@@ -2458,7 +2458,7 @@ jobs:
     environment: production
     permissions: {contents: read}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with: {persist-credentials: false}
       - name: Verify publisher repository
         run: test "$GITHUB_REPOSITORY" = 'desalvo/quorivio'
@@ -2474,7 +2474,7 @@ jobs:
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           pattern: quorivio-native-*-${{ github.run_id }}-${{ github.run_attempt }}
           merge-multiple: true
