@@ -39,13 +39,24 @@ export function linkedStatisticContext<T extends {id:string;page_design?:{widget
  const source=linkedStatisticSource(widget,widgets);
  return source?{activity,widgets,source}:undefined;
 }
-export type ResultView='bars'|'pie'|'table'|'cloud'|'gauge';
+export type ResultView='bars'|'pie'|'table'|'cloud'|'gauge'|'bubbles';
 /** Explicit result view overrides source; legacy results inherit the source view. */
 export function effectiveResultView(resultWidget:StatisticalWidget,widgets:StatisticalWidget[]):ResultView{
  const source=linkedStatisticSource(resultWidget,widgets);
  if(!source)return 'bars';
- const view=resultWidget.resultsView??source.resultsView;
- return view==='pie'||view==='table'||view==='cloud'||view==='gauge'?view:'bars';
+ const view=resultWidget.resultsView??source.resultsView??(source.kind==='reactions'?'bubbles':'bars');
+ return view==='pie'||view==='table'||view==='cloud'||view==='gauge'||view==='bubbles'?view:'bars';
+}
+/** Reaction-specific, anonymous aggregate bubble sizing; no user identities. */
+export function reactionBubbles(rows:readonly StatRow[],limit=5){
+ const available=rows.filter(r=>Number.isSafeInteger(r.count)&&r.count>=0);
+ const total=available.reduce((sum,r)=>sum+r.count,0);
+ const max=Math.max(1,...available.map(r=>r.count));
+ const safeLimit=Number.isSafeInteger(limit)&&limit>=1&&limit<=20?limit:5;
+ return [...available].sort((a,b)=>b.count-a.count).slice(0,safeLimit).map(row=>({
+  ...row,percent:total>0?row.count/total*100:0,
+  size:Math.round(56+60*Math.sqrt(Math.max(0,row.count)/max))
+ }));
 }
 export type GaugeConfig={
  gaugeMinMode?:'auto'|'manual';gaugeMaxMode?:'auto'|'manual';gaugeMin?:number;gaugeMax?:number;
