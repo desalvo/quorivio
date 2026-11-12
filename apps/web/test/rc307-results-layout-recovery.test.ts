@@ -46,8 +46,11 @@ test('RC307 a broken live results component cannot take down presenter workspace
  assert.ok(ui.includes('Riprova grafico'));
 });
 test('RC307 Format widget sort applies to all graphs',()=>{
- assert.ok(ui.includes('Ordinamento risposte (tutti i grafici)'));
- assert.ok(ui.includes('aria-label="Ordinamento risposte risultati"'));
+ // Sorting only applies to multi-row result charts; gauge is a single value.
+ assert.ok(ui.includes("['bars','pie','table','cloud','bubbles'].includes(formatChart)"));
+ assert.ok(ui.includes('aria-label="Ordinamento risultati - Formato widget"'));
+ assert.ok(ui.includes("value={w.resultSortOrder||'index-asc'}"));
+ assert.ok(ui.includes("onChange={e=>patch(w.id,{resultSortOrder:e.target.value})}"));
  for(const mode of ['index-asc','index-desc','count-asc','count-desc'])assert.ok(ui.includes('<option value="'+mode+'">'));
 });
 

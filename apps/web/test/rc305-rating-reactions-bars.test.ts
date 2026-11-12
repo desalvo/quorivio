@@ -33,7 +33,9 @@ test('RC305 React rows use maximum of visible bars and source widget kind',()=>{
  assert.ok(ui.includes('visibleResultBars(sourceRows,widget.resultSortOrder,widget.resultTopCount)'));
  assert.ok(ui.includes('resultBarWidth(r.count,maxBarCount)'));
  assert.ok(ui.includes('data-result-source-kind={source.kind}'));
- assert.ok(ui.includes('aria-label="Ordinamento risposte risultati"'));
+ assert.ok(ui.includes('aria-label="Ordinamento risultati - Formato widget"'));
+ assert.ok(ui.includes("value={w.resultSortOrder||'index-asc'}"));
+ assert.ok(ui.includes("onChange={e=>patch(w.id,{resultSortOrder:e.target.value})}"));
  for(const value of ['count-desc','count-asc','index-asc','index-desc'])assert.ok(ui.includes('<option value="'+value+'">'));
 });
 test('RC305 old content-fit max-content rows are overridden to stretch bars',()=>{

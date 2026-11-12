@@ -51,6 +51,8 @@ test('RC318: only relevant chart controls appear in Formato widget and Top N is 
  assert.match(main,/formatChart==='gauge'&&<div className="gauge-format-controls"/);
  assert.match(main,/Numero risultati principali - Formato widget/);
  assert.match(main,/Ordinamento risultati - Formato widget/);
+ assert.ok(main.includes("['bars','pie','table','cloud','bubbles'].includes(formatChart)"));
+ assert.ok(main.includes("['bars','pie','table','cloud','gauge'].includes(widget.resultsView)"));
  assert.match(main,/onChange={e=>patch\(w\.id,\{resultSortOrder:e\.target\.value\}\)}/);
  assert.doesNotMatch(main,/\{sort\}/);
  assert.match(main,/chart==='bubbles'&&<div className="linked-results-bubbles"/);

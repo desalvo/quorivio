@@ -1,5 +1,8 @@
 # Quorivio 0.1.0-dev — RC293 — Compact visual manuals and product brochures
 
+**RC318 follow-up after CI 43142951211 (2026-11-12):** TypeScript compiled and RC318-specific tests passed, but the full frontend Node suite found stale RC305/RC307 assertions expecting retired sort labels and one legacy question-frequency-cloud contract. The contextual per-widget sort remains intact; RC305 and RC307 now assert its actual persisted selector and the supported multi-row chart types (excluding Gauge). The legacy question results route once again restricts its chart list to bars/pie/table/cloud/gauge; reaction bubbles are exclusive to reaction sources. RC318 regression coverage and source SHA-256 manifest updated. **Further CI validation pending; do not merge or publish Docker images until green.**
+
+
 **RC318 functional TypeScript correction (2026-11-12):** Full production typecheck in PR CI 43142548062 flagged an undefined `sort` JSX variable inside the new contextual widget format ribbon. Replaced placeholder with a real, persisted result ordering selector (original/reverse, count ascending/descending) for bar, pie, table, word-cloud and emoji-bubble result charts. Bound to selected result widget `resultSortOrder`; new regression rejects the orphaned JSX placeholder. Updated source/test manifest. **Await full CI; no merge or Docker publication claim.**
 
 
