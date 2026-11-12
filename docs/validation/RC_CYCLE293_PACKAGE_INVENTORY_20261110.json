@@ -22934,14 +22934,14 @@
       "000dd15f"
     ],
     "tools/tests/test_rc300_image_archive_guard.py": [
-      "ce000000",
-      "0a000000",
-      "e4000000",
-      "74000000",
-      "273c4371",
-      "631164b9",
-      "5a5ed0eb",
-      "36497115"
+      "c79e9b8e",
+      "5e645817",
+      "b70dd723",
+      "792cfab7",
+      "845aaee8",
+      "efddbed2",
+      "15ed2e27",
+      "7e395809"
     ],
     "tools/tests/test_rc301_native_pie.py": [
       "289a2ed9",
