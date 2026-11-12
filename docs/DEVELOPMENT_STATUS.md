@@ -1,5 +1,8 @@
 # Quorivio 0.1.0-dev — RC293 — Compact visual manuals and product brochures
 
+**RC318 RC269 follow-up (2026-11-12):** The no-reload assertion introduced in the RC269 historical test accidentally searched the entire application, matching unrelated intentional navigation calls. CI 43142267768 failed on this overbroad test. Narrowed only the negative assertion to the `redirectExpiredPresenterAuth` function, preserving separate positive assertions for in-app login signal and HTTP request suppression. Does not alter runtime navigation. **Pending CI; external readiness remains 85.25%.**
+
+
 **RC318 historical RC269 auth regression update (2026-11-12):** The RC269 Node static test expected a full-document `window.location.replace` on expired presenter auth, contradicting the fix for the authentication-required reload/rate-limit loop. Ownership transfer, LDAP, sidebar and mobile-option assertions remain. Updated expiry assertion to require the new in-app login signal, history replacement without reload and an authenticated-request suppression guard. CI 43141627966 failed specifically on the stale assertion. **Next CI pending; external RC readiness unchanged.**
 
 

@@ -7,7 +7,9 @@ test('expired presenter auth redirects once; multipart and fetch APIs also use t
  // a network fetch loop and eventually hit the API rate limiter.
  assert.match(ui,/window\.history\.replaceState/);
  assert.match(ui,/window\.dispatchEvent\(new Event\('quorivio:authentication-expired'\)\)/);
- assert.doesNotMatch(ui,/window\.location\.(?:replace|assign|reload)\(/);
+ const expiryGuard=ui.split('function redirectExpiredPresenterAuth(',2)[1].split('async function authenticatedFetch(',1)[0];
+ assert.ok(expiryGuard,'expired-session guard must exist');
+ assert.doesNotMatch(expiryGuard,/window\.location\.(?:replace|assign|reload)\(/);
  assert.match(ui,/if\(reauthenticationRedirecting&&!authRoute&&!guestRoute\)/);
  assert.match(ui,/status===401&&\['authentication_required','session_revoked'\]/);
  assert.match(ui,/async function authenticatedFetch/);
