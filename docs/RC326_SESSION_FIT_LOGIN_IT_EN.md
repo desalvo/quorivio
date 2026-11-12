@@ -15,3 +15,19 @@
 - **Widget formatting:** proportional automatic fitting is enabled by default and scales text, charts, legends, counts and truth badges as a group. Natural and anticipated content geometry is remeasured on resize and live data changes. Editing widget bounds/fonts does not disable fitting. Remove the redundant auto-height checkbox; leave widget geometry untouched.
 - **Login background:** reuse the original manual cover asset, dark contrast overlay, responsive mobile layout, and no third-party resources.
 - **Validation:** TypeScript regressions and Chromium CI, followed by gated multiarch Docker images once green. Official RC readiness unchanged.
+
+## RC327 — Adattamento proporzionale senza fuoriuscite / Overflow-safe proportional fitting
+
+**IT:** Corretto il caso limite in cui testi e risultati molto lunghi superavano il riquadro perché una scala minima rigida impediva di ridurli ulteriormente. Ora la scala non supera mai il rapporto consentito da larghezza e altezza, compreso lo spazio previsto per tutti i risultati; quando lo spazio è maggiore non esiste un tetto di ingrandimento predefinito. Un eventuale limite massimo esplicito resta rispettato. L'aumento del contenuto applica immediatamente una riduzione della scala, senza toccare la geometria salvata del widget. Le opzioni manuali con adattamento disabilitato restano inalterate.
+
+**EN:** Fixed a boundary case where very long text or results could escape a widget because an unconditional minimum scale prevented further shrinkage. Proportional sizing now honors both dimensions, including predicted result rows, and uses available space without a default enlargement ceiling; a specifically requested maximum is still supported. Growing content forces an immediate downscale, while authored widget geometry and explicit scroll mode remain unchanged.
+
+**Validazione / Verification:** Node/TypeScript regressions for extreme text, predicted rows, optional caps and live-size changes; full PR CI must pass before merge or Docker publication. The official RC sign-off remains **85.25% (43 accepted, 17 partial)** pending external checks.
+
+## RC328 — Righe su più linee, Formato widget e spazio verticale / Multiline results and balanced use of widget height
+
+**IT:** In «Formato widget → Contenuti» è disponibile la stessa opzione persistente «Adatta automaticamente il contenuto alla dimensione del widget», già presente nelle proprietà del widget risultati (e per gli altri widget di contenuto idonei). Il risultato non forza più la larghezza di ogni risposta al testo completo: le etichette lunghe vanno a capo all'interno della larghezza disponibile, mantenendo insieme l'ultima parola e il conteggio. Il grafico a torta resta leggibile e limitato, mentre le righe si distribuiscono nell'altezza residua. L'algoritmo anticipa solo le righe selezionate per la visualizzazione, senza riservare righe invisibili o ricontare quelle già renderizzate. Lo scaling proporzionale del gruppo resta applicato soltanto quando necessario e non cambia la geometria salvata. Modalità manuale con scroll invariata.
+
+**EN:** «Widget formatting → Content» exposes the very same persisted automatic-fit option as the results inspector (and other eligible content widgets). Long answers wrap within the available width instead of forcing a full-line max-content width; the last word and its count remain together. Pie charts stay readable and bounded while answer rows distribute across unused widget height. Predictive measurement considers only selected visible rows and avoids double-counting those already rendered. The authored widget rectangle is unchanged, and explicit scroll mode remains available.
+
+**Acceptance:** compare exact long-option fixture in editor, rehearsal/preview, live presenter and mobile; verify no tiny corner layout, clipping or unwanted nested scroll. The official RC readiness remains **85.25%** until independent sign-off.

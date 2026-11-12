@@ -2124,14 +2124,14 @@
       "54a62e5d"
     ],
     "apps/web/src/main.tsx": [
-      "281f1dda",
-      "dbf7822c",
-      "e51678a0",
-      "0ce37206",
-      "e68fb7a9",
-      "e1bc1826",
-      "ec78550f",
-      "f5159081"
+      "e3681d39",
+      "92fbf20f",
+      "9cce69f4",
+      "55871326",
+      "8c9b5247",
+      "6dee941c",
+      "061d4259",
+      "0faffc3c"
     ],
     "apps/web/src/main.tsx.orig": [
       "9230e5a3",
@@ -2504,14 +2504,14 @@
       "2586b822"
     ],
     "apps/web/src/style.css": [
-      "a75b8510",
-      "b379f496",
-      "856999be",
-      "bf3fc8fa",
-      "a6ff37bf",
-      "2c630f33",
-      "02872262",
-      "305f108c"
+      "537d9c55",
+      "e92e50b5",
+      "eba295ac",
+      "82dd9747",
+      "7a55ab5e",
+      "91d3d264",
+      "054a1545",
+      "c59af14a"
     ],
     "apps/web/src/thumbnail-menu-layout.ts": [
       "a4748563",
@@ -2614,14 +2614,14 @@
       "0f1f5272"
     ],
     "apps/web/src/widget-content-scale.ts": [
-      "1738bdc2",
-      "2af0a448",
-      "7076b9ac",
-      "62c0a7f0",
-      "7675a0c2",
-      "98c5cde2",
-      "bd89a7a9",
-      "c5efd330"
+      "5d0e2d9f",
+      "d35d55e9",
+      "9ce293cf",
+      "029907c6",
+      "df23ce9c",
+      "e3c35d77",
+      "c7c0b22b",
+      "cc0b2209"
     ],
     "apps/web/src/widget-geometry.ts": [
       "305e623c",
@@ -3704,14 +3704,14 @@
       "faf66d98"
     ],
     "apps/web/test/rc306-long-bar-labels.test.ts": [
-      "3760214a",
-      "888636a4",
-      "18b2ce59",
-      "4c9e9d3c",
-      "f35e38f6",
-      "763f8fcd",
-      "cd1aac96",
-      "3dfc6ad7"
+      "e16f56de",
+      "4b5785b5",
+      "907b37be",
+      "9d787c7a",
+      "16f507ef",
+      "8dca7c5f",
+      "fc9aa76d",
+      "2c083264"
     ],
     "apps/web/test/rc307-results-layout-recovery.test.ts": [
       "6ff03c04",
@@ -3784,14 +3784,14 @@
       "51f8069c"
     ],
     "apps/web/test/rc326-session-fit-cover.test.ts": [
-      "04612fc7",
-      "9b0cb505",
-      "7e371f26",
-      "b9f8b1a3",
-      "ef1cb09d",
-      "6566d805",
-      "07e34e6e",
-      "cd3ea6a3"
+      "f9a1a99b",
+      "2e8c65d0",
+      "3b69f8e3",
+      "4e914aa1",
+      "e1d9a2ad",
+      "9714fec6",
+      "9296c775",
+      "3188e9b3"
     ],
     "apps/web/test/rc70-editor-timer-font.test.ts": [
       "116cfb27",
@@ -4544,14 +4544,14 @@
       "d240df37"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "4cae9b60",
-      "d8737375",
-      "be5abd87",
-      "fc05473e",
-      "04accd93",
-      "85679861",
-      "9ea5bbcf",
-      "456a001e"
+      "b92e3b24",
+      "e8a30bb4",
+      "206dd377",
+      "ba116ba4",
+      "7145cb07",
+      "b6962925",
+      "f8b6c4fd",
+      "6784feaf"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",
@@ -5964,14 +5964,14 @@
       "6548a333"
     ],
     "docs/RC326_SESSION_FIT_LOGIN_IT_EN.md": [
-      "5dd330b9",
-      "918a30e4",
-      "0ded24fa",
-      "e489f1f8",
-      "55fb2b5c",
-      "e8e8f4af",
-      "e4f83eb0",
-      "69ac852a"
+      "93e0896f",
+      "d16d3ca0",
+      "eebf48c9",
+      "626fb6cc",
+      "fe394468",
+      "e8d1fd0a",
+      "c84517e3",
+      "ec586fab"
     ],
     "docs/RC49_HAPROXY_CROSS_NODE_RWX.en.md": [
       "7c1cc75e",
@@ -18354,14 +18354,14 @@
       "7bab3f3a"
     ],
     "tools/ci_rc306_bar_wrap_chromium.py": [
-      "4969c336",
-      "04a1ad7a",
-      "3993623d",
-      "6723e0c1",
-      "852d5b3c",
-      "65dae0fe",
-      "ad59ee6c",
-      "7eaae5d4"
+      "99565ee4",
+      "d0ba669e",
+      "eac11709",
+      "0a39d963",
+      "e756bde2",
+      "a1c70777",
+      "5c1b8818",
+      "04f5b26a"
     ],
     "tools/ci_rc307_live_bar_dashboard_chromium.py": [
       "3e31e68f",
