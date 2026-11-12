@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
   "cycle": 293,
-  "file_count_excluding_manifest": 2634,
+  "file_count_excluding_manifest": 2636,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -234,14 +234,14 @@
       "2dd5f6ba"
     ],
     "apps/api/src/domain.ts": [
-      "d8580c5b",
-      "ba23e7b5",
-      "cfb544e6",
-      "9634f056",
-      "861740df",
-      "466c24c6",
-      "636f32f0",
-      "d0dd2946"
+      "2aa98904",
+      "f1667a37",
+      "349ca964",
+      "f10aa026",
+      "42ee859a",
+      "36248e95",
+      "88b6763c",
+      "f55721e3"
     ],
     "apps/api/src/email-otp.ts": [
       "442c62ac",
@@ -2124,14 +2124,14 @@
       "54a62e5d"
     ],
     "apps/web/src/main.tsx": [
-      "0f2e906c",
-      "f3521073",
-      "55d3ec6e",
-      "f41a5d64",
-      "bfb07a82",
-      "a81b9ef8",
-      "d6775205",
-      "eb585c66"
+      "4b43089a",
+      "8dec673b",
+      "e5f863ff",
+      "cbc23730",
+      "8d9ab012",
+      "f05e9072",
+      "ea6a7a14",
+      "131317eb"
     ],
     "apps/web/src/main.tsx.orig": [
       "9230e5a3",
@@ -2504,14 +2504,14 @@
       "2586b822"
     ],
     "apps/web/src/style.css": [
-      "c8e70c69",
-      "992eb89c",
-      "b99847e4",
-      "dd00f27d",
-      "c4d59e3e",
-      "78778433",
-      "6c40f690",
-      "5510ed0f"
+      "1035a080",
+      "1134d565",
+      "ef0b6445",
+      "7fa23eb6",
+      "ac709122",
+      "a5119737",
+      "37c9d5f1",
+      "63ae4875"
     ],
     "apps/web/src/thumbnail-menu-layout.ts": [
       "a4748563",
@@ -26342,6 +26342,26 @@
       "23b01aef",
       "8dce2aa2",
       "133c807e"
+    ],
+    "apps/web/src/presenter-profile-fit.ts": [
+      "e46e5e53",
+      "cd268e38",
+      "1ddfcc96",
+      "86ced652",
+      "822deb30",
+      "59ce005d",
+      "29184f0a",
+      "c28a3484"
+    ],
+    "apps/web/test/rc330-sso-profile.test.ts": [
+      "3685c23b",
+      "3f46f09c",
+      "6d6f2717",
+      "0c9a71d6",
+      "0dd0e130",
+      "99baa224",
+      "2a27d5a3",
+      "85d331c0"
     ]
   }
 }
