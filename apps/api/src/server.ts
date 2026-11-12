@@ -567,12 +567,23 @@ app.post('/api/auth/email-mfa/verify',async(req,res)=>{try{
  await refreshGravatarForUser(user.user_id);
  res.json({email:user.email,role:user.role,must_change_password:user.must_change_password});
  }catch(e){sendError(res,e)}});
+/** Verify MFA account changes against the internal password OR a separately linked,
+ * still enabled LDAP identity. An email match alone never authorizes a user. */
+async function verifyAccountPassword(uid:string,password:string,storedHash:string):Promise<boolean>{
+ if(typeof password!=='string'||password.length<1||password.length>1024)return false;
+ if(await bcrypt.compare(password,storedHash))return true;
+ const ldap=await enabledLdapBackend(db,secret);if(!ldap)return false;
+ const linked=await db.query("SELECT li.subject,u.email FROM ldap_identities li JOIN users u ON u.id=li.user_id WHERE li.user_id=$1 AND li.provider='default'",[uid]);
+ if(!linked.rowCount)return false;
+ const verified=await authenticateDirectory(ldap,linked.rows[0].email,password);
+ return Boolean(verified&&verified.subject===linked.rows[0].subject&&verified.email===linked.rows[0].email);
+}
 app.post('/api/auth/email-mfa/settings',requireAuth,async(req,res)=>{try{
  const uid=auth(req)!,enabled=req.body?.enabled,password=req.body?.password;
   if(enabled===true&&!await backendAllowsMfa(db,secret,uid)){res.status(403).json({error:'mfa_disabled_for_backend'});return}
  if(typeof enabled!=='boolean'||typeof password!=='string'){res.status(400).json({error:'invalid_request'});return}
  const r=await db.query('SELECT email,password_hash,email_mfa_enabled FROM users WHERE id=$1',[uid]);
- if(!r.rowCount||!await bcrypt.compare(password,r.rows[0].password_hash)){res.status(403).json({error:'invalid_credentials'});return}
+ if(!r.rowCount||!await verifyAccountPassword(uid,password,r.rows[0].password_hash)){res.status(403).json({error:'invalid_credentials'});return}
  if(r.rows[0].email_mfa_enabled===enabled){res.status(409).json({error:'email_mfa_already_in_requested_state'});return}
  if(enabled){
   const smtp=await activeSmtpConfig();
@@ -711,10 +722,10 @@ app.post('/api/auth/mfa/confirm',requireAuth,async(req,res)=>{try{
  }catch(e){sendError(res,e)}});
 app.post('/api/auth/mfa/disable',requireAuth,async(req,res)=>{try{
  const uid=auth(req)!;const code=String(req.body?.code||'');const password=String(req.body?.password||'');const r=await db.query('SELECT password_hash,totp_secret,totp_enabled FROM users WHERE id=$1',[uid]);
- if(!r.rowCount||!r.rows[0].totp_enabled||!await bcrypt.compare(password,r.rows[0].password_hash)||!validTotpCode(code)||!verifyTotp(openTotp(r.rows[0].totp_secret,secret),code)){res.status(403).json({error:'invalid_credentials'});return}
+ if(!r.rowCount||!r.rows[0].totp_enabled||!await verifyAccountPassword(uid,password,r.rows[0].password_hash)||!validTotpCode(code)||!verifyTotp(openTotp(r.rows[0].totp_secret,secret),code)){res.status(403).json({error:'invalid_credentials'});return}
  await db.query('UPDATE users SET totp_secret=NULL,totp_pending_secret=NULL,totp_enabled=false,auth_revoked_at=now() WHERE id=$1',[uid]);await db.query('DELETE FROM mfa_recovery_codes WHERE user_id=$1',[uid]);res.json({enabled:false});
  }catch(e){sendError(res,e)}});
-app.post('/api/auth/mfa/recovery-codes/rotate',requireAuth,async(req,res)=>{try{const uid=auth(req)!;const {password,code}=req.body||{};const r=await db.query('SELECT password_hash,totp_secret,totp_enabled FROM users WHERE id=$1',[uid]);if(!r.rowCount||!r.rows[0].totp_enabled||typeof password!=='string'||!await bcrypt.compare(password,r.rows[0].password_hash)||!validTotpCode(code)||!verifyTotp(openTotp(r.rows[0].totp_secret,secret),code)){res.status(403).json({error:'invalid_credentials'});return}const codes=generateRecoveryCodes(),client=await db.connect();try{await client.query('BEGIN');await client.query('DELETE FROM mfa_recovery_codes WHERE user_id=$1',[uid]);for(const c of codes)await client.query('INSERT INTO mfa_recovery_codes(user_id,code_hash) VALUES($1,$2)',[uid,recoveryCodeDigest(c,secret)]);await client.query('COMMIT')}catch(e){await client.query('ROLLBACK');throw e}finally{client.release()}res.json({recovery_codes:codes});}catch(e){sendError(res,e)}});
+app.post('/api/auth/mfa/recovery-codes/rotate',requireAuth,async(req,res)=>{try{const uid=auth(req)!;const {password,code}=req.body||{};const r=await db.query('SELECT password_hash,totp_secret,totp_enabled FROM users WHERE id=$1',[uid]);if(!r.rowCount||!r.rows[0].totp_enabled||typeof password!=='string'||!await verifyAccountPassword(uid,password,r.rows[0].password_hash)||!validTotpCode(code)||!verifyTotp(openTotp(r.rows[0].totp_secret,secret),code)){res.status(403).json({error:'invalid_credentials'});return}const codes=generateRecoveryCodes(),client=await db.connect();try{await client.query('BEGIN');await client.query('DELETE FROM mfa_recovery_codes WHERE user_id=$1',[uid]);for(const c of codes)await client.query('INSERT INTO mfa_recovery_codes(user_id,code_hash) VALUES($1,$2)',[uid,recoveryCodeDigest(c,secret)]);await client.query('COMMIT')}catch(e){await client.query('ROLLBACK');throw e}finally{client.release()}res.json({recovery_codes:codes});}catch(e){sendError(res,e)}});
 app.get('/api/admin/smtp',requireAuth,requireAdmin,async(_req,res)=>{try{res.json(publicSmtpConfig(await activeSmtpConfig()))}catch(e){sendError(res,e)}});
 app.put('/api/admin/smtp',requireAuth,requireAdmin,async(req,res)=>{try{
  const previous=await activeSmtpConfig();const body={...req.body,password:req.body?.password||previous?.password};

@@ -21,6 +21,13 @@ test('verify consumes challenge transactionally and never issues cookie before v
  assert.match(handler,/await client.query\('COMMIT'\)/);
  assert.match(handler,/res.cookie\('q_auth'/);
 });
-test('federated login cannot bypass required email MFA',()=>{
- assert.match(server,/if\(u.totp_enabled\|\|u.email_mfa_enabled\)/);
+test('password login enforces enrolled MFA while federated SSO delegates MFA to IdP',()=>{
+ assert.match(server,/if\(user\.totp_enabled\|\|user\.email_mfa_enabled\)/);
+ assert.match(server,/if\(r\.rows\[0\]\.totp_enabled\|\|r\.rows\[0\]\.email_mfa_enabled\)/);
+ assert.doesNotMatch(server,/oidc_mfa_requires_local_login|social_mfa_requires_local_login/);
+});
+test('LDAP MFA administration requires matching directory subject, not just email',()=>{
+ assert.match(server,/async function verifyAccountPassword\(/);
+ assert.match(server,/authenticateDirectory\(ldap,linked\.rows\[0\]\.email,password\)/);
+ assert.match(server,/verified\.subject===linked\.rows\[0\]\.subject/);
 });
