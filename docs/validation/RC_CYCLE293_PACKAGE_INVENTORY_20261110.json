@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
   "cycle": 293,
-  "file_count_excluding_manifest": 2611,
+  "file_count_excluding_manifest": 2612,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -174,14 +174,14 @@
       "2dd5f6ba"
     ],
     "apps/api/src/domain.ts": [
-      "7d86480d",
-      "403bc39e",
-      "45ca4821",
-      "1c9f1398",
-      "d132203f",
-      "cd1dc197",
-      "0b0a162f",
-      "60d18e27"
+      "422d180c",
+      "322745b6",
+      "238d094d",
+      "a4c82b69",
+      "af4b1a3e",
+      "d6481b04",
+      "9db43453",
+      "88e2f7ef"
     ],
     "apps/api/src/email-otp.ts": [
       "442c62ac",
@@ -2044,14 +2044,14 @@
       "54a62e5d"
     ],
     "apps/web/src/main.tsx": [
-      "1a4ebcaf",
-      "3d79caf7",
-      "f3c8c068",
-      "3c8325d0",
-      "29606ca7",
-      "b7a84fe7",
-      "4f481c66",
-      "ec5e1cef"
+      "574d0151",
+      "56bb0d0b",
+      "41965532",
+      "f1c26ca3",
+      "aa24605c",
+      "20646541",
+      "3c1dfb4f",
+      "30424c77"
     ],
     "apps/web/src/main.tsx.orig": [
       "9230e5a3",
@@ -2424,14 +2424,14 @@
       "2586b822"
     ],
     "apps/web/src/style.css": [
-      "c4268485",
-      "c89f4bf9",
-      "ce19de21",
-      "d078600c",
-      "f224e65f",
-      "d3b87d8e",
-      "1745bb30",
-      "7f826010"
+      "6a4493e5",
+      "42f2e6dc",
+      "8c121e07",
+      "db5942b3",
+      "8eddcf9b",
+      "79235d8a",
+      "4e5cff54",
+      "fea22301"
     ],
     "apps/web/src/thumbnail-menu-layout.ts": [
       "a4748563",
@@ -2584,14 +2584,14 @@
       "f116c35e"
     ],
     "apps/web/src/widget-results.ts": [
-      "6e25c551",
-      "38dd770e",
-      "aa3ddd4b",
-      "90c67d6f",
-      "674740b6",
-      "4ebcc895",
-      "dd137c6d",
-      "b6d25caa"
+      "40cf8eaf",
+      "a6205ce0",
+      "4f2da68e",
+      "c67f00d8",
+      "ea322365",
+      "6585035c",
+      "184caa06",
+      "678ccff2"
     ],
     "apps/web/src/widget-rich-editor.tsx": [
       "610fdf07",
@@ -3284,14 +3284,14 @@
       "50d5cca1"
     ],
     "apps/web/test/rc222-editor-compact-answer-format.test.ts": [
-      "6786b355",
-      "594bc60a",
-      "eda489c2",
-      "02d61a15",
-      "71d55bad",
-      "6296ff51",
-      "f91f8791",
-      "74715984"
+      "2953efc7",
+      "af4049f3",
+      "395488bb",
+      "3d89e224",
+      "8f8bcd6f",
+      "def7c8e6",
+      "7e88f2e0",
+      "938aa41f"
     ],
     "apps/web/test/rc223-format-footer-qr.test.ts": [
       "7f559305",
@@ -3474,14 +3474,14 @@
       "0ac3f952"
     ],
     "apps/web/test/rc269-auth-sidebar-ownership.test.ts": [
-      "a5527629",
-      "d0979250",
-      "6b8f4f81",
-      "2f144067",
-      "c053180b",
-      "ec208dab",
-      "520f3a37",
-      "3ce1b1c3"
+      "de641bf5",
+      "1c2c0dfc",
+      "ddc22b7f",
+      "87fa9de5",
+      "cf7655da",
+      "3d635ef7",
+      "042e9977",
+      "b871cbf8"
     ],
     "apps/web/test/rc274-answer-truth.test.ts": [
       "72090a02",
@@ -3594,14 +3594,14 @@
       "73a154e1"
     ],
     "apps/web/test/rc305-rating-reactions-bars.test.ts": [
-      "199e6da5",
-      "f952869e",
-      "c0732267",
-      "d4f69312",
-      "5dea991e",
-      "199639bb",
-      "78adfcd7",
-      "80e2104f"
+      "ade0c555",
+      "e990fa56",
+      "c7c9ae73",
+      "7b7add8b",
+      "5ad31dac",
+      "4cb0103d",
+      "8b7d818d",
+      "faf66d98"
     ],
     "apps/web/test/rc306-long-bar-labels.test.ts": [
       "3ac09a31",
@@ -3614,14 +3614,14 @@
       "25ad9824"
     ],
     "apps/web/test/rc307-results-layout-recovery.test.ts": [
-      "044ef885",
-      "79c94bca",
-      "6059a647",
-      "d81cfda3",
-      "5a90d040",
-      "02e43a9b",
-      "0605b5d4",
-      "faaf4e7e"
+      "5d7af945",
+      "ed7a6e1b",
+      "5eb8fb72",
+      "da9fa431",
+      "adf61c5e",
+      "11218bda",
+      "2e66ae3d",
+      "c646f974"
     ],
     "apps/web/test/rc70-editor-timer-font.test.ts": [
       "116cfb27",
@@ -5084,14 +5084,14 @@
       "d240df37"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "1e1bec79",
-      "3d86fc87",
-      "9e153053",
-      "aae931ad",
-      "0d761561",
-      "e693815b",
-      "2f325a3e",
-      "8aadf621"
+      "7f89b2e5",
+      "dc29eabd",
+      "9f97bcd3",
+      "b209a222",
+      "f472c0e4",
+      "b70f86f8",
+      "fc766348",
+      "0a4c5711"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",
@@ -22264,14 +22264,14 @@
       "a45db826"
     ],
     "tools/tests/test_rc222_compact_editor_answers.py": [
-      "e8a7c2fc",
-      "577a834d",
-      "509594f6",
-      "8c375129",
-      "774929f5",
-      "dfe82546",
-      "18b9878c",
-      "7f4736fc"
+      "01c5a5aa",
+      "c69bdc87",
+      "28302d89",
+      "ce9e8728",
+      "bde66766",
+      "d92f456b",
+      "44cd681b",
+      "78b0089c"
     ],
     "tools/tests/test_rc223_format_layout.py": [
       "85976f4d",
@@ -26112,6 +26112,16 @@
       "411e1342",
       "ba698a16",
       "76e43547"
+    ],
+    "apps/web/test/rc318-auth-reactions-format.test.ts": [
+      "e5534a36",
+      "dd8d3270",
+      "f0239b98",
+      "6660df4b",
+      "3095e43d",
+      "9032c6b5",
+      "c7e53215",
+      "77652ea9"
     ]
   }
 }

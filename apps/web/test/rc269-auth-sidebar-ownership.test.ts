@@ -3,7 +3,14 @@ const ui=readFileSync(new URL('../src/main.tsx',import.meta.url),'utf8');
 const css=readFileSync(new URL('../src/style.css',import.meta.url),'utf8');
 const api=readFileSync(new URL('../../api/src/server.ts',import.meta.url),'utf8');
 test('expired presenter auth redirects once; multipart and fetch APIs also use the guard',()=>{
- assert.match(ui,/window\.location\.replace\('\/\?reauthentication_required=1'\)/);
+ // Expired credentials render sign-in in-app; navigation would re-trigger
+ // a network fetch loop and eventually hit the API rate limiter.
+ assert.match(ui,/window\.history\.replaceState/);
+ assert.match(ui,/window\.dispatchEvent\(new Event\('quorivio:authentication-expired'\)\)/);
+ const expiryGuard=ui.split('function redirectExpiredPresenterAuth(',2)[1].split('async function authenticatedFetch(',1)[0];
+ assert.ok(expiryGuard,'expired-session guard must exist');
+ assert.doesNotMatch(expiryGuard,/window\.location\.(?:replace|assign|reload)\(/);
+ assert.match(ui,/if\(reauthenticationRedirecting&&!authRoute&&!guestRoute\)/);
  assert.match(ui,/status===401&&\['authentication_required','session_revoked'\]/);
  assert.match(ui,/async function authenticatedFetch/);
  assert.match(ui,/authenticatedFetch\(`\/api\/sessions\//);

@@ -1,0 +1,61 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {reactionBubbles,effectiveResultView} from '../src/widget-results.ts';
+import {validPageDesign} from '../../api/src/domain.ts';
+
+const main=readFileSync(new URL('../src/main.tsx',import.meta.url),'utf8');
+const css=readFileSync(new URL('../src/style.css',import.meta.url),'utf8');
+test('RC318: expired presenter auth returns to login without full-document reload or repeated API retries',()=>{
+ const redirect=main.split('function redirectExpiredPresenterAuth(',2)[1].split('async function authenticatedFetch(',1)[0];
+ assert.match(redirect,/reauthenticationRedirecting=true/);
+ assert.match(redirect,/window.history.replaceState/);
+ assert.match(redirect,/quorivio:authentication-expired/);
+ assert.doesNotMatch(redirect,/location\.(?:replace|reload|assign)\(/);
+ assert.match(main,/if\(reauthenticationRedirecting&&!authRoute&&!guestRoute\)/);
+ assert.match(main,/const apiPath=url\.startsWith\('\/api\/'\)/);
+ assert.match(main,/if\(reauthenticationRedirecting&&apiPath&&!apiPath\.startsWith/);
+ assert.match(main,/return new Response\(JSON\.stringify\(\{error:'authentication_required'\}\)/);
+ assert.match(main,/setMe\(null\);setSnap\(null\);setSelected\(''\)/);
+ assert.match(main,/writeWorkspaceLocation\(\{sessionId:'',section:'workspace'/);
+});
+test('RC318: linked reaction statistics default to bubbles but honor explicit chart preference',()=>{
+ const source={id:'emoji',kind:'reactions'};
+ const result={id:'result',kind:'results-button',targetWidgetId:'emoji'};
+ assert.equal(effectiveResultView(result,[source]),'bubbles');
+ assert.equal(effectiveResultView({...result,resultsView:'bars'},[source]),'bars');
+ assert.equal(effectiveResultView({...result,resultsView:'pie'},[source]),'pie');
+ assert.equal(effectiveResultView(result,[{id:'emoji',kind:'question'}]),'bars');
+ assert.equal(effectiveResultView({...result,resultsView:'bubbles'},[{id:'emoji',kind:'question'}]),'bars');
+ assert.equal(validPageDesign({widgets:[{id:'emoji',kind:'reactions',resultsView:'bubbles'},result]}),true);
+ assert.equal(validPageDesign({widgets:[{id:'emoji',kind:'reactions',resultsView:'unrecognized'}]}),false);
+ assert.equal(validPageDesign({widgets:[{id:'question',kind:'question',resultsView:'bubbles'}]}),false);
+});
+test('RC318: reaction bubbles are proportionate, privacy-safe and respect top N and sorting',()=>{
+ const rows=[{id:'a',label:'👍',count:12},{id:'b',label:'❤️',count:4},{id:'c',label:'😂',count:8},{id:'d',label:'👏',count:0}];
+ const top=reactionBubbles(rows,2);
+ assert.deepEqual(top.map(x=>x.label),['👍','😂']);
+ assert.deepEqual(top.map(x=>x.count),[12,8]);
+ assert.equal(top[0].percent,50);
+ assert.equal(top[0].size>top[1].size,true);
+ assert.deepEqual(reactionBubbles(rows,2,'count-asc').map(x=>x.label),['👏','❤️']);
+ assert.deepEqual(reactionBubbles(rows,2,'index-desc').map(x=>x.label),['👏','😂']);
+ assert.equal(reactionBubbles([{id:'z',label:'😮',count:0}])[0].percent,0);
+ assert.equal(reactionBubbles([{id:'x',label:'❤',count:-1}]).length,0);
+});
+test('RC318: only relevant chart controls appear in Formato widget and Top N is editable there',()=>{
+ assert.match(main,/const formatChart=w.kind==='results-button'\?effectiveResultView\(w,formatSourceWidgets\)/);
+ assert.match(main,/formatLinkedSource\?\.kind==='reactions'/);
+ assert.match(main,/formatChart==='pie'&&<>/);
+ assert.match(main,/formatChart==='bars'&&<>/);
+ assert.match(main,/formatChart==='gauge'&&<div className="gauge-format-controls"/);
+ assert.match(main,/Numero risultati principali - Formato widget/);
+ assert.match(main,/Ordinamento risultati - Formato widget/);
+ assert.ok(main.includes("['bars','pie','table','cloud','bubbles'].includes(formatChart)"));
+ assert.ok(main.includes("['bars','pie','table','cloud','gauge'].includes(widget.resultsView)"));
+ assert.match(main,/onChange={e=>patch\(w\.id,\{resultSortOrder:e\.target\.value\}\)}/);
+ assert.doesNotMatch(main,/\{sort\}/);
+ assert.match(main,/chart==='bubbles'&&<div className="linked-results-bubbles"/);
+ assert.match(main,/chart!=='gauge'&&chart!=='bubbles'/);
+ assert.match(css,/\.linked-results-bubble-orb/);
+});
