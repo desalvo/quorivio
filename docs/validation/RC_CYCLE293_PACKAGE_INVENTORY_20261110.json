@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
   "cycle": 293,
-  "file_count_excluding_manifest": 2636,
+  "file_count_excluding_manifest": 2637,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -44,14 +44,14 @@
       "e377db62"
     ],
     ".github/workflows/ci.yml": [
-      "6558e6ae",
-      "e3adf62a",
-      "4ae316b9",
-      "a0b6e826",
-      "424e0b9a",
-      "d8bcc67f",
-      "e9543ac5",
-      "5afa4333"
+      "abe27477",
+      "32f30b2c",
+      "2438b515",
+      "294c23bd",
+      "07ecf7ae",
+      "02da3be2",
+      "4c1c087b",
+      "97bcfb4c"
     ],
     ".github/workflows/converter-image.yml": [
       "9d99101a",
@@ -2504,14 +2504,14 @@
       "2586b822"
     ],
     "apps/web/src/style.css": [
-      "1035a080",
-      "1134d565",
-      "ef0b6445",
-      "7fa23eb6",
-      "ac709122",
-      "a5119737",
-      "37c9d5f1",
-      "63ae4875"
+      "0c1f4cb0",
+      "a99b813e",
+      "6cb10339",
+      "74b1d076",
+      "55b8e65e",
+      "5d3ebb9b",
+      "b7793d40",
+      "e37a0af9"
     ],
     "apps/web/src/thumbnail-menu-layout.ts": [
       "a4748563",
@@ -3764,14 +3764,14 @@
       "780e8ac8"
     ],
     "apps/web/test/rc325-server-settings-tabs.test.ts": [
-      "cba29057",
-      "ff767f1b",
-      "5c01085c",
-      "d0316ec0",
-      "dd00da70",
-      "b11cd56d",
-      "bc7d7ca6",
-      "00aa3a7e"
+      "d3c37a56",
+      "562e02ab",
+      "e3535699",
+      "5be37cdb",
+      "a935e178",
+      "d5c7759d",
+      "225942af",
+      "73bb7c96"
     ],
     "apps/web/test/rc325-ui-locale.test.ts": [
       "18caa7c2",
@@ -4544,14 +4544,14 @@
       "d240df37"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "7acaf07b",
-      "c15bd456",
-      "1a166ccd",
-      "6af43e79",
-      "f16894dc",
-      "ef6b5c90",
-      "d2925808",
-      "7730acb3"
+      "ca5e8f99",
+      "d7f9d289",
+      "f6625e88",
+      "81f941d9",
+      "eb9d061f",
+      "e6a4ab86",
+      "0860430e",
+      "97592efb"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",
@@ -26254,14 +26254,14 @@
       "7be5beb3"
     ],
     "tools/ci_rc329_server_settings_tabs_chromium.py": [
-      "ef5e3d1e",
-      "10bf9816",
-      "b98db028",
-      "8a39368c",
-      "7b779f87",
-      "2c8c8a05",
-      "997771ec",
-      "4c0fb7b3"
+      "9ee15842",
+      "f4d88f16",
+      "56107a81",
+      "7f0c8006",
+      "813a25ac",
+      "994cacaf",
+      "db9ec938",
+      "3b4e0fcc"
     ],
     "apps/api/src/sso-branding.ts": [
       "6b1866ef",
@@ -26362,6 +26362,16 @@
       "64a073c9",
       "b64a64f2",
       "b347c558"
+    ],
+    "tools/stage_verified_manuals.sh": [
+      "dc153bb9",
+      "903eab0d",
+      "c5ac3451",
+      "f54379a0",
+      "b6219d44",
+      "1ccfbac5",
+      "51205492",
+      "3afb8229"
     ]
   }
 }
