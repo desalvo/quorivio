@@ -20484,14 +20484,14 @@
       "bf424364"
     ],
     "tools/tests/test_rc148_phone_atomic_undo.py": [
-      "fa5974a1",
-      "44d38b40",
-      "db4da0f0",
-      "0f3cf357",
-      "9a0ceeb8",
-      "eb9a24c9",
-      "1b9e06f9",
-      "d6e47eff"
+      "8ff4a608",
+      "f3cc3607",
+      "5df285b2",
+      "4ed17815",
+      "2af23044",
+      "4305bdad",
+      "48cc6e10",
+      "92476958"
     ],
     "tools/tests/test_rc149_background_contracts.py": [
       "ff3521b6",
@@ -22254,14 +22254,14 @@
       "d3e08f35"
     ],
     "tools/tests/test_rc_cycle117_autofit_atomic_undo.py": [
-      "de5207cd",
-      "032285a9",
-      "21bc6301",
-      "5587bfe0",
-      "8126f8e2",
-      "207b4269",
-      "9a33362d",
-      "3afc5482"
+      "6a336670",
+      "97f38914",
+      "638eca41",
+      "38d288c5",
+      "07aa0c74",
+      "057775a3",
+      "a7a1e982",
+      "6a23a5d4"
     ],
     "tools/tests/test_rc_cycle118_localized_release_headers.py": [
       "fd1ba973",
