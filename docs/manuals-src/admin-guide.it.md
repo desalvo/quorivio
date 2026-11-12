@@ -284,7 +284,7 @@ La scheda OAuth social non richiede Issuer. Anche questi pulsanti hanno logo int
 2. Eseguire **Testa bozza senza salvare**: non abilita e non memorizza credenziali. Salvare, quindi eseguire **Testa backend salvato**. Discovery/JWKS non convalidano i segreti OAuth.
 3. Abilitare il backend e verificare con un browser privato che ogni SSO compaia con logo, nome e colore corretti.
 4. Eseguire un accesso vero e il collegamento esplicito a un account approvato. Non associare account sulla sola email: identità federata = provider e subject stabile.
-5. Per OIDC custom usare **Carica logo custom per provider OIDC**: immagini raster ridotte, controllate dal backend e pubblicate come asset locale all'app, mai tramite URL terzi.
+5. Per OIDC custom usare **Carica logo custom per provider OIDC**: immagini raster ridotte, controllate dal backend e incorporate come dati immagine validati nella risposta SSO, mai tramite URL terzi.
 6. Conservare un amministratore locale di emergenza; ruotare i segreti, verificare HTTPS, audit, revoche e informativa GDPR sui trasferimenti dati verso IdP esterni.
 
 

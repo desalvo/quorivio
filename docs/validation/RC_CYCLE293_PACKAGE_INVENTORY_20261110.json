@@ -584,14 +584,14 @@
       "6cf4c002"
     ],
     "apps/api/src/server.ts": [
-      "5fe34a65",
-      "bd9c8e56",
-      "b11bb6cd",
-      "2f425d64",
-      "b987bf62",
-      "63ce8f06",
-      "7eda804a",
-      "a0054b9c"
+      "0a1e5e44",
+      "ba95ba45",
+      "019b5406",
+      "5efce1af",
+      "664918cd",
+      "f8f05141",
+      "1e6a2f9d",
+      "2e8446eb"
     ],
     "apps/api/src/session-bus.ts": [
       "09ec6487",
@@ -13164,24 +13164,24 @@
       "5072a7dc"
     ],
     "docs/manuals-src/admin-guide.en.md": [
-      "f3686db3",
-      "d1f8b0db",
-      "346594f5",
-      "7c9bc9f1",
-      "0e55b5c8",
-      "25e875f5",
-      "94b42c3a",
-      "5e6eb5af"
+      "f5bdd1b7",
+      "ea26cc12",
+      "14495d66",
+      "f81597b9",
+      "efd9ff46",
+      "66cf711e",
+      "8751d2b2",
+      "f3fea371"
     ],
     "docs/manuals-src/admin-guide.it.md": [
-      "b5c4567a",
-      "b34fc0a1",
-      "70df3c29",
-      "62f18ac6",
-      "b7fa8d04",
-      "cb4c0c79",
-      "d6ae6b33",
-      "aabfd7e6"
+      "8f24b6b8",
+      "b21823eb",
+      "593c6485",
+      "cadefe07",
+      "6f530761",
+      "c439b525",
+      "2ae627d2",
+      "9ab3f80a"
     ],
     "docs/manuals-src/presenter-guide.en.md": [
       "5c01b869",

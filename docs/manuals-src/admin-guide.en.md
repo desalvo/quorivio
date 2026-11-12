@@ -284,7 +284,7 @@ Social OAuth does not have an Issuer field. Each enabled backend gets an indepen
 2. Choose **Test unsaved draft** (does not enable or save); then Save and **Test saved backend**. Discovery/JWKS alone cannot prove OAuth client credentials.
 3. Enable each provider; verify logo, label and distinctive colour in a private browser.
 4. Test real sign-in and explicit approved-account linking. Never link by email alone: federated identity is the pair provider + stable subject.
-5. For custom OIDC upload a small raster logo. The server validates the data and the login does not request third-party logo URLs.
+5. For custom OIDC upload a small raster logo. The server validates the embedded image data and the login does not request third-party logo URLs.
 6. Keep a local recovery administrator, rotate credentials, enforce HTTPS/audit and review GDPR notices for personal data sent to external IdPs.
 
 
