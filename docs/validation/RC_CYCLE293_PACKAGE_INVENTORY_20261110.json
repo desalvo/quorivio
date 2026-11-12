@@ -20794,14 +20794,14 @@
       "17852ef6"
     ],
     "tools/tests/test_rc_cycle66_verified_sso_reconciliation.py": [
-      "4766d72c",
-      "9449cc71",
-      "7cdd542c",
-      "8cd9314b",
-      "f8dfccf4",
-      "6995188a",
-      "d4e8cbab",
-      "b3da1afe"
+      "dfdb7d47",
+      "99b6ee30",
+      "b62124c3",
+      "7d50996e",
+      "80bd1ef7",
+      "c432632a",
+      "753a705c",
+      "55d5fa1a"
     ],
     "tools/tests/test_rc_cycle67_browser_rehearsal_gate.py": [
       "f51ae214",
