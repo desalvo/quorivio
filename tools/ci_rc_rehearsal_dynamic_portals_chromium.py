@@ -6,9 +6,12 @@ import subprocess
 from pathlib import Path
 from playwright.async_api import async_playwright
 ROOT=Path(__file__).resolve().parents[1]
-NODE=r'''const fs=require('fs'),ts=require('typescript');
-const result=ts.transpileModule(fs.readFileSync(process.argv[1],'utf8'),{fileName:'rehearsal-dialog.ts',compilerOptions:{target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext}});
-process.stdout.write(result.outputText.replace(/^export /gm,'')+'\nvar QuorivioRehearsal={activateRehearsalDialog};');'''
+"""TypeScript 7 no longer ships the JavaScript compiler API. Use Node 22's
+built-in erasable TS stripping to execute the actual focus module in Chromium."""
+NODE=r'''const fs=require('node:fs'),{stripTypeScriptTypes}=require('node:module');
+if(typeof stripTypeScriptTypes!=='function')throw Error('node_typescript_stripping_unavailable');
+const js=stripTypeScriptTypes(fs.readFileSync(process.argv[1],'utf8'),{mode:'strip'});
+process.stdout.write(js.replace(/^export /gm,'')+'\nvar QuorivioRehearsal={activateRehearsalDialog};');'''
 
 async def main():
     env=dict(os.environ)
