@@ -398,7 +398,7 @@ export function activateUiLanguage(language:UiLanguage):()=>void{
  if(language==='it')return ()=>{};
  const textCopies=new Map<Text,TextCopy>();
  const attrCopies=new Map<Element,Map<string,AttrCopy>>();
- const skip=(element:Element|null)=>!element||!!element.closest('input,textarea,select,option,script,style,code,pre,svg,canvas,[contenteditable],[data-ui-locale-ignore],.widget-fit-content,.page-editor-preview-title,.page-editor-preview-widget');
+ const skip=(element:Element|null)=>!element||!!element.closest('script,style,code,pre,svg,canvas,[contenteditable],[data-ui-locale-ignore],.widget-fit-content,.page-editor-preview-title,.page-editor-preview-widget');
  const withinApp=(element:Element|null)=>!!element?.closest('#root,.page-editor-thumb-menu-floating,.editor-floating-scope,.editor-floating-panel,.rehearsal-dialog');
  function visitText(node:Text){
   const parent=node.parentElement;
