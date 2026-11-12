@@ -22,6 +22,12 @@ import re
 import posixpath
 from urllib.parse import unquote, urlsplit
 
+def _valid_uuid4(value):
+    try:
+        return isinstance(value,str) and str(uuid.UUID(value))==value and uuid.UUID(value).version==4
+    except (ValueError,TypeError,AttributeError):
+        return False
+
 MAX_PPTX_BYTES = 50 * 1024 * 1024
 MAX_UNCOMPRESSED_BYTES = 250 * 1024 * 1024
 MAX_ZIP_ENTRIES = 3000
@@ -1259,7 +1265,11 @@ def portable_to_pptx(data, destination, media_dir=None):
                             gs=OxmlElement('a:gs');gs.set('pos',str(pos))
                             srgb=OxmlElement('a:srgbClr');srgb.set('val',color.lstrip('#'))
                             gs.append(srgb);stops.append(gs)
-                        grad.append(stops);linear=OxmlElement('a:lin');linear.set('ang','8100000');linear.set('scaled','1');grad.append(linear);sp.insert(0,grad)
+                        grad.append(stops);linear=OxmlElement('a:lin');linear.set('ang','8100000');linear.set('scaled','1');grad.append(linear)
+                        insert_at=0
+                        for idx,child in enumerate(sp):
+                            if child.tag.endswith(('}prstGeom','}custGeom')):insert_at=idx+1
+                        sp.insert(insert_at,grad)
                     else:
                         sh.fill.solid()
                         sh.fill.fore_color.rgb=RGBColor.from_string(style.get('fillColor','#dbeafe').lstrip('#'))

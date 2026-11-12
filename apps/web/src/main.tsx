@@ -2996,6 +2996,8 @@ me===undefined?<main id="main-content" className="narrow">Caricamento...</main>:
   <button type="button" className="small outline" disabled={sidebarBusy} onClick={closeSidebarSession} title="Chiude soltanto questa vista: presentazione e partecipanti restano attivi.">Chiudi sessione</button>
   <button type="button" className="small outline" disabled={sidebarBusy} onClick={()=>void duplicateSelected()}>Duplica sessione</button>
   <button type="button" className="small outline" disabled={sidebarBusy} onClick={()=>void exportSelectedSessionLocal()} aria-label="Esporta copia completa della sessione in locale (.quo)"><Download size={16}/> Esporta in locale (.quo)</button>
+  <a className="outline asbutton" href={'/api/sessions/'+encodeURIComponent(selected)+'/export.pdf'} download>Esporta PDF della presentazione</a>
+  <a className="outline asbutton" href={'/api/sessions/'+encodeURIComponent(selected)+'/export.pptx'} download>Esporta PowerPoint (PPTX)</a>
   <button type="button" className="small outline" disabled={sidebarBusy} onClick={()=>localSessionImportRef.current?.click()}><Upload size={16}/> Importa da locale (.quo)</button>
   <p className="muted tiny">Copia portabile di pagine, widget, schemi e allegati. Non comprende risposte, partecipanti, statistiche o credenziali.</p>
   <details className="panel session-debug-submit"><summary>Invia sessione all'autore per segnalare un bug o richiedere una feature</summary>
