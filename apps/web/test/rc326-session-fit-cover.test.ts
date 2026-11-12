@@ -24,7 +24,7 @@ test('authenticated session prefetch coalesces hover and click',()=>{
 });
 test('automatic content fit is default and does not mutate widget geometry',()=>{
  assert.match(ui,/data-fit-mode=\{allowScale\?'scale':'scroll'\}/);
- assert.match(ui,/results\.dataset\.fitPredictedRows/);
+ assert.match(ui,/results\?\.dataset\.fitPredictedRows/);
  assert.match(ui,/chartHasRows/);
  assert.match(ui,/data-fit-predicted-rows=\{sourceRows\.length\}/);
  assert.match(ui,/checked=\{w\.autoFit!==false\}/);
