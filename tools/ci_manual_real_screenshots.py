@@ -124,6 +124,22 @@ async def main():
             await settings_tabs.get_by_role('tab',name='Audit').click()
             await expect(settings_tabs.get_by_role('tab',name='Audit')).to_have_attribute('aria-selected','true')
             await shot('admin-audit',admin,'[aria-label="Audit amministrativo"]')
+            # RC325: a real unsaved auth-provider draft survives tab switches.
+            await settings_tabs.get_by_role('tab',name='Autenticazione').click()
+            new_provider=admin.get_by_role('textbox',name='ID nuovo provider OIDC')
+            await expect(new_provider).to_be_visible(timeout=12000)
+            await new_provider.fill('cidraft325')
+            await settings_tabs.get_by_role('tab',name='Generale').click()
+            await settings_tabs.get_by_role('tab',name='Autenticazione').click()
+            await expect(new_provider).to_have_value('cidraft325')
+            # Locale must update navigation AND editor/admin menus, not just hero text.
+            await admin.get_by_role('button',name='Switch interface language to English').click()
+            await expect(nav.get_by_role('button',name='Server settings')).to_be_visible(timeout=12000)
+            await expect(nav.get_by_role('button',name='User management')).to_be_visible(timeout=12000)
+            await expect(settings_tabs.get_by_role('tab',name='Authentication')).to_be_visible(timeout=12000)
+            await expect(settings_tabs.get_by_role('tab',name='General')).to_be_visible(timeout=12000)
+            await admin.get_by_role('button',name='Passa la lingua dell’interfaccia in italiano').click()
+            await expect(nav.get_by_role('button',name='Impostazioni server')).to_be_visible(timeout=12000)
             await nav.get_by_role('button',name='Gestione utenti').click()
             await shot('admin-users',admin)
 
