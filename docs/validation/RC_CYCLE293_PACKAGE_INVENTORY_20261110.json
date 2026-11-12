@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
   "cycle": 293,
-  "file_count_excluding_manifest": 2626,
+  "file_count_excluding_manifest": 2636,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -174,14 +174,14 @@
       "ad9a890c"
     ],
     "apps/api/src/auth-backends.ts": [
-      "3fc41b07",
-      "e19e93cb",
-      "cfa7b684",
-      "822342af",
-      "fd23b6e7",
-      "5e2b8656",
-      "544f43a3",
-      "040aad23"
+      "9b1af948",
+      "3f2b2de5",
+      "366723bb",
+      "f520b840",
+      "da565b83",
+      "1c6c235e",
+      "e80a58de",
+      "774b5967"
     ],
     "apps/api/src/background-upload-failure.ts": [
       "da211908",
@@ -234,14 +234,14 @@
       "2dd5f6ba"
     ],
     "apps/api/src/domain.ts": [
-      "d8580c5b",
-      "ba23e7b5",
-      "cfb544e6",
-      "9634f056",
-      "861740df",
-      "466c24c6",
-      "636f32f0",
-      "d0dd2946"
+      "2aa98904",
+      "f1667a37",
+      "349ca964",
+      "f10aa026",
+      "42ee859a",
+      "36248e95",
+      "88b6763c",
+      "f55721e3"
     ],
     "apps/api/src/email-otp.ts": [
       "442c62ac",
@@ -414,14 +414,14 @@
       "018632ad"
     ],
     "apps/api/src/oidc.ts": [
-      "3ca302ff",
-      "431d1674",
-      "183d4394",
-      "d559faed",
-      "6fa418dc",
-      "80fbf9d4",
-      "0ba25c37",
-      "44897d52"
+      "62417c13",
+      "5b7da8cd",
+      "8267d3a8",
+      "a869d315",
+      "0a649716",
+      "54c6819b",
+      "ecda8782",
+      "06d56982"
     ],
     "apps/api/src/operation-audit.ts": [
       "47b17194",
@@ -584,14 +584,14 @@
       "6cf4c002"
     ],
     "apps/api/src/server.ts": [
-      "1142f9bc",
-      "cad6b074",
-      "c4933869",
-      "b481bac1",
-      "5e8515b2",
-      "2a71f016",
-      "1036dea6",
-      "61788da9"
+      "e6957e1b",
+      "0af14510",
+      "5e0dad16",
+      "1cc46e29",
+      "1820f226",
+      "50c8045c",
+      "40c6aa9b",
+      "d882a010"
     ],
     "apps/api/src/session-bus.ts": [
       "09ec6487",
@@ -634,14 +634,14 @@
       "833ffb6c"
     ],
     "apps/api/src/social-oauth.ts": [
-      "5bb4a78d",
-      "56afbe11",
-      "31901f84",
-      "2f238fc5",
-      "431a06f4",
-      "6ca87ec9",
-      "308a1ceb",
-      "ae7df79e"
+      "efefa761",
+      "1a087a67",
+      "332a8036",
+      "c8542437",
+      "57386bd6",
+      "2931e3b2",
+      "bb1b9cbb",
+      "d1db04c7"
     ],
     "apps/api/src/statistics-export.ts": [
       "515715cf",
@@ -1954,14 +1954,14 @@
       "85c9ac92"
     ],
     "apps/web/src/admin-auth-backends.tsx": [
-      "f52d0490",
-      "8e7205fa",
-      "4553e996",
-      "6df1b686",
-      "3930edc5",
-      "450f30da",
-      "45ff3318",
-      "caa05a8b"
+      "6b5b7425",
+      "0d77e75f",
+      "f72fe067",
+      "86e93620",
+      "95368013",
+      "d7e4eb78",
+      "2efc71dc",
+      "a93c1edc"
     ],
     "apps/web/src/answer-field-resize.ts": [
       "65a512c2",
@@ -2124,14 +2124,14 @@
       "54a62e5d"
     ],
     "apps/web/src/main.tsx": [
-      "e3681d39",
-      "92fbf20f",
-      "9cce69f4",
-      "55871326",
-      "8c9b5247",
-      "6dee941c",
-      "061d4259",
-      "0faffc3c"
+      "4b43089a",
+      "8dec673b",
+      "e5f863ff",
+      "cbc23730",
+      "8d9ab012",
+      "f05e9072",
+      "ea6a7a14",
+      "131317eb"
     ],
     "apps/web/src/main.tsx.orig": [
       "9230e5a3",
@@ -2504,14 +2504,14 @@
       "2586b822"
     ],
     "apps/web/src/style.css": [
-      "7affb984",
-      "ed94acd8",
-      "5562de46",
-      "2e215298",
-      "314a944f",
-      "d7957021",
-      "963dd77d",
-      "52d83c3a"
+      "1035a080",
+      "1134d565",
+      "ef0b6445",
+      "7fa23eb6",
+      "ac709122",
+      "a5119737",
+      "37c9d5f1",
+      "63ae4875"
     ],
     "apps/web/src/thumbnail-menu-layout.ts": [
       "a4748563",
@@ -4264,14 +4264,14 @@
       "02981214"
     ],
     "docs/AUTH_BACKENDS_CONFIGURATION_IT_EN.md": [
-      "ef3fcee8",
-      "1a193533",
-      "00de8c7f",
-      "6d4c3cf9",
-      "04f7ed0c",
-      "6953fc57",
-      "8e915fb1",
-      "129eda61"
+      "bd4aef57",
+      "2705d1fe",
+      "364a9c1e",
+      "cb941923",
+      "2382e63f",
+      "eb97bc99",
+      "0a634d22",
+      "720c2035"
     ],
     "docs/BUILD_INFO.en.md": [
       "15789afe",
@@ -4544,14 +4544,14 @@
       "d240df37"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "2b1c9224",
-      "2a945e31",
-      "1486eaaf",
-      "a25dc693",
-      "95130d13",
-      "77dce00f",
-      "b600ec92",
-      "24f4b006"
+      "7acaf07b",
+      "c15bd456",
+      "1a166ccd",
+      "6af43e79",
+      "f16894dc",
+      "ef6b5c90",
+      "d2925808",
+      "7730acb3"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",
@@ -13164,24 +13164,24 @@
       "5072a7dc"
     ],
     "docs/manuals-src/admin-guide.en.md": [
-      "47213d94",
-      "97c69972",
-      "731b7478",
-      "998c6767",
-      "9772a37e",
-      "707d8ac7",
-      "049b09d4",
-      "ae185aba"
+      "f5bdd1b7",
+      "ea26cc12",
+      "14495d66",
+      "f81597b9",
+      "efd9ff46",
+      "66cf711e",
+      "8751d2b2",
+      "f3fea371"
     ],
     "docs/manuals-src/admin-guide.it.md": [
-      "1a79e930",
-      "48152fe3",
-      "a2e2735c",
-      "318cb366",
-      "0001dc11",
-      "72d7205a",
-      "5d52cf02",
-      "80540286"
+      "8f24b6b8",
+      "b21823eb",
+      "593c6485",
+      "cadefe07",
+      "6f530761",
+      "c439b525",
+      "2ae627d2",
+      "9ab3f80a"
     ],
     "docs/manuals-src/presenter-guide.en.md": [
       "5c01b869",
@@ -26262,6 +26262,106 @@
       "2c8c8a05",
       "997771ec",
       "4c0fb7b3"
+    ],
+    "apps/api/src/sso-branding.ts": [
+      "6b1866ef",
+      "9e6d1677",
+      "88300cff",
+      "4b130c96",
+      "c980ce29",
+      "c9348e99",
+      "1fcb4d2b",
+      "d4964cc9"
+    ],
+    "apps/web/public/sso-icons/google.svg": [
+      "56399973",
+      "8c472cf2",
+      "a2b9e078",
+      "33c1bf04",
+      "2c2a3358",
+      "3bc16c36",
+      "5be53c5e",
+      "00c6fb8d"
+    ],
+    "apps/web/public/sso-icons/github.svg": [
+      "3fc1fe5c",
+      "6696e496",
+      "a3e06648",
+      "aee80bcd",
+      "7244d1f9",
+      "4f5bab8c",
+      "3df1e355",
+      "bc64d9ba"
+    ],
+    "apps/web/public/sso-icons/facebook.svg": [
+      "ab2aec65",
+      "f47050f0",
+      "415a1432",
+      "c8ac08c3",
+      "07e0f7bc",
+      "65bb343f",
+      "80035dad",
+      "50db7656"
+    ],
+    "apps/web/public/sso-icons/okta.svg": [
+      "ed339984",
+      "3f8e901b",
+      "49518b50",
+      "c16fabc8",
+      "67c83572",
+      "03e7acc9",
+      "3b9ec46e",
+      "1c69552f"
+    ],
+    "apps/web/public/sso-icons/keycloak.svg": [
+      "c16b83b2",
+      "06286fa1",
+      "d2fd14ba",
+      "4c21f6e7",
+      "93997f30",
+      "df13f39e",
+      "1d6cdd64",
+      "5fd6d6d5"
+    ],
+    "apps/web/public/sso-icons/authentik.svg": [
+      "6cf925e5",
+      "87417e89",
+      "3396c866",
+      "89c00a70",
+      "0accc40e",
+      "4917dd86",
+      "3c09e926",
+      "57ec7ab8"
+    ],
+    "apps/web/public/sso-icons/microsoft.svg": [
+      "72651802",
+      "9768df36",
+      "dbd98ecc",
+      "b797cd71",
+      "a9fe66fb",
+      "23b01aef",
+      "8dce2aa2",
+      "133c807e"
+    ],
+    "apps/web/src/presenter-profile-fit.ts": [
+      "e46e5e53",
+      "cd268e38",
+      "1ddfcc96",
+      "86ced652",
+      "822deb30",
+      "59ce005d",
+      "29184f0a",
+      "c28a3484"
+    ],
+    "apps/web/test/rc330-sso-profile.test.ts": [
+      "611e2971",
+      "fc233b24",
+      "a48d1c61",
+      "5c2f5d45",
+      "a58d7e2f",
+      "64a073c9",
+      "b64a64f2",
+      "b347c558"
     ]
   }
 }

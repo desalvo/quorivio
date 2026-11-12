@@ -38,6 +38,7 @@ import {validPageOrder} from './page-sequence.js';
 import {HOUSEKEEPING_PERIOD_MS,removeExpiredConversionJobs,removeOrphanSessionAssetFiles} from './temporary-housekeeping.js';
 import {authenticateDirectory,searchDirectory} from './ldap-auth.js';
 import {loadAuthBackends,backendPublic,saveAuthBackend,testAuthBackend,enabledLdapBackend,enabledOidcBackends,enabledSocialBackends,backendAllowsMfa} from './auth-backends.js';
+import {publicSsoBranding} from './sso-branding.js';
 import {auditOperation,validAuditRetention} from './operation-audit.js';
 import {sendRegistrationReviewEmail} from './smtp.js';
 import {allowedBackupBackends,validateBackupTarget,sealBackupConfig,openBackupConfig,publicBackupConfig,type BackupTarget} from './backup-storage.js';
@@ -51,6 +52,7 @@ const base=process.env.PUBLIC_BASE_URL||'http://localhost:8080';let publicBase=b
 app.use(helmet({contentSecurityPolicy:process.env.NODE_ENV==='production'?
  {useDefaults:false,directives:productionCspDirectives(base)}:false}));
 app.use((_req,res,next)=>{res.setHeader('Permissions-Policy',quorivioPermissionsPolicy);next()});
+app.use('/api/admin/auth/backends',express.json({limit:'64kb'})); // Base64 32 KiB logo, scoped to admin provider configuration
 app.use(express.json({limit:'32kb'}));const server=createServer(app);const wss=new WebSocketServer({noServer:true});
 const hash=(v:string)=>createHash('sha256').update(v).digest('hex');const sign=(s:string)=>createHmac('sha256',secret).update(s).digest('base64url');const cookies=(s:string='')=>Object.fromEntries(s.split(';').map(x=>x.trim().split('=')).filter(x=>x.length===2));
 function auth(req:express.Request){const token=cookies(req.headers.cookie).q_auth;if(!token)return null;const parts=token.split('.');if(parts.length!==3||!/^\d+$/.test(parts[1]))return null;const body=parts.slice(0,2).join('.');const a=Buffer.from(sign(body));const b=Buffer.from(parts[2]);if(a.length!==b.length||!timingSafeEqual(a,b)||Number(parts[1])<Date.now())return null;return parts[0]}
@@ -363,7 +365,7 @@ async function authorizedFederatedLink(req:express.Request){
 app.get('/api/auth/oidc/providers',async(_req,res)=>{try{
  const [oidc,social]=await Promise.all([enabledOidcBackends(db,secret),enabledSocialBackends(db,secret)]);
  res.setHeader('Cache-Control','no-store');
- res.json({providers:[...oidc.map(x=>({id:x.id,label:x.label||x.id})),...social.map(x=>({id:x.id,label:x.id==='github'?'GitHub':'Facebook'}))]});
+ res.json({providers:[...oidc.map(x=>({id:x.id,label:x.label||x.id,...publicSsoBranding(x.id,x)})),...social.map(x=>({id:x.id,label:x.id==='github'?'GitHub':'Facebook',...publicSsoBranding(x.id,x)}))]});
  }catch(e){console.error('auth provider discovery failed',e instanceof Error?e.name:'error');res.status(503).json({error:'auth_config_unavailable'})}});
 app.get('/api/auth/oidc/:provider/start',async(req,res)=>{try{
  const p=(await enabledOidcBackends(db,secret).catch(()=>[])).find(x=>x.id===req.params.provider);if(!p){res.status(404).json({error:'provider_unavailable'});return}

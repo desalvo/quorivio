@@ -7,6 +7,7 @@ import {createCipheriv,createDecipheriv,createHash,randomBytes} from 'node:crypt
 import {ldapSettingsFromEnv,type LdapSettings} from './ldap-auth.js';
 import {providersFromEnv,validProvider,validOidcCallback,validateDiscovery,fetchOidcJson,type OidcProvider} from './oidc.js';
 import {socialProviders,type SocialProvider} from './social-oauth.js';
+import {validateSsoBranding,publicSsoBranding} from './sso-branding.js';
 
 export type AuthBackendKind='local'|'ldap'|'oidc'|'social';
 export type Backend={id:string;kind:AuthBackendKind;enabled:boolean;mfaEnabled:boolean;config:Record<string,any>;lastTestedAt:string|null};
@@ -16,8 +17,8 @@ const secretFields=new Set(['bindPassword','clientSecret']);
 const configFields:Record<AuthBackendKind,string[]>={
  local:[],
  ldap:['url','startTls','bindDn','bindPassword','baseDn','filter','idAttribute','emailAttribute','groupAttribute','adminGroupDn','presenterGroupDn','organizationId','autoProvision','caFile','label'],
- oidc:['issuer','clientId','clientSecret','redirectUri','label'],
- social:['clientId','clientSecret','redirectUri','label']
+ oidc:['issuer','clientId','clientSecret','redirectUri','label','logoData','buttonColor'],
+ social:['clientId','clientSecret','redirectUri','label','buttonColor']
 };
 function key(secret:string){return createHash('sha256').update('quorivio-auth-backends-v1:').update(secret).digest()}
 export function sealAuthConfig(data:Record<string,any>,secret:string):string{
@@ -41,6 +42,10 @@ export function defaultAuthBackends(env:NodeJS.ProcessEnv=process.env):Backend[]
   {id:'local',kind:'local',enabled:true,mfaEnabled:true,config:{},lastTestedAt:null},
   {id:'ldap',kind:'ldap',enabled:false,mfaEnabled:false,config:ldap||{},lastTestedAt:null},
   {id:'google',kind:'oidc',enabled:false,mfaEnabled:false,config:{label:'Google'},lastTestedAt:null},
+  {id:'microsoft',kind:'oidc',enabled:false,mfaEnabled:false,config:{label:'Microsoft Entra ID'},lastTestedAt:null},
+  {id:'okta',kind:'oidc',enabled:false,mfaEnabled:false,config:{label:'Okta'},lastTestedAt:null},
+  {id:'keycloak',kind:'oidc',enabled:false,mfaEnabled:false,config:{label:'Keycloak'},lastTestedAt:null},
+  {id:'authentik',kind:'oidc',enabled:false,mfaEnabled:false,config:{label:'Authentik'},lastTestedAt:null},
   {id:'github',kind:'social',enabled:false,mfaEnabled:false,config:{label:'GitHub'},lastTestedAt:null},
   {id:'facebook',kind:'social',enabled:false,mfaEnabled:false,config:{label:'Facebook'},lastTestedAt:null}
  ];
@@ -81,6 +86,7 @@ export function validateAuthBackend(id:string,kind:AuthBackendKind,config:Record
   return true;
  }
  if(!['oidc','social'].includes(kind))throw Error('invalid_backend_kind');
+ validateSsoBranding(id,config);
  const label=config.label;
  if(typeof label!=='string'||!label.trim()||label.length>80||/[<>\r\n]/.test(label))throw Error('invalid_backend_label');
  if(kind==='oidc'){
@@ -123,10 +129,12 @@ export async function prepareAuthBackend(db:Pool,secret:string,id:string,input:u
  const current=(await loadAuthBackends(db,secret)).find(b=>b.id===id);
  const config={...(current?.config||{})};
  for(const [field,value] of Object.entries(body.config||{})){
-  if(!configFields[kind].includes(field)||!(typeof value==='string'||typeof value==='boolean')||typeof value==='string'&&value.length>2048)throw Error('invalid_backend_config');
+  if(!configFields[kind].includes(field)||!(typeof value==='string'||typeof value==='boolean')||typeof value==='string'&&value.length>(field==='logoData'?46000:2048))throw Error('invalid_backend_config');
   if(secretFields.has(field)&&value==='')continue; // preserve the previous encrypted credential
   config[field]=value;
  }
+ // Validate branding even for disabled drafts; untrusted images never reach the login page.
+ if(kind==='oidc'||kind==='social')validateSsoBranding(id,config);
  // Every enabled backend must have complete, secure configuration.
  if(kind==='local')Object.keys(config).forEach(key=>delete config[key]);
  if(kind!=='local'&&body.enabled)validateAuthBackend(id,kind,config);
@@ -160,7 +168,7 @@ export async function enabledOidcBackends(db:Pool,secret:string):Promise<OidcPro
  return (await loadAuthBackends(db,secret)).filter(x=>x.kind==='oidc'&&x.enabled).map(b=>{validateAuthBackend(b.id,b.kind,b.config);return {...b.config,id:b.id} as OidcProvider});
 }
 export async function enabledSocialBackends(db:Pool,secret:string):Promise<SocialProvider[]>{
- return (await loadAuthBackends(db,secret)).filter(x=>x.kind==='social'&&x.enabled).map(b=>{validateAuthBackend(b.id,b.kind,b.config);return {id:b.id,clientId:b.config.clientId,clientSecret:b.config.clientSecret,redirectUri:b.config.redirectUri} as SocialProvider});
+ return (await loadAuthBackends(db,secret)).filter(x=>x.kind==='social'&&x.enabled).map(b=>{validateAuthBackend(b.id,b.kind,b.config);return {id:b.id,clientId:b.config.clientId,clientSecret:b.config.clientSecret,redirectUri:b.config.redirectUri,buttonColor:b.config.buttonColor} as SocialProvider});
 }
 export async function backendAllowsMfa(db:Pool,secret:string,userId:string):Promise<boolean>{
  const isLdap=(await db.query('SELECT EXISTS(SELECT 1 FROM ldap_identities WHERE user_id=$1) AS ldap',[userId])).rows[0]?.ldap===true;

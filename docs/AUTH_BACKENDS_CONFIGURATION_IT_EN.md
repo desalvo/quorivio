@@ -19,3 +19,9 @@ LDAP tests perform secure service bind and a limited search. OIDC tests validate
 
 ### RC324 — Test unsaved configurations
 **Test draft without saving** probes the exact settings currently shown, including a new OIDC provider that has not yet been stored. It uses the same validation as Save but **does not enable a provider, persist its credentials, or mark the stored configuration as tested**. Testing a saved configuration still updates its last-tested timestamp. OIDC discovery/JWKS and OAuth configuration checks are not proof of working client credentials: interactive sign-in remains required. Refreshing the provider list after a Save or Test preserves unsaved changes in other providers; a manual reload asks for confirmation before discarding drafts. Both testing modes require platform-admin authorization.
+
+## RC330 — SSO preset, loghi e pulsanti / Prepared SSO branding
+
+Provider OIDC predisposti: Google, Microsoft Entra ID, Okta, Keycloak, Authentik; provider OAuth: GitHub e Facebook. I provider custom OIDC usano loghi PNG/JPEG/WebP massimo 32 KiB, non SVG o URL remoti. Colori pulsante distinti, credenziali cifrate e default disabilitato. Per tabelle dei portali esterni e callback consultare la sezione 12.1–12.4 del Manuale dell'amministratore IT/EN.
+
+Prepared OIDC and OAuth providers have bundled logos and distinct login colours; custom OIDC accepts small validated raster uploads. See administrator guides §12.1–12.4 for external portals, issuer/client/redirect configuration and security.
