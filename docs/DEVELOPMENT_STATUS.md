@@ -1,5 +1,8 @@
 # Quorivio 0.1.0-dev — RC293 — Compact visual manuals and product brochures
 
+**RC318 historical RC269 auth regression update (2026-11-12):** The RC269 Node static test expected a full-document `window.location.replace` on expired presenter auth, contradicting the fix for the authentication-required reload/rate-limit loop. Ownership transfer, LDAP, sidebar and mobile-option assertions remain. Updated expiry assertion to require the new in-app login signal, history replacement without reload and an authenticated-request suppression guard. CI 43141627966 failed specifically on the stale assertion. **Next CI pending; external RC readiness unchanged.**
+
+
 **RC318 CI historical regression reconciliation (2026-11-12):** RC222 old Python and Node source-contract tests still required the former result-panel title ("Stile indipendente delle opzioni e delle barre"), despite the live panel intentionally supporting titles, options, bars, pies and gauges under the new heading ("Stile indipendente di titoli, opzioni e risultati"). Updated both tests to verify the modern heading while retaining typography, wrapping, content-persistence and dedicated results-format controls. This resolves the specific failure seen in workflow 43138983580 without reverting contextual formatting. **CI must be rerun before merge; no claim of green or Docker publication.**
 
 
