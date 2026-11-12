@@ -1,5 +1,7 @@
 # Quorivio 0.1.0-dev — RC293 — Compact visual manuals and product brochures
 
+**RC316 — Luminous Gauge and compact results widget (2026-11-12):** Redesigned the shared Gauge SVG with a continuous optional green/yellow/red gradient, 0–100-style graduated ticks scaled to configured min/max, luminous needle with numeric center value, accessible SVG label and responsive dark dial. Automatic results-widget fitting now reduces excessive height for Gauge without changing manually sized widgets. Added UI source contracts for needle/compact sizing. **Pending PR CI, no release or external gate promotion.** Official score remains 85.25% (43 accepted / 17 partial).
+
 **RC315 — Operator evidence hardening (2026-11-12):** Recovered previously unmerged PR #26 evidence-bundle verification code on top of latest main. Includes `--init-evidence`/`--verify-evidence`, exact commit binding, safe relative evidence artifact paths, SHA256 integrity, and rejection of unauthorized independent sign-off. Regression tests retained. External RC gate score unchanged (85.25%, 43 accepted / 17 partial).
 
 # Quorivio 0.1.0-dev — RC313 — Grafana-style semicircular Gauge (2026-11-11)
