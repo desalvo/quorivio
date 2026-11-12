@@ -188,7 +188,7 @@ function WidgetContentFit({children,editor=false,allowScale=true,minScale=.005,t
   return()=>{cancelAnimationFrame(raf);resize.disconnect();changes.disconnect()};
  },[children,allowScale,minScale]);
  return <><div className="widget-fit-frame" ref={frame} data-scaled={allowScale&&Math.abs(factor-1)>.015} data-fit-mode={allowScale?'scale':'scroll'}>
-  <div className="widget-fit-content" ref={body} style={{...textStyle,transform:allowScale&&Math.abs(factor-1)>.015?`scale(${factor})`:undefined}}>{children}</div>
+  <div className="widget-fit-content" ref={body} style={{...textStyle,'--widget-fit-scale':allowScale?factor:1,transform:allowScale&&Math.abs(factor-1)>.015?`scale(${factor})`:undefined} as React.CSSProperties}>{children}</div>
  </div>{editor&&allowScale&&factor<.985&&<span className="widget-rescale-indicator" role="status" title={`Contenuto ridotto al ${Math.round(factor*100)}% per entrare nel widget`} aria-label={`Contenuto ridotto al ${Math.round(factor*100)}%`}>↘ {Math.round(factor*100)}%</span>}</>;
 }
 
