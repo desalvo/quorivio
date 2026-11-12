@@ -16,15 +16,15 @@ test('RC138: moving a result layer onto another widget is permitted and saved',(
  assert.deepEqual(freeWidgetPosition(base,{x:50,y:10},20,20),{x:50,y:10,width:20,height:20});
  assert.equal(validPageDesign({widgets:[{id:'results',kind:'results-button',position:moved[0].position},{id:'question',kind:'question',position:moved[1].position}]}),true);
 });
-test('RC138: shrinking lower edge disables auto fit rather than rescaling the result chart',()=>{
+test('RC326: shrinking lower edge preserves auto-fit and rescales complete result chart',()=>{
  const original=[w('results',10,10,35,40)];
  const next=resizeWidgetToCollisionLimit(original,'results',{x:10,y:10,width:35,height:14});
  assert.equal(next[0].position.height,14);
- assert.equal(next[0].autoFit,false);
+ assert.equal(next[0].autoFit,true);
  assert.equal(original[0].position.height,40);
  assert.match(main,/aria-label="Ridimensionamento automatico contenuto risultati"/);
- assert.ok(main.includes("allowScale={!['qr','participant-count','results-button'].includes(w.kind)}"));
- assert.match(css,/widget-fit-frame\[data-fit-mode="scroll"\] \.linked-results/);
+ assert.ok(main.includes("allowScale={w.autoFit!==false&&!['qr','participant-count'].includes(w.kind)}"));
+ assert.match(css,/widget-fit-frame\[data-fit-mode="scale"\]/);
 });
 test('RC138: presenter-owned results are aggregate only and never include answer identity',()=>{
  const rows=[
