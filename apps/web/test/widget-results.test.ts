@@ -40,3 +40,20 @@ test('RC313 linked results use the source chart by default, allow explicit overr
  assert.equal(effectiveResultView({id:'r',kind:'results-button',targetWidgetId:'q'},[source]),'pie');
  assert.equal(effectiveResultView({id:'r',kind:'results-button',targetWidgetId:'q',resultsView:'gauge'},[source]),'gauge');
 });
+
+test('RC316 Gauge shares the graduated needle dial across editor, rehearsal and live without empty vertical area',async()=>{
+ const {readFileSync}=await import('node:fs');
+ const {fileURLToPath}=await import('node:url');
+ const {resolve,dirname}=await import('node:path');
+ const base=resolve(dirname(fileURLToPath(import.meta.url)),'../src');
+ const main=readFileSync(resolve(base,'main.tsx'),'utf8');
+ const css=readFileSync(resolve(base,'style.css'),'utf8');
+ assert.match(main,/className="linked-results-gauge-needle"/);
+ assert.match(main,/length:51/);
+ assert.match(main,/viewBox="0 0 360 286"/);
+ assert.match(main,/effectiveResultView\(w,widgets\)==='gauge'/);
+ assert.match(main,/p\.height>desired\+1/);
+ assert.match(css,/\.linked-results\.result-view-gauge \.[\s\S]*?max-height:none!important/);
+ assert.match(css,/\.linked-results-gauge-fill\{fill:none;stroke-width:20/);
+ assert.equal(gaugeModel([{id:'1',label:'3',count:1},{id:'2',label:'5',count:1}],{},'rating').value,4);
+});

@@ -322,23 +322,39 @@ function LinkedResultSourceQuestion({result,source,rankedRows=[]}:{result:any;so
   </>}
  </section>;
 }
-/** Same SVG semicircle for editor, rehearsal, live projection and history. */
+/** RC316: shared, accessible, responsive dial with needle, graduated scale and glow. */
 function ResultGauge({widget,rows,sourceKind='question'}:{widget:any;rows:StatRow[];sourceKind?:string}){
- const model=gaugeModel(rows,widget,sourceKind);
- const gradientId=React.useId().replace(/:/g,'');
- const color=gaugeColor(widget.gaugeColor);
- const minColor=gaugeColor(widget.gaugeMinColor,'#d44949');
- const maxColor=gaugeColor(widget.gaugeMaxColor,'#22ad80');
- const showValue=widget.gaugeShowValue!==false;
+ const model=gaugeModel(rows,widget,sourceKind),uid=React.useId().replace(/:/g,'');
+ const color=gaugeColor(widget.gaugeColor),minColor=gaugeColor(widget.gaugeMinColor,'#11e98b'),maxColor=gaugeColor(widget.gaugeMaxColor,'#ff4263');
+ const showValue=widget.gaugeShowValue!==false,gradient=widget.gaugeGradient!==false;
  const label=model.value===null?'—':Number(model.value.toFixed(2)).toLocaleString('it-IT',{maximumFractionDigits:2});
- return <svg className="linked-results-gauge" viewBox="0 0 300 200" role="img" aria-label={`Gauge semicircolare: ${model.value===null?'nessun dato':label}; minimo ${model.min}; massimo ${model.max}; aggregazione ${model.aggregation}`} preserveAspectRatio="xMidYMid meet">
+ const fmt=(v:number)=>Number(v.toFixed(2)).toLocaleString('it-IT',{maximumFractionDigits:2});
+ const point=(part:number,radius:number)=>({x:180-Math.cos(Math.PI*part)*radius,y:183-Math.sin(Math.PI*part)*radius});
+ const tip=point(model.percent/100,116),ticks=Array.from({length:51},(_,i)=>{
+  const t=i/50,major=i%5===0;return {i,major,inside:point(t,major?108:116),outside:point(t,124),label:major?point(t,91):null};
+ });
+ const arc="M 46 183 A 134 134 0 0 1 314 183",arcColor=gradient?`url(#gauge-arc-${uid})`:color;
+ return <svg className="linked-results-gauge" viewBox="0 0 360 286" role="img" aria-label={`Gauge semicircolare: ${model.value===null?'nessun dato':label}; minimo ${model.min}; massimo ${model.max}; aggregazione ${model.aggregation}`} preserveAspectRatio="xMidYMid meet" data-gauge-needle={model.value===null?'empty':'active'}>
   <title>{`Gauge ${model.aggregation}: ${label}, intervallo ${model.min}–${model.max}`}</title>
-  <defs><linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stopColor={minColor}/><stop offset="100%" stopColor={maxColor}/></linearGradient></defs>
-  <path className="linked-results-gauge-track" d="M 30 165 A 120 120 0 0 1 270 165" pathLength={100}/>
-  <path className="linked-results-gauge-fill" d="M 30 165 A 120 120 0 0 1 270 165" pathLength={100} stroke={widget.gaugeGradient===true?`url(#${gradientId})`:color} strokeDasharray={`${model.percent} 100`}/>
-  {showValue&&<text x="150" y="142" textAnchor="middle" className="linked-results-gauge-value">{label}</text>}
-  <text x="30" y="189" textAnchor="start" className="linked-results-gauge-limit">{model.min}</text>
-  <text x="270" y="189" textAnchor="end" className="linked-results-gauge-limit">{model.max}</text>
+  <defs>
+   <linearGradient id={`gauge-arc-${uid}`} x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stopColor={minColor}/><stop offset="48%" stopColor="#ffe944"/><stop offset="100%" stopColor={maxColor}/></linearGradient>
+   <linearGradient id={`gauge-needle-${uid}`} x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stopColor="#9ea9dc"/><stop offset="48%" stopColor="#fff"/><stop offset="100%" stopColor="#e4ecff"/></linearGradient>
+   <filter id={`gauge-glow-${uid}`} x="-30%" y="-50%" width="160%" height="200%"><feGaussianBlur stdDeviation="5"/></filter>
+  </defs>
+  <path className="linked-results-gauge-halo" d={arc} stroke={arcColor} filter={`url(#gauge-glow-${uid})`}/>
+  <path className="linked-results-gauge-track" d={arc}/>
+  <path className="linked-results-gauge-fill" d={arc} stroke={arcColor}/>
+  {ticks.map(t=><g key={t.i} className={t.major?'linked-results-gauge-major':'linked-results-gauge-minor'}>
+   <line x1={t.inside.x} y1={t.inside.y} x2={t.outside.x} y2={t.outside.y}/>
+   {t.label&&<text x={t.label.x} y={t.label.y} dominantBaseline="middle" textAnchor="middle">{fmt(model.min+t.i/50*(model.max-model.min))}</text>}
+  </g>)}
+  {model.value!==null&&<g className="linked-results-gauge-needle">
+   <path d={`M 174 188 L ${tip.x} ${tip.y} L 186 178 Z`} fill={`url(#gauge-needle-${uid})`}/>
+   <circle cx="180" cy="183" r="15" fill="#25345e" stroke="#a9b9ff" strokeWidth="3"/>
+   <circle cx="176" cy="179" r="7" fill="#d0d9ff" opacity=".8"/>
+  </g>}
+  {showValue&&<text className="linked-results-gauge-value" x="180" y="245" textAnchor="middle">{label}</text>}
+  <text className="linked-results-gauge-caption" x="180" y="273" textAnchor="middle">{widget.label||'Risultati'}</text>
  </svg>;
 }
 
@@ -1245,6 +1261,15 @@ function WidgetCanvas({widgets,numberingWidgets,onChange,pageTitle="",sessionTit
    const frame=node.querySelector<HTMLElement>(':scope > .widget-fit-frame');
    const content=frame?.querySelector<HTMLElement>(':scope > .widget-fit-content');
    if(!frame||!content)continue;
+   // Gauge uses a compact aspect ratio; shrink only automatically fitted results widgets.
+   if(w.kind==='results-button'&&effectiveResultView(w,widgets)==='gauge'){
+    const desired=Math.max(13,Math.min(80,(node.clientWidth*.78+(w.resultsOnly?12:54))/rect.height*100));
+    if(p.height>desired+1){
+     const current:any[]=changes??widgets;
+     changes=current.map(z=>z.id===w.id?{...z,position:{...z.position,height:desired}}:z);
+     continue;
+    }
+   }
    const overflow=measuredContentOverflowPx(frame.clientHeight,content.scrollHeight);
    if(overflow<=2)continue;
    const next=autoFitExpandedPosition(p,overflow,rect.height);
@@ -1586,7 +1611,7 @@ function WidgetCanvas({widgets,numberingWidgets,onChange,pageTitle="",sessionTit
    <label><input type="checkbox" checked={w.kind==='qr'?w.showTitle===true:w.showTitle!==false} onChange={e=>patch(w.id,{showTitle:e.target.checked})}/> {['question','timed-quiz','topic-question'].includes(w.kind)?'Mostra testo della domanda':'Mostra titolo widget'}</label>
    {w.kind==='qr'&&<><label><input type="checkbox" checked={w.showQrUrl!==false} onChange={e=>patch(w.id,{showQrUrl:e.target.checked})}/> Mostra URL accesso (riga singola)</label>{w.showQrUrl!==false&&<label>Dimensione font URL (px)<EditableNumberField ariaLabel="Dimensione font URL QRCode" min={10} max={96} value={w.qrUrlFontSize??15} onCommit={next=>{const old=Math.max(10,Math.min(96,Number(w.qrUrlFontSize)||15));const width=Number(w.position?.width)||25;const x=Number(w.position?.x)||0;const delta=Math.max(0,next-old)*0.9;const growth=Math.max(0,Math.min(delta,100-x-width));patch(w.id,{qrUrlFontSize:next,qrUrlWidthExtra:(Number(w.qrUrlWidthExtra)||0)+growth*12.8,position:{...w.position,width:width+growth}})}}/></label>}</>}
    {['question','timed-quiz','rating','reactions','topic-question','results-button'].includes(w.kind)&&<><label>Tipo di grafico risultati<select aria-label="Tipo grafico risultati - Formato widget" value={w.resultsView||(w.kind==='results-button'?linkedStatisticSource(w,widgets)?.resultsView:undefined)||'bars'} onChange={e=>patch(w.id,{resultsView:e.target.value})}><option value="bars">Barre</option><option value="pie">Torta</option><option value="table">Tabella</option><option value="cloud">Nuvola</option><option value="gauge">Gauge semicircolare</option></select></label>
-   {(w.resultsView||(w.kind==='results-button'?linkedStatisticSource(w,widgets)?.resultsView:undefined))==='gauge'&&<div className="gauge-format-controls" role="group" aria-label="Opzioni Gauge"><label>Limite minimo<select aria-label="Modalità minimo Gauge" value={w.gaugeMinMode||'auto'} onChange={e=>patch(w.id,{gaugeMinMode:e.target.value})}><option value="auto">Automatico da dati / sorgente</option><option value="manual">Manuale</option></select></label>{w.gaugeMinMode==='manual'&&<label>Minimo<input type="number" aria-label="Minimo Gauge" step="any" min={-1000000} max={1000000} value={w.gaugeMin??0} onChange={e=>{const n=Number(e.target.value);if(Number.isFinite(n)&&Math.abs(n)<=1000000)patch(w.id,{gaugeMin:n})}}/></label>}<label>Limite massimo<select aria-label="Modalità massimo Gauge" value={w.gaugeMaxMode||'auto'} onChange={e=>patch(w.id,{gaugeMaxMode:e.target.value})}><option value="auto">Automatico da dati / sorgente</option><option value="manual">Manuale</option></select></label>{w.gaugeMaxMode==='manual'&&<label>Massimo<input type="number" aria-label="Massimo Gauge" step="any" min={-1000000} max={1000000} value={w.gaugeMax??9} onChange={e=>{const n=Number(e.target.value);if(Number.isFinite(n)&&Math.abs(n)<=1000000)patch(w.id,{gaugeMax:n})}}/></label>}<label>Aggregazione<select aria-label="Aggregazione Gauge" value={w.gaugeAggregation||'mean'} onChange={e=>patch(w.id,{gaugeAggregation:e.target.value})}><option value="min">Minimo</option><option value="max">Massimo</option><option value="mean">Media ponderata</option></select></label><label><input type="checkbox" checked={w.gaugeShowValue!==false} onChange={e=>patch(w.id,{gaugeShowValue:e.target.checked})}/> Mostra indicatore del valore</label><label>Colore Gauge<input type="color" aria-label="Colore Gauge" value={w.gaugeColor||'#000000'} onChange={e=>patch(w.id,{gaugeColor:e.target.value})}/></label><label><input type="checkbox" checked={w.gaugeGradient===true} onChange={e=>patch(w.id,{gaugeGradient:e.target.checked})}/> Gradiente minimo/massimo</label>{w.gaugeGradient===true&&<><label>Colore minimo<input type="color" aria-label="Colore minimo Gauge" value={w.gaugeMinColor||'#d44949'} onChange={e=>patch(w.id,{gaugeMinColor:e.target.value})}/></label><label>Colore massimo<input type="color" aria-label="Colore massimo Gauge" value={w.gaugeMaxColor||'#22ad80'} onChange={e=>patch(w.id,{gaugeMaxColor:e.target.value})}/></label></>}</div>}</>}
+   {(w.resultsView||(w.kind==='results-button'?linkedStatisticSource(w,widgets)?.resultsView:undefined))==='gauge'&&<div className="gauge-format-controls" role="group" aria-label="Opzioni Gauge"><label>Limite minimo<select aria-label="Modalità minimo Gauge" value={w.gaugeMinMode||'auto'} onChange={e=>patch(w.id,{gaugeMinMode:e.target.value})}><option value="auto">Automatico da dati / sorgente</option><option value="manual">Manuale</option></select></label>{w.gaugeMinMode==='manual'&&<label>Minimo<input type="number" aria-label="Minimo Gauge" step="any" min={-1000000} max={1000000} value={w.gaugeMin??0} onChange={e=>{const n=Number(e.target.value);if(Number.isFinite(n)&&Math.abs(n)<=1000000)patch(w.id,{gaugeMin:n})}}/></label>}<label>Limite massimo<select aria-label="Modalità massimo Gauge" value={w.gaugeMaxMode||'auto'} onChange={e=>patch(w.id,{gaugeMaxMode:e.target.value})}><option value="auto">Automatico da dati / sorgente</option><option value="manual">Manuale</option></select></label>{w.gaugeMaxMode==='manual'&&<label>Massimo<input type="number" aria-label="Massimo Gauge" step="any" min={-1000000} max={1000000} value={w.gaugeMax??9} onChange={e=>{const n=Number(e.target.value);if(Number.isFinite(n)&&Math.abs(n)<=1000000)patch(w.id,{gaugeMax:n})}}/></label>}<label>Aggregazione<select aria-label="Aggregazione Gauge" value={w.gaugeAggregation||'mean'} onChange={e=>patch(w.id,{gaugeAggregation:e.target.value})}><option value="min">Minimo</option><option value="max">Massimo</option><option value="mean">Media ponderata</option></select></label><label><input type="checkbox" checked={w.gaugeShowValue!==false} onChange={e=>patch(w.id,{gaugeShowValue:e.target.checked})}/> Mostra indicatore del valore</label><label>Colore Gauge<input type="color" aria-label="Colore Gauge" value={w.gaugeColor||'#000000'} onChange={e=>patch(w.id,{gaugeColor:e.target.value})}/></label><label><input type="checkbox" checked={w.gaugeGradient!==false} onChange={e=>patch(w.id,{gaugeGradient:e.target.checked})}/> Gradiente minimo/massimo</label>{w.gaugeGradient!==false&&<><label>Colore minimo<input type="color" aria-label="Colore minimo Gauge" value={w.gaugeMinColor||'#d44949'} onChange={e=>patch(w.id,{gaugeMinColor:e.target.value})}/></label><label>Colore massimo<input type="color" aria-label="Colore massimo Gauge" value={w.gaugeMaxColor||'#22ad80'} onChange={e=>patch(w.id,{gaugeMaxColor:e.target.value})}/></label></>}</div>}</>}
    {w.kind==='results-button'&&<><label><input type="checkbox" checked={w.pieShowOptionNumbers===true} onChange={e=>patch(w.id,{pieShowOptionNumbers:e.target.checked})}/> Torta: numera le opzioni nella torta e nella legenda</label><label><input type="checkbox" checked={w.pieShowPercentages===true} onChange={e=>patch(w.id,{pieShowPercentages:e.target.checked})}/> Torta: visualizza percentuale per fetta</label><label className="results-pie-size-control">Dimensione torta <input type="range" aria-label="Dimensione torta risultati" min={25} max={150} step={5} value={resultPieSize(w.pieSize)} onChange={e=>patch(w.id,{pieSize:Number(e.target.value)})}/><output>{resultPieSize(w.pieSize)}%</output></label><label>Ordinamento risposte (tutti i grafici)<select aria-label="Ordinamento risposte risultati" value={w.resultSortOrder||'count-desc'} onChange={e=>patch(w.id,{resultSortOrder:e.target.value})}><option value="count-desc">Numero risposte decrescente</option><option value="count-asc">Numero risposte crescente</option><option value="index-asc">Indice opzione crescente</option><option value="index-desc">Indice opzione decrescente</option></select></label><label><input type="checkbox" checked={w.barHitGradient===true} onChange={e=>patch(w.id,{barHitGradient:e.target.checked})}/> Barre: gradiente proporzionale al numero di risposte</label>{w.barHitGradient===true&&<span className="results-gradient-colors" role="group" aria-label="Colori del gradiente delle barre risultati"><label>Colore iniziale <input type="color" aria-label="Colore iniziale gradiente barre" value={w.barGradientStartColor||'#cbd5e1'} onChange={e=>patch(w.id,{barGradientStartColor:e.target.value})}/></label><label>Colore finale <input type="color" aria-label="Colore finale gradiente barre" value={w.barGradientEndColor||'#1a9e8b'} onChange={e=>patch(w.id,{barGradientEndColor:e.target.value})}/></label></span>}<label><input type="checkbox" checked={w.resultsOnly===true} onChange={e=>patch(w.id,{resultsOnly:e.target.checked})}/> Solo risultati</label><label><input type="checkbox" checked={w.showSourceTitle??w.showSourceQuestion===true} onChange={e=>patch(w.id,{showSourceTitle:e.target.checked,showSourceAnswers:w.showSourceAnswers??w.showSourceQuestion===true,resultsOnly:e.target.checked?false:w.resultsOnly})}/> Riporta titolo sorgente</label><label><input type="checkbox" checked={w.showSourceAnswers??w.showSourceQuestion===true} onChange={e=>patch(w.id,{showSourceAnswers:e.target.checked,showSourceTitle:w.showSourceTitle??w.showSourceQuestion===true,resultsOnly:e.target.checked?false:w.resultsOnly})}/> Riporta opzioni sorgente</label></>}
    {w.kind==='footer'&&<><label><input type="checkbox" checked={w.footerShowSessionTitle!==false} onChange={e=>patch(w.id,{footerShowSessionTitle:e.target.checked})}/> Testo della sessione</label><label><input type="checkbox" checked={w.footerShowPageNumber!==false} onChange={e=>patch(w.id,{footerShowPageNumber:e.target.checked})}/> Numero pagina</label><label><input type="checkbox" checked={w.footerSeparator!==false} onChange={e=>patch(w.id,{footerSeparator:e.target.checked})}/> Linea separatrice</label></>}
   </div></section>}

@@ -2044,14 +2044,14 @@
       "54a62e5d"
     ],
     "apps/web/src/main.tsx": [
-      "372fc74e",
-      "75a9ade9",
-      "995f547d",
-      "4387f780",
-      "6638b54b",
-      "0abbcd72",
-      "cd103b8d",
-      "e7cdf543"
+      "2fbdd8e3",
+      "a54cf3f5",
+      "37a84cb4",
+      "c2941b6d",
+      "4c87446b",
+      "17774f6f",
+      "ec1d73a0",
+      "67bda8ff"
     ],
     "apps/web/src/main.tsx.orig": [
       "9230e5a3",
@@ -2424,14 +2424,14 @@
       "2586b822"
     ],
     "apps/web/src/style.css": [
-      "c7922f5b",
-      "7cd3ee72",
-      "b04e54c1",
-      "addbb960",
-      "5d2fb09c",
-      "1463c51a",
-      "c4c43521",
-      "1866ad99"
+      "f8d87cd0",
+      "4ef796f8",
+      "7fc4aebe",
+      "2d5e0d62",
+      "61c08bd1",
+      "2f9a3155",
+      "ed90e85f",
+      "c4290e7f"
     ],
     "apps/web/src/thumbnail-menu-layout.ts": [
       "a4748563",
@@ -3844,14 +3844,14 @@
       "881885b6"
     ],
     "apps/web/test/widget-results.test.ts": [
-      "eec7e119",
-      "1b01d35b",
-      "264b8a69",
-      "a58c771f",
-      "f628c69b",
-      "1bb68ea4",
-      "1bc16f15",
-      "a982d019"
+      "d0f148b4",
+      "58e18306",
+      "3a1b6e4d",
+      "f9183fe1",
+      "252ddcc2",
+      "18a3ddad",
+      "a8b44e92",
+      "e2e15c64"
     ],
     "apps/web/test/widget-rich-editor-ime.test.ts": [
       "88248341",
@@ -5084,14 +5084,14 @@
       "d240df37"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "febae2c6",
-      "6f400fb7",
-      "800ecee8",
-      "5114c800",
-      "d4717093",
-      "1b542fde",
-      "fc826291",
-      "98a81b5b"
+      "b8d0855e",
+      "831d0e23",
+      "97005ac6",
+      "063339cd",
+      "33334168",
+      "857215be",
+      "7b7633f6",
+      "91cbdb78"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",
