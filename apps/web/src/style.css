@@ -4026,12 +4026,25 @@ body .editor-floating-panel.widget-selection-palette{
 .linked-results.result-view-pie .linked-results-items{flex:1 1 auto!important;min-height:24%!important;overflow-y:auto!important;scrollbar-width:thin}
 .linked-results-pie-empty{vector-effect:non-scaling-stroke}
 
-/* RC313: identical vector semicircle across all chart rendering surfaces. */
-.linked-results-gauge{display:block;width:min(100%,520px);height:auto;max-height:52%;margin:0 auto;overflow:visible;flex:0 1 auto}
-.linked-results-gauge-track{stroke:#e3e7ed;stroke-width:19;fill:none;stroke-linecap:round}
-.linked-results-gauge-fill{stroke-width:19;fill:none;stroke-linecap:round;stroke-dashoffset:0;transition:stroke-dasharray 240ms ease}
-.linked-results-gauge-value{font:700 36px system-ui,sans-serif;fill:currentColor}
-.linked-results-gauge-limit{font:500 15px system-ui,sans-serif;fill:currentColor}
-.gauge-format-controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.gauge-format-controls label{display:flex;gap:6px;align-items:center}
-@media(prefers-reduced-motion:reduce){.linked-results-gauge-fill{transition:none}}
+/* RC316: luminous, graduated needle dial. No 52%-height cap: the widget
+   auto-fits to the chart, not to the old vertical answer list. */
+.linked-results.result-view-gauge{
+ background:radial-gradient(ellipse at 50% 78%,#1c295b 0%,#101b3a 52%,#090f24 100%)!important;
+ color:#f7f8ff!important;gap:.2em!important;overflow:hidden!important;
+}
+.linked-results.result-view-gauge .linked-results-gauge{
+ width:100%!important;max-width:580px!important;max-height:none!important;
+ height:auto!important;min-height:0!important;flex:0 1 auto!important;
+ margin:auto auto 0!important;overflow:visible!important;
+ filter:drop-shadow(0 1px 7px #4b49ad55);
+}
+.linked-results-gauge-halo{fill:none;stroke-width:27;opacity:.55;stroke-linecap:round}
+.linked-results-gauge-track{fill:none;stroke:#3b4765;stroke-width:22;stroke-linecap:round;opacity:.75}
+.linked-results-gauge-fill{fill:none;stroke-width:20;stroke-linecap:round}
+.linked-results-gauge-major line{stroke:#f5f7ff;stroke-width:2.6}
+.linked-results-gauge-minor line{stroke:#ced7ed;stroke-width:1;opacity:.65}
+.linked-results-gauge-major text{fill:#f7f9ff;font:600 12px system-ui,sans-serif}
+.linked-results-gauge-needle{filter:drop-shadow(0 2px 4px #a39cff8e)}
+.linked-results-gauge-value{fill:#fff;font:800 43px system-ui,sans-serif;letter-spacing:-1.5px}
+.linked-results-gauge-caption{fill:#d9defb;font:500 14px system-ui,sans-serif}
+@media(prefers-reduced-motion:reduce){.linked-results-gauge *{transition:none!important;animation:none!important}}
