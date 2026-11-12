@@ -3284,14 +3284,14 @@
       "50d5cca1"
     ],
     "apps/web/test/rc222-editor-compact-answer-format.test.ts": [
-      "6786b355",
-      "594bc60a",
-      "eda489c2",
-      "02d61a15",
-      "71d55bad",
-      "6296ff51",
-      "f91f8791",
-      "74715984"
+      "2953efc7",
+      "af4049f3",
+      "395488bb",
+      "3d89e224",
+      "8f8bcd6f",
+      "def7c8e6",
+      "7e88f2e0",
+      "938aa41f"
     ],
     "apps/web/test/rc223-format-footer-qr.test.ts": [
       "7f559305",
@@ -5084,14 +5084,14 @@
       "d240df37"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "cd6abc28",
-      "e5ddd540",
-      "249cc5ce",
-      "85b5b72d",
-      "6977614b",
-      "252b2873",
-      "1ce9cfd8",
-      "2226b13d"
+      "64fdf98c",
+      "640a549d",
+      "78f57898",
+      "66f4380e",
+      "aaea0ccc",
+      "b07765f5",
+      "7b79b4bf",
+      "940ae056"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",
@@ -22264,14 +22264,14 @@
       "a45db826"
     ],
     "tools/tests/test_rc222_compact_editor_answers.py": [
-      "e8a7c2fc",
-      "577a834d",
-      "509594f6",
-      "8c375129",
-      "774929f5",
-      "dfe82546",
-      "18b9878c",
-      "7f4736fc"
+      "01c5a5aa",
+      "c69bdc87",
+      "28302d89",
+      "ce9e8728",
+      "bde66766",
+      "d92f456b",
+      "44cd681b",
+      "78b0089c"
     ],
     "tools/tests/test_rc223_format_layout.py": [
       "85976f4d",

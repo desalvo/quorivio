@@ -1,5 +1,8 @@
 # Quorivio 0.1.0-dev — RC293 — Compact visual manuals and product brochures
 
+**RC318 CI historical regression reconciliation (2026-11-12):** RC222 old Python and Node source-contract tests still required the former result-panel title ("Stile indipendente delle opzioni e delle barre"), despite the live panel intentionally supporting titles, options, bars, pies and gauges under the new heading ("Stile indipendente di titoli, opzioni e risultati"). Updated both tests to verify the modern heading while retaining typography, wrapping, content-persistence and dedicated results-format controls. This resolves the specific failure seen in workflow 43138983580 without reverting contextual formatting. **CI must be rerun before merge; no claim of green or Docker publication.**
+
+
 **RC318 additional network and chart hardening (2026-11-12):** Protected authenticated upload/download HTTP calls from repeated network requests after expiry, while leaving public join and re-login available. The request wrapper now returns a synthetic 401 for stale authenticated transfers. Reaction bubbles are constrained to reaction sources and fall back to bars if a linked source changes; API schema rejects bubbles on incompatible source widgets. Regression coverage and checksum manifest updated. **Full CI remains to be confirmed; no external RC acceptance or Docker publication claimed.**
 
 
