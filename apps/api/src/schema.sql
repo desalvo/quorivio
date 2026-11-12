@@ -29,6 +29,8 @@ ALTER TABLE activities ADD COLUMN IF NOT EXISTS result_design jsonb NOT NULL DEF
 ALTER TABLE participants ADD COLUMN IF NOT EXISTS pseudonym text;
 ALTER TABLE participants ADD COLUMN IF NOT EXISTS user_id uuid REFERENCES users(id) ON DELETE SET NULL;
 CREATE TABLE IF NOT EXISTS platform_settings(key text PRIMARY KEY,value text NOT NULL,updated_at timestamptz NOT NULL DEFAULT now());
+-- Disabled-by-default, encrypted authentication-provider configuration (all replicas share PostgreSQL).
+CREATE TABLE IF NOT EXISTS auth_backends(id text PRIMARY KEY,kind text NOT NULL CHECK(kind IN ('local','ldap','oidc','social')),enabled boolean NOT NULL DEFAULT false,mfa_enabled boolean NOT NULL DEFAULT false,config_encrypted text NOT NULL DEFAULT '',last_tested_at timestamptz,updated_at timestamptz NOT NULL DEFAULT now());
 INSERT INTO platform_settings(key,value) VALUES('closed_session_retention_days','60') ON CONFLICT DO NOTHING;
 -- Durable GDPR session-media erasure outbox. Must be created before startup purge.
 CREATE TABLE IF NOT EXISTS session_asset_cleanup_jobs(
