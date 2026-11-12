@@ -49,7 +49,7 @@ const initialConfig=(id:string,kind:Kind)=>({
 });
 export function AuthBackendSettingsPanel({request}:{request:ApiRequest}){
  const [items,setItems]=useState<Backend[]>([]),[selected,setSelected]=useState('local'),[drafts,setDrafts]=useState<Record<string,Backend>>({});
- const [newId,setNewId]=useState(''),[busy,setBusy]=useState(false),[message,setMessage]=useState('');
+ const [newId,setNewId]=useState(''),[newKind,setNewKind]=useState<'ldap'|'oidc'>('oidc'),[busy,setBusy]=useState(false),[message,setMessage]=useState('');
  const refresh=async(resetDrafts=true)=>{const r=await request<{backends:Backend[]}>('/admin/auth/backends','GET',undefined,{cache:'no-store'});setItems(r.backends);if(resetDrafts)setDrafts({})};
  useEffect(()=>{void refresh().catch(e=>setMessage(String(e)))},[]);
  const existing=items.find(x=>x.id===selected);
@@ -90,9 +90,11 @@ export function AuthBackendSettingsPanel({request}:{request:ApiRequest}){
    await refresh(false).catch(()=>setMessage(prefix+detail+' Impossibile aggiornare l’elenco.'));}
   catch(e){setMessage('Test non riuscito: '+String(e))}finally{setBusy(false)}
  };
- const add=()=>{const id=newId.trim().toLowerCase();
-  if(!/^[a-z][a-z0-9_-]{1,31}$/.test(id)||['local','ldap','github','facebook'].includes(id)||items.some(x=>x.id===id)){setMessage('ID OIDC non valido o già utilizzato.');return}
-  setDrafts(old=>({...old,[id]:{id,kind:'oidc',enabled:false,mfaEnabled:false,configured:false,hasSecret:false,lastTestedAt:null,config:initialConfig(id,'oidc')}}));
+ const add=()=>{const raw=newId.trim().toLowerCase();
+  const id=newKind==='ldap'?(raw.startsWith('ldap-')?raw:'ldap-'+raw):raw;
+  if(!/^[a-z][a-z0-9_-]{1,31}$/.test(id)||(newKind==='ldap'&&!/^ldap-[a-z][a-z0-9_-]{0,25}$/.test(id))||(newKind==='oidc'&&id.startsWith('ldap-'))||['local','ldap','github','facebook'].includes(id)||items.some(x=>x.id===id)){setMessage('ID non valido o già utilizzato.');return}
+  const config={...initialConfig(id,newKind),...(newKind==='ldap'?{label:raw.replace(/^ldap-/,'').replace(/[-_]/g,' ').toUpperCase()}: {})};
+  setDrafts(old=>({...old,[id]:{id,kind:newKind,enabled:false,mfaEnabled:false,configured:false,hasSecret:false,lastTestedAt:null,config}}));
   setSelected(id);setNewId('');setMessage('Configura il provider e salva; sarà inizialmente disabilitato.');
  };
  return <section className="panel auth-backend-settings" aria-label="Autenticazione e autorizzazione server">
@@ -100,9 +102,9 @@ export function AuthBackendSettingsPanel({request}:{request:ApiRequest}){
   <p className="muted tiny">Solo gli amministratori di piattaforma possono configurare questi backend. LDAP(S), Google, GitHub, Facebook e gli altri provider OIDC sono disabilitati per default; possono essere attivi contemporaneamente. Ogni SSO attiva avrà un pulsante separato alla login.</p>
   <label>Backend<select aria-label="Seleziona backend di autenticazione" value={selected} onChange={e=>{setSelected(e.target.value);setMessage('')}}>
    {items.map(p=><option key={p.id} value={p.id}>{p.id==='local'?'Interno':p.config.label||p.id} — {p.enabled?'attivo':'disabilitato'}</option>)}
-   {!items.some(x=>x.id===selected)&&item&&<option value={item.id}>{item.id} — nuovo OIDC</option>}
+   {!items.some(x=>x.id===selected)&&item&&<option value={item.id}>{item.id} — nuovo {item.kind.toUpperCase()}</option>}
   </select></label>
-  <div className="activity-row"><label>Nuovo provider OIDC<input aria-label="ID nuovo provider OIDC" placeholder="infn" maxLength={32} value={newId} onChange={e=>setNewId(e.target.value)}/></label><button type="button" className="outline small" disabled={busy||!newId.trim()} onClick={add}>Aggiungi SSO</button></div>
+  <div className="activity-row"><label>Tipo nuovo provider<select aria-label="Tipo nuovo provider" value={newKind} onChange={e=>setNewKind(e.target.value as 'ldap'|'oidc')}><option value="ldap">LDAP / Active Directory</option><option value="oidc">SSO OIDC</option></select></label><label>Identificativo<input aria-label="ID nuovo provider" placeholder={newKind==='ldap'?'infn (diventa ldap-infn)':'infn'} maxLength={32} value={newId} onChange={e=>setNewId(e.target.value)}/></label><button type="button" className="outline small" disabled={busy||!newId.trim()} onClick={add}>Aggiungi provider</button></div>
   {item&&<>
    <p className="muted tiny">Tipo: {item.kind.toUpperCase()} · {item.configured?'Configurazione salvata completa':'Configurazione salvata incompleta'} · Ultimo test salvato: {item.lastTestedAt?new Date(item.lastTestedAt).toLocaleString('it-IT'):'mai eseguito'}{drafts[selected]?' · Modifiche non salvate':''}</p>
    {item.kind==='local'?<p>Il backend interno non può essere disabilitato: mantiene sempre disponibile l’accesso amministrativo.</p>:

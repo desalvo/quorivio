@@ -62,7 +62,8 @@ export function defaultAuthBackends(env:NodeJS.ProcessEnv=process.env):Backend[]
 }
 function expectedKind(id:string):AuthBackendKind{
  if(id==='local')return 'local';
- if(id==='ldap')return 'ldap';
+ if(id==='ldap'||/^ldap-[a-z][a-z0-9_-]{0,25}$/.test(id))return 'ldap';
+ if(id.startsWith('ldap-'))throw Error('invalid_backend_id');
  if(id==='github'||id==='facebook')return 'social';
  if(!BACKEND_ID.test(id))throw Error('invalid_backend_id');
  return 'oidc';
@@ -154,8 +155,17 @@ export async function saveAuthBackend(db:Pool,secret:string,id:string,input:unkn
   [id,kind,revised.enabled,revised.mfaEnabled,kind==='local'?'':sealAuthConfig(config,secret)]);
  return backendPublic(revised);
 }
-export async function enabledLdapBackend(db:Pool,secret:string):Promise<LdapSettings|null>{
- const b=(await loadAuthBackends(db,secret)).find(x=>x.id==='ldap');
+export function ldapIdentityKey(backendId:string):string{return backendId==='ldap'?'default':backendId}
+export async function enabledLdapBackends(db:Pool,secret:string):Promise<{id:string;label:string}[]>{
+ const backends=await loadAuthBackends(db,secret);
+ return backends.filter(b=>b.kind==='ldap'&&b.enabled).map(b=>{
+  validateAuthBackend(b.id,b.kind,b.config);
+  return {id:b.id,label:String(b.config.label||b.id)};
+ });
+}
+export async function enabledLdapBackend(db:Pool,secret:string,id='ldap'):Promise<LdapSettings|null>{
+ if(id!=='ldap'&&!/^ldap-[a-z][a-z0-9_-]{0,25}$/.test(id))return null;
+ const b=(await loadAuthBackends(db,secret)).find(x=>x.id===id&&x.kind==='ldap');
  if(!b?.enabled)return null;
  validateAuthBackend(b.id,b.kind,b.config);
  const c=b.config;
@@ -171,9 +181,10 @@ export async function enabledSocialBackends(db:Pool,secret:string):Promise<Socia
  return (await loadAuthBackends(db,secret)).filter(x=>x.kind==='social'&&x.enabled).map(b=>{validateAuthBackend(b.id,b.kind,b.config);return {id:b.id,clientId:b.config.clientId,clientSecret:b.config.clientSecret,redirectUri:b.config.redirectUri,buttonColor:b.config.buttonColor} as SocialProvider});
 }
 export async function backendAllowsMfa(db:Pool,secret:string,userId:string):Promise<boolean>{
- const isLdap=(await db.query('SELECT EXISTS(SELECT 1 FROM ldap_identities WHERE user_id=$1) AS ldap',[userId])).rows[0]?.ldap===true;
+ const linked=await db.query('SELECT provider FROM ldap_identities WHERE user_id=$1 ORDER BY provider LIMIT 1',[userId]);
+ const id=linked.rowCount?(linked.rows[0].provider==='default'?'ldap':linked.rows[0].provider):'local';
  const backends=await loadAuthBackends(db,secret);
- return Boolean(backends.find(x=>x.id===(isLdap?'ldap':'local'))?.mfaEnabled);
+ return Boolean(backends.find(x=>x.id===id&&x.enabled)?.mfaEnabled);
 }
 /** Tests do not create sessions or link users, and cannot expose credentials. */
 export async function testAuthBackend(db:Pool,secret:string,id:string,draft?:unknown):Promise<{ok:true;scope:string;preview:boolean}>{

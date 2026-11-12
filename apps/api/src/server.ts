@@ -37,7 +37,7 @@ import {normalizeWord,validateQuestion,moderationStatus,safeFrequency,parseModer
 import {validPageOrder} from './page-sequence.js';
 import {HOUSEKEEPING_PERIOD_MS,removeExpiredConversionJobs,removeOrphanSessionAssetFiles} from './temporary-housekeeping.js';
 import {authenticateDirectory,searchDirectory} from './ldap-auth.js';
-import {loadAuthBackends,backendPublic,saveAuthBackend,testAuthBackend,enabledLdapBackend,enabledOidcBackends,enabledSocialBackends,backendAllowsMfa} from './auth-backends.js';
+import {loadAuthBackends,backendPublic,saveAuthBackend,testAuthBackend,enabledLdapBackend,enabledLdapBackends,ldapIdentityKey,enabledOidcBackends,enabledSocialBackends,backendAllowsMfa} from './auth-backends.js';
 import {publicSsoBranding} from './sso-branding.js';
 import {auditOperation,validAuditRetention} from './operation-audit.js';
 import {sendRegistrationReviewEmail} from './smtp.js';
@@ -439,9 +439,14 @@ app.get('/api/auth/social/:provider/callback',async(req,res)=>{
 /** LDAP/LDAPS is opt-in and *separate* from local authentication. An LDAP
  * search is not authentication: the user's own DN must successfully bind.
  * Email matches never create implicit links to existing local/SSO accounts. */
-app.get('/api/auth/ldap/status',async(_req,res)=>{try{const ldapSettings=await enabledLdapBackend(db,secret).catch(()=>null);res.setHeader('Cache-Control','no-store');res.json({enabled:!!ldapSettings,label:ldapSettings?.label||'LDAP / Active Directory'})}catch(e){console.error('LDAP status unavailable',e instanceof Error?e.name:'error');res.status(503).json({error:'auth_config_unavailable'})}});
+app.get('/api/auth/ldap/status',async(_req,res)=>{try{
+ const providers=await enabledLdapBackends(db,secret);
+ res.setHeader('Cache-Control','no-store');
+ res.json({enabled:providers.length>0,label:providers[0]?.label||'LDAP / Active Directory',providers});
+ }catch(e){console.error('LDAP status unavailable',e instanceof Error?e.name:'error');res.status(503).json({error:'auth_config_unavailable'})}});
 app.post('/api/auth/ldap/register',async(req,res)=>{
- const ldapSettings=await enabledLdapBackend(db,secret).catch(()=>null);
+ const backendId=typeof req.body?.backendId==='string'?req.body.backendId:'ldap';
+ const ldapSettings=await enabledLdapBackend(db,secret,backendId).catch(()=>null);
  if(!ldapSettings){res.status(404).json({error:'ldap_not_configured'});return}
  const login=req.body?.email,password=req.body?.password;
  if(typeof login!=='string'||typeof password!=='string'||!login.trim()||login.length>254){res.status(400).json({error:'invalid_request'});return}
@@ -451,18 +456,19 @@ app.post('/api/auth/ldap/register',async(req,res)=>{
   const cx=await db.connect();let begun=false;
   try{await cx.query('BEGIN');begun=true;
    if((await cx.query('SELECT 1 FROM users WHERE lower(email)=$1',[verified.email])).rowCount||
-      (await cx.query('SELECT 1 FROM ldap_identities WHERE provider=$1 AND subject=$2',['default',verified.subject])).rowCount){await cx.query('ROLLBACK');begun=false;res.status(409).json({error:'account_exists'});return}
+      (await cx.query('SELECT 1 FROM ldap_identities WHERE provider=$1 AND subject=$2',[ldapIdentityKey(backendId),verified.subject])).rowCount){await cx.query('ROLLBACK');begun=false;res.status(409).json({error:'account_exists'});return}
    const orgId=ldapSettings.organizationId||(await cx.query('SELECT id FROM organizations ORDER BY id LIMIT 1')).rows[0]?.id;
    if(!orgId){await cx.query('ROLLBACK');begun=false;res.status(503).json({error:'organization_unavailable'});return}
    const id=randomUUID();await cx.query('INSERT INTO users(id,organization_id,email,password_hash,role,approved,must_change_password) VALUES($1,$2,$3,$4,$5,false,false)',[id,orgId,verified.email,await bcrypt.hash(randomBytes(32).toString('base64url'),12),'user']);
-   await cx.query('INSERT INTO ldap_identities(provider,subject,user_id) VALUES($1,$2,$3)',['default',verified.subject,id]);
+   await cx.query('INSERT INTO ldap_identities(provider,subject,user_id) VALUES($1,$2,$3)',[ldapIdentityKey(backendId),verified.subject,id]);
    await cx.query('COMMIT');begun=false;
    void notifyRegistration(verified.email,'ldap');res.status(202).json({status:'pending_admin_approval'});
   }finally{if(begun)await cx.query('ROLLBACK').catch(()=>{});cx.release()}
  }catch(e){if((e as any)?.code==='23505'){res.status(409).json({error:'account_exists'});return}console.error('ldap registration unavailable',e instanceof Error?e.name:'unknown');res.status(503).json({error:'ldap_registration_unavailable'})}
 });
 app.post('/api/auth/ldap/login',async(req,res)=>{
- const ldapSettings=await enabledLdapBackend(db,secret).catch(()=>null);
+ const backendId=typeof req.body?.backendId==='string'?req.body.backendId:'ldap';
+ const ldapSettings=await enabledLdapBackend(db,secret,backendId).catch(()=>null);
  if(!ldapSettings){res.status(404).json({error:'ldap_not_configured'});return}
  const login=req.body?.email,password=req.body?.password;
  if(typeof login!=='string'||typeof password!=='string'||login.length>254||!login.trim()||password.length>1024){res.status(400).json({error:'invalid_request'});return}
@@ -472,7 +478,7 @@ app.post('/api/auth/ldap/login',async(req,res)=>{
   const cx=await db.connect();let user:any;let started=false;
   try{
    await cx.query('BEGIN');started=true;
-   const linked=await cx.query('SELECT u.id,u.email,u.role,u.approved,u.must_change_password,u.totp_enabled,u.email_mfa_enabled FROM ldap_identities li JOIN users u ON u.id=li.user_id WHERE li.provider=$1 AND li.subject=$2 FOR UPDATE OF u',['default',verified.subject]);
+   const linked=await cx.query('SELECT u.id,u.email,u.role,u.approved,u.must_change_password,u.totp_enabled,u.email_mfa_enabled FROM ldap_identities li JOIN users u ON u.id=li.user_id WHERE li.provider=$1 AND li.subject=$2 FOR UPDATE OF u',[ldapIdentityKey(backendId),verified.subject]);
    if(linked.rowCount){
     user=linked.rows[0];
     // Directory groups never overwrite administrator-assigned Quorivio roles.
@@ -483,7 +489,7 @@ app.post('/api/auth/ldap/login',async(req,res)=>{
     if(!org.rowCount){res.status(503).json({error:'ldap_organization_unavailable'});return}
     const id=randomUUID();const passwordHash=await bcrypt.hash(randomBytes(32).toString('base64url'),12);
     await cx.query('INSERT INTO users(id,organization_id,email,password_hash,role,approved,must_change_password) VALUES($1,$2,$3,$4,$5,false,false)',[id,ldapSettings.organizationId,verified.email,passwordHash,'user']);
-    await cx.query('INSERT INTO ldap_identities(provider,subject,user_id) VALUES($1,$2,$3)',['default',verified.subject,id]);
+    await cx.query('INSERT INTO ldap_identities(provider,subject,user_id) VALUES($1,$2,$3)',[ldapIdentityKey(backendId),verified.subject,id]);
     user={id,email:verified.email,role:'user',approved:false,must_change_password:false,totp_enabled:false,email_mfa_enabled:false};
     // Notification only after a successful commit below.
    }else{res.status(403).json({error:'ldap_account_not_provisioned'});return}
@@ -503,7 +509,8 @@ app.post('/api/auth/ldap/login',async(req,res)=>{
 /* Explicit account linking requires an already authenticated presenter AND a
  * fresh successful directory bind. Never link identities based on email alone. */
 app.post('/api/auth/ldap/link',requireAuth,async(req,res)=>{
- const ldapSettings=await enabledLdapBackend(db,secret).catch(()=>null);
+ const backendId=typeof req.body?.backendId==='string'?req.body.backendId:'ldap';
+ const ldapSettings=await enabledLdapBackend(db,secret,backendId).catch(()=>null);
  if(!ldapSettings){res.status(404).json({error:'ldap_not_configured'});return}
  const login=req.body?.email,password=req.body?.password;
  if(typeof login!=='string'||typeof password!=='string'||!login.trim()||login.length>254){res.status(400).json({error:'invalid_request'});return}
@@ -512,7 +519,7 @@ app.post('/api/auth/ldap/link',requireAuth,async(req,res)=>{
   if(!verified){res.status(401).json({error:'invalid_credentials'});return}
   const self=await db.query('SELECT email FROM users WHERE id=$1',[auth(req)]);
   if(!self.rowCount||self.rows[0].email.toLowerCase()!==verified.email){res.status(403).json({error:'ldap_verified_email_mismatch'});return}
-  await db.query('INSERT INTO ldap_identities(provider,subject,user_id) VALUES($1,$2,$3)',['default',verified.subject,auth(req)]);
+  await db.query('INSERT INTO ldap_identities(provider,subject,user_id) VALUES($1,$2,$3)',[ldapIdentityKey(backendId),verified.subject,auth(req)]);
   res.status(201).json({ok:true});
  }catch(e){if(e&&typeof e==='object'&&(e as any).code==='23505'){res.status(409).json({error:'ldap_identity_already_linked'});return}console.error('ldap link failed',e instanceof Error?e.name:'error');res.status(503).json({error:'ldap_authentication_unavailable'})}
 });
@@ -574,11 +581,15 @@ app.post('/api/auth/email-mfa/verify',async(req,res)=>{try{
 async function verifyAccountPassword(uid:string,password:string,storedHash:string):Promise<boolean>{
  if(typeof password!=='string'||password.length<1||password.length>1024)return false;
  if(await bcrypt.compare(password,storedHash))return true;
- const ldap=await enabledLdapBackend(db,secret);if(!ldap)return false;
- const linked=await db.query("SELECT li.subject,u.email FROM ldap_identities li JOIN users u ON u.id=li.user_id WHERE li.user_id=$1 AND li.provider='default'",[uid]);
- if(!linked.rowCount)return false;
- const verified=await authenticateDirectory(ldap,linked.rows[0].email,password);
- return Boolean(verified&&verified.subject===linked.rows[0].subject&&verified.email===linked.rows[0].email);
+ const linked=await db.query('SELECT li.provider,li.subject,u.email FROM ldap_identities li JOIN users u ON u.id=li.user_id WHERE li.user_id=$1',[uid]);
+ for(const identity of linked.rows){
+  const backendId=identity.provider==='default'?'ldap':String(identity.provider);
+  const ldap=await enabledLdapBackend(db,secret,backendId);
+  if(!ldap)continue;
+  const verified=await authenticateDirectory(ldap,identity.email,password);
+  if(verified&&verified.subject===identity.subject&&verified.email===identity.email)return true;
+ }
+ return false;
 }
 app.post('/api/auth/email-mfa/settings',requireAuth,async(req,res)=>{try{
  const uid=auth(req)!,enabled=req.body?.enabled,password=req.body?.password;
@@ -806,14 +817,16 @@ app.patch('/api/admin/users/:id/identity',requireAuth,requireAdmin,async(req,res
  if(!result.rowCount){res.status(404).end();return}res.json(result.rows[0]);
  }catch(e){if((e as any)?.code==='23505'){res.status(409).json({error:'email_already_taken'});return}sendError(res,e)}});
 app.get('/api/admin/ldap/search',requireAuth,requireAdmin,async(req,res)=>{
- const ldapSettings=await enabledLdapBackend(db,secret).catch(()=>null);
+ const backendId=typeof req.query.backendId==='string'?req.query.backendId:'ldap';
+ const ldapSettings=await enabledLdapBackend(db,secret,backendId).catch(()=>null);
  if(!ldapSettings){res.status(404).json({error:'ldap_not_configured'});return}
  const q=String(req.query.q||'').trim();if(q.length<2||q.length>120){res.status(400).json({error:'invalid_search'});return}
  try{res.setHeader('Cache-Control','private, no-store');res.json({items:await searchDirectory(ldapSettings,q)})}
  catch(e){console.error('ldap search failed',e instanceof Error?e.name:'unknown');res.status(503).json({error:'directory_unavailable'})}
 });
 app.post('/api/admin/ldap/users',requireAuth,requireAdmin,async(req,res)=>{
- const ldapSettings=await enabledLdapBackend(db,secret).catch(()=>null);
+ const backendId=typeof req.body?.backendId==='string'?req.body.backendId:'ldap';
+ const ldapSettings=await enabledLdapBackend(db,secret,backendId).catch(()=>null);
  if(!ldapSettings){res.status(404).json({error:'ldap_not_configured'});return}
  const q=String(req.body?.query||'').trim(),subject=req.body?.subject,role=req.body?.role;
  if(q.length<2||q.length>120||typeof subject!=='string'||!['user','presenter','moderator','org_admin','platform_admin'].includes(role)){res.status(400).json({error:'invalid_user'});return}
@@ -825,7 +838,7 @@ app.post('/api/admin/ldap/users',requireAuth,requireAdmin,async(req,res)=>{
   try{await cx.query('BEGIN');begun=true;
    if((await cx.query('SELECT 1 FROM users WHERE lower(email)=$1',[found.email])).rowCount){await cx.query('ROLLBACK');begun=false;res.status(409).json({error:'account_exists'});return}
    const uid=randomUUID();await cx.query('INSERT INTO users(id,organization_id,email,password_hash,role,approved,must_change_password) VALUES($1,$2,$3,$4,$5,true,false)',[uid,org.organization_id,found.email,await bcrypt.hash(randomBytes(32).toString('base64url'),12),role]);
-   await cx.query('INSERT INTO ldap_identities(provider,subject,user_id) VALUES($1,$2,$3)',['default',subject,uid]);
+   await cx.query('INSERT INTO ldap_identities(provider,subject,user_id) VALUES($1,$2,$3)',[ldapIdentityKey(backendId),subject,uid]);
    await cx.query('COMMIT');begun=false;res.status(201).json({id:uid,email:found.email,role,approved:true,backend:'ldap'});
   }finally{if(begun)await cx.query('ROLLBACK').catch(()=>{});cx.release()}
  }catch(e){if((e as any)?.code==='23505'){res.status(409).json({error:'account_exists'});return}sendError(res,e)}
