@@ -62,3 +62,10 @@ test('RC330 exact Authentik issuer and token claim preserve trailing slash',asyn
  assert.equal(validateClaims(claims,provider,claims.nonce).subject,'alice');
  assert.throws(()=>validateClaims({...claims,iss:provider.issuer.slice(0,-1)},provider,claims.nonce),/invalid_oidc_claims/);
 });
+test('RC330 admin-only JSON logo payload fits Base64 overhead without widening public API limits',()=>{
+ assert.match(server,/app\.use\('\/api\/admin\/auth\/backends',express\.json\(\{limit:'64kb'\}\)\)/);
+ assert.match(server,/app\.use\(express\.json\(\{limit:'32kb'\}\)\)/);
+ const full32Kib=Buffer.alloc(32768);
+ const stringified=JSON.stringify({kind:'oidc',enabled:false,mfaEnabled:false,config:{logoData:'data:image/png;base64,'+full32Kib.toString('base64')}});
+ assert.ok(Buffer.byteLength(stringified)>32768&&Buffer.byteLength(stringified)<65536);
+});

@@ -52,6 +52,7 @@ const base=process.env.PUBLIC_BASE_URL||'http://localhost:8080';let publicBase=b
 app.use(helmet({contentSecurityPolicy:process.env.NODE_ENV==='production'?
  {useDefaults:false,directives:productionCspDirectives(base)}:false}));
 app.use((_req,res,next)=>{res.setHeader('Permissions-Policy',quorivioPermissionsPolicy);next()});
+app.use('/api/admin/auth/backends',express.json({limit:'64kb'})); // Base64 32 KiB logo, scoped to admin provider configuration
 app.use(express.json({limit:'32kb'}));const server=createServer(app);const wss=new WebSocketServer({noServer:true});
 const hash=(v:string)=>createHash('sha256').update(v).digest('hex');const sign=(s:string)=>createHmac('sha256',secret).update(s).digest('base64url');const cookies=(s:string='')=>Object.fromEntries(s.split(';').map(x=>x.trim().split('=')).filter(x=>x.length===2));
 function auth(req:express.Request){const token=cookies(req.headers.cookie).q_auth;if(!token)return null;const parts=token.split('.');if(parts.length!==3||!/^\d+$/.test(parts[1]))return null;const body=parts.slice(0,2).join('.');const a=Buffer.from(sign(body));const b=Buffer.from(parts[2]);if(a.length!==b.length||!timingSafeEqual(a,b)||Number(parts[1])<Date.now())return null;return parts[0]}
