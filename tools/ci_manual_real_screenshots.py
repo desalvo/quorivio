@@ -115,7 +115,14 @@ async def main():
             await nav.get_by_role('button',name='Impostazioni server').click()
             await expect(admin.get_by_role('heading',name='Configurazione server')).to_be_visible()
             await shot('admin-server-settings',admin)
+            # RC325: settings sections are now accessible tabs, not a vertical
+            # document. Open the real panel before capturing its real screenshot.
+            settings_tabs=admin.get_by_role('tablist',name='Schede delle impostazioni del server')
+            await settings_tabs.get_by_role('tab',name='Backup').click()
+            await expect(settings_tabs.get_by_role('tab',name='Backup')).to_have_attribute('aria-selected','true')
             await shot('admin-backups',admin,'[aria-label="Backup completo dell’istanza"]')
+            await settings_tabs.get_by_role('tab',name='Audit').click()
+            await expect(settings_tabs.get_by_role('tab',name='Audit')).to_have_attribute('aria-selected','true')
             await shot('admin-audit',admin,'[aria-label="Audit amministrativo"]')
             await nav.get_by_role('button',name='Gestione utenti').click()
             await shot('admin-users',admin)
