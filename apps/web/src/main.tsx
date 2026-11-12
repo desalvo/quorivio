@@ -196,9 +196,16 @@ function redirectExpiredPresenterAuth(url:string,status:number,apiError?:string)
 /** Multipart transfers and downloads bypass the JSON request helper but still
  * use the same reauthentication behavior when their presenter cookie expires. */
 async function authenticatedFetch(input:RequestInfo|URL,init?:RequestInit):Promise<Response>{
+ const url=typeof input==='string'?input:input instanceof URL?input.pathname:input.url;
+ const apiPath=url.startsWith('/api/')?url.slice(4):'';
+ // Suppress stale multipart/download requests after the first expired-auth 401.
+ // A local response prevents background polling from hitting server rate limits.
+ // Anonymous join and sign-in calls must remain available.
+ if(reauthenticationRedirecting&&apiPath&&!apiPath.startsWith('/auth/')&&!apiPath.startsWith('/join/')){
+  return new Response(JSON.stringify({error:'authentication_required'}),{status:401,headers:{'Content-Type':'application/json'}});
+ }
  const response=await fetch(input,init);
  if(response.status===401){
-  const url=typeof input==='string'?input:input instanceof URL?input.pathname:input.url;
   if(url.startsWith('/api/')&&!url.startsWith('/api/join/')){
    const info=await response.clone().json().catch(()=>({}));
    redirectExpiredPresenterAuth(url.slice(4),response.status,info?.error);
@@ -209,7 +216,8 @@ async function authenticatedFetch(input:RequestInfo|URL,init?:RequestInit):Promi
 async function request<T=any>(url:string,method='GET',body?:unknown,options?:{signal?:AbortSignal;cache?:RequestCache}):Promise<T>{
  // After expiry, suppress stale background calls; allow login/MFA and identity discovery.
  const authRoute=url.startsWith('/auth/');
- if(reauthenticationRedirecting&&!authRoute){const error=Object.assign(new Error('authentication_required'),{status:401});return Promise.reject(error)}
+ const guestRoute=url.startsWith('/join/');
+ if(reauthenticationRedirecting&&!authRoute&&!guestRoute){const error=Object.assign(new Error('authentication_required'),{status:401});return Promise.reject(error)}
  const res=await fetch('/api'+url,{method,credentials:'include',headers:{'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body),signal:options?.signal,cache:options?.cache});if(!res.ok){let info:any={};try{info=await res.json()}catch{}redirectExpiredPresenterAuth(url,res.status,info.error);const e=new Error(res.status===429&&info.error==='rate_limited'?'Limite temporaneo di richieste raggiunto: riprova tra poco.':info.error||`HTTP ${res.status}`) as Error&{status:number};e.status=res.status;throw e}if(authRoute&&res.ok&&(url==='/auth/me'||url==='/auth/login'||url==='/auth/ldap/login'||url.startsWith('/auth/mfa/'))){reauthenticationRedirecting=false;}
  return res.status===204||res.status===205?undefined as T:res.json()}
 /** A stalled request must never keep a restored session on a blank page indefinitely. */

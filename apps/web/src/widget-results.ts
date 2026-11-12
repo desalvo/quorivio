@@ -45,7 +45,9 @@ export function effectiveResultView(resultWidget:StatisticalWidget,widgets:Stati
  const source=linkedStatisticSource(resultWidget,widgets);
  if(!source)return 'bars';
  const view=resultWidget.resultsView??source.resultsView??(source.kind==='reactions'?'bubbles':'bars');
- return view==='pie'||view==='table'||view==='cloud'||view==='gauge'||view==='bubbles'?view:'bars';
+ // A reaction-only bubble mode cannot leak into a re-linked non-reaction source.
+ if(view==='bubbles')return source.kind==='reactions'?'bubbles':'bars';
+ return view==='pie'||view==='table'||view==='cloud'||view==='gauge'?view:'bars';
 }
 /** Reaction-specific, anonymous aggregate bubble sizing; no user identities. */
 export function reactionBubbles(rows:readonly StatRow[],limit=5,sort:'count-desc'|'count-asc'|'index-asc'|'index-desc'='count-desc'){

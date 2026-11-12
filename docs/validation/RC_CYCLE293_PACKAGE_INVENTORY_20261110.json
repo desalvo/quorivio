@@ -174,14 +174,14 @@
       "2dd5f6ba"
     ],
     "apps/api/src/domain.ts": [
-      "2191063f",
-      "90fd1175",
-      "fb910204",
-      "9e03224f",
-      "602f9241",
-      "b4242aa6",
-      "8cbe27c0",
-      "e6bfad8c"
+      "422d180c",
+      "322745b6",
+      "238d094d",
+      "a4c82b69",
+      "af4b1a3e",
+      "d6481b04",
+      "9db43453",
+      "88e2f7ef"
     ],
     "apps/api/src/email-otp.ts": [
       "442c62ac",
@@ -2044,14 +2044,14 @@
       "54a62e5d"
     ],
     "apps/web/src/main.tsx": [
-      "aef357c6",
-      "8a2fbc6e",
-      "61edae9b",
-      "4a81a25e",
-      "1e5cc164",
-      "c4e88661",
-      "0f142eb3",
-      "4d932a14"
+      "809bbc30",
+      "14ca9a66",
+      "fdbab36f",
+      "35b15fe2",
+      "0aa1bc44",
+      "f8a205e0",
+      "eeffb1e5",
+      "f165b8a8"
     ],
     "apps/web/src/main.tsx.orig": [
       "9230e5a3",
@@ -2584,14 +2584,14 @@
       "f116c35e"
     ],
     "apps/web/src/widget-results.ts": [
-      "398de8fa",
-      "8a5ef31d",
-      "7c1a483e",
-      "2a74aa41",
-      "70ce2046",
-      "37a34f06",
-      "ffe99f9d",
-      "0d7c7493"
+      "40cf8eaf",
+      "a6205ce0",
+      "4f2da68e",
+      "c67f00d8",
+      "ea322365",
+      "6585035c",
+      "184caa06",
+      "678ccff2"
     ],
     "apps/web/src/widget-rich-editor.tsx": [
       "610fdf07",
@@ -5084,14 +5084,14 @@
       "d240df37"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "5c2d52a5",
-      "6bf022ca",
-      "7122b91d",
-      "7fc49873",
-      "b69e4a55",
-      "c61ede9a",
-      "2e854984",
-      "87a53bc2"
+      "cd6abc28",
+      "e5ddd540",
+      "249cc5ce",
+      "85b5b72d",
+      "6977614b",
+      "252b2873",
+      "1ce9cfd8",
+      "2226b13d"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",
@@ -26114,14 +26114,14 @@
       "76e43547"
     ],
     "apps/web/test/rc318-auth-reactions-format.test.ts": [
-      "815cc9c5",
-      "7f01920d",
-      "8056e9cd",
-      "25738bb5",
-      "ae94c7ea",
-      "0bef9453",
-      "7ae8ab47",
-      "3ce954c7"
+      "7b2a7361",
+      "8abbff17",
+      "858207e9",
+      "c7f6a089",
+      "ee1a85aa",
+      "866ffacb",
+      "8b28cefc",
+      "ec27ab2f"
     ]
   }
 }

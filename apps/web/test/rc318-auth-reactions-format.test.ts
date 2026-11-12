@@ -12,7 +12,10 @@ test('RC318: expired presenter auth returns to login without full-document reloa
  assert.match(redirect,/window.history.replaceState/);
  assert.match(redirect,/quorivio:authentication-expired/);
  assert.doesNotMatch(redirect,/location\.(?:replace|reload|assign)\(/);
- assert.match(main,/if\(reauthenticationRedirecting&&!authRoute\)/);
+ assert.match(main,/if\(reauthenticationRedirecting&&!authRoute&&!guestRoute\)/);
+ assert.match(main,/const apiPath=url\.startsWith\('\/api\/'\)/);
+ assert.match(main,/if\(reauthenticationRedirecting&&apiPath&&!apiPath\.startsWith/);
+ assert.match(main,/return new Response\(JSON\.stringify\(\{error:'authentication_required'\}\)/);
  assert.match(main,/setMe\(null\);setSnap\(null\);setSelected\(''\)/);
  assert.match(main,/writeWorkspaceLocation\(\{sessionId:'',section:'workspace'/);
 });
@@ -23,8 +26,10 @@ test('RC318: linked reaction statistics default to bubbles but honor explicit ch
  assert.equal(effectiveResultView({...result,resultsView:'bars'},[source]),'bars');
  assert.equal(effectiveResultView({...result,resultsView:'pie'},[source]),'pie');
  assert.equal(effectiveResultView(result,[{id:'emoji',kind:'question'}]),'bars');
+ assert.equal(effectiveResultView({...result,resultsView:'bubbles'},[{id:'emoji',kind:'question'}]),'bars');
  assert.equal(validPageDesign({widgets:[{id:'emoji',kind:'reactions',resultsView:'bubbles'},result]}),true);
  assert.equal(validPageDesign({widgets:[{id:'emoji',kind:'reactions',resultsView:'unrecognized'}]}),false);
+ assert.equal(validPageDesign({widgets:[{id:'question',kind:'question',resultsView:'bubbles'}]}),false);
 });
 test('RC318: reaction bubbles are proportionate, privacy-safe and respect top N and sorting',()=>{
  const rows=[{id:'a',label:'👍',count:12},{id:'b',label:'❤️',count:4},{id:'c',label:'😂',count:8},{id:'d',label:'👏',count:0}];
