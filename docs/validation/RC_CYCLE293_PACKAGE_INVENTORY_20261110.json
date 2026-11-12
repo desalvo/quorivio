@@ -19624,14 +19624,14 @@
       "f0b0fe82"
     ],
     "tools/tests/test_k8s_ha_hardening.py": [
-      "ff237744",
-      "077aa14c",
-      "0d1412fc",
-      "b2c5afa9",
-      "ca239bcb",
-      "a826ef84",
-      "3fe5a559",
-      "fb4c8118"
+      "d8caf82c",
+      "b49d6e29",
+      "d4f8ace8",
+      "d9e9a094",
+      "a16d5024",
+      "7ec65510",
+      "d6ebc019",
+      "283730aa"
     ],
     "tools/tests/test_k8s_runtime_cycle24.py": [
       "2d478d9c",
