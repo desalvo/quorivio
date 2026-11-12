@@ -81,6 +81,51 @@ def main()->None:
     assert result['fitTransform']=='none',f"{width}px: content was scaled: {result}"
     metrics.append((width,result['lines'],result['textFont'],round(result['trackWidth'])))
     page.close()
+   # RC328: using the shipped CSS, long pie-result labels must wrap and
+   # the automatic-fit layout must fill the canvas instead of shrinking to
+   # a tiny upper-left corner. This browser fixture contains no user data.
+   fit_page=browser.new_page(viewport={"width":1120,"height":850})
+   fit_markup=(HTML.replace('WID','740')
+     .replace('LABEL',LONG)
+     .replace('height:360px','height:700px')
+     .replace('data-fit-mode="scroll"','data-fit-mode="scale"')
+     .replace('result-view-bars','result-view-pie')
+     .replace('<div class="linked-results-items">',
+       '<svg class="linked-results-pie linked-results-pie-chart" '
+       'style="--pie-chart-ratio:500 / 320" viewBox="0 0 500 320">'
+       '<circle cx="250" cy="160" r="105" fill="green"/></svg>'
+       '<div class="linked-results-items">'))
+   fit_page.set_content(fit_markup)
+   fit_page.add_style_tag(content=CSS.read_text(encoding='utf8'))
+   fit=fit_page.evaluate("""() => {
+     const frame=document.querySelector('.widget-fit-frame');
+     const results=frame.querySelector('.linked-results');
+     const label=frame.querySelector('.linked-result-label');
+     const pair=frame.querySelector('.linked-result-pair');
+     const last=frame.querySelector('.linked-results-row:last-child');
+     const pie=frame.querySelector('.linked-results-pie-chart');
+     const fr=frame.getBoundingClientRect();
+     return {
+       frameHeight:fr.height,
+       resultsHeight:results.getBoundingClientRect().height,
+       labelLines:label.getClientRects().length,
+       labelWhiteSpace:getComputedStyle(label).whiteSpace,
+       pairWidth:pair.getBoundingClientRect().width,
+       frameWidth:fr.width,
+       rowOverflow:pair.scrollWidth-pair.clientWidth,
+       lastRowFraction:(last.getBoundingClientRect().bottom-fr.top)/fr.height,
+       pieHeight:pie.getBoundingClientRect().height
+     };
+   }""")
+   assert fit['labelLines']>=2, 'RC328: fit mode must wrap long labels: '+repr(fit)
+   assert fit['labelWhiteSpace'] in ('normal','pre-wrap'), 'RC328: nowrap unexpectedly won: '+repr(fit)
+   assert fit['pairWidth']<=fit['frameWidth']+2, 'RC328: max-content strip overflow: '+repr(fit)
+   assert fit['rowOverflow']<=3, 'RC328: horizontal clipping: '+repr(fit)
+   assert fit['resultsHeight']>=fit['frameHeight']*.90, 'RC328: results did not use widget height: '+repr(fit)
+   assert fit['lastRowFraction']>.62, 'RC328: answer rows stayed in upper corner: '+repr(fit)
+   assert 80<fit['pieHeight']<460, 'RC328: pie no longer bounded and visible: '+repr(fit)
+   fit_page.close()
+   print('RC328 native Chromium auto-fit multiline pie passed:',fit,flush=True)
    print('RC306 native Chromium multiline result bars passed:',metrics,flush=True)
   finally:browser.close()
 
