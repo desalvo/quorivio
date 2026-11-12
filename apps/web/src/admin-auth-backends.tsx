@@ -44,7 +44,7 @@ const initialConfig=(id:string,kind:Kind)=>({
 export function AuthBackendSettingsPanel({request}:{request:ApiRequest}){
  const [items,setItems]=useState<Backend[]>([]),[selected,setSelected]=useState('local'),[drafts,setDrafts]=useState<Record<string,Backend>>({});
  const [newId,setNewId]=useState(''),[busy,setBusy]=useState(false),[message,setMessage]=useState('');
- const refresh=async()=>{const r=await request<{backends:Backend[]}>('/admin/auth/backends','GET',undefined,{cache:'no-store'});setItems(r.backends);setDrafts({})};
+ const refresh=async(resetDrafts=true)=>{const r=await request<{backends:Backend[]}>('/admin/auth/backends','GET',undefined,{cache:'no-store'});setItems(r.backends);if(resetDrafts)setDrafts({})};
  useEffect(()=>{void refresh().catch(e=>setMessage(String(e)))},[]);
  const existing=items.find(x=>x.id===selected);
  const item=drafts[selected]||existing;
@@ -53,14 +53,23 @@ export function AuthBackendSettingsPanel({request}:{request:ApiRequest}){
  const save=async()=>{if(!item)return;setBusy(true);setMessage('');
   try{
    await request('/admin/auth/backends/'+encodeURIComponent(item.id),'PUT',{kind:item.kind,enabled:item.kind==='local'?true:item.enabled,mfaEnabled:item.mfaEnabled,config:item.config});
-   await refresh();setMessage('Backend salvato. Le modifiche si applicano a tutte le repliche del server.');}
+   setDrafts(previous=>{const next={...previous};delete next[item.id];return next});
+   try{await refresh(false);setMessage('Backend salvato. Le modifiche si applicano a tutte le repliche del server.');}
+   catch{setMessage('Backend salvato; impossibile aggiornare l’elenco. Ricarica per verificarlo.')}}
   catch(e){setMessage('Salvataggio non riuscito: '+String(e))}finally{setBusy(false)}
  };
  const test=async()=>{if(!item)return;setBusy(true);setMessage('');
-  try{const result=await request<{ok:true;scope:string}>('/admin/auth/backends/'+encodeURIComponent(item.id)+'/test','POST',{});
-   setMessage(result.scope==='configuration_only_interactive_oauth_required'
-    ?'Configurazione OAuth valida; la verifica completa di client ID/secret richiede un accesso interattivo.'
-    :'Test riuscito: '+result.scope);await refresh();}
+  // Probe what is visibly edited, not a previous saved version. Draft tests do
+  // not persist secrets, update the last-tested timestamp, or enable providers.
+  const preview=Boolean(drafts[selected])||!existing;
+  const payload=preview?{kind:item.kind,enabled:item.kind==='local'?true:item.enabled,mfaEnabled:item.mfaEnabled,config:item.config}:{};
+  try{const result=await request<{ok:true;scope:string;preview:boolean}>('/admin/auth/backends/'+encodeURIComponent(item.id)+'/test','POST',payload);
+   const prefix=result.preview?'Test della bozza riuscito (non salvata). ':'Test del backend salvato riuscito. ';
+   const detail=result.scope==='configuration_only_interactive_oauth_required'
+    ?'La verifica OAuth è solo statica: ID e segreto richiedono un accesso interattivo.'
+    :'Ambito verificato: '+result.scope;
+   setMessage(prefix+detail);
+   await refresh(false).catch(()=>setMessage(prefix+detail+' Impossibile aggiornare l’elenco.'));}
   catch(e){setMessage('Test non riuscito: '+String(e))}finally{setBusy(false)}
  };
  const add=()=>{const id=newId.trim().toLowerCase();
@@ -77,7 +86,7 @@ export function AuthBackendSettingsPanel({request}:{request:ApiRequest}){
   </select></label>
   <div className="activity-row"><label>Nuovo provider OIDC<input aria-label="ID nuovo provider OIDC" placeholder="infn" maxLength={32} value={newId} onChange={e=>setNewId(e.target.value)}/></label><button type="button" className="outline small" disabled={busy||!newId.trim()} onClick={add}>Aggiungi SSO</button></div>
   {item&&<>
-   <p className="muted tiny">Tipo: {item.kind.toUpperCase()} · {item.configured?'Configurazione completa':'Configurazione incompleta'} · Ultimo test: {item.lastTestedAt?new Date(item.lastTestedAt).toLocaleString('it-IT'):'mai eseguito'}</p>
+   <p className="muted tiny">Tipo: {item.kind.toUpperCase()} · {item.configured?'Configurazione salvata completa':'Configurazione salvata incompleta'} · Ultimo test salvato: {item.lastTestedAt?new Date(item.lastTestedAt).toLocaleString('it-IT'):'mai eseguito'}{drafts[selected]?' · Modifiche non salvate':''}</p>
    {item.kind==='local'?<p>Il backend interno non può essere disabilitato: mantiene sempre disponibile l’accesso amministrativo.</p>:
     <label><input type="checkbox" checked={item.enabled} onChange={e=>change({enabled:e.target.checked})}/> Abilita questo backend per login e collegamento identità</label>}
    {item.kind==='local'||item.kind==='ldap'?
@@ -93,7 +102,7 @@ export function AuthBackendSettingsPanel({request}:{request:ApiRequest}){
    {item.kind==='ldap'&&<p className="muted tiny">TLS con verifica dei certificati sempre attiva. Per CA private, monta il certificato nel server e specifica il percorso. L'account di servizio viene testato con una bind sicura e una ricerca limitata.</p>}
    {item.kind==='oidc'&&<p className="muted tiny">Callback richiesto: /api/auth/oidc/{item.id}/callback. Il test verifica discovery e chiavi JWKS; la prova completa delle credenziali richiede un login.</p>}
    {item.kind==='social'&&<p className="muted tiny">Callback richiesto: /api/auth/social/{item.id}/callback. Il test statico non può provare il client secret senza un accesso OAuth reale.</p>}
-   <div className="downloads"><button type="button" className="primary small" disabled={busy} onClick={()=>void save()}>Salva configurazione</button><button type="button" className="outline small" disabled={busy||!existing} onClick={()=>void test()}>Testa backend salvato</button><button type="button" className="outline small" disabled={busy} onClick={()=>void refresh().catch(e=>setMessage(String(e)))}>Ricarica</button></div>
+   <div className="downloads"><button type="button" className="primary small" disabled={busy} onClick={()=>void save()}>Salva configurazione</button><button type="button" className="outline small" disabled={busy} onClick={()=>void test()}>{drafts[selected]||!existing?'Testa bozza senza salvare':'Testa backend salvato'}</button><button type="button" className="outline small" disabled={busy} onClick={()=>{if(Object.keys(drafts).length>0&&!window.confirm('Ricaricare? Le modifiche non salvate a tutti i backend andranno perse.'))return;void refresh().catch(e=>setMessage(String(e)))}}>Ricarica</button></div>
   </>}
   {message&&<p role="status">{message}</p>}
  </section>;
