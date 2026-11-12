@@ -1151,7 +1151,7 @@ jobs:
           python3 tools/ci_page_thumbnail_native.py --engines chromium
       - name: Upload Chromium failure diagnostics
         if: failure() && github.event_name == 'workflow_dispatch' && inputs.browser_test || (failure() && github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite) || (failure() && (github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[full-ci]') || contains(github.event.head_commit.message, '[publish-docker]'))))
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: chromium-editor-failure
           path: /tmp/quorivio-browser-artifacts/
@@ -1331,7 +1331,7 @@ jobs:
           QUORIVIO_MANUAL_OUTPUT_DIR=/tmp/quorivio-manual-build python3 -m unittest tools.tests.test_rc284_manual_pdf_gallery -q
       - name: Publish build-matched real screenshots and six manuals
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: quorivio-live-manuals-${{ github.sha }}
           path: |
@@ -1433,7 +1433,7 @@ jobs:
         run: python3 tools/ci_browser_profile.py
       - name: Upload Chromium real editor failure diagnostics
         if: failure() && github.event_name == 'workflow_dispatch' && inputs.browser_test || (failure() && github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite) || (failure() && (github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[full-ci]') || contains(github.event.head_commit.message, '[publish-docker]'))))
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: chromium-real-editor-failure
           path: /tmp/quorivio-browser-artifacts/
@@ -1441,7 +1441,7 @@ jobs:
           retention-days: 3
       - name: Upload Chromium participant failure diagnostics
         if: failure() && github.event_name == 'workflow_dispatch' && inputs.browser_test || (failure() && github.event_name == 'workflow_dispatch' && inputs.rc_acceptance_suite) || (failure() && (github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[full-ci]') || contains(github.event.head_commit.message, '[publish-docker]'))))
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: chromium-participant-failure
           path: /tmp/quorivio-browser-artifacts/
@@ -1520,7 +1520,7 @@ jobs:
           python3 tools/ci_backup_restore.py
       - name: Upload sanitized disposable DR rehearsal metrics
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dr-rehearsal-ci-only
           path: /tmp/quorivio-dr-rehearsal.json
@@ -1947,7 +1947,7 @@ jobs:
         run: python3 tools/ci_rc301_pie_cross_engine.py --engines firefox webkit
       - name: Upload cross-browser failure evidence
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: firefox-webkit-rc-acceptance-failure
           path: /tmp/quorivio-cross-browser-artifacts/
@@ -2008,7 +2008,7 @@ jobs:
           gzip -t *.tar.gz
       - name: Upload portable Docker images [full-ci]
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[full-ci]')
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: quorivio-docker-images-${{ github.sha }}
           path: /tmp/quorivio-ci-images/
@@ -2375,7 +2375,7 @@ jobs:
           printf '%s\n' "$IMAGE_DIGEST" > "digests/$ARCH.digest"
           printf '%s\n' "$CONVERTER_IMAGE_DIGEST" > "digests/converter-$ARCH.digest"
       - name: Transfer both native digests for paired multiarch publication
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: quorivio-native-${{ matrix.arch }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
