@@ -28,18 +28,18 @@ class EditorAnswerAndFooterRC109(unittest.TestCase):
    self.assertIn(x,DOMAIN)
   self.assertIn('w.autoFit===undefined||typeof w.autoFit',DOMAIN)
 
- def test_manual_geometry_disables_autofit_and_can_be_reenabled(self):
+ def test_manual_geometry_preserves_autofit_and_remains_reversible(self):
   # RC133 delegates pointer/keyboard resizing to the continuous first-contact
   # geometry helper; that helper disables autoFit only for manual resizing.
   GEOMETRY=(R/'apps/web/src/widget-placement.ts').read_text()
-  self.assertIn('autoFit:false',GEOMETRY)
+  self.assertNotIn('autoFit:false',GEOMETRY)
   self.assertIn('resizeWidgetToCollisionLimit(widgets,w.id,position)',MAIN)
   self.assertIn('moveWidgetsToCollisionLimit(widgets,[w.id]',MAIN)
   self.assertIn('checked={w.autoFit!==false}',MAIN)
   self.assertIn('autoFit:e.target.checked',MAIN)
-  self.assertIn("widgetMayAutoFit(w.kind,w.autoFit)",MAIN)
-  self.assertIn("Adatta automaticamente l'altezza al contenuto",MAIN)
-  self.assertIn('autoFitExpandedPosition',MAIN)
+  self.assertIn('proportionalWidgetScale({',MAIN)
+  self.assertNotIn("Adatta automaticamente l'altezza al contenuto",MAIN)
+  self.assertNotIn('autoFitExpandedPosition(',MAIN)
 
  def test_footer_title_centered_with_separator(self):
   self.assertIn('box-shadow:inset 0 1px 0',CSS)
