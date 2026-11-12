@@ -11,28 +11,34 @@ WORKFLOW=(ROOT/'.github/workflows/ci.yml').read_text(encoding='utf8')
 
 
 def preserves_atomic_undo(history, editor):
+    """RC326: auto-fit is a presentational transform, never a geometry history edit.
+
+    Retain and verify the legacy stale-write protection, but do not require the
+    now-removed auto-height DOM effect to mutate history when content changes.
+    """
     return all(s in history for s in (
       'export function reconcileWidgetAutoFit<T>',
       'state.gestureBase !== null',
       '!same(state.present, base)',
-      'past:',  # still a bounded explicit edit/undo history
+      'past:',
       'return {...state, present: fitted}',
     )) and all(s in editor for s in (
       'onAutoFit?:(base:any[],fitted:any[])=>void',
-      'if(onAutoFit)onAutoFit(widgets,changes);else onChange(changes)',
       'setWidgetHistory(h=>reconcileWidgetAutoFit(h,base,fitted))',
-    )) and bool(re.search(
+      'autoFit is a content-fit preference, NEVER a widget geometry edit',
+      'proportionalWidgetScale({',
+      "allowScale={w.autoFit!==false&&!['qr','participant-count'].includes(w.kind)&&editing!==w.id}",
+    )) and 'if(onAutoFit)onAutoFit(widgets,changes);else onChange(changes)' not in editor and 'autoFitExpandedPosition(' not in editor and bool(re.search(
       r'''onAutoFit\s*=\s*\{\s*canvasDevice\s*===\s*['"]phone['"]\s*\?\s*undefined\s*:\s*reconcilePageAutoFit\s*\}''',
       editor,
     ))
-
 
 class RC117AtomicUndo(unittest.TestCase):
     def test_derived_fit_is_not_separate_history_step(self):
         self.assertTrue(preserves_atomic_undo(HISTORY,EDITOR))
 
     def test_rejects_legacy_fit_replay_and_stale_state(self):
-        self.assertFalse(preserves_atomic_undo(HISTORY,EDITOR.replace('if(onAutoFit)onAutoFit(widgets,changes);else onChange(changes)','onChange(changes)')))
+        self.assertFalse(preserves_atomic_undo(HISTORY,EDITOR.replace('autoFit is a content-fit preference, NEVER a widget geometry edit','legacy auto-height mutates geometry')))
         self.assertFalse(preserves_atomic_undo(HISTORY.replace('!same(state.present, base)','false'),EDITOR))
         self.assertFalse(preserves_atomic_undo(HISTORY.replace('return {...state, present: fitted}','return editWidgets(state,fitted)'),EDITOR))
 

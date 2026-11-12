@@ -39,6 +39,6 @@ test('closing format widget does not clear active widget selection',()=>{
  assert.match(ui,/suspendFormattingRibbon=\{pageConflict\}/);
 });
 test('scale content is not transformed while editing text',()=>{
- assert.ok(ui.includes("allowScale={!['qr','participant-count','results-button'].includes(w.kind)&&!mobileMode&&editing!==w.id}"));
+ assert.ok(ui.includes("allowScale={w.autoFit!==false&&!['qr','participant-count'].includes(w.kind)&&editing!==w.id}"));
  assert.match(css,/\.widget-fit-content\{min-height:0\}/);
 });

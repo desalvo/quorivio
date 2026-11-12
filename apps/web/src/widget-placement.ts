@@ -39,7 +39,7 @@ export function resizeWidgetToCollisionLimit<T extends Widget>(original:readonly
  if(!Object.values(proposed).every(Number.isFinite)||proposed.width<.01||proposed.height<.01||
     proposed.x<0||proposed.y<0||proposed.x+proposed.width>100.0001||
     proposed.y+proposed.height>100.0001)return [...original];
- return original.map(w=>w.id===id?{...w,position:{...w.position,...proposed},autoFit:false} as T:w);
+ return original.map(w=>w.id===id?{...w,position:{...w.position,...proposed}} as T:w);
 }
 
 export type AlignmentGuide={axis:'x'|'y';at:number;source:'canvas'|'widget'};

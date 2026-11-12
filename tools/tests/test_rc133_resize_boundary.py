@@ -24,7 +24,7 @@ class RC133ResizeBoundary(unittest.TestCase):
   self.assertIn('export function resizeWidgetToCollisionLimit',PLACEMENT)
   self.assertIn('proposed.x+proposed.width>100.0001',PLACEMENT)
   self.assertIn('proposed.y+proposed.height>100.0001',PLACEMENT)
-  self.assertIn('autoFit:false',PLACEMENT)
+  self.assertNotIn('autoFit:false',PLACEMENT)
   self.assertNotIn('force: true',MAIN)
  def test_cancelled_response_resize_reverts_to_pointer_down_height(self):
   self.assertIn('const cancel=(e:React.PointerEvent<HTMLSpanElement>)=>{const start=drag.current;',MAIN)

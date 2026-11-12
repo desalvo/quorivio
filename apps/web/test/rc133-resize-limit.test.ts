@@ -7,7 +7,7 @@ test('RC138: east resizing can overlap arbitrarily thin neighbours',()=>{
  const original=[w('selected',10,10,10,12),w('barrier',28.05,9,.05,14)];
  const next=resizeWidgetToCollisionLimit(original,'selected',{x:10,y:10,width:70,height:12});
  assert.equal(next[0].position.width,70);assert.equal(overlapsOtherWidgets(next,['selected']),true);
- assert.equal(next[0].autoFit,false);assert.equal(original[0].autoFit,true);
+ assert.equal(next[0].autoFit,true);assert.equal(original[0].autoFit,true);
 });
 test('RC138: west/north resizing can reach the canvas border through widgets',()=>{
  const original=[w('a',40,40,20,20),w('west',29,40,1,20),w('north',40,28,20,2)];

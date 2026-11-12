@@ -13,13 +13,28 @@ CI=(ROOT/'.github/workflows/ci.yml').read_text(encoding='utf8')
 
 
 def autofit_types(source: str) -> bool:
-    block=source[source.index(' // Automatic content sizing is the default.'):source.index(' const patch=(id:string',source.index(' // Automatic content sizing is the default.'))]
+    """RC326: legacy geometry-growth arrays are gone. Verify the current
+    strictly typed proportional fit and that it cannot mutate widget bounds.
+    Keep this a mutation-sensitive contract; the mandatory tsc/Vite build
+    independently enforces actual TypeScript correctness.
+    """
+    marker='function WidgetContentFit({'
+    if marker not in source or 'type DiskVolumeStatus=' not in source:
+        return False
+    block=source.split(marker,1)[1].split('type DiskVolumeStatus=',1)[0]
+    implementation=(ROOT/'apps/web/src/widget-content-scale.ts').read_text()
     return all(x in block for x in (
-        'const current: any[]=changes??widgets;',
-        'const proposal:any[]=current.map((z:any)=>',
-        'const accepted:any[]=rejectWidgetCollisions(current,proposal,[w.id]);',
-        'if(accepted.find(z=>z.id===w.id)?.position?.height>p.height+.1)changes=accepted;',
-    )) and 'const current=changes||widgets' not in block
+        'const frame=useRef<HTMLDivElement>(null),body=useRef<HTMLDivElement>(null);',
+        'const a=frame.current,b=body.current',
+        'const next=proportionalWidgetScale({',
+        'frameWidth:a.clientWidth,frameHeight:a.clientHeight',
+        'contentWidth:Math.max(b.scrollWidth,b.clientWidth)',
+        'contentHeight:Math.max(b.scrollHeight,b.clientHeight)',
+        'setFactor(previous=>',
+    )) and all(x in implementation for x in (
+        'export type FitDimensions=',
+        'export function proportionalWidgetScale(d:FitDimensions):number',
+    )) and 'autoFitExpandedPosition(' not in source and 'rejectWidgetCollisions(current,proposal,[w.id])' not in block
 
 
 def editor_permission_fields(source: str) -> set[str] | None:
@@ -89,7 +104,7 @@ class RC115StrictTypeContracts(unittest.TestCase):
     def test_graphic_options_use_exact_domain_unions(self):
         self.assertTrue(graphic_type_narrowing(UI,DOMAIN))
     def test_negative_mutations_reject_original_compiler_errors(self):
-        self.assertFalse(autofit_types(UI.replace('const current: any[]=changes??widgets;','const current=changes||widgets;',1)))
+        self.assertFalse(autofit_types(UI.replace('const next=proportionalWidgetScale({','const next=unsafeAutoFit({',1)))
         # Mutate the actual current union: RC150 extends it past resultsOnly.
         for field in ('showTitle','autoFit'):
             mutated=remove_editor_permission(UI,field)

@@ -14,8 +14,8 @@ test('protruding 6px handles are not text overflow',()=>{
  assert.equal(measuredContentOverflowPx(92,92),0);
  assert.equal(measuredContentOverflowPx(92,94),2);
  assert.equal(autoFitExpandedPosition(original[0].position,measuredContentOverflowPx(92,92),460),null);
- assert.match(editor,/querySelector<HTMLElement>\(':scope > \.widget-fit-frame'\)/);
- assert.match(editor,/measuredContentOverflowPx\(frame\.clientHeight,content\.scrollHeight\)/);
+ assert.match(editor,/proportionalWidgetScale\(\{/);
+ assert.match(editor,/const next=proportionalWidgetScale/);
  assert.doesNotMatch(editor,/const overflow=node\.scrollHeight-node\.clientHeight/);
 });
 test('genuine oversized content grows once and then stops',()=>{

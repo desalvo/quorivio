@@ -972,7 +972,12 @@ const englishLabels:Record<string,string>={
   "Solo gli amministratori di piattaforma possono configurare questi backend. LDAP(S), Google, GitHub, Facebook e gli altri provider OIDC sono disabilitati per default; possono essere attivi contemporaneamente. Ogni SSO attiva avrà un pulsante separato alla login.": "Only platform administrators can configure these backends. LDAP(S), Google, GitHub, Facebook and other OIDC providers are disabled by default and may run simultaneously. Each enabled SSO gets a separate sign-in button.",
   "TLS con verifica dei certificati sempre attiva. Per CA private, monta il certificato nel server e specifica il percorso. L'account di servizio viene testato con una bind sicura e una ricerca limitata.": "Certificate verification is always required for TLS. For private CAs, mount the certificate on the server and specify its path. Service accounts are tested with a secure bind and limited search.",
   "Callback richiesto: /api/auth/oidc/{item.id}/callback. Il test verifica discovery e chiavi JWKS; la prova completa delle credenziali richiede un login.": "Required callback: /api/auth/oidc/{item.id}/callback. Testing verifies discovery and JWKS keys; full credential testing requires sign-in.",
-  "Callback richiesto: /api/auth/social/{item.id}/callback. Il test statico non può provare il client secret senza un accesso OAuth reale.": "Required callback: /api/auth/social/{item.id}/callback. Static testing cannot validate the client secret without an actual OAuth login."
+  "Callback richiesto: /api/auth/social/{item.id}/callback. Il test statico non può provare il client secret senza un accesso OAuth reale.": "Required callback: /api/auth/social/{item.id}/callback. Static testing cannot validate the client secret without an actual OAuth login.",
+  "Chiude soltanto questa vista: presentazione e partecipanti restano attivi.": "Close this view only: presentation and participants remain active.",
+  "Caricamento sessione…": "Loading session…",
+  "Verifica dei dati e dei permessi della sessione in corso.": "Checking session data and permissions.",
+  "Adatta automaticamente il contenuto alla dimensione del widget": "Automatically fit content to widget size",
+  "Attivo per default: ridimensiona proporzionalmente insieme grafici, legende, percentuali, risposte e testi, senza scorrimento. Rimane attivo quando modifichi geometria, font e opzioni.": "Enabled by default: proportionally scale charts, legends, percentages, answers and text together without scrolling. Stays enabled after changes to geometry, fonts and options."
 };
 export function translateUiText(value:string,language:UiLanguage):string{
  if(language==='it'||!value)return value;

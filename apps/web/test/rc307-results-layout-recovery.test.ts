@@ -23,15 +23,17 @@ test('RC307 pie sorting preserves source option numbering independently of slice
  assert.deepEqual(slices.map(x=>x.label.split(' ')[0]),['3.','2.','1.']);
  assert.deepEqual(slices.map(x=>x.count),[11,10,8]);
 });
-test('RC307 one consistent scroll/no-scale results fit policy for every view',()=>{
+test('RC326 newer explicit content-fit policy supersedes RC307 scroll-only rendering',()=>{
  for(const marker of [
-  "allowScale={!['qr','participant-count','results-button'].includes(w.kind)}",
-  "allowScale={!['qr','participant-count','results-button'].includes(kind)&&!mobile}",
-  "allowScale={!['qr','participant-count','results-button'].includes(w.kind)&&!mobileMode&&editing!==w.id}",
+  "allowScale={w.autoFit!==false&&!['qr','participant-count'].includes(w.kind)}",
+  "allowScale={w.autoFit!==false&&!['qr','participant-count'].includes(kind)}",
+  "allowScale={w.autoFit!==false&&!['qr','participant-count'].includes(w.kind)&&editing!==w.id}",
  ])assert.ok(ui.includes(marker),marker);
  assert.ok(ui.includes("editor textStyle={stageWidgetTypography(w,{pageTitle,masterTitleStyle},mobileMode)"));
+ assert.ok(ui.includes("data-fit-mode={allowScale?'scale':'scroll'}"));
  assert.ok(css.includes('RC307 — One results layout in editor/schema, rehearsal and live projection'));
  assert.ok(css.includes('.canvas-widget-results-native{display:contents!important;}'));
+ assert.ok(css.includes('RC326: the entire authored widget scales together'));
 });
 test('RC307 results title is not forcibly suppressed in editor rendering',()=>{
  assert.ok(ui.includes("w.kind==='results-button'?{...w,showTitle:editing===w.id?false:w.showTitle}"));

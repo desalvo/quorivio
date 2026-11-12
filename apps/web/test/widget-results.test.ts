@@ -51,8 +51,10 @@ test('RC316 Gauge shares the graduated needle dial across editor, rehearsal and 
  assert.match(main,/className="linked-results-gauge-needle"/);
  assert.match(main,/length:51/);
  assert.match(main,/viewBox="0 0 360 286"/);
- assert.match(main,/effectiveResultView\(w,widgets\)==='gauge'/);
- assert.match(main,/p\.height>desired\+1/);
+ // Gauge preserves its authored rectangle; only the contents are fitted.
+ assert.match(main,/chartHasRows=Boolean\(results&&\['bars','pie','table','cloud'\]\.includes/);
+ assert.match(main,/const next=proportionalWidgetScale\(\{/);
+ assert.match(main,/data-fit-predicted-chart=\{chart\}/);
  assert.match(css,/\.linked-results\.result-view-gauge \.[\s\S]*?max-height:none!important/);
  assert.match(css,/\.linked-results-gauge-fill\{fill:none;stroke-width:20/);
  assert.equal(gaugeModel([{id:'1',label:'3',count:1},{id:'2',label:'5',count:1}],{},'rating').value,4);

@@ -41,7 +41,7 @@ class RC141ResultAndRatingContract(unittest.TestCase):
     def test_results_atomic_label_and_count_and_auto_fit(self):
         self.assertIn('className="linked-result-pair"', UI)
         self.assertIn('className="linked-result-label"', UI)
-        self.assertIn('minScale={w.kind===\'results-button\'?.04:.12}', UI)
+        self.assertIn('minScale={w.kind===\'results-button\'?.005:.08}', UI)
         self.assertIn('white-space:nowrap!important', CSS)
         self.assertIn('data-fit-mode="scale"', CSS)
         self.assertIn('data-fit-mode="scroll"', CSS)

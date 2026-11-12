@@ -21,12 +21,13 @@ class MobileRatingContracts(unittest.TestCase):
   self.assertIn('audiencePortrait?audiencePhoneLayout.widgets:participantReadingMode?audienceReadingWidgets:audienceVisibleWidgets',ui)
   self.assertIn('height:audiencePhoneLayout.height',ui)
   self.assertIn('mobile&&!viewActivity?.page_design?.importedImageFit?{backgroundImage:viewActivity?.page_design?.mobile?.backgroundAssetId?',ui)
- def test_phone_controls_do_not_downscale_fonts(self):
+ def test_phone_controls_share_opt_in_content_fit_without_touching_desktop_geometry(self):
   ui=source('apps/web/src/main.tsx');css=source('apps/web/src/style.css')
-  self.assertIn("allowScale={!['qr','participant-count','results-button'].includes(kind)&&!mobile}",ui)
-  self.assertIn("allowScale={!['qr','participant-count','results-button'].includes(w.kind)&&!mobileMode&&editing!==w.id}",ui)
+  self.assertIn("allowScale={w.autoFit!==false&&!['qr','participant-count'].includes(kind)}",ui)
+  self.assertIn("allowScale={w.autoFit!==false&&!['qr','participant-count'].includes(w.kind)&&editing!==w.id}",ui)
   self.assertIn('min-height:min-content!important;',css)
   self.assertIn('width:390px!important;height:100%!important;',css)
+  self.assertIn('transform:scale(var(--widget-fit-scale,1))!important;',css)
  def test_collaboration_and_restore_keep_mobile_draft(self):
   self.assertIn('validMobilePageLayout',source('apps/web/src/page-draft-recovery.ts'))
   self.assertIn("const mobile=value('/mobile'",source('apps/web/src/page-merge.ts'))

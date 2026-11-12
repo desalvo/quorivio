@@ -7,7 +7,13 @@ class SessionFullPageNavigation(unittest.TestCase):
   ui=(ROOT/'apps/web/src/main.tsx').read_text()
   for label in ["['new','Nuova sessione']","['open','Apri sessione']","['calendar','Calendario']"]:self.assertIn(label,ui)
   for pane in ["dashboardPage==='new'", "dashboardPage==='open'", "dashboardPage==='calendar'", "dashboardPage!=='session'"]:self.assertIn(pane,ui)
-  self.assertIn("setSelected(s.id);setSnap(null);setDashboardPage('session')",ui)
+  # RC326 opens from an authenticated, short-lived in-memory preview
+  # without always forcing a blank session-loading panel.
+  self.assertIn("setSnap(candidate&&Date.now()-candidate.at<5000?candidate.snapshot:null)",ui)
+  self.assertIn("setSelected(s.id);setDashboardPage('session')",ui)
+  self.assertIn("onFocus={()=>warmSessionSnapshot(s.id)}",ui)
+  self.assertIn('sessionPreviewPending.current.get(key)',ui)
+  self.assertIn('setSelectedSessionRole(normalized.session.access_role||null)',ui)
   self.assertIn("setSessionTab('pages')",ui)
  def test_reflow_and_invitation(self):
   css=(ROOT/'apps/web/src/style.css').read_text()
