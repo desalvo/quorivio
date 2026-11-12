@@ -15,3 +15,11 @@
 - **Widget formatting:** proportional automatic fitting is enabled by default and scales text, charts, legends, counts and truth badges as a group. Natural and anticipated content geometry is remeasured on resize and live data changes. Editing widget bounds/fonts does not disable fitting. Remove the redundant auto-height checkbox; leave widget geometry untouched.
 - **Login background:** reuse the original manual cover asset, dark contrast overlay, responsive mobile layout, and no third-party resources.
 - **Validation:** TypeScript regressions and Chromium CI, followed by gated multiarch Docker images once green. Official RC readiness unchanged.
+
+## RC327 — Adattamento proporzionale senza fuoriuscite / Overflow-safe proportional fitting
+
+**IT:** Corretto il caso limite in cui testi e risultati molto lunghi superavano il riquadro perché una scala minima rigida impediva di ridurli ulteriormente. Ora la scala non supera mai il rapporto consentito da larghezza e altezza, compreso lo spazio previsto per tutti i risultati; quando lo spazio è maggiore non esiste un tetto di ingrandimento predefinito. Un eventuale limite massimo esplicito resta rispettato. L'aumento del contenuto applica immediatamente una riduzione della scala, senza toccare la geometria salvata del widget. Le opzioni manuali con adattamento disabilitato restano inalterate.
+
+**EN:** Fixed a boundary case where very long text or results could escape a widget because an unconditional minimum scale prevented further shrinkage. Proportional sizing now honors both dimensions, including predicted result rows, and uses available space without a default enlargement ceiling; a specifically requested maximum is still supported. Growing content forces an immediate downscale, while authored widget geometry and explicit scroll mode remain unchanged.
+
+**Validazione / Verification:** Node/TypeScript regressions for extreme text, predicted rows, optional caps and live-size changes; full PR CI must pass before merge or Docker publication. The official RC sign-off remains **85.25% (43 accepted, 17 partial)** pending external checks.

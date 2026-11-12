@@ -2124,14 +2124,14 @@
       "54a62e5d"
     ],
     "apps/web/src/main.tsx": [
-      "281f1dda",
-      "dbf7822c",
-      "e51678a0",
-      "0ce37206",
-      "e68fb7a9",
-      "e1bc1826",
-      "ec78550f",
-      "f5159081"
+      "34e4dd51",
+      "d96699b6",
+      "af93a894",
+      "d9efdb13",
+      "adbcc824",
+      "4c844d7e",
+      "03f126ea",
+      "f3fc5103"
     ],
     "apps/web/src/main.tsx.orig": [
       "9230e5a3",
@@ -2614,14 +2614,14 @@
       "0f1f5272"
     ],
     "apps/web/src/widget-content-scale.ts": [
-      "1738bdc2",
-      "2af0a448",
-      "7076b9ac",
-      "62c0a7f0",
-      "7675a0c2",
-      "98c5cde2",
-      "bd89a7a9",
-      "c5efd330"
+      "5d0e2d9f",
+      "d35d55e9",
+      "9ce293cf",
+      "029907c6",
+      "df23ce9c",
+      "e3c35d77",
+      "c7c0b22b",
+      "cc0b2209"
     ],
     "apps/web/src/widget-geometry.ts": [
       "305e623c",
@@ -3784,14 +3784,14 @@
       "51f8069c"
     ],
     "apps/web/test/rc326-session-fit-cover.test.ts": [
-      "04612fc7",
-      "9b0cb505",
-      "7e371f26",
-      "b9f8b1a3",
-      "ef1cb09d",
-      "6566d805",
-      "07e34e6e",
-      "cd3ea6a3"
+      "3f4bbc24",
+      "c899955c",
+      "80352834",
+      "0f0ab0c6",
+      "c5e47757",
+      "da411dfb",
+      "dab4816b",
+      "61d79131"
     ],
     "apps/web/test/rc70-editor-timer-font.test.ts": [
       "116cfb27",
@@ -4544,14 +4544,14 @@
       "d240df37"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "4cae9b60",
-      "d8737375",
-      "be5abd87",
-      "fc05473e",
-      "04accd93",
-      "85679861",
-      "9ea5bbcf",
-      "456a001e"
+      "8f899c0e",
+      "0879158c",
+      "93918aab",
+      "3793c6e1",
+      "126d2e13",
+      "1f51301a",
+      "73a570de",
+      "fb909d12"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",
@@ -5964,14 +5964,14 @@
       "6548a333"
     ],
     "docs/RC326_SESSION_FIT_LOGIN_IT_EN.md": [
-      "5dd330b9",
-      "918a30e4",
-      "0ded24fa",
-      "e489f1f8",
-      "55fb2b5c",
-      "e8e8f4af",
-      "e4f83eb0",
-      "69ac852a"
+      "8b7c3b9a",
+      "5bec02a1",
+      "432555ae",
+      "4b724199",
+      "e94477c5",
+      "ba0d1bfb",
+      "4ae307d6",
+      "1aea35c3"
     ],
     "docs/RC49_HAPROXY_CROSS_NODE_RWX.en.md": [
       "7c1cc75e",

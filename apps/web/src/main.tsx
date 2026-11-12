@@ -174,9 +174,10 @@ function WidgetContentFit({children,editor=false,allowScale=true,minScale=.005,t
      frameWidth:a.clientWidth,frameHeight:a.clientHeight,
      contentWidth:Math.max(b.scrollWidth,b.clientWidth),
      contentHeight:Math.max(b.scrollHeight,b.clientHeight),
-     predictedHeight:predicted,minScale,maxScale:2.25
+     predictedHeight:predicted,minScale
     });
-    setFactor(previous=>Math.abs(previous-next)<.006?previous:next);
+    // Always shrink when the content grows: the previous scale may now overflow.
+    setFactor(previous=>next<previous?next:Math.abs(previous-next)<.0001?previous:next);
    });
   };
   measure();const resize=new ResizeObserver(measure);

@@ -45,3 +45,20 @@ test('login reuses bundled manual cover without external image requests',()=>{
  assert.match(css,/url\('\/docs\/assets\/quorivio-manual-cover\.png'\)/);
  assert.match(css,/rgba\(8,12,29/);
 });
+
+test('RC327: extreme and predicted content never exceeds either widget dimension',()=>{
+ const extreme={frameWidth:160,frameHeight:90,contentWidth:1_000_000,contentHeight:100,minScale:.08};
+ const reduced=proportionalWidgetScale(extreme);
+ assert.ok(reduced<.005,'automatic fit must override a minimum that would clip content');
+ assert.ok(reduced*extreme.contentWidth<=extreme.frameWidth);
+ assert.ok(reduced*extreme.contentHeight<=extreme.frameHeight);
+ const forecast=proportionalWidgetScale({frameWidth:300,frameHeight:180,contentWidth:90,contentHeight:40,predictedWidth:750,predictedHeight:900});
+ assert.equal(forecast,.2);
+ const enlarged=proportionalWidgetScale({frameWidth:300,frameHeight:200,contentWidth:10,contentHeight:10});
+ assert.equal(enlarged,20,'small content can occupy the maximal available dimension');
+ const capped=proportionalWidgetScale({frameWidth:300,frameHeight:200,contentWidth:10,contentHeight:10,maxScale:3});
+ assert.equal(capped,3,'a specialized renderer may explicitly cap upscaling');
+ assert.equal(proportionalWidgetScale({frameWidth:300,frameHeight:200,contentWidth:Infinity,contentHeight:10}),1);
+ assert.doesNotMatch(ui,/maxScale:2\\.25/,'default content fit must not impose an arbitrary enlargement cap');
+ assert.match(ui,/setFactor\\(previous=>next<previous\\?next:/,'growth in natural content must immediately reduce scale');
+});
