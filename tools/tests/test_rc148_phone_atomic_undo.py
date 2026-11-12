@@ -18,7 +18,8 @@ class RC148PhoneAtomicUndo(unittest.TestCase):
         self.assertTrue(preserves_atomic_undo(HISTORY, EDITOR))
         self.assertIn('!same(state.present, base)', HISTORY)
         self.assertIn('return {...state, present: fitted}', HISTORY)
-        self.assertIn('if(onAutoFit)onAutoFit(widgets,changes);else onChange(changes)', EDITOR)
+        self.assertNotIn('if(onAutoFit)onAutoFit(widgets,changes);else onChange(changes)', EDITOR)
+        self.assertIn('proportionalWidgetScale({', EDITOR)
 
     def test_phone_branch_must_not_use_desktop_fit(self):
         self.assertTrue(preserves_atomic_undo(HISTORY, EDITOR))
