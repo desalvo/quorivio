@@ -1,3 +1,9 @@
+## Partecipazione in presenza o da remoto — RC332
+Quorivio funziona per eventi **in presenza, remoti e ibridi**, con platee locali oppure geograficamente distribuite. Da **smartphone, tablet o PC** apri il link o scansiona il QR della sessione, seleziona la risposta al sondaggio, invia il quiz, esprimi gradimento o usa le reazioni quando il presentatore abilita i widget. Domande e risultati sono sincronizzati con il flusso live della presentazione. A seconda delle impostazioni puoi partecipare **come utente autenticato o anonimo**. Il numero di **500 partecipanti contemporanei** è un limite teorico, non una garanzia di prestazioni; in caso di evento molto grande l'organizzatore deve dimensionare e testare il server.
+
+
+---
+
 # Guida del partecipante
 
 **Quorivio 0.1.0-dev · Build documentale RC293 · 10 novembre 2026**

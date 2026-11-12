@@ -1,3 +1,11 @@
+## Engaging audiences in person and remotely — practical RC332 example
+Quorivio enables both **people in the room** and **remote participants across different locations** to contribute. For a 30-minute workshop, create a session with an introduction containing text, logo and photography, a video page, a multiple-choice poll, a timed quiz, a 0–9 satisfaction index and a results page. Show the QR code on site and share the URL with participants on phones, tablets or desktops: everyone uses the same live session, synchronized answers and emoji reactions. Choose when results appear and display them as bars, pies, tables, word clouds, semicircular gauges or reaction bubbles. Presenter profiles, timers, headers/footers, images, videos and rich graphic elements complete the session; resize widget contents proportionally.
+
+A session can accept **authenticated or anonymous** audience members, as configured. **Up to 500 simultaneous participants** is a *theoretical* maximum requiring load tests on the actual deployment. The portable `.quo`, PPTX and PDF exports are available from the session; visually inspect converted exports before distribution because pixel-for-pixel parity with the live browser rendering is not yet certified. For support, presenters can send the session .quo with a bug/feature description, explicit sharing consent and an optional 24-hour diagnostic report. Default retention is 30 days, configurable by a platform administrator.
+
+
+---
+
 # Presenter guide
 
 **Quorivio 0.1.0-dev · Documentation build RC293 · 10 November 2026**

@@ -1,3 +1,30 @@
+## RC332 — Sessioni ibride, LDAP multipli, notifiche e assistenza
+Quorivio supporta riunioni **in presenza**, **da remoto** e **ibride**. I partecipanti, locali o geograficamente distribuiti, rispondono in tempo reale da smartphone, tablet o computer tramite URL/QR; in funzione della sessione possono partecipare come utenti autenticati o anonimi. Il valore di **500 partecipanti contemporanei** è un massimo *teorico di progettazione*, non un benchmark certificato: per esercizio e SLA devono essere eseguiti test di carico con la topologia effettiva (API, PostgreSQL, WebSocket, ingress, CPU e rete).
+
+### Directory LDAP/LDAPS multiple
+In **Impostazioni server → Autenticazione** scegliere **LDAP / Active Directory** come tipo e inserire un identificativo distinto (es. `infn` → `ldap-infn`) e un nome visibile al login. Configurare separatamente URI LDAPS oppure LDAP con StartTLS, DN e password di bind, Base DN, filtro utente contenente `{login}`, attributi immutabili, gruppi e provisioning; testare prima di abilitare. Ogni provider è disabilitato per default. Il backend interno è sempre disponibile. Il login mostra separatamente tutte le directory abilitate e le SSO abilitate. Per le CA private il certificato deve essere montato nel container; non disabilitare mai la verifica TLS. L'associazione di identità richiede un bind dell'utente e non avviene mai in base alla sola e-mail.
+
+### Notifiche: eventi, canali e destinatari
+In **Impostazioni server → Notifiche** attivare indipendentemente gli eventi (1) registrazione e cambio stato utente, (2) alert di sistema, errori e warning, (3) invio sessioni per debugging. Per ogni canale abilitare/disabilitare il trasporto e scegliere **tutti gli amministratori** oppure i destinatari da un elenco indipendente. I canali esterni partono disabilitati. I token sono cifrati nel database, non letti in chiaro dall'interfaccia: lasciare vuoto un campo token già configurato per conservarlo.
+
+| Canale | Parametri da configurare | Preparazione esterna |
+|---|---|---|
+| E-mail | SMTP nelle Impostazioni server → Posta elettronica, indirizzo autore e destinatari amministratori | Server SMTP con TLS, identità mittente autorizzata e consegna di prova |
+| Pushover | Application API token e User Key distinta per ogni destinatario | Creare una applicazione in Pushover, ottenere token e User Key dalle utenze destinatarie |
+| Telegram | Token del bot e Chat ID distinto per amministratore | Creare il bot con BotFather, avviare una conversazione autorizzata e rilevare il Chat ID |
+| WhatsApp | Meta access token, Phone Number ID, API version, nome/lingua del template approvato e numero E.164 per destinatario | Configurare Meta WhatsApp Cloud API, numero Business, template approvato e opt-in del destinatario |
+
+Il test sui canali attivi si avvia dalla scheda **Notifiche**. Per Telegram, WhatsApp e Pushover non inserire segreti nelle descrizioni delle sessioni; i messaggi contengono solo un breve riassunto non sensibile. Per WhatsApp un template Business approvato e l'opt-in sono prerequisiti.
+
+### Inviare una sessione per bug o nuove funzionalità
+Dalla dashboard della sessione l'autore/presentatore usa **Invia sessione per debug**: seleziona *bug* o *feature*, descrive la richiesta, autorizza esplicitamente la condivisione del file `.quo` e, separatamente, l'eventuale rapporto tecnico di anomalie delle ultime 24 ore. Il file .quo esclude risposte dei partecipanti e credenziali. Se il canale e-mail e SMTP sono attivi, il sistema tenta l'invio del bundle all'indirizzo autore impostato (allegati SMTP soggetti al limite di 14 MiB); in ogni caso il materiale resta scaricabile dagli amministratori nella scheda **Debug** per la durata configurata. Per file troppo grandi o SMTP non disponibile lo stato di consegna segnala il mancato invio, senza cancellare il deposito amministrativo.
+
+### Retention e pulizia automatica
+In **Impostazioni server → Generale** impostare **Conservazione file temporanei e sessioni debug** (default **30 giorni**, range 1–3650). Il task ogni 12 ore cancella archivi debug scaduti, directory temporanee di conversione inattive, asset orfani identificati con sicurezza e la registrazione anonima di incidenti oltre soglia. I file registrati, i contenuti permanenti e i job attivi sono preservati; in cluster i bundle di debug devono risiedere sul volume condiviso degli asset. Se l'invio delle notifiche fallisce, la rimozione per scadenza procede ugualmente. Verificare su staging diritti di accesso, volume RWX, log di cleanup e policy GDPR. I log diagnostici disponibili sono eventi minimizzati, non copie di stack/cookie/segreti; i crash che non hanno prodotto tracce persistenti non sono ricostruibili.
+
+
+---
+
 # Manuale dell'amministratore
 
 **Quorivio 0.1.0-dev · Build documentale RC293 · 10 novembre 2026**

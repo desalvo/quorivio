@@ -1,3 +1,30 @@
+## RC332 — Hybrid audiences, multiple LDAP directories, notifications and support
+Quorivio is designed for **in-person**, **remote** and **hybrid** meetings. Local and geographically distributed participants can interact in real time from phones, tablets and desktops using a URL/QR code. A session may allow authenticated or anonymous participation. **500 simultaneous participants** is a *theoretical design limit*, not a certified benchmark: validate production sizing and SLAs through realistic load testing.
+
+### Multiple LDAP/LDAPS directories
+In **Server settings → Authentication**, choose **LDAP / Active Directory**, provide a unique ID (e.g. `research` becomes `ldap-research`) and a distinct login display name. Configure LDAPS or LDAP with StartTLS, bind DN/password, Base DN, filter with `{login}`, immutable identity attributes, groups, provisioning and CA certificate path; test the draft before enabling it. All external backends start disabled. Internal login is always available. The login page lists every enabled LDAP provider and federated SSO choice independently. TLS verification is mandatory. Existing identities are not linked by matching e-mail addresses.
+
+### Notification channels and configuration
+In **Server settings → Notifications**, enable event groups independently: user registrations/status changes, system alerts/errors/warnings, and debugging submissions. Configure each enabled channel and select **all administrators** or an independent list of administrator recipients. Third-party channels default to disabled; saved API tokens are encrypted and never echoed to the browser.
+
+| Channel | Required settings | External setup |
+|---|---|---|
+| E-mail | SMTP in Server settings → E-mail, author support address, admin recipients | Secure SMTP host, valid sender identity, delivery test |
+| Pushover | Application API token; User Key per recipient | Create a Pushover application, obtain API token and recipient User Keys |
+| Telegram | Bot token; Chat ID per recipient | Create a bot using BotFather, authorize/start conversations and collect Chat IDs |
+| WhatsApp | Meta access token, Phone Number ID, Graph API version, approved template/language and E.164 phone numbers | Provision WhatsApp Cloud API, verified Business number, approved message template and valid recipient opt-in |
+
+Use **Send test** to verify active channels. Pushover, Telegram and WhatsApp messages contain a limited, non-sensitive summary, never a raw debug archive or credentials. WhatsApp proactive messages require an approved Business template.
+
+### Session submission for bug reports or feature requests
+From the session dashboard, a presenter selects **Send session for debugging**, chooses bug/feature, writes the report, expressly agrees to send a portable `.quo` session and optionally consents to a **24-hour** minimized diagnostic incident report. This portable archive excludes audience responses and credentials. With e-mail notifications and SMTP enabled, Quorivio attempts to e-mail the archive to the configured support author (SMTP attachment limit: 14 MiB). Regardless of delivery outcome, administrators can download the archive from **Server settings → Debug** until expiration.
+
+### Default 30-day cleanup
+Set **Temporary files and debug-session retention** in **Server settings → General**; default **30 days**, configurable from 1–3650 days. The 12-hour cleanup cycle removes expired debug bundles, inactive temporary converter workspaces, confirmed unregistered orphan media and aged privacy-minimized system incidents. Registered assets, permanent content and active conversion jobs are preserved. In multi-replica deployments, debug storage must use the shared asset volume. Failures to send notifications do not block expiry cleanup. Stored diagnostics record limited event codes rather than raw stack traces, secrets, addresses or audience data; a crash with no durable incident record cannot be reconstructed.
+
+
+---
+
 # Administrator guide
 
 **Quorivio 0.1.0-dev · Documentation build RC293 · 10 November 2026**
