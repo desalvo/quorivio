@@ -160,10 +160,11 @@ function WidgetContentFit({children,editor=false,allowScale=true,minScale=.005,t
     const results=b.querySelector<HTMLElement>('.linked-results');
     const rows=results?.querySelector<HTMLElement>('.linked-results-items');
     const actualRows=Array.from(rows?.querySelectorAll<HTMLElement>('.linked-results-row')||[]);
-    const configuredRows=Number(results?.dataset.fitPredictedRows??actualRows.length);
+    const chartHasRows=Boolean(results&&['bars','pie','table','cloud'].includes(results.dataset.fitPredictedChart||''));
+    const configuredRows=chartHasRows?Number(results?.dataset.fitPredictedRows??actualRows.length):0;
     const tallestRow=Math.max(22,...actualRows.map(row=>row.offsetHeight));
     const otherHeight=results?Math.max(0,results.scrollHeight-(rows?.scrollHeight||0)):0;
-    const predicted=results?predictedResultsHeight({
+    const predicted=results&&chartHasRows?predictedResultsHeight({
      rows:Math.max(actualRows.length,configuredRows||0),
      maxRowHeight:tallestRow,
      otherHeight:b.scrollHeight-results.scrollHeight+otherHeight,
@@ -2065,7 +2066,7 @@ const [sessionLoadState,setSessionLoadState]=useState<'idle'|'loading'|'ready'|'
    const deadline=window.setTimeout(()=>controller.abort(),12000);
    try{
     const inFlight=attempt===0?sessionPreviewPending.current.get(key):undefined;
-    const value=await (inFlight??sessionSnapshotRequest(selected,controller.signal));
+    const value=await (inFlight?inFlight.then(value=>value??sessionSnapshotRequest(selected,controller.signal)):sessionSnapshotRequest(selected,controller.signal));
     if(!isOwnerSessionSnapshot(value,selected))throw new Error('invalid_session_snapshot');
     if(!active)return;
     const normalized=normalizeOwnerSessionSnapshot(value);
