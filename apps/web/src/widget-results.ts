@@ -48,12 +48,13 @@ export function effectiveResultView(resultWidget:StatisticalWidget,widgets:Stati
  return view==='pie'||view==='table'||view==='cloud'||view==='gauge'||view==='bubbles'?view:'bars';
 }
 /** Reaction-specific, anonymous aggregate bubble sizing; no user identities. */
-export function reactionBubbles(rows:readonly StatRow[],limit=5){
+export function reactionBubbles(rows:readonly StatRow[],limit=5,sort:'count-desc'|'count-asc'|'index-asc'|'index-desc'='count-desc'){
  const available=rows.filter(r=>Number.isSafeInteger(r.count)&&r.count>=0);
  const total=available.reduce((sum,r)=>sum+r.count,0);
  const max=Math.max(1,...available.map(r=>r.count));
  const safeLimit=Number.isSafeInteger(limit)&&limit>=1&&limit<=20?limit:5;
- return [...available].sort((a,b)=>b.count-a.count).slice(0,safeLimit).map(row=>({
+ const ranked=available.map((row,index)=>({row,index})).sort((a,b)=>sort==='index-asc'?a.index-b.index:sort==='index-desc'?b.index-a.index:sort==='count-asc'?a.row.count-b.row.count||a.index-b.index:b.row.count-a.row.count||a.index-b.index);
+ return ranked.slice(0,safeLimit).map(({row})=>({
   ...row,percent:total>0?row.count/total*100:0,
   size:Math.round(56+60*Math.sqrt(Math.max(0,row.count)/max))
  }));
