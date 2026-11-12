@@ -113,8 +113,9 @@ test('live reactions replace choice in PostgreSQL and refresh authenticated aggr
 
 test('profile previews show authenticated name/photo and public email only when opted in',()=>{
  assert.match(source,/function EditorPresenterProfileWidget/);
- assert.match(source,/usePrivateProfile=\{true\}/);
- assert.match(source,/showEmail=\{widget.showEmail===true\}/);
- assert.match(source,/p\.profile_photo_url/);
- assert.match(source,/p\.name/);
+ assert.match(source,/usePrivateProfile=\\{w.kind==='profile'\\}/);
+ assert.match(source,/showEmail:widget.showEmail===true/);
+ assert.match(source,/profile\\?\\.profile_photo_url/);
+ assert.match(source,/profile\\.name/);
+ assert.match(source,/showEmail===true&&profile.email/);
 });
