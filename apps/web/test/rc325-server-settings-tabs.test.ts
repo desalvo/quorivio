@@ -72,3 +72,9 @@ test('RC329 server tabs always have visible controls and WCAG-AA text contrast',
  assert.match(main,/role="tablist"/);
  assert.match(main,/tabIndex=\{serverSettingsTab===item\.id\?0:-1\}/);
 });
+test('RC331 server tabs do not animate into an inaccessible selected colour',()=>{
+ const block=css.split('/* RC329: platform server tabs live inside a dark dashboard.')[1]||'';
+ assert.match(block,/\.dashboard \.server-settings-tabs > button\.server-settings-tab\{[\s\S]*?transition:none!important/);
+ const chromium=readFileSync(new URL('../../../tools/ci_rc329_server_settings_tabs_chromium.py',import.meta.url),'utf8');
+ assert.match(chromium,/metric\["transitionDuration"\] == "0s"/);
+});

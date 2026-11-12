@@ -4255,6 +4255,8 @@ main.hero.login-manual-cover .panel.login{
  letter-spacing:0!important;text-align:center!important;
  white-space:nowrap!important;text-shadow:none!important;
  box-shadow:0 1px 3px #07172755!important;cursor:pointer!important;
+ /* Avoid low-contrast intermediate colour from global background transition. */
+ transition:none!important;
 }
 .dashboard .server-settings-tabs > button.server-settings-tab:not([aria-selected="true"]):hover{
  background:#345d7d!important;color:#ffffff!important;border-color:#add6f0!important;

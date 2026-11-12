@@ -62,7 +62,8 @@ def main() -> None:
                     return {text:el.textContent, fg:style.color, bg:style.backgroundColor,
                       visibility:style.visibility, opacity:Number(style.opacity),
                       display:style.display, width:box.width, height:box.height,
-                      selected:el.getAttribute('aria-selected')};
+                      selected:el.getAttribute('aria-selected'),
+                      transitionDuration:style.transitionDuration};
                 })""")
                 for i, metric in enumerate(metrics):
                     assert metric["text"] == LABELS[i], metric
@@ -71,6 +72,7 @@ def main() -> None:
                     assert metric["display"] != "none", metric
                     assert metric["width"] >= 58 and metric["height"] >= 40, metric
                     assert metric["selected"] == ("true" if i == 0 else "false"), metric
+                    assert metric["transitionDuration"] == "0s", metric
                     assert contrast(metric["fg"], metric["bg"]) >= 4.5, metric
                 # A hover must remain legible, and mobile must scroll to Audit.
                 tabs.nth(1).hover()
