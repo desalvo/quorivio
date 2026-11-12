@@ -2149,10 +2149,18 @@ async function servePresentationExport(req:express.Request,res:express.Response,
    await writeFile(path.join(scratch,'portable.json'),portable,{flag:'wx',mode:0o600});
    // Stage only referenced, session-owned image assets for the isolated PPTX worker.
    const definition=JSON.parse(portable);
-   const imageIds=[...new Set<string>(definition.activities.flatMap((a:any)=>[
-    ...(a.page_design?.widgets||[]).filter((w:any)=>['image','logo'].includes(w.kind)).map((w:any)=>w.assetId),
-    ...(a.slide_asset_id?[a.slide_asset_id]:[])
-   ]))];
+   const masterBackground=definition.session?.theme?.master?.backgroundAssetId;
+   const imageIds=[...new Set<string>([
+    ...(masterBackground?[masterBackground]:[]),
+    ...definition.activities.flatMap((a:any)=>[
+     ...(a.page_design?.backgroundAssetId?[a.page_design.backgroundAssetId]:[]),
+     ...(a.page_design?.widgets||[]).flatMap((w:any)=>[
+      ...(['image','logo'].includes(w.kind)&&w.assetId?[w.assetId]:[]),
+      ...(w.style?.fillMode==='image'&&w.style?.fillImageAssetId?[w.style.fillImageAssetId]:[])
+     ]),
+     ...(a.slide_asset_id?[a.slide_asset_id]:[])
+    ])
+   ].filter((id):id is string=>typeof id==='string'&&id.length>0))];
    if(imageIds.length>200)throw Error('pptx_export_too_many_images');
    if(imageIds.length){
     const registered=await db.query('SELECT id,mime_type,byte_size,sha256 FROM session_assets WHERE session_id=$1 AND participant_id IS NULL AND id=ANY($2::uuid[])',[s.id,imageIds]);
