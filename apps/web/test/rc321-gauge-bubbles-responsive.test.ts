@@ -23,6 +23,7 @@ test('RC321 bubble fit is the default, persists, and can return to scroll mode',
  assert.match(main,/fit=\{\(widget\.bubbleNoScroll\?\?source\.bubbleNoScroll\)!==false\}/);
  assert.match(css,/\.linked-results\.result-view-bubbles\[data-bubbles-fit="true"\]/);
  assert.match(main,/new ResizeObserver\(measure\)/);
+ assert.match(main,/reactionBubbles\(rows,widget\.resultTopCount\?\?rows\.length/);
  assert.equal(validPageDesign({widgets:[{id:'reaction',kind:'reactions',bubbleNoScroll:false}]}),true);
  assert.equal(validPageDesign({widgets:[{id:'reaction',kind:'reactions',bubbleNoScroll:1}]}),false);
 });
