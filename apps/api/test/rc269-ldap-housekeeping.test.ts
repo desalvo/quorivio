@@ -27,7 +27,7 @@ test('30-day conversion cleanup keeps recent, unknown, active and symlinked work
   await mkdir(path.join(root,locked,'.conversion-lock')); 
   await mkdir(path.join(root,'human-named-folder'));
   await symlink(path.join(root,expired),path.join(root,'d'.repeat(32)));
-  const later=Date.now()+HOUSEKEEPING_PERIOD_MS+60000;
+  const later=Date.now()+temporaryRetentionMs(30)+60000;
   const removed=await removeExpiredConversionJobs(root,later,new Set([path.join(root,active)]));
   assert.equal(removed,2); // expired and recent become stale at a simulated 30 day future clock
   await assert.rejects(stat(path.join(root,expired)),{code:'ENOENT'});
@@ -45,7 +45,7 @@ test('persistent files are never purged if registered; unknown library folders u
   await writeFile(path.join(root,session,used),'used');await writeFile(path.join(root,session,unused),'orphan');
   await writeFile(path.join(root,'background-library','saved'),'important');
   const calls:string[]=[];
-  const removed=await removeOrphanSessionAssetFiles(root,async(_sid,aid)=>{calls.push(aid);return aid===used},Date.now()+HOUSEKEEPING_PERIOD_MS+60000);
+  const removed=await removeOrphanSessionAssetFiles(root,async(_sid,aid)=>{calls.push(aid);return aid===used},Date.now()+temporaryRetentionMs(30)+60000);
   assert.equal(removed,1);assert.ok(calls.includes(used));
   await stat(path.join(root,session,used));await stat(path.join(root,'background-library','saved'));
   await assert.rejects(stat(path.join(root,session,unused)),{code:'ENOENT'});
