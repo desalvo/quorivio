@@ -71,19 +71,19 @@ class RC293VisualManualsAndBrochures(unittest.TestCase):
   self.assertIn('break-before:auto',css)
   self.assertNotIn('break-before:page',css)
 
- def test_two_brochures_have_two_searchable_pages_and_release_metadata(self):
+ def test_two_brochures_have_six_searchable_pages_and_release_metadata(self):
   for language in ('it','en'):
    pdf=ROOT/f'docs/brochures/quorivio-brochure-{language}.pdf'
    copy=ROOT/f'apps/web/public/docs/brochures/quorivio-brochure-{language}.pdf'
    self.assertEqual(pdf.read_bytes(),copy.read_bytes())
    with fitz.open(pdf) as doc:
-    self.assertEqual(doc.page_count,2)
-    for page in doc:self.assertGreaterEqual(len(page.get_image_info()),1)
+    self.assertEqual(doc.page_count,6)
+    for page in doc:self.assertTrue(page.get_image_info() or len(page.get_drawings())>=12)
     t='\n'.join(p.get_text() for p in doc)
-    for word in ('Quorivio',metadata()['build'],'Alessandro De Salvo','braket71@gmail.com','EUPL-1.2','github.com/desalvo/quorivio','.quo'):
+    for word in ('Quorivio','RC333','Alessandro De Salvo','braket71@gmail.com','EUPL-1.2','github.com/desalvo/quorivio','.quo'):
      self.assertIn(word,t)
     self.assertNotRegex(t,r'\b[0-9a-f]{40}\b')
-  self.assertIn('official-quorivio-logo.png',(ROOT/'tools/generate_brochures.py').read_text())
+  self.assertIn('mock-reference-6-pages-2026-11.jpg',(ROOT/'tools/generate_brochures.py').read_text())
 
  def test_ci_and_source_release_guard_references(self):
   ci=(ROOT/'.github/workflows/ci.yml').read_text()
