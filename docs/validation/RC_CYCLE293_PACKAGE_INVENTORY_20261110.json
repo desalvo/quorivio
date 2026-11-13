@@ -44,14 +44,14 @@
       "e377db62"
     ],
     ".github/workflows/ci.yml": [
-      "d9e18580",
-      "5e7ed58d",
-      "b0410f93",
-      "18dd951e",
-      "4fae8696",
-      "c44c0048",
-      "2773fd62",
-      "60e68e4c"
+      "9e88ab28",
+      "2b199e91",
+      "39337a99",
+      "552f0011",
+      "abe1458b",
+      "885c320d",
+      "8ee0576d",
+      "6f4f3af0"
     ],
     ".github/workflows/converter-image.yml": [
       "9d99101a",
@@ -18714,14 +18714,14 @@
       "38f15337"
     ],
     "tools/generate_brochures.py": [
-      "d9724f4a",
-      "26b476fe",
-      "793eefb0",
-      "17af3b73",
-      "7dd60dd8",
-      "febf9ff9",
-      "8176181b",
-      "febda736"
+      "37c24763",
+      "b1f3d03d",
+      "a1ec58c3",
+      "c09502fc",
+      "6e892117",
+      "2a13a4e7",
+      "0c84ff79",
+      "c9038cf4"
     ],
     "tools/generate_manuals.py": [
       "3fa672fe",
