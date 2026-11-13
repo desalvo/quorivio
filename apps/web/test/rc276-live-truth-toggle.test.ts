@@ -10,7 +10,7 @@ const liveTruthWiring=(source:string)=>{
  const live=liveSection(source),chart=chartSection(source);
  return live.includes('linkedStatisticContext(widget,activity,activities,widgets)') &&
    live.includes('const sourceWidgets=context?.widgets||[]') &&
-   live.includes('<LinkedResultChart widget={widget} widgets={sourceWidgets} rows={rows} emptyLabel="live"/>') &&
+   live.includes('<LinkedResultChart widget={widget} widgets={sourceWidgets} rows={rows} emptyLabel="live" participation={participation}/>') &&
    chart.includes('const source=linkedStatisticSource(widget,widgets)') &&
    chart.includes('resultHasAnswerKey(source,widget.targetQuestionId') &&
    chart.includes('const viewWidget={...widget,showCorrectAnswers:hasKey&&truthVisible}') &&

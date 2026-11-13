@@ -140,10 +140,32 @@ async function configuredQrPublicBase():Promise<string>{
  return typeof value==='string'&&/^https?:\/\//.test(value)?value:publicBase;
 }
 const strip=(s:any)=>({access_role:s.access_role||'owner',id:s.id,title:s.title,reference_date:s.reference_date,join_code:s.join_code,status:s.status,expires_at:s.expires_at,current_activity_id:s.current_activity_id,presenter_activity_id:s.presenter_activity_id||s.current_activity_id,allow_anonymous:s.allow_anonymous,show_results:s.show_results,theme:s.theme,retention_days:s.retention_days,demo_template_key:s.demo_template_key||null,join_url:`/join/${s.join_secret}`});
-async function snapshot(sid:string){const s=(await db.query('SELECT * FROM sessions WHERE id=$1',[sid])).rows[0];if(!s)return null;const acts=(await db.query('SELECT * FROM activities WHERE session_id=$1 ORDER BY position',[sid])).rows as Activity[];const counts=(await db.query('SELECT a.id AS activity_id,r.option_id,count(*)::int AS count FROM activities a JOIN responses r ON r.activity_id=a.id AND r.invalidated_at IS NULL WHERE a.session_id=$1 GROUP BY a.id,r.option_id',[sid])).rows;const totals=(await db.query('SELECT activity_id,count(*)::int AS count FROM responses WHERE invalidated_at IS NULL AND activity_id IN (SELECT id FROM activities WHERE session_id=$1) GROUP BY activity_id',[sid])).rows;const reactions=(await db.query('SELECT activity_id,emoji,count(*)::int AS count FROM page_reactions WHERE session_id=$1 GROUP BY activity_id,emoji',[sid])).rows;return {session:strip(s),activities:acts,results:counts,totals,reactions,connected_participants:await connectedParticipants(sid)};}
+async function snapshot(sid:string){const s=(await db.query('SELECT * FROM sessions WHERE id=$1',[sid])).rows[0];if(!s)return null;const acts=(await db.query('SELECT * FROM activities WHERE session_id=$1 ORDER BY position',[sid])).rows as Activity[];const counts=(await db.query('SELECT a.id AS activity_id,r.option_id,count(*)::int AS count FROM activities a JOIN responses r ON r.activity_id=a.id AND r.invalidated_at IS NULL WHERE a.session_id=$1 GROUP BY a.id,r.option_id',[sid])).rows;const totals=(await db.query('SELECT activity_id,count(*)::int AS count FROM responses WHERE invalidated_at IS NULL AND activity_id IN (SELECT id FROM activities WHERE session_id=$1) GROUP BY activity_id',[sid])).rows;const reactions=(await db.query('SELECT activity_id,emoji,count(*)::int AS count FROM page_reactions WHERE session_id=$1 GROUP BY activity_id,emoji',[sid])).rows;return {session:strip(s),activities:acts,results:counts,totals,reactions,connected_participants:await connectedParticipants(sid),responded_connected_participants:await respondedConnectedParticipants(sid)};}
 const sockets=new Map<string,Set<WebSocket>>();
 const liveSocketIds=new WeakMap<WebSocket,string>();
 async function connectedParticipants(sid:string){const r=await db.query("SELECT count(DISTINCT participant_id)::int AS n FROM live_connections WHERE session_id=$1 AND participant_id IS NOT NULL AND last_seen>now()-interval '50 seconds'",[sid]);return r.rows[0]?.n||0;}
+/** Count unique currently connected participants with >=1 valid server-side
+ * answer/interaction; only aggregate totals reach the authenticated owner.
+ * Multiple answers by the same user count once. No private IDs leave SQL. */
+async function respondedConnectedParticipants(sid:string){
+ const result=await db.query(`
+  WITH responders AS (
+   SELECT participant_id FROM widget_answers WHERE session_id=$1
+   UNION SELECT r.participant_id FROM responses r
+    JOIN activities a ON a.id=r.activity_id
+    WHERE a.session_id=$1 AND r.invalidated_at IS NULL
+   UNION SELECT participant_id FROM page_ratings WHERE session_id=$1
+   UNION SELECT participant_id FROM page_reactions WHERE session_id=$1
+   UNION SELECT participant_id FROM topic_widget_questions WHERE session_id=$1
+  )
+  SELECT count(DISTINCT live.participant_id)::int AS answered
+  FROM live_connections live INNER JOIN responders r
+   ON r.participant_id=live.participant_id
+  WHERE live.session_id=$1 AND live.participant_id IS NOT NULL
+   AND live.last_seen>now()-interval '50 seconds'`,[sid]);
+ return Math.max(0,Number(result.rows[0]?.answered)||0);
+}
+
 
 const liveSnapshots=createLiveSnapshotQueue(async(sid:string)=>{if(!sockets.get(sid)?.size)return;const data=await snapshot(sid);deliverLiveSnapshot(sockets.get(sid)||[],data,participantSnapshot,ws=>(ws as any).view==='owner',shouldDropSlowSocket,(error)=>console.error('live socket delivery error',sid,error instanceof Error?error.name:'unknown'));},(error,sid)=>console.error('live snapshot failed',sid,error instanceof Error?error.message:'unknown'));
 async function broadcastLocal(sid:string){await liveSnapshots.enqueue(sid)}

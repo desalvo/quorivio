@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
   "cycle": 293,
-  "file_count_excluding_manifest": 2643,
+  "file_count_excluding_manifest": 2646,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -44,14 +44,14 @@
       "e377db62"
     ],
     ".github/workflows/ci.yml": [
-      "abe27477",
-      "32f30b2c",
-      "2438b515",
-      "294c23bd",
-      "07ecf7ae",
-      "02da3be2",
-      "4c1c087b",
-      "97bcfb4c"
+      "9e88ab28",
+      "2b199e91",
+      "39337a99",
+      "552f0011",
+      "abe1458b",
+      "885c320d",
+      "8ee0576d",
+      "6f4f3af0"
     ],
     ".github/workflows/converter-image.yml": [
       "9d99101a",
@@ -194,14 +194,14 @@
       "2dd5f6ba"
     ],
     "apps/api/src/domain.ts": [
-      "2aa98904",
-      "f1667a37",
-      "349ca964",
-      "f10aa026",
-      "42ee859a",
-      "36248e95",
-      "88b6763c",
-      "f55721e3"
+      "b97cb876",
+      "723a6320",
+      "64819158",
+      "d60e4793",
+      "f70cbd3d",
+      "3e3da989",
+      "94f8fb0a",
+      "89e402de"
     ],
     "apps/api/src/email-otp.ts": [
       "442c62ac",
@@ -554,14 +554,14 @@
       "6cf4c002"
     ],
     "apps/api/src/server.ts": [
-      "e3acb4d3",
-      "ef237f11",
-      "36725b19",
-      "77759de3",
-      "cf123afe",
-      "8f90f6f0",
-      "06f35499",
-      "ac82934e"
+      "e00e8dc5",
+      "50666a48",
+      "b81d29f8",
+      "5ddea720",
+      "e17636de",
+      "c5970c1c",
+      "dbb709df",
+      "26b9f204"
     ],
     "apps/api/src/session-bus.ts": [
       "09ec6487",
@@ -2204,14 +2204,14 @@
       "54a62e5d"
     ],
     "apps/web/src/main.tsx": [
-      "b80e4790",
-      "03d1d6e3",
-      "3a58ecc3",
-      "b9c14f0e",
-      "71a96992",
-      "bc17f780",
-      "aa062bb2",
-      "c12b786a"
+      "9b4cba2c",
+      "b70e6759",
+      "5ec2db39",
+      "964edbb2",
+      "202a501d",
+      "a358351a",
+      "9b6ab4f6",
+      "3fe5131c"
     ],
     "apps/web/src/main.tsx.orig": [
       "9230e5a3",
@@ -2594,14 +2594,14 @@
       "2586b822"
     ],
     "apps/web/src/style.css": [
-      "0c1f4cb0",
-      "a99b813e",
-      "6cb10339",
-      "74b1d076",
-      "55b8e65e",
-      "5d3ebb9b",
-      "b7793d40",
-      "e37a0af9"
+      "28ddd9e4",
+      "d8b6b4f3",
+      "75fd7b1d",
+      "de1b064d",
+      "fdc9ea40",
+      "1e7329d9",
+      "3c91c866",
+      "f632b8c5"
     ],
     "apps/web/src/thumbnail-menu-layout.ts": [
       "a4748563",
@@ -2774,14 +2774,14 @@
       "ddb75970"
     ],
     "apps/web/src/widget-results.ts": [
-      "b2d10320",
-      "a1735075",
-      "03abe4f5",
-      "f8fa5178",
-      "7197c704",
-      "874161c6",
-      "a5677e11",
-      "95aa285c"
+      "535fa2c6",
+      "9f4c2299",
+      "f5b937b9",
+      "562aa6e9",
+      "74434e1d",
+      "e8fc26fb",
+      "ad49be02",
+      "0a421770"
     ],
     "apps/web/src/widget-rich-editor.tsx": [
       "610fdf07",
@@ -3354,14 +3354,14 @@
       "aace8f9a"
     ],
     "apps/web/test/rc191-cross-page-preview.test.ts": [
-      "d4a5b52a",
-      "37024726",
-      "c3a1e578",
-      "22dde113",
-      "59a07021",
-      "1dd87200",
-      "35c52aa0",
-      "5a1d7ed6"
+      "7e7e9386",
+      "7ce7a94d",
+      "1f43a230",
+      "79b0ec54",
+      "d8bbfb9c",
+      "136ec974",
+      "387d6c7a",
+      "d7160b20"
     ],
     "apps/web/test/rc192-linked-question.test.ts": [
       "5c7a14db",
@@ -3684,14 +3684,14 @@
       "f1e7648d"
     ],
     "apps/web/test/rc276-live-truth-toggle.test.ts": [
-      "24344668",
-      "775262da",
-      "6f3382e5",
-      "64cbd04a",
-      "b410cb08",
-      "a1d53d16",
-      "e370236a",
-      "3d371815"
+      "ec9cf2ed",
+      "783b4570",
+      "820b8997",
+      "d85668cf",
+      "c7e42c1e",
+      "a8a7c840",
+      "0372a63c",
+      "49091ada"
     ],
     "apps/web/test/rc285-local-session-transfer.test.ts": [
       "2dbb2eea",
@@ -18714,14 +18714,14 @@
       "38f15337"
     ],
     "tools/generate_brochures.py": [
-      "d9c19203",
-      "2d9a8720",
-      "d277f723",
-      "257dbb0b",
-      "dc042e85",
-      "384af086",
-      "d8bc1023",
-      "72160190"
+      "43f2848b",
+      "a0ed7828",
+      "a45bebf0",
+      "55c234ef",
+      "897d4ec7",
+      "c6a31bfa",
+      "a7396c91",
+      "ac84fb4d"
     ],
     "tools/generate_manuals.py": [
       "3fa672fe",
@@ -19104,14 +19104,14 @@
       "c7fade13"
     ],
     "tools/stage_verified_manuals.sh": [
-      "dc153bb9",
-      "903eab0d",
-      "c5ac3451",
-      "f54379a0",
-      "b6219d44",
-      "1ccfbac5",
-      "51205492",
-      "3afb8229"
+      "33697dd5",
+      "3c5a2c8a",
+      "12fcd510",
+      "c51959a2",
+      "f896f5cd",
+      "98d233b8",
+      "1df56b56",
+      "1a3f9fa9"
     ],
     "tools/test_rc270_wizard_backup.py": [
       "28ffe9f1",
@@ -26432,6 +26432,36 @@
       "c3ec050f",
       "4501ac60",
       "7be5beb3"
+    ],
+    "apps/web/src/response-participation.ts": [
+      "2ad1a2d9",
+      "66cded84",
+      "d9e62a4f",
+      "b651aa2b",
+      "a91e9473",
+      "3beb879f",
+      "4458f07f",
+      "6cada28c"
+    ],
+    "apps/api/test/rc333_response_participation.test.ts": [
+      "25f58a8d",
+      "084910d4",
+      "bb8038b4",
+      "6f4d5f73",
+      "376dbb22",
+      "c3a93e21",
+      "a1abc14e",
+      "60bf7432"
+    ],
+    "tools/verify_portrait_brochures.py": [
+      "b0fd4afb",
+      "49d0c35a",
+      "5ce08c82",
+      "01a67387",
+      "d8aa5bb3",
+      "b503805b",
+      "c8f561bb",
+      "5d075d6e"
     ]
   }
 }

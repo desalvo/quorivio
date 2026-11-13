@@ -20,3 +20,20 @@ for role in user presenter admin; do
   done
 done
 echo "Verified all six build-matched manuals in the Docker app context."
+
+# Ship the build-matched six-page A4 portrait brochures in the native app too.
+brochure_dir="apps/web/public/docs/brochures"
+mkdir -p "$brochure_dir"
+for lang in it en; do
+  name="quorivio-brochure-$lang.pdf"
+  mapfile -t matches < <(find "$source_root" -type f -name "$name" -print)
+  test "${#matches[@]}" -eq 1 || { echo "Missing/duplicate portrait brochure: $name" >&2; exit 1; }
+  source_file="${matches[0]}"
+  test -s "$source_file"
+  test "$(head -c 5 "$source_file")" = '%PDF-'
+  test "$(wc -c < "$source_file")" -gt 20000
+  cp "$source_file" "$brochure_dir/$name"
+  cmp "$source_file" "$brochure_dir/$name"
+  sha256sum "$brochure_dir/$name"
+done
+echo "Verified both six-page portrait brochures in the Docker app context."

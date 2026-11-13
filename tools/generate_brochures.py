@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Two-page Quorivio marketing brochures (IT/EN), with editable searchable text.
+"""Six-page portrait Quorivio marketing brochures (IT/EN), with editable searchable text.
 
 ImageGen-derived environmental photography is SYNTHETIC, while screen captures
 come from a hash-verified archived CI run. Publication metadata is shared with
 all six manuals, and no source-commit identifier is printed on either brochure.
 """
 from pathlib import Path
+import os
 from io import BytesIO
 import shutil
 from PIL import Image,ImageOps
@@ -20,7 +21,7 @@ from manual_screenshot_catalog import evidence,LATEST_ARCHIVED_SCREENSHOTS,LATES
 ROOT=Path(__file__).resolve().parents[1]
 ART=ROOT/'docs/assets/brochure-editorial'
 SCREEN=ROOT/'docs/assets/manual-evidence-rc291'
-OUT=ROOT/'docs/brochures'; WEB=ROOT/'apps/web/public/docs/brochures'
+OUT=Path(os.environ.get('QUORIVIO_BROCHURE_OUTPUT_DIR',str(ROOT/'docs/brochures'))); WEB=ROOT/'apps/web/public/docs/brochures'
 W,H=A4
 BLUE='#121f3b';TEAL='#10a99b';PURPLE='#5447ad';MUTED='#4d6078';WHITE='#ffffff';LIGHT='#f0f7f9'
 pdfmetrics.registerFont(TTFont('Lato','/usr/share/fonts/truetype/lato/Lato-Regular.ttf'))
@@ -66,10 +67,11 @@ def image_contain(c,path,x,y,w,h):
  nw,nh=im.size;pw=nw/3;ph=nh/3
  c.drawImage(ImageReader(im),x+(w-pw)/2,y+(h-ph)/2,pw,ph,mask='auto')
 
-def logo_png()->Path:
- out=ART/'official-quorivio-logo.png'
- cairosvg.svg2png(url=str(ROOT/'docs/assets/quorivio-logo.svg'),write_to=str(out),output_width=540)
- return out
+def logo_png() -> ImageReader:
+ # No repository mutations: the archived official-quorivio-logo.png is immutable.
+ # Render the official SVG to PNG in memory for ReportLab.
+ png=cairosvg.svg2png(url=str(ROOT/'docs/assets/quorivio-logo.svg'),output_width=540)
+ return ImageReader(BytesIO(png))
 
 def small_icon(c,x,y,kind,colorhex=TEAL):
  border(c,colorhex);c.setLineWidth(2)
@@ -96,17 +98,17 @@ DATA={
   'pills':['EDITOR VISUALE','SESSIONI LIVE','OPEN SOURCE'],
   'three':[('Crea', 'Pagine, widget, schemi e anteprime con controlli di formattazione.'),('Coinvolgi','QR e codici sessione; sondaggi, quiz e domande aperte anche da mobile.'),('Analizza','Risultati, grafici e feedback durante la presentazione.')],
   'why':'In presenza, da remoto o ibrido: pubblico sempre protagonista',
-  'whytext':'Presentatore, partecipante e amministratore hanno viste dedicate. Il sistema può essere installato e gestito sulla propria infrastruttura, con accessi autorizzati e strumenti di audit.',
+  'whytext':'Il pubblico entra con un QR code, risponde a sondaggi e quiz da smartphone, invia domande e segue i risultati in tempo reale mentre il presentatore conduce le slide.',
   'workflow':'DALL’IDEA ALL’EVENTO LIVE',
   'steps':['Crea una sessione','Progetta pagine e schemi','Prova le anteprime','Conduci e raccogli risposte'],
   'features':'FUNZIONI CHE FANNO LA DIFFERENZA',
   'blocks':[('Contenuti e interazione','Testi, immagini, video, QR, titoli, footer, timer, quiz singoli/multipli, domande aperte e gradimento.'),
    ('Risultati e controllo','Grafici a barre, torta, gauge, bolle, tabelle e word cloud, partecipanti connessi, evidenziazione R delle opzioni corrette.'),
    ('Portabilità','Copia di sessione .quo con contenuti, allegati e calendario; import locale che crea una nuova sessione.'),
-   ('Amministrazione','Utenti e ruoli, LDAP/SSO, ClamAV, backup, restore, audit, scaling e scenari DR documentati.')],
+   ('Coinvolgimento del pubblico','Sondaggi dal vivo, quiz e competizioni, Q&A, reazioni, risultati immediati e percentuale di partecipazione per chi presenta.')],
   'screens':'INTERFACCIA AUTENTICA · ARCHIVIO DI COLLAUDO',
   'tech':'INFRASTRUTTURA E GOVERNANCE',
-  'techlines':['In presenza e da remoto, fino a 500 teorici','Linux, Docker, Podman e Kubernetes','GDPR: privacy by design; carico da validare'],
+  'techlines':['500 partecipanti distinti: benchmark temporaneo CI superato','Linux, Docker, Podman e Kubernetes','GDPR by design; dimensionare le installazioni reali'],
   'meta':'DATI DI PUBBLICAZIONE',
   'min':'Minimo indicativo per una prova: 2 vCPU, 4 GiB RAM e 20 GiB di disco più DB/media; produzione da dimensionare.',
   'note':'Foto ambientali e alcuni mock sono illustrazioni sintetiche. Le schermate dell’app sono immagini vere di una build di prova archiviata; possono variare.',
@@ -116,17 +118,17 @@ DATA={
   'pills':['VISUAL EDITOR','LIVE SESSIONS','OPEN SOURCE'],
   'three':[('Create','Pages, widgets, masters and previews with advanced formatting.'),('Engage','QR and session codes; polls, quizzes and open questions on mobile.'),('Understand','Results, charts and feedback during the presentation.')],
   'why':'In person, remotely or hybrid: engage everyone',
-  'whytext':'Presenters, participants and administrators have dedicated views. Deploy on infrastructure you manage, with authorised access and auditing tools.',
+  'whytext':'Attendees join with a QR code, answer live polls and quizzes on their phones, submit questions and watch real-time results while the presenter controls the slides.',
   'workflow':'FROM IDEA TO LIVE EVENT',
   'steps':['Create a session','Design pages and masters','Rehearse all previews','Go live and collect answers'],
   'features':'FEATURES THAT MAKE A DIFFERENCE',
   'blocks':[('Content and interaction','Text, images, video, QR, title/footer, timers, single/multiple choice quizzes, open questions and ratings.'),
    ('Results and control','Bars, pies, gauges, bubbles, tables, word clouds, connected participant counts and R-based correct-answer highlighting.'),
    ('Portability','Portable .quo session bundle with content, media and calendar; local import creates a new session.'),
-   ('Administration','Users and roles, LDAP/SSO, ClamAV, backups, restore, audit, scaling and documented DR workflows.')],
+   ('Audience engagement','Live polls, quizzes and competitions, Q&A, reactions, instant charts and response-participation percentage for presenters.')],
   'screens':'AUTHENTIC UI · ARCHIVED TEST BUILD',
   'tech':'INFRASTRUCTURE AND GOVERNANCE',
-  'techlines':['In-person and remote; 500 theoretical users','Linux, Docker, Podman and Kubernetes','GDPR-aware; load testing still required'],
+  'techlines':['500 distinct participants: disposable CI benchmark passed','Linux, Docker, Podman and Kubernetes','Privacy by design; production sizing remains necessary'],
   'meta':'PUBLICATION DETAILS',
   'min':'Indicative evaluation minimum: 2 vCPU, 4 GiB RAM and 20 GiB disk plus database/media; size production by measurement.',
   'note':'Environmental photos and some mockups are synthetic illustrations. UI screenshots are genuine captures from an archived test build and may differ.',
@@ -136,86 +138,124 @@ DATA={
 def page_footer(c,i,lang):
  color(c,BLUE);c.rect(0,0,W,43,stroke=0,fill=1)
  txt(c,39,18,DATA[lang]['footer'],9.2,True,WHITE)
- txt(c,W-52,18,f'{i}/2',9,True,'#93e4df')
+ txt(c,W-52,18,f'{i}/6',9,True,'#93e4df')
 
 def build_one(lang):
  d=DATA[lang];meta=metadata();validate_release(meta)
  evidence(SCREEN,expected_commit=__import__('manual_screenshot_catalog').LATEST_ARCHIVED_COMMIT,minimum=20)
- OUT.mkdir(parents=True,exist_ok=True);WEB.mkdir(parents=True,exist_ok=True)
+ OUT.mkdir(parents=True,exist_ok=True)
+ if not os.environ.get('QUORIVIO_BROCHURE_NO_WEB'):WEB.mkdir(parents=True,exist_ok=True)
  dest=OUT/('quorivio-brochure-'+lang+'.pdf');c=Canvas(str(dest),pagesize=A4,pageCompression=1)
- c.setTitle('Quorivio | '+('Brochure illustrativa' if lang=='it' else 'Illustrative brochure'))
+ c.setTitle('Quorivio | '+('Brochure illustrativa - sei pagine verticali' if lang=='it' else 'Six-page portrait brochure'))
  c.setAuthor(meta['author'])
- # Page 1 - premium hero with photo + genuine product screenshot.
- color(c,'#f7fbff');c.rect(0,0,W,H,fill=1,stroke=0)
- color(c,BLUE);c.roundRect(0,733,W,109,19,fill=1,stroke=0)
- color(c,WHITE);c.roundRect(36,753,189,55,13,stroke=0,fill=1)
- c.drawImage(ImageReader(logo_png()),40,758,176,45,mask='auto')
- txt(c,41,742,d['tag']+'  •  '+meta['build'],8,True,'#a5e9e3')
- pill(c,418,777,d['pills'][0]);pill(c,418,748,d['pills'][2],fill=PURPLE)
- txt(c,40,691,'QUORIVIO',32,True)
- y=wrap(c,d['sub'],40,662,265,20,25,3,ink=BLUE,bold=True)
- y-=6
- wrap(c,d['hero'],40,y,260,11.3,16,7,ink=MUTED)
- image_cover(c,ART/('marketing-photo-'+lang+'.jpg'),321,499,232,218)
- border(c,TEAL);c.setLineWidth(2);c.roundRect(320,498,234,220,14,fill=0,stroke=1)
- # Three product evidence cards.
- cards=[('editor-canvas','screen'),('participant-question-smartphone','people'),('presenter-live','chart')]
- for n,((title,copy),(img,kind)) in enumerate(zip(d['three'],cards)):
-  x=40+n*176
-  panel(c,x,300,162,179)
-  color(c,'#e9f5f5');c.roundRect(x+8,379,146,92,8,stroke=0,fill=1)
-  image_contain(c,SCREEN/(img+'.png'),x+10,382,142,85)
-  small_icon(c,x+12,341,kind)
-  txt(c,x+55,360,title,13,True)
-  wrap(c,copy,x+14,331,136,8.9,12,5,ink=MUTED)
- # Dovetailed aspirational band.
- panel(c,40,139,514,145,background='#e8f5f3',outline='#c9e6e2')
- txt(c,57,255,d['why'],13.2,True)
- wrap(c,d['whytext'],57,235,295,9.6,14,8)
- image_cover(c,ROOT/'docs/assets/manual-illustrations/editorial-collaborative-workflow-rc286.jpg',393,153,144,110)
- pill(c,56,161,d['pills'][1])
- txt(c,45,98,d['note'],7.7,False,ink=MUTED) if len(d['note'])<100 else wrap(c,d['note'],45,104,505,7.5,10,3,ink=MUTED)
- page_footer(c,1,lang);c.showPage()
- # Page 2 - functions, workflow and real screenshots.
- color(c,'#f7fafc');c.rect(0,0,W,H,stroke=0,fill=1)
- color(c,BLUE);c.roundRect(0,758,W,84,17,fill=1,stroke=0)
- txt(c,40,790,d['workflow'],18,True,WHITE)
- txt(c,40,771,meta['name']+'  •  '+meta['version']+'  •  '+meta['build'],8.5,False,'#bcf5ea')
- for k,name in enumerate(d['steps']):
-  x=40+k*133
-  panel(c,x,694,124,52,background='#edf8f7',outline='#bfdbda')
-  color(c,TEAL);c.circle(x+15,720,11,stroke=0,fill=1)
-  txt(c,x+12,716,str(k+1),9.2,True,WHITE)
-  wrap(c,name,x+30,722,88,9,11,3,ink=BLUE,bold=True)
-  if k<3:
-   border(c,TEAL);c.setLineWidth(1.7);c.line(x+124,722,x+131,722)
- txt(c,43,673,d['features'],15.5,True)
- for k,(head,copy) in enumerate(d['blocks']):
-  col=k%2;row=k//2;x=40+col*262;y=522-row*122
-  panel(c,x,y,250,113)
-  color(c,TEAL);c.roundRect(x+12,y+77,33,27,8,stroke=0,fill=1)
-  txt(c,x+23,y+87,str(k+1),12,True,WHITE)
-  txt(c,x+55,y+86,head,11.6,True)
-  wrap(c,copy,x+13,y+65,223,8.7,12,5,ink=MUTED)
-  color(c,'#ecf7f7');c.roundRect(x+13,y+11,223,29,6,stroke=0,fill=1)
-  small_icon(c,x+18,y+8,['screen','chart','screen','people'][k])
-  txt(c,x+57,y+20,['EDITOR  •  WIDGET','LIVE  •  REPORT','SESSION  .quo','SECURITY  •  OPS'][k],8,True,ink=PURPLE)
- # lower divided section: true screenshot and facts.
- txt(c,43,372,d['screens'],10,True,ink=PURPLE)
- panel(c,40,238,253,127,background='#eef4f7')
- image_contain(c,SCREEN/'rehearsal-side-by-side.png',47,246,238,111)
- txt(c,308,365,d['tech'],10.6,True)
- label_list(c,311,347,d['techlines'],7.8,16)
- panel(c,40,80,514,143,background='#edf8f6',outline='#b9dbd6')
- txt(c,53,204,d['meta'],11.8,True)
- left=[('Version',meta['version']+' · '+meta['build']),('Author' if lang=='en' else 'Autore',meta['author']),('Licenza' if lang=='it' else 'License',meta['license'])]
- yy=184
- for key,value in left:
-  txt(c,53,yy,key+':',8.5,True);txt(c,117,yy,value,8.5);yy-=19
- txt(c,54,118,'GitHub:  github.com/desalvo/quorivio',8.6,True)
- txt(c,309,182,meta['email'],8.8)
- wrap(c,d['min'],309,160,230,8.1,11,5,ink=MUTED)
- page_footer(c,2,lang);c.save();shutil.copy2(dest,WEB/dest.name)
+ logo=logo_png()
+ def header(number,section):
+  color(c,'#f7fbff');c.rect(0,0,W,H,fill=1,stroke=0)
+  color(c,BLUE);c.rect(0,H-78,W,78,stroke=0,fill=1)
+  color(c,WHITE);c.roundRect(31,H-64,168,47,9,stroke=0,fill=1)
+  c.drawImage(logo,36,H-61,158,42,mask='auto')
+  font_size=13
+  while pdfmetrics.stringWidth(section,'LatoBold',font_size)>W-252 and font_size>8:font_size-=.5
+  txt(c,225,H-43,section,font_size,True,WHITE)
+  page_footer(c,number,lang)
+ def line(text,x,y,width,size=10,leading=14,bold=False,ink=BLUE,low=50):
+  font='LatoBold' if bold else 'Lato'
+  chunks=[];part=''
+  for word in str(text).split():
+   candidate=(part+' '+word).strip()
+   if part and pdfmetrics.stringWidth(candidate,font,size)>width:
+    chunks.append(part);part=word
+   else:part=candidate
+  if part:chunks.append(part)
+  if y-(len(chunks)-1)*leading<low:raise ValueError('brochure text crosses a card or footer: '+str(text)[:50])
+  for chunk in chunks:
+   if pdfmetrics.stringWidth(chunk,font,size)>width:raise ValueError('oversized brochure word: '+chunk)
+   txt(c,x,y,chunk,size,bold,ink);y-=leading
+  return y
+ def headline(s,x,y,width,size=19):
+  while pdfmetrics.stringWidth(s,'LatoBold',size)>width and size>10:size-=.5
+  txt(c,x,y,s,size,True,BLUE)
+ def photo_whole(source,x,y,w,h):
+  # Contain, never crop. Every source pixel remains visible.
+  image_contain(c,source,x,y,w,h)
+ # 1: cover, full photograph and real UI screenshot.
+ header(1,d['tag'])
+ headline(d['sub'],36,718,520,19)
+ line(d['hero'],36,684,520,11,16,False,MUTED,620)
+ panel(c,36,277,523,319,background=WHITE)
+ photo_whole(ART/('marketing-photo-'+lang+'.jpg'),46,286,503,300)
+ headline(('Presenta, interagisci, coinvolgi!' if lang=='it' else 'Present. Interact. Engage.'),37,251,519,17)
+ line(d['whytext'],38,225,516,9.6,14,False,MUTED,175)
+ line(('Slide, QR, sondaggi live, quiz, reazioni, grafici e domande del pubblico.' if lang=='it' else 'Slides, QR, live polls, quizzes, reactions, charts and audience questions.'),38,133,512,9.4,14,True,PURPLE,95)
+ line(d['note'],38,91,512,7.8,11,False,MUTED,51)
+ c.showPage()
+ # 2: product workflow and authentic screenshots.
+ header(2,d['workflow'])
+ headline(d['workflow'],37,725,520,20)
+ for i,step in enumerate(d['steps']):
+  y=634-i*94;panel(c,37,y,522,80,background=WHITE)
+  color(c,TEAL if i%2==0 else PURPLE);c.circle(62,y+40,14,fill=1,stroke=0)
+  txt(c,57,y+36,str(i+1),11,True,WHITE)
+  line(step,91,y+45,447,12,16,True,BLUE,y+15)
+ headline(d['screens'],38,240,510,12.5)
+ panel(c,37,75,520,155,background='#edf4f9')
+ photo_whole(SCREEN/'rehearsal-side-by-side.png',48,85,498,135)
+ c.showPage()
+ # 3: rich widgets and features with actual editor screenshot.
+ header(3,d['features'])
+ headline(d['features'],38,726,515,19)
+ for i,(title,body) in enumerate(d['blocks']):
+  x=37+(i%2)*266;y=427-(i//2)*216
+  panel(c,x,y,257,203,background=WHITE)
+  color(c,TEAL if i%2==0 else PURPLE);c.roundRect(x+12,y+156,31,30,7,fill=1,stroke=0)
+  txt(c,x+23,y+166,str(i+1),11,True,WHITE)
+  headline(title,x+12,y+132,231,12.5)
+  line(body,x+12,y+112,231,10,15,False,MUTED,y+47)
+  small_icon(c,x+13,y+13,['screen','chart','screen','people'][i])
+ panel(c,37,75,520,122,background='#ebf6f3')
+ photo_whole(SCREEN/'editor-canvas.png',49,83,496,105)
+ c.showPage()
+ # 4: live audience and participant device evidence.
+ header(4,d['why'])
+ headline(d['why'],37,726,517,17)
+ line(d['whytext'],38,698,510,10,14,False,MUTED,643)
+ panel(c,37,388,520,240,background=WHITE)
+ photo_whole(SCREEN/'participant-question-smartphone.png',48,399,250,219)
+ photo_whole(SCREEN/'presenter-live.png',307,399,240,219)
+ for i,(title,summary) in enumerate(d['three']):
+  y=305-i*78;panel(c,37,y,520,67,background=WHITE)
+  headline(title,51,y+43,493,13)
+  line(summary,51,y+21,490,9.4,12,False,MUTED,y+8)
+ c.showPage()
+ # 5: technical and infrastructure facts.
+ header(5,d['tech'])
+ headline(d['tech'],38,726,519,19)
+ for i,content in enumerate(d['techlines']):
+  y=612-i*101;panel(c,37,y,520,88,background=WHITE)
+  color(c,TEAL);c.circle(58,y+47,9,stroke=0,fill=1)
+  line(content,79,y+51,457,11.3,16,True,BLUE,y+15)
+ panel(c,37,178,520,107,background='#edf8f6')
+ headline(d['why'],52,255,484,13)
+ line(d['min'],52,226,486,9.6,14,False,MUTED,186)
+ panel(c,37,75,520,92,background=WHITE)
+ photo_whole(SCREEN/'editor-canvas.png',45,83,505,75)
+ c.showPage()
+ # 6: features and publication metadata.
+ header(6,d['meta'])
+ headline(d['meta'],38,727,517,19)
+ for i,(title,body) in enumerate(d['three']):
+  y=622-i*88;panel(c,38,y,519,77,background=WHITE)
+  headline(title,51,y+49,485,13.5)
+  line(body,51,y+26,484,9.6,13,False,MUTED,y+10)
+ panel(c,38,200,519,139,background='#edf8f6')
+ txt(c,53,310,'Version: '+meta['version']+'  •  '+meta['build'],10.2,True)
+ txt(c,53,287,('Autore: ' if lang=='it' else 'Author: ')+meta['author'],10.2)
+ txt(c,53,264,meta['email'],10.2)
+ txt(c,53,241,'License: '+meta['license']+'  •  github.com/desalvo/quorivio',9.9)
+ line(d['note'],52,177,493,8.5,12,False,MUTED,129)
+ txt(c,53,95,'PDF  •  PPTX  •  .quo  •  PostgreSQL  •  Docker  •  Kubernetes',9.5,True)
+ c.showPage();c.save()
+ if not os.environ.get('QUORIVIO_BROCHURE_NO_WEB'):shutil.copy2(dest,WEB/dest.name)
  print(dest.name,'bytes',dest.stat().st_size)
  return dest
 
