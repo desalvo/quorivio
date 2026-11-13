@@ -67,10 +67,11 @@ def image_contain(c,path,x,y,w,h):
  nw,nh=im.size;pw=nw/3;ph=nh/3
  c.drawImage(ImageReader(im),x+(w-pw)/2,y+(h-ph)/2,pw,ph,mask='auto')
 
-def logo_png()->Path:
- out=ART/'official-quorivio-logo.png'
- cairosvg.svg2png(url=str(ROOT/'docs/assets/quorivio-logo.svg'),write_to=str(out),output_width=540)
- return out
+def logo_png() -> ImageReader:
+ # No repository mutations: the archived official-quorivio-logo.png is immutable.
+ # Render the official SVG to PNG in memory for ReportLab.
+ png=cairosvg.svg2png(url=str(ROOT/'docs/assets/quorivio-logo.svg'),output_width=540)
+ return ImageReader(BytesIO(png))
 
 def small_icon(c,x,y,kind,colorhex=TEAL):
  border(c,colorhex);c.setLineWidth(2)
@@ -152,7 +153,7 @@ def build_one(lang):
   color(c,'#f7fbff');c.rect(0,0,W,H,fill=1,stroke=0)
   color(c,BLUE);c.rect(0,H-78,W,78,stroke=0,fill=1)
   color(c,WHITE);c.roundRect(31,H-64,168,47,9,stroke=0,fill=1)
-  c.drawImage(ImageReader(logo),36,H-61,158,42,mask='auto')
+  c.drawImage(logo,36,H-61,158,42,mask='auto')
   font_size=13
   while pdfmetrics.stringWidth(section,'LatoBold',font_size)>W-252 and font_size>8:font_size-=.5
   txt(c,225,H-43,section,font_size,True,WHITE)
