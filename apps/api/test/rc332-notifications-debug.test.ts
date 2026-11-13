@@ -28,6 +28,6 @@ test('user-facing status notices default to off and need SMTP',async()=>{
 });
 test('account state changes are announced only after commit, and orphan debug bundles are cleaned',()=>{
  const source=readFileSync(new URL('../src/server.ts',import.meta.url),'utf8');
- assert.match(source,/notifySubjectStatus\\(result\\.rows\\[0\\]\\.email/);
- assert.match(source,/removeOrphanDebugBundles\\(db,assetRoot,retentionDays\\)/);
+ assert.ok(source.includes('notifySubjectStatus(result.rows[0].email'));
+ assert.ok(source.includes('removeOrphanDebugBundles(db,assetRoot,retentionDays)'));
 });
