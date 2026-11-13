@@ -17,7 +17,7 @@ RUN set -eux; \
     DEBIAN_FRONTEND=noninteractive apt-get -o Acquire::Retries=0 install -y --no-install-recommends --only-upgrade zlib1g; \
     zlib_version="$(dpkg-query -W -f='${Version}' zlib1g)"; \
     dpkg --compare-versions "$zlib_version" ge '1:1.3.dfsg+really1.3.1-1+deb13u1' || { echo "Unsafe Debian zlib1g package: $zlib_version" >&2; exit 1; }; \
-    DEBIAN_FRONTEND=noninteractive apt-get -o Acquire::Retries=0 install -y --no-install-recommends poppler-utils libreoffice-impress chromium fonts-dejavu-core fonts-lato fonts-liberation; \
+    DEBIAN_FRONTEND=noninteractive apt-get -o Acquire::Retries=0 install -y --no-install-recommends poppler-utils libreoffice-impress fonts-dejavu-core chromium fonts-lato fonts-liberation; \
     rm -rf /var/lib/apt/lists/*; \
     useradd -u 1000 -m converter; \
     mkdir /conversions; \
