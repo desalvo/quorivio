@@ -28,6 +28,8 @@ test('password login enforces enrolled MFA while federated SSO delegates MFA to 
 });
 test('LDAP MFA administration requires matching directory subject, not just email',()=>{
  assert.match(server,/async function verifyAccountPassword\(/);
- assert.match(server,/authenticateDirectory\(ldap,linked\.rows\[0\]\.email,password\)/);
- assert.match(server,/verified\.subject===linked\.rows\[0\]\.subject/);
+ assert.match(server,/authenticateDirectory\(ldap,identity\.email,password\)/);
+ assert.match(server,/enabledLdapBackend\(db,secret,backendId\)/);
+ assert.match(server,/identity\.provider==='default'\?'ldap':String\(identity\.provider\)/);
+ assert.match(server,/verified\.subject===identity\.subject/);
 });
