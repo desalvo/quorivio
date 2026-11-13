@@ -4328,3 +4328,19 @@ main.hero.login-manual-cover .panel.login{
 .linked-response-participation small{display:block;font-size:.8em;line-height:1.25;max-width:100%;white-space:normal;overflow-wrap:anywhere;color:#51647a}
 .response-participation-size-control{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .response-participation-size-control input[type=range]{min-width:105px;flex:1}
+
+/* RC334: Line/Area/Donut/Radar SVG charts share the presenter/editor autosizing model. */
+.linked-results .linked-results-advanced-chart{
+ display:block;flex:0 1 auto;align-self:center;width:100%;min-width:0;
+ max-width:650px;height:auto;aspect-ratio:560 / 300;
+ max-height:min(52%,330px);overflow:visible;background:transparent;
+}
+.linked-results.result-view-line .linked-results-items,
+.linked-results.result-view-area .linked-results-items,
+.linked-results.result-view-donut .linked-results-items,
+.linked-results.result-view-radar .linked-results-items{min-height:0;flex:1 1 auto;overflow-y:auto;overflow-x:hidden;}
+.result-advanced-chart-controls{display:inline-flex;align-items:center;flex-wrap:wrap;gap:.6em;min-width:0;}
+.result-advanced-chart-controls label{display:inline-flex;align-items:center;gap:.35em;flex-wrap:wrap;min-width:0;}
+.result-advanced-chart-controls input[type=range]{width:clamp(90px,12vw,180px);accent-color:#0b8677;}
+.result-advanced-chart-controls output{font-weight:700;font-variant-numeric:tabular-nums;}
+@media(max-width:640px){.linked-results .linked-results-advanced-chart{max-height:42%;}}

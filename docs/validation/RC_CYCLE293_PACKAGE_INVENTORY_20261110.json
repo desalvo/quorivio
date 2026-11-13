@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
   "cycle": 293,
-  "file_count_excluding_manifest": 2649,
+  "file_count_excluding_manifest": 2655,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -244,14 +244,14 @@
       "2dd5f6ba"
     ],
     "apps/api/src/domain.ts": [
-      "b97cb876",
-      "723a6320",
-      "64819158",
-      "d60e4793",
-      "f70cbd3d",
-      "3e3da989",
-      "94f8fb0a",
-      "89e402de"
+      "138ba169",
+      "932aab90",
+      "16e57e88",
+      "5d677a96",
+      "b1e12bca",
+      "e8c58c0a",
+      "b748a38a",
+      "14348944"
     ],
     "apps/api/src/email-otp.ts": [
       "442c62ac",
@@ -1553,6 +1553,16 @@
       "7b7ca86f",
       "232ffb13"
     ],
+    "apps/api/test/result-advanced-chart-config.test.ts": [
+      "089c337b",
+      "21f54ff4",
+      "55c5a570",
+      "d95aed55",
+      "c360fc26",
+      "816d2b55",
+      "820ceb60",
+      "167529aa"
+    ],
     "apps/api/test/rich-page-widgets.test.ts": [
       "b9248fe6",
       "aba9e9c0",
@@ -2264,14 +2274,14 @@
       "54a62e5d"
     ],
     "apps/web/src/main.tsx": [
-      "9b4cba2c",
-      "b70e6759",
-      "5ec2db39",
-      "964edbb2",
-      "202a501d",
-      "a358351a",
-      "9b6ab4f6",
-      "3fe5131c"
+      "65d62c79",
+      "b31e6917",
+      "b3f33488",
+      "28d2e4f3",
+      "60dc6377",
+      "3393cf81",
+      "8221bf9b",
+      "5f6dee5f"
     ],
     "apps/web/src/main.tsx.orig": [
       "9230e5a3",
@@ -2543,6 +2553,26 @@
       "4458f07f",
       "6cada28c"
     ],
+    "apps/web/src/result-advanced-chart-geometry.ts": [
+      "b4e1e8ba",
+      "f5f9dcb3",
+      "60a24f9e",
+      "b7065c98",
+      "4bd20c4b",
+      "1882d31e",
+      "5e41ecbf",
+      "b0c6da6b"
+    ],
+    "apps/web/src/result-advanced-chart.tsx": [
+      "f2518768",
+      "7fbd82f4",
+      "c4fb20e1",
+      "91a58cd9",
+      "249cae3c",
+      "2319437f",
+      "902b8d0a",
+      "80fd7451"
+    ],
     "apps/web/src/result-bar-gradient.ts": [
       "2279c2e0",
       "54d0f089",
@@ -2664,14 +2694,14 @@
       "2586b822"
     ],
     "apps/web/src/style.css": [
-      "28ddd9e4",
-      "d8b6b4f3",
-      "75fd7b1d",
-      "de1b064d",
-      "fdc9ea40",
-      "1e7329d9",
-      "3c91c866",
-      "f632b8c5"
+      "96547cdd",
+      "cd685044",
+      "32d02856",
+      "fe963602",
+      "a9c2acc4",
+      "cab5b887",
+      "81ba4d90",
+      "f02edbda"
     ],
     "apps/web/src/thumbnail-menu-layout.ts": [
       "a4748563",
@@ -2844,14 +2874,14 @@
       "ddb75970"
     ],
     "apps/web/src/widget-results.ts": [
-      "535fa2c6",
-      "9f4c2299",
-      "f5b937b9",
-      "562aa6e9",
-      "74434e1d",
-      "e8fc26fb",
-      "ad49be02",
-      "0a421770"
+      "cdfd412e",
+      "4e6bbf93",
+      "ec8b3df2",
+      "c1087409",
+      "7394e5d9",
+      "a0ada599",
+      "0ea82b93",
+      "7d523d65"
     ],
     "apps/web/src/widget-rich-editor.tsx": [
       "610fdf07",
@@ -4043,6 +4073,26 @@
       "6b011b81",
       "f393af67"
     ],
+    "apps/web/test/result-advanced-chart-geometry.test.ts": [
+      "c16dfaa0",
+      "15403c15",
+      "154dfc30",
+      "6ba56d8f",
+      "96ec9bb4",
+      "788462cc",
+      "3592a3d6",
+      "0d8aead7"
+    ],
+    "apps/web/test/result-advanced-chart-modes.test.ts": [
+      "a63d3528",
+      "72f8d0ad",
+      "2630be3c",
+      "a5898707",
+      "5faa70ee",
+      "42ee72d9",
+      "f57851cc",
+      "673e12af"
+    ],
     "apps/web/test/result-cloud.test.ts": [
       "2fe97460",
       "03bae4cc",
@@ -4704,24 +4754,24 @@
       "455a0f27"
     ],
     "docs/DEVELOPMENT_STATUS.it.md": [
-      "0692c753",
-      "db503d82",
-      "cd56a35b",
-      "30ff8f73",
-      "346396cc",
-      "e793f67e",
-      "1f0a9cb0",
-      "779c632f"
+      "68b36609",
+      "5b88bf97",
+      "976df76e",
+      "ae9fb60d",
+      "ba624497",
+      "334888ff",
+      "f361a299",
+      "d04d650c"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "55a7ac5c",
-      "592e36cf",
-      "9a72792b",
-      "50b7a81f",
-      "f78fa812",
-      "da862324",
-      "7135ec15",
-      "10c55f8d"
+      "9a72cb18",
+      "544f0375",
+      "aabc5d6a",
+      "529a665c",
+      "29f7bb32",
+      "54f2fa48",
+      "402fb9c4",
+      "d9ffba68"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",
@@ -6162,6 +6212,16 @@
       "828f534b",
       "4a94a00f",
       "759c3938"
+    ],
+    "docs/RC334_RESULT_CHARTS_IT_EN.md": [
+      "31e36d9a",
+      "2b4ac548",
+      "24c45e3f",
+      "2fae5884",
+      "7e5c9525",
+      "b4bdbb35",
+      "bdcb426d",
+      "b794f401"
     ],
     "docs/RC49_HAPROXY_CROSS_NODE_RWX.en.md": [
       "7c1cc75e",

@@ -39,7 +39,7 @@ export function linkedStatisticContext<T extends {id:string;page_design?:{widget
  const source=linkedStatisticSource(widget,widgets);
  return source?{activity,widgets,source}:undefined;
 }
-export type ResultView='bars'|'pie'|'table'|'cloud'|'gauge'|'bubbles';
+export type ResultView='bars'|'pie'|'table'|'cloud'|'gauge'|'bubbles'|'line'|'area'|'donut'|'radar';
 /** Explicit result view overrides source; legacy results inherit the source view. */
 export function effectiveResultView(resultWidget:StatisticalWidget,widgets:StatisticalWidget[]):ResultView{
  const source=linkedStatisticSource(resultWidget,widgets);
@@ -47,7 +47,7 @@ export function effectiveResultView(resultWidget:StatisticalWidget,widgets:Stati
  const view=resultWidget.resultsView??source.resultsView??(source.kind==='reactions'?'bubbles':'bars');
  // A reaction-only bubble mode cannot leak into a re-linked non-reaction source.
  if(view==='bubbles')return source.kind==='reactions'?'bubbles':'bars';
- return view==='pie'||view==='table'||view==='cloud'||view==='gauge'?view:'bars';
+ return view==='pie'||view==='table'||view==='cloud'||view==='gauge'||view==='line'||view==='area'||view==='donut'||view==='radar'?view:'bars';
 }
 /** Reaction-specific, anonymous aggregate bubble sizing; no user identities. */
 export function reactionBubbles(rows:readonly StatRow[],limit=5,sort:'count-desc'|'count-asc'|'index-asc'|'index-desc'='count-desc'){
