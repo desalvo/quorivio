@@ -78,6 +78,10 @@ class RC293VisualManualsAndBrochures(unittest.TestCase):
    self.assertEqual(pdf.read_bytes(),copy.read_bytes())
    with fitz.open(pdf) as doc:
     self.assertEqual(doc.page_count,6)
+    if language=='it':
+     page_four=doc[3].get_text()
+     self.assertIn('nelle widget di risultato',page_four)
+     self.assertNotIn('elle widget risultati',page_four)
     for page in doc:self.assertTrue(page.get_image_info() or len(page.get_drawings())>=12)
     t='\n'.join(p.get_text() for p in doc)
     for word in ('Quorivio','RC333','Alessandro De Salvo','braket71@gmail.com','EUPL-1.2','github.com/desalvo/quorivio','.quo'):

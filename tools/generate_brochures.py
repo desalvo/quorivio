@@ -220,7 +220,7 @@ TEXT={
    'widgets_title':'Widget potenti per\npresentazioni dinamiche','widgets_sub':'Un’ampia libreria di widget, grafici professionali e contenuti multimediali.',
    'widgets':['Scelta singola e multipla','Risposta aperta','Soddisfazione 0–10','Sondaggi e votazioni','Q&A e domande live','Immagine','Video','Testo e markup','Profilo presentatore','Reazioni live'],
    'result_title':'Risultati ricchi e professionali','charts':['Barre','Torta','Linee','Area','Donut','Radar','Nuvola di parole','Tabella'],
-   'gauge_title':'Percentuale di risposte\nelle widget risultati','gauge_sub':'Monitora in tempo reale la partecipazione con un grafico gauge integrato nella widget risultati.',
+   'gauge_title':'Percentuale di risposte\nnelle widget di risultato','gauge_sub':'Monitora in tempo reale la partecipazione con un grafico gauge integrato nella widget risultati.',
    'gauge_question':'Hai già usato strumenti di IA?','answers':['Sì, regolarmente','Sì, occasionalmente','No, ma sono interessato','No, non mi interessa'],
    'settings':'Formato widget (Risultati)','toggle':'Mostra percentuale di risposte','gauge_size':'Dimensione gauge',
    'details':['Calcolo automatico: utenti che hanno risposto almeno una volta / utenti connessi','Intervallo dal 0% al 100%','Dimensione regolabile dal 20% al 100%','Aggiornamento in tempo reale'],

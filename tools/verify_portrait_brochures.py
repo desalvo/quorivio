@@ -23,6 +23,8 @@ def verify(folder:Path):
                 text=p.get_text()
                 if len(text.strip())<110:raise ValueError(f'{lang} p{idx+1}: image-only or insufficient live text')
                 if REQUIRED[lang][idx] not in text:raise ValueError(f'{lang} p{idx+1}: wrong mock section')
+                if lang=='it' and idx==3 and ('nelle widget di risultato' not in text or 'elle widget risultati' in text):
+                    raise ValueError('Italian page 4: invalid or outdated response gauge title')
                 all_text.append(text)
                 for b in p.get_text('dict')['blocks']:
                     if b['type']!=0:continue

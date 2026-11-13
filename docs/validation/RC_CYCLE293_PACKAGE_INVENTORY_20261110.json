@@ -1914,14 +1914,14 @@
       "abb42242"
     ],
     "apps/web/public/docs/brochures/quorivio-brochure-it.pdf": [
-      "91b4ba05",
-      "f689311a",
-      "21d0357c",
-      "682cd0c2",
-      "5c27c16a",
-      "e93fb917",
-      "eb8efd18",
-      "7619e7dc"
+      "4c37d537",
+      "8a3640cb",
+      "ddb1965a",
+      "83f22d31",
+      "a8eaf816",
+      "f4a80ef3",
+      "f92b5137",
+      "5605673c"
     ],
     "apps/web/public/docs/manuals/admin-guide.en.pdf": [
       "7ebafbbe",
@@ -13344,14 +13344,14 @@
       "abb42242"
     ],
     "docs/brochures/quorivio-brochure-it.pdf": [
-      "91b4ba05",
-      "f689311a",
-      "21d0357c",
-      "682cd0c2",
-      "5c27c16a",
-      "e93fb917",
-      "eb8efd18",
-      "7619e7dc"
+      "4c37d537",
+      "8a3640cb",
+      "ddb1965a",
+      "83f22d31",
+      "a8eaf816",
+      "f4a80ef3",
+      "f92b5137",
+      "5605673c"
     ],
     "docs/manuals-src/README.md": [
       "6a225c63",
@@ -18764,14 +18764,14 @@
       "38f15337"
     ],
     "tools/generate_brochures.py": [
-      "c3336905",
-      "5aff8c3d",
-      "ed8b9be2",
-      "6c7d8759",
-      "0cea32ab",
-      "d73dba18",
-      "7da87502",
-      "82ae8b83"
+      "e9f19cf5",
+      "9f72752a",
+      "58783856",
+      "bffcbc33",
+      "0877234e",
+      "b4d9a995",
+      "a32d2aeb",
+      "2706600e"
     ],
     "tools/generate_manuals.py": [
       "3fa672fe",
@@ -22094,14 +22094,14 @@
       "32d33eb3"
     ],
     "tools/tests/test_rc293_visual_manuals_brochures.py": [
-      "d0b507f6",
-      "776e69a5",
-      "d3187e69",
-      "23a3b1f5",
-      "56894aea",
-      "294886c0",
-      "f3ec7da0",
-      "998d6576"
+      "8a495c62",
+      "b8871bf1",
+      "288a3d12",
+      "435c6bc2",
+      "3490fdc1",
+      "b18f9358",
+      "b4e3c504",
+      "644bd00e"
     ],
     "tools/tests/test_rc295_gitleaks_history.py": [
       "dbd28538",
@@ -23624,14 +23624,14 @@
       "ac463e63"
     ],
     "tools/verify_portrait_brochures.py": [
-      "6e2bdd4e",
-      "1f50e754",
-      "27faa6f5",
-      "aebee981",
-      "d76e0ae1",
-      "064e9717",
-      "014a8472",
-      "b6ead267"
+      "db6954e8",
+      "de3b9ee4",
+      "df083b2a",
+      "fc3e3091",
+      "b8c4df31",
+      "3f9326d7",
+      "c8986d3d",
+      "a398ee36"
     ],
     "tools/verify_rc_checksum_manifest.py": [
       "d1962a79",
