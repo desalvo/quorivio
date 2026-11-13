@@ -122,6 +122,19 @@ export async function deliverNotice(db:Pool,secret:string,smtp:SmtpConfig|null,e
  }
  return {attempted,failed};
 }
+/** Account-status notices to the affected user. Explicitly opt-in; the
+ * administrator channel recipients never determine user delivery. */
+export async function sendUserStatusNotice(db:Pool,secret:string,smtp:SmtpConfig|null,to:string,details:string):Promise<boolean>{
+ if(!smtp||!/^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/.test(to)||to.length>254)return false;
+ const settings=await loadNoticeConfig(db,secret);
+ if(!settings.notifyUsers||!settings.events.user_status||!settings.channels.email.enabled)return false;
+ const {default:mailer}=await import('nodemailer');
+ const tx=mailer.createTransport({host:smtp.host,port:smtp.port,secure:smtp.secure,requireTLS:!smtp.secure,
+  auth:{user:smtp.user,pass:smtp.password},connectionTimeout:10000,greetingTimeout:10000,socketTimeout:15000,tls:{rejectUnauthorized:true}});
+ try{await tx.sendMail({from:smtp.senderName?{name:smtp.senderName,address:smtp.from}:smtp.from,to,
+  subject:'[Quorivio] Account status',text:'Quorivio: '+details.replace(/[\\x00-\\x1f]/g,' ').slice(0,240)});return true}
+ finally{tx.close()}
+}
 export async function sendDebugEmail(smtp:SmtpConfig|null,to:string,id:string,bundle:Buffer,message:string,diagnostics:unknown){
  if(!smtp)return {sent:false,reason:'smtp_not_configured'};
  if(bundle.length>14*1024*1024)return {sent:false,reason:'attachment_too_large'};

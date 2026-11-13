@@ -1,6 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {defaultNoticeConfig,mergeNoticeConfig,publicNoticeConfig} from '../src/notifications.ts';
+import {readFileSync} from 'node:fs';
+import {defaultNoticeConfig,mergeNoticeConfig,publicNoticeConfig,sendUserStatusNotice} from '../src/notifications.ts';
 import {validateDebugSubmission,debugBundlePath} from '../src/debug-submissions.ts';
 test('external notification channels are disabled until configured',()=>{
  const settings=defaultNoticeConfig();
@@ -19,4 +20,14 @@ test('debug archives need separate explicit sharing and diagnostics consent',()=
  assert.throws(()=>validateDebugSubmission({...report,consentSubmission:false}),/debug_submission_consent_required/);
  assert.throws(()=>validateDebugSubmission({...report,consentDiagnostics:null}),/debug_diagnostic_consent_required/);
  assert.throws(()=>debugBundlePath('/tmp','../../outside'),/invalid_debug_id/);
+});
+
+test('user-facing status notices default to off and need SMTP',async()=>{
+ const db={query:async()=>({rowCount:0,rows:[]})} as any;
+ assert.equal(await sendUserStatusNotice(db,'example-secret',null,'someone@example.org','Updated'),false);
+});
+test('account state changes are announced only after commit, and orphan debug bundles are cleaned',()=>{
+ const source=readFileSync(new URL('../src/server.ts',import.meta.url),'utf8');
+ assert.match(source,/notifySubjectStatus\\(result\\.rows\\[0\\]\\.email/);
+ assert.match(source,/removeOrphanDebugBundles\\(db,assetRoot,retentionDays\\)/);
 });

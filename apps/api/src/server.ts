@@ -39,10 +39,9 @@ import {HOUSEKEEPING_PERIOD_MS,removeExpiredConversionJobs,removeOrphanSessionAs
 import {authenticateDirectory,searchDirectory} from './ldap-auth.js';
 import {loadAuthBackends,backendPublic,saveAuthBackend,testAuthBackend,enabledLdapBackend,enabledLdapBackends,ldapIdentityKey,enabledOidcBackends,enabledSocialBackends,backendAllowsMfa} from './auth-backends.js';
 import {publicSsoBranding} from './sso-branding.js';
-import {loadNoticeConfig,publicNoticeConfig,saveNoticeConfig,deliverNotice,sendDebugEmail,type NoticeEvent} from './notifications.js';
-import {validateDebugSubmission,createDebugSubmission,listDebugSubmissions,readDebugSubmission,purgeDebugSubmissions,MAX_DEBUG_BUNDLE_BYTES} from './debug-submissions.js';
+import {loadNoticeConfig,publicNoticeConfig,saveNoticeConfig,deliverNotice,sendDebugEmail,sendUserStatusNotice,type NoticeEvent} from './notifications.js';
+import {validateDebugSubmission,createDebugSubmission,listDebugSubmissions,readDebugSubmission,purgeDebugSubmissions,removeOrphanDebugBundles,MAX_DEBUG_BUNDLE_BYTES} from './debug-submissions.js';
 import {auditOperation,validAuditRetention} from './operation-audit.js';
-import {sendRegistrationReviewEmail} from './smtp.js';
 import {allowedBackupBackends,validateBackupTarget,sealBackupConfig,openBackupConfig,publicBackupConfig,type BackupTarget} from './backup-storage.js';
 import {buildFullBackup,uploadBackup} from './full-backup.js';
 import express from 'express';import helmet from 'helmet';import pg from 'pg';import bcrypt from 'bcryptjs';import QRCode from 'qrcode';import {WebSocketServer,WebSocket} from 'ws';import {liveSessionActive,livePresenterAuthorized,liveParticipantAuthorized} from './live-socket-policy.js';import {createLiveSnapshotQueue} from './live-snapshot-queue.js';import {createLivePeriodicRefresh} from './live-periodic-refresh.js';import {deliverLiveSnapshot} from './live-broadcast.js';import {shouldDropSlowSocket} from './live-delivery-policy.js';import {createServer} from 'node:http';import {randomUUID,randomBytes,createHash,createHmac,timingSafeEqual} from 'node:crypto';import {readFileSync,existsSync} from 'node:fs';import {mkdir,writeFile,readFile,unlink,rm,copyFile} from 'node:fs/promises';import {validAsset} from './asset-policy.js';import {normalizedFileName,findAvailableFileName} from './file-display-names.js';import {receiveAssetStream} from './stream-upload.js';import {scanUploadedFile} from './malware-scan.js';import {classifyBackgroundUploadFailure,backgroundUploadLog,type BackgroundUploadPhase} from './background-upload-failure.js';import {readdir,stat} from 'node:fs/promises';import path from 'node:path';import {fileURLToPath} from 'node:url';import {validTransition,validateOptions,checkAnswer,publicActivity,publicTheme,escapeCsvCell,validRetentionDays,validPageDesign,validPseudonym,validAnswerMode,validateSubmittedAnswer,validReaction,type Activity,type SessionStatus} from './domain.js';
@@ -105,13 +104,13 @@ function notifyAdminEvent(event:NoticeEvent,details:string){
  void (async()=>{const smtp=await activeSmtpConfig().catch(()=>null);return deliverNotice(db,secret,smtp,event,details)})()
  .catch(e=>console.warn('notification delivery unavailable',e instanceof Error?e.name:'unknown'));
 }
+function notifySubjectStatus(email:string,details:string){
+ void (async()=>sendUserStatusNotice(db,secret,await activeSmtpConfig().catch(()=>null),email,details))()
+ .catch(e=>console.warn('user notification unavailable',e instanceof Error?e.name:'unknown'));
+}
 async function notifyRegistration(email:string,backend:'local'|'ldap'){
- notifyAdminEvent('user_status','New registration for approval');
- try{const config=await activeSmtpConfig();if(!config){console.warn('registration notification requires SMTP');return}
- const result=await db.query("SELECT email FROM users WHERE role='platform_admin' AND approved=true ORDER BY email");
- const recipients=result.rows.map(r=>String(r.email)).filter(v=>/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v));
- if(recipients.length)await sendRegistrationReviewEmail(config,recipients,email,backend);
- }catch(e){console.error('registration notification failed',e instanceof Error?e.name:'unknown')}
+ notifyAdminEvent('user_status','New account registration awaiting approval');
+ notifySubjectStatus(email,'Your registration is awaiting administrator approval.');
 }
 
 // Page countdowns are authoritative in PostgreSQL, not just a disabled browser
@@ -892,6 +891,10 @@ app.patch('/api/admin/users/:id',requireAuth,requireAdmin,async(req,res)=>{
    WHERE id=$1 RETURNING id,email,nickname,role,approved`,[req.params.id,role,approved,hasNickname,nickname]);
   changedPermissions=before.role!==role||before.approved!==approved;
   await cx.query('COMMIT');
+  if(changedPermissions){
+   notifyAdminEvent('user_status','An administrator changed a user status');
+   notifySubjectStatus(result.rows[0].email,approved?'Your account permissions have been updated.':'Your account is awaiting approval or has been suspended.');
+  }
   if(changedPermissions)for(const peers of sockets.values())for(const ws of peers)if((ws as any).uid===req.params.id)ws.close(1008,'account permissions changed');
   res.json(result.rows[0]);
  }catch(e){await cx.query('ROLLBACK').catch(()=>{});
@@ -2733,8 +2736,9 @@ async function runHousekeeping(){
    const r=await db.query('SELECT 1 FROM session_assets WHERE id=$1 AND session_id=$2 LIMIT 1',[aid,sid]);return !!r.rowCount;
   },Date.now(),retentionDays);
   const purgedDebug=await purgeDebugSubmissions(db,assetRoot,retentionDays);
+  const orphanDebug=await removeOrphanDebugBundles(db,assetRoot,retentionDays);
   await db.query("DELETE FROM system_incidents WHERE occurred_at<now()-($1::integer*interval '1 day')",[retentionDays]);
-  console.log('scheduled housekeeping completed',JSON.stringify({retentionDays,conversionWorkspacesRemoved:conversion,unregisteredOldMediaRemoved:orphan,purgedDebug}));
+  console.log('scheduled housekeeping completed',JSON.stringify({retentionDays,conversionWorkspacesRemoved:conversion,unregisteredOldMediaRemoved:orphan,purgedDebug,orphanDebug}));
  }finally{housekeepingInProgress=false}
 }
 async function initialize(){await withBootstrapLock(db,async bootstrap=>{const schema=readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)),'../src/schema.sql'),'utf8');await bootstrap.query(schema);publicBase=(await bootstrap.query("SELECT value FROM platform_settings WHERE key='public_base_url'")).rows[0]?.value||base;// Helm and Kubernetes wizard may bootstrap a first backup target via a Kubernetes Secret.

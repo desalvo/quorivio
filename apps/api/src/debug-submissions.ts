@@ -3,7 +3,7 @@
  * PostgreSQL row locks coordinate physical erasure across API replicas.
  */
 import type {Pool} from 'pg';
-import {mkdir,readFile,writeFile,unlink,lstat} from 'node:fs/promises';
+import {mkdir,readFile,writeFile,unlink,lstat,readdir} from 'node:fs/promises';
 import path from 'node:path';
 import {randomUUID} from 'node:crypto';
 
@@ -53,7 +53,7 @@ export async function purgeDebugSubmissions(db:Pool,root:string,retentionDays:nu
  const cx=await db.connect();let deleted=0;
  try{
   await cx.query('BEGIN');
-  const rows=await cx.query("SELECT id FROM debug_submissions WHERE created_at<now()-($1::integer*interval '1 day') ORDER BY created_at LIMIT 100 FOR UPDATE SKIP LOCKED",[retentionDays]);
+  const rows=await cx.query("SELECT id FROM debug_submissions WHERE expires_at<=now() ORDER BY expires_at LIMIT 100 FOR UPDATE SKIP LOCKED",[retentionDays]);
   for(const row of rows.rows){
    const file=debugBundlePath(root,row.id);
    try{await unlink(file)}catch(e){if((e as NodeJS.ErrnoException).code!=='ENOENT')throw e}
@@ -63,4 +63,29 @@ export async function purgeDebugSubmissions(db:Pool,root:string,retentionDays:nu
  }catch(e){await cx.query('ROLLBACK').catch(()=>{});throw e}
  finally{cx.release()}
  return deleted;
+}
+
+/** Reclaim orphaned .quo archives left by an interrupted write. No active
+ * registered bundle is touched, even if its filesystem timestamps are old. */
+export async function removeOrphanDebugBundles(db:Pool,root:string,retentionDays:number,now=Date.now()):Promise<number>{
+ if(!Number.isInteger(retentionDays)||retentionDays<1||retentionDays>3650)throw Error('invalid_debug_retention');
+ const dir=path.join(root,'debug-submissions');
+ const st=await lstat(dir).catch(e=>{if((e as NodeJS.ErrnoException).code==='ENOENT')return null;throw e});
+ if(!st)return 0;
+ if(!st.isDirectory()||st.isSymbolicLink())throw Error('unsafe_debug_directory');
+ const cutoff=now-retentionDays*86400000;let removed=0;
+ for(const entry of (await readdir(dir,{withFileTypes:true})).slice(0,500)){
+  if(!entry.isFile()||entry.isSymbolicLink()||!entry.name.endsWith('.quo'))continue;
+  const id=entry.name.slice(0,-4);
+  if(!uuid.test(id))continue;
+  const target=debugBundlePath(root,id);
+  const info=await lstat(target).catch(e=>{if((e as NodeJS.ErrnoException).code==='ENOENT')return null;throw e});
+  if(!info||!info.isFile()||info.isSymbolicLink()||Math.max(info.mtimeMs,info.ctimeMs)>=cutoff)continue;
+  const row=await db.query('SELECT 1 FROM debug_submissions WHERE id=$1',[id]);
+  if(row.rowCount)continue;
+  const verify=await lstat(target).catch(()=>null);
+  if(!verify||!verify.isFile()||verify.isSymbolicLink()||Math.max(verify.mtimeMs,verify.ctimeMs)>=cutoff)continue;
+  await unlink(target);removed++;
+ }
+ return removed;
 }
