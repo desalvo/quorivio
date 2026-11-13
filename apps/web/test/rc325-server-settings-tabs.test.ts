@@ -4,8 +4,8 @@ import test from 'node:test';
 const main=readFileSync(new URL('../src/main.tsx',import.meta.url),'utf8');
 const css=readFileSync(new URL('../src/style.css',import.meta.url),'utf8');
 const locale=readFileSync(new URL('../src/ui-locale.ts',import.meta.url),'utf8');
-test('server settings renders seven keyboard-accessible tabs with matching panels',()=>{
- const tabs=['general','auth','smtp','storage','converter','backup','audit'];
+test('server settings renders nine keyboard-accessible tabs with matching panels',()=>{
+ const tabs=['general','auth','notifications','debug','smtp','storage','converter','backup','audit'];
  for(const name of tabs){
   assert.match(main,new RegExp('id="server-settings-panel-'+name+'"'));
   assert.match(main,new RegExp("hidden=\\{serverSettingsTab!=='"+name+"'\\}"));

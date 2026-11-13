@@ -22,6 +22,12 @@ import re
 import posixpath
 from urllib.parse import unquote, urlsplit
 
+def _valid_uuid4(value):
+    try:
+        return isinstance(value,str) and str(uuid.UUID(value))==value and uuid.UUID(value).version==4
+    except (ValueError,TypeError,AttributeError):
+        return False
+
 MAX_PPTX_BYTES = 50 * 1024 * 1024
 MAX_UNCOMPRESSED_BYTES = 250 * 1024 * 1024
 MAX_ZIP_ENTRIES = 3000
@@ -1138,11 +1144,46 @@ def portable_to_pptx(data, destination, media_dir=None):
     for page_index, activity in enumerate(activities, 1):
         slide = p.slides.add_slide(p.slide_layouts[6])
         design = activity.get('page_design') or {}
-        background = design.get('backgroundColor')
+        theme = (data.get('session') or {}).get('theme') or {}
+        master_background = (theme.get('master') or {}) if not design.get('suppressMaster') else {}
+        background = design.get('backgroundColor') or theme.get('backgroundColor')
         if background is not None:
             from pptx.dml.color import RGBColor
             slide.background.fill.solid()
             slide.background.fill.fore_color.rgb = RGBColor.from_string(background[1:])
+        # Restore the exact referenced bytes and geometry of page/master photo
+        # backgrounds before widget overlays. External URLs are intentionally
+        # not downloaded by the isolated converter.
+        background_id = design.get('backgroundAssetId') or master_background.get('backgroundAssetId')
+        if background_id:
+            if media_dir is None or not _valid_uuid4(background_id):
+                raise ValueError('Invalid background image reference')
+            media_base = Path(media_dir)
+            backdrop_path = media_base / background_id
+            if any(folder.is_symlink() for folder in (media_base, *media_base.parents)) or backdrop_path.is_symlink() or not backdrop_path.is_file() or backdrop_path.stat().st_size > 10*1024*1024:
+                raise ValueError('Missing or oversized background image')
+            backdrop = backdrop_path.read_bytes()
+            if not (_supported_image(backdrop,'image/png') or _supported_image(backdrop,'image/jpeg')):
+                raise ValueError('Invalid background media')
+            from PIL import Image
+            with Image.open(io.BytesIO(backdrop)) as source:
+                iw,ih = source.size
+            if iw<=0 or ih<=0:raise ValueError('Invalid background dimensions')
+            fit=design.get('importedImageFit') or 'cover'
+            sw,sh=int(p.slide_width),int(p.slide_height)
+            if fit=='contain':
+                ratio=min(sw/iw,sh/ih);bw,bh=int(iw*ratio),int(ih*ratio)
+                slide.shapes.add_picture(io.BytesIO(backdrop),(sw-bw)//2,(sh-bh)//2,bw,bh)
+            else:
+                picture=slide.shapes.add_picture(io.BytesIO(backdrop),0,0,sw,sh)
+                if fit=='cover':
+                    src=iw/ih;dst=sw/sh
+                    if src>dst:
+                        crop=(1-dst/src)/2;picture.crop_left=picture.crop_right=crop
+                    else:
+                        crop=(1-src/dst)/2;picture.crop_top=picture.crop_bottom=crop
+                elif fit!='fill':
+                    raise ValueError('Invalid background fit')
         # A PDF/PPTX imported slide is stored as a session-owned raster image.
         # Re-embed its verified pixels before overlaying editable Quorivio widgets.
         slide_asset_id = activity.get('slide_asset_id')
@@ -1185,7 +1226,7 @@ def portable_to_pptx(data, destination, media_dir=None):
         for scheme_widget in scheme:
             _validate_inline_marks(scheme_widget)
         for widget in widgets:
-            if widget.get('kind') not in ('text', 'postit', 'question', 'timed-quiz', 'image', 'logo', 'title', 'footer', 'qr'):
+            if widget.get('kind') not in ('text', 'postit', 'question', 'timed-quiz', 'image', 'logo', 'title', 'footer', 'qr', 'shape', 'line'):
                 continue
             position = widget.get('position') or {'x': 5, 'y': 5, 'width': 90, 'height': 20}
             if (widget.get('kind') == 'footer' and all(position.get(key) == value for key,value in
@@ -1194,6 +1235,60 @@ def portable_to_pptx(data, destination, media_dir=None):
             x, y, w, h = (float(position.get(k, v)) for k, v in [('x', 5), ('y', 5), ('width', 90), ('height', 20)])
             if not all(math.isfinite(v) for v in (x, y, w, h)) or x < 0 or y < 0 or w <= 0 or h <= 0 or x+w > 100.00001 or y+h > 100.00001:
                 raise ValueError('Invalid widget geometry')
+            if widget.get('kind') in ('shape','line'):
+                from pptx.dml.color import RGBColor
+                from pptx.enum.shapes import MSO_AUTO_SHAPE_TYPE, MSO_CONNECTOR
+                from pptx.util import Pt
+                style=widget.get('style') or {}
+                colors = {'rectangle':MSO_AUTO_SHAPE_TYPE.RECTANGLE,
+                    'rounded-rectangle':MSO_AUTO_SHAPE_TYPE.ROUNDED_RECTANGLE,
+                    'circle':MSO_AUTO_SHAPE_TYPE.OVAL,'ellipse':MSO_AUTO_SHAPE_TYPE.OVAL,
+                    'triangle':MSO_AUTO_SHAPE_TYPE.ISOSCELES_TRIANGLE,
+                    'diamond':MSO_AUTO_SHAPE_TYPE.DIAMOND,'hexagon':MSO_AUTO_SHAPE_TYPE.HEXAGON,
+                    'pentagon':MSO_AUTO_SHAPE_TYPE.PENTAGON,'star':MSO_AUTO_SHAPE_TYPE.STAR_5_POINT,
+                    'arrow':MSO_AUTO_SHAPE_TYPE.RIGHT_ARROW,'heart':MSO_AUTO_SHAPE_TYPE.HEART,
+                    'cloud':MSO_AUTO_SHAPE_TYPE.CLOUD,'speech':MSO_AUTO_SHAPE_TYPE.RECTANGULAR_CALLOUT}
+                if widget['kind']=='shape':
+                    sh=slide.shapes.add_shape(colors.get(style.get('shapeType'),MSO_AUTO_SHAPE_TYPE.RECTANGLE),
+                        int(p.slide_width*x/100),int(p.slide_height*y/100),
+                        int(p.slide_width*w/100),int(p.slide_height*h/100))
+                    if style.get('fillNone'):sh.fill.background()
+                    elif style.get('fillMode')=='gradient':
+                        # Native OOXML gradient survives LibreOffice/PowerPoint editing.
+                        from pptx.oxml.xmlchemy import OxmlElement
+                        sp=sh._element.spPr
+                        for node in list(sp):
+                            if node.tag.endswith(('}solidFill','}gradFill','}noFill','}blipFill','}pattFill')):
+                                sp.remove(node)
+                        grad=OxmlElement('a:gradFill');stops=OxmlElement('a:gsLst')
+                        for pos,color in [(0,style.get('fillColor','#dbeafe')),(100000,style.get('gradientEndColor','#57a6f8'))]:
+                            gs=OxmlElement('a:gs');gs.set('pos',str(pos))
+                            srgb=OxmlElement('a:srgbClr');srgb.set('val',color.lstrip('#'))
+                            gs.append(srgb);stops.append(gs)
+                        grad.append(stops);linear=OxmlElement('a:lin');linear.set('ang','8100000');linear.set('scaled','1');grad.append(linear)
+                        insert_at=0
+                        for idx,child in enumerate(sp):
+                            if child.tag.endswith(('}prstGeom','}custGeom')):insert_at=idx+1
+                        sp.insert(insert_at,grad)
+                    else:
+                        sh.fill.solid()
+                        sh.fill.fore_color.rgb=RGBColor.from_string(style.get('fillColor','#dbeafe').lstrip('#'))
+                else:
+                    direction=style.get('lineDirection','horizontal')
+                    coords={'horizontal':(0,.5,1,.5),'vertical':(.5,0,.5,1),
+                            'diagonal':(0,0,1,1),'reverse':(1,0,0,1)}
+                    a,b,c,d=coords.get(direction,coords['horizontal'])
+                    sh=slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT,
+                        int(p.slide_width*(x+a*w)/100),int(p.slide_height*(y+b*h)/100),
+                        int(p.slide_width*(x+c*w)/100),int(p.slide_height*(y+d*h)/100))
+                if style.get('strokeNone') or style.get('strokeWidth')==0:
+                    sh.line.fill.background()
+                else:
+                    sh.line.color.rgb=RGBColor.from_string(style.get('strokeColor','#334155').lstrip('#'))
+                    sh.line.width=Pt(style.get('strokeWidth',2))
+                rotation=position.get('rotation',0)
+                if isinstance(rotation,(int,float)) and math.isfinite(rotation):sh.rotation=rotation%360
+                continue
             if widget.get('kind') == 'qr':
                 _add_participant_qr(slide, p, (x, y, w, h),
                                     _participant_qr_target(data.get('session')), qr_image_cache)

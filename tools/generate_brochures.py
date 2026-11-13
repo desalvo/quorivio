@@ -91,42 +91,42 @@ def label_list(c,x,y,items,size=9,lead=17,ink=BLUE):
  return y
 
 DATA={
- 'it':{'tag':'BROCHURE DI PRODOTTO','sub':'Presentazioni interattive, quiz e pubblico protagonista',
+ 'it':{'tag':'BROCHURE ILLUSTRATIVA','sub':'Presentazioni interattive, quiz e pubblico protagonista',
   'hero':'Dalla progettazione delle pagine alle risposte in diretta: un solo ambiente per preparare, provare e condurre eventi con partecipanti su smartphone o desktop.',
   'pills':['EDITOR VISUALE','SESSIONI LIVE','OPEN SOURCE'],
-  'three':[('Crea', 'Pagine, widget, schemi e anteprime con controlli di formattazione.'),('Coinvolgi','QR e codici sessione; sondaggi, quiz e domande aperte.'),('Analizza','Risultati, grafici e feedback durante la presentazione.')],
-  'why':'Dall’aula alla conferenza: rendi il pubblico parte attiva',
+  'three':[('Crea', 'Pagine, widget, schemi e anteprime con controlli di formattazione.'),('Coinvolgi','QR e codici sessione; sondaggi, quiz e domande aperte anche da mobile.'),('Analizza','Risultati, grafici e feedback durante la presentazione.')],
+  'why':'In presenza, da remoto o ibrido: pubblico sempre protagonista',
   'whytext':'Presentatore, partecipante e amministratore hanno viste dedicate. Il sistema può essere installato e gestito sulla propria infrastruttura, con accessi autorizzati e strumenti di audit.',
   'workflow':'DALL’IDEA ALL’EVENTO LIVE',
   'steps':['Crea una sessione','Progetta pagine e schemi','Prova le anteprime','Conduci e raccogli risposte'],
   'features':'FUNZIONI CHE FANNO LA DIFFERENZA',
   'blocks':[('Contenuti e interazione','Testi, immagini, video, QR, titoli, footer, timer, quiz singoli/multipli, domande aperte e gradimento.'),
-   ('Risultati e controllo','Grafici a barre e torta, word cloud, partecipanti connessi, evidenziazione R delle opzioni corrette.'),
+   ('Risultati e controllo','Grafici a barre, torta, gauge, bolle, tabelle e word cloud, partecipanti connessi, evidenziazione R delle opzioni corrette.'),
    ('Portabilità','Copia di sessione .quo con contenuti, allegati e calendario; import locale che crea una nuova sessione.'),
    ('Amministrazione','Utenti e ruoli, LDAP/SSO, ClamAV, backup, restore, audit, scaling e scenari DR documentati.')],
   'screens':'INTERFACCIA AUTENTICA · ARCHIVIO DI COLLAUDO',
   'tech':'INFRASTRUTTURA E GOVERNANCE',
-  'techlines':['Server Linux, Docker, Podman e Kubernetes','PostgreSQL 18; ingress NGINX o HAProxy','GDPR: strumenti privacy by design, non certificazione automatica'],
+  'techlines':['In presenza e da remoto, fino a 500 teorici','Linux, Docker, Podman e Kubernetes','GDPR: privacy by design; carico da validare'],
   'meta':'DATI DI PUBBLICAZIONE',
   'min':'Minimo indicativo per una prova: 2 vCPU, 4 GiB RAM e 20 GiB di disco più DB/media; produzione da dimensionare.',
   'note':'Foto ambientali e alcuni mock sono illustrazioni sintetiche. Le schermate dell’app sono immagini vere di una build di prova archiviata; possono variare.',
   'footer':'Quorivio — crea, coinvolgi, misura. Sul tuo server.'},
- 'en':{'tag':'PRODUCT BROCHURE','sub':'Interactive presentations, quizzes and audience engagement',
+ 'en':{'tag':'ILLUSTRATIVE BROCHURE','sub':'Interactive presentations, quizzes and audience engagement',
   'hero':'From designing slides to receiving live answers: one environment to prepare, rehearse and run events with participants on smartphones or desktops.',
   'pills':['VISUAL EDITOR','LIVE SESSIONS','OPEN SOURCE'],
-  'three':[('Create','Pages, widgets, masters and previews with advanced formatting.'),('Engage','QR and session codes; polls, quizzes and open questions.'),('Understand','Results, charts and feedback during the presentation.')],
-  'why':'From classrooms to conferences: let your audience take part',
+  'three':[('Create','Pages, widgets, masters and previews with advanced formatting.'),('Engage','QR and session codes; polls, quizzes and open questions on mobile.'),('Understand','Results, charts and feedback during the presentation.')],
+  'why':'In person, remotely or hybrid: engage everyone',
   'whytext':'Presenters, participants and administrators have dedicated views. Deploy on infrastructure you manage, with authorised access and auditing tools.',
   'workflow':'FROM IDEA TO LIVE EVENT',
   'steps':['Create a session','Design pages and masters','Rehearse all previews','Go live and collect answers'],
   'features':'FEATURES THAT MAKE A DIFFERENCE',
   'blocks':[('Content and interaction','Text, images, video, QR, title/footer, timers, single/multiple choice quizzes, open questions and ratings.'),
-   ('Results and control','Bar/pie charts, word clouds, connected participant counts and R-based correct-answer highlighting.'),
+   ('Results and control','Bars, pies, gauges, bubbles, tables, word clouds, connected participant counts and R-based correct-answer highlighting.'),
    ('Portability','Portable .quo session bundle with content, media and calendar; local import creates a new session.'),
    ('Administration','Users and roles, LDAP/SSO, ClamAV, backups, restore, audit, scaling and documented DR workflows.')],
   'screens':'AUTHENTIC UI · ARCHIVED TEST BUILD',
   'tech':'INFRASTRUCTURE AND GOVERNANCE',
-  'techlines':['Linux server, Docker, Podman and Kubernetes','PostgreSQL 18; NGINX or HAProxy ingress','GDPR-oriented privacy tools; no automatic certification'],
+  'techlines':['In-person and remote; 500 theoretical users','Linux, Docker, Podman and Kubernetes','GDPR-aware; load testing still required'],
   'meta':'PUBLICATION DETAILS',
   'min':'Indicative evaluation minimum: 2 vCPU, 4 GiB RAM and 20 GiB disk plus database/media; size production by measurement.',
   'note':'Environmental photos and some mockups are synthetic illustrations. UI screenshots are genuine captures from an archived test build and may differ.',
@@ -143,7 +143,7 @@ def build_one(lang):
  evidence(SCREEN,expected_commit=__import__('manual_screenshot_catalog').LATEST_ARCHIVED_COMMIT,minimum=20)
  OUT.mkdir(parents=True,exist_ok=True);WEB.mkdir(parents=True,exist_ok=True)
  dest=OUT/('quorivio-brochure-'+lang+'.pdf');c=Canvas(str(dest),pagesize=A4,pageCompression=1)
- c.setTitle('Quorivio | '+('Brochure del prodotto' if lang=='it' else 'Product brochure'))
+ c.setTitle('Quorivio | '+('Brochure illustrativa' if lang=='it' else 'Illustrative brochure'))
  c.setAuthor(meta['author'])
  # Page 1 - premium hero with photo + genuine product screenshot.
  color(c,'#f7fbff');c.rect(0,0,W,H,fill=1,stroke=0)

@@ -20,7 +20,8 @@ test('provider secrets are sealed at rest and omitted from administrative read A
 test('only LDAP and local users can enroll Quorivio MFA; SSO delegates MFA to IdP',()=>{
  assert.match(server,/enabled===true&&!await backendAllowsMfa/);
  assert.match(server,/if\(!await backendAllowsMfa\(db,secret,uid\)\)/);
- assert.match(source,/backends\.find\(x=>x\.id===\(isLdap\?'ldap':'local'\)\)/);
+ assert.match(source,/backends\.find\(x=>x\.id===id&&x\.enabled\)/);
+ assert.match(source,/ldapIdentityKey/);
  assert.doesNotMatch(server,/oidc_mfa_requires_local_login|social_mfa_requires_local_login/);
 });
 test('insecure LDAP fails closed while StartTLS and LDAPS remain supported',()=>{

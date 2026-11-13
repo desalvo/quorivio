@@ -1,3 +1,11 @@
+## Sessioni coinvolgenti in presenza e a distanza — esempio pratico RC332
+Quorivio rende protagonisti sia i partecipanti **in sala** sia quelli **remoti, anche distribuiti geograficamente**. Per un workshop di 30 minuti crea una sessione, aggiungi una pagina di introduzione con testo, logo e foto, una pagina con video, un sondaggio a scelta multipla, un quiz temporizzato, un indice di gradimento 0–9 e una pagina di risultati. Mostra il QR alla platea locale e invia il link a chi è collegato da smartphone, tablet o PC: tutti interagiscono con lo stesso stato live, risposte sincronizzate e reazioni emoji. Regola la visibilità dei risultati e visualizzali come barre, torta, tabella, nuvola di parole, gauge semicircolare o bolle per le reazioni. Puoi usare widget profilo presentatore, timer, intestazioni, footer, testi, immagini, media e elementi grafici; adatta il contenuto proporzionalmente nei widget.
+
+La platea può includere utenti **autenticati oppure anonimi**, secondo le impostazioni di sessione. **Fino a 500 partecipanti contemporanei** rappresenta un massimo *teorico*, da verificare con test di carico e infrastruttura effettiva. Le esportazioni `.quo`, PPTX e PDF sono disponibili dalla sessione; verificare la resa grafica prima di una consegna, perché le esportazioni convertite non sono ancora certificate come identiche pixel per pixel alla presentazione live. Per supporto, dalla dashboard puoi inviare `.quo` con descrizione di bug/feature, consenso esplicito e rapporto opzionale delle ultime 24 ore. Il materiale è conservato per 30 giorni per default, configurabili dal server.
+
+
+---
+
 # Manuale del presentatore
 
 **Quorivio 0.1.0-dev · Build documentale RC293 · 10 novembre 2026**

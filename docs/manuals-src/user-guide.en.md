@@ -1,3 +1,9 @@
+## Join in person or remotely — RC332
+Quorivio supports **in-person, remote and hybrid** events for local and geographically distributed audiences. From a **smartphone, tablet or desktop**, follow a session link or scan a QR code to answer polls, complete quizzes, submit ratings or send emoji reactions whenever the presenter opens those widgets. Questions and results stay synchronized with the live presentation. Depending on session configuration, you may participate **with an account or anonymously**. **500 simultaneous attendees** is a theoretical design limit, not a performance guarantee; organizers of large events must test and size their own deployment.
+
+
+---
+
 # Participant guide
 
 **Quorivio 0.1.0-dev · Documentation build RC293 · 10 November 2026**

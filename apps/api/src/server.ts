@@ -35,12 +35,13 @@ import {widgetAnswerShapeChanged,aggregateWidgetAnswerRevisions,aggregateShortTe
 import {answerKeyIds,gradeChoiceAnswer} from './widget-answer-key.js';
 import {normalizeWord,validateQuestion,moderationStatus,safeFrequency,parseModerationQueueQuery,parseModerationBulk} from './audience-tools.js';
 import {validPageOrder} from './page-sequence.js';
-import {HOUSEKEEPING_PERIOD_MS,removeExpiredConversionJobs,removeOrphanSessionAssetFiles} from './temporary-housekeeping.js';
+import {HOUSEKEEPING_PERIOD_MS,removeExpiredConversionJobs,removeOrphanSessionAssetFiles,DEFAULT_TEMP_RETENTION_DAYS} from './temporary-housekeeping.js';
 import {authenticateDirectory,searchDirectory} from './ldap-auth.js';
-import {loadAuthBackends,backendPublic,saveAuthBackend,testAuthBackend,enabledLdapBackend,enabledOidcBackends,enabledSocialBackends,backendAllowsMfa} from './auth-backends.js';
+import {loadAuthBackends,backendPublic,saveAuthBackend,testAuthBackend,enabledLdapBackend,enabledLdapBackends,ldapIdentityKey,enabledOidcBackends,enabledSocialBackends,backendAllowsMfa} from './auth-backends.js';
 import {publicSsoBranding} from './sso-branding.js';
+import {loadNoticeConfig,publicNoticeConfig,saveNoticeConfig,deliverNotice,sendDebugEmail,sendUserStatusNotice,type NoticeEvent} from './notifications.js';
+import {validateDebugSubmission,createDebugSubmission,listDebugSubmissions,readDebugSubmission,purgeDebugSubmissions,removeOrphanDebugBundles,MAX_DEBUG_BUNDLE_BYTES} from './debug-submissions.js';
 import {auditOperation,validAuditRetention} from './operation-audit.js';
-import {sendRegistrationReviewEmail} from './smtp.js';
 import {allowedBackupBackends,validateBackupTarget,sealBackupConfig,openBackupConfig,publicBackupConfig,type BackupTarget} from './backup-storage.js';
 import {buildFullBackup,uploadBackup} from './full-backup.js';
 import express from 'express';import helmet from 'helmet';import pg from 'pg';import bcrypt from 'bcryptjs';import QRCode from 'qrcode';import {WebSocketServer,WebSocket} from 'ws';import {liveSessionActive,livePresenterAuthorized,liveParticipantAuthorized} from './live-socket-policy.js';import {createLiveSnapshotQueue} from './live-snapshot-queue.js';import {createLivePeriodicRefresh} from './live-periodic-refresh.js';import {deliverLiveSnapshot} from './live-broadcast.js';import {shouldDropSlowSocket} from './live-delivery-policy.js';import {createServer} from 'node:http';import {randomUUID,randomBytes,createHash,createHmac,timingSafeEqual} from 'node:crypto';import {readFileSync,existsSync} from 'node:fs';import {mkdir,writeFile,readFile,unlink,rm,copyFile} from 'node:fs/promises';import {validAsset} from './asset-policy.js';import {normalizedFileName,findAvailableFileName} from './file-display-names.js';import {receiveAssetStream} from './stream-upload.js';import {scanUploadedFile} from './malware-scan.js';import {classifyBackgroundUploadFailure,backgroundUploadLog,type BackgroundUploadPhase} from './background-upload-failure.js';import {readdir,stat} from 'node:fs/promises';import path from 'node:path';import {fileURLToPath} from 'node:url';import {validTransition,validateOptions,checkAnswer,publicActivity,publicTheme,escapeCsvCell,validRetentionDays,validPageDesign,validPseudonym,validAnswerMode,validateSubmittedAnswer,validReaction,type Activity,type SessionStatus} from './domain.js';
@@ -57,7 +58,12 @@ app.use(express.json({limit:'32kb'}));const server=createServer(app);const wss=n
 const hash=(v:string)=>createHash('sha256').update(v).digest('hex');const sign=(s:string)=>createHmac('sha256',secret).update(s).digest('base64url');const cookies=(s:string='')=>Object.fromEntries(s.split(';').map(x=>x.trim().split('=')).filter(x=>x.length===2));
 function auth(req:express.Request){const token=cookies(req.headers.cookie).q_auth;if(!token)return null;const parts=token.split('.');if(parts.length!==3||!/^\d+$/.test(parts[1]))return null;const body=parts.slice(0,2).join('.');const a=Buffer.from(sign(body));const b=Buffer.from(parts[2]);if(a.length!==b.length||!timingSafeEqual(a,b)||Number(parts[1])<Date.now())return null;return parts[0]}
 async function requireAuth(req:express.Request,res:express.Response,next:express.NextFunction){const uid=auth(req);if(!uid){res.status(401).json({error:'authentication_required'});return}try{const r=await db.query('SELECT approved,must_change_password,password_changed_at,auth_revoked_at FROM users WHERE id=$1',[uid]);if(r.rowCount){const issued=authCookieIssuedAt(req.headers.cookie);const revoked=[r.rows[0].password_changed_at,r.rows[0].auth_revoked_at].some(v=>v&&(issued===null||issued<new Date(v).getTime()));if(revoked){res.status(401).json({error:'session_revoked'});return}}if(!r.rowCount||!r.rows[0].approved){res.status(403).json({error:'account_pending_approval'});return}if(r.rows[0].must_change_password&&!['/api/auth/change-password','/api/auth/me'].includes(req.path)){res.status(403).json({error:'password_change_required'});return}next()}catch{res.status(503).json({error:'auth_unavailable'})}}
-const sendError=(res:express.Response,e:unknown)=>{console.error('request error',e instanceof Error?e.message:'unknown');res.status(500).json({error:'internal_error'})};
+const sendError=(res:express.Response,e:unknown)=>{
+ console.error('request error',e instanceof Error?e.name:'unknown');
+ void db.query("INSERT INTO system_incidents(severity,code) VALUES('error','internal_error')").catch(()=>{});
+ void notifyAdminEvent('system_alert','Internal application error');
+ res.status(500).json({error:'internal_error'});
+};
 function originSafe(req:express.Request){return !['POST','PUT','PATCH','DELETE'].includes(req.method)||allowedWriteOrigin(req.headers.origin,base)}
 app.use('/api',(req,res,next)=>{if(!originSafe(req)){res.status(403).json({error:'invalid_origin'});return;}next()});
 // Shared, database-backed fixed-window limiter: consistent across all API replicas.
@@ -94,12 +100,17 @@ app.use('/api', (req,res,next)=>{
   }
  });next();
 });
+function notifyAdminEvent(event:NoticeEvent,details:string){
+ void (async()=>{const smtp=await activeSmtpConfig().catch(()=>null);return deliverNotice(db,secret,smtp,event,details)})()
+ .catch(e=>console.warn('notification delivery unavailable',e instanceof Error?e.name:'unknown'));
+}
+function notifySubjectStatus(email:string,details:string){
+ void (async()=>sendUserStatusNotice(db,secret,await activeSmtpConfig().catch(()=>null),email,details))()
+ .catch(e=>console.warn('user notification unavailable',e instanceof Error?e.name:'unknown'));
+}
 async function notifyRegistration(email:string,backend:'local'|'ldap'){
- try{const config=await activeSmtpConfig();if(!config){console.warn('registration notification requires SMTP');return}
- const result=await db.query("SELECT email FROM users WHERE role='platform_admin' AND approved=true ORDER BY email");
- const recipients=result.rows.map(r=>String(r.email)).filter(v=>/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v));
- if(recipients.length)await sendRegistrationReviewEmail(config,recipients,email,backend);
- }catch(e){console.error('registration notification failed',e instanceof Error?e.name:'unknown')}
+ notifyAdminEvent('user_status','New account registration awaiting approval');
+ notifySubjectStatus(email,'Your registration is awaiting administrator approval.');
 }
 
 // Page countdowns are authoritative in PostgreSQL, not just a disabled browser
@@ -439,9 +450,14 @@ app.get('/api/auth/social/:provider/callback',async(req,res)=>{
 /** LDAP/LDAPS is opt-in and *separate* from local authentication. An LDAP
  * search is not authentication: the user's own DN must successfully bind.
  * Email matches never create implicit links to existing local/SSO accounts. */
-app.get('/api/auth/ldap/status',async(_req,res)=>{try{const ldapSettings=await enabledLdapBackend(db,secret).catch(()=>null);res.setHeader('Cache-Control','no-store');res.json({enabled:!!ldapSettings,label:ldapSettings?.label||'LDAP / Active Directory'})}catch(e){console.error('LDAP status unavailable',e instanceof Error?e.name:'error');res.status(503).json({error:'auth_config_unavailable'})}});
+app.get('/api/auth/ldap/status',async(_req,res)=>{try{
+ const providers=await enabledLdapBackends(db,secret);
+ res.setHeader('Cache-Control','no-store');
+ res.json({enabled:providers.length>0,label:providers[0]?.label||'LDAP / Active Directory',providers});
+ }catch(e){console.error('LDAP status unavailable',e instanceof Error?e.name:'error');res.status(503).json({error:'auth_config_unavailable'})}});
 app.post('/api/auth/ldap/register',async(req,res)=>{
- const ldapSettings=await enabledLdapBackend(db,secret).catch(()=>null);
+ const backendId=typeof req.body?.backendId==='string'?req.body.backendId:'ldap';
+ const ldapSettings=await enabledLdapBackend(db,secret,backendId).catch(()=>null);
  if(!ldapSettings){res.status(404).json({error:'ldap_not_configured'});return}
  const login=req.body?.email,password=req.body?.password;
  if(typeof login!=='string'||typeof password!=='string'||!login.trim()||login.length>254){res.status(400).json({error:'invalid_request'});return}
@@ -451,18 +467,19 @@ app.post('/api/auth/ldap/register',async(req,res)=>{
   const cx=await db.connect();let begun=false;
   try{await cx.query('BEGIN');begun=true;
    if((await cx.query('SELECT 1 FROM users WHERE lower(email)=$1',[verified.email])).rowCount||
-      (await cx.query('SELECT 1 FROM ldap_identities WHERE provider=$1 AND subject=$2',['default',verified.subject])).rowCount){await cx.query('ROLLBACK');begun=false;res.status(409).json({error:'account_exists'});return}
+      (await cx.query('SELECT 1 FROM ldap_identities WHERE provider=$1 AND subject=$2',[ldapIdentityKey(backendId),verified.subject])).rowCount){await cx.query('ROLLBACK');begun=false;res.status(409).json({error:'account_exists'});return}
    const orgId=ldapSettings.organizationId||(await cx.query('SELECT id FROM organizations ORDER BY id LIMIT 1')).rows[0]?.id;
    if(!orgId){await cx.query('ROLLBACK');begun=false;res.status(503).json({error:'organization_unavailable'});return}
    const id=randomUUID();await cx.query('INSERT INTO users(id,organization_id,email,password_hash,role,approved,must_change_password) VALUES($1,$2,$3,$4,$5,false,false)',[id,orgId,verified.email,await bcrypt.hash(randomBytes(32).toString('base64url'),12),'user']);
-   await cx.query('INSERT INTO ldap_identities(provider,subject,user_id) VALUES($1,$2,$3)',['default',verified.subject,id]);
+   await cx.query('INSERT INTO ldap_identities(provider,subject,user_id) VALUES($1,$2,$3)',[ldapIdentityKey(backendId),verified.subject,id]);
    await cx.query('COMMIT');begun=false;
    void notifyRegistration(verified.email,'ldap');res.status(202).json({status:'pending_admin_approval'});
   }finally{if(begun)await cx.query('ROLLBACK').catch(()=>{});cx.release()}
  }catch(e){if((e as any)?.code==='23505'){res.status(409).json({error:'account_exists'});return}console.error('ldap registration unavailable',e instanceof Error?e.name:'unknown');res.status(503).json({error:'ldap_registration_unavailable'})}
 });
 app.post('/api/auth/ldap/login',async(req,res)=>{
- const ldapSettings=await enabledLdapBackend(db,secret).catch(()=>null);
+ const backendId=typeof req.body?.backendId==='string'?req.body.backendId:'ldap';
+ const ldapSettings=await enabledLdapBackend(db,secret,backendId).catch(()=>null);
  if(!ldapSettings){res.status(404).json({error:'ldap_not_configured'});return}
  const login=req.body?.email,password=req.body?.password;
  if(typeof login!=='string'||typeof password!=='string'||login.length>254||!login.trim()||password.length>1024){res.status(400).json({error:'invalid_request'});return}
@@ -472,7 +489,7 @@ app.post('/api/auth/ldap/login',async(req,res)=>{
   const cx=await db.connect();let user:any;let started=false;
   try{
    await cx.query('BEGIN');started=true;
-   const linked=await cx.query('SELECT u.id,u.email,u.role,u.approved,u.must_change_password,u.totp_enabled,u.email_mfa_enabled FROM ldap_identities li JOIN users u ON u.id=li.user_id WHERE li.provider=$1 AND li.subject=$2 FOR UPDATE OF u',['default',verified.subject]);
+   const linked=await cx.query('SELECT u.id,u.email,u.role,u.approved,u.must_change_password,u.totp_enabled,u.email_mfa_enabled FROM ldap_identities li JOIN users u ON u.id=li.user_id WHERE li.provider=$1 AND li.subject=$2 FOR UPDATE OF u',[ldapIdentityKey(backendId),verified.subject]);
    if(linked.rowCount){
     user=linked.rows[0];
     // Directory groups never overwrite administrator-assigned Quorivio roles.
@@ -483,7 +500,7 @@ app.post('/api/auth/ldap/login',async(req,res)=>{
     if(!org.rowCount){res.status(503).json({error:'ldap_organization_unavailable'});return}
     const id=randomUUID();const passwordHash=await bcrypt.hash(randomBytes(32).toString('base64url'),12);
     await cx.query('INSERT INTO users(id,organization_id,email,password_hash,role,approved,must_change_password) VALUES($1,$2,$3,$4,$5,false,false)',[id,ldapSettings.organizationId,verified.email,passwordHash,'user']);
-    await cx.query('INSERT INTO ldap_identities(provider,subject,user_id) VALUES($1,$2,$3)',['default',verified.subject,id]);
+    await cx.query('INSERT INTO ldap_identities(provider,subject,user_id) VALUES($1,$2,$3)',[ldapIdentityKey(backendId),verified.subject,id]);
     user={id,email:verified.email,role:'user',approved:false,must_change_password:false,totp_enabled:false,email_mfa_enabled:false};
     // Notification only after a successful commit below.
    }else{res.status(403).json({error:'ldap_account_not_provisioned'});return}
@@ -503,7 +520,8 @@ app.post('/api/auth/ldap/login',async(req,res)=>{
 /* Explicit account linking requires an already authenticated presenter AND a
  * fresh successful directory bind. Never link identities based on email alone. */
 app.post('/api/auth/ldap/link',requireAuth,async(req,res)=>{
- const ldapSettings=await enabledLdapBackend(db,secret).catch(()=>null);
+ const backendId=typeof req.body?.backendId==='string'?req.body.backendId:'ldap';
+ const ldapSettings=await enabledLdapBackend(db,secret,backendId).catch(()=>null);
  if(!ldapSettings){res.status(404).json({error:'ldap_not_configured'});return}
  const login=req.body?.email,password=req.body?.password;
  if(typeof login!=='string'||typeof password!=='string'||!login.trim()||login.length>254){res.status(400).json({error:'invalid_request'});return}
@@ -512,7 +530,7 @@ app.post('/api/auth/ldap/link',requireAuth,async(req,res)=>{
   if(!verified){res.status(401).json({error:'invalid_credentials'});return}
   const self=await db.query('SELECT email FROM users WHERE id=$1',[auth(req)]);
   if(!self.rowCount||self.rows[0].email.toLowerCase()!==verified.email){res.status(403).json({error:'ldap_verified_email_mismatch'});return}
-  await db.query('INSERT INTO ldap_identities(provider,subject,user_id) VALUES($1,$2,$3)',['default',verified.subject,auth(req)]);
+  await db.query('INSERT INTO ldap_identities(provider,subject,user_id) VALUES($1,$2,$3)',[ldapIdentityKey(backendId),verified.subject,auth(req)]);
   res.status(201).json({ok:true});
  }catch(e){if(e&&typeof e==='object'&&(e as any).code==='23505'){res.status(409).json({error:'ldap_identity_already_linked'});return}console.error('ldap link failed',e instanceof Error?e.name:'error');res.status(503).json({error:'ldap_authentication_unavailable'})}
 });
@@ -574,11 +592,15 @@ app.post('/api/auth/email-mfa/verify',async(req,res)=>{try{
 async function verifyAccountPassword(uid:string,password:string,storedHash:string):Promise<boolean>{
  if(typeof password!=='string'||password.length<1||password.length>1024)return false;
  if(await bcrypt.compare(password,storedHash))return true;
- const ldap=await enabledLdapBackend(db,secret);if(!ldap)return false;
- const linked=await db.query("SELECT li.subject,u.email FROM ldap_identities li JOIN users u ON u.id=li.user_id WHERE li.user_id=$1 AND li.provider='default'",[uid]);
- if(!linked.rowCount)return false;
- const verified=await authenticateDirectory(ldap,linked.rows[0].email,password);
- return Boolean(verified&&verified.subject===linked.rows[0].subject&&verified.email===linked.rows[0].email);
+ const linked=await db.query('SELECT li.provider,li.subject,u.email FROM ldap_identities li JOIN users u ON u.id=li.user_id WHERE li.user_id=$1',[uid]);
+ for(const identity of linked.rows){
+  const backendId=identity.provider==='default'?'ldap':String(identity.provider);
+  const ldap=await enabledLdapBackend(db,secret,backendId);
+  if(!ldap)continue;
+  const verified=await authenticateDirectory(ldap,identity.email,password);
+  if(verified&&verified.subject===identity.subject&&verified.email===identity.email)return true;
+ }
+ return false;
 }
 app.post('/api/auth/email-mfa/settings',requireAuth,async(req,res)=>{try{
  const uid=auth(req)!,enabled=req.body?.enabled,password=req.body?.password;
@@ -806,14 +828,16 @@ app.patch('/api/admin/users/:id/identity',requireAuth,requireAdmin,async(req,res
  if(!result.rowCount){res.status(404).end();return}res.json(result.rows[0]);
  }catch(e){if((e as any)?.code==='23505'){res.status(409).json({error:'email_already_taken'});return}sendError(res,e)}});
 app.get('/api/admin/ldap/search',requireAuth,requireAdmin,async(req,res)=>{
- const ldapSettings=await enabledLdapBackend(db,secret).catch(()=>null);
+ const backendId=typeof req.query.backendId==='string'?req.query.backendId:'ldap';
+ const ldapSettings=await enabledLdapBackend(db,secret,backendId).catch(()=>null);
  if(!ldapSettings){res.status(404).json({error:'ldap_not_configured'});return}
  const q=String(req.query.q||'').trim();if(q.length<2||q.length>120){res.status(400).json({error:'invalid_search'});return}
  try{res.setHeader('Cache-Control','private, no-store');res.json({items:await searchDirectory(ldapSettings,q)})}
  catch(e){console.error('ldap search failed',e instanceof Error?e.name:'unknown');res.status(503).json({error:'directory_unavailable'})}
 });
 app.post('/api/admin/ldap/users',requireAuth,requireAdmin,async(req,res)=>{
- const ldapSettings=await enabledLdapBackend(db,secret).catch(()=>null);
+ const backendId=typeof req.body?.backendId==='string'?req.body.backendId:'ldap';
+ const ldapSettings=await enabledLdapBackend(db,secret,backendId).catch(()=>null);
  if(!ldapSettings){res.status(404).json({error:'ldap_not_configured'});return}
  const q=String(req.body?.query||'').trim(),subject=req.body?.subject,role=req.body?.role;
  if(q.length<2||q.length>120||typeof subject!=='string'||!['user','presenter','moderator','org_admin','platform_admin'].includes(role)){res.status(400).json({error:'invalid_user'});return}
@@ -825,7 +849,7 @@ app.post('/api/admin/ldap/users',requireAuth,requireAdmin,async(req,res)=>{
   try{await cx.query('BEGIN');begun=true;
    if((await cx.query('SELECT 1 FROM users WHERE lower(email)=$1',[found.email])).rowCount){await cx.query('ROLLBACK');begun=false;res.status(409).json({error:'account_exists'});return}
    const uid=randomUUID();await cx.query('INSERT INTO users(id,organization_id,email,password_hash,role,approved,must_change_password) VALUES($1,$2,$3,$4,$5,true,false)',[uid,org.organization_id,found.email,await bcrypt.hash(randomBytes(32).toString('base64url'),12),role]);
-   await cx.query('INSERT INTO ldap_identities(provider,subject,user_id) VALUES($1,$2,$3)',['default',subject,uid]);
+   await cx.query('INSERT INTO ldap_identities(provider,subject,user_id) VALUES($1,$2,$3)',[ldapIdentityKey(backendId),subject,uid]);
    await cx.query('COMMIT');begun=false;res.status(201).json({id:uid,email:found.email,role,approved:true,backend:'ldap'});
   }finally{if(begun)await cx.query('ROLLBACK').catch(()=>{});cx.release()}
  }catch(e){if((e as any)?.code==='23505'){res.status(409).json({error:'account_exists'});return}sendError(res,e)}
@@ -867,6 +891,10 @@ app.patch('/api/admin/users/:id',requireAuth,requireAdmin,async(req,res)=>{
    WHERE id=$1 RETURNING id,email,nickname,role,approved`,[req.params.id,role,approved,hasNickname,nickname]);
   changedPermissions=before.role!==role||before.approved!==approved;
   await cx.query('COMMIT');
+  if(changedPermissions){
+   notifyAdminEvent('user_status','An administrator changed a user status');
+   notifySubjectStatus(result.rows[0].email,approved?'Your account permissions have been updated.':'Your account is awaiting approval or has been suspended.');
+  }
   if(changedPermissions)for(const peers of sockets.values())for(const ws of peers)if((ws as any).uid===req.params.id)ws.close(1008,'account permissions changed');
   res.json(result.rows[0]);
  }catch(e){await cx.query('ROLLBACK').catch(()=>{});
@@ -1072,6 +1100,21 @@ app.post('/api/admin/auth/backends/:id/test',requireAuth,requireAdmin,async(req,
  const result=await testAuthBackend(db,secret,req.params.id,draft);
  res.setHeader('Cache-Control','private, no-store');res.json(result);
  }catch(e){console.error('authentication backend test unavailable',e instanceof Error?e.name:'error');res.status(422).json({error:'backend_test_failed'})}});
+/** Configurable notification events, administrator recipients and sealed provider tokens. */
+app.get('/api/admin/notifications',requireAuth,requireAdmin,async(_req,res)=>{try{
+ const config=await loadNoticeConfig(db,secret);
+ const admins=(await db.query("SELECT id,email FROM users WHERE role='platform_admin' AND approved=true ORDER BY email LIMIT 100")).rows;
+ res.setHeader('Cache-Control','private, no-store');res.json({settings:publicNoticeConfig(config),admins});
+ }catch(e){sendError(res,e)}});
+app.put('/api/admin/notifications',requireAuth,requireAdmin,async(req,res)=>{try{
+ const result=await saveNoticeConfig(db,secret,req.body);
+ res.setHeader('Cache-Control','private, no-store');res.json({settings:result});
+ }catch(e){res.status(422).json({error:e instanceof Error?e.message:'invalid_notification_settings'})}});
+app.post('/api/admin/notifications/test',requireAuth,requireAdmin,async(req,res)=>{try{
+ const event=req.body?.event;
+ if(!['user_status','system_alert','debug_session'].includes(event)){res.status(400).json({error:'invalid_notification_event'});return}
+ res.json(await deliverNotice(db,secret,await activeSmtpConfig().catch(()=>null),event,'Admin test message'));
+ }catch(e){res.status(503).json({error:'notification_delivery_unavailable'})}});
 app.get('/api/admin/settings',requireAuth,requireAdmin,async(_req,res)=>{try{const r=await db.query('SELECT key,value FROM platform_settings');res.json(Object.fromEntries(r.rows.map(x=>[x.key,x.value])))}catch(e){sendError(res,e)}});
 app.patch('/api/admin/settings',requireAuth,requireAdmin,async(req,res)=>{
  const patch=validateSettingsPatch(req.body);
@@ -1082,6 +1125,7 @@ app.patch('/api/admin/settings',requireAuth,requireAdmin,async(req,res)=>{
   await cx.query('BEGIN');
   for(const [key,value] of patch.changes){
    await cx.query('INSERT INTO platform_settings(key,value) VALUES($1,$2) ON CONFLICT(key) DO UPDATE SET value=$2,updated_at=now()',[key,value]);
+   if(key==='temporary_retention_days')await cx.query("UPDATE debug_submissions SET expires_at=created_at+($1::integer*interval '1 day')",[Number(value)]);
   }
   await cx.query('COMMIT');
   const publicSetting=patch.changes.find(([key])=>key==='public_base_url');
@@ -1648,6 +1692,79 @@ app.get('/api/sessions/:id/assets/:assetId',requireAuth,async(req,res)=>{try{
  }catch(e){sendError(res,e)}});
 app.get('/api/sessions/:id/export.json',requireAuth,async(req,res)=>{try{const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}res.setHeader('Content-Disposition','attachment; filename="quorivio-session.json"');res.json(await portableSession(s.id))}catch(e){sendError(res,e)}});
 app.post('/api/sessions/import',requireAuth,requirePresenter,async(req,res)=>{try{if(!validPortable(req.body)){res.status(400).json({error:'invalid_import'});return}const id=await createFromPortable(req.body,auth(req)!);res.status(201).json({id})}catch(e){sendError(res,e)}});
+/** The debug package is the same portable, presenter-authored .quo format as Export. */
+async function portableDebugBundle(sid:string):Promise<Buffer>{
+ const definition=await portableSession(sid),refs=referencedAssets(definition);
+ const rows=(await db.query('SELECT id,display_name,background_library_copy,mime_type,byte_size,sha256 FROM session_assets WHERE session_id=$1 AND participant_id IS NULL ORDER BY id',[sid])).rows;
+ if(rows.length>300||[...refs].some(id=>!rows.some((row:any)=>row.id===id)))throw Error('debug_bundle_assets_invalid');
+ let total=0;const assets:BundleAsset[]=[],media=new Map<string,Buffer>();
+ for(const row of rows){
+  const bytes=Number(row.byte_size);total+=bytes;
+  if(total>MAX_DEBUG_BUNDLE_BYTES||bytes>50*1024*1024)throw Error('debug_bundle_media_limit');
+  const body=await readFile(path.join(assetRoot,sid,row.id)),digest=createHash('sha256').update(body).digest('hex');
+  if(bytes!==body.length||digest!==row.sha256)throw Error('debug_bundle_media_integrity');
+  assets.push({id:row.id,mime:row.mime_type,bytes,sha256:digest,...(row.display_name?{display_name:row.display_name}:{}),...(row.background_library_copy?{background_library_copy:true}:{})});media.set(row.id,body);
+ }
+ const encoded=encodeBundle({format:'quorivio-bundle',version:1,definition,assets},media);
+ if(encoded.length>MAX_DEBUG_BUNDLE_BYTES)throw Error('debug_bundle_too_large');
+ return encoded;
+}
+async function debugRetentionDays(){
+ const r=await db.query("SELECT value FROM platform_settings WHERE key='temporary_retention_days'");
+ const value=Number(r.rows[0]?.value||30);
+ if(!Number.isInteger(value)||value<1||value>3650)throw Error('invalid_debug_retention');
+ return value;
+}
+app.post('/api/sessions/:id/debug-submit',requireAuth,async(req,res)=>{try{
+ const session=await owner(req.params.id,auth(req)!);
+ if(!session){res.status(404).end();return}
+ const input=validateDebugSubmission(req.body);
+ const bundle=await portableDebugBundle(session.id);
+ let diagnostics:unknown=null;
+ if(input.consentDiagnostics){
+  const incidents=await db.query("SELECT occurred_at,severity,code FROM system_incidents WHERE occurred_at>=now()-interval '24 hours' ORDER BY occurred_at DESC LIMIT 200");
+  diagnostics={periodHours:24,generatedAt:new Date().toISOString(),appVersion:'0.1.0',runtime:{node:process.versions.node,platform:process.platform},incidents:incidents.rows};
+ }
+ const submitted=await createDebugSubmission(db,assetRoot,session.id,auth(req)!,req.body,bundle,diagnostics,await debugRetentionDays());
+ res.status(201).json({id:submitted.id,retentionDays:submitted.expiresInDays,stored:true});
+ // Never block or roll back submission when an external channel is unavailable.
+ void (async()=>{
+  const config=await loadNoticeConfig(db,secret),smtp=await activeSmtpConfig().catch(()=>null);
+  let status='disabled';
+  if(config.events.debug_session&&config.channels.email.enabled){
+   const delivery=await sendDebugEmail(smtp,config.supportEmail,submitted.id,bundle,input.message,diagnostics);
+   status=delivery.sent?'sent':delivery.reason||'failed';
+  }
+  await db.query('UPDATE debug_submissions SET email_delivery_status=$2 WHERE id=$1',[submitted.id,status]);
+  await deliverNotice(db,secret,smtp,'debug_session','New debugging session available to administrators for download');
+ })().catch(e=>console.warn('debug notification unavailable',e instanceof Error?e.name:'unknown'));
+ }catch(e){const reason=e instanceof Error?e.message:'invalid_debug_submission';
+  if(reason.startsWith('invalid_')||reason.startsWith('debug_')){res.status(422).json({error:reason});return}
+  sendError(res,e)}});
+app.get('/api/admin/debug-submissions',requireAuth,requireAdmin,async(_req,res)=>{try{
+ res.setHeader('Cache-Control','private, no-store');
+ res.json({items:await listDebugSubmissions(db),retentionDays:await debugRetentionDays()});
+ }catch(e){sendError(res,e)}});
+app.get('/api/admin/debug-submissions/:id/download',requireAuth,requireAdmin,async(req,res)=>{try{
+ const bytes=await readDebugSubmission(db,assetRoot,req.params.id);
+ if(!bytes){res.status(404).end();return}
+ res.setHeader('Cache-Control','private, no-store');res.setHeader('X-Content-Type-Options','nosniff');
+ res.setHeader('Content-Type','application/octet-stream');res.setHeader('Content-Disposition','attachment; filename="quorivio-debug-'+req.params.id+'.quo"');
+ res.send(bytes);
+ }catch(e){sendError(res,e)}});
+
+/** Consent-gated 24-hour diagnostic report retained alongside .quo. Never
+ * expose it to session presenters or unauthenticated clients. */
+app.get('/api/admin/debug-submissions/:id/report.json',requireAuth,requireAdmin,async(req,res)=>{try{
+ const id=req.params.id;
+ if(!/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(id)){res.status(404).end();return}
+ const row=await db.query('SELECT diagnostics FROM debug_submissions WHERE id=$1 AND consent_diagnostics=true AND expires_at>now()',[id]);
+ if(!row.rowCount||!row.rows[0].diagnostics){res.status(404).end();return}
+ res.setHeader('Cache-Control','private, no-store');res.setHeader('X-Content-Type-Options','nosniff');
+ res.setHeader('Content-Type','application/json; charset=utf-8');
+ res.setHeader('Content-Disposition','attachment; filename="quorivio-diagnostics-'+id+'.json"');
+ res.send(JSON.stringify(row.rows[0].diagnostics));
+ }catch(e){sendError(res,e)}});
 // Self-contained Quorivio v1 bundle: no participants, responses, credentials or secrets.
 app.get('/api/sessions/:id/export.quo',requireAuth,async(req,res)=>{try{
  const session=await owner(req.params.id,auth(req)!);if(!session){res.status(404).end();return}
@@ -2047,10 +2164,18 @@ async function servePresentationExport(req:express.Request,res:express.Response,
    await writeFile(path.join(scratch,'portable.json'),portable,{flag:'wx',mode:0o600});
    // Stage only referenced, session-owned image assets for the isolated PPTX worker.
    const definition=JSON.parse(portable);
-   const imageIds=[...new Set<string>(definition.activities.flatMap((a:any)=>[
-    ...(a.page_design?.widgets||[]).filter((w:any)=>['image','logo'].includes(w.kind)).map((w:any)=>w.assetId),
-    ...(a.slide_asset_id?[a.slide_asset_id]:[])
-   ]))];
+   const masterBackground=definition.session?.theme?.master?.backgroundAssetId;
+   const imageIds=[...new Set<string>([
+    ...(masterBackground?[masterBackground]:[]),
+    ...definition.activities.flatMap((a:any)=>[
+     ...(a.page_design?.backgroundAssetId?[a.page_design.backgroundAssetId]:[]),
+     ...(a.page_design?.widgets||[]).flatMap((w:any)=>[
+      ...(['image','logo'].includes(w.kind)&&w.assetId?[w.assetId]:[]),
+      ...(w.style?.fillMode==='image'&&w.style?.fillImageAssetId?[w.style.fillImageAssetId]:[])
+     ]),
+     ...(a.slide_asset_id?[a.slide_asset_id]:[])
+    ])
+   ].filter((id):id is string=>typeof id==='string'&&id.length>0))];
    if(imageIds.length>200)throw Error('pptx_export_too_many_images');
    if(imageIds.length){
     const registered=await db.query('SELECT id,mime_type,byte_size,sha256 FROM session_assets WHERE session_id=$1 AND participant_id IS NULL AND id=ANY($2::uuid[])',[s.id,imageIds]);
@@ -2616,11 +2741,16 @@ async function runHousekeeping(){
  if(housekeepingInProgress)return;
  housekeepingInProgress=true;
  try{
-  const conversion=await removeExpiredConversionJobs(process.env.QUORIVIO_CONVERSION_DIR||'/conversions');
+  const row=await db.query("SELECT value FROM platform_settings WHERE key='temporary_retention_days'");
+  const retentionDays=Number(row.rows[0]?.value||DEFAULT_TEMP_RETENTION_DAYS);
+  const conversion=await removeExpiredConversionJobs(process.env.QUORIVIO_CONVERSION_DIR||'/conversions',Date.now(),new Set(),retentionDays);
   const orphan=await removeOrphanSessionAssetFiles(assetRoot,async(sid,aid)=>{
    const r=await db.query('SELECT 1 FROM session_assets WHERE id=$1 AND session_id=$2 LIMIT 1',[aid,sid]);return !!r.rowCount;
-  });
-  console.log('12h housekeeping completed',JSON.stringify({conversionWorkspacesRemoved:conversion,unregisteredOldMediaRemoved:orphan}));
+  },Date.now(),retentionDays);
+  const purgedDebug=await purgeDebugSubmissions(db,assetRoot,retentionDays);
+  const orphanDebug=await removeOrphanDebugBundles(db,assetRoot,retentionDays);
+  await db.query("DELETE FROM system_incidents WHERE occurred_at<now()-($1::integer*interval '1 day')",[retentionDays]);
+  console.log('scheduled housekeeping completed',JSON.stringify({retentionDays,conversionWorkspacesRemoved:conversion,unregisteredOldMediaRemoved:orphan,purgedDebug,orphanDebug}));
  }finally{housekeepingInProgress=false}
 }
 async function initialize(){await withBootstrapLock(db,async bootstrap=>{const schema=readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)),'../src/schema.sql'),'utf8');await bootstrap.query(schema);publicBase=(await bootstrap.query("SELECT value FROM platform_settings WHERE key='public_base_url'")).rows[0]?.value||base;// Helm and Kubernetes wizard may bootstrap a first backup target via a Kubernetes Secret.

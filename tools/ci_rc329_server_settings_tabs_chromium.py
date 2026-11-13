@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""RC329: actual Chromium CSS visibility/contrast for seven server-setting tabs.
+"""RC329: actual Chromium CSS visibility/contrast for nine server-setting tabs.
 
 Uses shipped Quorivio CSS and an HTML fixture matching the authenticated
 administrator's tablist. No session, credentials, or network requests involved.
@@ -14,7 +14,7 @@ from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
 CSS = ROOT / "apps/web/src/style.css"
-LABELS = ("Generale", "Autenticazione", "Posta elettronica", "Spazio disco",
+LABELS = ("Generale", "Autenticazione", "Notifiche", "Debug", "Posta elettronica", "Spazio disco",
           "Convertitore", "Backup", "Audit")
 HTML = """<!doctype html><html lang="it"><head><meta charset="UTF-8"></head>
 <body><div class="app"><main class="dashboard"><aside class="aside"></aside>
@@ -56,7 +56,7 @@ def main() -> None:
                 page.set_content(HTML.replace("BUTTONS", buttons))
                 page.add_style_tag(content=CSS.read_text(encoding="utf-8"))
                 tabs = page.locator(".server-settings-tabs > button.server-settings-tab")
-                assert tabs.count() == 7
+                assert tabs.count() == len(LABELS)
                 metrics = tabs.evaluate_all("""elements => elements.map(el => {
                     const style = getComputedStyle(el), box = el.getBoundingClientRect();
                     return {text:el.textContent, fg:style.color, bg:style.backgroundColor,
@@ -91,7 +91,7 @@ def main() -> None:
                        return t.left>=p.left-2 && t.right<=p.right+2
                     }""")
                     assert visible, "Audit tab cannot be reached on mobile"
-                print(f"RC329 tabs: {width}px, all 7 visible, WCAG-AA contrast PASS", flush=True)
+                print(f"RC329 tabs: {width}px, all 9 visible, WCAG-AA contrast PASS", flush=True)
                 page.close()
         finally:
             browser.close()

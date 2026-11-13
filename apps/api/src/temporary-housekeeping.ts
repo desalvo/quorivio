@@ -7,6 +7,11 @@ import path from 'node:path';
 const jobName=/^[a-f0-9]{32}$/i;
 const uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[1-8][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
 export const HOUSEKEEPING_PERIOD_MS=12*60*60*1000;
+export const DEFAULT_TEMP_RETENTION_DAYS=30;
+export function temporaryRetentionMs(days=DEFAULT_TEMP_RETENTION_DAYS):number{
+ if(!Number.isInteger(days)||days<1||days>3650)throw Error('invalid_temporary_retention');
+ return days*24*60*60*1000;
+}
 export type HousekeepingStats={expiredWorkspaces:number;orphanFiles:number;preserved:number};
 
 /** Check not only the job directory's mtime: writing an existing nested output
@@ -29,11 +34,11 @@ async function isStaleTree(dir:string,cutoff:number,depth=0,budget={count:0}):Pr
 }
 /** Conversion roots are ephemeral pod-local volumes. Workspaces use unpredictable
  * hex IDs and are not reusable/library content. Active jobs are exempt. */
-export async function removeExpiredConversionJobs(root:string,now=Date.now(),active:ReadonlySet<string>=new Set()):Promise<number>{
+export async function removeExpiredConversionJobs(root:string,now=Date.now(),active:ReadonlySet<string>=new Set(),retentionDays=DEFAULT_TEMP_RETENTION_DAYS):Promise<number>{
  let deleted=0;let entries;
  try{entries=await readdir(root,{withFileTypes:true})}catch(e){if((e as NodeJS.ErrnoException).code==='ENOENT')return 0;throw e}
  if((await lstat(root)).isSymbolicLink())throw Error('unsafe_conversion_root_symlink');
- const cutoff=now-HOUSEKEEPING_PERIOD_MS;
+ const cutoff=now-temporaryRetentionMs(retentionDays);
  for(const entry of entries.slice(0,10000)){
   if(!entry.isDirectory()||entry.isSymbolicLink()||!jobName.test(entry.name))continue;
   const candidate=path.join(root,entry.name);
@@ -48,11 +53,11 @@ export async function removeExpiredConversionJobs(root:string,now=Date.now(),act
 /** Only files with a missing authoritative session_assets row are removable;
  * all other directories (background-library, profile-photos, unknown) stay intact.
  * The callback must fail closed on unavailable PostgreSQL, not return false. */
-export async function removeOrphanSessionAssetFiles(root:string,isRegistered:(sessionId:string,assetId:string)=>Promise<boolean>,now=Date.now()):Promise<number>{
+export async function removeOrphanSessionAssetFiles(root:string,isRegistered:(sessionId:string,assetId:string)=>Promise<boolean>,now=Date.now(),retentionDays=DEFAULT_TEMP_RETENTION_DAYS):Promise<number>{
  let deleted=0;let sessions;
  try{sessions=await readdir(root,{withFileTypes:true})}catch(e){if((e as NodeJS.ErrnoException).code==='ENOENT')return 0;throw e}
  if((await lstat(root)).isSymbolicLink())throw Error('unsafe_asset_root_symlink');
- const cutoff=now-HOUSEKEEPING_PERIOD_MS;
+ const cutoff=now-temporaryRetentionMs(retentionDays);
  for(const session of sessions.slice(0,10000)){
   if(!session.isDirectory()||session.isSymbolicLink()||!uuid.test(session.name))continue;
   const folder=path.join(root,session.name);
