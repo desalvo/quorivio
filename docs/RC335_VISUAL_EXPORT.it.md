@@ -20,3 +20,7 @@ Le richieste restano autenticate e permesse al proprietario/collaboratore. Per i
 - Test del deck PPTX visuale con un PNG 16:9 esatto per pagina e controlli di quota;
 - Test dell'autenticazione del capture token, restrizioni URL, contratti UI e dei quattro link.
 - Full CI e pubblicazione immagini Docker sono prerequisiti, non dati per scontati.
+
+## Istantanee dei contatori live (aggiornamento RC335)
+
+La cattura ora congela i **soli conteggi aggregati** di partecipanti connessi e di partecipanti che hanno risposto, prelevandoli dallo snapshot del server al momento del download. La widget "Partecipanti connessi" e il gauge delle risposte ricevute non devono mai mostrare numeri casuali della simulazione durante l'esportazione. I dati sono verificati come interi non negativi, con il numero di risposte limitato a quello dei connessi; non sono incluse identità, scelte individuali o identificativi dei partecipanti.

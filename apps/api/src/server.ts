@@ -2199,7 +2199,7 @@ async function servePresentationExport(req:express.Request,res:express.Response,
    if(!presentationExportPages(planned,view).length){res.status(422).json({error:'no_visible_presentation_pages'});return}
    pptxDefinition.capture_session_id=s.id;
    const aggregated=await snapshot(s.id);
-   pptxDefinition.capture_results={results:aggregated?.results||[],totals:aggregated?.totals||[]};
+   pptxDefinition.capture_results={results:aggregated?.results||[],totals:aggregated?.totals||[],connected_participants:aggregated?.connected_participants??0,responded_connected_participants:aggregated?.responded_connected_participants??0};
    // Aggregate only counts; individual votes, participant identifiers and
    // free-text answers must never become part of a visual export snapshot.
    const [widgetCounts,ratingCounts,reactionCounts]=await Promise.all([

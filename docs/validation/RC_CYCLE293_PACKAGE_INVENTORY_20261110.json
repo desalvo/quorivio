@@ -544,14 +544,14 @@
       "143a1035"
     ],
     "apps/api/src/presentation-export-snapshot.ts": [
-      "8fb82cf1",
-      "a6940b7c",
-      "5d9cf259",
-      "78dfa989",
-      "c6685662",
-      "1c60b124",
-      "5241773f",
-      "c2c0e63b"
+      "b51455b4",
+      "0e4d5680",
+      "6f8c6de9",
+      "639a8219",
+      "60f65b36",
+      "16b115f3",
+      "2ac4d729",
+      "25f8fed4"
     ],
     "apps/api/src/presentation-routing.ts": [
       "aa775947",
@@ -624,14 +624,14 @@
       "6cf4c002"
     ],
     "apps/api/src/server.ts": [
-      "1911d446",
-      "7d174f90",
-      "098113b7",
-      "35dcdc9b",
-      "031a0df1",
-      "ea849f32",
-      "fdf417dd",
-      "16d7d67b"
+      "5ec6ec3e",
+      "38c75d6c",
+      "5e372aa4",
+      "d29724e0",
+      "e5c6d3b0",
+      "fed64c36",
+      "b7d1357e",
+      "117a3804"
     ],
     "apps/api/src/session-bus.ts": [
       "09ec6487",
@@ -1294,14 +1294,14 @@
       "d65d8f4f"
     ],
     "apps/api/test/presentation-export-name.test.ts": [
-      "4f30e5e6",
-      "f742e343",
-      "79157bd3",
-      "d7a73583",
-      "9db56d59",
-      "365c0c5c",
-      "55defa31",
-      "bb9cdd05"
+      "2ae98f03",
+      "7c6f8911",
+      "33bbd034",
+      "e1106e53",
+      "a4a6f438",
+      "e9b99dac",
+      "d80f8af7",
+      "f7828bd9"
     ],
     "apps/api/test/presenter-profile-cycle38.test.ts": [
       "8a371d05",
@@ -2304,14 +2304,14 @@
       "54a62e5d"
     ],
     "apps/web/src/main.tsx": [
-      "5de93d5b",
-      "753ee3eb",
-      "f389934f",
-      "24ecd24d",
-      "5125fd70",
-      "2089a633",
-      "9a6de4a3",
-      "83e637f1"
+      "94b35741",
+      "ca8b732b",
+      "b01b200e",
+      "3d15a7af",
+      "9b0f3a29",
+      "b7301042",
+      "1cc6b19a",
+      "e5631ea9"
     ],
     "apps/web/src/main.tsx.orig": [
       "9230e5a3",
@@ -4024,14 +4024,14 @@
       "b347c558"
     ],
     "apps/web/test/rc335-visual-export.test.ts": [
-      "831d27e3",
-      "6de12d68",
-      "ee6e9e86",
-      "f7527c88",
-      "e09617bb",
-      "00cf24a9",
-      "4f5cd3dc",
-      "47c6491c"
+      "126e73ec",
+      "9341558b",
+      "18b0db03",
+      "dd8af94a",
+      "56703eb9",
+      "d4366c86",
+      "0acc0ee0",
+      "eafca1e4"
     ],
     "apps/web/test/rc70-editor-timer-font.test.ts": [
       "116cfb27",
@@ -6264,14 +6264,14 @@
       "b794f401"
     ],
     "docs/RC335_VISUAL_EXPORT.it.md": [
-      "e117afea",
-      "191affce",
-      "a2e119c4",
-      "329f961f",
-      "0860b24c",
-      "aede46aa",
-      "a627e332",
-      "f8645570"
+      "bbadf2d5",
+      "dc02c971",
+      "6b0f7ec6",
+      "78c12b50",
+      "84bf93fb",
+      "ae9bdf9b",
+      "b3a703d1",
+      "a8d47d3c"
     ],
     "docs/RC49_HAPROXY_CROSS_NODE_RWX.en.md": [
       "7c1cc75e",

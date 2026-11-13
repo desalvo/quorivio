@@ -35,3 +35,11 @@ test('visual snapshot is sourced only from authored metadata and aggregate stati
  assert.match(code,/delete session\.join_secret/);
  assert.match(code,/capture_widget_results/);
 });
+
+test('visual snapshot contains bounded aggregate participation, without identity data',()=>{
+ const code=readFileSync(new URL('../src/presentation-export-snapshot.ts',import.meta.url),'utf8');
+ assert.match(code,/connected_participants:connected/);
+ assert.match(code,/responded_connected_participants:responded/);
+ assert.match(code,/Math.min\(connected,/);
+ assert.match(code,/delete session.join_secret/);
+});

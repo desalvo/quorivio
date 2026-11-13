@@ -35,3 +35,10 @@ test('capture is gated by per-job capability and Chromium blocks unrelated URLs'
  assert.match(python,/if route_path\.startswith\('\/api\/'\)/);
  assert.doesNotMatch(python,/storage_state=/);
 });
+
+test('visual export freezes live aggregate participation while rehearsal retains synthetic values',()=>{
+ assert.match(main,/data-live-participants="true"/);
+ assert.match(main,/data-simulated-participants="true"/);
+ assert.match(main,/emptyLabel="esportazione statica" participation=/);
+ assert.match(server,/connected_participants:aggregated\?\.connected_participants/);
+});
