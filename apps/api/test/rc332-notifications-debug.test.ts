@@ -31,3 +31,11 @@ test('account state changes are announced only after commit, and orphan debug bu
  assert.ok(source.includes('notifySubjectStatus(result.rows[0].email'));
  assert.ok(source.includes('removeOrphanDebugBundles(db,assetRoot,retentionDays)'));
 });
+
+test('administrators may download retained consented diagnostic reports',()=>{
+ const source=readFileSync(new URL('../src/server.ts',import.meta.url),'utf8');
+ const admin=readFileSync(new URL('../../web/src/admin-debug.tsx',import.meta.url),'utf8');
+ assert.ok(source.includes("'/api/admin/debug-submissions/:id/report.json'"));
+ assert.ok(source.includes('consent_diagnostics=true AND expires_at>now()'));
+ assert.ok(admin.includes('report.json'));
+});

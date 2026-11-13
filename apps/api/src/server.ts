@@ -1753,6 +1753,18 @@ app.get('/api/admin/debug-submissions/:id/download',requireAuth,requireAdmin,asy
  res.send(bytes);
  }catch(e){sendError(res,e)}});
 
+/** Consent-gated 24-hour diagnostic report retained alongside .quo. Never
+ * expose it to session presenters or unauthenticated clients. */
+app.get('/api/admin/debug-submissions/:id/report.json',requireAuth,requireAdmin,async(req,res)=>{try{
+ const id=req.params.id;
+ if(!/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(id)){res.status(404).end();return}
+ const row=await db.query('SELECT diagnostics FROM debug_submissions WHERE id=$1 AND consent_diagnostics=true AND expires_at>now()',[id]);
+ if(!row.rowCount||!row.rows[0].diagnostics){res.status(404).end();return}
+ res.setHeader('Cache-Control','private, no-store');res.setHeader('X-Content-Type-Options','nosniff');
+ res.setHeader('Content-Type','application/json; charset=utf-8');
+ res.setHeader('Content-Disposition','attachment; filename="quorivio-diagnostics-'+id+'.json"');
+ res.send(JSON.stringify(row.rows[0].diagnostics));
+ }catch(e){sendError(res,e)}});
 // Self-contained Quorivio v1 bundle: no participants, responses, credentials or secrets.
 app.get('/api/sessions/:id/export.quo',requireAuth,async(req,res)=>{try{
  const session=await owner(req.params.id,auth(req)!);if(!session){res.status(404).end();return}
