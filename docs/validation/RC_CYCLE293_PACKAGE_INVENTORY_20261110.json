@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
   "cycle": 293,
-  "file_count_excluding_manifest": 2655,
+  "file_count_excluding_manifest": 2662,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -84,14 +84,14 @@
       "640f725a"
     ],
     "Dockerfile.converter": [
-      "05f4d8c5",
-      "ffd69b5e",
-      "4a3e89ed",
-      "764ea5d0",
-      "0d7b429b",
-      "8b7525a8",
-      "3683eeef",
-      "cbde89fb"
+      "b403064a",
+      "fd9d32d9",
+      "0624fd68",
+      "c25a9595",
+      "67883634",
+      "9f92504e",
+      "285efe44",
+      "83fbf343"
     ],
     "LICENSE": [
       "73c273b1",
@@ -533,6 +533,26 @@
       "1f9acb0b",
       "338666b8"
     ],
+    "apps/api/src/presentation-export-names.ts": [
+      "07ef848f",
+      "dc82ff86",
+      "1b8e665b",
+      "29687c73",
+      "6a0801b1",
+      "d6d2e45f",
+      "a6ac8cc6",
+      "143a1035"
+    ],
+    "apps/api/src/presentation-export-snapshot.ts": [
+      "8fb82cf1",
+      "a6940b7c",
+      "5d9cf259",
+      "78dfa989",
+      "c6685662",
+      "1c60b124",
+      "5241773f",
+      "c2c0e63b"
+    ],
     "apps/api/src/presentation-routing.ts": [
       "aa775947",
       "99c004d4",
@@ -604,14 +624,14 @@
       "6cf4c002"
     ],
     "apps/api/src/server.ts": [
-      "e00e8dc5",
-      "50666a48",
-      "b81d29f8",
-      "5ddea720",
-      "e17636de",
-      "c5970c1c",
-      "dbb709df",
-      "26b9f204"
+      "1911d446",
+      "7d174f90",
+      "098113b7",
+      "35dcdc9b",
+      "031a0df1",
+      "ea849f32",
+      "fdf417dd",
+      "16d7d67b"
     ],
     "apps/api/src/session-bus.ts": [
       "09ec6487",
@@ -1272,6 +1292,16 @@
       "d4e51efc",
       "196c0705",
       "d65d8f4f"
+    ],
+    "apps/api/test/presentation-export-name.test.ts": [
+      "4f30e5e6",
+      "f742e343",
+      "79157bd3",
+      "d7a73583",
+      "9db56d59",
+      "365c0c5c",
+      "55defa31",
+      "bb9cdd05"
     ],
     "apps/api/test/presenter-profile-cycle38.test.ts": [
       "8a371d05",
@@ -2274,14 +2304,14 @@
       "54a62e5d"
     ],
     "apps/web/src/main.tsx": [
-      "65d62c79",
-      "b31e6917",
-      "b3f33488",
-      "28d2e4f3",
-      "60dc6377",
-      "3393cf81",
-      "8221bf9b",
-      "5f6dee5f"
+      "232dd47a",
+      "ea0ebd3f",
+      "eb91d15a",
+      "d1fc4770",
+      "339ccd41",
+      "f4e4015f",
+      "c7b78ed9",
+      "6751a742"
     ],
     "apps/web/src/main.tsx.orig": [
       "9230e5a3",
@@ -2694,14 +2724,14 @@
       "2586b822"
     ],
     "apps/web/src/style.css": [
-      "96547cdd",
-      "cd685044",
-      "32d02856",
-      "fe963602",
-      "a9c2acc4",
-      "cab5b887",
-      "81ba4d90",
-      "f02edbda"
+      "c1e78a04",
+      "bc891068",
+      "e54a37f5",
+      "7f588a3d",
+      "cd43796b",
+      "f35fb121",
+      "ca13d17d",
+      "e9acd24d"
     ],
     "apps/web/src/thumbnail-menu-layout.ts": [
       "a4748563",
@@ -3993,6 +4023,16 @@
       "b64a64f2",
       "b347c558"
     ],
+    "apps/web/test/rc335-visual-export.test.ts": [
+      "831d27e3",
+      "6de12d68",
+      "ee6e9e86",
+      "f7527c88",
+      "e09617bb",
+      "00cf24a9",
+      "4f5cd3dc",
+      "47c6491c"
+    ],
     "apps/web/test/rc70-editor-timer-font.test.ts": [
       "116cfb27",
       "f9be91d4",
@@ -4294,14 +4334,14 @@
       "d65a5587"
     ],
     "compose.yaml": [
-      "a8330194",
-      "415b424e",
-      "a4b0c85b",
-      "58056370",
-      "a4c793d6",
-      "f93165b5",
-      "274bc84d",
-      "5335d24b"
+      "1d460c77",
+      "67496a65",
+      "2591fb92",
+      "238995fc",
+      "210f6a4c",
+      "ec8a9000",
+      "60a615f8",
+      "3e56e30b"
     ],
     "docs/ADMIN_MFA_RESET.en.md": [
       "92d209d4",
@@ -4754,24 +4794,24 @@
       "455a0f27"
     ],
     "docs/DEVELOPMENT_STATUS.it.md": [
-      "68b36609",
-      "5b88bf97",
-      "976df76e",
-      "ae9fb60d",
-      "ba624497",
-      "334888ff",
-      "f361a299",
-      "d04d650c"
+      "54b7bdec",
+      "1d1d0774",
+      "17f8b0e5",
+      "7880b585",
+      "5fb8adba",
+      "5d6a3c14",
+      "6e49c2c6",
+      "c74b825b"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "9a72cb18",
-      "544f0375",
-      "aabc5d6a",
-      "529a665c",
-      "29f7bb32",
-      "54f2fa48",
-      "402fb9c4",
-      "d9ffba68"
+      "c5e36872",
+      "cb504a8c",
+      "67b4822a",
+      "a497fb0a",
+      "28a16abb",
+      "f78b2200",
+      "50d42aa7",
+      "03ccdef9"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",
@@ -6222,6 +6262,16 @@
       "b4bdbb35",
       "bdcb426d",
       "b794f401"
+    ],
+    "docs/RC335_VISUAL_EXPORT.it.md": [
+      "e117afea",
+      "191affce",
+      "a2e119c4",
+      "329f961f",
+      "0860b24c",
+      "aede46aa",
+      "a627e332",
+      "f8645570"
     ],
     "docs/RC49_HAPROXY_CROSS_NODE_RWX.en.md": [
       "7c1cc75e",
@@ -17484,14 +17534,14 @@
       "867310f9"
     ],
     "helm/quorivio/templates/deployment.yaml": [
-      "c8fd4f8f",
-      "d94e482f",
-      "375ca07f",
-      "3736ffab",
-      "053dd479",
-      "40a7ea97",
-      "cacc9af2",
-      "2db7513a"
+      "ceba57e8",
+      "7e739152",
+      "dbf95978",
+      "f7415274",
+      "32b9d7e0",
+      "114fc48c",
+      "44bfa04d",
+      "ffbb84ec"
     ],
     "helm/quorivio/templates/ingress.yaml": [
       "96205841",
@@ -18804,14 +18854,14 @@
       "bf1eca2d"
     ],
     "tools/conversion_worker.py": [
-      "94cc5b3c",
-      "249a0ed6",
-      "2a9ebee5",
-      "72967cb2",
-      "6d72ff1b",
-      "15e6f1de",
-      "0ad3c84f",
-      "7462c5be"
+      "d9ad53c9",
+      "405fe4c1",
+      "fee838dc",
+      "c51019bd",
+      "55596780",
+      "23d05572",
+      "39689eb4",
+      "c014f030"
     ],
     "tools/fixtures/ci_richtext_harness.tsx": [
       "34ba28e5",
@@ -23623,6 +23673,16 @@
       "5e848c0b",
       "64481c77"
     ],
+    "tools/tests/test_visual_export.py": [
+      "0da18e80",
+      "b9186719",
+      "2f29128b",
+      "056f9fdb",
+      "46fab813",
+      "a997c8ba",
+      "0452a0d1",
+      "bab17c5e"
+    ],
     "tools/tests/test_visual_parity_rehearsal_20261028.py": [
       "7bb37a23",
       "f0c1dfb8",
@@ -26552,6 +26612,16 @@
       "c3ec050f",
       "4501ac60",
       "7be5beb3"
+    ],
+    "tools/visual_export.py": [
+      "8c3b9321",
+      "a2e26a7c",
+      "5028f98e",
+      "8a0d9808",
+      "7059d587",
+      "7ac8214f",
+      "ecf4f8ed",
+      "3cc29356"
     ]
   }
 }

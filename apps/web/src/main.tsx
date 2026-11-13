@@ -933,7 +933,7 @@ function PhoneRehearsalStage({children,height}:{children:React.ReactNode;height:
    </div>
   </div>;
 }
-function SessionRehearsal({snapshot,onClose,initialPageId,initialMode='participant'}:{snapshot:Snapshot;onClose:()=>void;initialPageId?:string;initialMode?:RehearsalMode}){
+function SessionRehearsal({snapshot,onClose,initialPageId,initialMode='participant',captureMode,captureJob}:{snapshot:Snapshot;onClose:()=>void;initialPageId?:string;initialMode?:RehearsalMode;captureMode?:'presenter'|'participant';captureJob?:string}){
  const [mode,setMode]=useState<RehearsalMode>(initialMode);
  const [participantDevice,setParticipantDevice]=useState<'desktop'|'phone'>('desktop');
  useEffect(()=>{setMode(initialMode)},[initialMode]);
@@ -960,7 +960,14 @@ function SessionRehearsal({snapshot,onClose,initialPageId,initialMode='participa
  useEffect(()=>{const timer=window.setInterval(()=>setRehearsalNow(Date.now()),1000);return()=>window.clearInterval(timer)},[]);
  const presenterWidgets=activity?.page_design?.suppressMaster?((activity?.page_design?.widgets||[]) as any[]):resolveSlideMasterWidgets((activity?.page_design?.widgets||[]) as any[],snapshot.session.theme?.master?.widgets);
  const widgets=audienceActivity?.page_design?.suppressMaster?((audienceActivity?.page_design?.widgets||[]) as any[]):resolveSlideMasterWidgets((audienceActivity?.page_design?.widgets||[]) as any[],snapshot.session.theme?.master?.widgets);
- const pageExpired=pageInteractionExpired(widgets,pageStartedAt,rehearsalNow);
+ const pageExpired=!captureMode&&pageInteractionExpired(widgets,pageStartedAt,rehearsalNow);
+ useEffect(()=>{
+  if(!captureMode)return;
+  (window as any).__quorivioExportSetPage=(index:number)=>{
+   if(Number.isInteger(index)&&index>=0&&index<presenterPages.length)setPage(index);
+  };
+  return()=>{delete (window as any).__quorivioExportSetPage};
+ },[captureMode,presenterPages.length]);
  const [fullScreen,setFullScreen]=useState(false);const shellRef=useRef<HTMLDivElement>(null);
 
  const closeRef=useRef(onClose);closeRef.current=onClose;
@@ -1021,9 +1028,24 @@ function SessionRehearsal({snapshot,onClose,initialPageId,initialMode='participa
       const source=context?.source;
       const sourceWidgets=context?.widgets||[];
       const actual=source?rehearsalFreeTextRows(source,submittedAnswers,w.targetQuestionId||''):[];
-      const rows=source?(actual.length?actual:sampleStatisticRows(source,seed,submittedAnswers,w.targetQuestionId||'',{[source.id]:topicSubmissions[context!.activity.id+':'+source.id]||0})):undefined;
-      return <LinkedResultChart widget={w} widgets={sourceWidgets} rows={rows} emptyLabel="simulazione"/>;
+      const part=w.targetQuestionId?source?.questions?.find((q:any)=>q.id===w.targetQuestionId):source;
+      const aggregateData=(snapshot as any).capture_widget_results||{};
+      const scoped=(source?.kind==='rating'?aggregateData.ratings:source?.kind==='reactions'?aggregateData.reactions:aggregateData.widgets)||[];
+      const byWidget=(scoped as any[]).filter((r:any)=>r.activity_id===context?.activity.id&&r.widget_id===source?.id&&(!w.targetQuestionId||r.question_id===w.targetQuestionId));
+      const recent=Math.max(0,...byWidget.map((r:any)=>Number(r.revision)||0));
+      const counted=byWidget.filter((r:any)=>source?.kind==='rating'||source?.kind==='reactions'||Number(r.revision)===recent);
+      const legacy=(snapshot.results||[]).filter((r:any)=>r.activity_id===context?.activity.id);
+      const options=source?.kind==='rating'?Array.from({length:10},(_,i)=>({id:String(i),label:String(i)})):source?.kind==='reactions'?REHEARSAL_EMOJIS.map(emoji=>({id:emoji,label:emoji})):part?.options||[];
+      const capturedRows=(options as any[]).map((opt:any)=>({id:opt.id,label:opt.label,count:Math.max(0,counted.filter((r:any)=>r.option_id===opt.id).reduce((n:number,r:any)=>n+(Number(r.count)||0),0)+(byWidget.length?0:(Number(legacy.find((r:any)=>r.option_id===opt.id)?.count)||0)))}));
+      const rows=source?(captureMode?capturedRows:(actual.length?actual:sampleStatisticRows(source,seed,submittedAnswers,w.targetQuestionId||'',{[source.id]:topicSubmissions[context!.activity.id+':'+source.id]||0}))):undefined;
+      return <LinkedResultChart widget={w} widgets={sourceWidgets} rows={rows} emptyLabel={captureMode?'esportazione statica':'simulazione'}/>;
      })():
+    kind==='profile'&&captureMode?(()=>{
+      const profiles=Array.isArray((snapshot as any).capture_profiles)?(snapshot as any).capture_profiles:[];
+      const profile=w.presenterId?profiles.find((p:any)=>p.id===w.presenterId):profiles.find((p:any)=>p.is_owner)||profiles[0];
+      return <PresenterProfileCard {...w} profile={profile||null} photoUrl={profile?.profile_photo_url}/>;
+     })():
+     kind==='qr'&&captureMode?<div className="projection-sample-qr participant-access-qr" aria-label="QR di accesso partecipanti"><img src={`/api/export-render/${captureJob}/qr.png`} alt="QR di accesso alla sessione" />{w.showQrUrl!==false&&<small>{snapshot.session.join_url||''}</small>}</div>:
     kind==='reactions'&&viewer==='presenter'?<ProjectionWidgetContent sessionId={snapshot.session.id} widget={w} activity={viewActivity} joinCode={snapshot.session.join_code} usePrivateProfile={true} sessionTitle={snapshot.session.title} pageNumber={viewPageNumber} masterTitleStyle={snapshot.session.theme?.master?.titleStyle}/>:kind==='reactions'?<div className="projection-sample-reactions">{w.showTitle!==false&&<strong><WidgetStyledText text={w.label||'Reazioni'} widget={w} field="label"/></strong>}<ReactionChoices size={w.reactionIconSize||32} selected={typeof submittedAnswers[w.id]==='string'?submittedAnswers[w.id] as string:undefined} disabled={pageExpired} onSelect={emoji=>submitDemoDirect(w.id,'reactions',emoji)}/></div>:
     kind==='rating'?<RatingStageContent widget={w} readOnly={viewer==='presenter'} disabled={pageExpired} comment={viewer==='participant'?demoRatingComments[w.id]||'':''} onCommentChange={comment=>setDemoRatingComments(old=>({...old,[w.id]:comment}))} selected={viewer==='participant'&&typeof submittedAnswers[w.id]==='string'?submittedAnswers[w.id] as string:undefined} onSelect={viewer==='participant'?n=>submitDemoDirect(w.id,'rating',String(n)):undefined}/>:
     (kind==='question'||kind==='timed-quiz')?<div className="projection-question-group" aria-label="Domande interattive di prova">
@@ -1044,6 +1066,9 @@ function SessionRehearsal({snapshot,onClose,initialPageId,initialMode='participa
  // Render the modal at document.body. When it is nested inside editor/dashboard,
  // an ancestor can become inert or aria-hidden during focus/background isolation,
  // leaving a visually correct dialog invisible to the accessibility tree.
+ if(captureMode)return <div id="quorivio-export-slide" data-export-page={page} data-export-view={captureMode} className="rehearsal-desktop-stage" style={{width:1280,height:720,position:'relative',transform:'none'}}>
+    {activity?renderSlide(captureMode):<div role="alert">Nessuna pagina disponibile</div>}
+   </div>;
  return createPortal(<div className="rehearsal-backdrop" onClick={e=>{if(e.target===e.currentTarget)onClose()}} role="dialog" aria-modal="true" aria-label="Anteprima interattiva della sessione"><div ref={shellRef} tabIndex={-1} className={'rehearsal-shell rehearsal-mode-'+mode+(fullScreen?' rehearsal-immersive':'')}>
   <header className="rehearsal-toolbar"><strong>ANTEPRIMA · {snapshot.session.title}</strong><span>Nessuna risposta di prova viene salvata</span><div className="rehearsal-mode-switch" role="group" aria-label="Modalità anteprima"><button type="button" aria-pressed={mode==='presenter'} onClick={()=>setMode('presenter')}>Presentatore</button><button type="button" aria-pressed={mode==='participant'} onClick={()=>setMode('participant')}>Partecipante</button><button type="button" aria-pressed={mode==='both'} onClick={()=>setMode('both')}>Affiancate</button><button type="button" aria-pressed={mode==='mobile'} onClick={()=>setMode('mobile')}>Smartphone</button></div>{mode==='both'&&<div className="rehearsal-device-switch" role="group" aria-label="Dispositivo partecipante"><button type="button" aria-pressed={participantDevice==='desktop'} onClick={()=>setParticipantDevice('desktop')}>Desktop</button><button type="button" aria-pressed={participantDevice==='phone'} onClick={()=>setParticipantDevice('phone')}>Smartphone</button></div>}<button type="button" onClick={()=>{void(document.fullscreenElement?document.exitFullscreen():shellRef.current?.requestFullscreen())?.catch(()=>setFullScreen(false))}} aria-pressed={fullScreen} aria-label="Visualizza anteprima a tutto schermo">{fullScreen?'Riduci':'⛶ Tutto schermo'}</button><button type="button" onClick={onClose} aria-label="Chiudi anteprima">× Chiudi</button></header>
   <div className="rehearsal-stage">{activity?<div className="rehearsal-panes">{(mode==='presenter'||mode==='both')&&<div className="rehearsal-pane"><strong className="rehearsal-pane-heading">Presentatore · {activity?.title||'Pagina'} · statistiche simulate</strong><DesktopRehearsalStage immersive={fullScreen}>{renderSlide('presenter')}</DesktopRehearsalStage>{demoResultsVisible&&<section id="rehearsal-simulated-results" className="rehearsal-statistics" aria-label="Statistiche della simulazione">{presenterWidgets.filter(w=>w.kind==='results-button').map(w=>{const context=linkedStatisticContext(w,activity,activities,presenterWidgets);const source=context?.source;const rows=source?rehearsalFreeTextRows(source,submittedAnswers,w.targetQuestionId||''):[];return <LinkedResultChart key={w.id} widget={w} widgets={context?.widgets||[]} rows={source?(rows.length?rows:sampleStatisticRows(source,seed,submittedAnswers,w.targetQuestionId||'',{[source.id]:topicSubmissions[context!.activity.id+':'+source.id]||0})):undefined} emptyLabel="simulazione"/>})}</section>}</div>}{(mode==='participant'||mode==='both'||mode==='mobile')&&<div className={'rehearsal-pane'+(mode==='mobile'||(mode==='both'&&participantDevice==='phone')?' rehearsal-pane-phone':'')}><strong className="rehearsal-pane-heading">Partecipante · {audienceActivity?.title||'Pagina'} · {mode==='mobile'||(mode==='both'&&participantDevice==='phone')?'smartphone':'prova interattiva'}</strong>{mode==='mobile'||(mode==='both'&&participantDevice==='phone')?(participantStaticWidescreenPage(audienceActivity)?<div className="rehearsal-phone-widescreen-frame" aria-label="Pagina statica 16:9 su smartphone"><DesktopRehearsalStage>{renderSlide('participant')}</DesktopRehearsalStage></div>:<PhoneRehearsalStage height={participantPhoneLayout(widgets,audienceActivity?.page_design?.mobile).height}>{renderSlide('participant',true)}</PhoneRehearsalStage>):<DesktopRehearsalStage immersive={fullScreen}>{renderSlide('participant')}</DesktopRehearsalStage>}</div>}</div>:<p>Questa sessione non contiene ancora pagine.</p>}</div>
@@ -3033,8 +3058,12 @@ me===undefined?<main id="main-content" className="narrow">Caricamento...</main>:
   <button type="button" className="small outline" disabled={sidebarBusy} onClick={closeSidebarSession} title="Chiude soltanto questa vista: presentazione e partecipanti restano attivi.">Chiudi sessione</button>
   <button type="button" className="small outline" disabled={sidebarBusy} onClick={()=>void duplicateSelected()}>Duplica sessione</button>
   <button type="button" className="small outline" disabled={sidebarBusy} onClick={()=>void exportSelectedSessionLocal()} aria-label="Esporta copia completa della sessione in locale (.quo)"><Download size={16}/> Esporta in locale (.quo)</button>
-  <a className="outline asbutton" href={'/api/sessions/'+encodeURIComponent(selected)+'/export.pdf'} download>Esporta PDF della presentazione</a>
-  <a className="outline asbutton" href={'/api/sessions/'+encodeURIComponent(selected)+'/export.pptx'} download>Esporta PowerPoint (PPTX)</a>
+  <div className="presentation-exports" role="group" aria-label="Esporta presentazione visiva, scegli vista e formato">
+   <a className="outline asbutton" href={'/api/sessions/'+encodeURIComponent(selected)+'/export.pdf?view=presenter'} download>PDF presentatore</a>
+   <a className="outline asbutton" href={'/api/sessions/'+encodeURIComponent(selected)+'/export.pdf?view=participant'} download>PDF partecipante</a>
+   <a className="outline asbutton" href={'/api/sessions/'+encodeURIComponent(selected)+'/export.pptx?view=presenter'} download>PPTX presentatore</a>
+   <a className="outline asbutton" href={'/api/sessions/'+encodeURIComponent(selected)+'/export.pptx?view=participant'} download>PPTX partecipante</a>
+  </div>
   <button type="button" className="small outline" disabled={sidebarBusy} onClick={()=>localSessionImportRef.current?.click()}><Upload size={16}/> Importa da locale (.quo)</button>
   <p className="muted tiny">Copia portabile di pagine, widget, schemi e allegati. Non comprende risposte, partecipanti, statistiche o credenziali.</p>
   <details className="panel session-debug-submit"><summary>Invia sessione all'autore per segnalare un bug o richiedere una feature</summary>
@@ -3350,4 +3379,26 @@ function GlobalPageZoomShell(){
   </aside>}
  </>;
 }
-createRoot(document.getElementById('root')!).render(<GlobalPageZoomShell/>);
+/** Capture-only entrypoint: no dashboard, no live credentials, no editing. */
+function VisualExportCapturePage({job,viewer}:{job:string;viewer:'presenter'|'participant'}){
+ const [snapshot,setSnapshot]=useState<Snapshot|null>(null);
+ const [failed,setFailed]=useState(false);
+ useEffect(()=>{
+  const abort=new AbortController();
+  fetch('/api/export-render/'+job,{signal:abort.signal,credentials:'omit',cache:'no-store'})
+   .then(r=>{if(!r.ok)throw Error('capture_denied');return r.json()})
+   .then(data=>{if(!abort.signal.aborted)setSnapshot(data as Snapshot)})
+   .catch(()=>{if(!abort.signal.aborted)setFailed(true)});
+  return()=>abort.abort();
+ },[job]);
+ if(failed)return <main role="alert">Esportazione non disponibile</main>;
+ if(!snapshot)return <main role="status">Preparazione esportazione…</main>;
+ return <SessionRehearsal snapshot={snapshot} captureMode={viewer} captureJob={job} onClose={()=>{}}/>;
+}
+const captureRoute=/^\/export-render\/([0-9a-f]{32})$/.exec(window.location.pathname);
+const captureViewer=new URLSearchParams(window.location.search).get('view');
+if(captureRoute&&['presenter','participant'].includes(captureViewer||'')){
+ createRoot(document.getElementById('root')!).render(<VisualExportCapturePage job={captureRoute[1]} viewer={captureViewer as 'presenter'|'participant'}/>);
+}else{
+ createRoot(document.getElementById('root')!).render(<GlobalPageZoomShell/>);
+}

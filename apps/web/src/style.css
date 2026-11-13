@@ -4344,3 +4344,17 @@ main.hero.login-manual-cover .panel.login{
 .result-advanced-chart-controls input[type=range]{width:clamp(90px,12vw,180px);accent-color:#0b8677;}
 .result-advanced-chart-controls output{font-weight:700;font-variant-numeric:tabular-nums;}
 @media(max-width:640px){.linked-results .linked-results-advanced-chart{max-height:42%;}}
+
+/* RC335: pixel-faithful private capture of the existing 1280x720 presenter /
+ * participant React rehearsal canvas; no editor chrome or browser scrollbars. */
+html:has(#quorivio-export-slide),body:has(#quorivio-export-slide),body:has(#quorivio-export-slide) #root{
+ box-sizing:border-box!important;margin:0!important;padding:0!important;
+ width:1280px!important;min-width:1280px!important;max-width:1280px!important;
+ height:720px!important;min-height:720px!important;max-height:720px!important;
+ overflow:hidden!important;zoom:100%!important;background:#fff!important;
+}
+#quorivio-export-slide{position:relative!important;inset:0!important;box-sizing:border-box!important;overflow:hidden!important;contain:layout paint;}
+#quorivio-export-slide>.rehearsal-slide{width:1280px!important;height:720px!important;min-height:720px!important;border:0!important;border-radius:0!important;box-shadow:none!important;}
+#quorivio-export-slide .rehearsal-widgets{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;overflow:hidden!important;}
+#quorivio-export-slide :is(.rehearsal-widget,.linked-results){animation:none!important;transition:none!important;}
+.presentation-exports{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}

@@ -1,5 +1,8 @@
 # Quorivio 0.1.0-dev — RC293 — Manuali visuali compatti e brochure
 
+**RC335 (13 novembre 2026) — Esportazioni visive presentatore/partecipante:** Introdotti quattro download PDF/PPTX distinti per la sessione (`presentatore` / `partecipante` nel nome del file). Ogni pagina esportata viene catturata dal renderer React reale a 1280×720 tramite Chromium isolato, rispettando la mappatura delle pagine partecipante nascoste al presentatore, gli schemi e i media. PDF e PPTX usano gli stessi pixel; il PPTX visuale è basato su immagini per pagina, quindi non ha più i widget singolarmente modificabili. Video dinamici e interazioni non possono restare interattivi in documenti statici. Token temporaneo esclusivo del job, richieste di rete esterne bloccate. Test locali Python/Node superati; full CI, build container e confronto visivo end-to-end da certificare. Percentuale prodotto 85,25% invariata. Vedi `docs/RC335_VISUAL_EXPORT.it.md`.
+
+
 **RC334 (13 novembre 2026) — Nuovi grafici risultati:** Aggiunte le visualizzazioni SVG Linee, Area, Donut e Radar, condivise tra editor, simulazione e presentazione live; opzioni di Formato widget per curve, punti e valori, spessore, opacità, foro/percentuali Donut e griglia Radar; persistenza validata, ereditarietà della sorgente e ordinamento dei risultati aggregati. Aggiunti test di regressione sulle geometrie e sui parametri; full CI GitHub, pubblicazione nativa AMD64/ARM64 su Docker Hub e collaudi esterni sono gate separati. Dettagli in `docs/RC334_RESULT_CHARTS_IT_EN.md`. Avanzamento globale precedentemente dichiarato **85,25%** invariato in attesa della rivalutazione formale dei gate.
 
 

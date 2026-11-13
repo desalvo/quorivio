@@ -1,5 +1,8 @@
 # Quorivio 0.1.0-dev — RC293 — Compact visual manuals and product brochures
 
+**RC335 (13 November 2026) — Visual exports of presenter vs participant decks:** Added four dedicated PDF/PPTX session downloads (`presentatore` / `partecipante` in the session-derived filenames). The exported pages use isolated Chromium captures of the existing 1280×720 React slide renderer, include the presenter-hidden participant mapping, master styles and source media, and store the same pixels in PPTX and PDF. These *visual-fidelity* decks have raster-backed slides (unlike the older editable OOXML format); dynamic videos and ongoing interaction cannot be interactive in static files. An ephemeral job-only token protects capture data, and external browser navigation is blocked. Local Python/Node smoke tests pass; full CI, native container build and visual end-to-end comparison are pending. Earlier overall product completion 85.25% unchanged. See `docs/RC335_VISUAL_EXPORT.it.md`.
+
+
 **RC334 (13 November 2026) — New result charts:** Added Line, Area, Donut and Radar SVG result visualizations, shared by editor, rehearsal and live presenter screens; widget-format controls for smoothing, points and values, line thickness, opacity, donut hole/percentages and radar grid levels; validated persistence, source inheritance and sorted aggregate results. Geometry and API regression tests added; full GitHub CI, Docker Hub native AMD64/ARM64 publication and external acceptance are separate gates. See `docs/RC334_RESULT_CHARTS_IT_EN.md`. Previously reported overall readiness **85.25%** remains unchanged until a formal updated gate inventory.
 
 

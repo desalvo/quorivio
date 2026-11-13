@@ -37,6 +37,7 @@ services:
     environment:
       QUORIVIO_WORKER_TOKEN: ${QUORIVIO_WORKER_TOKEN:?set_QUORIVIO_WORKER_TOKEN}
       QUORIVIO_CONVERSION_DIR: /conversions
+      QUORIVIO_CAPTURE_BASE_URL: http://app:8080
     volumes:
       - conversion-tmp:/conversions
     security_opt: ["no-new-privileges:true"]

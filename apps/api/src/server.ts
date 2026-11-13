@@ -16,6 +16,8 @@ import {profilePhotoId,publicPresenterProfiles} from './profile-photo.js';
 import {inspectProfileImage} from './profile-image.js';
 import {authCookieIssuedAt,presenterAuthActive} from './live-auth.js';
 import {firstPresenterPage,audienceForPresenter,validAudienceMapping,PAGE_UUID,validPortablePageRouting,remapPortablePageRouting} from './presentation-routing.js';
+import {presentationExportView,presentationContentDisposition} from './presentation-export-names.js';
+import {presentationExportPages,visualExportSnapshot} from './presentation-export-snapshot.js';
 import {SESSION_CHANNEL,startSessionBus} from './session-bus.js';
 import {boundedFederatedJson} from './federated-response.js';
 import {FEDERATED_LINK_ELIGIBLE_SQL,FEDERATED_LINK_INSERT_SQL,validFederatedLinkIssuedAt} from './federated-link.js';
@@ -1386,7 +1388,7 @@ app.get('/api/sessions',requireAuth,requirePresenter,async(req,res)=>{try{
 app.post('/api/sessions',requireAuth,requirePresenter,async(req,res)=>{try{const title=String(req.body?.title||'').trim();const referenceDate=String(req.body?.reference_date||new Date().toISOString().slice(0,10));if(!title||title.length>160||!validDate(referenceDate)){res.status(400).json({error:'invalid_title'});return}const uid=auth(req)!;const u=(await db.query('SELECT organization_id FROM users WHERE id=$1',[uid])).rows[0];if(!u){res.status(401).end();return}const id=randomUUID(),code=randomBytes(5).toString('hex').toUpperCase(),joinSecret=randomBytes(20).toString('base64url');const r=await db.query(`INSERT INTO sessions(id,organization_id,owner_id,title,join_code,join_secret,expires_at,reference_date,retention_days) VALUES($1,$2,$3,$4,$5,$6,now()+interval '1 day',$7,${SESSION_RETENTION_DEFAULT_SQL}) RETURNING *`,[id,u.organization_id,uid,title,code,joinSecret,referenceDate]);res.status(201).json(strip(r.rows[0]))}catch(e){sendError(res,e)}});
 
 // Portable definition exports intentionally omit participant data and join credentials.
-async function portableSession(id:string){
+async function portableSession(id:string,visualCapture=false){
  const session=(await db.query('SELECT title,reference_date::text AS reference_date,theme,allow_anonymous,show_results FROM sessions WHERE id=$1',[id])).rows[0];
  // Dates and appointments are part of the authored session, not audience data.
  // Preserve the local IANA timezone without converting the wall-clock time.
@@ -1403,7 +1405,7 @@ async function portableSession(id:string){
    if(Array.isArray(layout.media))layout.media=layout.media.map((m:any)=>m.kind==='image'?{...m,url:'https://quorivio.invalid/portable-slide'}:m);
    activity.page_design=layout;
   }
-  for(const design of [activity.page_design,activity.result_design])for(const widget of design?.widgets||[]){if(widget.kind==='profile')delete widget.presenterId;}
+  for(const design of [activity.page_design,activity.result_design])for(const widget of design?.widgets||[]){if(widget.kind==='profile'&&!visualCapture)delete widget.presenterId;}
  }
  return {format:'quorivio-session',version:1,session,activities};
 }
@@ -2163,16 +2165,55 @@ app.post('/api/presentations/import-editable',requireAuth,requirePresenter,async
   res.status(201).json({id,pages:portable.activities.length,warning:mime==='application/pdf'?'partial_pdf_fidelity':'partial_pptx_fidelity',fidelity});
  }catch(e){sendError(res,e)}finally{await rm(scratch,{recursive:true,force:true}).catch(()=>{})}
 });
+/** Private capture endpoint: a per-export capability lets the isolated browser
+ * read only this session's sanitized definition, never user cookies. */
+app.get('/api/export-render/:job',async(req,res)=>{
+ try{
+  const job=String(req.params.job||''),candidate=req.get('x-quorivio-capture-token')||'';
+  if(!/^[0-9a-f]{32}$/.test(job)||!/^[0-9a-f]{64}$/.test(candidate)){res.status(404).end();return}
+  const folder=path.join(process.env.QUORIVIO_CONVERSION_DIR||'/conversions',job);
+  const target=await readFile(path.join(folder,'capture-token'),'utf8');
+  if(!/^[0-9a-f]{64}$/.test(target)||!timingSafeEqual(Buffer.from(target,'ascii'),Buffer.from(candidate,'ascii'))){res.status(404).end();return}
+  const raw=await readFile(path.join(folder,'portable.json'),'utf8');
+  if(Buffer.byteLength(raw)>2*1024*1024){res.status(413).end();return}
+  const definition=JSON.parse(raw);
+  if(typeof definition.capture_session_id!=='string'||!PAGE_UUID.test(definition.capture_session_id))throw Error('invalid_capture_session');
+  res.setHeader('Cache-Control','no-store');res.setHeader('Referrer-Policy','no-referrer');
+  res.json(visualExportSnapshot(definition,definition.capture_session_id,definition.capture_results));
+ }catch{res.status(404).end()}
+});
+
 async function servePresentationExport(req:express.Request,res:express.Response,format:'pptx'|'pdf'){
  try{
   const s=await owner(req.params.id,auth(req)!);if(!s){res.status(404).end();return}
+  const view=presentationExportView(req.query.view??'presenter');
+  if(!view){res.status(400).json({error:'invalid_presentation_view'});return}
   if(!await converterAdmissionState().then(state=>state.enabled)){res.status(503).json({error:'conversion_worker_not_configured'});return}
   const workerUrl=process.env.QUORIVIO_CONVERTER_WORKER_URL,token=process.env.QUORIVIO_WORKER_TOKEN||'';
   if(!workerUrl||!/^http:\/\/[a-zA-Z0-9.-]+:\d{2,5}$/.test(workerUrl)||token.length<32){res.status(503).json({error:'conversion_worker_not_configured'});return}
   const scratch=path.join(process.env.QUORIVIO_CONVERSION_DIR||'/conversions',randomBytes(16).toString('hex'));
   await mkdir(scratch,{recursive:false,mode:0o700});
   try{
-   const pptxDefinition=await portableSession(s.id);
+   const pptxDefinition:any=await portableSession(s.id,true);
+   const planned=pptxDefinition.activities.map((a:any)=>({id:a.portable_id,page_design:a.page_design}));
+   if(!presentationExportPages(planned,view).length){res.status(422).json({error:'no_visible_presentation_pages'});return}
+   pptxDefinition.capture_session_id=s.id;
+   const aggregated=await snapshot(s.id);
+   pptxDefinition.capture_results={results:aggregated?.results||[],totals:aggregated?.totals||[]};
+   // Aggregate only counts; individual votes, participant identifiers and
+   // free-text answers must never become part of a visual export snapshot.
+   const [widgetCounts,ratingCounts,reactionCounts]=await Promise.all([
+    db.query(`SELECT w.activity_id,w.widget_id,w.question_id,w.revision,opt.id AS option_id,count(*)::int AS count
+      FROM widget_answers w
+      CROSS JOIN LATERAL jsonb_array_elements_text(CASE WHEN jsonb_typeof(w.answer_payload->'optionIds')='array' THEN w.answer_payload->'optionIds' ELSE '[]'::jsonb END) opt(id)
+      WHERE w.session_id=$1 AND w.answer_mode IN ('single','multiple')
+      GROUP BY w.activity_id,w.widget_id,w.question_id,w.revision,opt.id LIMIT 10000`,[s.id]),
+    db.query(`SELECT activity_id,widget_id,score::text AS option_id,count(*)::int AS count FROM page_ratings WHERE session_id=$1 GROUP BY activity_id,widget_id,score LIMIT 10000`,[s.id]),
+    db.query(`SELECT activity_id,widget_id,emoji AS option_id,count(*)::int AS count FROM page_reactions WHERE session_id=$1 GROUP BY activity_id,widget_id,emoji LIMIT 10000`,[s.id])
+   ]);
+   pptxDefinition.capture_widget_results={widgets:widgetCounts.rows,ratings:ratingCounts.rows,reactions:reactionCounts.rows};
+   const profiles=await db.query("SELECT u.id,u.email,coalesce(nullif(u.display_name,''),'Presentatore') AS name,u.profile_photo_url,(u.id=$1) AS is_owner FROM users u WHERE u.id=$1 OR u.id IN (SELECT user_id FROM session_presenters WHERE session_id=$2)",[s.owner_id,s.id]);
+   pptxDefinition.capture_profiles=profiles.rows.map((p:any)=>({...p,profile_photo_url:null}));
    // A QR in an exported deck must be scannable after download. Supply only
    // the authenticated owner's session-specific public join link; do not
    // persist that bearer in the reusable JSON import/export format.
@@ -2184,15 +2225,21 @@ async function servePresentationExport(req:express.Request,res:express.Response,
    const portable=JSON.stringify(pptxDefinition);
    if(Buffer.byteLength(portable)>2*1024*1024){res.status(413).json({error:'session_too_large_for_pptx'});return}
    await writeFile(path.join(scratch,'portable.json'),portable,{flag:'wx',mode:0o600});
+   await writeFile(path.join(scratch,'capture-token'),randomBytes(32).toString('hex'),{flag:'wx',mode:0o600});
+   await writeFile(path.join(scratch,'export-view'),view,{flag:'wx',mode:0o600});
    // Stage only referenced, session-owned image assets for the isolated PPTX worker.
    const definition=JSON.parse(portable);
    const masterBackground=definition.session?.theme?.master?.backgroundAssetId;
    const imageIds=[...new Set<string>([
     ...(masterBackground?[masterBackground]:[]),
+    ...((definition.session?.theme?.master?.widgets||[]) as any[]).flatMap((w:any)=>[
+     ...(['image','logo','video','pdf'].includes(w.kind)&&w.assetId?[w.assetId]:[]),
+     ...(w.style?.fillMode==='image'&&w.style?.fillImageAssetId?[w.style.fillImageAssetId]:[])
+    ]),
     ...definition.activities.flatMap((a:any)=>[
      ...(a.page_design?.backgroundAssetId?[a.page_design.backgroundAssetId]:[]),
      ...(a.page_design?.widgets||[]).flatMap((w:any)=>[
-      ...(['image','logo'].includes(w.kind)&&w.assetId?[w.assetId]:[]),
+      ...(['image','logo','video','pdf'].includes(w.kind)&&w.assetId?[w.assetId]:[]),
       ...(w.style?.fillMode==='image'&&w.style?.fillImageAssetId?[w.style.fillImageAssetId]:[])
      ]),
      ...(a.slide_asset_id?[a.slide_asset_id]:[])
@@ -2205,20 +2252,41 @@ async function servePresentationExport(req:express.Request,res:express.Response,
     const mediaFolder=path.join(scratch,'export-media');await mkdir(mediaFolder,{mode:0o700});
     let total=0;
     for(const asset of registered.rows){
-     if(!['image/png','image/jpeg'].includes(asset.mime_type)||asset.byte_size>10*1024*1024)throw Error('pptx_export_unsupported_media');
+     if(!['image/png','image/jpeg','image/gif','image/webp','application/pdf','video/mp4','video/webm'].includes(asset.mime_type)||asset.byte_size>10*1024*1024)throw Error('visual_export_unsupported_media');
      const buffer=await readFile(path.join(assetRoot,s.id,asset.id));
      total+=buffer.length;
      if(total>50*1024*1024||buffer.length!==Number(asset.byte_size)||createHash('sha256').update(buffer).digest('hex')!==asset.sha256)throw Error('pptx_export_media_integrity');
      await writeFile(path.join(mediaFolder,asset.id),buffer,{flag:'wx',mode:0o600});
     }
    }
-   const controller=new AbortController(),deadline=setTimeout(()=>controller.abort(),240000);
-   try{const r=await fetch(`${workerUrl}/${format==='pdf'?'portable-export-pdf':'portable-export'}`,{method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({job:path.basename(scratch)}),signal:controller.signal});if(!r.ok)throw Error('editable_export_failed')}
+   const profileWidgets=definition.activities.flatMap((a:any)=>a.page_design?.widgets||[]).filter((w:any)=>w.kind==='profile');
+   if(profileWidgets.length){
+    const photos=path.join(scratch,'export-media');await mkdir(photos,{recursive:true,mode:0o700});
+    let totalProfileBytes=0;
+    for(const p of pptxDefinition.capture_profiles){
+     const id=profilePhotoId(profiles.rows.find((x:any)=>x.id===p.id)?.profile_photo_url);
+     if(!id)continue;
+     const photo=await readFile(profilePhotoPath(id));
+     totalProfileBytes+=photo.length;
+     if(totalProfileBytes>30*1024*1024)throw Error('too_many_profile_photos');
+     const mime=photo[0]===255&&photo[1]===216?'image/jpeg':photo.toString('ascii',8,12)==='WEBP'?'image/webp':'image/png';
+     inspectProfileImage(photo,mime);
+     await writeFile(path.join(photos,'profile-'+id),photo,{flag:'wx',mode:0o600});
+     p.profile_photo_url='/api/export-render/'+path.basename(scratch)+'/profile/'+id;
+    }
+    const saved=JSON.parse(await readFile(path.join(scratch,'portable.json'),'utf8'));
+    saved.capture_profiles=pptxDefinition.capture_profiles;
+    const updated=JSON.stringify(saved);
+    if(Buffer.byteLength(updated)>2*1024*1024)throw Error('capture_definition_too_large');
+    await writeFile(path.join(scratch,'portable.json'),updated,{mode:0o600});
+   }
+   const controller=new AbortController(),deadline=setTimeout(()=>controller.abort(),900000);
+   try{const r=await fetch(`${workerUrl}/${format==='pdf'?'visual-export-pdf':'visual-export'}`,{method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({job:path.basename(scratch)}),signal:controller.signal});if(!r.ok)throw Error('visual_export_failed')}
    finally{clearTimeout(deadline)}
    const output=await readFile(path.join(scratch,format==='pdf'?'presentation.pdf':'presentation.pptx'));
-   if(output.length>50*1024*1024||format==='pdf'&&!output.subarray(0,5).equals(Buffer.from('%PDF-')))throw Error('presentation_export_invalid');
+   if(output.length>50*1024*1024||format==='pdf'&&!output.subarray(0,5).equals(Buffer.from('%PDF-'))||format==='pptx'&&!output.subarray(0,2).equals(Buffer.from('PK')))throw Error('presentation_export_invalid');
    res.setHeader('Content-Type',format==='pdf'?'application/pdf':'application/vnd.openxmlformats-officedocument.presentationml.presentation');
-   res.setHeader('Content-Disposition',`attachment; filename="quorivio-session.${format}"`);
+   res.setHeader('Content-Disposition',presentationContentDisposition(s.title,view,format));
    res.setHeader('Cache-Control','private, no-store');res.send(output);
   }finally{await rm(scratch,{recursive:true,force:true}).catch(()=>{})}
  }catch(e){sendError(res,e)}

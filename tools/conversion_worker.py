@@ -16,6 +16,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from import_presentation import convert
 from pptx_portable import pptx_to_portable, portable_to_pptx, inspect_pptx_fidelity
 from pdf_portable import pdf_to_portable
+from visual_export import render_visual_export
 
 ROOT = pathlib.Path(os.path.abspath(os.environ.get('QUORIVIO_CONVERSION_DIR', '/conversions')))  # Do not resolve away a symlink before checking it
 TOKEN = os.environ.get('QUORIVIO_WORKER_TOKEN', '')
@@ -99,7 +100,7 @@ def _source_digest(path):
 def execute_portable_job(job, mode):
     """Run bounded portable conversion in the isolated worker; opaque job IDs only."""
     workspace = _workspace(job)
-    if mode not in ('import', 'export', 'export-pdf'):
+    if mode not in ('import', 'export', 'export-pdf', 'visual-export', 'visual-export-pdf'):
         raise ValueError('invalid portable mode')
     reservation = workspace / '.conversion-lock'
     with _ACTIVE_LOCK:
@@ -148,6 +149,8 @@ def execute_portable_job(job, mode):
             staged_file = None
             import_complete = True
             return {'pages': len(result['activities']), 'fidelity': fidelity}
+        if mode in ('visual-export', 'visual-export-pdf'):
+            return render_visual_export(workspace, mode)
         source = workspace / 'portable.json'
         destination = workspace / 'presentation.pptx'
         media = workspace / 'export-media'
@@ -205,7 +208,7 @@ class Handler(BaseHTTPRequestHandler):
         return self.reply(200 if ready else 503, {'ready': ready})
 
     def do_POST(self):
-        if self.path not in ('/convert', '/portable-import', '/portable-export', '/portable-export-pdf'):
+        if self.path not in ('/convert', '/portable-import', '/portable-export', '/portable-export-pdf', '/visual-export', '/visual-export-pdf'):
             return self.reply(404, {'error': 'not_found'})
         auth_headers = self.headers.get_all('Authorization', [])
         auth = auth_headers[0] if len(auth_headers) == 1 else ''
@@ -230,7 +233,7 @@ class Handler(BaseHTTPRequestHandler):
                                  parse_constant=_reject_nonfinite)
             if not isinstance(request, dict) or set(request) != {'job'} or not isinstance(request['job'], str):
                 return self.reply(400, {'error': 'invalid_request'})
-            return self.reply(200, execute_job(request['job']) if self.path == '/convert' else execute_portable_job(request['job'], 'import' if self.path == '/portable-import' else 'export-pdf' if self.path == '/portable-export-pdf' else 'export'))
+            return self.reply(200, execute_job(request['job']) if self.path == '/convert' else execute_portable_job(request['job'], 'import' if self.path == '/portable-import' else 'export-pdf' if self.path == '/portable-export-pdf' else 'visual-export-pdf' if self.path == '/visual-export-pdf' else 'visual-export' if self.path == '/visual-export' else 'export'))
         except (ValueError, OSError, RuntimeError, TimeoutError, json.JSONDecodeError) as exc:
             # Print only a stable POSIX errno (never untrusted paths, PDF
             # contents or converter stderr), to distinguish EXDEV from EACCES.
