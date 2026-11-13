@@ -68,7 +68,7 @@ test('live projection uses the same cross-page resolver with the source activity
  assert.doesNotMatch(live,/liveRevision/,'live snapshot updates must not cancel every in-flight source stats HTTP request');
  // RC276: R state now lives inside the common LinkedResultChart renderer.
  // Never require a second live-only state: it would desynchronize rehearsals.
- assert.match(live,/<LinkedResultChart widget=\{widget\} widgets=\{sourceWidgets\} rows=\{rows\} emptyLabel="live"\/>/);
+ assert.match(live,/<LinkedResultChart widget=\{widget\} widgets=\{sourceWidgets\} rows=\{rows\} emptyLabel="live" participation=\{participation\}\/>/);
  const shared=main.split('function LinkedResultChart(',2)[1].split('function PresenterLinkedResult(',1)[0];
  assert.match(shared,/const \[truthVisible,setTruthVisible\]=useState\(widget\.showCorrectAnswers===true\)/);
  assert.match(shared,/resultHasAnswerKey\(source,widget\.targetQuestionId/);
