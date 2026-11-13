@@ -7,8 +7,8 @@ const ui=readFileSync(new URL('../src/main.tsx',import.meta.url),'utf8');
 const css=readFileSync(new URL('../src/style.css',import.meta.url),'utf8');
 const original=[{id:'first',count:8},{id:'second',count:10},{id:'third',count:11}];
 test('RC307 all graph types have a single source-ordered data sequence',()=>{
- assert.ok(ui.includes('const data=sortedResultBars(sourceRows,widget.resultSortOrder)'));
- assert.ok(ui.includes('const displayRows=visibleResultBars(sourceRows,widget.resultSortOrder,widget.resultTopCount)'));
+ assert.ok(ui.includes('const data=sortedResultBars(sourceRows,widget.resultSortOrder??source.resultSortOrder)'));
+ assert.ok(ui.includes('const displayRows=visibleResultBars(sourceRows,widget.resultSortOrder??source.resultSortOrder,widget.resultTopCount??source.resultTopCount)'));
  assert.ok(ui.includes('const pieSegments=resultPieLayout(data.map(r=>r.count)'));
  assert.ok(ui.includes('rankedRows={data}'));
  for(const order of ['index-asc','index-desc','count-asc','count-desc']){
@@ -49,7 +49,7 @@ test('RC307 a broken live results component cannot take down presenter workspace
 });
 test('RC307 Format widget sort applies to all graphs',()=>{
  // Sorting only applies to multi-row result charts; gauge is a single value.
- assert.ok(ui.includes("['bars','pie','table','cloud','bubbles'].includes(formatChart)"));
+ assert.ok(ui.includes("['bars','pie','table','cloud','bubbles','line','area','donut','radar'].includes(formatChart)"));
  assert.ok(ui.includes('aria-label="Ordinamento risultati - Formato widget"'));
  assert.ok(ui.includes("value={w.resultSortOrder||'index-asc'}"));
  assert.ok(ui.includes("onChange={e=>patch(w.id,{resultSortOrder:e.target.value})}"));

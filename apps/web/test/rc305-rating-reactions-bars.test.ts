@@ -30,7 +30,7 @@ test('RC305 maximum displayed bar is always 100% with safe zero handling',()=>{
  assert.equal(resultBarWidth(100,22),100);
 });
 test('RC305 React rows use maximum of visible bars and source widget kind',()=>{
- assert.ok(ui.includes('visibleResultBars(sourceRows,widget.resultSortOrder,widget.resultTopCount)'));
+ assert.ok(ui.includes('visibleResultBars(sourceRows,widget.resultSortOrder??source.resultSortOrder,widget.resultTopCount??source.resultTopCount)'));
  assert.ok(ui.includes('resultBarWidth(r.count,maxBarCount)'));
  assert.ok(ui.includes('data-result-source-kind={source.kind}'));
  assert.ok(ui.includes('aria-label="Ordinamento risultati - Formato widget"'));
@@ -59,5 +59,5 @@ test('RC305 per-widget rating histogram is scoped to source, activity and sessio
 });
 test('RC305 persisted sort modes validated fail closed by owner API',()=>{
  assert.ok(domain.includes("resultSortOrder?:'index-asc'|'index-desc'|'count-asc'|'count-desc'"));
- assert.ok(domain.includes("w.resultSortOrder===undefined||(w.kind==='results-button'"));
+ assert.ok(domain.includes("w.resultSortOrder===undefined||(['question','timed-quiz','rating','reactions','topic-question','results-button'].includes(w.kind)"));
 });

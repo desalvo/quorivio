@@ -3884,14 +3884,14 @@
       "73a154e1"
     ],
     "apps/web/test/rc305-rating-reactions-bars.test.ts": [
-      "ade0c555",
-      "e990fa56",
-      "c7c9ae73",
-      "7b7add8b",
-      "5ad31dac",
-      "4cb0103d",
-      "8b7d818d",
-      "faf66d98"
+      "8cc500f2",
+      "781e0d66",
+      "d70cea52",
+      "32e88cb5",
+      "e457eea1",
+      "44e96b6e",
+      "08c4decf",
+      "535ea719"
     ],
     "apps/web/test/rc306-long-bar-labels.test.ts": [
       "e16f56de",
@@ -3904,14 +3904,14 @@
       "2c083264"
     ],
     "apps/web/test/rc307-results-layout-recovery.test.ts": [
-      "6ff03c04",
-      "8d450caa",
-      "d4476e7d",
-      "1eecefe9",
-      "dfa554f7",
-      "4f007672",
-      "7d3f9a8e",
-      "a5c5709b"
+      "8b5dea2f",
+      "d2f0d53b",
+      "6159e8a2",
+      "c7e3dfff",
+      "ca391976",
+      "a639c573",
+      "08049ed1",
+      "ea092eb8"
     ],
     "apps/web/test/rc317-presenter-profile-parity.test.ts": [
       "12bd753a",
@@ -3924,14 +3924,14 @@
       "76e43547"
     ],
     "apps/web/test/rc318-auth-reactions-format.test.ts": [
-      "e7a6fba8",
-      "07628327",
-      "970394cd",
-      "9332c808",
-      "a891e106",
-      "e3b53018",
-      "c5b3a9c8",
-      "1ddad7c5"
+      "6a75db7f",
+      "b6fb828a",
+      "f20fc9b8",
+      "708ba2a4",
+      "e45957d3",
+      "654f4465",
+      "6d17d2bb",
+      "0e06edde"
     ],
     "apps/web/test/rc321-gauge-bubbles-responsive.test.ts": [
       "a5f939ac",
@@ -4094,14 +4094,14 @@
       "673e12af"
     ],
     "apps/web/test/result-cloud.test.ts": [
-      "2fe97460",
-      "03bae4cc",
-      "2855f262",
-      "59acf896",
-      "4204e377",
-      "1acc4b72",
-      "b26f752c",
-      "0f81fcf5"
+      "1668b6ef",
+      "5153752b",
+      "3ae3d338",
+      "e5c31da1",
+      "310ebe78",
+      "17012c26",
+      "fb39b6b3",
+      "649c74dd"
     ],
     "apps/web/test/session-load-recovery.test.ts": [
       "89ba5433",
