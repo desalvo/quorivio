@@ -16,9 +16,7 @@ import subprocess
 import tempfile
 from urllib.parse import urlparse
 
-from pptx import Presentation
 from pptx.util import Inches
-import qrcode
 
 VIEWERS = frozenset(('presenter', 'participant'))
 JOB_RE = re.compile(r'[0-9a-f]{32}\Z')
@@ -82,6 +80,7 @@ def _qr_png(target):
     if not isinstance(target, str) or not target.startswith(('https://', 'http://')) or len(target) > 2048:
         return None
     stream = io.BytesIO()
+    import qrcode
     image = qrcode.make(target, box_size=6, border=2)
     image.save(stream, format='PNG')
     return stream.getvalue()
@@ -185,6 +184,7 @@ def image_deck_to_pptx(image_files, destination):
     image_files = list(image_files)
     if not 1 <= len(image_files) <= 200:
         raise ValueError('Invalid visual deck length')
+    from pptx import Presentation
     pptx = Presentation()
     pptx.slide_width = Inches(13.333333)
     pptx.slide_height = Inches(7.5)

@@ -16,7 +16,6 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from import_presentation import convert
 from pptx_portable import pptx_to_portable, portable_to_pptx, inspect_pptx_fidelity
 from pdf_portable import pdf_to_portable
-from visual_export import render_visual_export
 
 ROOT = pathlib.Path(os.path.abspath(os.environ.get('QUORIVIO_CONVERSION_DIR', '/conversions')))  # Do not resolve away a symlink before checking it
 TOKEN = os.environ.get('QUORIVIO_WORKER_TOKEN', '')
@@ -150,6 +149,9 @@ def execute_portable_job(job, mode):
             import_complete = True
             return {'pages': len(result['activities']), 'fidelity': fidelity}
         if mode in ('visual-export', 'visual-export-pdf'):
+            # Pillow/PPTX/Playwright are needed only by the visual export path.
+            # Legacy import and admission checks must load without these deps.
+            from visual_export import render_visual_export
             return render_visual_export(workspace, mode)
         source = workspace / 'portable.json'
         destination = workspace / 'presentation.pptx'
