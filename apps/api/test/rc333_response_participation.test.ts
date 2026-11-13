@@ -19,8 +19,9 @@ test('RC333 gauge is disabled by default; optional only for result widget; scale
 test('RC333 only one response per connected user, bounded 0..100',()=>{
  assert.equal(responseParticipationPercent(0,0),0);
  assert.equal(responseParticipationPercent(0,500),0);
- assert.equal(responseParticipationPercent(1,500),0);
+ assert.equal(responseParticipationPercent(1,500),0.2);
  assert.equal(responseParticipationPercent(250,500),50);
+ assert.equal(responseParticipationPercent(499,500),99.8);
  assert.equal(responseParticipationPercent(500,500),100);
  assert.equal(responseParticipationPercent(650,500),100);
  assert.equal(responseParticipationPercent(-2,500),0);
