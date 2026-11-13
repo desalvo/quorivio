@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
   "cycle": 293,
-  "file_count_excluding_manifest": 2662,
+  "file_count_excluding_manifest": 2664,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -224,14 +224,14 @@
       "8f48a8f6"
     ],
     "apps/api/src/debug-submissions.ts": [
-      "19b932f1",
-      "5315ffc0",
-      "3a0459f5",
-      "803487bd",
-      "4ffcda07",
-      "2d043042",
-      "1f7d554a",
-      "0911e39e"
+      "b5364141",
+      "1686fcd2",
+      "07c4aa71",
+      "ec82b526",
+      "a938ffc1",
+      "030a76e8",
+      "ce4a4b8d",
+      "8de0cf02"
     ],
     "apps/api/src/disk-monitor.ts": [
       "4d304a57",
@@ -1542,6 +1542,16 @@
       "c3a93e21",
       "a1abc14e",
       "60bf7432"
+    ],
+    "apps/api/test/rc336-debug-housekeeping.test.ts": [
+      "d7a044a5",
+      "c4057ea6",
+      "41d497c1",
+      "97f630b4",
+      "24c293f0",
+      "4900bb57",
+      "6b96cfa9",
+      "7e0e50f7"
     ],
     "apps/api/test/rc71-session-lifecycle.test.ts": [
       "2e8b873d",
@@ -4804,14 +4814,14 @@
       "c74b825b"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "c5e36872",
-      "cb504a8c",
-      "67b4822a",
-      "a497fb0a",
-      "28a16abb",
-      "f78b2200",
-      "50d42aa7",
-      "03ccdef9"
+      "f21f833b",
+      "35b58eed",
+      "0e1f8be1",
+      "df53d330",
+      "e71620b0",
+      "ecdc8cf5",
+      "0484e09d",
+      "bdcaf1a7"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",
@@ -6272,6 +6282,16 @@
       "ae9bdf9b",
       "b3a703d1",
       "a8d47d3c"
+    ],
+    "docs/RC336_CI_CLEANUP_IT_EN.md": [
+      "f7bc7a58",
+      "c7b35a8c",
+      "93aa94f8",
+      "54d0c12f",
+      "80771c40",
+      "ea218850",
+      "09a6dc3c",
+      "c785c7ed"
     ],
     "docs/RC49_HAPROXY_CROSS_NODE_RWX.en.md": [
       "7c1cc75e",
@@ -22274,14 +22294,14 @@
       "352e9bf6"
     ],
     "tools/tests/test_rc332_export_background.py": [
-      "58321cdc",
-      "ea936938",
-      "46d24d01",
-      "0b43add4",
-      "2bad3b8b",
-      "407ec527",
-      "49de4eae",
-      "bb8b1d39"
+      "39c0b7af",
+      "1fde69ae",
+      "04273e04",
+      "ec879ab2",
+      "7dde591a",
+      "199ce7ac",
+      "25fb2bba",
+      "f4d72489"
     ],
     "tools/tests/test_rc73_slide_master.py": [
       "2c080f2d",

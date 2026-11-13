@@ -1,5 +1,8 @@
 # Quorivio 0.1.0-dev — RC293 — Compact visual manuals and product brochures
 
+**RC336 (13 November 2026) — RC335 CI fixes and diagnostic cleanup:** Reconciled obsolete RC332 export tests with all four real presenter/participant PDF/PPTX actions. Removed the PostgreSQL extra bind argument from the expired debug-bundle SELECT (which has no placeholders); preserved transactional locking and rollback. Added tests for successful purge, rollback on filesystem errors, and missing-file idempotence, plus bilingual notes. The source SHA-256 inventory is updated in the same commit. Full CI and paired native Docker publication are required before RC336 is accepted. Official product readiness remains 85.25% (43 accepted, 17 partial).
+
+
 **RC335 (13 November 2026) — Visual exports of presenter vs participant decks:** Added four dedicated PDF/PPTX session downloads (`presentatore` / `partecipante` in the session-derived filenames). The exported pages use isolated Chromium captures of the existing 1280×720 React slide renderer, include the presenter-hidden participant mapping, master styles and source media, and store the same pixels in PPTX and PDF. These *visual-fidelity* decks have raster-backed slides (unlike the older editable OOXML format); dynamic videos and ongoing interaction cannot be interactive in static files. An ephemeral job-only token protects capture data, and external browser navigation is blocked. Local Python/Node smoke tests pass; full CI, native container build and visual end-to-end comparison are pending. Earlier overall product completion 85.25% unchanged. See `docs/RC335_VISUAL_EXPORT.it.md`.
 
 

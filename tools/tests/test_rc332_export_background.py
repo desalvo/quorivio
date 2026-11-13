@@ -11,6 +11,10 @@ class RC332Export(unittest.TestCase):
   web=(ROOT/'apps/web/src/main.tsx').read_text()
   self.assertIn('masterBackground',server)
   self.assertIn('backgroundAssetId',server)
-  self.assertIn('Esporta PDF della presentazione',web)
-  self.assertIn('Esporta PowerPoint (PPTX)',web)
+  # RC335 exposes two different views in each downloadable format.
+  for label in ('PDF presentatore','PDF partecipante','PPTX presentatore','PPTX partecipante'):
+   self.assertIn(label,web)
+  for fmt in ('pdf','pptx'):
+   for view in ('presenter','participant'):
+    self.assertIn(f"/export.{fmt}?view={view}",web)
 if __name__=='__main__':unittest.main()

@@ -53,7 +53,8 @@ export async function purgeDebugSubmissions(db:Pool,root:string,retentionDays:nu
  const cx=await db.connect();let deleted=0;
  try{
   await cx.query('BEGIN');
-  const rows=await cx.query("SELECT id FROM debug_submissions WHERE expires_at<=now() ORDER BY expires_at LIMIT 100 FOR UPDATE SKIP LOCKED",[retentionDays]);
+  // Expiry is already stored in expires_at; the SELECT has no $1 placeholder.
+  const rows=await cx.query("SELECT id FROM debug_submissions WHERE expires_at<=now() ORDER BY expires_at LIMIT 100 FOR UPDATE SKIP LOCKED");
   for(const row of rows.rows){
    const file=debugBundlePath(root,row.id);
    try{await unlink(file)}catch(e){if((e as NodeJS.ErrnoException).code!=='ENOENT')throw e}
