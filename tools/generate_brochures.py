@@ -106,9 +106,53 @@ def photo(c,path,x,y,w,h,position='center'):
     else:
         rect(c,x,y,w,h,PALE,10);return
     factor=max(1.5, min(3, 1800/max(w,h)))
-    im=ImageOps.fit(im,(int(w*factor),int(h*factor)),Image.Resampling.LANCZOS,centering=(.5,.5))
+    center=(.20,.5) if position=='portrait' else (.5,.5)
+    if position=='contain':
+        foreground=ImageOps.contain(im,(int(w*factor),int(h*factor)),Image.Resampling.LANCZOS)
+        frame=Image.new('RGB',(int(w*factor),int(h*factor)),'#edf1ff')
+        frame.paste(foreground,((frame.width-foreground.width)//2,(frame.height-foreground.height)//2))
+        im=frame
+    else:
+        im=ImageOps.fit(im,(int(w*factor),int(h*factor)),Image.Resampling.LANCZOS,centering=center)
+    if position=='portrait':
+        # Composite a *continuous* left fade into the dark cover, eliminating
+        # hard vertical crop lines and keeping the entire speaker's face visible.
+        import PIL.Image as _Image
+        mask=_Image.new('L',(im.width,1))
+        mask.putdata([round(255*min(1,max(0,(i/im.width-.52)/.19))) for i in range(im.width)])
+        im=_Image.composite(im,_Image.new('RGB',im.size,(17,25,67)),mask.resize(im.size))
     b=BytesIO();im.save(b,'JPEG',quality=90,optimize=True);b.seek(0)
     c.drawImage(ImageReader(b),x,y,w,h)
+
+def draw_devices(c,x,y,w,h):
+    """Crisp vector illustration of a presenter laptop, results tablet and poll phone.
+
+    Avoids re-cropping low-resolution text from the panoramic reference board.
+    """
+    # Laptop screen with an original abstract presentation (not an app screenshot).
+    rect(c,x+7,y+57,206,137,NAVY,9)
+    rect(c,x+13,y+64,194,123,'#eff4ff',4)
+    rect(c,x+17,y+139,187,44,PURPLE,4)
+    text(c,'La nostra strategia',x+24,y+163,12,WHITE,'LatoBlack')
+    text(c,'per il futuro',x+24,y+147,10,WHITE,'LatoBold')
+    rect(c,x+24,y+116,83,8,BLUE,3)
+    rect(c,x+24,y+102,139,6,'#cbd6f1',3)
+    rect(c,x+24,y+89,104,6,'#cbd6f1',3)
+    fill(c,HexColor('#7181a9'));p=c.beginPath();p.moveTo(x,y+51);p.lineTo(x+221,y+51);p.lineTo(x+235,y+43);p.lineTo(x-7,y+43);p.close();c.drawPath(p,stroke=0,fill=1)
+    rect(c,x+75,y+46,70,4,'#a8b1ca',3)
+    # Tablet chart screen.
+    rect(c,x+220,y+36,78,144,NAVY,8)
+    rect(c,x+227,y+45,64,125,WHITE,4)
+    text(c,'Risultati',x+232,y+153,8,NAVY,'LatoBlack')
+    for j,(v,col) in enumerate(zip([46,58,29,38],[BLUE,CYAN,PURPLE,PINK])):
+        rect(c,x+234+j*13,y+83,9,v,col,2)
+    # Smartphone poll card, offset in front of the laptop edge.
+    rect(c,x+287,y+28,43,117,'#10183c',7)
+    rect(c,x+291,y+35,35,100,'#eef2ff',3)
+    fill(c,CYAN);c.circle(x+309,y+122,8,stroke=0,fill=1)
+    for j,(q,col) in enumerate(zip([17,22,12],[PURPLE,BLUE,PINK])):
+        rect(c,x+297,y+99-j*22,q,9,col,2)
+    icon(c,x+310,y+52,'check',GREEN)
 
 def bg(c,page):
     rect(c,0,0,W,H,WHITE)
@@ -137,7 +181,7 @@ def reference_files(reference):
     # Source mock is used only for local layout proofing, not needed in git.
     if not reference or not reference.is_file():return {}
     im=Image.open(reference).convert('RGB');regions={
-      'hero':(275,88,517,196),
+      'hero':(170,65,515,345),
       'session':(543,191,1005,415),
       'results':(1240,307,1492,521),
       'gauge':(105,663,499,824),
@@ -229,21 +273,20 @@ def make_brochure(lang,out,reference=None):
     c.setTitle('Quorivio - six page A4 portrait brochure - '+lang.upper())
     c.setAuthor('Alessandro De Salvo - INFN Sez. Roma1')
     def end(p): footer(c,p,lang);c.showPage()
-    def artwork(key,x,y,w,h):photo(c,choose_photo(refs,key,lang),x,y,w,h)
+    def artwork(key,x,y,w,h):photo(c,choose_photo(refs,key,lang),x,y,w,h,'portrait' if key=='hero' else 'center')
     # 1 • Immersive cover. Full bleed, like the visual reference.
     rect(c,0,0,W,H,NAVY)
-    fill(c,HexColor('#3624a6'));c.circle(W+55,H-52,155,fill=1,stroke=0)
-    fill(c,HexColor(CYAN));c.circle(W+52,H-59,86,fill=1,stroke=0)
-    fill(c,HexColor(PURPLE));c.circle(W-160,H-20,65,fill=1,stroke=0)
+    # Portrait scene sits behind the copy, like the user-provided mock.
+    artwork('hero',219,220,W-219,580)
+    fill(c,HexColor('#3624a6'));c.circle(W+71,H-28,88,fill=1,stroke=0)
+    fill(c,HexColor(CYAN));c.circle(W+64,H-21,43,fill=1,stroke=0)
     logo(c,30,H-75,1.08,True)
     text(c,'INTERACTIVE PRESENTATIONS  •  LIVE ENGAGEMENT' if lang=='en' else 'PRESENTAZIONI INTERATTIVE  •  COINVOLGIMENTO LIVE',31,H-105,9.1,'#d6eeff','LatoBold')
     yy=H-168
     for i,t in enumerate(d['cover']):
         text(c,t,30,yy,43 if i<2 else 47,CYAN if i==2 else WHITE,'LatoBlack');yy-=51
-    lines(c,d['cover_sub'],32,H-345,525,12.5,17,WHITE,'LatoBold',max_lines=4)
-    # hero photography with a dark/turquoise frame
-    rect(c,0,165,W,265,'#182e6b')
-    artwork('hero',0,166,W,266)
+    lines(c,d['cover_sub'],32,H-345,322,11.8,16,WHITE,'LatoBold',max_lines=6)
+    # Wide, dark caption plate ties the portrait to the icon ribbon.
     rect(c,0,165,W,55,'#20185d')
     lines(c,d['copy1'],27,194,535,13,17,WHITE,'LatoHeavy',max_lines=2)
     colorbars=[PURPLE,BLUE,CYAN,PINK,PURPLE]
@@ -293,6 +336,10 @@ def make_brochure(lang,out,reference=None):
             else:cw=new
         if cw:rr.append(cw)
         for n,w in enumerate(rr[:3]):text(c,w,xx+51,yytext-n*11,8.6,NAVY,'LatoBold',True)
+    card(c,23,395,549,94,'#f1efff',12,None)
+    artwork('results',340,396,231,92)
+    text(c,'Live charts at a glance' if lang=='en' else 'Grafici live a colpo d’occhio',38,452,15.5,NAVY,'LatoBlack')
+    lines(c,'Instant poll outcomes, styled to fit each results widget.' if lang=='en' else 'Risposte e statistiche immediate, pronte per essere presentate.',38,428,293,10,13,MUTED,'LatoBold',max_lines=3)
     card(c,22,103,551,282,'#f3f4ff',17)
     text(c,d['result_title'],38,352,21,NAVY,'LatoBlack')
     text(c,'Bar  •  Pie  •  Line  •  Donut  •  Radar  •  Word cloud' if lang=='en' else 'Barre  •  Torta  •  Linee  •  Donut  •  Radar  •  Nuvola parole',39,333,10,MUTED,'LatoBold')
@@ -351,11 +398,11 @@ def make_brochure(lang,out,reference=None):
     # 5 • formats and 500 participant benchmark
     bg(c,5);title(c,d['event_title'],d['event_sub'],29)
     for i,(name,desc,key) in enumerate(zip(d['events'],d['events_copy'],['hall','remote','hybrid'])):
-        x=25+i*186;card(c,x,497,174,183,WHITE,10,None)
-        artwork(key,x+5,550,164,126)
-        icon(c,x+21,528,'people' if i!=1 else 'screen',[PURPLE,BLUE,VIOLET][i])
-        text(c,name,x+44,528,12,NAVY,'LatoBlack')
-        lines(c,desc,x+11,512,153,9,11,MUTED,'LatoBold',max_lines=2)
+        x=25+i*186;card(c,x,527,174,183,WHITE,10,None)
+        artwork(key,x+5,580,164,126)
+        icon(c,x+21,558,'people' if i!=1 else 'screen',[PURPLE,BLUE,VIOLET][i])
+        text(c,name,x+44,558,12,NAVY,'LatoBlack')
+        lines(c,desc,x+11,542,153,9,11,MUTED,'LatoBold',max_lines=2)
     # vibrant, faithful brush-stroke highlight, but no unjustified guarantee
     rect(c,25,360,543,124,'#f0f3ff',12,None)
     rect(c,37,374,238,96,PURPLE,27,None)
@@ -366,7 +413,7 @@ def make_brochure(lang,out,reference=None):
         icon(c,290,451-i*25,'check',GREEN)
         lines(c,item,318,451-i*25,225,9.4,11,INK,'LatoBold',max_lines=2)
     card(c,25,75,543,267,'#edf1ff',12,None)
-    artwork('devices',36,130,329,201)
+    draw_devices(c,36,130,329,201)
     # drawn QR-like mark, decorative label (not functional)
     rect(c,401,175,141,140,WHITE,8,None)
     for ix in range(11):
