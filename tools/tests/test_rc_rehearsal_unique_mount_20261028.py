@@ -13,7 +13,13 @@ CI=(ROOT/'tools/ci_browser_editor.py').read_text(encoding='utf8')
 
 class RehearsalUniqueMount(unittest.TestCase):
     def test_only_two_declaration_sites_have_disjoint_guards(self):
-        self.assertEqual(UI.count('<SessionRehearsal '), 2)
+        # Two interactive rehearsal mounts remain mutually exclusive. A third
+        # instance is an isolated capture-only root, never a dialog or portal.
+        self.assertEqual(UI.count('<SessionRehearsal '), 3)
+        self.assertIn('<SessionRehearsal snapshot={snapshot} captureMode={viewer}',UI)
+        self.assertIn('if(captureMode)return <div id="quorivio-export-slide"',UI)
+        self.assertIn("if(captureRoute&&['presenter','participant'].includes(captureViewer||''))",UI)
+        self.assertIn("createRoot(document.getElementById('root')!).render(<VisualExportCapturePage",UI)
         self.assertIn('{rehearsalOpen&&!designActivity&&<RehearsalErrorBoundary ', UI,
                       'Dashboard preview must not mount while the editor exists')
         self.assertIn('{rehearsalOpen&&<RehearsalErrorBoundary ', UI,
