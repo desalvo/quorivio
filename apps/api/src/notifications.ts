@@ -1,7 +1,25 @@
 /** RC332: opt-in multichannel notices, encrypted at rest. The public API never reveals tokens. */
 import type {Pool} from 'pg';
 import type {SmtpConfig} from './smtp.js';
-import {sealAuthConfig,openAuthConfig} from './auth-backends.js';
+import {createCipheriv,createDecipheriv,createHash,randomBytes} from 'node:crypto';
+// Shared encrypted settings format. Keep the same v1 derivation as auth-backends
+// without loading the application registry during standalone Node test execution.
+const noticeKey=(secret:string)=>createHash('sha256').update('quorivio-auth-backends-v1:').update(secret).digest();
+function sealAuthConfig(data:Record<string,any>,secret:string):string{
+ const iv=randomBytes(12),cipher=createCipheriv('aes-256-gcm',noticeKey(secret),iv);
+ const body=Buffer.concat([cipher.update(JSON.stringify(data),'utf8'),cipher.final()]);
+ return ['v1',iv.toString('base64url'),cipher.getAuthTag().toString('base64url'),body.toString('base64url')].join('.');
+}
+function openAuthConfig(data:string,secret:string):Record<string,any>{
+ const parts=data.split('.');
+ if(parts.length!==4||parts[0]!=='v1')throw Error('invalid_notification_blob');
+ const iv=Buffer.from(parts[1],'base64url'),tag=Buffer.from(parts[2],'base64url');
+ if(iv.length!==12||tag.length!==16)throw Error('invalid_notification_blob');
+ const dec=createDecipheriv('aes-256-gcm',noticeKey(secret),iv);dec.setAuthTag(tag);
+ const obj=JSON.parse(Buffer.concat([dec.update(Buffer.from(parts[3],'base64url')),dec.final()]).toString('utf8'));
+ if(!obj||typeof obj!=='object'||Array.isArray(obj))throw Error('invalid_notification_blob');
+ return obj;
+}
 
 export type NoticeEvent='user_status'|'system_alert'|'debug_session';
 export type NoticeChannel='email'|'pushover'|'telegram'|'whatsapp';
