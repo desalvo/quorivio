@@ -126,7 +126,7 @@ async def main():
             await shot('admin-audit',admin,'[aria-label="Audit amministrativo"]')
             # RC325: a real unsaved auth-provider draft survives tab switches.
             await settings_tabs.get_by_role('tab',name='Autenticazione').click()
-            new_provider=admin.get_by_role('textbox',name='ID nuovo provider OIDC')
+            new_provider=admin.get_by_role('textbox',name='ID nuovo provider')
             await expect(new_provider).to_be_visible(timeout=12000)
             await new_provider.fill('cidraft325')
             await settings_tabs.get_by_role('tab',name='Generale').click()
