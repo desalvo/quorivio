@@ -1038,7 +1038,8 @@ function SessionRehearsal({snapshot,onClose,initialPageId,initialMode='participa
       const options=source?.kind==='rating'?Array.from({length:10},(_,i)=>({id:String(i),label:String(i)})):source?.kind==='reactions'?REHEARSAL_EMOJIS.map(emoji=>({id:emoji,label:emoji})):part?.options||[];
       const capturedRows=(options as any[]).map((opt:any)=>({id:opt.id,label:opt.label,count:Math.max(0,counted.filter((r:any)=>r.option_id===opt.id).reduce((n:number,r:any)=>n+(Number(r.count)||0),0)+(byWidget.length?0:(Number(legacy.find((r:any)=>r.option_id===opt.id)?.count)||0)))}));
       const rows=source?(captureMode?capturedRows:(actual.length?actual:sampleStatisticRows(source,seed,submittedAnswers,w.targetQuestionId||'',{[source.id]:topicSubmissions[context!.activity.id+':'+source.id]||0}))):undefined;
-      return <LinkedResultChart widget={w} widgets={sourceWidgets} rows={rows} emptyLabel={captureMode?'esportazione statica':'simulazione'}/>;
+      if(captureMode)return <LinkedResultChart widget={w} widgets={sourceWidgets} rows={rows} emptyLabel="esportazione statica"/>;
+       return <LinkedResultChart widget={w} widgets={sourceWidgets} rows={rows} emptyLabel="simulazione"/>;
      })():
     kind==='profile'&&captureMode?(()=>{
       const profiles=Array.isArray((snapshot as any).capture_profiles)?(snapshot as any).capture_profiles:[];
