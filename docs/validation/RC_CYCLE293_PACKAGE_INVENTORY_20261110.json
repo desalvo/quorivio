@@ -20494,14 +20494,14 @@
       "b390bbfe"
     ],
     "tools/tests/test_rc103_participant_qr_pptx.py": [
-      "345f6f9a",
-      "4d6daa9a",
-      "1ec0acf4",
-      "e23372b8",
-      "5b9f7b81",
-      "b81d0c2f",
-      "257051df",
-      "6c4a5dae"
+      "48c463e9",
+      "4ef92893",
+      "3a98b7bb",
+      "bd96adf0",
+      "2f812961",
+      "15942944",
+      "080ab85f",
+      "c554e62b"
     ],
     "tools/tests/test_rc104_pptx_inline_text_roundtrip.py": [
       "efd23c2c",

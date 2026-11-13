@@ -72,7 +72,11 @@ class ParticipantQrPowerpoint(unittest.TestCase):
         self.assertIn('const exportHasQr=pptxDefinition.activities.some',s)
         self.assertIn('pptxDefinition.session.participant_join_url=',s)
         self.assertIn('const portable=JSON.stringify(pptxDefinition)',s)
-        self.assertNotIn('participant_join_url',s.split('async function portableSession(id:string)',1)[1].split('\n',1)[0])
+        self.assertIn('async function portableSession(id:string,visualCapture=false)',s)
+        generic=s.split('async function portableSession(id:string,visualCapture=false)',1)[1].split('function validPortable(',1)[0]
+        self.assertNotIn('participant_join_url',generic)
+        self.assertIn('res.json(await portableSession(s.id))',s)
+        self.assertIn('await portableSession(s.id,true)',s)
         self.assertIn('qrcode==8.2',(ROOT/'Dockerfile.converter').read_text())
 
 if __name__=='__main__':unittest.main()
