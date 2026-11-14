@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
   "cycle": 293,
-  "file_count_excluding_manifest": 2669,
+  "file_count_excluding_manifest": 2672,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -4834,24 +4834,24 @@
       "455a0f27"
     ],
     "docs/DEVELOPMENT_STATUS.it.md": [
-      "26f7e234",
-      "2a2706d5",
-      "fad57596",
-      "a7bae18f",
-      "167db828",
-      "5be0e9af",
-      "2fce8f62",
-      "f92fbd58"
+      "6b384ae3",
+      "e61bc2d5",
+      "6f27b894",
+      "43e809aa",
+      "eafbcc12",
+      "42043b16",
+      "189d284d",
+      "fa3de054"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "a55f5777",
-      "4115bbd7",
-      "419b08d0",
-      "d7f9a288",
-      "edb6897d",
-      "874d3124",
-      "048ac075",
-      "8832cadd"
+      "ed9185ee",
+      "bbb87433",
+      "ec05df36",
+      "add1f003",
+      "ac157fdb",
+      "25eb103f",
+      "dab592ef",
+      "9bcd21f5"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",
@@ -26692,6 +26692,36 @@
       "acb6be32",
       "537fde99",
       "5bb4803b"
+    ],
+    "tools/ci_visual_export_smoke.py": [
+      "8a6c71e6",
+      "c1f2a97f",
+      "2315006a",
+      "5a70cc39",
+      "73e4b029",
+      "c7c9aa32",
+      "53a72f95",
+      "a103c16a"
+    ],
+    "tools/tests/test_rc339_export_smoke.py": [
+      "37f98b98",
+      "19f047d5",
+      "c525c381",
+      "9fad7002",
+      "9d37b0ab",
+      "df1490c2",
+      "e424df47",
+      "0cc9655a"
+    ],
+    "docs/RC339_STAGING_EXPORT_SMOKE_IT_EN.md": [
+      "8d954b43",
+      "e6f4ab2d",
+      "4060d0dd",
+      "7e510e7c",
+      "0efd9927",
+      "15c62cc9",
+      "90c79bc3",
+      "3a171036"
     ]
   }
 }

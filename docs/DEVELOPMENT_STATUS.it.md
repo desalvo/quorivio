@@ -1,5 +1,8 @@
 # Quorivio 0.1.0-dev — RC293 — Manuali visuali compatti e brochure
 
+**RC339 (14 novembre 2026) — Collaudo export visivi in staging:** Il commit main 4c3c63bc5749 ha superato la full CI #43535065013 e la pubblicazione Docker multiarch abbinata. Aggiunto uno smoke opt-in senza conservazione file o segreti: verifica 401 anonimo e i quattro export autenticati PDF/PPTX (presentatore e partecipante), MIME, filename UTF-8, limite dimensioni e slide grafiche. Quattro regressioni Python sono passate in locale; restano da verificare il deployment reale e la fedeltà pixel-per-pixel. Avanzamento indipendente ancora 85,25% (43 gate accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Vedi docs/RC339_STAGING_EXPORT_SMOKE_IT_EN.md.
+
+
 **RC338 (14 novembre 2026) — Altezza campo commento nella lettura accessibile:** La CI RC337 #43531911477 ha superato i test API/frontend, ma il Chromium reale ha rilevato che il campo commento del widget Gradimento nella modalità «Lettura accessibile» su smartphone poteva scendere sotto 44 px. Una regola storica `min-height:3em!important` prevaleva sui 44 px. Corretto il CSS con selettore più specifico limitato a `stage-reading`, senza alterare la geometria originale 16:9. Aggiunto test di regressione; necessari full CI e publishing Docker abbinato. Il fix export 500/autenticazione RC337 resta invariato. Avanzamento ufficiale 85,25%.
 
 
