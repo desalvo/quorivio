@@ -1,5 +1,8 @@
 # Quorivio 0.1.0-dev — RC293 — Compact visual manuals and product brochures
 
+**RC339 (14 November 2026) — Four-view visual-export staging acceptance:** Main SHA 4c3c63bc5749 passed full CI #43535065013 and paired multiarch Docker publication. Added a secret-safe, no-persistence opt-in smoke for anonymous 401 and all four authenticated presenter/participant PDF/PPTX downloads, plus MIME, UTF-8 filename, size and visual slide checks. Four offline Python regressions passed locally; live deployment and pixel-level comparison remain pending. Independent readiness is still 85.25% (43 accepted / 17 partial); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. See docs/RC339_STAGING_EXPORT_SMOKE_IT_EN.md.
+
+
 **RC338 (14 November 2026) — Accessible rating field in Chromium participant CI:** The RC337 CI run 43531911477 passed API/frontend regressions, but independent real Chromium participant acceptance failed on a less-than-44px rating-comment textarea in mobile reading mode. A legacy `min-height:3em!important` CSS rule outranked `44px` when the inherited font was small. Added a higher-specificity minimum 44px limited to `stage-reading`, preserving authored 16:9 geometry. Added regression; real browser and full CI plus paired multiarch Docker publication remain mandatory. Visual export SQL/auth fix of RC337 remains unchanged; independent acceptance remains 85.25%.
 
 
