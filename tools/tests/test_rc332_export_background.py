@@ -16,5 +16,10 @@ class RC332Export(unittest.TestCase):
    self.assertIn(label,web)
   for fmt in ('pdf','pptx'):
    for view in ('presenter','participant'):
-    self.assertIn(f"/export.{fmt}?view={view}",web)
+    self.assertIn(f"downloadSelectedPresentation('{view}','{fmt}')",web)
+  # The authenticated handler now builds the API URL dynamically. Verify the
+  # actual route template and fetch path instead of requiring literal links.
+  self.assertIn('async function downloadSelectedPresentation(',web)
+  self.assertIn('await authenticatedFetch(',web)
+  self.assertIn('/export.${format}?view=${view}',web)
 if __name__=='__main__':unittest.main()
