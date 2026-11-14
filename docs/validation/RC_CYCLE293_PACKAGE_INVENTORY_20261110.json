@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
   "cycle": 293,
-  "file_count_excluding_manifest": 2676,
+  "file_count_excluding_manifest": 2677,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -14,14 +14,14 @@
       "a0b72041"
     ],
     ".env.compose.example": [
-      "80628788",
-      "17bd2629",
-      "7bb2208c",
-      "98153196",
-      "361d14d6",
-      "0fc8fe35",
-      "b4caff64",
-      "564e099a"
+      "ef64f707",
+      "b4083fbf",
+      "c4f0f20c",
+      "ec31d431",
+      "be9ee66e",
+      "733ad934",
+      "3e3308cd",
+      "6e8483db"
     ],
     ".env.example": [
       "d1a9c90b",
@@ -4374,14 +4374,14 @@
       "d65a5587"
     ],
     "compose.yaml": [
-      "1d460c77",
-      "67496a65",
-      "2591fb92",
-      "238995fc",
-      "210f6a4c",
-      "ec8a9000",
-      "60a615f8",
-      "3e56e30b"
+      "bf20b496",
+      "842d3391",
+      "88c11410",
+      "bce3d63d",
+      "20dbd54e",
+      "db6802a1",
+      "e9916b54",
+      "f2dc34d7"
     ],
     "docs/ADMIN_MFA_RESET.en.md": [
       "92d209d4",
@@ -4834,24 +4834,24 @@
       "455a0f27"
     ],
     "docs/DEVELOPMENT_STATUS.it.md": [
-      "d1f49703",
-      "f858e9bb",
-      "298006b9",
-      "04da4db3",
-      "06da4979",
-      "e43bc0fd",
-      "786814c6",
-      "5f74f295"
+      "bb25a040",
+      "d85ce4ac",
+      "8ebf7a0a",
+      "56cf7a25",
+      "f934f16d",
+      "d3d5c104",
+      "7b09608d",
+      "ef4955ad"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "b33f8fa3",
-      "0b277fef",
-      "eb43a4b0",
-      "bd03c69a",
-      "9a9bcc57",
-      "eaceed12",
-      "32fc807b",
-      "e359a9ef"
+      "8e14a596",
+      "ab95bfad",
+      "5d773edc",
+      "e0461d51",
+      "d86d4765",
+      "78cbffe8",
+      "b956282c",
+      "38c012c5"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",
@@ -17604,14 +17604,14 @@
       "867310f9"
     ],
     "helm/quorivio/templates/deployment.yaml": [
-      "ceba57e8",
-      "7e739152",
-      "dbf95978",
-      "f7415274",
-      "32b9d7e0",
-      "114fc48c",
-      "44bfa04d",
-      "ffbb84ec"
+      "11a76ac2",
+      "0c546693",
+      "6039fc5c",
+      "39cd40b5",
+      "bfd2c5ce",
+      "3cf4a31e",
+      "f080aaf8",
+      "4c82f462"
     ],
     "helm/quorivio/templates/ingress.yaml": [
       "96205841",
@@ -17654,14 +17654,14 @@
       "db05b5f4"
     ],
     "helm/quorivio/values.yaml": [
-      "54156c4a",
-      "efd9bc01",
-      "756f0f93",
-      "f70933fd",
-      "150baaf8",
-      "bc49641a",
-      "69f51e46",
-      "b289f820"
+      "a433f04f",
+      "66a8c4a0",
+      "8639369f",
+      "7fd42ec3",
+      "d907cf63",
+      "187e083d",
+      "c6be3d3b",
+      "f22cbb48"
     ],
     "package-lock.json": [
       "21cfaa39",
@@ -26754,14 +26754,24 @@
       "88a7d71d"
     ],
     "docs/RC340_VISUAL_EXPORT_502_IT_EN.md": [
-      "7a57d0ae",
-      "f7c12168",
-      "d2d7f77b",
-      "76ef4621",
-      "677c772f",
-      "5754c1b4",
-      "da9a1a09",
-      "f9e6c071"
+      "dfe157f7",
+      "e5161e13",
+      "a7415f6f",
+      "675c9f0e",
+      "80f45b8e",
+      "a39237ab",
+      "401f04d2",
+      "0c7952c0"
+    ],
+    "tools/tests/test_rc340_paired_images.py": [
+      "8b94ac1c",
+      "f0de8ca2",
+      "78ee52a2",
+      "7569273f",
+      "7e69c04e",
+      "efdd5d9c",
+      "d003907c",
+      "515f3dbf"
     ]
   }
 }
