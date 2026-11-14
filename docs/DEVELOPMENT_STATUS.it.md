@@ -1,5 +1,8 @@
 # Quorivio 0.1.0-dev — RC293 — Manuali visuali compatti e brochure
 
+**RC337 (14 novembre 2026) — Export 500 e gestione autenticazione:** Eliminata la query SQL su `page_reactions.widget_id`, colonna inesistente. I conteggi aggregati anonimi delle reazioni vengono attribuiti ai widget Reazioni realmente presenti nella pagina, con controlli e limiti. I quattro pulsanti PDF/PPTX ora scaricano tramite la richiesta autenticata senza navigare alla risposta JSON in caso di errore; un 401 avvia la procedura di login preesistente, mentre un errore del converter è HTTP 502. Manteniamo i nomi corretti, il renderer isolato, la privacy e l'inventario SHA-256. Aggiunti test e istruzioni bilingui; CI, Docker e prova reale sul deployment restano verifiche distinte. Avanzamento ufficiale invariato 85,25%.
+
+
 **RC335 (13 novembre 2026) — Esportazioni visive presentatore/partecipante:** Introdotti quattro download PDF/PPTX distinti per la sessione (`presentatore` / `partecipante` nel nome del file). Ogni pagina esportata viene catturata dal renderer React reale a 1280×720 tramite Chromium isolato, rispettando la mappatura delle pagine partecipante nascoste al presentatore, gli schemi e i media. PDF e PPTX usano gli stessi pixel; il PPTX visuale è basato su immagini per pagina, quindi non ha più i widget singolarmente modificabili. Video dinamici e interazioni non possono restare interattivi in documenti statici. Token temporaneo esclusivo del job, richieste di rete esterne bloccate. Test locali Python/Node superati; full CI, build container e confronto visivo end-to-end da certificare. Percentuale prodotto 85,25% invariata. Vedi `docs/RC335_VISUAL_EXPORT.it.md`.
 
 

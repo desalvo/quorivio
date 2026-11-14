@@ -19,6 +19,7 @@ import {participantReadingWidgets} from './live-slide-policy';
 import {stageWidgetTypography} from './stage-widget-typography';
 import {consumeRecoveryTokenFromUrl} from './password-recovery-url';
 import {validPageDesign} from '../../api/src/domain';
+import {exportFileName} from '../../api/src/presentation-export-names';
 import {setChoiceTruth,clearChoiceTruth,gradeChoiceAnswer} from '../../api/src/widget-answer-key';
 import type {AnswerFeedback} from '../../api/src/widget-answer-key';
 import type {PageDesign,WidgetTextStyle,WidgetInlineMark,WidgetSubquestion} from '../../api/src/domain';
@@ -2419,6 +2420,41 @@ async function importQuorivioBundle(file:File|undefined){
   setNotice('Sessione importata come nuova copia: pagine, schemi e allegati ripristinati. Risposte e partecipanti non inclusi.');
  }catch(e){notify(e)}finally{setSidebarBusy(false)}
 }
+async function downloadSelectedPresentation(view:'presenter'|'participant',format:'pdf'|'pptx'){
+ if(!selected||!snap||sidebarBusy)return;
+ const sessionId=selected,title=snap.session.title;
+ setSidebarBusy(true);
+ setNotice('Preparazione '+format.toUpperCase()+' '+(view==='presenter'?'presentatore':'partecipante')+'…');
+ try{
+  // Keep the dashboard mounted even when the server returns a structured error.
+  // Direct <a href="/api/..."> navigation previously replaced Quorivio with raw
+  // JSON and prevented its established re-authentication handler from running.
+  const response=await authenticatedFetch(`/api/sessions/${encodeURIComponent(sessionId)}/export.${format}?view=${view}`,{credentials:'include',cache:'no-store'});
+  if(!response.ok){
+   const info=await response.json().catch(()=>({}));
+   if(response.status===401)throw Error('Sessione scaduta: accedi nuovamente per esportare.');
+   if(response.status===503)throw Error('Convertitore non disponibile (HTTP 503). Controllare le impostazioni del server.');
+   if(response.status===502)throw Error('Rendering della presentazione non riuscito (HTTP 502).');
+   throw Error('Esportazione '+format.toUpperCase()+' non riuscita (HTTP '+response.status+').'+(info.error==='no_visible_presentation_pages'?' Nessuna pagina esportabile.':''));
+  }
+  const expectedMime=format==='pdf'?'application/pdf':'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+  if((response.headers.get('Content-Type')||'').split(';')[0].trim().toLowerCase()!==expectedMime)throw Error('Il server non ha restituito il tipo di documento atteso.');
+  const advertised=response.headers.get('Content-Length');
+  if(advertised!==null&&Number(advertised)>50*1024*1024)throw Error('Il documento supera il limite di 50 MiB.');
+  const blob=await response.blob();
+  if(blob.size<8||blob.size>50*1024*1024)throw Error('Documento esportato di dimensioni non valide.');
+  const header=new Uint8Array(await blob.slice(0,5).arrayBuffer());
+  if(format==='pdf'&&!(header[0]===37&&header[1]===80&&header[2]===68&&header[3]===70&&header[4]===45)
+   ||format==='pptx'&&!(header[0]===80&&header[1]===75))throw Error('Il server ha restituito un documento non valido.');
+  const url=URL.createObjectURL(blob);
+  try{
+   const link=document.createElement('a');link.href=url;link.download=exportFileName(title,view,format);
+   document.body.appendChild(link);link.click();link.remove();
+  }finally{window.setTimeout(()=>URL.revokeObjectURL(url),60000)}
+  setNotice('Documento '+format.toUpperCase()+' '+(view==='presenter'?'presentatore':'partecipante')+' pronto per il salvataggio.');
+ }catch(e){notify(e)}finally{setSidebarBusy(false)}
+}
+
 async function exportSelectedSessionLocal(){
  if(!selected||!snap||sidebarBusy)return;
  setSidebarBusy(true);
@@ -3061,10 +3097,10 @@ me===undefined?<main id="main-content" className="narrow">Caricamento...</main>:
   <button type="button" className="small outline" disabled={sidebarBusy} onClick={()=>void duplicateSelected()}>Duplica sessione</button>
   <button type="button" className="small outline" disabled={sidebarBusy} onClick={()=>void exportSelectedSessionLocal()} aria-label="Esporta copia completa della sessione in locale (.quo)"><Download size={16}/> Esporta in locale (.quo)</button>
   <div className="presentation-exports" role="group" aria-label="Esporta presentazione visiva, scegli vista e formato">
-   <a className="outline asbutton" href={'/api/sessions/'+encodeURIComponent(selected)+'/export.pdf?view=presenter'} download>PDF presentatore</a>
-   <a className="outline asbutton" href={'/api/sessions/'+encodeURIComponent(selected)+'/export.pdf?view=participant'} download>PDF partecipante</a>
-   <a className="outline asbutton" href={'/api/sessions/'+encodeURIComponent(selected)+'/export.pptx?view=presenter'} download>PPTX presentatore</a>
-   <a className="outline asbutton" href={'/api/sessions/'+encodeURIComponent(selected)+'/export.pptx?view=participant'} download>PPTX partecipante</a>
+   <button type="button" className="outline asbutton" disabled={sidebarBusy} onClick={()=>void downloadSelectedPresentation('presenter','pdf')}>PDF presentatore</button>
+   <button type="button" className="outline asbutton" disabled={sidebarBusy} onClick={()=>void downloadSelectedPresentation('participant','pdf')}>PDF partecipante</button>
+   <button type="button" className="outline asbutton" disabled={sidebarBusy} onClick={()=>void downloadSelectedPresentation('presenter','pptx')}>PPTX presentatore</button>
+   <button type="button" className="outline asbutton" disabled={sidebarBusy} onClick={()=>void downloadSelectedPresentation('participant','pptx')}>PPTX partecipante</button>
   </div>
   <button type="button" className="small outline" disabled={sidebarBusy} onClick={()=>localSessionImportRef.current?.click()}><Upload size={16}/> Importa da locale (.quo)</button>
   <p className="muted tiny">Copia portabile di pagine, widget, schemi e allegati. Non comprende risposte, partecipanti, statistiche o credenziali.</p>

@@ -18,6 +18,7 @@ import {authCookieIssuedAt,presenterAuthActive} from './live-auth.js';
 import {firstPresenterPage,audienceForPresenter,validAudienceMapping,PAGE_UUID,validPortablePageRouting,remapPortablePageRouting} from './presentation-routing.js';
 import {presentationExportView,presentationContentDisposition} from './presentation-export-names.js';
 import {presentationExportPages,visualExportSnapshot} from './presentation-export-snapshot.js';
+import {capturePageReactionWidgetCounts} from './presentation-export-reactions.js';
 import {SESSION_CHANNEL,startSessionBus} from './session-bus.js';
 import {boundedFederatedJson} from './federated-response.js';
 import {FEDERATED_LINK_ELIGIBLE_SQL,FEDERATED_LINK_INSERT_SQL,validFederatedLinkIssuedAt} from './federated-link.js';
@@ -2202,16 +2203,19 @@ async function servePresentationExport(req:express.Request,res:express.Response,
    pptxDefinition.capture_results={results:aggregated?.results||[],totals:aggregated?.totals||[],connected_participants:aggregated?.connected_participants??0,responded_connected_participants:aggregated?.responded_connected_participants??0};
    // Aggregate only counts; individual votes, participant identifiers and
    // free-text answers must never become part of a visual export snapshot.
-   const [widgetCounts,ratingCounts,reactionCounts]=await Promise.all([
+   const [widgetCounts,ratingCounts]=await Promise.all([
     db.query(`SELECT w.activity_id,w.widget_id,w.question_id,w.revision,opt.id AS option_id,count(*)::int AS count
       FROM widget_answers w
       CROSS JOIN LATERAL jsonb_array_elements_text(CASE WHEN jsonb_typeof(w.answer_payload->'optionIds')='array' THEN w.answer_payload->'optionIds' ELSE '[]'::jsonb END) opt(id)
       WHERE w.session_id=$1 AND w.answer_mode IN ('single','multiple')
       GROUP BY w.activity_id,w.widget_id,w.question_id,w.revision,opt.id LIMIT 10000`,[s.id]),
-    db.query(`SELECT activity_id,widget_id,score::text AS option_id,count(*)::int AS count FROM page_ratings WHERE session_id=$1 GROUP BY activity_id,widget_id,score LIMIT 10000`,[s.id]),
-    db.query(`SELECT activity_id,widget_id,emoji AS option_id,count(*)::int AS count FROM page_reactions WHERE session_id=$1 GROUP BY activity_id,widget_id,emoji LIMIT 10000`,[s.id])
+    db.query(`SELECT activity_id,widget_id,score::text AS option_id,count(*)::int AS count FROM page_ratings WHERE session_id=$1 GROUP BY activity_id,widget_id,score LIMIT 10000`,[s.id])
    ]);
-   pptxDefinition.capture_widget_results={widgets:widgetCounts.rows,ratings:ratingCounts.rows,reactions:reactionCounts.rows};
+   // page_reactions is keyed by activity/participant; it has no widget_id.
+   // Reuse the already-authorized aggregate snapshot and attach counts only to
+   // the authored reactions widgets belonging to that same activity.
+   const capturedReactions=capturePageReactionWidgetCounts(pptxDefinition.activities,aggregated?.reactions);
+   pptxDefinition.capture_widget_results={widgets:widgetCounts.rows,ratings:ratingCounts.rows,reactions:capturedReactions};
    const profiles=await db.query("SELECT u.id,u.email,coalesce(nullif(u.display_name,''),'Presentatore') AS name,u.profile_photo_url,(u.id=$1) AS is_owner FROM users u WHERE u.id=$1 OR u.id IN (SELECT user_id FROM session_presenters WHERE session_id=$2)",[s.owner_id,s.id]);
    pptxDefinition.capture_profiles=profiles.rows.map((p:any)=>({...p,profile_photo_url:null}));
    // A QR in an exported deck must be scannable after download. Supply only
@@ -2281,8 +2285,15 @@ async function servePresentationExport(req:express.Request,res:express.Response,
     await writeFile(path.join(scratch,'portable.json'),updated,{mode:0o600});
    }
    const controller=new AbortController(),deadline=setTimeout(()=>controller.abort(),900000);
-   try{const r=await fetch(`${workerUrl}/${format==='pdf'?'visual-export-pdf':'visual-export'}`,{method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({job:path.basename(scratch)}),signal:controller.signal});if(!r.ok)throw Error('visual_export_failed')}
-   finally{clearTimeout(deadline)}
+   try{
+    const r=await fetch(`${workerUrl}/${format==='pdf'?'visual-export-pdf':'visual-export'}`,{method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({job:path.basename(scratch)}),signal:controller.signal});
+    if(!r.ok){
+     // A conversion worker failure is a gateway failure, not a successful download.
+     // Log only the HTTP status: never expose the private capture capability.
+     console.error('visual export worker failed',r.status);
+     res.status(502).json({error:'visual_export_renderer_failed'});return;
+    }
+   }finally{clearTimeout(deadline)}
    const output=await readFile(path.join(scratch,format==='pdf'?'presentation.pdf':'presentation.pptx'));
    if(output.length>50*1024*1024||format==='pdf'&&!output.subarray(0,5).equals(Buffer.from('%PDF-'))||format==='pptx'&&!output.subarray(0,2).equals(Buffer.from('PK')))throw Error('presentation_export_invalid');
    res.setHeader('Content-Type',format==='pdf'?'application/pdf':'application/vnd.openxmlformats-officedocument.presentationml.presentation');

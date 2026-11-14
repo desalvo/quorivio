@@ -1,5 +1,8 @@
 # Quorivio 0.1.0-dev — RC293 — Compact visual manuals and product brochures
 
+**RC337 (14 November 2026) — Visual export 500 and authentication UX:** Fixed the unconditional PostgreSQL `page_reactions.widget_id` lookup (column does not exist). Export now expands the existing page-scoped anonymous reaction aggregates to authored reaction widget IDs with bounded, validated mapping. Kept PDF/PPTX presenter and participant exports, visual converter isolation, secure cookie policy and GD­PR boundaries. Downloads use the shared authenticated fetch wrapper, preserve the dashboard on HTTP errors and offer valid filename and magic-byte checks. Worker failures return sanitized HTTP 502. Added regressions and bilingual operator notes. Full CI, publication and real deployment smoke test still required; independent readiness remains 85.25%.
+
+
 **RC336 (13 November 2026) — RC335 CI fixes and diagnostic cleanup:** Reconciled obsolete RC332 export tests with all four real presenter/participant PDF/PPTX actions. Removed the PostgreSQL extra bind argument from the expired debug-bundle SELECT (which has no placeholders); preserved transactional locking and rollback. Added tests for successful purge, rollback on filesystem errors, and missing-file idempotence, plus bilingual notes. The source SHA-256 inventory is updated in the same commit. Full CI and paired native Docker publication are required before RC336 is accepted. Official product readiness remains 85.25% (43 accepted, 17 partial).
 
 
