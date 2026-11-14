@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
   "cycle": 293,
-  "file_count_excluding_manifest": 2672,
+  "file_count_excluding_manifest": 2676,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -44,14 +44,14 @@
       "e377db62"
     ],
     ".github/workflows/ci.yml": [
-      "9e88ab28",
-      "2b199e91",
-      "39337a99",
-      "552f0011",
-      "abe1458b",
-      "885c320d",
-      "8ee0576d",
-      "6f4f3af0"
+      "e9aa4015",
+      "efde3d69",
+      "f455c56b",
+      "0868bbd7",
+      "7c888877",
+      "6cbdf439",
+      "0d181ec2",
+      "d8999cbe"
     ],
     ".github/workflows/converter-image.yml": [
       "9d99101a",
@@ -634,14 +634,14 @@
       "6cf4c002"
     ],
     "apps/api/src/server.ts": [
-      "d3c9bc85",
-      "9693cad4",
-      "fcbb5c8a",
-      "ded1f3d5",
-      "ac7f2d5d",
-      "3c4c4d33",
-      "7181fcca",
-      "9f616c16"
+      "e5113b62",
+      "efecec79",
+      "a2697063",
+      "2c0e004e",
+      "d86e324a",
+      "5ea34c90",
+      "d86f5a6b",
+      "9d996000"
     ],
     "apps/api/src/session-bus.ts": [
       "09ec6487",
@@ -4834,24 +4834,24 @@
       "455a0f27"
     ],
     "docs/DEVELOPMENT_STATUS.it.md": [
-      "6b384ae3",
-      "e61bc2d5",
-      "6f27b894",
-      "43e809aa",
-      "eafbcc12",
-      "42043b16",
-      "189d284d",
-      "fa3de054"
+      "d1f49703",
+      "f858e9bb",
+      "298006b9",
+      "04da4db3",
+      "06da4979",
+      "e43bc0fd",
+      "786814c6",
+      "5f74f295"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "ed9185ee",
-      "bbb87433",
-      "ec05df36",
-      "add1f003",
-      "ac157fdb",
-      "25eb103f",
-      "dab592ef",
-      "9bcd21f5"
+      "b33f8fa3",
+      "0b277fef",
+      "eb43a4b0",
+      "bd03c69a",
+      "9a9bcc57",
+      "eaceed12",
+      "32fc807b",
+      "e359a9ef"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",
@@ -18924,14 +18924,14 @@
       "bf1eca2d"
     ],
     "tools/conversion_worker.py": [
-      "dac9b1f5",
-      "23b9f8d9",
-      "21184877",
-      "81b71a66",
-      "00b1c078",
-      "81db798d",
-      "45ca00a8",
-      "d2004391"
+      "9dc60163",
+      "f85c914f",
+      "b9511edf",
+      "2c3202e5",
+      "f23fcd4d",
+      "cbc0ac95",
+      "f5823d69",
+      "ba372ba1"
     ],
     "tools/fixtures/ci_richtext_harness.tsx": [
       "34ba28e5",
@@ -19824,14 +19824,14 @@
       "13bf4a77"
     ],
     "tools/tests/test_converter_http_integration.py": [
-      "4bbf84bf",
-      "dfec8da9",
-      "60b42fab",
-      "f4756d87",
-      "1a6f9da5",
-      "f58d9100",
-      "6b582733",
-      "8ffb9d7b"
+      "718aaa70",
+      "a94b0ef2",
+      "391b275f",
+      "876901dd",
+      "fcce5ba2",
+      "ed4a95a4",
+      "17d3112d",
+      "1d6783a7"
     ],
     "tools/tests/test_cycle31_bootstrap.py": [
       "1c06d769",
@@ -26722,6 +26722,46 @@
       "15c62cc9",
       "90c79bc3",
       "3a171036"
+    ],
+    "apps/api/src/presentation-export-ratings.ts": [
+      "bc86a1d4",
+      "bb5aae8b",
+      "bddf5449",
+      "0742c0ec",
+      "57339732",
+      "ad2ecd89",
+      "c73c2c9b",
+      "ff2f0a00"
+    ],
+    "apps/api/test/rc340-export-rating.test.ts": [
+      "b3bfe239",
+      "76364df1",
+      "b1f4dccf",
+      "5ff52baa",
+      "bc1a258b",
+      "a92392b8",
+      "169b9ac5",
+      "59fc23c1"
+    ],
+    "tools/ci_rc340_export_sql.mjs": [
+      "d0f896f9",
+      "07ee888c",
+      "a319a929",
+      "72739d51",
+      "1d9d7980",
+      "87a2ab69",
+      "a1671165",
+      "88a7d71d"
+    ],
+    "docs/RC340_VISUAL_EXPORT_502_IT_EN.md": [
+      "7a57d0ae",
+      "f7c12168",
+      "d2d7f77b",
+      "76ef4621",
+      "677c772f",
+      "5754c1b4",
+      "da9a1a09",
+      "f9e6c071"
     ]
   }
 }
