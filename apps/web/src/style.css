@@ -2195,6 +2195,14 @@ main.participant-live-view .audience-widget-layout.stage-fidelity{
  min-height:3em!important;
 }
 
+/* RC338: reading mode is an accessible document, not a scaled slide.
+ * Explicitly override a legacy 3em!important which can be below 44px
+ * without changing the authored 16:9 geometry. */
+.audience-widget-layout.stage-reading>.page-widget textarea.rating-comment-input{
+ min-height:44px!important;
+}
+
+
 /* RC161: the master and both widget editors inherit a real Arial baseline.
    Explicit per-widget faces remain authoritative. */
 :is(.slide-scheme-workspace,.powerpoint-editor) .widget-canvas-item{font-family:Arial,sans-serif}

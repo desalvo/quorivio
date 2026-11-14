@@ -1,5 +1,8 @@
 # Quorivio 0.1.0-dev — RC293 — Manuali visuali compatti e brochure
 
+**RC338 (14 novembre 2026) — Altezza campo commento nella lettura accessibile:** La CI RC337 #43531911477 ha superato i test API/frontend, ma il Chromium reale ha rilevato che il campo commento del widget Gradimento nella modalità «Lettura accessibile» su smartphone poteva scendere sotto 44 px. Una regola storica `min-height:3em!important` prevaleva sui 44 px. Corretto il CSS con selettore più specifico limitato a `stage-reading`, senza alterare la geometria originale 16:9. Aggiunto test di regressione; necessari full CI e publishing Docker abbinato. Il fix export 500/autenticazione RC337 resta invariato. Avanzamento ufficiale 85,25%.
+
+
 **RC337 (14 novembre 2026) — Export 500 e gestione autenticazione:** Eliminata la query SQL su `page_reactions.widget_id`, colonna inesistente. I conteggi aggregati anonimi delle reazioni vengono attribuiti ai widget Reazioni realmente presenti nella pagina, con controlli e limiti. I quattro pulsanti PDF/PPTX ora scaricano tramite la richiesta autenticata senza navigare alla risposta JSON in caso di errore; un 401 avvia la procedura di login preesistente, mentre un errore del converter è HTTP 502. Manteniamo i nomi corretti, il renderer isolato, la privacy e l'inventario SHA-256. Aggiunti test e istruzioni bilingui; CI, Docker e prova reale sul deployment restano verifiche distinte. Avanzamento ufficiale invariato 85,25%.
 
 

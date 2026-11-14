@@ -1,5 +1,8 @@
 # Quorivio 0.1.0-dev — RC293 — Compact visual manuals and product brochures
 
+**RC338 (14 November 2026) — Accessible rating field in Chromium participant CI:** The RC337 CI run 43531911477 passed API/frontend regressions, but independent real Chromium participant acceptance failed on a less-than-44px rating-comment textarea in mobile reading mode. A legacy `min-height:3em!important` CSS rule outranked `44px` when the inherited font was small. Added a higher-specificity minimum 44px limited to `stage-reading`, preserving authored 16:9 geometry. Added regression; real browser and full CI plus paired multiarch Docker publication remain mandatory. Visual export SQL/auth fix of RC337 remains unchanged; independent acceptance remains 85.25%.
+
+
 **RC337 (14 November 2026) — Visual export 500 and authentication UX:** Fixed the unconditional PostgreSQL `page_reactions.widget_id` lookup (column does not exist). Export now expands the existing page-scoped anonymous reaction aggregates to authored reaction widget IDs with bounded, validated mapping. Kept PDF/PPTX presenter and participant exports, visual converter isolation, secure cookie policy and GD­PR boundaries. Downloads use the shared authenticated fetch wrapper, preserve the dashboard on HTTP errors and offer valid filename and magic-byte checks. Worker failures return sanitized HTTP 502. Added regressions and bilingual operator notes. Full CI, publication and real deployment smoke test still required; independent readiness remains 85.25%.
 
 
