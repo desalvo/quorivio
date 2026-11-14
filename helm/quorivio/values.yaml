@@ -1,7 +1,7 @@
 image:
   repository: desalvo/quorivio
   tag: latest
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 replicaCount: 1
 # Opt-in: prevent both replicas from sharing one Kubernetes hostname (requires >=2 schedulable nodes).
 enforceNodeDiversity: false
@@ -44,7 +44,8 @@ assets:
   storageClassName: ""
 
 converter:
-  image: "desalvo/quorivio-converter:0.1.0-dev"
+  image: "desalvo/quorivio-converter:latest"
+  imagePullPolicy: Always
   resources:
     requests: {cpu: 100m, memory: 256Mi}
     limits: {cpu: "2", memory: 2Gi}
