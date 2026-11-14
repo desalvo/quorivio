@@ -24,5 +24,13 @@ class PairedImages(unittest.TestCase):
         self.assertIn('dockerfile: Dockerfile.converter', compose)
         self.assertIn('QUORIVIO_CAPTURE_BASE_URL: http://app:8080', compose)
 
+    def test_ingress_timeout_defaults_cover_nginx_and_haproxy(self):
+        ingress = (ROOT/'helm/quorivio/templates/ingress.yaml').read_text(encoding='utf8')
+        self.assertIn('nginx.ingress.kubernetes.io/proxy-read-timeout', ingress)
+        self.assertIn('nginx.ingress.kubernetes.io/proxy-send-timeout', ingress)
+        self.assertIn('haproxy.org/timeout-server', ingress)
+        self.assertIn('mergeOverwrite $defaults', ingress)
+        self.assertIn('"900s"', ingress)
+
 if __name__ == '__main__':
     unittest.main()

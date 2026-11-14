@@ -1,28 +1,29 @@
-# RC340 — Export PDF/PPTX: SQL PostgreSQL e gestione del 502
+# RC340 — Esportazione PDF/PPTX: converter, ingress e immagini coerenti
 
 ## Italiano
 
-**Difetto confermato:** nella versione precedente la funzione di esportazione selezionava `page_ratings.widget_id`, colonna assente nello schema PostgreSQL (i voti hanno soltanto `session_id`, `activity_id`, `participant_id` e `score`). Questa query veniva eseguita sempre, anche quando non esistevano valutazioni. La correzione raggruppa per pagina e punteggio e associa i conteggi ai widget `rating` realmente presenti nella pagina, senza trasferire alcun voto o identificativo individuale. Non sono necessarie modifiche allo schema.
+Il 502 segnalato su `quorivio.apps.desalvo.eu` NON è stato riprodotto direttamente: non abbiamo accesso ai log del deployment. Il percorso di esportazione utilizza un converter isolato con Chromium/Playwright e, per PDF, LibreOffice. Gli errori possono nascere nel worker o nel proxy prima che la risposta HTTP raggiunga l'interfaccia.
 
-Il nuovo test Node verifica mapping, pagine, conteggi non validi, vincolo massimo e SQL. Un gate CI obbligatorio esegue **la stessa query** contro il database PostgreSQL 18 di test. Non basta una verifica statica del codice.
+**Verifica schema:** una prima ipotesi riguardava `page_ratings.widget_id`, apparentemente assente nella definizione iniziale di PostgreSQL. Il nuovo test CI sul database reale ha dimostrato che la colonna esiste grazie alla successiva istruzione `ALTER TABLE page_ratings ADD COLUMN IF NOT EXISTS widget_id`. La query originale era valida. La modifica SQL ipotizzata è stata annullata: i voti restano distinti per widget, senza perdita di dati né cambiamenti di schema.
 
-**Seconda protezione:** un'eccezione imprevista (anche proveniente da Playwright/Chromium) non deve più far terminare senza risposta la richiesta HTTP del converter. Il worker deve restituire una risposta JSON 422 `conversion_failed`, che il server può trasformare nel previsto errore HTTP 502 JSON senza esporre token, cookie o documenti. È previsto un test HTTP con errore simulato.
+**Correzioni effettive:**
+- Il worker ora intercetta anche eccezioni inattese di Chromium/Playwright e restituisce `422 conversion_failed` anziché chiudere la connessione, senza pubblicare dettagli sensibili. Il server mantiene il proprio errore `502 visual_export_renderer_failed` quando il converter fallisce.
+- Helm ora usa di default `desalvo/quorivio:latest` e `desalvo/quorivio-converter:latest`, entrambe con `imagePullPolicy: Always`; la versione precedente puntava il converter a `0.1.0-dev` e riutilizzava potenzialmente immagini app obsolete.
+- Docker Compose può scaricare direttamente entrambe le immagini pubblicate e conserva la possibilità di build locale.
+- Helm imposta timeout ingress di 900 secondi per NGINX (`proxy-read-timeout`, `proxy-send-timeout`) e HAProxy Technologies (`haproxy.org/timeout-server`), mantenendo le annotazioni personalizzate prevalenti. I timeout precedenti predefiniti possono interrompere conversioni lente.
+- Regression test: errore HTTP imprevisto del converter, coerenza immagini e timeout ingress. La suite RC339 di export su un ambiente reale è ancora opt-in e non è stata eseguita sul sito dell'utente.
 
-**Limiti della diagnosi:** l'errore 502 segnalato su `quorivio.apps.desalvo.eu` potrebbe essere prodotto direttamente da ingress, reverse proxy, timeout, OOMKill o immagini app/converter non aggiornate. Il difetto SQL è provato dal codice, ma il server in esecuzione non è accessibile per esaminare i log da questa sessione. Non si deve dichiarare il problema di produzione chiuso senza un test di download reale.
-
-Dopo il superamento della CI e la pubblicazione di entrambe le immagini con lo **stesso SHA**, verificare in Kubernetes:
+**Deploy e accettazione:** pubblicare prima app e converter dallo stesso SHA dopo la full CI; usare preferibilmente tag immutabili corrispondenti `sha-<SHA12>` per entrambi. Aggiornare Helm o Compose: Docker Hub da solo non aggiorna container/pod già in esecuzione. Verificare quattro esportazioni (PDF e PPTX, presentatore e partecipante), includendo reazioni, risultati e QR. Se compare ancora un 502, raccogliere solo i log tecnici, evitando segreti:
 
     kubectl -n <namespace> get pods -o wide
     kubectl -n <namespace> describe pod <nome-pod>
     kubectl -n <namespace> logs <nome-pod> -c quorivio --since=20m
     kubectl -n <namespace> logs <nome-pod> -c converter --since=20m
 
-Oppure, con Docker Compose: `docker compose ps` e `docker compose logs --since=20m app converter`. Controllare anche i log dell'ingress durante l'export. Non pubblicare token, cookie, URL QR contenenti segreti, password o dati dei partecipanti.
+Controllare gli eventi di `OOMKilled` e timeout ingress. In Compose usare `docker compose ps` e `docker compose logs --since=20m app converter`. Per distinguere il 502 prodotto dall'applicazione da quello del proxy controllare `Content-Type` e corpo della risposta senza copiare cookie o token.
 
-**Immagini coerenti:** il chart Helm precedente usava `quorivio:latest` con `IfNotPresent` ma il converter era ancora `quorivio-converter:0.1.0-dev`. I default ora puntano entrambi a `latest` e Helm usa `imagePullPolicy: Always`. Compose può scaricare entrambe le immagini, mantenendo disponibile la build locale. Per un deployment riproducibile, impostare `quorivio:sha-<SHA12>` e `quorivio-converter:sha-<SHA12>` con la stessa revisione, poi eseguire `helm upgrade` oppure `docker compose pull && docker compose up -d`. La pubblicazione su Docker Hub da sola non aggiorna i pod già avviati.
-
-Il test RC339 con account di staging è un controllo opt-in e non è stato eseguito sul deployment reale. Stato RC indipendente invariato: **85,25%** (43 gate accettati, 17 parziali).
+**Stato:** senza una prova end-to-end sul deployment non è corretto dichiarare risolto il 502 di produzione; avanzamento RC esterno invariato 85,25% (43 gate accettati, 17 parziali).
 
 ## English
 
-The PDF/PPTX visual export unconditionally queried nonexistent PostgreSQL column `page_ratings.widget_id`. RC340 executes a page/score aggregate against the actual schema, mapping only sanitized totals to authored rating widgets. A required PostgreSQL CI gate runs the same SQL, and HTTP worker regressions ensure unexpected Playwright failures produce a sanitized 422 rather than a broken upstream connection. The external 502 may still originate from the ingress or converter and must be corroborated with deployment logs. Test four presenter/participant exports using a matching pair of app and converter images before declaring production resolution. External release readiness remains 85.25%.
+The reported production 502 is not directly reproducible without access to the deployment logs. The original `page_ratings.widget_id` query is valid: a later SQL migration adds that column, as the real PostgreSQL CI gate proved. The proposed page-level aggregation was reverted. RC340 instead prevents unexpected Playwright exceptions from dropping the converter HTTP connection, aligns published app/converter image defaults in Helm and Compose, and adds overrideable 900-second NGINX/HAProxy ingress timeouts. Production resolution still requires matched-image rollout, worker and ingress logs, and real four-view PDF/PPTX acceptance. External RC readiness remains 85.25%.
