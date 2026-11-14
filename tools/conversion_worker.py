@@ -236,9 +236,11 @@ class Handler(BaseHTTPRequestHandler):
             if not isinstance(request, dict) or set(request) != {'job'} or not isinstance(request['job'], str):
                 return self.reply(400, {'error': 'invalid_request'})
             return self.reply(200, execute_job(request['job']) if self.path == '/convert' else execute_portable_job(request['job'], 'import' if self.path == '/portable-import' else 'export-pdf' if self.path == '/portable-export-pdf' else 'visual-export-pdf' if self.path == '/visual-export-pdf' else 'visual-export' if self.path == '/visual-export' else 'export'))
-        except (ValueError, OSError, RuntimeError, TimeoutError, json.JSONDecodeError) as exc:
-            # Print only a stable POSIX errno (never untrusted paths, PDF
-            # contents or converter stderr), to distinguish EXDEV from EACCES.
+        except Exception as exc:
+            # Playwright can raise its own exceptions, unrelated to the built-in
+            # TimeoutError/RuntimeError hierarchy. Never drop the HTTP response:
+            # catch all ordinary exceptions, keeping messages and tokens private.
+            # Print only a stable POSIX errno, never paths, captures or stderr.
             if isinstance(exc, OSError):
                 self.log_error('conversion rejected: OSError errno=%s', exc.errno)
             else:

@@ -55,6 +55,7 @@ spec:
       containers:
         - name: converter
           image: {{ .Values.converter.image | quote }}
+          imagePullPolicy: {{ .Values.converter.imagePullPolicy }}
           ports: [{name: converter, containerPort: 8099}]
           env:
             - name: QUORIVIO_WORKER_TOKEN

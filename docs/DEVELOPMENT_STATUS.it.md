@@ -1,5 +1,8 @@
 # Quorivio 0.1.0-dev — RC293 — Manuali visuali compatti e brochure
 
+**RC340 (14 novembre 2026) — SQL export e gestione 502:** Corretta una query incondizionata sulla colonna inesistente `page_ratings.widget_id`; i conteggi dei voti ora vengono aggregati per pagina e associati ai widget di gradimento, senza dati individuali. Aggiunte quattro regressioni API, verifica obbligatoria della stessa query su PostgreSQL 18 e test HTTP del converter per eccezioni Playwright inattese, ora tradotte in 422 sanitizzato anziché connessione interrotta. I default Helm/Compose ora allineano app e converter e impostano pull Always in Helm; log del deployment, full CI e Docker abbinato restano gate distinti; avanzamento invariato 85,25% (43 accettati / 17 parziali). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Vedi docs/RC340_VISUAL_EXPORT_502_IT_EN.md.
+
+
 **RC339 (14 novembre 2026) — Collaudo export visivi in staging:** Il commit main 4c3c63bc5749 ha superato la full CI #43535065013 e la pubblicazione Docker multiarch abbinata. Aggiunto uno smoke opt-in senza conservazione file o segreti: verifica 401 anonimo e i quattro export autenticati PDF/PPTX (presentatore e partecipante), MIME, filename UTF-8, limite dimensioni e slide grafiche. Quattro regressioni Python sono passate in locale; restano da verificare il deployment reale e la fedeltà pixel-per-pixel. Avanzamento indipendente ancora 85,25% (43 gate accettati / 17 parziali); `rc_strict=false`, `publish_image=false`, `publish_latest=false`. Vedi docs/RC339_STAGING_EXPORT_SMOKE_IT_EN.md.
 
 
