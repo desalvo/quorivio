@@ -78,5 +78,14 @@ class HTTPWorkerIntegration(unittest.TestCase):
         self.assertFalse((workspace / '.conversion-lock').exists())
 
 
+    def test_visual_renderer_unexpected_exception_returns_sanitized_422(self):
+        payload = json.dumps({'job': 'c'*32}).encode()
+        with patch.object(worker, 'execute_portable_job', side_effect=Exception('PRIVATE_SLIDE_CONTENT')):
+            status, body = self.request('POST', '/visual-export', payload, self.token)
+        self.assertEqual(status, 422)
+        self.assertEqual(body, {'error': 'conversion_failed'})
+        self.assertNotIn('PRIVATE_SLIDE_CONTENT', json.dumps(body))
+        self.assertEqual(self.request('GET', '/health')[0], 200)
+
 if __name__ == '__main__':
     unittest.main()

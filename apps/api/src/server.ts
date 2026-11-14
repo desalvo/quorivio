@@ -19,6 +19,7 @@ import {firstPresenterPage,audienceForPresenter,validAudienceMapping,PAGE_UUID,v
 import {presentationExportView,presentationContentDisposition} from './presentation-export-names.js';
 import {presentationExportPages,visualExportSnapshot} from './presentation-export-snapshot.js';
 import {capturePageReactionWidgetCounts} from './presentation-export-reactions.js';
+import {capturePageRatingWidgetCounts,PRESENTATION_EXPORT_RATINGS_SQL} from './presentation-export-ratings.js';
 import {SESSION_CHANNEL,startSessionBus} from './session-bus.js';
 import {boundedFederatedJson} from './federated-response.js';
 import {FEDERATED_LINK_ELIGIBLE_SQL,FEDERATED_LINK_INSERT_SQL,validFederatedLinkIssuedAt} from './federated-link.js';
@@ -2209,13 +2210,14 @@ async function servePresentationExport(req:express.Request,res:express.Response,
       CROSS JOIN LATERAL jsonb_array_elements_text(CASE WHEN jsonb_typeof(w.answer_payload->'optionIds')='array' THEN w.answer_payload->'optionIds' ELSE '[]'::jsonb END) opt(id)
       WHERE w.session_id=$1 AND w.answer_mode IN ('single','multiple')
       GROUP BY w.activity_id,w.widget_id,w.question_id,w.revision,opt.id LIMIT 10000`,[s.id]),
-    db.query(`SELECT activity_id,widget_id,score::text AS option_id,count(*)::int AS count FROM page_ratings WHERE session_id=$1 GROUP BY activity_id,widget_id,score LIMIT 10000`,[s.id])
+    db.query(PRESENTATION_EXPORT_RATINGS_SQL,[s.id])
    ]);
    // page_reactions is keyed by activity/participant; it has no widget_id.
    // Reuse the already-authorized aggregate snapshot and attach counts only to
    // the authored reactions widgets belonging to that same activity.
    const capturedReactions=capturePageReactionWidgetCounts(pptxDefinition.activities,aggregated?.reactions);
-   pptxDefinition.capture_widget_results={widgets:widgetCounts.rows,ratings:ratingCounts.rows,reactions:capturedReactions};
+   const capturedRatings=capturePageRatingWidgetCounts(pptxDefinition.activities,ratingCounts.rows);
+   pptxDefinition.capture_widget_results={widgets:widgetCounts.rows,ratings:capturedRatings,reactions:capturedReactions};
    const profiles=await db.query("SELECT u.id,u.email,coalesce(nullif(u.display_name,''),'Presentatore') AS name,u.profile_photo_url,(u.id=$1) AS is_owner FROM users u WHERE u.id=$1 OR u.id IN (SELECT user_id FROM session_presenters WHERE session_id=$2)",[s.owner_id,s.id]);
    pptxDefinition.capture_profiles=profiles.rows.map((p:any)=>({...p,profile_photo_url:null}));
    // A QR in an exported deck must be scannable after download. Supply only
