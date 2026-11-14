@@ -19,6 +19,8 @@ Dopo il superamento della CI e la pubblicazione di entrambe le immagini con lo *
 
 Oppure, con Docker Compose: `docker compose ps` e `docker compose logs --since=20m app converter`. Controllare anche i log dell'ingress durante l'export. Non pubblicare token, cookie, URL QR contenenti segreti, password o dati dei partecipanti.
 
+**Immagini coerenti:** il chart Helm precedente usava `quorivio:latest` con `IfNotPresent` ma il converter era ancora `quorivio-converter:0.1.0-dev`. I default ora puntano entrambi a `latest` e Helm usa `imagePullPolicy: Always`. Compose può scaricare entrambe le immagini, mantenendo disponibile la build locale. Per un deployment riproducibile, impostare `quorivio:sha-<SHA12>` e `quorivio-converter:sha-<SHA12>` con la stessa revisione, poi eseguire `helm upgrade` oppure `docker compose pull && docker compose up -d`. La pubblicazione su Docker Hub da sola non aggiorna i pod già avviati.
+
 Il test RC339 con account di staging è un controllo opt-in e non è stato eseguito sul deployment reale. Stato RC indipendente invariato: **85,25%** (43 gate accettati, 17 parziali).
 
 ## English
