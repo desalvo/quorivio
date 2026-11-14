@@ -9,7 +9,7 @@ const python=readFileSync(new URL('../../../tools/visual_export.py',import.meta.
 
 test('four distinct downloads select presenter/participant and PDF/PPTX',()=>{
  for(const view of ['presenter','participant'])for(const format of ['pdf','pptx'])
-  assert.ok(main.includes(`/export.${format}?view=${view}`),`${view}-${format}`);
+  assert.ok(main.includes(`downloadSelectedPresentation('${view}','${format}')`),`${view}-${format}`);
  assert.ok(server.includes('presentationContentDisposition(s.title,view,format)'));
 });
 test('visual slides use the real rehearsal 1280x720 renderer, without editor chrome',()=>{
