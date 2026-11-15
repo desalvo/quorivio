@@ -74,6 +74,7 @@ def main():
         base = Path(raw)
         dist, work = base / "dist", base / "conversions"
         work.mkdir(mode=0o755)
+        work.chmod(0o777)  # synthetic CI-only fixture: allow UID 1000 to clean its own files
         container = None
         worker_name = "quo-rc341-" + secrets.token_hex(5)
         docker_export = cmd("docker", "create", "quorivio:gate").stdout.strip()
