@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
   "cycle": 293,
-  "file_count_excluding_manifest": 2674,
+  "file_count_excluding_manifest": 2678,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -44,14 +44,14 @@
       "e377db62"
     ],
     ".github/workflows/ci.yml": [
-      "9e88ab28",
-      "2b199e91",
-      "39337a99",
-      "552f0011",
-      "abe1458b",
-      "885c320d",
-      "8ee0576d",
-      "6f4f3af0"
+      "8c9e90d0",
+      "9bfc15a6",
+      "d48cb98e",
+      "26431f46",
+      "5aad2b9c",
+      "0f838a63",
+      "6f0ddba3",
+      "ffe3cc75"
     ],
     ".github/workflows/converter-image.yml": [
       "9d99101a",
@@ -84,14 +84,14 @@
       "640f725a"
     ],
     "Dockerfile.converter": [
-      "1d3873ef",
-      "7c17a655",
-      "4e683271",
-      "f933b285",
-      "3240e492",
-      "dbbe5087",
-      "81ee17ad",
-      "b68c0271"
+      "801738e3",
+      "2523e5c7",
+      "e33c7598",
+      "f19bc0f7",
+      "2d608b88",
+      "37b7db60",
+      "f3347ec7",
+      "a3271127"
     ],
     "LICENSE": [
       "73c273b1",
@@ -634,14 +634,14 @@
       "6cf4c002"
     ],
     "apps/api/src/server.ts": [
-      "d3c9bc85",
-      "9693cad4",
-      "fcbb5c8a",
-      "ded1f3d5",
-      "ac7f2d5d",
-      "3c4c4d33",
-      "7181fcca",
-      "9f616c16"
+      "36c272e4",
+      "f4068fa2",
+      "f0fe9e76",
+      "25cb518c",
+      "0575ad20",
+      "c5d5b9fd",
+      "b8348203",
+      "4c64ea9c"
     ],
     "apps/api/src/session-bus.ts": [
       "09ec6487",
@@ -2334,14 +2334,14 @@
       "54a62e5d"
     ],
     "apps/web/src/main.tsx": [
-      "1b6033a1",
-      "da6c6e04",
-      "ad1098ca",
-      "658d20f5",
-      "d530d0cb",
-      "42c5a897",
-      "2486a5c8",
-      "08c45a01"
+      "8f3b1fa4",
+      "3d474841",
+      "24767d6f",
+      "cd1b1ece",
+      "10bdd8dd",
+      "b7825ce5",
+      "e04afaa3",
+      "aa11c8dd"
     ],
     "apps/web/src/main.tsx.orig": [
       "9230e5a3",
@@ -4834,24 +4834,24 @@
       "455a0f27"
     ],
     "docs/DEVELOPMENT_STATUS.it.md": [
-      "61bf509d",
-      "089384f1",
-      "22ea9b8d",
-      "1c776665",
-      "3e8fe639",
-      "1e084881",
-      "9e9d12b2",
-      "b9a43e7c"
+      "705d7922",
+      "78a72b28",
+      "54fbc497",
+      "71fe0d7b",
+      "3daf287c",
+      "5a607f9d",
+      "88ee829e",
+      "d3d417fa"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "82596a08",
-      "4830aca1",
-      "8ad251d0",
-      "db466580",
-      "9224fccc",
-      "a15714b0",
-      "cd1fc2e6",
-      "832b7378"
+      "d0fcbe7e",
+      "c272cc13",
+      "5f398ec8",
+      "9c036b2f",
+      "d987b38e",
+      "b2ab65b2",
+      "655b4ec3",
+      "99cff14b"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",
@@ -18924,14 +18924,14 @@
       "bf1eca2d"
     ],
     "tools/conversion_worker.py": [
-      "9dc60163",
-      "f85c914f",
-      "b9511edf",
-      "2c3202e5",
-      "f23fcd4d",
-      "cbc0ac95",
-      "f5823d69",
-      "ba372ba1"
+      "d2ac16b8",
+      "9b1fc119",
+      "427a87c1",
+      "8c4b4947",
+      "563246b3",
+      "ba6ecbc1",
+      "eb7a9e47",
+      "f86206e9"
     ],
     "tools/fixtures/ci_richtext_harness.tsx": [
       "34ba28e5",
@@ -26684,14 +26684,14 @@
       "7be5beb3"
     ],
     "tools/visual_export.py": [
-      "83f2da01",
-      "b7d891ff",
-      "585ff9c4",
-      "0696fc67",
-      "8447f6ba",
-      "acb6be32",
-      "537fde99",
-      "5bb4803b"
+      "ac2941f9",
+      "b2bb3a2c",
+      "0ac31e97",
+      "6d772396",
+      "a2a85058",
+      "43c9a496",
+      "7aa0f4b9",
+      "5b715d21"
     ],
     "tools/ci_visual_export_smoke.py": [
       "8a6c71e6",
@@ -26742,6 +26742,46 @@
       "82e66ce9",
       "c632d6c6",
       "405ce4f5"
+    ],
+    "tools/ci_rc341_visual_container_e2e.py": [
+      "3bcde7ec",
+      "0ed6e497",
+      "9616174b",
+      "a9a089d3",
+      "b4dce69a",
+      "fd5e8238",
+      "bfa8eacc",
+      "0aa921ed"
+    ],
+    "docs/RC341_VISUAL_EXPORT_RUNTIME_GATE_IT_EN.md": [
+      "331716f5",
+      "5206240e",
+      "ad94097c",
+      "7c2add02",
+      "2c57a00d",
+      "2277c0c1",
+      "3f420ba0",
+      "8a7fb820"
+    ],
+    "tools/tests/test_rc341_visual_diagnostics.py": [
+      "c95d160c",
+      "e05608e9",
+      "b05cb046",
+      "8865069d",
+      "ba15895c",
+      "c6315d49",
+      "bcfd7674",
+      "cf1a2442"
+    ],
+    "tools/tests/test_rc341_browser_environment.py": [
+      "a7df6e12",
+      "c8763ab5",
+      "2fc4a7c1",
+      "e77b8406",
+      "d7f8d615",
+      "1101f90c",
+      "5fdb7738",
+      "1d7ea237"
     ]
   }
 }

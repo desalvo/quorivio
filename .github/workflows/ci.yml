@@ -1990,6 +1990,9 @@ jobs:
           push: false
           load: true
           tags: quorivio-converter:gate
+      - name: RC341 real Chromium PDF/PPTX export in isolated converter image (mandatory)
+        timeout-minutes: 9
+        run: python3 tools/ci_rc341_visual_container_e2e.py
       - name: Scan runtime image
         uses: aquasecurity/trivy-action@v0.36.0
         with:
