@@ -26,3 +26,9 @@ La percentuale di prontezza RC indipendente rimane 85,25%.
 ## English
 
 RC341 introduces mandatory real converter-image Chromium/LibreOffice smoke using the actual compiled web bundle for presenter/participant PDF and PPTX exports. A synthetic local-only test fixture exercises both formats and both views, checks final document integrity, and preserves private per-job paths and token checks. The test is not a substitute for PostgreSQL-authenticated staging acceptance or production logs. The reported 502 remains unconfirmed as resolved on the live installation. Independent RC readiness stays 85.25%.
+
+### Esito del primo collaudo RC341
+
+La CI [43762696511](https://github.com/desalvo/quorivio/actions/runs/43762696511) ha correttamente bloccato il rilascio: Chromium nel converter reale si è chiuso in fase `launch` con eccezione `TargetClosedError`, generando HTTP 422. La causa compatibile è l'ambiente HOME/XDG non scrivibile in presenza di `readOnlyRootFilesystem`; la RC341 alloca quindi un HOME/profilo Chromium privato per job su `/tmp`, escludendo le credenziali del worker dalle variabili passate al browser. Anche il default HOME dell'immagine converter è ora `/tmp`, scrivibile mediante tmpfs. **È una correzione da ricollaudare:** non rappresenta ancora una prova di risoluzione sul sito reale.
+
+English: The first mandatory image test failed at Chromium browser startup (`TargetClosedError`). RC341 now uses a per-job writable HOME/XDG environment with a credential-free browser environment and a writable converter HOME under the existing /tmp mount. These changes require rerunning the same fail-closed image test.
