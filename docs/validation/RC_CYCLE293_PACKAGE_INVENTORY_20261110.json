@@ -1,7 +1,7 @@
 {
   "version": "0.1.0-dev",
   "cycle": 293,
-  "file_count_excluding_manifest": 2677,
+  "file_count_excluding_manifest": 2678,
   "files_sha256_hex_groups": {
     ".dockerignore": [
       "91355ab0",
@@ -84,14 +84,14 @@
       "640f725a"
     ],
     "Dockerfile.converter": [
-      "1d3873ef",
-      "7c17a655",
-      "4e683271",
-      "f933b285",
-      "3240e492",
-      "dbbe5087",
-      "81ee17ad",
-      "b68c0271"
+      "801738e3",
+      "2523e5c7",
+      "e33c7598",
+      "f19bc0f7",
+      "2d608b88",
+      "37b7db60",
+      "f3347ec7",
+      "a3271127"
     ],
     "LICENSE": [
       "73c273b1",
@@ -4834,24 +4834,24 @@
       "455a0f27"
     ],
     "docs/DEVELOPMENT_STATUS.it.md": [
-      "375a8150",
-      "d3f130ac",
-      "a42d56ff",
-      "fbb67e6e",
-      "4029fedc",
-      "582ec4a8",
-      "dff720f4",
-      "e1d4c043"
+      "705d7922",
+      "78a72b28",
+      "54fbc497",
+      "71fe0d7b",
+      "3daf287c",
+      "5a607f9d",
+      "88ee829e",
+      "d3d417fa"
     ],
     "docs/DEVELOPMENT_STATUS.md": [
-      "10cc52bd",
-      "1b86f764",
-      "4d268863",
-      "2d17f08e",
-      "b9dd1bf8",
-      "1d523c84",
-      "554d22c3",
-      "99316f92"
+      "d0fcbe7e",
+      "c272cc13",
+      "5f398ec8",
+      "9c036b2f",
+      "d987b38e",
+      "b2ab65b2",
+      "655b4ec3",
+      "99cff14b"
     ],
     "docs/DISTRIBUTED_AUTH.en.md": [
       "0353d15d",
@@ -26684,14 +26684,14 @@
       "7be5beb3"
     ],
     "tools/visual_export.py": [
-      "c3569560",
-      "70c1e84c",
-      "e77eb0b6",
-      "f2e2b3b0",
-      "4330eb15",
-      "8d96af20",
-      "7435a38c",
-      "a795bf25"
+      "ac2941f9",
+      "b2bb3a2c",
+      "0ac31e97",
+      "6d772396",
+      "a2a85058",
+      "43c9a496",
+      "7aa0f4b9",
+      "5b715d21"
     ],
     "tools/ci_visual_export_smoke.py": [
       "8a6c71e6",
@@ -26754,14 +26754,14 @@
       "0aa921ed"
     ],
     "docs/RC341_VISUAL_EXPORT_RUNTIME_GATE_IT_EN.md": [
-      "a63e47de",
-      "03203d9d",
-      "9e667af9",
-      "5b29d3f5",
-      "ddfb1170",
-      "2a01eb1e",
-      "05cff4d5",
-      "1d01470b"
+      "331716f5",
+      "5206240e",
+      "ad94097c",
+      "7c2add02",
+      "2c57a00d",
+      "2277c0c1",
+      "3f420ba0",
+      "8a7fb820"
     ],
     "tools/tests/test_rc341_visual_diagnostics.py": [
       "c95d160c",
@@ -26772,6 +26772,16 @@
       "c6315d49",
       "bcfd7674",
       "cf1a2442"
+    ],
+    "tools/tests/test_rc341_browser_environment.py": [
+      "a7df6e12",
+      "c8763ab5",
+      "2fc4a7c1",
+      "e77b8406",
+      "d7f8d615",
+      "1101f90c",
+      "5fdb7738",
+      "1d7ea237"
     ]
   }
 }
