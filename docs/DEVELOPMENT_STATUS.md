@@ -1,5 +1,8 @@
 # Quorivio 0.1.0-dev — RC293 — Compact visual manuals and product brochures
 
+**RC341 (15 November 2026) — Runtime visual-export acceptance:** Added a mandatory four-mode PDF/PPTX Chromium/LibreOffice runtime smoke using the actual compiled React assets and production-like read-only converter image. Synthetic, local-only presenter/participant decks; no customer credentials or network egress. Regressions in live production still require deployment logs and full authenticated staging acceptance. Independent readiness remains 85.25% (43 accepted, 17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. See docs/RC341_VISUAL_EXPORT_RUNTIME_GATE_IT_EN.md.
+
+
 **RC340 (14 November 2026) — Visual export 502 hardening:** The real PostgreSQL CI gate proved that page_ratings.widget_id is supplied by a later migration; an incorrect page-scoped SQL rewrite was reverted and widget-scoped ratings preserved. Unexpected Playwright exceptions now return a sanitized worker 422 rather than a dropped connection. Helm/Compose app and converter default tags are aligned, with Helm always-pull and overrideable NGINX/HAProxy 900s ingress timeouts. Full CI, paired image publication and live deployment export acceptance remain separate gates; 85.25% (43 accepted / 17 partial). `rc_strict=false`, `publish_image=false`, `publish_latest=false`. See docs/RC340_VISUAL_EXPORT_502_IT_EN.md.
 
 
