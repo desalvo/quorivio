@@ -2289,9 +2289,12 @@ async function servePresentationExport(req:express.Request,res:express.Response,
     const r=await fetch(`${workerUrl}/${format==='pdf'?'visual-export-pdf':'visual-export'}`,{method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({job:path.basename(scratch)}),signal:controller.signal});
     if(!r.ok){
      // A conversion worker failure is a gateway failure, not a successful download.
-     // Log only the HTTP status: never expose the private capture capability.
-     console.error('visual export worker failed',r.status);
-     res.status(502).json({error:'visual_export_renderer_failed'});return;
+     // A closed enumeration is safe to report and correlate with converter logs.
+     // Do not forward arbitrary worker exception text, URLs, cookies or tokens.
+     const failure=await r.json().catch(()=>({})) as {phase?:unknown};
+     const stage=typeof failure.phase==='string'&&['setup','launch','navigate','render','slide','capture','package','pdf'].includes(failure.phase)?failure.phase:'unknown';
+     console.error('visual export worker failed',r.status,'stage='+stage);
+     res.status(502).json({error:'visual_export_renderer_failed',phase:stage});return;
     }
    }finally{clearTimeout(deadline)}
    const output=await readFile(path.join(scratch,format==='pdf'?'presentation.pdf':'presentation.pptx'));

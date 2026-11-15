@@ -240,12 +240,19 @@ class Handler(BaseHTTPRequestHandler):
             # Playwright can raise its own exceptions, unrelated to the built-in
             # TimeoutError/RuntimeError hierarchy. Never drop the HTTP response:
             # catch all ordinary exceptions, keeping messages and tokens private.
-            # Print only a stable POSIX errno, never paths, captures or stderr.
-            if isinstance(exc, OSError):
-                self.log_error('conversion rejected: OSError errno=%s', exc.errno)
+            # Print only stable errno and a bounded visual stage, never paths, URLs, captures or stderr.
+            phase = getattr(exc, 'stage', None)
+            if phase not in ('setup', 'launch', 'navigate', 'render', 'slide', 'capture', 'package', 'pdf'):
+                phase = None
+            underlying = exc.__cause__ if exc.__cause__ is not None else exc
+            if isinstance(underlying, OSError):
+                self.log_error('conversion rejected: %s errno=%s phase=%s', type(underlying).__name__, underlying.errno, phase or 'unknown')
             else:
-                self.log_error('conversion rejected: %s', type(exc).__name__)
-            return self.reply(422, {'error': 'conversion_failed'})
+                self.log_error('conversion rejected: %s phase=%s', type(underlying).__name__, phase or 'unknown')
+            payload = {'error': 'conversion_failed'}
+            if phase is not None:
+                payload['phase'] = phase
+            return self.reply(422, payload)
 
     def reply(self, status, payload):
         data = json.dumps(payload).encode()

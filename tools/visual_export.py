@@ -23,6 +23,21 @@ JOB_RE = re.compile(r'[0-9a-f]{32}\Z')
 ASSET_RE = re.compile(r'[0-9a-fA-F-]{36}\Z')
 MAX_EXPORT_SIZE = 50 * 1024 * 1024
 
+class VisualExportFailure(Exception):
+    """Stable diagnostic stage only; never include slide contents or URLs."""
+
+    def __init__(self, stage):
+        super().__init__(stage)
+        self.stage = stage
+
+def _run_stage(stage, action, *args, **kwargs):
+    try:
+        return action(*args, **kwargs)
+    except VisualExportFailure:
+        raise
+    except Exception as exc:
+        raise VisualExportFailure(stage) from exc
+
 
 def presenter_steps(definition):
     """Match the React rehearsal: each presenter step may map another audience page."""
@@ -113,69 +128,78 @@ def render_deck(workspace: Path, *, view: str, origin: str):
 
     # A dependency is intentionally imported only for visual export, not for
     # legacy OOXML import/export. No local or remote secrets are passed to JS.
-    from playwright.sync_api import sync_playwright
-    with sync_playwright() as playwright:
-        browser = playwright.chromium.launch(
-            executable_path=os.environ.get('QUORIVIO_CAPTURE_BROWSER', '/usr/bin/chromium'),
-            headless=True, args=['--disable-dev-shm-usage', '--disable-extensions', '--no-first-run'])
-        try:
-            context = browser.new_context(viewport={'width': 1280, 'height': 720},
-                device_scale_factor=1, reduced_motion='reduce', java_script_enabled=True)
-            def route_request(route):
-                request = route.request
-                parsed = urlparse(request.url)
-                # No network outside the internal application origin: a slide
-                # with an external URL must never cause a privileged SSRF.
-                if f'{parsed.scheme}://{parsed.netloc}' != origin:
-                    route.abort();return
-                route_path = parsed.path
-                if route_path == f'/api/export-render/{workspace.name}':
-                    headers = dict(request.headers)
-                    headers['x-quorivio-capture-token'] = token
-                    route.continue_(headers=headers)
-                    return
-                if route_path == f'/api/export-render/{workspace.name}/qr.png' and png_qr:
-                    route.fulfill(status=200, body=png_qr, headers={'Content-Type':'image/png', 'Cache-Control':'no-store'})
-                    return
-                profile_prefix = f'/api/export-render/{workspace.name}/profile/'
-                if route_path.startswith(profile_prefix):
-                    image_id = route_path[len(profile_prefix):]
-                    if not ASSET_RE.fullmatch(image_id):
+    stage = 'launch'
+    try:
+        from playwright.sync_api import sync_playwright
+        with sync_playwright() as playwright:
+            stage = 'launch'
+            browser = playwright.chromium.launch(
+                executable_path=os.environ.get('QUORIVIO_CAPTURE_BROWSER', '/usr/bin/chromium'),
+                headless=True, args=['--disable-dev-shm-usage', '--disable-extensions', '--no-first-run'])
+            try:
+                context = browser.new_context(viewport={'width': 1280, 'height': 720},
+                    device_scale_factor=1, reduced_motion='reduce', java_script_enabled=True)
+                def route_request(route):
+                    request = route.request
+                    parsed = urlparse(request.url)
+                    # No network outside the internal application origin: a slide
+                    # with an external URL must never cause a privileged SSRF.
+                    if f'{parsed.scheme}://{parsed.netloc}' != origin:
                         route.abort();return
-                    _image_response(route,media_base / ('profile-'+image_id))
-                    return
-                asset_prefix = f'/api/sessions/{session_id}/assets/'
-                if route_path.startswith(asset_prefix):
-                    asset_id = route_path[len(asset_prefix):]
-                    if not ASSET_RE.fullmatch(asset_id):
+                    route_path = parsed.path
+                    if route_path == f'/api/export-render/{workspace.name}':
+                        headers = dict(request.headers)
+                        headers['x-quorivio-capture-token'] = token
+                        route.continue_(headers=headers)
+                        return
+                    if route_path == f'/api/export-render/{workspace.name}/qr.png' and png_qr:
+                        route.fulfill(status=200, body=png_qr, headers={'Content-Type':'image/png', 'Cache-Control':'no-store'})
+                        return
+                    profile_prefix = f'/api/export-render/{workspace.name}/profile/'
+                    if route_path.startswith(profile_prefix):
+                        image_id = route_path[len(profile_prefix):]
+                        if not ASSET_RE.fullmatch(image_id):
+                            route.abort();return
+                        _image_response(route,media_base / ('profile-'+image_id))
+                        return
+                    asset_prefix = f'/api/sessions/{session_id}/assets/'
+                    if route_path.startswith(asset_prefix):
+                        asset_id = route_path[len(asset_prefix):]
+                        if not ASSET_RE.fullmatch(asset_id):
+                            route.abort();return
+                        _image_response(route, media_base / asset_id)
+                        return
+                    # Never proxy authenticated/private API endpoints other than
+                    # the one-time capture definition, and never open public links.
+                    if route_path.startswith('/api/'):
                         route.abort();return
-                    _image_response(route, media_base / asset_id)
-                    return
-                # Never proxy authenticated/private API endpoints other than
-                # the one-time capture definition, and never open public links.
-                if route_path.startswith('/api/'):
-                    route.abort();return
-                route.continue_()
-            context.route('**/*', route_request)
-            page = context.new_page()
-            page.goto(f'{origin}/export-render/{workspace.name}?view={view}',
-                      wait_until='domcontentloaded',timeout=45000)
-            page.wait_for_selector('#quorivio-export-slide[data-export-page="0"]', timeout=45000)
-            images = []
-            for i in range(len(steps)):
-                if i:
-                    page.evaluate('(index) => window.__quorivioExportSetPage(index)', i)
-                    page.wait_for_selector(f'#quorivio-export-slide[data-export-page="{i}"]', timeout=20000)
-                page.evaluate('() => document.fonts.ready')
-                page.wait_for_function("""() => [...document.querySelectorAll('#quorivio-export-slide img')].every(img => !img.getAttribute('src') || (img.complete && img.naturalWidth > 0))""", timeout=20000)
-                target = captures / f'page-{i+1:04d}.png'
-                page.locator('#quorivio-export-slide').screenshot(path=str(target), animations='disabled', timeout=30000)
-                images.append(target)
-                if sum(p.stat().st_size for p in images) > MAX_EXPORT_SIZE:
-                    raise ValueError('Captured presentation exceeds size limit')
-            context.close()
-        finally:
-            browser.close()
+                    route.continue_()
+                context.route('**/*', route_request)
+                page = context.new_page()
+                stage = 'navigate'
+                page.goto(f'{origin}/export-render/{workspace.name}?view={view}',
+                          wait_until='domcontentloaded',timeout=45000)
+                stage = 'render'
+                page.wait_for_selector('#quorivio-export-slide[data-export-page="0"]', timeout=45000)
+                images = []
+                for i in range(len(steps)):
+                    stage = 'slide'
+                    if i:
+                        page.evaluate('(index) => window.__quorivioExportSetPage(index)', i)
+                        page.wait_for_selector(f'#quorivio-export-slide[data-export-page="{i}"]', timeout=20000)
+                    page.evaluate('() => document.fonts.ready')
+                    page.wait_for_function("""() => [...document.querySelectorAll('#quorivio-export-slide img')].every(img => !img.getAttribute('src') || (img.complete && img.naturalWidth > 0))""", timeout=20000)
+                    target = captures / f'page-{i+1:04d}.png'
+                    stage = 'capture'
+                    page.locator('#quorivio-export-slide').screenshot(path=str(target), animations='disabled', timeout=30000)
+                    images.append(target)
+                    if sum(p.stat().st_size for p in images) > MAX_EXPORT_SIZE:
+                        raise ValueError('Captured presentation exceeds size limit')
+                context.close()
+            finally:
+                browser.close()
+    except Exception as exc:
+        raise VisualExportFailure(stage) from exc
     return images
 
 
@@ -215,17 +239,20 @@ def render_visual_export(workspace,mode):
     if viewer_path.is_symlink():
         raise ValueError('Invalid export mode file')
     view=viewer_path.read_text(encoding='ascii')
-    pages=render_deck(workspace,view=view,origin=os.environ.get('QUORIVIO_CAPTURE_BASE_URL',''))
+    pages=_run_stage('setup', render_deck, workspace,view=view,origin=os.environ.get('QUORIVIO_CAPTURE_BASE_URL',''))
     pptx=workspace/'presentation.pptx'
-    image_deck_to_pptx(pages,pptx)
+    _run_stage('package', image_deck_to_pptx, pages,pptx)
     if mode=='visual-export-pdf':
-        profile=workspace/'.lo-visual-export-profile'
-        result=subprocess.run(['libreoffice','-env:UserInstallation=file://'+str(profile),
-            '--headless','--convert-to','pdf:impress_pdf_Export',
-            '--outdir',str(workspace),str(pptx)],stdin=subprocess.DEVNULL,
-            capture_output=True,timeout=120,check=False)
-        output=workspace/'presentation.pdf'
-        if result.returncode or output.is_symlink() or not output.is_file() or not 8 <= output.stat().st_size <= MAX_EXPORT_SIZE or output.open('rb').read(5)!=b'%PDF-':
-            raise ValueError('Invalid visual PDF')
-        output.chmod(0o600)
+        try:
+            profile=workspace/'.lo-visual-export-profile'
+            result=subprocess.run(['libreoffice','-env:UserInstallation=file://'+str(profile),
+                '--headless','--convert-to','pdf:impress_pdf_Export',
+                '--outdir',str(workspace),str(pptx)],stdin=subprocess.DEVNULL,
+                capture_output=True,timeout=120,check=False)
+            output=workspace/'presentation.pdf'
+            if result.returncode or output.is_symlink() or not output.is_file() or not 8 <= output.stat().st_size <= MAX_EXPORT_SIZE or output.open('rb').read(5)!=b'%PDF-':
+                raise ValueError('Invalid visual PDF')
+            output.chmod(0o600)
+        except Exception as exc:
+            raise VisualExportFailure('pdf') from exc
     return {'pages': len(pages), 'bytes':(workspace/('presentation.pdf' if mode=='visual-export-pdf' else 'presentation.pptx')).stat().st_size}

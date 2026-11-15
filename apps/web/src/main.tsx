@@ -2434,7 +2434,10 @@ async function downloadSelectedPresentation(view:'presenter'|'participant',forma
    const info=await response.json().catch(()=>({}));
    if(response.status===401)throw Error('Sessione scaduta: accedi nuovamente per esportare.');
    if(response.status===503)throw Error('Convertitore non disponibile (HTTP 503). Controllare le impostazioni del server.');
-   if(response.status===502)throw Error('Rendering della presentazione non riuscito (HTTP 502).');
+   if(response.status===502){
+    const phase=typeof info.phase==='string'&&/^(setup|launch|navigate|render|slide|capture|package|pdf)$/.test(info.phase)?info.phase:null;
+    throw Error('Rendering della presentazione non riuscito (HTTP 502'+(phase?' · fase '+phase:'')+').');
+   }
    throw Error('Esportazione '+format.toUpperCase()+' non riuscita (HTTP '+response.status+').'+(info.error==='no_visible_presentation_pages'?' Nessuna pagina esportabile.':''));
   }
   const expectedMime=format==='pdf'?'application/pdf':'application/vnd.openxmlformats-officedocument.presentationml.presentation';
